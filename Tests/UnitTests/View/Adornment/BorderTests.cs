@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class BorderTests (ITestOutputHelper output)
 {
@@ -8,7 +8,11 @@ public class BorderTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
     {
-        var superView = new View { Width = 10, Height = 10, CanFocus = true };
+        var superView = new View
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 10, Height = 10, CanFocus = true
+        };
         var otherView = new View { Width = 0, Height = 0, CanFocus = true };
         superView.Add (otherView);
 
@@ -39,7 +43,7 @@ public class BorderTests (ITestOutputHelper output)
 
         view.CanFocus = true;
         view.SetFocus ();
-        View.SetClipToScreen ();
+        view.SetClipToScreen ();
         view.Draw ();
         Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
         Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground);
@@ -51,7 +55,11 @@ public class BorderTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Border_Uses_Parent_Scheme ()
     {
-        var view = new View { Title = "A", Height = 2, Width = 5 };
+        var view = new View
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Title = "A", Height = 2, Width = 5
+        };
         view.Border!.Thickness = new (0, 1, 0, 0);
         view.Border!.LineStyle = LineStyle.Single;
 
@@ -721,7 +729,7 @@ public class BorderTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void HasSuperView ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
@@ -748,7 +756,7 @@ public class BorderTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void HasSuperView_Title ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
@@ -839,6 +847,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var superView = new View
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Id = "superView",
             Width = 5,
             Height = 5,
@@ -902,6 +911,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var superView = new View
         {
+            Driver = ApplicationImpl.Instance.Driver,
             Id = "superView",
             Title = "A",
             Width = 11,

@@ -119,7 +119,7 @@ Lets the user pick a date from a visual calendar.
 
 ## [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
 
-A [Toplevel.Modal](~/api/Terminal.Gui.Views.Toplevel.Modal.yml) [Window](~/api/Terminal.Gui.Views.Window.yml). Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
+A [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.Modal.yml) [Window](~/api/Terminal.Gui.Views.Window.yml). Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
 
 ```text
 ┏┥Demo Title┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -327,7 +327,7 @@ Last List Item
 
 ## [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml)
 
-Provides a menu bar that spans the top of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) View with drop-down and cascading menus.  By default, any sub-sub-menus (sub-menus of the [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)s added to [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting [MenuBar.UseSubMenusSingleFrame](~/api/Terminal.Gui.Views.MenuBar.UseSubMenusSingleFrame.yml) to true, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar. 
+Provides a menu bar that spans the top of a [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) View with drop-down and cascading menus.  By default, any sub-sub-menus (sub-menus of the [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)s added to [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting [MenuBar.UseSubMenusSingleFrame](~/api/Terminal.Gui.Views.MenuBar.UseSubMenusSingleFrame.yml) to true, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar. 
 
 ```text
 File  Edit  About (Top-Level)
@@ -518,7 +518,7 @@ Demo Text
 
 ## [Slider\<T\>](~/api/Terminal.Gui.Views.Slider-1.yml)
 
-Provides a tpe-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
+Provides a type-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
 
 
@@ -532,7 +532,7 @@ Displays a spinning glyph or combinations of glyphs to indicate progress or acti
 
 ## [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml)
 
-A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
+A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of a [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
 
 ```text
 Ctrl+Z  Quit  Quit │ F1  Help Text  Help │ F10  ☐
@@ -645,9 +645,9 @@ Provides time editing functionality with mouse support
 02:48:05
 ```
 
-## [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml)
+## [Runnable](~/api/Terminal.Gui.Views.Runnable.yml)
 
-Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as [Dialog](~/api/Terminal.Gui.Views.Dialog.yml), [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml), and [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)).
+Runnable views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as [Dialog](~/api/Terminal.Gui.Views.Dialog.yml), [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml), and [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)).
 
 ```text
 Demo Text

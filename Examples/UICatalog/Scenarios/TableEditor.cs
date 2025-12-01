@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Data;
 using System.Globalization;
 using System.Text;
@@ -458,22 +458,6 @@ public class TableEditor : Scenario
 
     private Scheme? _alternatingScheme;
     private DataTable? _currentTable;
-    private MenuItem? _miAlternatingColors;
-    private MenuItem? _miAlwaysShowHeaders;
-    private MenuItem? _miAlwaysUseNormalColorForVerticalCellLines;
-    private MenuItem? _miBottomline;
-    private MenuItem? _miCellLines;
-    private MenuItem? _miCheckboxes;
-    private MenuItem? _miCursor;
-    private MenuItem? _miExpandLastColumn;
-    private MenuItem? _miFullRowSelect;
-    private MenuItem? _miHeaderMidline;
-    private MenuItem? _miHeaderOverline;
-    private MenuItem? _miHeaderUnderline;
-    private MenuItem? _miRadioboxes;
-    private MenuItem? _miShowHeaders;
-    private MenuItem? _miShowHorizontalScrollIndicators;
-    private MenuItem? _miSmoothScrolling;
     private Scheme? _redScheme;
     private Scheme? _redSchemeAlt;
     private TableView? _tableView;
@@ -515,243 +499,42 @@ public class TableEditor : Scenario
         Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ();
+        Runnable appWindow = new ();
 
         _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_File",
-                     new MenuItem []
-                     {
-                         new (
-                              "_OpenBigExample",
-                              "",
-                              () => OpenExample (true)
-                             ),
-                         new (
-                              "_OpenSmallExample",
-                              "",
-                              () => OpenExample (false)
-                             ),
-                         new (
-                              "OpenCharacter_Map",
-                              "",
-                              () => OpenUnicodeMap ()
-                             ),
-                         new (
-                              "OpenTreeExample",
-                              "",
-                              () => OpenTreeExample ()
-                             ),
-                         new (
-                              "_CloseExample",
-                              "",
-                              () => CloseExample ()
-                             ),
-                         new ("_Quit", "", () => Quit ())
-                     }
-                    ),
-                new (
-                     "_View",
-                     new []
-                     {
-                         _miShowHeaders =
-                             new (
-                                  "_ShowHeaders",
-                                  "",
-                                  () => ToggleShowHeaders ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style.ShowHeaders,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         _miAlwaysShowHeaders =
-                             new (
-                                  "_AlwaysShowHeaders",
-                                  "",
-                                  () => ToggleAlwaysShowHeaders ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style.AlwaysShowHeaders,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         _miHeaderOverline =
-                             new (
-                                  "_HeaderOverLine",
-                                  "",
-                                  () => ToggleOverline ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style
-                                                     .ShowHorizontalHeaderOverline,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         _miHeaderMidline = new (
-                                                 "_HeaderMidLine",
-                                                 "",
-                                                 () => ToggleHeaderMidline ()
-                                                )
-                         {
-                             Checked = _tableView!.Style
-                                                 .ShowVerticalHeaderLines,
-                             CheckType = MenuItemCheckStyle.Checked
-                         },
-                         _miHeaderUnderline = new (
-                                                   "_HeaderUnderLine",
-                                                   "",
-                                                   () => ToggleUnderline ()
-                                                  )
-                         {
-                             Checked = _tableView!.Style
-                                                 .ShowHorizontalHeaderUnderline,
-                             CheckType = MenuItemCheckStyle.Checked
-                         },
-                         _miBottomline = new (
-                                              "_BottomLine",
-                                              "",
-                                              () => ToggleBottomline ()
-                                             )
-                         {
-                             Checked = _tableView!.Style
-                                                 .ShowHorizontalBottomline,
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
-                         },
-                         _miShowHorizontalScrollIndicators =
-                             new (
-                                  "_HorizontalScrollIndicators",
-                                  "",
-                                  () =>
-                                      ToggleHorizontalScrollIndicators ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style
-                                                     .ShowHorizontalScrollIndicators,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         _miFullRowSelect = new (
-                                                 "_FullRowSelect",
-                                                 "",
-                                                 () => ToggleFullRowSelect ()
-                                                )
-                         {
-                             Checked = _tableView!.FullRowSelect,
-                             CheckType = MenuItemCheckStyle.Checked
-                         },
-                         _miCellLines = new (
-                                             "_CellLines",
-                                             "",
-                                             () => ToggleCellLines ()
-                                            )
-                         {
-                             Checked = _tableView!.Style
-                                                 .ShowVerticalCellLines,
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
-                         },
-                         _miExpandLastColumn =
-                             new (
-                                  "_ExpandLastColumn",
-                                  "",
-                                  () => ToggleExpandLastColumn ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style.ExpandLastColumn,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         _miAlwaysUseNormalColorForVerticalCellLines =
-                             new (
-                                  "_AlwaysUseNormalColorForVerticalCellLines",
-                                  "",
-                                  () =>
-                                      ToggleAlwaysUseNormalColorForVerticalCellLines ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style
-                                                     .AlwaysUseNormalColorForVerticalCellLines,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         _miSmoothScrolling =
-                             new (
-                                  "_SmoothHorizontalScrolling",
-                                  "",
-                                  () => ToggleSmoothScrolling ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style
-                                                     .SmoothHorizontalScrolling,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         new ("_AllLines", "", () => ToggleAllCellLines ()),
-                         new ("_NoLines", "", () => ToggleNoCellLines ()),
-                         _miCheckboxes = new (
-                                              "_Checkboxes",
-                                              "",
-                                              () => ToggleCheckboxes (false)
-                                             )
-                         {
-                             Checked = false,
-                             CheckType = MenuItemCheckStyle.Checked
-                         },
-                         _miRadioboxes = new (
-                                              "_Radioboxes",
-                                              "",
-                                              () => ToggleCheckboxes (true)
-                                             )
-                         {
-                             Checked = false,
-                             CheckType = MenuItemCheckStyle.Checked
-                         },
-                         _miAlternatingColors =
-                             new (
-                                  "Alternating Colors",
-                                  "",
-                                  () => ToggleAlternatingColors ()
-                                 ) { CheckType = MenuItemCheckStyle.Checked },
-                         _miCursor =
-                             new (
-                                  "Invert Selected Cell First Character",
-                                  "",
-                                  () =>
-                                      ToggleInvertSelectedCellFirstCharacter ()
-                                 )
-                             {
-                                 Checked = _tableView!.Style
-                                                     .InvertSelectedCellFirstCharacter,
-                                 CheckType = MenuItemCheckStyle.Checked
-                             },
-                         new (
-                              "_ClearColumnStyles",
-                              "",
-                              () => ClearColumnStyles ()
-                             ),
-                         new ("Sho_w All Columns", "", () => ShowAllColumns ())
-                     }
-                    ),
-                new (
-                     "_Column",
-                     new MenuItem []
-                     {
-                         new ("_Set Max Width", "", SetMaxWidth),
-                         new ("_Set Min Width", "", SetMinWidth),
-                         new (
-                              "_Set MinAcceptableWidth",
-                              "",
-                              SetMinAcceptableWidth
-                             ),
-                         new (
-                              "_Set All MinAcceptableWidth=1",
-                              "",
-                              SetMinAcceptableWidthToOne
-                             )
-                     }
-                    )
-            ]
-        };
+        var menu = new MenuBar ();
+
+        // File menu
+        menu.Add (
+                  new MenuBarItem (
+                                   "_File",
+                                   [
+                                       new MenuItem { Title = "_OpenBigExample", Action = () => OpenExample (true) },
+                                       new MenuItem { Title = "_OpenSmallExample", Action = () => OpenExample (false) },
+                                       new MenuItem { Title = "OpenCharacter_Map", Action = OpenUnicodeMap },
+                                       new MenuItem { Title = "OpenTreeExample", Action = OpenTreeExample },
+                                       new MenuItem { Title = "_CloseExample", Action = CloseExample },
+                                       new MenuItem { Title = "_Quit", Action = Quit }
+                                   ]
+                                  )
+                 );
+
+        // View menu - created with helper method due to complexity
+        menu.Add (CreateViewMenu ());
+
+        // Column menu
+        menu.Add (
+                  new MenuBarItem (
+                                   "_Column",
+                                   [
+                                       new MenuItem { Title = "_Set Max Width", Action = SetMaxWidth },
+                                       new MenuItem { Title = "_Set Min Width", Action = SetMinWidth },
+                                       new MenuItem { Title = "_Set MinAcceptableWidth", Action = SetMinAcceptableWidth },
+                                       new MenuItem { Title = "_Set All MinAcceptableWidth=1", Action = SetMinAcceptableWidthToOne }
+                                   ]
+                                  )
+                 );
 
         appWindow.Add (menu);
 
@@ -828,28 +611,28 @@ public class TableEditor : Scenario
 
         // if user clicks the mouse in TableView
         _tableView!.MouseClick += (s, e) =>
-                                 {
-                                     if (_currentTable == null)
-                                     {
-                                         return;
-                                     }
+                                  {
+                                      if (_currentTable == null)
+                                      {
+                                          return;
+                                      }
 
-                                     _tableView!.ScreenToCell (e.Position, out int? clickedCol);
+                                      _tableView!.ScreenToCell (e.Position, out int? clickedCol);
 
-                                     if (clickedCol != null)
-                                     {
-                                         if (e.Flags.HasFlag (MouseFlags.Button1Clicked))
-                                         {
-                                             // left click in a header
-                                             SortColumn (clickedCol.Value);
-                                         }
-                                         else if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
-                                         {
-                                             // right click in a header
-                                             ShowHeaderContextMenu (clickedCol.Value, e);
-                                         }
-                                     }
-                                 };
+                                      if (clickedCol != null)
+                                      {
+                                          if (e.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                          {
+                                              // left click in a header
+                                              SortColumn (clickedCol.Value);
+                                          }
+                                          else if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                          {
+                                              // right click in a header
+                                              ShowHeaderContextMenu (clickedCol.Value, e);
+                                          }
+                                      }
+                                  };
 
         _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
@@ -859,6 +642,261 @@ public class TableEditor : Scenario
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
+    }
+
+    private MenuBarItem CreateViewMenu ()
+    {
+        // Store checkbox references for the toggle methods to access
+        Dictionary<string, CheckBox> checkboxes = new ();
+
+        MenuItem CreateCheckBoxMenuItem (string key, string title, bool initialState, Action<bool> onToggle)
+        {
+            CheckBox checkBox = new ()
+            {
+                Title = title,
+                CheckedState = initialState ? CheckState.Checked : CheckState.UnChecked
+            };
+
+            checkBox.CheckedStateChanged += (s, e) => onToggle (checkBox.CheckedState == CheckState.Checked);
+
+            MenuItem item = new () { CommandView = checkBox };
+
+            item.Accepting += (s, e) =>
+                              {
+                                  checkBox.AdvanceCheckState ();
+                                  e.Handled = true;
+                              };
+
+            checkboxes [key] = checkBox;
+
+            return item;
+        }
+
+        return new (
+                    "_View",
+                    [
+                        CreateCheckBoxMenuItem (
+                                                "ShowHeaders",
+                                                "_ShowHeaders",
+                                                _tableView!.Style.ShowHeaders,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ShowHeaders = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "AlwaysShowHeaders",
+                                                "_AlwaysShowHeaders",
+                                                _tableView!.Style.AlwaysShowHeaders,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.AlwaysShowHeaders = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "HeaderOverline",
+                                                "_HeaderOverLine",
+                                                _tableView!.Style.ShowHorizontalHeaderOverline,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ShowHorizontalHeaderOverline = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "HeaderMidline",
+                                                "_HeaderMidLine",
+                                                _tableView!.Style.ShowVerticalHeaderLines,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ShowVerticalHeaderLines = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "HeaderUnderline",
+                                                "_HeaderUnderLine",
+                                                _tableView!.Style.ShowHorizontalHeaderUnderline,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ShowHorizontalHeaderUnderline = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "Bottomline",
+                                                "_BottomLine",
+                                                _tableView!.Style.ShowHorizontalBottomline,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ShowHorizontalBottomline = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "HorizontalScrollIndicators",
+                                                "_HorizontalScrollIndicators",
+                                                _tableView!.Style.ShowHorizontalScrollIndicators,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ShowHorizontalScrollIndicators = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "FullRowSelect",
+                                                "_FullRowSelect",
+                                                _tableView!.FullRowSelect,
+                                                state =>
+                                                {
+                                                    _tableView!.FullRowSelect = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "CellLines",
+                                                "_CellLines",
+                                                _tableView!.Style.ShowVerticalCellLines,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ShowVerticalCellLines = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "ExpandLastColumn",
+                                                "_ExpandLastColumn",
+                                                _tableView!.Style.ExpandLastColumn,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.ExpandLastColumn = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "AlwaysUseNormalColorForVerticalCellLines",
+                                                "_AlwaysUseNormalColorForVerticalCellLines",
+                                                _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "SmoothScrolling",
+                                                "_SmoothHorizontalScrolling",
+                                                _tableView!.Style.SmoothHorizontalScrolling,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.SmoothHorizontalScrolling = state;
+                                                    _tableView!.Update ();
+                                                }
+                                               ),
+                        new MenuItem
+                        {
+                            Title = "_AllLines",
+                            Action = () =>
+                                     {
+                                         _tableView!.Style.ShowHorizontalHeaderOverline = true;
+                                         _tableView!.Style.ShowVerticalHeaderLines = true;
+                                         _tableView!.Style.ShowHorizontalHeaderUnderline = true;
+                                         _tableView!.Style.ShowVerticalCellLines = true;
+
+                                         checkboxes ["HeaderOverline"].CheckedState = CheckState.Checked;
+                                         checkboxes ["HeaderMidline"].CheckedState = CheckState.Checked;
+                                         checkboxes ["HeaderUnderline"].CheckedState = CheckState.Checked;
+                                         checkboxes ["CellLines"].CheckedState = CheckState.Checked;
+
+                                         _tableView!.Update ();
+                                     }
+                        },
+                        new MenuItem
+                        {
+                            Title = "_NoLines",
+                            Action = () =>
+                                     {
+                                         _tableView!.Style.ShowHorizontalHeaderOverline = false;
+                                         _tableView!.Style.ShowVerticalHeaderLines = false;
+                                         _tableView!.Style.ShowHorizontalHeaderUnderline = false;
+                                         _tableView!.Style.ShowVerticalCellLines = false;
+
+                                         checkboxes ["HeaderOverline"].CheckedState = CheckState.UnChecked;
+                                         checkboxes ["HeaderMidline"].CheckedState = CheckState.UnChecked;
+                                         checkboxes ["HeaderUnderline"].CheckedState = CheckState.UnChecked;
+                                         checkboxes ["CellLines"].CheckedState = CheckState.UnChecked;
+
+                                         _tableView!.Update ();
+                                     }
+                        },
+                        CreateCheckBoxMenuItem (
+                                                "Checkboxes",
+                                                "_Checkboxes",
+                                                false,
+                                                state =>
+                                                {
+                                                    if (state)
+                                                    {
+                                                        ToggleCheckboxes (false);
+                                                        checkboxes ["Radioboxes"].CheckedState = CheckState.UnChecked;
+                                                    }
+                                                    else if (HasCheckboxes ())
+                                                    {
+                                                        ToggleCheckboxes (false);
+                                                    }
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "Radioboxes",
+                                                "_Radioboxes",
+                                                false,
+                                                state =>
+                                                {
+                                                    if (state)
+                                                    {
+                                                        ToggleCheckboxes (true);
+                                                        checkboxes ["Checkboxes"].CheckedState = CheckState.UnChecked;
+                                                    }
+                                                    else if (HasCheckboxes ())
+                                                    {
+                                                        ToggleCheckboxes (true);
+                                                    }
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "AlternatingColors",
+                                                "Alternating Colors",
+                                                false,
+                                                state =>
+                                                {
+                                                    if (state)
+                                                    {
+                                                        _tableView!.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingScheme : null; };
+                                                    }
+                                                    else
+                                                    {
+                                                        _tableView!.Style.RowColorGetter = null;
+                                                    }
+
+                                                    _tableView!.SetNeedsDraw ();
+                                                }
+                                               ),
+                        CreateCheckBoxMenuItem (
+                                                "Cursor",
+                                                "Invert Selected Cell First Character",
+                                                _tableView!.Style.InvertSelectedCellFirstCharacter,
+                                                state =>
+                                                {
+                                                    _tableView!.Style.InvertSelectedCellFirstCharacter = state;
+                                                    _tableView!.SetNeedsDraw ();
+                                                }
+                                               ),
+                        new MenuItem { Title = "_ClearColumnStyles", Action = ClearColumnStyles },
+                        new MenuItem { Title = "Sho_w All Columns", Action = ShowAllColumns }
+                    ]
+                   );
     }
 
     protected override void Dispose (bool disposing)
@@ -988,7 +1026,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery ((sender as View)?.App, 60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1078,7 +1116,7 @@ public class TableEditor : Scenario
     }
 
     private string GetUnicodeCategory (uint u) { return _ranges!.FirstOrDefault (r => u >= r.Start && u <= r.End)?.Category ?? "Unknown"; }
-    private bool HasCheckboxes () { return _tableView!.Table is CheckBoxTableSourceWrapperBase; }
+    private bool HasCheckboxes () => _tableView!.Table is CheckBoxTableSourceWrapperBase;
 
     private void HideColumn (int clickedCol)
     {
@@ -1127,7 +1165,7 @@ public class TableEditor : Scenario
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery ("Could not find local drives", e.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView?.App, "Could not find local drives", e.Message, "Ok");
         }
 
         _tableView!.Table = source;
@@ -1161,10 +1199,10 @@ public class TableEditor : Scenario
         ok.Accepting += (s, e) =>
                         {
                             accepted = true;
-                            Application.RequestStop ();
+                            (s as View)?.App?.RequestStop ();
                         };
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
+        cancel.Accepting += (s, e) => { (s as View)?.App?.RequestStop (); };
 
         var d = new Dialog
         {
@@ -1180,7 +1218,7 @@ public class TableEditor : Scenario
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _tableView.App?.Run (d);
         d.Dispose ();
 
         if (accepted)
@@ -1191,7 +1229,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView.App, 60, 20, "Failed to set", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1236,7 +1274,6 @@ public class TableEditor : Scenario
                                    // color 0 and negative values red
                                    d <= 0.0000001
                                        ? a.RowIndex % 2 == 0
-                                         && _miAlternatingColors!.Checked == true
                                              ? _redSchemeAlt
                                              : _redScheme
                                        :
@@ -1363,7 +1400,7 @@ public class TableEditor : Scenario
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
-        Application.Popover?.Register (contextMenu);
+        e.View?.App!.Popover?.Register (contextMenu);
         contextMenu?.MakeVisible (new (e.ScreenPosition.X + 1, e.ScreenPosition.Y + 1));
     }
 
@@ -1414,7 +1451,7 @@ public class TableEditor : Scenario
         _tableView!.Update ();
     }
 
-    private string StripArrows (string columnName) { return columnName.Replace ($"{Glyphs.DownArrow}", "").Replace ($"{Glyphs.UpArrow}", ""); }
+    private string StripArrows (string columnName) => columnName.Replace ($"{Glyphs.DownArrow}", "").Replace ($"{Glyphs.UpArrow}", "");
 
     private void TableViewKeyPress (object? sender, Key e)
     {
@@ -1429,9 +1466,9 @@ public class TableEditor : Scenario
             {
                 // Delete button deletes all rows when in full row mode
                 foreach (int toRemove in _tableView!.GetAllSelectedCells ()
-                                                   .Select (p => p.Y)
-                                                   .Distinct ()
-                                                   .OrderByDescending (i => i))
+                                                    .Select (p => p.Y)
+                                                    .Distinct ()
+                                                    .OrderByDescending (i => i))
                 {
                     _currentTable.Rows.RemoveAt (toRemove);
                 }
@@ -1450,79 +1487,12 @@ public class TableEditor : Scenario
         }
     }
 
-    private void ToggleAllCellLines ()
-    {
-        _tableView!.Style.ShowHorizontalHeaderOverline = true;
-        _tableView!.Style.ShowVerticalHeaderLines = true;
-        _tableView!.Style.ShowHorizontalHeaderUnderline = true;
-        _tableView!.Style.ShowVerticalCellLines = true;
-
-        _miHeaderOverline!.Checked = true;
-        _miHeaderMidline!.Checked = true;
-        _miHeaderUnderline!.Checked = true;
-        _miCellLines!.Checked = true;
-
-        _tableView!.Update ();
-    }
-
-    private void ToggleAlternatingColors ()
-    {
-        //toggle menu item
-        _miAlternatingColors!.Checked = !_miAlternatingColors.Checked;
-
-        if (_miAlternatingColors.Checked == true)
-        {
-            _tableView!.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingScheme : null; };
-        }
-        else
-        {
-            _tableView!.Style.RowColorGetter = null;
-        }
-
-        _tableView!.SetNeedsDraw ();
-    }
-
-    private void ToggleAlwaysShowHeaders ()
-    {
-        _miAlwaysShowHeaders!.Checked = !_miAlwaysShowHeaders.Checked;
-        _tableView!.Style.AlwaysShowHeaders = (bool)_miAlwaysShowHeaders.Checked!;
-        _tableView!.Update ();
-    }
-
-    private void ToggleAlwaysUseNormalColorForVerticalCellLines ()
-    {
-        _miAlwaysUseNormalColorForVerticalCellLines!.Checked =
-            !_miAlwaysUseNormalColorForVerticalCellLines.Checked;
-
-        _tableView!.Style.AlwaysUseNormalColorForVerticalCellLines =
-            (bool)_miAlwaysUseNormalColorForVerticalCellLines.Checked!;
-
-        _tableView!.Update ();
-    }
-
-    private void ToggleBottomline ()
-    {
-        _miBottomline!.Checked = !_miBottomline.Checked;
-        _tableView!.Style.ShowHorizontalBottomline = (bool)_miBottomline.Checked!;
-        _tableView!.Update ();
-    }
-
-    private void ToggleCellLines ()
-    {
-        _miCellLines!.Checked = !_miCellLines.Checked;
-        _tableView!.Style.ShowVerticalCellLines = (bool)_miCellLines.Checked!;
-        _tableView!.Update ();
-    }
-
     private void ToggleCheckboxes (bool radio)
     {
         if (_tableView!.Table is CheckBoxTableSourceWrapperBase wrapper)
         {
             // unwrap it to remove check boxes
             _tableView!.Table = wrapper.Wrapping;
-
-            _miCheckboxes!.Checked = false;
-            _miRadioboxes!.Checked = false;
 
             // if toggling off checkboxes/radio
             if (wrapper.UseRadioButtons == radio)
@@ -1550,98 +1520,6 @@ public class TableEditor : Scenario
         }
 
         _tableView!.Table = source;
-
-        if (radio)
-        {
-            _miRadioboxes!.Checked = true;
-            _miCheckboxes!.Checked = false;
-        }
-        else
-        {
-            _miRadioboxes!.Checked = false;
-            _miCheckboxes!.Checked = true;
-        }
-    }
-
-    private void ToggleExpandLastColumn ()
-    {
-        _miExpandLastColumn!.Checked = !_miExpandLastColumn.Checked;
-        _tableView!.Style.ExpandLastColumn = (bool)_miExpandLastColumn.Checked!;
-
-        _tableView!.Update ();
-    }
-
-    private void ToggleFullRowSelect ()
-    {
-        _miFullRowSelect!.Checked = !_miFullRowSelect.Checked;
-        _tableView!.FullRowSelect = (bool)_miFullRowSelect.Checked!;
-        _tableView!.Update ();
-    }
-
-    private void ToggleHeaderMidline ()
-    {
-        _miHeaderMidline!.Checked = !_miHeaderMidline.Checked;
-        _tableView!.Style.ShowVerticalHeaderLines = (bool)_miHeaderMidline.Checked!;
-        _tableView!.Update ();
-    }
-
-    private void ToggleHorizontalScrollIndicators ()
-    {
-        _miShowHorizontalScrollIndicators!.Checked = !_miShowHorizontalScrollIndicators.Checked;
-        _tableView!.Style.ShowHorizontalScrollIndicators = (bool)_miShowHorizontalScrollIndicators.Checked!;
-        _tableView!.Update ();
-    }
-
-    private void ToggleInvertSelectedCellFirstCharacter ()
-    {
-        //toggle menu item
-        _miCursor!.Checked = !_miCursor.Checked;
-        _tableView!.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked!;
-        _tableView!.SetNeedsDraw ();
-    }
-
-    private void ToggleNoCellLines ()
-    {
-        _tableView!.Style.ShowHorizontalHeaderOverline = false;
-        _tableView!.Style.ShowVerticalHeaderLines = false;
-        _tableView!.Style.ShowHorizontalHeaderUnderline = false;
-        _tableView!.Style.ShowVerticalCellLines = false;
-
-        _miHeaderOverline!.Checked = false;
-        _miHeaderMidline!.Checked = false;
-        _miHeaderUnderline!.Checked = false;
-        _miCellLines!.Checked = false;
-
-        _tableView!.Update ();
-    }
-
-    private void ToggleOverline ()
-    {
-        _miHeaderOverline!.Checked = !_miHeaderOverline.Checked;
-        _tableView!.Style.ShowHorizontalHeaderOverline = (bool)_miHeaderOverline.Checked!;
-        _tableView!.Update ();
-    }
-
-    private void ToggleShowHeaders ()
-    {
-        _miShowHeaders!.Checked = !_miShowHeaders.Checked;
-        _tableView!.Style.ShowHeaders = (bool)_miShowHeaders.Checked!;
-        _tableView!.Update ();
-    }
-
-    private void ToggleSmoothScrolling ()
-    {
-        _miSmoothScrolling!.Checked = !_miSmoothScrolling.Checked;
-        _tableView!.Style.SmoothHorizontalScrolling = (bool)_miSmoothScrolling.Checked!;
-
-        _tableView!.Update ();
-    }
-
-    private void ToggleUnderline ()
-    {
-        _miHeaderUnderline!.Checked = !_miHeaderUnderline.Checked;
-        _tableView!.Style.ShowHorizontalHeaderUnderline = (bool)_miHeaderUnderline.Checked!;
-        _tableView!.Update ();
     }
 
     private int ToTableCol (int col)
@@ -1654,13 +1532,11 @@ public class TableEditor : Scenario
         return col;
     }
 
-    private string TrimArrows (string columnName)
-    {
-        return columnName.TrimEnd (
-                                   (char)Glyphs.UpArrow.Value,
-                                   (char)Glyphs.DownArrow.Value
-                                  );
-    }
+    private string TrimArrows (string columnName) =>
+        columnName.TrimEnd (
+                            (char)Glyphs.UpArrow.Value,
+                            (char)Glyphs.DownArrow.Value
+                           );
 
     public class UnicodeRange (uint start, uint end, string category)
     {

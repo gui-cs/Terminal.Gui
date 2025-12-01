@@ -51,7 +51,7 @@ It doesn't make sense the every View instance has it's own notion of `MostFocuse
 * Find all instances of `view._hasFocus = ` and change them to use `SetHasFocus` (today, anyplace that sets `_hasFocus` is a BUG!!).
 * Change `SetFocus`/`SetHasFocus` etc... such that if the focus is changed to a different view heirarchy, `Application.MostFocusedView` gets set appropriately. 
 
-**MORE THOUGHT REQUIRED HERE** - There be dragons given how `Toplevel` has `OnEnter/OnLeave` overrrides. The above needs more study, but is directioally correct.
+**MORE THOUGHT REQUIRED HERE** - There be dragons given how `Runnable` has `OnEnter/OnLeave` overrrides. The above needs more study, but is directioally correct.
 
 ### `View` Cursor Changes
 * Add `public Point? CursorPosition`

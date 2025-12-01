@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.App;
@@ -10,101 +9,230 @@ namespace Terminal.Gui.App;
 public partial class ApplicationImpl : IApplication
 {
     /// <summary>
-    ///     Creates a new instance of the Application backend.
+    ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
+    ///     events.
     /// </summary>
-    public ApplicationImpl () { }
+    internal ApplicationImpl ()
+    {
+        // Subscribe to Application static property change events
+        Application.Force16ColorsChanged += OnForce16ColorsChanged;
+        Application.ForceDriverChanged += OnForceDriverChanged;
+    }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) { _componentFactory = componentFactory; }
-
-    #region Singleton
-
-    // Private static readonly Lazy instance of Application
-    private static Lazy<IApplication> _lazyInstance = new (() => new ApplicationImpl ());
-
-    /// <summary>
-    ///     Change the singleton implementation, should not be called except before application
-    ///     startup. This method lets you provide alternative implementations of core static gateway
-    ///     methods of <see cref="Application"/>.
-    /// </summary>
-    /// <param name="newApplication"></param>
-    public static void ChangeInstance (IApplication? newApplication) { _lazyInstance = new (newApplication!); }
-
-    /// <summary>
-    ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
-    ///     Change to your own implementation by using <see cref="ChangeInstance"/> (before init).
-    /// </summary>
-    public static IApplication Instance => _lazyInstance.Value;
-
-    #endregion Singleton
+    internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
 
     private string? _driverName;
 
+    /// <inheritdoc/>
+    public new string ToString () => Driver?.ToString () ?? string.Empty;
 
-    #region Input
-
-    private IMouse? _mouse;
+    #region Singleton - Legacy Static Support
 
     /// <summary>
-    ///     Handles mouse event state and processing.
+    ///     Lock object for synchronizing access to ModelUsage and _instance.
     /// </summary>
-    public IMouse Mouse
+    private static readonly object _modelUsageLock = new ();
+
+    /// <summary>
+    ///     Tracks which application model has been used in this process.
+    /// </summary>
+    public static ApplicationModelUsage ModelUsage { get; private set; } = ApplicationModelUsage.None;
+
+    /// <summary>
+    ///     Error message for when trying to use modern model after legacy static model.
+    /// </summary>
+    internal const string ERROR_MODERN_AFTER_LEGACY =
+        "Cannot use modern instance-based model (Application.Create) after using legacy static Application model (Application.Init/ApplicationImpl.Instance). "
+        + "Use only one model per process.";
+
+    /// <summary>
+    ///     Error message for when trying to use legacy static model after modern model.
+    /// </summary>
+    internal const string ERROR_LEGACY_AFTER_MODERN =
+        "Cannot use legacy static Application model (Application.Init/ApplicationImpl.Instance) after using modern instance-based model (Application.Create). "
+        + "Use only one model per process.";
+
+    /// <summary>
+    ///     Configures the singleton instance of <see cref="Application"/> to use the specified backend implementation.
+    /// </summary>
+    /// <param name="app"></param>
+    public static void SetInstance (IApplication? app)
+    {
+        lock (_modelUsageLock)
+        {
+            ModelUsage = ApplicationModelUsage.LegacyStatic;
+            _instance = app;
+        }
+    }
+
+    // Private static readonly Lazy instance of Application
+    private static IApplication? _instance;
+
+    /// <summary>
+    ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
+    /// </summary>
+    public static IApplication Instance
     {
         get
         {
-            if (_mouse is null)
-            {
-                _mouse = new MouseImpl { Application = this };
-            }
+            //Debug.Fail ("ApplicationImpl.Instance accessed - parallelizable tests should not use legacy static Application model");
 
-            return _mouse;
+            // Thread-safe: Use lock to make check-and-create atomic
+            lock (_modelUsageLock)
+            {
+                // If an instance already exists, return it without fence checking
+                // This allows for cleanup/reset operations
+                if (_instance is { })
+                {
+                    return _instance;
+                }
+
+                // Check if the instance-based model has already been used
+                if (ModelUsage == ApplicationModelUsage.InstanceBased)
+                {
+                    throw new InvalidOperationException (ERROR_LEGACY_AFTER_MODERN);
+                }
+
+                // Mark the usage and create the instance
+                ModelUsage = ApplicationModelUsage.LegacyStatic;
+
+                return _instance = new ApplicationImpl ();
+            }
         }
-        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    private IKeyboard? _keyboard;
-    private bool _stopAfterFirstIteration;
+    /// <summary>
+    ///     INTERNAL: Marks that the instance-based model has been used. Called by Application.Create().
+    /// </summary>
+    internal static void MarkInstanceBasedModelUsed ()
+    {
+        lock (_modelUsageLock)
+        {
+            // Check if the legacy static model has already been initialized
+            if (ModelUsage == ApplicationModelUsage.LegacyStatic && _instance?.Initialized == true)
+            {
+                throw new InvalidOperationException (ERROR_MODERN_AFTER_LEGACY);
+            }
+
+            ModelUsage = ApplicationModelUsage.InstanceBased;
+        }
+    }
 
     /// <summary>
-    ///     Handles keyboard input and key bindings at the Application level
+    ///     INTERNAL: Resets the model usage tracking. Only for testing purposes.
     /// </summary>
+    internal static void ResetModelUsageTracking ()
+    {
+        lock (_modelUsageLock)
+        {
+            ModelUsage = ApplicationModelUsage.None;
+            _instance = null;
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Resets state without going through the fence-checked Instance property.
+    ///     Used by Application.ResetState() to allow cleanup regardless of which model was used.
+    /// </summary>
+    internal static void ResetStateStatic (bool ignoreDisposed = false)
+    {
+        // If an instance exists, reset it
+        _instance?.ResetState (ignoreDisposed);
+
+        // Reset Application static properties to their defaults
+        // This ensures tests start with clean state
+        Application.ForceDriver = string.Empty;
+        Application.Force16Colors = false;
+        Application.IsMouseDisabled = false;
+        Application.QuitKey = Key.Esc;
+        Application.ArrangeKey = Key.F5.WithCtrl;
+        Application.NextTabGroupKey = Key.F6;
+        Application.NextTabKey = Key.Tab;
+        Application.PrevTabGroupKey = Key.F6.WithShift;
+        Application.PrevTabKey = Key.Tab.WithShift;
+
+        // Always reset the model tracking to allow tests to use either model after reset
+        ResetModelUsageTracking ();
+    }
+
+    #endregion Singleton - Legacy Static Support
+
+    #region Screen and Driver
+
+    /// <inheritdoc/>
+    public IClipboard? Clipboard => Driver?.Clipboard;
+
+    #endregion Screen and Driver
+
+    #region Keyboard
+
+    private IKeyboard? _keyboard;
+
+    /// <inheritdoc/>
     public IKeyboard Keyboard
     {
         get
         {
-            if (_keyboard is null)
-            {
-                _keyboard = new KeyboardImpl { Application = this };
-            }
+            _keyboard ??= new KeyboardImpl { App = this };
 
             return _keyboard;
         }
         set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion Input
+    #endregion Keyboard
 
-    #region View Management
+    #region Mouse
 
-    /// <inheritdoc/>
-    public ApplicationPopover? Popover { get; set; }
-
-    /// <inheritdoc/>
-    public ApplicationNavigation? Navigation { get; set; }
+    private IMouse? _mouse;
 
     /// <inheritdoc/>
-    public Toplevel? Top { get; set; }
+    public IMouse Mouse
+    {
+        get
+        {
+            _mouse ??= new MouseImpl { App = this };
 
-    // BUGBUG: Technically, this is not the full lst of TopLevels. There be dragons here, e.g. see how Toplevel.Id is used. What
+            return _mouse;
+        }
+        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
+    #endregion Mouse
+
+    #region Navigation and Popover
+
+    private ApplicationNavigation? _navigation;
 
     /// <inheritdoc/>
-    public ConcurrentStack<Toplevel> TopLevels { get; } = new ();
+    public ApplicationNavigation? Navigation
+    {
+        get
+        {
+            _navigation ??= new () { App = this };
+
+            return _navigation;
+        }
+        set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
+    }
+
+    private ApplicationPopover? _popover;
 
     /// <inheritdoc/>
-    public Toplevel? CachedSessionTokenToplevel { get; set; }
+    public ApplicationPopover? Popover
+    {
+        get
+        {
+            _popover ??= new () { App = this };
 
-    #endregion View Management
+            return _popover;
+        }
+        set => _popover = value;
+    }
+
+    #endregion Navigation and Popover
 }

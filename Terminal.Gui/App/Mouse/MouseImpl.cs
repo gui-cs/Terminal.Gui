@@ -1,31 +1,36 @@
-#nullable enable
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
 /// <summary>
 ///     INTERNAL: Implements <see cref="IMouse"/> to manage mouse event handling and state.
 ///     <para>
-///         This class holds all mouse-related state that was previously in the static <see cref="Application"/> class,
+///         This class holds all mouse-related state that was previously in the static <see cref="App"/> class,
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
-internal class MouseImpl : IMouse
+internal class MouseImpl : IMouse, IDisposable
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseImpl"/> class.
+    ///     Initializes a new instance of the <see cref="MouseImpl"/> class and subscribes to Application configuration property events.
     /// </summary>
-    public MouseImpl () { }
+    public MouseImpl ()
+    {
+        // Subscribe to Application static property change events
+        Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
+    }
+
+    private IApplication? _app;
 
     /// <inheritdoc/>
-    public IApplication? Application { get; set; }
+    public IApplication? App
+    {
+        get => _app;
+        set => _app = value;
+    }
 
     /// <inheritdoc/>
     public Point? LastMousePosition { get; set; }
-
-    /// <inheritdoc/>
-    public Point? GetLastMousePosition () { return LastMousePosition; }
 
     /// <inheritdoc/>
     public bool IsMouseDisabled { get; set; }
@@ -57,7 +62,7 @@ internal class MouseImpl : IMouse
     public void RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
         //Debug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
-        if (Application?.Initialized is true)
+        if (App?.Initialized is true)
         {
             // LastMousePosition is only set if the application is initialized.
             LastMousePosition = mouseEvent.ScreenPosition;
@@ -72,9 +77,9 @@ internal class MouseImpl : IMouse
         //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
+        List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
 
-        View? deepestViewUnderMouse = currentViewsUnderMouse.LastOrDefault ();
+        View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();
 
         if (deepestViewUnderMouse is { })
         {
@@ -96,7 +101,7 @@ internal class MouseImpl : IMouse
 
         // Dismiss the Popover if the user presses mouse outside of it
         if (mouseEvent.IsPressed
-            && Application?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
+            && App?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
             && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
@@ -119,9 +124,9 @@ internal class MouseImpl : IMouse
             return;
         }
 
-        // if the mouse is outside the Application.Top or Application.Popover hierarchy, we don't want to
+        // if the mouse is outside the Application.TopRunnable or Popover hierarchy, we don't want to
         // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (Application?.Top, deepestViewUnderMouse, true) && !View.IsInHierarchy (Application?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
+        if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true) && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }
@@ -161,7 +166,10 @@ internal class MouseImpl : IMouse
             return;
         }
 
-        RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
+        if (currentViewsUnderMouse is { })
+        {
+            RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
+        }
 
         while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabView is not { })
         {
@@ -256,6 +264,7 @@ internal class MouseImpl : IMouse
         // Do not clear LastMousePosition; Popover's require it to stay set with last mouse pos.
         CachedViewsUnderMouse.Clear ();
         MouseEvent = null;
+        MouseGrabView = null;
     }
 
     // Mouse grab functionality merged from MouseGrabHandler
@@ -391,5 +400,18 @@ internal class MouseImpl : IMouse
         }
 
         return false;
+    }
+
+    // Event handler for Application static property changes
+    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e)
+    {
+        IsMouseDisabled = e.NewValue;
+    }
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        // Unsubscribe from Application static property change events
+        Application.IsMouseDisabledChanged -= OnIsMouseDisabledChanged;
     }
 }

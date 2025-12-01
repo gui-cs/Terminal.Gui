@@ -98,7 +98,7 @@ public class ListViewWithSelection : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList)
         };
-        _eventListView.SchemeName = "TopLevel";
+        _eventListView.SchemeName = "Runnable";
         _appWindow.Add (_eventListView);
 
         _listView.SelectedItemChanged += (s, a) => LogEvent (s as View, a, "SelectedItemChanged");
@@ -237,7 +237,7 @@ public class ListViewWithSelection : Scenario
             int col,
             int line,
             int width,
-            int start = 0
+            int viewportX = 0
         )
         {
             container.Move (col, line);
@@ -247,7 +247,7 @@ public class ListViewWithSelection : Scenario
                                       string.Format ("{{0,{0}}}", -_nameColumnWidth),
                                       Scenarios [item].GetName ()
                                      );
-            RenderUstr (container, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, start);
+            RenderUstr (container, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, viewportX);
         }
 
         public void SetMark (int item, bool value)
@@ -288,10 +288,10 @@ public class ListViewWithSelection : Scenario
         }
 
         // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-        private void RenderUstr (View view, string ustr, int col, int line, int width, int start = 0)
+        private void RenderUstr (View view, string ustr, int col, int line, int width, int viewportX = 0)
         {
             var used = 0;
-            int index = start;
+            int index = viewportX;
 
             while (index < ustr.Length)
             {

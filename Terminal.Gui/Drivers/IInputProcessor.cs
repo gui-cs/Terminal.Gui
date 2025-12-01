@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Interface for main loop class that will process the queued input.
@@ -13,7 +11,7 @@ public interface IInputProcessor
     public event EventHandler<string>? AnsiSequenceSwallowed;
 
     /// <summary>
-    /// Gets the name of the driver associated with this input processor.
+    ///     Gets the name of the driver associated with this input processor.
     /// </summary>
     string? DriverName { get; init; }
 
@@ -59,7 +57,8 @@ public interface IInputProcessor
     ///     Called when a key up event has been dequeued. Raises the <see cref="KeyUp"/> event.
     /// </summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will call this method after <see cref="RaiseKeyDownEvent"/> processing
+    ///     Drivers that do not support key release events will call this method after <see cref="RaiseKeyDownEvent"/>
+    ///     processing
     ///     is complete.
     /// </remarks>
     /// <param name="key">The key event data.</param>
@@ -90,7 +89,10 @@ public interface IInputProcessor
     /// <summary>
     ///     Adds a mouse input event to the input queue. For unit tests.
     /// </summary>
+    /// <param name="app">
+    ///     The application instance to use. Used to use Invoke to raise the mouse
+    ///     event in the case where this method is not called on the main thread.
+    /// </param>
     /// <param name="mouseEvent"></param>
-    void EnqueueMouseEvent (MouseEventArgs mouseEvent);
-
+    void EnqueueMouseEvent (IApplication? app,  MouseEventArgs mouseEvent);
 }

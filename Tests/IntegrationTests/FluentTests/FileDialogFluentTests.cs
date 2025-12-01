@@ -42,15 +42,15 @@ public class FileDialogFluentTests
         return mockFileSystem;
     }
 
-    private Toplevel NewSaveDialog (out SaveDialog sd, bool modal = true)
+    private IRunnable NewSaveDialog (out SaveDialog sd)
     {
-        return NewSaveDialog (out sd, out _, modal);
+        return NewSaveDialog (out sd, out _);
     }
 
-    private Toplevel NewSaveDialog (out SaveDialog sd, out MockFileSystem fs, bool modal = true)
+    private IRunnable NewSaveDialog (out SaveDialog sd, out MockFileSystem fs)
     {
         fs = CreateExampleFileSystem ();
-        sd = new SaveDialog (fs) { Modal = modal };
+        sd = new SaveDialog (fs) { };
         return sd;
     }
 
@@ -60,10 +60,10 @@ public class FileDialogFluentTests
     public void CancelFileDialog_QuitKey_Quits (TestDriver d)
     {
         SaveDialog? sd = null;
-        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
-            .ScreenShot ("Save dialog", _out)
-            .EnqueueKeyEvent (Application.QuitKey)
-            .AssertTrue (sd!.Canceled);
+        using GuiTestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d, logWriter: _out)
+                                     .ScreenShot ("Save dialog", _out)
+                                     .EnqueueKeyEvent (Application.QuitKey)
+                                     .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -71,7 +71,7 @@ public class FileDialogFluentTests
     public void CancelFileDialog_UsingCancelButton_TabThenEnter (TestDriver d)
     {
         SaveDialog? sd = null;
-        using var c = With.A (() => NewSaveDialog (out sd, modal: false), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .Focus<Button> (b => b.Text == "_Cancel")
                           .AssertTrue (sd!.Canceled)
@@ -93,7 +93,7 @@ public class FileDialogFluentTests
     public void CancelFileDialog_UsingCancelButton_AltC (TestDriver d)
     {
         SaveDialog? sd = null;
-        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
                           .ScreenShot ("Save dialog", _out)
                           .EnqueueKeyEvent (Key.C.WithAlt)
                           .AssertTrue (sd!.Canceled);
@@ -132,12 +132,13 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .ScreenShot ("Save dialog", _out)
-                          .Focus<Button> (b => b.Text == "_Save")
-                          .EnqueueKeyEvent (Key.Enter)
-                          .AssertFalse (sd!.Canceled)
-                          .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
+        using GuiTestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+                                     .ScreenShot ("Save dialog", _out)
+                                     .Focus<Button> (b => b.Text == "_Save")
+                                     .EnqueueKeyEvent (Key.Enter)
+                                     .AssertFalse (sd!.Canceled)
+                                     .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName)
+                                     ;
     }
 
     private string GetFileSystemRoot (IFileSystem fs)
@@ -153,7 +154,7 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<Button> (b => b.Text == "►_Tree")
@@ -169,7 +170,7 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .LeftClick<Button> (b => b.Text == "►_Tree")
@@ -190,8 +191,8 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+                          .Then ((_) => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)
@@ -229,8 +230,8 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+                          .Then ((_) => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)
@@ -266,8 +267,8 @@ public class FileDialogFluentTests
     {
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
-        using var c = With.A (() => NewSaveDialog (out sd, out fs, modal: false), 100, 20, d)
-                          .Then (() => sd!.Style.PreserveFilenameOnDirectoryChanges = preserve)
+        using var c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+                          .Then ((_) => sd!.Style.PreserveFilenameOnDirectoryChanges = preserve)
                           .ScreenShot ("Save dialog", _out)
                           .AssertTrue (sd!.Canceled)
                           .Focus<TextField> (_ => true)

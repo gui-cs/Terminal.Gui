@@ -1,81 +1,108 @@
-﻿#nullable enable
-
-
+﻿
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
 ///     <see cref="IDriver"/>).
 /// </summary>
-public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Rune Rune = default)
+public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, string Grapheme = "")
 {
     /// <summary>The attributes to use when drawing the Glyph.</summary>
     public Attribute? Attribute { get; set; } = Attribute;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Cell"/> has been modified since the
+    ///     Gets or sets a value indicating whether this <see cref="T:Terminal.Gui.Drawing.Cell"/> has been modified since the
     ///     last time it was drawn.
     /// </summary>
     public bool IsDirty { get; set; } = IsDirty;
 
-    private Rune _rune = Rune;
+    private string _grapheme = Grapheme;
 
-    /// <summary>The character to display. If <see cref="Rune"/> is <see langword="null"/>, then <see cref="Rune"/> is ignored.</summary>
-    public Rune Rune
+    /// <summary>
+    ///     The single grapheme cluster to display from this cell. If <see cref="Grapheme"/> is <see langword="null"/> or
+    ///     <see cref="string.Empty"/>, then <see cref="Cell"/> is ignored.
+    /// </summary>
+    public string Grapheme
     {
-        get => _rune;
+        readonly get => _grapheme;
         set
         {
-            _combiningMarks?.Clear ();
-            _rune = value;
+            if (GraphemeHelper.GetGraphemes(value).ToArray().Length > 1)
+            {
+                throw new InvalidOperationException ($"Only a single {nameof (Grapheme)} cluster is allowed per Cell.");
+            }
+
+            if (!string.IsNullOrEmpty (value) && value.Length == 1 && char.IsSurrogate (value [0]))
+            {
+                throw new ArgumentException ($"Only valid Unicode scalar values are allowed in a single {nameof (Grapheme)} cluster.");
+            }
+
+            try
+            {
+                _grapheme = !string.IsNullOrEmpty (value) && !value.IsNormalized (NormalizationForm.FormC)
+                                ? value.Normalize (NormalizationForm.FormC)
+                                : value;
+            }
+            catch (ArgumentException)
+            {
+                // leave text unnormalized
+                _grapheme = value;
+            }
         }
     }
 
-    private List<Rune>? _combiningMarks;
-
     /// <summary>
-    ///     The combining marks for <see cref="Rune"/> that when combined makes this Cell a combining sequence. If
-    ///     <see cref="CombiningMarks"/> empty, then <see cref="CombiningMarks"/> is ignored.
+    ///     The rune for <see cref="Grapheme"/> or runes for <see cref="Grapheme"/> that when combined makes this Cell a combining sequence.
     /// </summary>
     /// <remarks>
-    ///     Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a
-    ///     single Rune.
+    ///     In the case where <see cref="Grapheme"/> has more than one rune it is a combining sequence that is normalized to a
+    ///     single Text which may occupies 1 or 2 columns.
     /// </remarks>
-    internal IReadOnlyList<Rune> CombiningMarks
-    {
-        // PERFORMANCE: Downside of the interface return type is that List<T> struct enumerator cannot be utilized, i.e. enumerator is allocated.
-        // If enumeration is used heavily in the future then might be better to expose the List<T> Enumerator directly via separate mechanism.
-        get
-        {
-            // Avoid unnecessary list allocation.
-            if (_combiningMarks == null)
-            {
-                return Array.Empty<Rune> ();
-            }
-            return _combiningMarks;
-        }
-    }
-
-    /// <summary>
-    ///     Adds combining mark to the cell.
-    /// </summary>
-    /// <param name="combiningMark">The combining mark to add to the cell.</param>
-    internal void AddCombiningMark (Rune combiningMark)
-    {
-        _combiningMarks ??= [];
-        _combiningMarks.Add (combiningMark);
-    }
-
-    /// <summary>
-    ///     Clears combining marks of the cell.
-    /// </summary>
-    internal void ClearCombiningMarks ()
-    {
-        _combiningMarks?.Clear ();
-    }
+    public IReadOnlyList<Rune> Runes => string.IsNullOrEmpty (Grapheme) ? [] : Grapheme.EnumerateRunes ().ToList ();
 
     /// <inheritdoc/>
-    public override string ToString () { return $"['{Rune}':{Attribute}]"; }
+    public override string ToString ()
+    {
+        string visibleText = EscapeControlAndInvisible (Grapheme);
+
+        return $"[\"{visibleText}\":{Attribute}]";
+    }
+
+    private static string EscapeControlAndInvisible (string text)
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return "";
+        }
+
+        var sb = new StringBuilder ();
+
+        foreach (var rune in text.EnumerateRunes ())
+        {
+            switch (rune.Value)
+            {
+                case '\0': sb.Append ("␀"); break;
+                case '\t': sb.Append ("\\t"); break;
+                case '\r': sb.Append ("\\r"); break;
+                case '\n': sb.Append ("\\n"); break;
+                case '\f': sb.Append ("\\f"); break;
+                case '\v': sb.Append ("\\v"); break;
+                default:
+                    if (char.IsControl ((char)rune.Value))
+                    {
+                        // show as \uXXXX
+                        sb.Append ($"\\u{rune.Value:X4}");
+                    }
+                    else
+                    {
+                        sb.Append (rune);
+                    }
+                    break;
+            }
+        }
+
+        return sb.ToString ();
+    }
 
     /// <summary>Converts the string into a <see cref="List{Cell}"/>.</summary>
     /// <param name="str">The string to convert.</param>
@@ -83,12 +110,8 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     /// <returns></returns>
     public static List<Cell> ToCellList (string str, Attribute? attribute = null)
     {
-        List<Cell> cells = new ();
-
-        foreach (Rune rune in str.EnumerateRunes ())
-        {
-            cells.Add (new () { Rune = rune, Attribute = attribute });
-        }
+        List<Cell> cells = [];
+        cells.AddRange (GraphemeHelper.GetGraphemes (str).Select (grapheme => new Cell { Grapheme = grapheme, Attribute = attribute }));
 
         return cells;
     }
@@ -101,9 +124,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     /// <returns>A <see cref="List{Cell}"/> for each line.</returns>
     public static List<List<Cell>> StringToLinesOfCells (string content, Attribute? attribute = null)
     {
-        List<Cell> cells = content.EnumerateRunes ()
-                                  .Select (x => new Cell { Rune = x, Attribute = attribute })
-                                  .ToList ();
+        List<Cell> cells = ToCellList (content, attribute);
 
         return SplitNewLines (cells);
     }
@@ -113,14 +134,14 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     /// <returns></returns>
     public static string ToString (IEnumerable<Cell> cells)
     {
-        var str = string.Empty;
+        StringBuilder sb = new ();
 
         foreach (Cell cell in cells)
         {
-            str += cell.Rune.ToString ();
+            sb.Append (cell.Grapheme);
         }
 
-        return str;
+        return sb.ToString ();
     }
 
     /// <summary>Converts a <see cref="List{Cell}"/> generic collection into a string.</summary>
@@ -148,26 +169,19 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
 
     internal static List<Cell> StringToCells (string str, Attribute? attribute = null)
     {
-        List<Cell> cells = [];
-
-        foreach (Rune rune in str.ToRunes ())
-        {
-            cells.Add (new () { Rune = rune, Attribute = attribute });
-        }
-
-        return cells;
+        return ToCellList (str, attribute);
     }
 
-    internal static List<Cell> ToCells (IEnumerable<Rune> runes, Attribute? attribute = null)
+    internal static List<Cell> ToCells (IEnumerable<string> strings, Attribute? attribute = null)
     {
-        List<Cell> cells = new ();
+        StringBuilder sb = new ();
 
-        foreach (Rune rune in runes)
+        foreach (string str in strings)
         {
-            cells.Add (new () { Rune = rune, Attribute = attribute });
+            sb.Append (str);
         }
 
-        return cells;
+        return ToCellList (sb.ToString (), attribute);
     }
 
     private static List<List<Cell>> SplitNewLines (List<Cell> cells)
@@ -180,14 +194,15 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
         // ASCII code 10 = Line Feed.
         for (; i < cells.Count; i++)
         {
-            if (cells [i].Rune.Value == 13)
+            if (cells [i].Grapheme.Length == 1 && cells [i].Grapheme [0] == 13)
             {
                 hasCR = true;
 
                 continue;
             }
 
-            if (cells [i].Rune.Value == 10)
+            if ((cells [i].Grapheme.Length == 1 && cells [i].Grapheme [0] == 10)
+                || cells [i].Grapheme == "\r\n")
             {
                 if (i - start > 0)
                 {

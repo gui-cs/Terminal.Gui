@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Generates autocomplete <see cref="Suggestion"/> based on a given cursor location within a string</summary>
@@ -7,9 +8,9 @@ public interface ISuggestionGenerator
     IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context);
 
     /// <summary>
-    ///     Returns <see langword="true"/> if <paramref name="rune"/> is a character that would continue autocomplete
+    ///     Returns <see langword="true"/> if <paramref name="text"/> is a character that would continue autocomplete
     ///     suggesting. Returns <see langword="false"/> if it is a 'breaking' character (i.e. terminating current word
     ///     boundary)
     /// </summary>
-    bool IsWordChar (Rune rune);
+    bool IsWordChar (string text);
 }

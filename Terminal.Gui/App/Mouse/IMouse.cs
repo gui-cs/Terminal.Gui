@@ -1,4 +1,3 @@
-#nullable enable
 using System.ComponentModel;
 
 namespace Terminal.Gui.App;
@@ -6,7 +5,7 @@ namespace Terminal.Gui.App;
 /// <summary>
 ///     Defines a contract for mouse event handling and state management in a Terminal.Gui application.
 ///     <para>
-///         This interface allows for decoupling of mouse-related functionality from the static <see cref="Application"/> class,
+///         This interface allows for decoupling of mouse-related functionality from the static <see cref="App"/> class,
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
@@ -16,17 +15,12 @@ public interface IMouse : IMouseGrabHandler
     /// Sets the application instance that this mouse handler is associated with.
     /// This provides access to application state without coupling to static Application class.
     /// </summary>
-    IApplication? Application { get; set; }
+    IApplication? App { get; set; }
 
     /// <summary>
     ///     Gets or sets the last known position of the mouse.
     /// </summary>
     Point? LastMousePosition { get; set; }
-
-    /// <summary>
-    ///     Gets the most recent position of the mouse.
-    /// </summary>
-    Point? GetLastMousePosition ();
 
     /// <summary>
     ///     Gets or sets whether the mouse is disabled. The mouse is enabled by default.

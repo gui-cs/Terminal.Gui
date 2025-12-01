@@ -1,6 +1,6 @@
-﻿using UnitTests;
+﻿#nullable enable
+using JetBrains.Annotations;
 using Xunit.Abstractions;
-using static Terminal.Gui.ViewBase.Pos;
 
 namespace UnitTests.LayoutTests;
 
@@ -14,7 +14,7 @@ public class PosViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Subtract_Operator ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };
@@ -69,7 +69,7 @@ public class PosViewTests (ITestOutputHelper output)
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count > 0)
             {

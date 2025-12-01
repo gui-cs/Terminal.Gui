@@ -1,7 +1,7 @@
 #nullable enable
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 /// <summary>
 ///     Tests <see cref="View.Diagnostics"/> static property and <see cref="ViewDiagnosticFlags"/> enum.

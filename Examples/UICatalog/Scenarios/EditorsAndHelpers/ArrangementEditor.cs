@@ -45,7 +45,7 @@ public sealed class ArrangementEditor : EditorBase
             if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
             {
                 ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
-                ViewToEdit.SchemeName = "Toplevel";
+                ViewToEdit.SchemeName = "Runnable";
             }
             else
             {

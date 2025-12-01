@@ -26,17 +26,18 @@ public class FakeInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
     }
 
     /// <inheritdoc />
-    public override void EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    public override void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent)
     {
         // FakeDriver uses ConsoleKeyInfo as its input record type, which cannot represent mouse events.
 
+        // TODO: Verify this is correct. This didn't check the threadId before.
         // If Application.Invoke is available (running in Application context), defer to next iteration
         // to ensure proper timing - the event is raised after views are laid out.
         // Otherwise (unit tests), raise immediately so tests can verify synchronously.
-        if (Application.MainThreadId is { })
+        if (app is {} && app.MainThreadId != Thread.CurrentThread.ManagedThreadId)
         {
             // Application is running - use Invoke to defer to next iteration
-            Application.Invoke (() => RaiseMouseEvent (mouseEvent));
+            app?.Invoke ((_) => RaiseMouseEvent (mouseEvent));
         }
         else
         {

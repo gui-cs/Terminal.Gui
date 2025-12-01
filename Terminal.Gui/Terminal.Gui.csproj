@@ -24,6 +24,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <LangVersion>12</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
         <!-- -->
         <RootNamespace>$(AssemblyName)</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -163,6 +164,16 @@
 		    <AnalyzerFiles Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" />
 	    </ItemGroup>
     </Target>
+
+
+    <ItemGroup>
+      <None Remove="..\Terminal.Gui.Analyzers\bin\Debug\netstandard2.0\Terminal.Gui.Analyzers.dll" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <None Remove="..\Terminal.Gui.Analyzers\bin\Debug\netstandard2.0\Terminal.Gui.Analyzers.dll" />
+    </ItemGroup>
     <ItemGroup>
 	    <None Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>

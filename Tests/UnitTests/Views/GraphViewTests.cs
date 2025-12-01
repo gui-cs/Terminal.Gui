@@ -44,7 +44,7 @@ internal class FakeVAxis : VerticalAxis
 
 #endregion
 
-public class GraphViewTests
+public class GraphViewTests : FakeDriverBase
 {
     /// <summary>
     ///     A cell size of 0 would result in mapping all graph space into the same cell of the console.  Since
@@ -74,7 +74,10 @@ public class GraphViewTests
     /// <returns></returns>
     public static GraphView GetGraph ()
     {
-        var gv = new GraphView ();
+        var gv = new GraphView ()
+        {
+            Driver = Application.Driver ?? CreateFakeDriver ()
+        };
         gv.BeginInit ();
         gv.EndInit ();
 
@@ -604,7 +607,10 @@ public class MultiBarSeriesTests
     [AutoInitShutdown]
     public void TestRendering_MultibarSeries ()
     {
-        var gv = new GraphView ();
+        var gv = new GraphView ()
+        {
+            App = ApplicationImpl.Instance,
+        };
         //gv.Scheme = new Scheme ();
 
         // y axis goes from 0.1 to 1 across 10 console rows
@@ -650,7 +656,7 @@ public class MultiBarSeriesTests
         fakeXAxis.LabelPoints.Clear ();
         gv.LayoutSubViews ();
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         Assert.Equal (3, fakeXAxis.LabelPoints.Count);
@@ -677,12 +683,13 @@ public class MultiBarSeriesTests
     }
 }
 
-public class BarSeriesTests
+public class BarSeriesTests : FakeDriverBase
 {
     [Fact]
     public void TestOneLongOneShortHorizontalBars_WithOffset ()
     {
         GraphView graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+        graph.Driver = CreateFakeDriver ();
         graph.Draw ();
 
         // no bars
@@ -847,7 +854,7 @@ public class BarSeriesTests
         // y axis goes from 0.1 to 1 across 10 console rows
         // x axis goes from 0 to 10 across 20 console columns
         gv.Viewport = new Rectangle (0, 0, 20, 10);
-       //gv.Scheme = new Scheme ();
+        //gv.Scheme = new Scheme ();
         gv.CellSize = new PointF (0.5f, 0.1f);
 
         gv.Series.Add (series = new FakeBarSeries ());
@@ -886,7 +893,7 @@ public class AxisTests
     {
         var gv = new GraphView ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
-       // gv.Scheme = new Scheme ();
+        // gv.Scheme = new Scheme ();
 
         // graph can't be completely empty or it won't draw
         gv.Series.Add (new ScatterSeries ());
@@ -1125,7 +1132,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         // we expect the text annotation to go down one line since
@@ -1222,7 +1229,7 @@ public class TextAnnotationTests
                             new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
                            );
         gv.LayoutSubViews ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         var expected =
@@ -1238,7 +1245,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1257,7 +1264,7 @@ public class TextAnnotationTests
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
         gv.SetNeedsDraw ();
-        View.SetClipToScreen ();
+        gv.SetClipToScreen ();
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1385,7 +1392,7 @@ public class PathAnnotationTests
          
          
           ";
-        DriverAssert.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output, gv.Driver);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1410,7 +1417,7 @@ public class PathAnnotationTests
          
          
           ";
-        DriverAssert.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output, gv.Driver);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1492,7 +1499,7 @@ public class PathAnnotationTests
     {
         // create a wide window
         var mount = new View { Width = 100, Height = 100 };
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         try
         {
@@ -1512,7 +1519,7 @@ public class PathAnnotationTests
             //put label into view
             mount.Add (view);
 
-            //putting mount into Toplevel since changing size
+            //putting mount into Runnable since changing size
             top.Add (mount);
             Application.Begin (top);
 
@@ -1528,7 +1535,7 @@ public class PathAnnotationTests
             // change the text and redraw
             view.Text = "ff1234";
             mount.SetNeedsDraw ();
-            View.SetClipToScreen ();
+            top.SetClipToScreen ();
             mount.Draw ();
 
             // should have the new text rendered
@@ -1545,7 +1552,11 @@ public class PathAnnotationTests
     [AutoInitShutdown]
     public void XAxisLabels_With_MarginLeft ()
     {
-        var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView
+        {
+            App = ApplicationImpl.Instance,
+            Viewport = new Rectangle (0, 0, 10, 7)
+        };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;
@@ -1584,7 +1595,11 @@ public class PathAnnotationTests
     [AutoInitShutdown]
     public void YAxisLabels_With_MarginBottom ()
     {
-        var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView
+        {
+            App = ApplicationImpl.Instance,
+            Viewport = new Rectangle (0, 0, 10, 7)
+        };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;

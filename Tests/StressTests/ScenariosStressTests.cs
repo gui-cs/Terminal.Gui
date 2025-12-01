@@ -110,7 +110,7 @@ public class ScenariosStressTests
             _output.WriteLine ($"Initialized == {a.Value}");
         }
 
-        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterationCount++;
 
@@ -126,7 +126,7 @@ public class ScenariosStressTests
 
         void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
         {
-            // Get a list of all subviews under Application.Top (and their subviews, etc.)
+            // Get a list of all subviews under Application.TopRunnable (and their subviews, etc.)
             // and subscribe to their DrawComplete event
             void SubscribeAllSubViews (View view)
             {
@@ -140,7 +140,7 @@ public class ScenariosStressTests
                 }
             }
 
-            SubscribeAllSubViews (Application.Top!);
+            SubscribeAllSubViews (Application.TopRunnableView!);
         }
 
         // If the scenario doesn't close within the abort time, this will force it to quit

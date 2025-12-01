@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
@@ -16,7 +17,9 @@ public static class Program
     private static void Main (string [] args)
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
+
+        IApplication app = Application.Create ();
+        app.Init ();
 
         #region The code in this region is not intended for use in a self-contained single-file. It's just here to make sure there is no functionality break with localization in Terminal.Gui using single-file
 
@@ -33,28 +36,25 @@ public static class Program
 
         #endregion
 
-        ExampleWindow app = new ();
-        Application.Run (app);
+        using ExampleWindow exampleWindow = new ();
+        string? userName = app.Run (exampleWindow) as string;
 
-        // Dispose the app object before shutdown
+
+        // Shutdown the application in order to free resources and clean up the terminal
         app.Dispose ();
-
-        // Before the application exits, reset Terminal.Gui for clean shutdown
-        Application.Shutdown ();
 
         // To see this output on the screen it must be done after shutdown,
         // which restores the previous screen.
-        Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
+        Console.WriteLine ($@"Username: {userName}");
     }
 }
 
 // Defines a top-level window with border and title
-public class ExampleWindow : Window
+public class ExampleWindow : Runnable<string>
 {
-    public static string? UserName;
-
     public ExampleWindow ()
     {
+        BorderStyle = LineStyle.Single;
         Title = $"Example App ({Application.QuitKey} to quit)";
 
         // Create input components and labels
@@ -100,13 +100,13 @@ public class ExampleWindow : Window
                            {
                                if (userNameText.Text == "admin" && passwordText.Text == "password")
                                {
-                                   MessageBox.Query ("Logging In", "Login Successful", "Ok");
-                                   UserName = userNameText.Text;
-                                   Application.RequestStop ();
+                                   MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
+                                   Result = userNameText.Text;
+                                   App?.RequestStop ();
                                }
                                else
                                {
-                                   MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
+                                   MessageBox.ErrorQuery (App, "Logging In", "Incorrect username or password", "Ok");
                                }
                                // When Accepting is handled, set e.Handled to true to prevent further processing.
                                e.Handled = true;

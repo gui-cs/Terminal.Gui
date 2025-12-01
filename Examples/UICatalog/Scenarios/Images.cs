@@ -151,7 +151,7 @@ public class Images : Scenario
         _win.Add (_tabView);
 
         // Start trying to detect sixel support
-        var sixelSupportDetector = new SixelSupportDetector ();
+        var sixelSupportDetector = new SixelSupportDetector (Application.Driver);
         sixelSupportDetector.Detect (UpdateSixelSupportState);
 
         Application.Run (_win);
@@ -183,7 +183,7 @@ public class Images : Scenario
 
         if (!_sixelSupportResult.SupportsTransparency)
         {
-            if (MessageBox.Query (
+            if (MessageBox.Query (ApplicationImpl.Instance,
                                   "Transparency Not Supported",
                                   "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
                                   "Yes",
@@ -288,7 +288,7 @@ public class Images : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
+            MessageBox.ErrorQuery (ApplicationImpl.Instance, "Could not open file", ex.Message, "Ok");
 
             return;
         }
@@ -492,7 +492,7 @@ public class Images : Scenario
     {
         if (_imageView.FullResImage == null)
         {
-            MessageBox.Query ("No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
+            MessageBox.Query (ApplicationImpl.Instance, "No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
 
             return;
         }

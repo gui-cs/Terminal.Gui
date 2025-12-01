@@ -32,7 +32,6 @@ public partial class View
         Driver?.AddRune (rune);
     }
 
-
     /// <summary>
     ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
     ///     convenience method that calls <see cref="AddRune(Rune)"/> with the <see cref="Rune"/> constructor.
@@ -63,7 +62,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         When the method returns, the draw position will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="GetClip()"/> or <see cref="Application.Screen"/>.
+    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="GetClip"/> or <see cref="Application.Screen"/>.
     ///     </para>
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
@@ -72,6 +71,25 @@ public partial class View
     {
         Driver?.AddStr (str);
     }
+
+    /// <summary>Draws the specified <paramref name="str"/> in the specified viewport-relative column and row of the View.</summary>
+    /// <para>
+    ///     If the provided coordinates are outside the visible content area, this method does nothing.
+    /// </para>
+    /// <remarks>
+    ///     The top-left corner of the visible content area is <c>ViewPort.Location</c>.
+    /// </remarks>
+    /// <param name="col">Column (viewport-relative).</param>
+    /// <param name="row">Row (viewport-relative).</param>
+    /// <param name="str">The Text.</param>
+    public void AddStr (int col, int row, string str)
+    {
+        if (Move (col, row))
+        {
+            Driver?.AddStr (str);
+        }
+    }
+
     /// <summary>Utility function to draw strings that contain a hotkey.</summary>
     /// <param name="text">String to display, the hotkey specifier before a letter flags the next letter as the hotkey.</param>
     /// <param name="hotColor">Hot color.</param>
@@ -121,8 +139,8 @@ public partial class View
         {
             DrawHotString (
                            text,
-                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : GetScheme ()!.Disabled,
-                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ()!.Disabled
+                           Enabled ? GetAttributeForRole (VisualRole.HotNormal) : GetScheme ().Disabled,
+                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ().Disabled
                           );
         }
     }
@@ -137,7 +155,7 @@ public partial class View
             return;
         }
 
-        Region prevClip = AddViewportToClip ();
+        Region? prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Attribute prev = SetAttribute (new (color ?? GetAttributeForRole (VisualRole.Normal).Background));
         Driver.FillRect (toClear);
@@ -155,7 +173,7 @@ public partial class View
             return;
         }
 
-        Region prevClip = AddViewportToClip ();
+        Region? prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Driver.FillRect (toClear, rune);
         SetClip (prevClip);

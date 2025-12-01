@@ -12,9 +12,9 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext Add (View v)
     {
-        WaitIteration (() =>
+        WaitIteration ((app) =>
                        {
-                           Toplevel top = Application.Top ?? throw new ("Top was null so could not add view");
+                           View top = App?.TopRunnableView ?? throw new ("Top was null so could not add view");
                            top.Add (v);
                            top.Layout ();
                            _lastView = v;
@@ -28,15 +28,15 @@ public partial class GuiTestContext
     /// <summary>
     ///     The last view added (e.g. with <see cref="Add"/>) or the root/current top.
     /// </summary>
-    public View LastView => _lastView ?? Application.Top ?? throw new ("Could not determine which view to add to");
+    public View LastView => _lastView ?? App?.TopRunnableView ?? throw new ("Could not determine which view to add to");
 
     private T Find<T> (Func<T, bool> evaluator) where T : View
     {
-        Toplevel? t = Application.Top;
+        View? t = App?.TopRunnableView;
 
         if (t == null)
         {
-            Fail ("Application.Top was null when attempting to find view");
+            Fail ("App.TopRunnable was null when attempting to find view");
         }
 
         T? f = FindRecursive (t!, evaluator);

@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -32,10 +31,15 @@ public partial class GuiTestContext : IDisposable
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
+
+    /// <summary>
+    ///     The IApplication instance that was created.
+    /// </summary>
+    public IApplication? App => _applicationImpl;
+
     private TestDriver _driverType;
 
     // ===== Application State Preservation (for restoration) =====
-    private IApplication? _originalApplicationInstance;
     private ILogger? _originalLogger;
 
     // ===== Test Configuration =====
@@ -64,11 +68,11 @@ public partial class GuiTestContext : IDisposable
 
         try
         {
-            InitializeApplication ();
+            App?.Init (GetDriverName ());
             _booting.Release ();
 
             // After Init, Application.Screen should be set by the driver
-            if (Application.Screen == Rectangle.Empty)
+            if (_applicationImpl?.Screen == Rectangle.Empty)
             {
                 throw new InvalidOperationException (
                                                      "Driver bug: Application.Screen is empty after Init. The driver should set the screen size during Init.");
@@ -101,7 +105,7 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     Constructor for tests that need to run the application with Application.Run.
     /// </summary>
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    internal GuiTestContext (Func<IRunnable> runnableBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
         _logWriter = logWriter;
         _runApplication = true;
@@ -115,21 +119,45 @@ public partial class GuiTestContext : IDisposable
                              {
                                  try
                                  {
-                                     InitializeApplication ();
+                                     try
+                                     {
+                                         App?.Init (GetDriverName ());
+                                     }
+                                     catch (Exception e)
+                                     {
+                                         Logging.Error(e.Message);
+                                         _runCancellationTokenSource.Cancel ();
+                                     }
+                                     finally
+                                     {
+                                         _booting.Release ();
+                                     }
 
-                                     _booting.Release ();
+                                     if (App is { Initialized: true })
+                                     {
+                                         IRunnable runnable = runnableBuilder ();
+                                         runnable.IsRunningChanged += (s, e) =>
+                                                                      {
+                                                                          if (!e.Value)
+                                                                          {
+                                                                              Finished = true;
+                                                                          }
+                                                                      };
+                                         App?.Run (runnable); // This will block, but it's on a background thread now
 
-                                     Toplevel t = topLevelBuilder ();
-                                     t.Closed += (s, e) => { Finished = true; };
-                                     Application.Run (t); // This will block, but it's on a background thread now
-
-                                     t.Dispose ();
-                                     Logging.Trace ("Application.Run completed");
-                                     Application.Shutdown ();
-                                     _runCancellationTokenSource.Cancel ();
+                                         if (runnable is View runnableView)
+                                         {
+                                             runnableView.Dispose ();
+                                         }
+                                         Logging.Trace ("Application.Run completed");
+                                         App?.Dispose ();
+                                         _runCancellationTokenSource.Cancel ();
+                                     }
                                  }
                                  catch (OperationCanceledException)
-                                 { }
+                                 {
+                                     Logging.Trace ("OperationCanceledException");
+                                 }
                                  catch (Exception ex)
                                  {
                                      _backgroundException = ex;
@@ -138,7 +166,6 @@ public partial class GuiTestContext : IDisposable
                                  finally
                                  {
                                      CleanupApplication ();
-
                                      if (_logWriter != null)
                                      {
                                          WriteOutLogs (_logWriter);
@@ -161,21 +188,13 @@ public partial class GuiTestContext : IDisposable
         }
     }
 
-    private void InitializeApplication ()
-    {
-        ApplicationImpl.ChangeInstance (_applicationImpl);
-
-        _applicationImpl?.Init (null, GetDriverName ());
-    }
-
 
     /// <summary>
     ///     Common initialization for both constructors.
     /// </summary>
     private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
     {
-        _timeout = timeout ?? TimeSpan.FromSeconds (10);
-        _originalApplicationInstance = ApplicationImpl.Instance;
+        _timeout = timeout ?? TimeSpan.FromSeconds (30);
         _originalLogger = Logging.Logger;
         _logsSb = new ();
         _driverType = driverType;
@@ -207,38 +226,36 @@ public partial class GuiTestContext : IDisposable
         // Remove frame limit
         Application.MaximumIterationsPerSecond = ushort.MaxValue;
 
-        //// Only set size if explicitly provided (width and height > 0)
-        //if (width > 0 && height > 0)
-        //{
-        //    _output.SetSize (width, height);
-        //}
-
         IComponentFactory? cf = null;
+
+        _output = new FakeOutput ();
+
+        // Only set size if explicitly provided (width and height > 0)
+        if (width > 0 && height > 0)
+        {
+           _output.SetSize (width, height);
+        }
 
         // TODO: As each drivers' IInput/IOutput implementations are made testable (e.g. 
         // TODO: safely injectable/mocked), we can expand this switch to use them.
         switch (driverType)
         {
             case TestDriver.DotNet:
-                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Windows:
-                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Unix:
-                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Fake:
-                _output = new FakeOutput ();
                 _sizeMonitor = new (_output);
                 cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
 
@@ -278,7 +295,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="doAction"></param>
     /// <returns></returns>
-    public GuiTestContext Then (Action doAction)
+    public GuiTestContext Then (Action<IApplication> doAction)
     {
         try
         {
@@ -302,7 +319,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    public GuiTestContext WaitIteration (Action? action = null)
+    public GuiTestContext WaitIteration (Action<IApplication>? action = null)
     {
         // If application has already exited don't wait!
         if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
@@ -312,31 +329,34 @@ public partial class GuiTestContext : IDisposable
             return this;
         }
 
-        if (Thread.CurrentThread.ManagedThreadId == Application.MainThreadId)
+        if (Thread.CurrentThread.ManagedThreadId == _applicationImpl?.MainThreadId)
         {
             throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
 
-        Logging.Trace ($"WaitIteration started");
-        action ??= () => { };
+        //Logging.Trace ($"WaitIteration started");
+        if (action is null)
+        {
+            action = (app) => { };
+        }
         CancellationTokenSource ctsActionCompleted = new ();
 
-        Application.Invoke (() =>
-        {
-            try
-            {
-                action ();
+        App?.Invoke (app =>
+                     {
+                         try
+                         {
+                             action (app);
 
-                //Logging.Trace ("Action completed");
-                ctsActionCompleted.Cancel ();
-            }
-            catch (Exception e)
-            {
-                Logging.Warning ($"Action failed with exception: {e}");
-                _backgroundException = e;
-                _fakeInput.ExternalCancellationTokenSource?.Cancel ();
-            }
-        });
+                             //Logging.Trace ("Action completed");
+                             ctsActionCompleted.Cancel ();
+                         }
+                         catch (Exception e)
+                         {
+                             Logging.Warning ($"Action failed with exception: {e}");
+                             _backgroundException = e;
+                             _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+                         }
+                     });
 
         // Blocks until either the token or the hardStopToken is cancelled.
         // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
@@ -356,8 +376,9 @@ public partial class GuiTestContext : IDisposable
         GuiTestContext? c = null;
         var sw = Stopwatch.StartNew ();
 
-        //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+        Logging.Trace ($"WaitUntil started with timeout {_timeout}");
 
+        int count = 0;
         while (!condition ())
         {
             if (sw.Elapsed > _timeout)
@@ -366,8 +387,10 @@ public partial class GuiTestContext : IDisposable
             }
 
             c = WaitIteration ();
+            count++;
         }
 
+        Logging.Trace ($"WaitUntil completed after {sw.ElapsedMilliseconds}ms and {count} iterations");
         return c ?? this;
     }
 
@@ -384,15 +407,30 @@ public partial class GuiTestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); }); }
+    public GuiTestContext ResizeConsole (int width, int height)
+    {
+        return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); });
+    }
 
     public GuiTestContext ScreenShot (string title, TextWriter? writer)
     {
         //Logging.Trace ($"{title}");
-        return WaitIteration (() =>
+        return WaitIteration ((app) =>
                               {
                                   writer?.WriteLine (title + ":");
-                                  var text = Application.ToString ();
+                                  var text = app.Driver?.ToString ();
+
+                                  writer?.WriteLine (text);
+                              });
+    }
+
+    public GuiTestContext AnsiScreenShot (string title, TextWriter? writer)
+    {
+        //Logging.Trace ($"{title}");
+        return WaitIteration ((app) =>
+                              {
+                                  writer?.WriteLine (title + ":");
+                                  var text = app.Driver?.ToAnsi ();
 
                                   writer?.WriteLine (text);
                               });
@@ -412,7 +450,7 @@ public partial class GuiTestContext : IDisposable
             {
                 try
                 {
-                    Application.Shutdown ();
+                    App?.Dispose ();
                 }
                 catch
                 {
@@ -425,7 +463,7 @@ public partial class GuiTestContext : IDisposable
             return this;
         }
 
-        WaitIteration (() => { Application.RequestStop (); });
+        WaitIteration ((app) => { app.RequestStop (); });
 
         // Wait for the application to stop, but give it a 1-second timeout
         const int WAIT_TIMEOUT_MS = 1000;
@@ -440,8 +478,8 @@ public partial class GuiTestContext : IDisposable
             // If this doesn't work there will be test failures as the main loop continues to run during next test.
             try
             {
-                Application.RequestStop ();
-                Application.Shutdown ();
+                App?.RequestStop ();
+                App?.Dispose ();
             }
             catch (Exception ex)
             {
@@ -507,6 +545,7 @@ public partial class GuiTestContext : IDisposable
     internal void Fail (string reason)
     {
         Logging.Error ($"{reason}");
+        WriteOutLogs (_logWriter);
 
         throw new (reason);
     }
@@ -516,9 +555,8 @@ public partial class GuiTestContext : IDisposable
         Logging.Trace ("CleanupApplication");
         _fakeInput.ExternalCancellationTokenSource = null;
 
-        Application.ResetState (true);
-        ApplicationImpl.ChangeInstance (_originalApplicationInstance);
-        Logging.Logger = _originalLogger;
+        App?.ResetState (true);
+        Logging.Logger = _originalLogger!;
         Finished = true;
 
         Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;

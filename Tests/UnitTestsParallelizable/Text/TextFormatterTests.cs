@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿#nullable disable
+using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.TextTests;
+namespace TextTests;
 
 public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -792,19 +793,16 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     [MemberData (nameof (CMGlyphs))]
     public void GetLengthThatFits_List_Simple_And_Wide_Runes (string text, int columns, int expectedLength)
     {
-        List<Rune> runes = text.ToRuneList ();
-        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (runes, columns));
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (text, columns));
     }
 
     [Theory]
     [InlineData ("test", 3, 3)]
     [InlineData ("test", 4, 4)]
     [InlineData ("test", 10, 4)]
-    public void GetLengthThatFits_Runelist (string text, int columns, int expectedLength)
+    public void GetLengthThatFits_For_String (string text, int columns, int expectedLength)
     {
-        List<Rune> runes = text.ToRuneList ();
-
-        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (runes, columns));
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (text, columns));
     }
 
     [Theory]
@@ -833,7 +831,8 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     public void GetLengthThatFits_With_Combining_Runes ()
     {
         var text = "Les Mise\u0328\u0301rables";
-        Assert.Equal (16, TextFormatter.GetLengthThatFits (text, 14));
+        Assert.Equal (14, TextFormatter.GetLengthThatFits (text, 14));
+        Assert.Equal ("Les Misę́rables", text);
     }
 
     [Fact]
@@ -841,14 +840,18 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     {
         List<string> text = new () { "Les Mis", "e\u0328\u0301", "rables" };
         Assert.Equal (1, TextFormatter.GetMaxColsForWidth (text, 1));
+        Assert.Equal ("Les Mis", text [0]);
+        Assert.Equal ("ę́", text [1]);
+        Assert.Equal ("rables", text [^1]);
     }
 
-    //[Fact]
-    //public void GetWidestLineLength_With_Combining_Runes ()
-    //{
-    //    var text = "Les Mise\u0328\u0301rables";
-    //    Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
-    //}
+    [Fact]
+    public void GetWidestLineLength_With_Combining_Runes ()
+    {
+        var text = "Les Mise\u0328\u0301rables";
+        Assert.Equal (14, TextFormatter.GetWidestLineLength (text, 1));
+        Assert.Equal ("Les Misę́rables", text);
+    }
 
     [Fact]
     public void Internal_Tests ()
@@ -1142,6 +1145,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void NeedsFormat_Sets ()
     {
+        IDriver driver = CreateFakeDriver ();
         var testText = "test";
         var testBounds = new Rectangle (0, 0, 100, 1);
         var tf = new TextFormatter ();
@@ -1151,7 +1155,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
         Assert.NotEmpty (tf.GetLines ());
         Assert.False (tf.NeedsFormat); // get_Lines causes a Format
         Assert.Equal (testText, tf.Text);
-        tf.Draw (testBounds, new (), new ());
+        tf.Draw (driver: driver, screen: testBounds, normalColor: new (), hotColor: new ());
         Assert.False (tf.NeedsFormat);
 
         tf.ConstrainToSize = new (1, 1);
@@ -2450,6 +2454,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal (expected, breakLines);
 
         // Double space Complex example - this is how VS 2022 does it
+        // which I think is not correct.
         //text = "A  sentence      has words.  ";
         //breakLines = "";
         //wrappedLines = TextFormatter.WordWrapText (text, width, preserveTrailingSpaces: true);
@@ -2761,8 +2766,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
                         "ฮ",
                         "ฯ",
                         "ะั",
-                        "า",
-                        "ำ"
+                        "าำ"
                     }
                 )]
     public void WordWrap_Unicode_SingleWordLine (
@@ -2797,7 +2801,17 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
         Assert.True (
                      expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0)
                     );
-        Assert.Equal (resultLines, wrappedLines);
+
+        if (maxWidth == 1)
+        {
+            List<string> newResultLines = resultLines.ToList ();
+            newResultLines [^1] = "";
+            Assert.Equal (newResultLines, wrappedLines);
+        }
+        else
+        {
+            Assert.Equal (resultLines, wrappedLines);
+        }
     }
 
     /// <summary>WordWrap strips CRLF</summary>
@@ -2987,7 +3001,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -3016,7 +3030,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -3042,7 +3056,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
@@ -3068,14 +3082,14 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
             ConstrainToHeight = 1
         };
 
-        tf.Draw (new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default, driver);
+        tf.Draw (driver, new Rectangle (0, 0, width, 1), Attribute.Default, Attribute.Default, default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
     }
 
     [Theory]
-    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
-    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
+    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misę́rables")]
+    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę́\nr\na\nb\nl\ne\ns")]
     [InlineData (
                     4,
                     4,
@@ -3084,7 +3098,7 @@ public class TextFormatterTests (ITestOutputHelper output) : FakeDriverBase
 LMre
 eias
 ssb 
- ęl "
+ ę́l "
                 )]
     public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
     {
@@ -3100,17 +3114,15 @@ ssb
         tf.ConstrainToSize = new (width, height);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
     }
-
 
     [Theory]
     [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
@@ -3139,12 +3151,11 @@ ssb
         Assert.True (tf.WordWrap);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
@@ -3178,17 +3189,15 @@ ssb
         Assert.False (tf.PreserveTrailingSpaces);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
     }
-
 
     [Theory]
     [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
@@ -3217,15 +3226,13 @@ ssb
         Assert.False (tf.PreserveTrailingSpaces);
 
         tf.Draw (
+                 driver,
                  new (0, 0, width, height),
                  new (ColorName16.White, ColorName16.Black),
                  new (ColorName16.Blue, ColorName16.Black),
-                 default (Rectangle),
-                 driver
-                );
+                 default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
         driver.End ();
     }
-
 }

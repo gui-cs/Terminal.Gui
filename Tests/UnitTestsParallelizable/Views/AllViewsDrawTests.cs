@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
 {
@@ -21,6 +21,7 @@ public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        view.Driver = driver;
         output.WriteLine ($"Testing {viewType}");
 
         if (view is IDesignable designable)

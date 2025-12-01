@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ColorPicker", "Color Picker.")]
+[ScenarioMetadata ("ColorPicker", "Color Picker and TrueColor demonstration.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Controls")]
 public class ColorPickers : Scenario
@@ -220,6 +220,33 @@ public class ColorPickers : Scenario
                                            };
         app.Add (cbShowName);
 
+        var lblDriverName = new Label
+        {
+            Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{Application.Driver?.GetName ()}`:"
+        };
+        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
+
+        var cbSupportsTrueColor = new CheckBox
+        {
+            X = Pos.Right (lblDriverName) + 1,
+            Y = Pos.Top (lblDriverName),
+            CheckedState = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
+            CanFocus = false,
+            Enabled = false,
+            Text = "SupportsTrueColor"
+        };
+        app.Add (cbSupportsTrueColor);
+
+        var cbUseTrueColor = new CheckBox
+        {
+            X = Pos.Right (cbSupportsTrueColor) + 1,
+            Y = Pos.Top (lblDriverName),
+            CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            Enabled = canTrueColor,
+            Text = "Force16Colors"
+        };
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Force16Colors = evt.Result == CheckState.Checked; };
+        app.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
         // Set default colors.
         foregroundColorPicker.SelectedColor = _demoView.SuperView!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
         backgroundColorPicker.SelectedColor = _demoView.SuperView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();

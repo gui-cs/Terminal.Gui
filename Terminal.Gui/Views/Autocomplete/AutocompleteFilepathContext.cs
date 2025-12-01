@@ -1,3 +1,4 @@
+#nullable disable
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 
@@ -11,16 +12,16 @@ internal class AutocompleteFilepathContext (string currentLine, int cursorPositi
 
 internal class FilepathSuggestionGenerator : ISuggestionGenerator
 {
-    private FileDialogState state;
+    private FileDialogState _state;
 
     public IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context)
     {
         if (context is AutocompleteFilepathContext fileState)
         {
-            state = fileState.State;
+            _state = fileState.State;
         }
 
-        if (state is null)
+        if (_state is null)
         {
             return Enumerable.Empty<Suggestion> ();
         }
@@ -41,7 +42,7 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
             return Enumerable.Empty<Suggestion> ();
         }
 
-        if (term.Equals (state?.Directory?.Name))
+        if (term.Equals (_state?.Directory?.Name))
         {
             // Clear suggestions
             return Enumerable.Empty<Suggestion> ();
@@ -49,13 +50,13 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
 
         bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
-        string [] suggestions = state.Children.Where (d => !d.IsParent)
-                                     .Select (
-                                              e => e.FileSystemInfo is IDirectoryInfo d
-                                                       ? d.Name + Path.DirectorySeparatorChar
-                                                       : e.FileSystemInfo.Name
-                                             )
-                                     .ToArray ();
+        string [] suggestions = _state!.Children.Where (d => !d.IsParent)
+                                       .Select (
+                                                e => e.FileSystemInfo is IDirectoryInfo d
+                                                         ? d.Name + Path.DirectorySeparatorChar
+                                                         : e.FileSystemInfo.Name
+                                               )
+                                       .ToArray ();
 
         string [] validSuggestions = suggestions
                                      .Where (
@@ -81,9 +82,9 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
                                .ToList ();
     }
 
-    public bool IsWordChar (Rune rune)
+    public bool IsWordChar (string text)
     {
-        if (rune.Value == '\n')
+        if (text == "\n")
         {
             return false;
         }

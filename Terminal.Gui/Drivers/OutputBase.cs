@@ -1,4 +1,3 @@
-#nullable enable
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -31,9 +30,6 @@ public abstract class OutputBase
 
         CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
-
-        const int MAX_CHARS_PER_RUNE = 2;
-        Span<char> runeBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
 
         for (int row = top; row < rows; row++)
         {
@@ -75,47 +71,10 @@ public abstract class OutputBase
                         lastCol = col;
                     }
 
-                    Attribute? attribute = buffer.Contents [row, col].Attribute;
-
-                    if (attribute is { })
-                    {
-                        Attribute attr = attribute.Value;
-
-                        // Performance: Only send the escape sequence if the attribute has changed.
-                        if (attr != redrawAttr)
-                        {
-                            redrawAttr = attr;
-
-                            AppendOrWriteAttribute (output, attr, _redrawTextStyle);
-
-                            _redrawTextStyle = attr.Style;
-                        }
-                    }
+                    Cell cell = buffer.Contents [row, col];
+                    AppendCellAnsi (cell, output, ref redrawAttr, ref _redrawTextStyle, cols, ref col);
 
                     outputWidth++;
-
-                    // Avoid Rune.ToString() by appending the rune chars.
-                    Rune rune = buffer.Contents [row, col].Rune;
-                    int runeCharsWritten = rune.EncodeToUtf16 (runeBuffer);
-                    ReadOnlySpan<char> runeChars = runeBuffer [..runeCharsWritten];
-                    output.Append (runeChars);
-
-                    if (buffer.Contents [row, col].CombiningMarks.Count > 0)
-                    {
-                        // AtlasEngine does not support NON-NORMALIZED combining marks in a way
-                        // compatible with the driver architecture. Any CMs (except in the first col)
-                        // are correctly combined with the base char, but are ALSO treated as 1 column
-                        // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
-                        // 
-                        // For now, we just ignore the list of CMs.
-                        //foreach (var combMark in Contents [row, col].CombiningMarks) {
-                        //	output.Append (combMark);
-                    }
-                    else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
-                    {
-                        WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        SetCursorPositionImpl (col - 1, row);
-                    }
 
                     buffer.Contents [row, col].IsDirty = false;
                 }
@@ -131,14 +90,16 @@ public abstract class OutputBase
             }
         }
 
-        foreach (SixelToRender s in Application.Sixel)
-        {
-            if (!string.IsNullOrWhiteSpace (s.SixelData))
-            {
-                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Out.Write (s.SixelData);
-            }
-        }
+        // BUGBUG: The Sixel impl depends on the legacy static Application object
+        // BUGBUG: Disabled for now
+        //foreach (SixelToRender s in  Application.Sixel)
+        //{
+        //    if (!string.IsNullOrWhiteSpace (s.SixelData))
+        //    {
+        //        SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+        //        Console.Out.Write (s.SixelData);
+        //    }
+        //}
 
         SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
         _cachedCursorVisibility = savedVisibility;
@@ -169,6 +130,101 @@ public abstract class OutputBase
     /// </summary>
     /// <param name="output"></param>
     protected abstract void Write (StringBuilder output);
+
+    /// <summary>
+    ///     Builds ANSI escape sequences for the specified rectangular region of the buffer.
+    /// </summary>
+    /// <param name="buffer">The output buffer to build ANSI for.</param>
+    /// <param name="startRow">The starting row (inclusive).</param>
+    /// <param name="endRow">The ending row (exclusive).</param>
+    /// <param name="startCol">The starting column (inclusive).</param>
+    /// <param name="endCol">The ending column (exclusive).</param>
+    /// <param name="output">The StringBuilder to append ANSI sequences to.</param>
+    /// <param name="lastAttr">The last attribute used, for optimization.</param>
+    /// <param name="includeCellPredicate">Predicate to determine which cells to include. If null, includes all cells.</param>
+    /// <param name="addNewlines">Whether to add newlines between rows.</param>
+    protected void BuildAnsiForRegion (
+        IOutputBuffer buffer,
+        int startRow,
+        int endRow,
+        int startCol,
+        int endCol,
+        StringBuilder output,
+        ref Attribute? lastAttr,
+        Func<int, int, bool>? includeCellPredicate = null,
+        bool addNewlines = true
+    )
+    {
+        TextStyle redrawTextStyle = TextStyle.None;
+
+        for (int row = startRow; row < endRow; row++)
+        {
+            for (int col = startCol; col < endCol; col++)
+            {
+                if (includeCellPredicate != null && !includeCellPredicate (row, col))
+                {
+                    continue;
+                }
+
+                Cell cell = buffer.Contents![row, col];
+                AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col);
+            }
+
+            // Add newline at end of row if requested
+            if (addNewlines)
+            {
+                output.AppendLine ();
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Appends ANSI sequences for a single cell to the output.
+    /// </summary>
+    /// <param name="cell">The cell to append ANSI for.</param>
+    /// <param name="output">The StringBuilder to append to.</param>
+    /// <param name="lastAttr">The last attribute used, updated if the cell's attribute is different.</param>
+    /// <param name="redrawTextStyle">The current text style for optimization.</param>
+    /// <param name="maxCol">The maximum column, used for wide character handling.</param>
+    /// <param name="currentCol">The current column, updated for wide characters.</param>
+    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol)
+    {
+        Attribute? attribute = cell.Attribute;
+
+        // Add ANSI escape sequence for attribute change
+        if (attribute.HasValue && attribute.Value != lastAttr)
+        {
+            lastAttr = attribute.Value;
+            AppendOrWriteAttribute (output, attribute.Value, redrawTextStyle);
+            redrawTextStyle = attribute.Value.Style;
+        }
+
+        // Add the grapheme
+        string grapheme = cell.Grapheme;
+        output.Append (grapheme);
+
+        // Handle wide grapheme
+        if (grapheme.GetColumns () > 1 && currentCol + 1 < maxCol)
+        {
+            currentCol++; // Skip next cell for wide character
+        }
+    }
+
+    /// <summary>
+    ///     Generates an ANSI escape sequence string representation of the given <paramref name="buffer"/> contents.
+    ///     This is the same output that would be written to the terminal to recreate the current screen contents.
+    /// </summary>
+    /// <param name="buffer">The output buffer to convert to ANSI.</param>
+    /// <returns>A string containing ANSI escape sequences representing the buffer contents.</returns>
+    public string ToAnsi (IOutputBuffer buffer)
+    {
+        var output = new StringBuilder ();
+        Attribute? lastAttr = null;
+
+        BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, output, ref lastAttr);
+
+        return output.ToString ();
+    }
 
     private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
     {

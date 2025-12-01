@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -11,68 +10,51 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Lifecycle (Init/Shutdown)
 {
+    /// <summary>
+    ///     Creates a new <see cref="IApplication"/> instance.
+    /// </summary>
+    /// <remarks>
+    ///     The recommended pattern is for developers to call <c>Application.Create()</c> and then use the returned
+    ///     <see cref="IApplication"/> instance for all subsequent application operations.
+    /// </remarks>
+    /// <returns>A new <see cref="IApplication"/> instance.</returns>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if the legacy static Application model has already been used in this process.
+    /// </exception>
+    public static IApplication Create ()
+    {
+        //Debug.Fail ("Application.Create() called");
+        ApplicationImpl.MarkInstanceBasedModelUsed ();
 
-    /// <summary>Initializes a new instance of a Terminal.Gui Application. <see cref="Shutdown"/> must be called when the application is closing.</summary>
-    /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
-    /// <para>
-    ///     This function loads the right <see cref="IDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
-    ///     assigns it to <see cref="Top"/>
-    /// </para>
-    /// <para>
-    ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
-    ///     <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and
-    ///     terminal settings
-    ///     restored.
-    /// </para>
-    /// <para>
-    ///     The <see cref="Run{T}"/> function combines
-    ///     <see cref="Init(IDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
-    ///     into a single
-    ///     call. An application can use <see cref="Run{T}"/> without explicitly calling
-    ///     <see cref="Init(IDriver,string)"/>.
-    /// </para>
-    /// <param name="driver">
-    ///     The <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or
-    ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
-    /// </param>
-    /// <param name="driverName">
-    ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
-    ///     <see cref="IDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
-    ///     specified the default driver for the platform will be used.
-    /// </param>
+        return new ApplicationImpl ();
+    }
+
+    /// <inheritdoc cref="IApplication.Init"/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Init (IDriver? driver = null, string? driverName = null)
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static void Init (string? driverName = null)
     {
-        ApplicationImpl.Instance.Init (driver, driverName ?? ForceDriver);
+        //Debug.Fail ("Application.Init() called - parallelizable tests should not use legacy static Application model");
+        ApplicationImpl.Instance.Init (driverName ?? ForceDriver);
     }
 
     /// <summary>
     ///     Gets or sets the main thread ID for the application.
     /// </summary>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static int? MainThreadId
     {
-        get => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId;
-        set => ((ApplicationImpl)ApplicationImpl.Instance).MainThreadId = value;
+        get => ApplicationImpl.Instance.MainThreadId;
+        internal set => ApplicationImpl.Instance.MainThreadId = value;
     }
 
-    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    /// <remarks>
-    ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
-    ///     up (Disposed)
-    ///     and terminal settings are restored.
-    /// </remarks>
-    public static void Shutdown () => ApplicationImpl.Instance.Shutdown ();
+    /// <inheritdoc cref="IApplication.Dispose"/>
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static void Shutdown () => ApplicationImpl.Instance.Dispose ();
 
-    /// <summary>
-    ///     Gets whether the application has been initialized with <see cref="Init"/> and not yet shutdown with <see cref="Shutdown"/>.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    ///     The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
-    /// </para>
-    /// </remarks>
+    /// <inheritdoc cref="IApplication.Initialized"/>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static bool Initialized
     {
         get => ApplicationImpl.Instance.Initialized;
@@ -80,6 +62,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     }
 
     /// <inheritdoc cref="IApplication.InitializedChanged"/>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static event EventHandler<EventArgs<bool>>? InitializedChanged
     {
         add => ApplicationImpl.Instance.InitializedChanged += value;
@@ -91,5 +74,10 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     // this in a function like this ensures we don't make mistakes in
     // guaranteeing that the state of this singleton is deterministic when Init
     // starts running and after Shutdown returns.
-    internal static void ResetState (bool ignoreDisposed = false) => ApplicationImpl.Instance?.ResetState (ignoreDisposed);
+    [Obsolete ("The legacy static Application object is going away.")]
+    internal static void ResetState (bool ignoreDisposed = false)
+    {
+        // Use the static reset method to bypass the fence check
+        ApplicationImpl.ResetStateStatic (ignoreDisposed);
+    }
 }

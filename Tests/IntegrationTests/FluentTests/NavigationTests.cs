@@ -11,7 +11,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void Toplevel_TabGroup_Forward_Backward (TestDriver d)
+    public void Runnable_TabGroup_Forward_Backward (TestDriver d)
     {
         var v1 = new View { Id = "v1", CanFocus = true };
         var v2 = new View { Id = "v2", CanFocus = true };
@@ -21,7 +21,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
         var v6 = new View { Id = "v6", CanFocus = true };
 
         using GuiTestContext c = With.A<Window> (50, 20, d, _out)
-                                     .Then (() =>
+                                     .Then ((app) =>
                                             {
                                                 var w1 = new Window { Id = "w1" };
                                                 w1.Add (v1, v2);
@@ -29,8 +29,8 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                                 w2.Add (v3, v4);
                                                 var w3 = new Window { Id = "w3" };
                                                 w3.Add (v5, v6);
-                                                Toplevel top = Application.Top!;
-                                                Application.Top!.Add (w1, w2, w3);
+                                                View top = app?.TopRunnableView!;
+                                                app?.TopRunnableView!.Add (w1, w2, w3);
                                             })
                                      .AssertTrue (v5.HasFocus)
                                      .EnqueueKeyEvent (Key.F6)
@@ -68,8 +68,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                      .EnqueueKeyEvent (Key.F6.WithShift)
                                      .AssertTrue (v4.HasFocus)
                                      .EnqueueKeyEvent (Key.F6)
-                                     .AssertTrue (v6.HasFocus)
-                                     .Stop ();
+                                     .AssertTrue (v6.HasFocus);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);
         Assert.False (v3.HasFocus);

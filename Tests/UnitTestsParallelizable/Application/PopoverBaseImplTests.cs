@@ -2,7 +2,7 @@ using System;
 using Terminal.Gui;
 using Terminal.Gui.App;
 using Xunit;
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 public class PopoverBaseImplTests
 {
@@ -23,12 +23,12 @@ public class PopoverBaseImplTests
     }
 
     [Fact]
-    public void Toplevel_Property_CanBeSetAndGet ()
+    public void Runnable_Property_CanBeSetAndGet ()
     {
         var popover = new TestPopover ();
-        var top = new Toplevel ();
-        popover.Toplevel = top;
-        Assert.Same (top, popover.Toplevel);
+        var top = new Runnable ();
+        popover.Current = top;
+        Assert.Same (top, popover.Current);
     }
 
     [Fact]
@@ -59,11 +59,11 @@ public class PopoverBaseImplTests
     }
 
     [Fact]
-    public void Show_DoesNotThrow_BasePopoverImpl ()
+    public void Show_Throw_If_Not_Registered ()
     {
         var popover = new TestPopover ();
 
         var popoverManager = new ApplicationPopover ();
-        popoverManager.Show (popover);
+        Assert.Throws<InvalidOperationException> (() => popoverManager.Show (popover));
     }
 }

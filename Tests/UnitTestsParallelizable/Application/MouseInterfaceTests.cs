@@ -2,7 +2,7 @@
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Parallelizable tests for IMouse interface.
@@ -41,7 +41,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         // Assert
         Assert.Equal (testPosition, mouse.LastMousePosition);
-        Assert.Equal (testPosition, mouse.GetLastMousePosition ());
+        Assert.Equal (testPosition, mouse.LastMousePosition);
     }
 
     [Fact]

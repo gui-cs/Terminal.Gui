@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.DriverTests;
+﻿namespace DriverTests;
 
 public class AnsiMouseParserTests
 {
@@ -23,7 +23,7 @@ public class AnsiMouseParserTests
     public void ProcessMouseInput_ReturnsCorrectFlags (string input, int expectedX, int expectedY, MouseFlags expectedFlags)
     {
         // Act
-        MouseEventArgs result = _parser.ProcessMouseInput (input);
+        MouseEventArgs? result = _parser.ProcessMouseInput (input);
 
         // Assert
         if (expectedFlags == MouseFlags.None)

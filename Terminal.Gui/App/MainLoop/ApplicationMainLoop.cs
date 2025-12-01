@@ -1,8 +1,5 @@
-﻿#nullable enable
-using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Terminal.Gui.Drivers;
 
 namespace Terminal.Gui.App;
 
@@ -29,6 +26,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     private IOutput? _output;
     private AnsiRequestScheduler? _ansiRequestScheduler;
     private ISizeMonitor? _sizeMonitor;
+
+    /// <inheritdoc/>
+    public IApplication? App { get; private set; }
 
     /// <inheritdoc/>
     public ITimedEvents TimedEvents
@@ -82,11 +82,6 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     }
 
     /// <summary>
-    ///     Handles raising events and setting required draw status etc when <see cref="Application.Top"/> changes
-    /// </summary>
-    public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
-
-    /// <summary>
     ///     Initializes the class with the provided subcomponents
     /// </summary>
     /// <param name="timedEvents"></param>
@@ -94,14 +89,17 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     /// <param name="inputProcessor"></param>
     /// <param name="consoleOutput"></param>
     /// <param name="componentFactory"></param>
+    /// <param name="app"></param>
     public void Initialize (
         ITimedEvents timedEvents,
         ConcurrentQueue<TInputRecord> inputBuffer,
         IInputProcessor inputProcessor,
         IOutput consoleOutput,
-        IComponentFactory<TInputRecord> componentFactory
+        IComponentFactory<TInputRecord> componentFactory,
+        IApplication? app
     )
     {
+        App = app;
         InputQueue = inputBuffer;
         Output = consoleOutput;
         InputProcessor = inputProcessor;
@@ -116,10 +114,10 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     /// <inheritdoc/>
     public void Iteration ()
     {
-        Application.RaiseIteration ();
+        App?.RaiseIteration ();
 
         DateTime dt = DateTime.Now;
-        int timeAllowed = 1000 / Math.Max(1,(int)Application.MaximumIterationsPerSecond);
+        int timeAllowed = 1000 / Math.Max (1, (int)Application.MaximumIterationsPerSecond);
 
         IterationImpl ();
 
@@ -139,14 +137,11 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        ToplevelTransitionManager.RaiseReadyEventIfNeeded ();
-        ToplevelTransitionManager.HandleTopMaybeChanging ();
-
-        if (Application.Top != null)
+        if (App?.TopRunnableView != null)
         {
-            bool needsDrawOrLayout = AnySubViewsNeedDrawn (Application.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (Application.Top)
-                                     || (Application.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (Application.Mouse.MouseGrabView));
+            bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
+                                     || AnySubViewsNeedDrawn (App?.TopRunnableView)
+                                     || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
 
             bool sizeChanged = SizeMonitor.Poll ();
 
@@ -154,7 +149,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             {
                 Logging.Redraws.Add (1);
 
-                Application.LayoutAndDraw (true);
+                App?.LayoutAndDraw (true);
 
                 Output.Write (OutputBuffer);
 
@@ -173,7 +168,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     private void SetCursor ()
     {
-        View? mostFocused = Application.Top!.MostFocused;
+        View? mostFocused = App?.TopRunnableView!.MostFocused;
 
         if (mostFocused == null)
         {
@@ -205,7 +200,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
         if (v.NeedsDraw || v.NeedsLayout)
         {
-           // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
+            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
 
             return true;
         }

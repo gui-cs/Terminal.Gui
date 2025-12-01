@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
@@ -13,16 +12,25 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
     // Queue for storing injected input that will be returned by Peek/Read
     private readonly ConcurrentQueue<ConsoleKeyInfo> _testInput = new ();
 
+    private int _peekCallCount;
+
+    /// <summary>
+    ///     Gets the number of times <see cref="Peek"/> has been called.
+    ///     This is useful for verifying that the input loop throttling is working correctly.
+    /// </summary>
+    internal int PeekCallCount => _peekCallCount;
+
     /// <summary>
     ///     Creates a new FakeInput.
     /// </summary>
-    public FakeInput ()
-    { }
+    public FakeInput () { }
 
     /// <inheritdoc/>
     public override bool Peek ()
     {
         // Will be called on the input thread.
+        Interlocked.Increment (ref _peekCallCount);
+
         return !_testInput.IsEmpty;
     }
 
@@ -36,7 +44,7 @@ public class FakeInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInf
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void AddInput (ConsoleKeyInfo input)
     {
         //Logging.Trace ($"Enqueuing input: {input.Key}");

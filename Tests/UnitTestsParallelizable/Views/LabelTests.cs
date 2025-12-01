@@ -1,12 +1,14 @@
+﻿#nullable enable
 using UnitTests;
+using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Label"/> that don't require Application.Driver or Application context.
 /// These tests can run in parallel without interference.
 /// </summary>
-public class LabelTests : FakeDriverBase
+public class LabelTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Text_Mirrors_Title ()
@@ -88,7 +90,7 @@ public class LabelTests : FakeDriverBase
 
         return;
 
-        void LabelOnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void LabelOnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -152,6 +154,208 @@ public class LabelTests : FakeDriverBase
         var label = new Label ();
         label.Text = "Test";
         Assert.Equal ("Test", label.Text);
+    }
+
+
+    [Fact]
+    public void CanFocus_False_HotKey_SetsFocus_Next ()
+    {
+        View otherView = new ()
+        {
+            Text = "otherView",
+            CanFocus = true
+        };
+
+        Label label = new ()
+        {
+            Text = "_label"
+        };
+
+        View nextView = new ()
+        {
+            Text = "nextView",
+            CanFocus = true
+        };
+
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+        runnable.Add (otherView, label, nextView);
+        otherView.SetFocus ();
+
+        // runnable.SetFocus ();
+        Assert.True (otherView.HasFocus);
+
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (label.HotKey));
+        Assert.False (otherView.HasFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    [Fact]
+    public void CanFocus_False_MouseClick_SetsFocus_Next ()
+    {
+        View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
+        Label label = new () { X = 0, Y = 1, Text = "_label" };
+        View nextView = new ()
+        {
+            X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true
+        };
+
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+        runnable.Add (otherView, label, nextView);
+        otherView.SetFocus ();
+
+        // click on label
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+
+    [Fact]
+    public void CanFocus_True_HotKey_SetsFocus ()
+    {
+        Label label = new ()
+        {
+            Text = "_label",
+            CanFocus = true
+        };
+
+        View view = new ()
+        {
+            Text = "view",
+            CanFocus = true
+        };
+
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+        runnable.Add (label, view);
+
+        view.SetFocus ();
+        Assert.True (label.CanFocus);
+        Assert.False (label.HasFocus);
+        Assert.True (view.CanFocus);
+        Assert.True (view.HasFocus);
+
+        // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (label.HotKey));
+        Assert.True (label.HasFocus);
+        Assert.False (view.HasFocus);
+    }
+
+
+
+    [Fact]
+    public void CanFocus_True_MouseClick_Focuses ()
+    {
+        Label label = new ()
+        {
+            Text = "label",
+            X = 0,
+            Y = 0,
+            CanFocus = true
+        };
+
+        View otherView = new ()
+        {
+            Text = "view",
+            X = 0,
+            Y = 1,
+            Width = 4,
+            Height = 1,
+            CanFocus = true
+        };
+
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ()
+        {
+            Width = 10,
+            Height = 10
+        }; ;
+        app.Begin (runnable);
+        runnable.Add (label, otherView);
+        label.SetFocus ();
+
+        Assert.True (label.CanFocus);
+        Assert.True (label.HasFocus);
+        Assert.True (otherView.CanFocus);
+        Assert.False (otherView.HasFocus);
+
+        otherView.SetFocus ();
+        Assert.True (otherView.HasFocus);
+
+        // label can focus, so clicking on it set focus
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        Assert.True (label.HasFocus);
+        Assert.False (otherView.HasFocus);
+
+        // click on view
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
+        Assert.False (label.HasFocus);
+        Assert.True (otherView.HasFocus);
+    }
+
+
+    [Fact]
+    public void With_Top_Margin_Without_Top_Border ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("Fake");
+        Runnable<bool> runnable = new ()
+        {
+            Width = 10,
+            Height = 10
+        }; ;
+        app.Begin (runnable);
+
+        var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
+        label.Margin!.Thickness = new (0, 1, 0, 0);
+        label.Border!.Thickness = new (1, 0, 1, 1);
+        runnable.Add (label);
+        app.LayoutAndDraw ();
+
+        Assert.Equal (new (0, 0, 6, 3), label.Frame);
+        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+│Test│
+└────┘",
+                                                       output,
+                                                       app.Driver
+                                                      );
+    }
+
+    [Fact]
+    public void Without_Top_Border ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("Fake");
+        Runnable<bool> runnable = new ()
+        {
+            Width = 10,
+            Height = 10
+        }; ;
+        app.Begin (runnable);
+
+        var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
+        label.Border!.Thickness = new (1, 0, 1, 1);
+        runnable.Add (label);
+        app.LayoutAndDraw ();
+
+        Assert.Equal (new (0, 0, 6, 2), label.Frame);
+        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+│Test│
+└────┘",
+                                                       output,
+                                                       app.Driver
+                                                      );
     }
 
 }

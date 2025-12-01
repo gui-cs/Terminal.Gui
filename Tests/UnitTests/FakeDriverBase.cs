@@ -4,7 +4,7 @@ namespace UnitTests;
 ///     Enables tests to create a FakeDriver for testing purposes.
 /// </summary>
 [Collection ("Global Test Setup")]
-public abstract class FakeDriverBase
+public abstract class FakeDriverBase /*: IDisposable*/
 {
     /// <summary>
     ///     Creates a new FakeDriver instance with the specified buffer size.
@@ -19,14 +19,20 @@ public abstract class FakeDriverBase
         var output = new FakeOutput ();
 
         DriverImpl driver = new (
-                                                          new FakeInputProcessor (null),
-                                                          new OutputBufferImpl (),
-                                                          output,
-                                                          new AnsiRequestScheduler (new AnsiResponseParser ()),
-                                                          new SizeMonitorImpl (output));
+                                 new FakeInputProcessor (null),
+                                 new OutputBufferImpl (),
+                                 output,
+                                 new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                 new SizeMonitorImpl (output));
 
         driver.SetScreenSize (width, height);
 
         return driver;
     }
+
+    ///// <inheritdoc />
+    //public void Dispose ()
+    //{
+    //    Application.ResetState (true);
+    //}
 }

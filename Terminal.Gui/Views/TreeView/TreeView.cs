@@ -2,6 +2,7 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
+#nullable disable
 using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;

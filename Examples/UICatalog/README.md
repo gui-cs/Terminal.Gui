@@ -80,7 +80,7 @@ The default `Window` shows the Scenario name and supports exiting the Scenario t
 
 ![screenshot](generic_screenshot.png)
 
-To build a more advanced scenario, where control of the `Toplevel` and `Window` is needed (e.g. for scenarios using `MenuBar` or `StatusBar`), simply use `Application.Top` per normal Terminal.Gui programming, as seen in the `Notepad` scenario.
+To build a more advanced scenario, where control of the `Runnable` and `Window` is needed (e.g. for scenarios using `MenuBar` or `StatusBar`), simply use `Application.Top` per normal Terminal.Gui programming, as seen in the `Notepad` scenario.
 
 For complete control, the `Init` and `Run` overrides can be implemented. The `base.Init` creates `Win`. The `base.Run` simply calls `Application.Run(Application.Top)`.
 

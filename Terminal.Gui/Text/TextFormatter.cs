@@ -1,4 +1,3 @@
-#nullable enable
 using System.Buffers;
 using System.Diagnostics;
 
@@ -11,7 +10,7 @@ namespace Terminal.Gui.Text;
 public class TextFormatter
 {
     // Utilized in CRLF related helper methods for faster newline char index search.
-    private static readonly SearchValues<char> NewlineSearchValues = SearchValues.Create(['\r', '\n']);
+    private static readonly SearchValues<char> NewlineSearchValues = SearchValues.Create (['\r', '\n']);
 
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
@@ -52,29 +51,26 @@ public class TextFormatter
     ///     Causes the text to be formatted (references <see cref="GetLines"/>). Sets <see cref="NeedsFormat"/> to
     ///     <c>false</c>.
     /// </remarks>
+    /// <param name="driver">The console driver currently used by the application.</param>
     /// <param name="screen">Specifies the screen-relative location and maximum size for drawing the text.</param>
     /// <param name="normalColor">The color to use for all text except the hotkey</param>
     /// <param name="hotColor">The color to use to draw the hotkey</param>
     /// <param name="maximum">Specifies the screen-relative location and maximum container size.</param>
-    /// <param name="driver">The console driver currently used by the application.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Draw (
+        IDriver? driver,
         Rectangle screen,
         Attribute normalColor,
         Attribute hotColor,
-        Rectangle maximum = default,
-        IDriver? driver = null
+        Rectangle maximum = default
     )
     {
+        ArgumentNullException.ThrowIfNull (driver);
+
         // With this check, we protect against subclasses with overrides of Text (like Button)
         if (string.IsNullOrEmpty (Text))
         {
             return;
-        }
-
-        if (driver is null)
-        {
-            driver = Application.Driver;
         }
 
         driver?.SetAttribute (normalColor);
@@ -126,9 +122,10 @@ public class TextFormatter
                 break;
             }
 
-            Rune [] runes = linesFormatted [line].ToRunes ();
+            string strings = linesFormatted [line];
+            string[] graphemes = GraphemeHelper.GetGraphemes (strings).ToArray ();
 
-            // When text is justified, we lost left or right, so we use the direction to align. 
+            // When text is justified, we lost left or right, so we use the direction to align.
 
             int x = 0, y = 0;
 
@@ -143,7 +140,7 @@ public class TextFormatter
                 }
                 else
                 {
-                    int runesWidth = StringExtensions.ToString (runes).GetColumns ();
+                    int runesWidth = strings.GetColumns ();
                     x = screen.Right - runesWidth;
                     CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                 }
@@ -199,7 +196,7 @@ public class TextFormatter
                 }
                 else
                 {
-                    int runesWidth = StringExtensions.ToString (runes).GetColumns ();
+                    int runesWidth = strings.GetColumns ();
                     x = screen.Left + (screen.Width - runesWidth) / 2;
 
                     CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
@@ -217,7 +214,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    y = screen.Bottom - runes.Length;
+                    y = screen.Bottom - graphemes.Length;
                 }
                 else
                 {
@@ -253,7 +250,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int s = (screen.Height - runes.Length) / 2;
+                    int s = (screen.Height - graphemes.Length) / 2;
                     y = screen.Top + s;
                 }
                 else
@@ -274,14 +271,14 @@ public class TextFormatter
             int size = isVertical ? screen.Height : screen.Width;
             int current = start + colOffset;
             List<Point?> lastZeroWidthPos = null!;
-            Rune rune = default;
-            int zeroLengthCount = isVertical ? runes.Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
+            string text = string.Empty;
+            int zeroLengthCount = isVertical ? strings.EnumerateRunes ().Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
 
             for (int idx = (isVertical ? start - y : start - x) + colOffset;
                  current < start + size + zeroLengthCount;
                  idx++)
             {
-                Rune lastRuneUsed = rune;
+                string lastTextUsed = text;
 
                 if (lastZeroWidthPos is null)
                 {
@@ -295,17 +292,17 @@ public class TextFormatter
                         continue;
                     }
 
-                    if (!FillRemaining && idx > runes.Length - 1)
+                    if (!FillRemaining && idx > graphemes.Length - 1)
                     {
                         break;
                     }
 
                     if ((!isVertical
                          && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
-                             || (idx < runes.Length && runes [idx].GetColumns () > screen.Width)))
+                             || (idx < graphemes.Length && graphemes [idx].GetColumns () > screen.Width)))
                         || (isVertical
                             && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
-                                || (idx < runes.Length && runes [idx].GetColumns () > screen.Width))))
+                                || (idx < graphemes.Length && graphemes [idx].GetColumns () > screen.Width))))
                     {
                         break;
                     }
@@ -316,13 +313,13 @@ public class TextFormatter
 
                 //	break;
 
-                rune = (Rune)' ';
+                text = " ";
 
                 if (isVertical)
                 {
-                    if (idx >= 0 && idx < runes.Length)
+                    if (idx >= 0 && idx < graphemes.Length)
                     {
-                        rune = runes [idx];
+                        text = graphemes [idx];
                     }
 
                     if (lastZeroWidthPos is null)
@@ -338,7 +335,7 @@ public class TextFormatter
 
                         if (foundIdx > -1)
                         {
-                            if (rune.IsCombiningMark ())
+                            if (Rune.GetRuneAt (text, 0).IsCombiningMark ())
                             {
                                 lastZeroWidthPos [foundIdx] =
                                     new Point (
@@ -351,7 +348,7 @@ public class TextFormatter
                                               current
                                              );
                             }
-                            else if (!rune.IsCombiningMark () && lastRuneUsed.IsCombiningMark ())
+                            else if (!Rune.GetRuneAt (text, 0).IsCombiningMark () && Rune.GetRuneAt (lastTextUsed, 0).IsCombiningMark ())
                             {
                                 current++;
                                 driver?.Move (x, current);
@@ -371,13 +368,13 @@ public class TextFormatter
                 {
                     driver?.Move (current, y);
 
-                    if (idx >= 0 && idx < runes.Length)
+                    if (idx >= 0 && idx < graphemes.Length)
                     {
-                        rune = runes [idx];
+                        text = graphemes [idx];
                     }
                 }
 
-                int runeWidth = GetRuneWidth (rune, TabWidth);
+                int runeWidth = GetTextWidth (text, TabWidth);
 
                 if (HotKeyPos > -1 && idx == HotKeyPos)
                 {
@@ -387,7 +384,7 @@ public class TextFormatter
                     }
 
                     driver?.SetAttribute (hotColor);
-                    driver?.AddRune (rune);
+                    driver?.AddStr (text);
                     driver?.SetAttribute (normalColor);
                 }
                 else
@@ -416,7 +413,7 @@ public class TextFormatter
                         }
                     }
 
-                    driver?.AddRune (rune);
+                    driver?.AddStr (text);
                 }
 
                 if (isVertical)
@@ -431,11 +428,11 @@ public class TextFormatter
                     current += runeWidth;
                 }
 
-                int nextRuneWidth = idx + 1 > -1 && idx + 1 < runes.Length
-                                        ? runes [idx + 1].GetColumns ()
+                int nextRuneWidth = idx + 1 > -1 && idx + 1 < graphemes.Length
+                                        ? graphemes [idx + 1].GetColumns ()
                                         : 0;
 
-                if (!isVertical && idx + 1 < runes.Length && current + nextRuneWidth > start + size)
+                if (!isVertical && idx + 1 < graphemes.Length && current + nextRuneWidth > start + size)
                 {
                     break;
                 }
@@ -933,9 +930,10 @@ public class TextFormatter
                 break;
             }
 
-            Rune [] runes = linesFormatted [line].ToRunes ();
+            string strings = linesFormatted [line];
+            string [] graphemes = GraphemeHelper.GetGraphemes (strings).ToArray ();
 
-            // When text is justified, we lost left or right, so we use the direction to align. 
+            // When text is justified, we lost left or right, so we use the direction to align.
             int x = 0, y = 0;
 
             switch (Alignment)
@@ -950,17 +948,17 @@ public class TextFormatter
                     }
                 case Alignment.End:
                     {
-                        int runesWidth = StringExtensions.ToString (runes).GetColumns ();
-                        x = screen.Right - runesWidth;
+                        int stringsWidth = strings.GetColumns ();
+                        x = screen.Right - stringsWidth;
 
                         break;
                     }
                 case Alignment.Start when isVertical:
                     {
-                        int runesWidth = line > 0
-                                         ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
-                                         : 0;
-                        x = screen.Left + runesWidth;
+                        int stringsWidth = line > 0
+                                               ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
+                                               : 0;
+                        x = screen.Left + stringsWidth;
 
                         break;
                     }
@@ -970,7 +968,7 @@ public class TextFormatter
                     break;
                 case Alignment.Fill when isVertical:
                     {
-                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                        int stringsWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
                         int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
                         int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
                         int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
@@ -979,7 +977,7 @@ public class TextFormatter
                         x = line == 0
                                 ? screen.Left
                                 : line < linesFormatted.Count - 1
-                                    ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
+                                    ? screen.Width - stringsWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
                                     : screen.Right - lastLineWidth;
 
                         break;
@@ -990,16 +988,16 @@ public class TextFormatter
                     break;
                 case Alignment.Center when isVertical:
                     {
-                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                        int stringsWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
                         int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
-                        x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
+                        x = screen.Left + linesWidth + (screen.Width - stringsWidth) / 2;
 
                         break;
                     }
                 case Alignment.Center:
                     {
-                        int runesWidth = StringExtensions.ToString (runes).GetColumns ();
-                        x = screen.Left + (screen.Width - runesWidth) / 2;
+                        int stringsWidth = strings.GetColumns ();
+                        x = screen.Left + (screen.Width - stringsWidth) / 2;
 
                         break;
                     }
@@ -1013,7 +1011,7 @@ public class TextFormatter
             {
                 // Vertical Alignment
                 case Alignment.End when isVertical:
-                    y = screen.Bottom - runes.Length;
+                    y = screen.Bottom - graphemes.Length;
 
                     break;
                 case Alignment.End:
@@ -1043,7 +1041,7 @@ public class TextFormatter
                     }
                 case Alignment.Center when isVertical:
                     {
-                        int s = (screen.Height - runes.Length) / 2;
+                        int s = (screen.Height - graphemes.Length) / 2;
                         y = screen.Top + s;
 
                         break;
@@ -1065,7 +1063,7 @@ public class TextFormatter
             int start = isVertical ? screen.Top : screen.Left;
             int size = isVertical ? screen.Height : screen.Width;
             int current = start + colOffset;
-            int zeroLengthCount = isVertical ? runes.Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
+            int zeroLengthCount = isVertical ? strings.EnumerateRunes ().Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
 
             int lineX = x, lineY = y, lineWidth = 0, lineHeight = 1;
 
@@ -1083,23 +1081,23 @@ public class TextFormatter
                     continue;
                 }
 
-                if (!FillRemaining && idx > runes.Length - 1)
+                if (!FillRemaining && idx > graphemes.Length - 1)
                 {
                     break;
                 }
 
                 if ((!isVertical
                      && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
-                         || (idx < runes.Length && runes [idx].GetColumns () > screen.Width)))
+                         || (idx < graphemes.Length && graphemes [idx].GetColumns () > screen.Width)))
                     || (isVertical
                         && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
-                            || (idx < runes.Length && runes [idx].GetColumns () > screen.Width))))
+                            || (idx < graphemes.Length && graphemes [idx].GetColumns () > screen.Width))))
                 {
                     break;
                 }
 
-                Rune rune = idx >= 0 && idx < runes.Length ? runes [idx] : (Rune)' ';
-                int runeWidth = GetRuneWidth (rune, TabWidth);
+                string text = idx >= 0 && idx < graphemes.Length ? graphemes [idx] : " ";
+                int runeWidth = GetStringWidth (text, TabWidth);
 
                 if (isVertical)
                 {
@@ -1118,11 +1116,11 @@ public class TextFormatter
 
                 current += isVertical && runeWidth > 0 ? 1 : runeWidth;
 
-                int nextRuneWidth = idx + 1 > -1 && idx + 1 < runes.Length
-                                        ? runes [idx + 1].GetColumns ()
+                int nextStringWidth = idx + 1 > -1 && idx + 1 < graphemes.Length
+                                        ? graphemes [idx + 1].GetColumns ()
                                         : 0;
 
-                if (!isVertical && idx + 1 < runes.Length && current + nextRuneWidth > start + size)
+                if (!isVertical && idx + 1 < graphemes.Length && current + nextStringWidth > start + size)
                 {
                     break;
                 }
@@ -1199,8 +1197,8 @@ public class TextFormatter
             return str;
         }
 
-        StringBuilder stringBuilder = new();
-        ReadOnlySpan<char> firstSegment = remaining[..firstNewlineCharIndex];
+        StringBuilder stringBuilder = new ();
+        ReadOnlySpan<char> firstSegment = remaining [..firstNewlineCharIndex];
         stringBuilder.Append (firstSegment);
 
         // The first newline is not yet skipped because the "keepNewLine" condition has not been evaluated.
@@ -1215,7 +1213,7 @@ public class TextFormatter
                 break;
             }
 
-            ReadOnlySpan<char> segment = remaining[..newlineCharIndex];
+            ReadOnlySpan<char> segment = remaining [..newlineCharIndex];
             stringBuilder.Append (segment);
 
             int stride = segment.Length;
@@ -1267,8 +1265,8 @@ public class TextFormatter
             return str;
         }
 
-        StringBuilder stringBuilder = new();
-        ReadOnlySpan<char> firstSegment = remaining[..firstNewlineCharIndex];
+        StringBuilder stringBuilder = new ();
+        ReadOnlySpan<char> firstSegment = remaining [..firstNewlineCharIndex];
         stringBuilder.Append (firstSegment);
 
         // The first newline is not yet skipped because the newline type has not been evaluated.
@@ -1283,7 +1281,7 @@ public class TextFormatter
                 break;
             }
 
-            ReadOnlySpan<char> segment = remaining[..newlineCharIndex];
+            ReadOnlySpan<char> segment = remaining [..newlineCharIndex];
             stringBuilder.Append (segment);
 
             int stride = segment.Length;
@@ -1335,33 +1333,34 @@ public class TextFormatter
     /// <returns>A list of text without the newline characters.</returns>
     public static List<string> SplitNewLine (string text)
     {
-        List<Rune> runes = text.ToRuneList ();
+        List<string> graphemes = GraphemeHelper.GetGraphemes (text).ToList ();
         List<string> lines = new ();
         var start = 0;
 
-        for (var i = 0; i < runes.Count; i++)
+        for (var i = 0; i < graphemes.Count; i++)
         {
             int end = i;
 
-            switch (runes [i].Value)
+            switch (graphemes [i])
             {
-                case '\n':
-                    lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
+                case "\n":
+                case "\r\n":
+                    lines.Add (StringExtensions.ToString (graphemes.GetRange (start, end - start)));
                     i++;
                     start = i;
 
                     break;
 
-                case '\r':
-                    if (i + 1 < runes.Count && runes [i + 1].Value == '\n')
+                case "\r":
+                    if (i + 1 < graphemes.Count && graphemes [i + 1] == "\n")
                     {
-                        lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
+                        lines.Add (StringExtensions.ToString (graphemes.GetRange (start, end - start)));
                         i += 2;
                         start = i;
                     }
                     else
                     {
-                        lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
+                        lines.Add (StringExtensions.ToString (graphemes.GetRange (start, end - start)));
                         i++;
                         start = i;
                     }
@@ -1370,14 +1369,14 @@ public class TextFormatter
             }
         }
 
-        switch (runes.Count)
+        switch (graphemes.Count)
         {
             case > 0 when lines.Count == 0:
-                lines.Add (StringExtensions.ToString (runes));
+                lines.Add (StringExtensions.ToString (graphemes));
 
                 break;
-            case > 0 when start < runes.Count:
-                lines.Add (StringExtensions.ToString (runes.GetRange (start, runes.Count - start)));
+            case > 0 when start < graphemes.Count:
+                lines.Add (StringExtensions.ToString (graphemes.GetRange (start, graphemes.Count - start)));
 
                 break;
             default:
@@ -1405,16 +1404,19 @@ public class TextFormatter
         }
 
         // if value is not wide enough
-        if (text.EnumerateRunes ().Sum (c => c.GetColumns ()) < width)
+        string [] graphemes = GraphemeHelper.GetGraphemes (text).ToArray ();
+        int totalColumns = graphemes.Sum (s => s.GetColumns ());
+
+        if (totalColumns < width)
         {
             // pad it out with spaces to the given Alignment
-            int toPad = width - text.EnumerateRunes ().Sum (c => c.GetColumns ());
+            int toPad = width - totalColumns;
 
             return text + new string (' ', toPad);
         }
 
         // value is too wide
-        return new (text.TakeWhile (c => (width -= ((Rune)c).GetColumns ()) >= 0).ToArray ());
+        return string.Concat (graphemes.TakeWhile (t => (width -= t.GetColumns ()) >= 0));
     }
 
     /// <summary>Formats the provided text to fit within the width provided using word wrapping.</summary>
@@ -1455,18 +1457,18 @@ public class TextFormatter
             return lines;
         }
 
-        List<Rune> runes = StripCRLF (text).ToRuneList ();
+        List<string> graphemes = GraphemeHelper.GetGraphemes (StripCRLF (text)).ToList ();
 
         int start = Math.Max (
-                              !runes.Contains ((Rune)' ') && textFormatter is { VerticalAlignment: Alignment.End } && IsVerticalDirection (textDirection)
-                                  ? runes.Count - width
+                              !graphemes.Contains (" ") && textFormatter is { VerticalAlignment: Alignment.End } && IsVerticalDirection (textDirection)
+                                  ? graphemes.Count - width
                                   : 0,
                               0);
         int end;
 
         if (preserveTrailingSpaces)
         {
-            while ((end = start) < runes.Count)
+            while (start < graphemes.Count)
             {
                 end = GetNextWhiteSpace (start, width, out bool incomplete);
 
@@ -1477,7 +1479,7 @@ public class TextFormatter
                     break;
                 }
 
-                lines.Add (StringExtensions.ToString (runes.GetRange (start, end - start)));
+                lines.Add (StringExtensions.ToString (graphemes.GetRange (start, end - start)));
                 start = end;
 
                 if (incomplete)
@@ -1494,14 +1496,14 @@ public class TextFormatter
             {
                 while ((end = start
                               + GetLengthThatFits (
-                                                   runes.GetRange (start, runes.Count - start),
+                                                   string.Concat (graphemes.GetRange (start, graphemes.Count - start)),
                                                    width,
                                                    tabWidth,
                                                    textDirection
                                                   ))
-                       < runes.Count)
+                       < graphemes.Count)
                 {
-                    while (runes [end].Value != ' ' && end > start)
+                    while (graphemes [end] != " " && end > start)
                     {
                         end--;
                     }
@@ -1510,22 +1512,22 @@ public class TextFormatter
                     {
                         end = start
                               + GetLengthThatFits (
-                                                   runes.GetRange (end, runes.Count - end),
+                                                   string.Concat (graphemes.GetRange (end, graphemes.Count - end)),
                                                    width,
                                                    tabWidth,
                                                    textDirection
                                                   );
                     }
 
-                    var str = StringExtensions.ToString (runes.GetRange (start, end - start));
+                    var str = StringExtensions.ToString (graphemes.GetRange (start, end - start));
                     int zeroLength = text.EnumerateRunes ().Sum (r => r.GetColumns () == 0 ? 1 : 0);
 
-                    if (end > start && GetRuneWidth (str, tabWidth, textDirection) <= width + zeroLength)
+                    if (end > start && GetTextWidth (str, tabWidth, textDirection) <= width + zeroLength)
                     {
                         lines.Add (str);
                         start = end;
 
-                        if (runes [end].Value == ' ')
+                        if (graphemes [end] == " ")
                         {
                             start++;
                         }
@@ -1539,9 +1541,9 @@ public class TextFormatter
             }
             else
             {
-                while ((end = start + width) < runes.Count)
+                while ((end = start + width) < graphemes.Count)
                 {
-                    while (runes [end].Value != ' ' && end > start)
+                    while (graphemes [end] != " " && end > start)
                     {
                         end--;
                     }
@@ -1553,11 +1555,11 @@ public class TextFormatter
 
                     var zeroLength = 0;
 
-                    for (int i = end; i < runes.Count - start; i++)
+                    for (int i = end; i < graphemes.Count - start; i++)
                     {
-                        Rune r = runes [i];
+                        string s = graphemes [i];
 
-                        if (r.GetColumns () == 0)
+                        if (s.GetColumns () == 0)
                         {
                             zeroLength++;
                         }
@@ -1569,7 +1571,7 @@ public class TextFormatter
 
                     lines.Add (
                                StringExtensions.ToString (
-                                                          runes.GetRange (
+                                                          graphemes.GetRange (
                                                                           start,
                                                                           end - start + zeroLength
                                                                          )
@@ -1578,7 +1580,7 @@ public class TextFormatter
                     end += zeroLength;
                     start = end;
 
-                    if (runes [end].Value == ' ')
+                    if (graphemes [end] == " ")
                     {
                         start++;
                     }
@@ -1592,13 +1594,13 @@ public class TextFormatter
             int length = cLength;
             incomplete = false;
 
-            while (length < cWidth && to < runes.Count)
+            while (length < cWidth && to < graphemes.Count)
             {
-                Rune rune = runes [to];
+                string grapheme = graphemes [to];
 
                 if (IsHorizontalDirection (textDirection))
                 {
-                    length += rune.GetColumns ();
+                    length += grapheme.GetColumns (false);
                 }
                 else
                 {
@@ -1607,7 +1609,7 @@ public class TextFormatter
 
                 if (length > cWidth)
                 {
-                    if (to >= runes.Count || (length > 1 && cWidth <= 1))
+                    if (to >= graphemes.Count || (length > 1 && cWidth <= 1))
                     {
                         incomplete = true;
                     }
@@ -1615,15 +1617,15 @@ public class TextFormatter
                     return to;
                 }
 
-                switch (rune.Value)
+                switch (grapheme)
                 {
-                    case ' ' when length == cWidth:
+                    case " " when length == cWidth:
                         return to + 1;
-                    case ' ' when length > cWidth:
+                    case " " when length > cWidth:
                         return to;
-                    case ' ':
+                    case " ":
                         return GetNextWhiteSpace (to + 1, cWidth, out incomplete, length);
-                    case '\t':
+                    case "\t":
                         {
                             length += tabWidth + 1;
 
@@ -1648,8 +1650,8 @@ public class TextFormatter
 
             return cLength switch
             {
-                > 0 when to < runes.Count && runes [to].Value != ' ' && runes [to].Value != '\t' => from,
-                > 0 when to < runes.Count && (runes [to].Value == ' ' || runes [to].Value == '\t') => from,
+                > 0 when to < graphemes.Count && graphemes [to] != " " && graphemes [to] != "\t" => from,
+                > 0 when to < graphemes.Count && (graphemes [to] == " " || graphemes [to] == "\t") => from,
                 _ => to
             };
         }
@@ -1657,7 +1659,7 @@ public class TextFormatter
         if (start < text.GetRuneCount ())
         {
             string str = ReplaceTABWithSpaces (
-                                               StringExtensions.ToString (runes.GetRange (start, runes.Count - start)),
+                                               StringExtensions.ToString (graphemes.GetRange (start, graphemes.Count - start)),
                                                tabWidth
                                               );
 
@@ -1721,42 +1723,42 @@ public class TextFormatter
         }
 
         text = ReplaceTABWithSpaces (text, tabWidth);
-        List<Rune> runes = text.ToRuneList ();
-        int zeroLength = runes.Sum (r => r.GetColumns () == 0 ? 1 : 0);
+        List<string> graphemes = GraphemeHelper.GetGraphemes (text).ToList ();
+        int zeroLength = graphemes.Sum (s => s.EnumerateRunes ().Sum (r => r.GetColumns() == 0 ? 1 : 0));
 
-        if (runes.Count - zeroLength > width)
+        if (graphemes.Count - zeroLength > width)
         {
             if (IsHorizontalDirection (textDirection))
             {
                 if (textFormatter is { Alignment: Alignment.End })
                 {
-                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (graphemes, graphemes.Count - width, text, width, tabWidth, textDirection);
                 }
 
                 if (textFormatter is { Alignment: Alignment.Center })
                 {
-                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (graphemes, Math.Max ((graphemes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
                 }
 
-                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
+                return GetRangeThatFits (graphemes, 0, text, width, tabWidth, textDirection);
             }
 
             if (IsVerticalDirection (textDirection))
             {
                 if (textFormatter is { VerticalAlignment: Alignment.End })
                 {
-                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (graphemes, graphemes.Count - width, text, width, tabWidth, textDirection);
                 }
 
                 if (textFormatter is { VerticalAlignment: Alignment.Center })
                 {
-                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (graphemes, Math.Max ((graphemes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
                 }
 
-                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
+                return GetRangeThatFits (graphemes, 0, text, width, tabWidth, textDirection);
             }
 
-            return StringExtensions.ToString (runes.GetRange (0, width + zeroLength));
+            return StringExtensions.ToString (graphemes.GetRange (0, width + zeroLength));
         }
 
         if (justify)
@@ -1768,18 +1770,18 @@ public class TextFormatter
         {
             if (textFormatter is { Alignment: Alignment.End })
             {
-                if (GetRuneWidth (text, tabWidth, textDirection) > width)
+                if (GetTextWidth (text, tabWidth, textDirection) > width)
                 {
-                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (graphemes, graphemes.Count - width, text, width, tabWidth, textDirection);
                 }
             }
             else if (textFormatter is { Alignment: Alignment.Center })
             {
-                return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
+                return GetRangeThatFits (graphemes, Math.Max ((graphemes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
             }
-            else if (GetRuneWidth (text, tabWidth, textDirection) > width)
+            else if (GetTextWidth (text, tabWidth, textDirection) > width)
             {
-                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
+                return GetRangeThatFits (graphemes, 0, text, width, tabWidth, textDirection);
             }
         }
 
@@ -1787,28 +1789,28 @@ public class TextFormatter
         {
             if (textFormatter is { VerticalAlignment: Alignment.End })
             {
-                if (runes.Count - zeroLength > width)
+                if (graphemes.Count - zeroLength > width)
                 {
-                    return GetRangeThatFits (runes, runes.Count - width, text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (graphemes, graphemes.Count - width, text, width, tabWidth, textDirection);
                 }
             }
             else if (textFormatter is { VerticalAlignment: Alignment.Center })
             {
-                return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
+                return GetRangeThatFits (graphemes, Math.Max ((graphemes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
             }
-            else if (runes.Count - zeroLength > width)
+            else if (graphemes.Count - zeroLength > width)
             {
-                return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
+                return GetRangeThatFits (graphemes, 0, text, width, tabWidth, textDirection);
             }
         }
 
         return text;
     }
 
-    private static string GetRangeThatFits (List<Rune> runes, int index, string text, int width, int tabWidth, TextDirection textDirection)
+    private static string GetRangeThatFits (List<string> strings, int index, string text, int width, int tabWidth, TextDirection textDirection)
     {
         return StringExtensions.ToString (
-                                          runes.GetRange (
+                                          strings.GetRange (
                                                           Math.Max (index, 0),
                                                           GetLengthThatFits (text, width, tabWidth, textDirection)
                                                          )
@@ -1846,7 +1848,7 @@ public class TextFormatter
 
         if (IsHorizontalDirection (textDirection))
         {
-            textCount = words.Sum (arg => GetRuneWidth (arg, tabWidth, textDirection));
+            textCount = words.Sum (arg => GetTextWidth (arg, tabWidth, textDirection));
         }
         else
         {
@@ -2141,11 +2143,11 @@ public class TextFormatter
              i < (linesCount == -1 ? lines.Count : startLine + linesCount);
              i++)
         {
-            string runes = lines [i];
+            string strings = lines [i];
 
-            if (runes.Length > 0)
+            if (strings.Length > 0)
             {
-                max += runes.EnumerateRunes ().Max (r => GetRuneWidth (r, tabWidth));
+                max += strings.EnumerateRunes ().Max (r => GetRuneWidth (r, tabWidth));
             }
         }
 
@@ -2167,7 +2169,7 @@ public class TextFormatter
     {
         List<string> result = SplitNewLine (text);
 
-        return result.Max (x => GetRuneWidth (x, tabWidth));
+        return result.Max (x => GetTextWidth (x, tabWidth));
     }
 
     /// <summary>
@@ -2186,13 +2188,13 @@ public class TextFormatter
     public static int GetSumMaxCharWidth (string text, int startIndex = -1, int length = -1, int tabWidth = 0)
     {
         var max = 0;
-        Rune [] runes = text.ToRunes ();
+        string [] graphemes = GraphemeHelper.GetGraphemes (text).ToArray ();
 
         for (int i = startIndex == -1 ? 0 : startIndex;
-             i < (length == -1 ? runes.Length : startIndex + length);
+             i < (length == -1 ? graphemes.Length : startIndex + length);
              i++)
         {
-            max += GetRuneWidth (runes [i], tabWidth);
+            max += GetStringWidth (graphemes [i], tabWidth);
         }
 
         return max;
@@ -2210,51 +2212,38 @@ public class TextFormatter
     /// <returns>The index of the text that fit the width.</returns>
     public static int GetLengthThatFits (string text, int width, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
-        return GetLengthThatFits (text?.ToRuneList () ?? [], width, tabWidth, textDirection);
-    }
-
-    /// <summary>Gets the number of the Runes in a list of Runes that will fit in <paramref name="width"/>.</summary>
-    /// <remarks>
-    ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
-    ///     glyphs (e.g. Arabic).
-    /// </remarks>
-    /// <param name="runes">The list of runes.</param>
-    /// <param name="width">The width.</param>
-    /// <param name="tabWidth">The width used for a tab.</param>
-    /// <param name="textDirection">The text direction.</param>
-    /// <returns>The index of the last Rune in <paramref name="runes"/> that fit in <paramref name="width"/>.</returns>
-    public static int GetLengthThatFits (List<Rune> runes, int width, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
-    {
-        if (runes is null || runes.Count == 0)
+        if (string.IsNullOrEmpty (text))
         {
             return 0;
         }
 
-        var runesLength = 0;
-        var runeIdx = 0;
+        var textLength = 0;
+        var stringIdx = 0;
 
-        for (; runeIdx < runes.Count; runeIdx++)
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
         {
-            int runeWidth = GetRuneWidth (runes [runeIdx], tabWidth, textDirection);
+            int textWidth = GetStringWidth (grapheme, tabWidth, textDirection);
 
-            if (runesLength + runeWidth > width)
+            if (textLength + textWidth > width)
             {
                 break;
             }
 
-            runesLength += runeWidth;
+            textLength += textWidth;
+            stringIdx++;
         }
 
-        return runeIdx;
+        return stringIdx;
     }
 
-    private static int GetRuneWidth (string str, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
+    private static int GetTextWidth (string str, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
         int runesWidth = 0;
-        foreach (Rune rune in str.EnumerateRunes ())
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (str))
         {
-            runesWidth += GetRuneWidth (rune, tabWidth, textDirection);
+            runesWidth += GetStringWidth (grapheme, tabWidth, textDirection);
         }
+
         return runesWidth;
     }
 
@@ -2275,6 +2264,23 @@ public class TextFormatter
         return runeWidth;
     }
 
+    private static int GetStringWidth (string str, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
+    {
+        int textWidth = IsHorizontalDirection (textDirection) ? str.GetColumns (false) : str.GetColumns () == 0 ? 0 : 1;
+
+        if (str == "\t")
+        {
+            return tabWidth;
+        }
+
+        if (textWidth is < 0 or > 0)
+        {
+            return Math.Max (textWidth, 1);
+        }
+
+        return textWidth;
+    }
+
     /// <summary>Gets the index position from the list based on the <paramref name="width"/>.</summary>
     /// <remarks>
     ///     This API will return incorrect results if the text includes glyphs whose width is dependent on surrounding
@@ -2286,23 +2292,23 @@ public class TextFormatter
     /// <returns>The index of the list that fit the width.</returns>
     public static int GetMaxColsForWidth (List<string> lines, int width, int tabWidth = 0)
     {
-        var runesLength = 0;
+        var textLength = 0;
         var lineIdx = 0;
 
         for (; lineIdx < lines.Count; lineIdx++)
         {
-            List<Rune> runes = lines [lineIdx].ToRuneList ();
+            string [] graphemes = GraphemeHelper.GetGraphemes (lines [lineIdx]).ToArray ();
 
-            int maxRruneWidth = runes.Count > 0
-                                    ? runes.Max (r => GetRuneWidth (r, tabWidth))
+            int maxTextWidth = graphemes.Length > 0
+                                    ? graphemes.Max (r => GetStringWidth (r, tabWidth))
                                     : 1;
 
-            if (runesLength + maxRruneWidth > width)
+            if (textLength + maxTextWidth > width)
             {
                 break;
             }
 
-            runesLength += maxRruneWidth;
+            textLength += maxTextWidth;
         }
 
         return lineIdx;
@@ -2445,12 +2451,12 @@ public class TextFormatter
         }
 
         const int maxStackallocCharBufferSize = 512; // ~1 kB
-        char[]? rentedBufferArray = null;
+        char []? rentedBufferArray = null;
         try
         {
             Span<char> buffer = text.Length <= maxStackallocCharBufferSize
-                ? stackalloc char[text.Length]
-                : (rentedBufferArray = ArrayPool<char>.Shared.Rent(text.Length));
+                ? stackalloc char [text.Length]
+                : (rentedBufferArray = ArrayPool<char>.Shared.Rent (text.Length));
 
             int i = 0;
             var remainingBuffer = buffer;
@@ -2468,7 +2474,7 @@ public class TextFormatter
 
             ReadOnlySpan<char> newText = buffer [..^remainingBuffer.Length];
             // If the resulting string would be the same as original then just return the original.
-            if (newText.Equals(text, StringComparison.Ordinal))
+            if (newText.Equals (text, StringComparison.Ordinal))
             {
                 return text;
             }

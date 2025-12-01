@@ -1,7 +1,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class ViewTests
 {
@@ -332,6 +332,7 @@ public class ViewTests
     public void Test_Nested_Views_With_Height_Equal_To_One ()
     {
         var v = new View { Width = 11, Height = 3 };
+        v.App = ApplicationImpl.Instance;
 
         var top = new View { Width = Dim.Fill (), Height = 1 };
         var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };
@@ -447,7 +448,7 @@ public class ViewTests
         Assert.Equal (0, view.Height);
         var win = new Window ();
         win.Add (view);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
 
@@ -457,6 +458,7 @@ public class ViewTests
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
         Application.Driver!.SetScreenSize (30, 5);
+        Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -494,7 +496,7 @@ public class ViewTests
         var button = new Button { Text = "Click Me" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         var iterations = 0;
@@ -508,7 +510,7 @@ public class ViewTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
         {
             iterations++;
 

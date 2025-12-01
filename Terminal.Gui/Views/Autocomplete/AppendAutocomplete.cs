@@ -1,3 +1,4 @@
+#nullable disable
 ﻿
 namespace Terminal.Gui.Views;
 
@@ -8,12 +9,12 @@ namespace Terminal.Gui.Views;
 public class AppendAutocomplete : AutocompleteBase
 {
     private bool _suspendSuggestions;
-    private TextField textField;
+    private TextField _textField;
 
     /// <summary>Creates a new instance of the <see cref="AppendAutocomplete"/> class.</summary>
     public AppendAutocomplete (TextField textField)
     {
-        this.textField = textField;
+        _textField = textField;
         base.SelectionKey = KeyCode.Tab;
 
         Scheme = new Scheme
@@ -35,15 +36,15 @@ public class AppendAutocomplete : AutocompleteBase
     /// <inheritdoc/>
     public override View HostControl
     {
-        get => textField;
-        set => textField = (TextField)value;
+        get => _textField;
+        set => _textField = (TextField)value;
     }
 
     /// <inheritdoc/>
     public override void ClearSuggestions ()
     {
         base.ClearSuggestions ();
-        textField.SetNeedsDraw ();
+        _textField.SetNeedsDraw ();
     }
 
     /// <inheritdoc/>
@@ -107,19 +108,19 @@ public class AppendAutocomplete : AutocompleteBase
         }
 
         // draw it like it's selected, even though it's not
-        textField.SetAttribute (
+        _textField.SetAttribute (
                                new Attribute (
                                               Scheme.Normal.Foreground,
-                                              textField.GetAttributeForRole(VisualRole.Focus).Background,
+                                              _textField.GetAttributeForRole(VisualRole.Focus).Background,
                                               Scheme.Normal.Style
                                              )
                               );
-        textField.Move (textField.Text.Length, 0);
+        _textField.Move (_textField.Text.Length, 0);
 
         Suggestion suggestion = Suggestions.ElementAt (SelectedIdx);
         string fragment = suggestion.Replacement.Substring (suggestion.Remove);
 
-        int spaceAvailable = textField.Viewport.Width - textField.Text.GetColumns ();
+        int spaceAvailable = _textField.Viewport.Width - _textField.Text.GetColumns ();
         int spaceRequired = fragment.EnumerateRunes ().Sum (c => c.GetColumns ());
 
         if (spaceAvailable < spaceRequired)
@@ -130,7 +131,7 @@ public class AppendAutocomplete : AutocompleteBase
                                   );
         }
 
-        Application.Driver?.AddStr (fragment);
+        _textField.Driver?.AddStr (fragment);
     }
 
     /// <summary>
@@ -143,12 +144,12 @@ public class AppendAutocomplete : AutocompleteBase
         if (MakingSuggestion ())
         {
             Suggestion insert = Suggestions.ElementAt (SelectedIdx);
-            string newText = textField.Text;
+            string newText = _textField.Text;
             newText = newText.Substring (0, newText.Length - insert.Remove);
             newText += insert.Replacement;
-            textField.Text = newText;
+            _textField.Text = newText;
 
-            textField.MoveEnd ();
+            _textField.MoveEnd ();
 
             ClearSuggestions ();
 
@@ -167,8 +168,8 @@ public class AppendAutocomplete : AutocompleteBase
             newText += Path.DirectorySeparatorChar;
         }
 
-        textField.Text = newText;
-        textField.MoveEnd ();
+        _textField.Text = newText;
+        _textField.MoveEnd ();
     }
 
     private bool CycleSuggestion (int direction)
@@ -185,7 +186,7 @@ public class AppendAutocomplete : AutocompleteBase
             SelectedIdx = Suggestions.Count () - 1;
         }
 
-        textField.SetNeedsDraw ();
+        _textField.SetNeedsDraw ();
 
         return true;
     }
@@ -195,5 +196,5 @@ public class AppendAutocomplete : AutocompleteBase
     ///     to see auto-complete (i.e. focused and cursor in right place).
     /// </summary>
     /// <returns></returns>
-    private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && textField.HasFocus && textField.CursorIsAtEnd (); }
+    private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && _textField.HasFocus && _textField.CursorIsAtEnd (); }
 }

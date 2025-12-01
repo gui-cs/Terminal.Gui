@@ -1,5 +1,5 @@
 #nullable enable
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 ///     Tests for <see cref="SelectorBase"/> functionality that applies to all selector implementations.
