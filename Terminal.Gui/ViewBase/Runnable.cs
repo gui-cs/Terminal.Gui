@@ -176,6 +176,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
         EventArgs<bool> args = new (newIsModal);
         IsModalChanged?.Invoke (this, args);
 
+        // Layout may need to change when modal state changes
         SetNeedsLayout ();
     }
 
