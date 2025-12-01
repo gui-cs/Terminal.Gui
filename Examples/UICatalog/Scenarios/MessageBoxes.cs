@@ -251,7 +251,7 @@ public class MessageBoxes : Scenario
                                                {
                                                    buttonPressedLabel.Text =
                                                        $"{MessageBox.Query (
-                                                                            ApplicationImpl.Instance, width,
+                                                                            Application.Instance, width,
                                                                              height,
                                                                              titleEdit.Text,
                                                                              messageEdit.Text,
@@ -263,7 +263,7 @@ public class MessageBoxes : Scenario
                                                else
                                                {
                                                    buttonPressedLabel.Text =
-                                                       $"{MessageBox.ErrorQuery (ApplicationImpl.Instance,
+                                                       $"{MessageBox.ErrorQuery (Application.Instance,
                                                                                  width,
                                                                                  height,
                                                                                  titleEdit.Text,

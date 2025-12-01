@@ -71,7 +71,7 @@ public class Notepad : Scenario
                                        new MenuItem
                                        {
                                            Title = "_About",
-                                           Action = () => MessageBox.Query (ApplicationImpl.Instance,  "Notepad", "About Notepad...", "Ok")
+                                           Action = () => MessageBox.Query (Application.Instance,  "Notepad", "About Notepad...", "Ok")
                                        }
                                    ]
                                   )
@@ -196,7 +196,7 @@ public class Notepad : Scenario
 
         if (tab.UnsavedChanges)
         {
-            int? result = MessageBox.Query (ApplicationImpl.Instance,
+            int? result = MessageBox.Query (Application.Instance,
                                             "Save Changes",
                                             $"Save changes to {tab.Text.TrimEnd ('*')}",
                                             "Yes",

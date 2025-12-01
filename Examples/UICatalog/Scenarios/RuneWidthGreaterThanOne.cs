@@ -166,7 +166,7 @@ public class RuneWidthGreaterThanOne : Scenario
     {
         if (_text is { })
         {
-            MessageBox.Query (ApplicationImpl.Instance, "Say Hello 你", $"Hello {_text.Text}", "Ok");
+            MessageBox.Query (Application.Instance, "Say Hello 你", $"Hello {_text.Text}", "Ok");
         }
     }
 
@@ -197,7 +197,7 @@ public class RuneWidthGreaterThanOne : Scenario
     {
         if (_text is { })
         {
-            MessageBox.Query (ApplicationImpl.Instance, "Say Hello", $"Hello {_text.Text}", "Ok");
+            MessageBox.Query (Application.Instance, "Say Hello", $"Hello {_text.Text}", "Ok");
         }
     }
 
@@ -252,7 +252,7 @@ public class RuneWidthGreaterThanOne : Scenario
     {
         if (_text is { })
         {
-            MessageBox.Query (ApplicationImpl.Instance, "こんにちはと言う", $"こんにちは {_text.Text}", "Ok");
+            MessageBox.Query (Application.Instance, "こんにちはと言う", $"こんにちは {_text.Text}", "Ok");
         }
     }
 

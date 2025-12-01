@@ -6,7 +6,7 @@ namespace Terminal.Gui.App;
 ///     Implementation of core <see cref="Application"/> methods using the modern
 ///     main loop architecture with component factories for different platforms.
 /// </summary>
-public partial class ApplicationImpl : IApplication
+internal partial class ApplicationImpl : IApplication
 {
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
@@ -75,7 +75,7 @@ public partial class ApplicationImpl : IApplication
     /// <summary>
     ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
     /// </summary>
-    public static IApplication Instance
+    internal static IApplication Instance
     {
         get
         {
