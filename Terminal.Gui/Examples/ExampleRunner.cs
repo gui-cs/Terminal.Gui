@@ -26,12 +26,32 @@ public static class ExampleRunner
                    : RunOutOfProcess (example, context);
     }
 
+    private static ExampleMetrics? ExtractMetricsFromOutput (string output)
+    {
+        // Look for the metrics marker in the output
+        Match match = Regex.Match (output, @"###TERMGUI_METRICS:(.+?)###");
+
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonSerializer.Deserialize<ExampleMetrics> (match.Groups [1].Value);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     [RequiresUnreferencedCode ("Calls System.Reflection.Assembly.LoadFrom")]
     [RequiresDynamicCode ("Calls System.Reflection.Assembly.LoadFrom")]
     private static ExampleResult RunInProcess (ExampleInfo example, ExampleContext context)
     {
         Environment.SetEnvironmentVariable (
-                                            ExampleContext.EnvironmentVariableName,
+                                            ExampleContext.ENVIRONMENT_VARIABLE_NAME,
                                             context.ToJson ());
 
         try
@@ -57,7 +77,7 @@ public static class ExampleRunner
             }
             else if (parameters.Length == 1 && parameters [0].ParameterType == typeof (string []))
             {
-                result = entryPoint.Invoke (null, new object [] { Array.Empty<string> () });
+                result = entryPoint.Invoke (null, [Array.Empty<string> ()]);
             }
             else
             {
@@ -89,7 +109,7 @@ public static class ExampleRunner
         }
         finally
         {
-            Environment.SetEnvironmentVariable (ExampleContext.EnvironmentVariableName, null);
+            Environment.SetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME, null);
         }
     }
 
@@ -105,7 +125,7 @@ public static class ExampleRunner
             CreateNoWindow = true
         };
 
-        psi.Environment [ExampleContext.EnvironmentVariableName] = context.ToJson ();
+        psi.Environment [ExampleContext.ENVIRONMENT_VARIABLE_NAME] = context.ToJson ();
 
         using Process? process = Process.Start (psi);
 
@@ -126,8 +146,8 @@ public static class ExampleRunner
         {
             try
             {
-                const bool killEntireProcessTree = true;
-                process.Kill (killEntireProcessTree);
+                const bool KILL_ENTIRE_PROCESS_TREE = true;
+                process.Kill (KILL_ENTIRE_PROCESS_TREE);
             }
             catch
             {
@@ -153,25 +173,5 @@ public static class ExampleRunner
             StandardError = stderr,
             Metrics = metrics
         };
-    }
-
-    private static ExampleMetrics? ExtractMetricsFromOutput (string output)
-    {
-        // Look for the metrics marker in the output
-        Match match = Regex.Match (output, @"###TERMGUI_METRICS:(.+?)###");
-
-        if (!match.Success)
-        {
-            return null;
-        }
-
-        try
-        {
-            return JsonSerializer.Deserialize<ExampleMetrics> (match.Groups [1].Value);
-        }
-        catch
-        {
-            return null;
-        }
     }
 }

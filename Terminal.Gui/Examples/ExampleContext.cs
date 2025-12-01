@@ -13,13 +13,13 @@ public class ExampleContext
     ///     Gets or sets the name of the driver to use (e.g., "FakeDriver", "DotnetDriver").
     ///     If <see langword="null"/>, the default driver for the platform is used.
     /// </summary>
-    public string? DriverName { get; set; } = null;
+    public string? DriverName { get; set; }
 
     /// <summary>
     ///     Gets or sets the list of key names to inject into the example during execution.
     ///     Each string should be a valid key name that can be parsed by <see cref="Input.Key.TryParse"/>.
     /// </summary>
-    public List<string> KeysToInject { get; set; } = new ();
+    public List<string> KeysToInject { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets the maximum time in milliseconds to allow the example to run before forcibly terminating it.
@@ -46,7 +46,7 @@ public class ExampleContext
     ///     The name of the environment variable used to pass the serialized <see cref="ExampleContext"/>
     ///     to example applications.
     /// </summary>
-    public const string EnvironmentVariableName = "TERMGUI_TEST_CONTEXT";
+    public const string ENVIRONMENT_VARIABLE_NAME = "TERMGUI_TEST_CONTEXT";
 
     /// <summary>
     ///     Serializes this context to a JSON string for passing via environment variables.

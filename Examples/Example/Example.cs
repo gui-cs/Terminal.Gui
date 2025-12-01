@@ -12,16 +12,16 @@ using Terminal.Gui.Views;
 
 [assembly: ExampleMetadata ("Simple Example", "A basic login form demonstrating Terminal.Gui fundamentals")]
 [assembly: ExampleCategory ("Getting Started")]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "a", "d", "m", "i", "n", "Tab", "p", "a", "s", "s", "w", "o", "r", "d", "Enter" }, Order = 1)]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "Enter" }, DelayMs = 500, Order = 2)]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "Esc" }, DelayMs = 100, Order = 3)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["a", "d", "m", "i", "n", "Tab", "p", "a", "s", "s", "w", "o", "r", "d", "Enter"], Order = 1)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Enter"], DelayMs = 500, Order = 2)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Esc"], DelayMs = 100, Order = 3)]
 
 // Override the default configuration for the application to use the Light theme
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
 ConfigurationManager.Enable (ConfigLocations.All);
 
 // Check for test context to determine driver
-string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.EnvironmentVariableName);
+string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME);
 string? driverName = null;
 
 if (!string.IsNullOrEmpty (contextJson))
