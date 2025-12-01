@@ -1,8 +1,8 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of
-///     <see cref="Shortcut"/>s. The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu
+///     A status bar is a <see cref="View"/> that snaps to the bottom of the Viewport displaying set of
+///     <see cref="Shortcut"/>s. The <see cref="StatusBar"/> should be context-sensitive. This means, if the main menu
 ///     and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog
 ///     to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a
 ///     new instance of a status bar.

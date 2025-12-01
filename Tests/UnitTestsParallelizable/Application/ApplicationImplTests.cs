@@ -110,7 +110,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window
+        IRunnable top = new Window
         {
             Title = "InitRunShutdown_Running_Set_To_False"
         };
@@ -158,7 +158,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window ();
+        IRunnable top = new Window ();
         var isIsModalChanged = 0;
 
         top.IsModalChanged
@@ -204,7 +204,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window ();
+        IRunnable top = new Window ();
 
         var isIsModalChanged = 0;
 
@@ -258,7 +258,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window
+        IRunnable top = new Window
         {
             Title = "InitRunShutdown_QuitKey_Quits"
         };
@@ -289,7 +289,7 @@ public class ApplicationImplTests
         Assert.False (top!.IsRunning);
 
         Assert.Null (app.TopRunnableView);
-        top.Dispose ();
+        ((top as Window)!).Dispose ();
         app.Dispose ();
         Assert.Null (app.TopRunnableView);
     }

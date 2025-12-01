@@ -53,11 +53,11 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [RequiresDynamicCode ("AOT")]
     [Obsolete ("The legacy static Application object is going away.")]
     public static IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : Toplevel, new() => ApplicationImpl.Instance.Run<TRunnable> (errorHandler, driverName);
+        where TRunnable : IRunnable, new() => ApplicationImpl.Instance.Run<TRunnable> (errorHandler, driverName);
 
     /// <inheritdoc cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static void Run (Toplevel view, Func<Exception, bool>? errorHandler = null) => ApplicationImpl.Instance.Run (view, errorHandler);
+    public static void Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null) => ApplicationImpl.Instance.Run (runnable, errorHandler);
 
     /// <inheritdoc cref="IApplication.AddTimeout"/>
     [Obsolete ("The legacy static Application object is going away.")]
@@ -94,7 +94,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <inheritdoc cref="IApplication.RequestStop(IRunnable)"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static void RequestStop (Toplevel? top = null) => ApplicationImpl.Instance.RequestStop (top);
+    public static void RequestStop (IRunnable? runnable = null) => ApplicationImpl.Instance.RequestStop (runnable);
 
     /// <inheritdoc cref="IApplication.End(SessionToken)"/>
     [Obsolete ("The legacy static Application object is going away.")]

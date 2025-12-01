@@ -209,7 +209,6 @@ public class SingleBackgroundWorker : Scenario
                 Title = "_top",
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
-                Modal = true
             };
 
             _top.KeyDown += (s, e) =>

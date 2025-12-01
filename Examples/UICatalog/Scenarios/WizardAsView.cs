@@ -66,7 +66,7 @@ public class WizardAsView : Scenario
 
         // Set Modal to false to cause the Wizard class to render without a frame and
         // behave like an non-modal View (vs. a modal/pop-up Window).
-        wizard.Modal = false;
+       // wizard.Modal = false;
 
         wizard.MovingBack += (s, args) =>
                              {

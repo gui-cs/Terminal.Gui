@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Games")]
 public class Mazing : Scenario
 {
-    private Toplevel? _top;
+    private Window? _top;
     private MazeGenerator? _m;
 
     private List<Point>? _potions;

@@ -38,7 +38,7 @@ public class ApplicationStressTests
         Application.Init (driverName: "fake");
         Random r = new ();
         TextField tf = new ();
-        var top = new Toplevel ();
+        var top = new Window ();
         top.Add (tf);
 
         _tbCounter = 0;

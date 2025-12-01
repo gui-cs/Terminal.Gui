@@ -101,7 +101,7 @@ public interface IApplication : IDisposable
     ///     </para>
     ///     <para>
     ///         Shutdown must be called for every call to <see cref="Init"/> or
-    ///         <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
+    ///         <see cref="Application.Run(IRunnable, Func{Exception, bool})"/> to ensure all resources are cleaned
     ///         up (Disposed) and terminal settings are restored.
     ///     </para>
     ///     <para>
@@ -270,7 +270,7 @@ public interface IApplication : IDisposable
 
     /// <summary>
     ///     Raised when <see cref="End(SessionToken)"/> was called and the session is stopping. The event args contain a
-    ///     reference to the <see cref="Toplevel"/>
+    ///     reference to the <see cref="IRunnable"/>
     ///     that was active during the session. This can be used to ensure the Toplevel is disposed of properly.
     /// </summary>
     /// <remarks>
