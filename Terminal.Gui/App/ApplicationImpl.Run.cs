@@ -174,8 +174,7 @@ public partial class ApplicationImpl
         runnable.RaiseIsRunningChangedEvent (true);
         runnable.RaiseIsModalChangedEvent (true);
 
-        // Note: Initialization, layout, focus, and cursor positioning are now handled
-        // by Runnable.RaiseIsRunningChangedEvent and Runnable.RaiseIsModalChangedEvent
+        LayoutAndDraw ();
 
         return token;
     }

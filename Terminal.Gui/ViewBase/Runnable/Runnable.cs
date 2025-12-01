@@ -178,12 +178,10 @@ public class Runnable : View, IRunnable
 
         // Layout may need to change when modal state changes
         SetNeedsLayout ();
+        SetNeedsDraw ();
 
         if (newIsModal)
         {
-            // Initial Layout and draw when becoming modal
-            App?.LayoutAndDraw (true);
-
             // Set focus to self if becoming modal
             if (HasFocus is false)
             {

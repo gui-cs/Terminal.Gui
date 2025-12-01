@@ -904,6 +904,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Equal (new (1), lv.Border!.Thickness);
         Assert.Null (lv.SelectedItem);
         Assert.Equal ("", lv.Text);
+        app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -976,6 +977,7 @@ public class ListViewTests (ITestOutputHelper output)
         app.Begin (top);
 
         Assert.Null (lv.SelectedItem);
+        app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1225,6 +1227,7 @@ public class ListViewTests (ITestOutputHelper output)
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
+        app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1267,6 +1270,7 @@ Item 6",
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
+        app.LayoutAndDraw ();
 
         Assert.Equal ("Second ", GetContents (0));
         Assert.Equal (new (' ', 7), GetContents (1));
@@ -1483,6 +1487,7 @@ Three",
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
+        app.LayoutAndDraw ();
 
         Assert.Equal (0, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
