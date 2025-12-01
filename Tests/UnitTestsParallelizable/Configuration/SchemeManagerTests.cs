@@ -47,7 +47,7 @@ public class SchemeManagerTests
         Assert.Contains ("Base", names);
         Assert.Contains ("Menu", names);
         Assert.Contains ("Dialog", names);
-        Assert.Contains ("Toplevel", names);
+        Assert.Contains ("Runnable", names);
         Assert.Contains ("Error", names);
     }
 

@@ -110,7 +110,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window
+        IRunnable top = new Window
         {
             Title = "InitRunShutdown_Running_Set_To_False"
         };
@@ -158,7 +158,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window ();
+        IRunnable top = new Window ();
         var isIsModalChanged = 0;
 
         top.IsModalChanged
@@ -204,7 +204,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window ();
+        IRunnable top = new Window ();
 
         var isIsModalChanged = 0;
 
@@ -258,7 +258,7 @@ public class ApplicationImplTests
 
         app.Init ("fake");
 
-        Toplevel top = new Window
+        IRunnable top = new Window
         {
             Title = "InitRunShutdown_QuitKey_Quits"
         };
@@ -289,7 +289,7 @@ public class ApplicationImplTests
         Assert.False (top!.IsRunning);
 
         Assert.Null (app.TopRunnableView);
-        top.Dispose ();
+        ((top as Window)!).Dispose ();
         app.Dispose ();
         Assert.Null (app.TopRunnableView);
     }
@@ -471,7 +471,7 @@ public class ApplicationImplTests
         Assert.Null (v2.TopRunnableView); // Top is still null until Run
 
         // Shutdown should clean up instance fields
-        v2.Shutdown ();
+        v2.Dispose ();
 
         Assert.Null (v2.Driver);
         Assert.False (v2.Initialized);
@@ -519,7 +519,7 @@ public class ApplicationImplTests
         IApplication? app = Application.Create ();
         app.Init ("fake");
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         SessionToken? sessionToken = app.Begin (top);
         Assert.NotNull (sessionToken);
 
@@ -545,7 +545,7 @@ public class ApplicationImplTests
         app.StopAfterFirstIteration = true;
 
         // Init has been called, but Driver has been set to null. Bad.
-        Assert.Throws<InvalidOperationException> (() => app.Run<Toplevel> ());
+        Assert.Throws<InvalidOperationException> (() => app.Run<Runnable> ());
     }
 
     [Fact]

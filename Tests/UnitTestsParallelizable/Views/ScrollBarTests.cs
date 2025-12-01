@@ -22,7 +22,7 @@ public class ScrollBarTests
     [Fact]
     public void AutoHide_False_Is_Default_CorrectlyHidesAndShows ()
     {
-        var super = new Toplevel ()
+        var super = new Runnable ()
         {
             Id = "super",
             Width = 1,
@@ -55,7 +55,7 @@ public class ScrollBarTests
     [Fact]
     public void AutoHide_False_CorrectlyHidesAndShows ()
     {
-        var super = new Toplevel ()
+        var super = new Runnable ()
         {
             Id = "super",
             Width = 1,
@@ -81,7 +81,7 @@ public class ScrollBarTests
     [Fact]
     public void AutoHide_True_Changing_ScrollableContentSize_CorrectlyHidesAndShows ()
     {
-        var super = new Toplevel ()
+        var super = new Runnable ()
         {
             Id = "super",
             Width = 1,
@@ -125,7 +125,7 @@ public class ScrollBarTests
     [Fact]
     public void AutoHide_Change_VisibleContentSize_CorrectlyHidesAndShows ()
     {
-        var super = new Toplevel ()
+        var super = new Runnable ()
         {
             Id = "super",
             Width = 1,

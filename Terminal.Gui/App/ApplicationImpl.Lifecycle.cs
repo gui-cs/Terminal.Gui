@@ -111,7 +111,7 @@ public partial class ApplicationImpl
     /// <remarks>
     ///     <para>
     ///         This method implements the <see cref="IDisposable"/> pattern and performs the same cleanup
-    ///         as <see cref="Shutdown"/>, but without returning a result.
+    ///         as <see cref="IDisposable.Dispose"/>, but without returning a result.
     ///     </para>
     ///     <para>
     ///         After calling <see cref="Dispose()"/>, use <see cref="GetResult"/> or <see cref="IApplication.GetResult{T}"/>
@@ -232,7 +232,7 @@ public partial class ApplicationImpl
         // === 0. Stop all timers ===
         TimedEvents?.StopAll ();
 
-        // === 1. Stop all running toplevels ===
+        // === 1. Stop all running runnables ===
         foreach (SessionToken token in SessionStack!.Reverse ())
         {
             if (token.Runnable is { })
@@ -253,7 +253,7 @@ public partial class ApplicationImpl
         Popover?.Dispose ();
         Popover = null;
 
-        // === 3. Clean up toplevels ===
+        // === 3. Clean up runnables ===
         SessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE
@@ -264,8 +264,6 @@ public partial class ApplicationImpl
             Debug.Assert (TopRunnableView.WasDisposed, $"Title = {TopRunnableView.Title}, Id = {TopRunnableView.Id}");
         }
 #endif
-
-        TopRunnableView = null;
 
         // === 4. Clean up driver ===
         if (Driver is { })

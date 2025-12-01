@@ -14,7 +14,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
 
     public void Dispose ()
     {
-        _app?.Shutdown ();
+        _app?.Dispose ();
         _app = null;
     }
 
@@ -438,7 +438,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.Same (app, result); // Fluent API returns this
 
         // Note: Run blocks until stopped, but StopAfterFirstIteration makes it return immediately
-        // The runnable is automatically disposed by Shutdown()
+        // The runnable is automatically disposed by Dispose()
     }
 
     [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
@@ -453,7 +453,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.Throws<NotInitializedException> (() => app.Run<TestRunnable> ());
 
         // Cleanup
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     private IApplication GetApp ()

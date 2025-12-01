@@ -20,7 +20,7 @@ public sealed class PosAlignDemo : Scenario
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
         };
 
-        SetupControls (appWindow, Dimension.Width, Schemes.Toplevel);
+        SetupControls (appWindow, Dimension.Width, Schemes.Runnable);
 
         SetupControls (appWindow, Dimension.Height, Schemes.Error);
 

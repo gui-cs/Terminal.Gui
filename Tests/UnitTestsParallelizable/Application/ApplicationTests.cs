@@ -40,24 +40,24 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.False (timeoutFired);
 
         app.StopAfterFirstIteration = true;
-        app.Run<Toplevel> ();
+        app.Run<Runnable> ();
 
         // The timeout should have fired
         Assert.True (timeoutFired);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
-    public void Begin_Null_Toplevel_Throws ()
+    public void Begin_Null_Runnable_Throws ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        // Test null Toplevel
+        // Test null Runnable
         Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.Null (app.TopRunnableView);
         app.Driver!.SetScreenSize (80, 25);
-        Toplevel top = new ();
+        Runnable top = new ();
         SessionToken? token = app.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), app.TopRunnableView!.Frame);
         app.Driver!.SetScreenSize (5, 5);
@@ -81,7 +81,7 @@ public class ApplicationTests (ITestOutputHelper output)
         }
         top.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -92,17 +92,17 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.NotNull (app.Driver);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
-    public void Init_Shutdown_Cleans_Up ()
+    public void Init_Dispose_Cleans_Up ()
     {
         IApplication app = Application.Create ();
 
         app.Init ("fake");
 
-        app.Shutdown ();
+        app.Dispose ();
 
 #if DEBUG_IDISPOSABLE
         // Validate there are no outstanding Responder-based instances 
@@ -113,10 +113,10 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Init_Shutdown_Fire_InitializedChanged ()
+    public void Init_Dispose_Fire_InitializedChanged ()
     {
         var initialized = false;
-        var shutdown = false;
+        var Dispose = false;
 
         IApplication app = Application.Create ();
 
@@ -124,11 +124,11 @@ public class ApplicationTests (ITestOutputHelper output)
 
         app.Init (driverName: "fake");
         Assert.True (initialized);
-        Assert.False (shutdown);
+        Assert.False (Dispose);
 
-        app.Shutdown ();
+        app.Dispose ();
         Assert.True (initialized);
-        Assert.True (shutdown);
+        Assert.True (Dispose);
 
         app.InitializedChanged -= OnApplicationOnInitializedChanged;
 
@@ -142,7 +142,7 @@ public class ApplicationTests (ITestOutputHelper output)
             }
             else
             {
-                shutdown = true;
+                Dispose = true;
             }
         }
     }
@@ -160,7 +160,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Init_Shutdown_Resets_Instance_Properties ()
+    public void Init_Dispose_Resets_Instance_Properties ()
     {
         IApplication app = Application.Create ();
 
@@ -187,8 +187,8 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.True (app.Initialized);
         Assert.NotNull (app.Driver);
 
-        // Shutdown cleans up
-        app.Shutdown ();
+        // Dispose cleans up
+        app.Dispose ();
 
         // Check reset state on the instance
         CheckReset (app);
@@ -206,8 +206,8 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Mouse.CachedViewsUnderMouse.Clear ();
         app.Mouse.LastMousePosition = new Point (1, 1);
 
-        // Shutdown and check reset
-        app.Shutdown ();
+        // Dispose and check reset
+        app.Dispose ();
         CheckReset (app);
 
         return;
@@ -241,7 +241,7 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.Equal (app.TopRunnable, rs!.Runnable);
         Assert.Null (app.Mouse.MouseGrabView); // public
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -250,7 +250,7 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        Toplevel top = new ();
+        Runnable top = new ();
         SessionToken? rs = app.Begin (top);
 
         var actionCalled = 0;
@@ -259,7 +259,7 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.Equal (1, actionCalled);
         top.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -271,11 +271,11 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Init ("fake");
 
         app.Iteration += Application_Iteration;
-        app.Run<Toplevel> ();
+        app.Run<Runnable> ();
         app.Iteration -= Application_Iteration;
 
         Assert.Equal (1, iteration);
-        app.Shutdown ();
+        app.Dispose ();
 
         return;
 
@@ -315,32 +315,32 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Screen = new (0, 0, driver.Cols, driver.Rows);
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
-    public void Shutdown_Alone_Does_Nothing ()
+    public void Dispose_Alone_Does_Nothing ()
     {
         IApplication app = Application.Create ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     #region RunTests
 
     [Fact]
-    public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throw ()
+    public void Run_T_After_InitWithDriver_with_Runnable_and_Driver_Does_Not_Throw ()
     {
         IApplication app = Application.Create ();
         app.StopAfterFirstIteration = true;
 
-        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
-        // Using another type not derived from Toplevel will throws at compile time
+        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Window is derived from Runnable)
+        // Using another type not derived from Runnable will throws at compile time
         app.Run<Window> (null, "fake");
 
-        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
+        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Dialog is derived from Runnable)
         app.Run<Dialog> (null, "fake");
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -349,13 +349,13 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        // Init doesn't create a Toplevel and assigned it to app.TopRunnable
+        // Init doesn't create a Runnable and assigned it to app.TopRunnable
         // but Begin does
-        var initTop = new Toplevel ();
+        var initTop = new Runnable ();
 
         app.Iteration += OnApplicationOnIteration;
 
-        app.Run<Toplevel> ();
+        app.Run<Runnable> ();
         app.Iteration -= OnApplicationOnIteration;
 
 #if DEBUG_IDISPOSABLE
@@ -365,7 +365,7 @@ public class ApplicationTests (ITestOutputHelper output)
 #endif
         initTop.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
 
         return;
 
@@ -380,29 +380,29 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Run_T_After_InitWithDriver_with_TestTopLevel_DoesNotThrow ()
+    public void Run_T_After_InitWithDriver_with_TestRunnable_DoesNotThrow ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
         app.StopAfterFirstIteration = true;
 
-        // Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
+        // Init has been called and we're passing no driver to Run<TestRunnable>. This is ok.
         app.Run<Window> ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
-    public void Run_T_After_InitNullDriver_with_TestTopLevel_DoesNotThrow ()
+    public void Run_T_After_InitNullDriver_with_TestRunnable_DoesNotThrow ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
         app.StopAfterFirstIteration = true;
 
-        // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestTopLevel>. Should be fine.
+        // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestRunnable>. Should be fine.
         app.Run<Window> ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -413,7 +413,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         app.Run<Window> ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -422,10 +422,10 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.StopAfterFirstIteration = true;
 
-        // Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
-        app.Run<Toplevel> (null, "fake");
+        // Init has NOT been called and we're passing a valid driver to Run<TestRunnable>. This is ok.
+        app.Run<Runnable> (null, "fake");
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -434,7 +434,7 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         SessionToken? rs = app.Begin (top);
         Assert.NotNull (rs);
 
@@ -444,7 +444,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         top.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
 
         return;
 
@@ -456,7 +456,7 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
+    public void Run_A_Modal_Runnable_Refresh_Background_On_Moving ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
@@ -484,7 +484,7 @@ public class ApplicationTests (ITestOutputHelper output)
         app.End (rs!);
         w.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -499,7 +499,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.Null (app.TopRunnableView);
 
-        app.Shutdown ();
+        app.Dispose ();
         Assert.Null (app.TopRunnableView);
 
         return;
@@ -513,10 +513,10 @@ public class ApplicationTests (ITestOutputHelper output)
 
     #endregion
 
-    #region ShutdownTests
+    #region DisposeTests
 
     [Fact]
-    public async Task Shutdown_Allows_Async ()
+    public async Task Dispose_Allows_Async ()
     {
         var isCompletedSuccessfully = false;
 
@@ -529,7 +529,7 @@ public class ApplicationTests (ITestOutputHelper output)
         }
 
         IApplication app = Application.Create ();
-        app.Shutdown ();
+        app.Dispose ();
 
         Assert.False (isCompletedSuccessfully);
         await TaskWithAsyncContinuation ();
@@ -538,10 +538,10 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Shutdown_Resets_SyncContext ()
+    public void Dispose_Resets_SyncContext ()
     {
         IApplication app = Application.Create ();
-        app.Shutdown ();
+        app.Dispose ();
         Assert.Null (SynchronizationContext.Current);
     }
 

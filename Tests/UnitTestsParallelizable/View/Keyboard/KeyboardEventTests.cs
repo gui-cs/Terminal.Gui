@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿#nullable disable
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console

@@ -15,7 +15,7 @@ namespace Terminal.Gui.Configuration;
 /// 	"Default": {
 /// 		"Schemes": [
 /// 		{
-/// 		"TopLevel": {
+/// 		"Runnable": {
 /// 		"Normal": {
 /// 			"Foreground": "BrightGreen",
 /// 			"Background": "Black"

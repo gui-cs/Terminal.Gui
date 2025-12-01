@@ -1,5 +1,4 @@
-﻿using System;
-using Terminal.Gui.ViewBase;
+﻿using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
 namespace ReactiveExample;

@@ -1,4 +1,5 @@
-﻿namespace UnitTests_Parallelizable.ViewTests;
+﻿#nullable disable
+namespace UnitTests_Parallelizable.ViewTests;
 
 public class PosTests
 {

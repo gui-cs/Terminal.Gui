@@ -106,7 +106,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_NewMouseEvent_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {
-        View view = CreateInstanceIfNotGeneric (viewType);
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {
@@ -126,7 +126,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_NewMouseEvent_Clicked_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {
-        View view = CreateInstanceIfNotGeneric (viewType);
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {

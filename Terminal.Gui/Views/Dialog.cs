@@ -1,7 +1,7 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Toplevel.Modal"/> <see cref="Window"/>. Supports a simple API for adding <see cref="Button"/>s
+///     Supports a simple API for adding <see cref="Button"/>s
 ///     across the bottom. By default, the <see cref="Dialog"/> is centered and used the <see cref="Schemes.Dialog"/>
 ///     scheme.
 /// </summary>
@@ -44,7 +44,6 @@ public class Dialog : Window
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
-        Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
     }

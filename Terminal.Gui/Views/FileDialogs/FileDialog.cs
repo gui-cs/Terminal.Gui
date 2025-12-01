@@ -105,7 +105,7 @@ public class FileDialog : Dialog, IDesignable
 
                                     e.Handled = true;
 
-                                    if (Modal)
+                                    if (IsModal)
                                     {
                                         (s as View)?.App?.RequestStop ();
                                     }
@@ -874,7 +874,7 @@ public class FileDialog : Dialog, IDesignable
 
         Canceled = false;
 
-        if (Modal)
+        if (IsModal)
         {
             App?.RequestStop ();
         }
@@ -1646,7 +1646,6 @@ public class FileDialog : Dialog, IDesignable
 
     bool IDesignable.EnableForDesign ()
     {
-        Modal = false;
         OnIsRunningChanged (true);
         return true;
     }

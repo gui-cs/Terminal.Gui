@@ -5,8 +5,8 @@ Terminal.Gui v2 uses an instance-based application architecture with the **IRunn
 ## Key Features
 
 - **Instance-Based**: Use `Application.Create()` to get an `IApplication` instance instead of static methods
-- **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Toplevel`
-- **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for elegant, concise code  
+- **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Runnable`
+- **Fluent API**: Chain `Init()` and `Run()` for elegant, concise code  
 - **IDisposable Pattern**: Proper resource cleanup with `Dispose()` or `using` statements
 - **Automatic Disposal**: Framework-created runnables are automatically disposed
 - **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
@@ -35,8 +35,8 @@ graph TB
     subgraph Stack["app.SessionStack"]
         direction TB
         S1[Window<br/>Currently Active]
-        S2[Previous Toplevel<br/>Waiting]
-        S3[Base Toplevel<br/>Waiting]
+        S2[Previous Runnable<br/>Waiting]
+        S3[Base Runnable<br/>Waiting]
         
         S1 -.-> S2 -.-> S3
     end
@@ -83,33 +83,33 @@ sequenceDiagram
 ```csharp
 // OLD (v1 / early v2 - still works but obsolete):
 Application.Init();
-var top = new Toplevel();
+var top = new Window();
 top.Add(myView);
 Application.Run(top);
 top.Dispose();
-Application.Shutdown();
+Application.Shutdown(); // Obsolete - use Dispose() instead
 
-// NEW (v2 recommended - instance-based):
-var app = Application.Create();
-app.Init();
-var top = new Toplevel();
-top.Add(myView);
-app.Run(top);
-top.Dispose();
-app.Shutdown();
-
-// NEWEST (v2 with IRunnable and Fluent API):
-Color? result = Application.Create()
-                           .Init()
-                           .Run<ColorPickerDialog>()
-                           .Shutdown() as Color?;
-
-// RECOMMENDED (v2 with IDisposable and using statement):
-Color? result;
+// RECOMMENDED (v2 - instance-based with using statement):
 using (var app = Application.Create().Init())
 {
-    result = app.Run<ColorPickerDialog>().GetResult<Color>();
+    var top = new Window();
+    top.Add(myView);
+    app.Run(top);
+    top.Dispose();
+} // app.Dispose() called automatically
+
+// WITH IRunnable (fluent API with automatic disposal):
+using (var app = Application.Create().Init())
+{
+    app.Run<ColorPickerDialog>();
+    Color? result = app.GetResult<Color>();
 }
+
+// SIMPLEST (manual disposal):
+var app = Application.Create().Init();
+app.Run<ColorPickerDialog>();
+Color? result = app.GetResult<Color>();
+app.Dispose();
 ```
 
 **Note:** The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton). `Application.Create()` creates a **new** `ApplicationImpl` instance, enabling multiple application contexts and better testability.
@@ -183,11 +183,11 @@ public class MyView : View
 
 ## IRunnable Architecture
 
-Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples runnable behavior from the `Toplevel` class hierarchy. Views can implement `IRunnable<TResult>` to participate in session management without inheritance constraints.
+Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples runnable behavior from the `Runnable` class hierarchy. Views can implement `IRunnable<TResult>` to participate in session management without inheritance constraints.
 
 ### Key Benefits
 
-- **Interface-Based**: No forced inheritance from `Toplevel`
+- **Interface-Based**: No forced inheritance from `Runnable`
 - **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
 - **Fluent API**: Method chaining for elegant, concise code
 - **Automatic Disposal**: Framework manages lifecycle of created runnables
@@ -198,11 +198,23 @@ Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples ru
 The fluent API enables elegant method chaining with automatic resource management:
 
 ```csharp
-// All-in-one: Create, initialize, run, shutdown, and extract result
-Color? result = Application.Create()
-                           .Init()
-                           .Run<ColorPickerDialog>()
-                           .Shutdown() as Color?;
+// Recommended: using statement with GetResult
+using (var app = Application.Create().Init())
+{
+    app.Run<ColorPickerDialog>();
+    Color? result = app.GetResult<Color>();
+    
+    if (result is { })
+    {
+        ApplyColor(result);
+    }
+}
+
+// Alternative: Manual disposal
+var app = Application.Create().Init();
+app.Run<ColorPickerDialog>();
+Color? result = app.GetResult<Color>();
+app.Dispose();
 
 if (result is { })
 {
@@ -214,7 +226,8 @@ if (result is { })
 
 - `Init()` - Returns `IApplication` for chaining
 - `Run<TRunnable>()` - Creates and runs runnable, returns `IApplication`
-- `Shutdown()` - Disposes framework-owned runnables, returns `object?` result
+- `GetResult()` / `GetResult<T>()` - Extract typed result after run
+- `Dispose()` - Release all resources (called automatically with `using`)
 
 ### Disposal Semantics
 
@@ -222,18 +235,25 @@ if (result is { })
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|
-| `Run<TRunnable>()` | Framework | Framework | Automatic in `Shutdown()` |
+| `Run<TRunnable>()` | Framework | Framework | Automatic when `Run<T>()` returns |
 | `Run(IRunnable)` | Caller | Caller | Manual by caller |
 
 ```csharp
 // Framework ownership - automatic disposal
-var result = app.Run<MyDialog>().Shutdown();
+using (var app = Application.Create().Init())
+{
+    app.Run<MyDialog>(); // Dialog disposed automatically when Run returns
+    var result = app.GetResult<MyResultType>();
+}
 
 // Caller ownership - manual disposal
-var dialog = new MyDialog();
-app.Run(dialog);
-var result = dialog.Result;
-dialog.Dispose();  // Caller must dispose
+using (var app = Application.Create().Init())
+{
+    var dialog = new MyDialog();
+    app.Run(dialog);
+    var result = dialog.Result;
+    dialog.Dispose();  // Caller must dispose
+}
 ```
 
 ### Creating Runnable Views
@@ -285,7 +305,6 @@ All events follow Terminal.Gui's Cancellable Work Pattern:
 |-------|-------------|------|----------|
 | `IsRunningChanging` | ✓ | Before add/remove from stack | Extract result, prevent close |
 | `IsRunningChanged` | ✗ | After stack change | Post-start/stop cleanup |
-| `IsModalChanging` | ✓ | Before becoming/leaving top | Prevent activation |
 | `IsModalChanged` | ✗ | After modal state change | Update UI after focus change |
 
 **Example - Result Extraction:**
@@ -340,39 +359,34 @@ public interface IApplication
 
 ## IApplication Interface
 
-The `IApplication` interface defines the application contract with support for both legacy `Toplevel` and modern `IRunnable` patterns:
+The `IApplication` interface defines the application contract with support for both legacy `Runnable` and modern `IRunnable` patterns:
 
 ```csharp
 public interface IApplication
 {
-    // Legacy Toplevel support
-    Toplevel? Current { get; }
-    ConcurrentStack<Runnable<bool>> SessionStack { get; }
-    
-    // IRunnable support
+    // IRunnable support (primary)
     IRunnable? TopRunnable { get; }
-    ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; }
-    IRunnable? FrameworkOwnedRunnable { get; set; }
+    View? TopRunnableView { get; }
+    ConcurrentStack<SessionToken>? SessionStack { get; }
     
     // Driver and lifecycle
     IDriver? Driver { get; }
-    IMainLoopCoordinator? MainLoop { get; }
+    IMainLoopCoordinator? Coordinator { get; }
     
-    // Fluent API methods
+    // Fluent API methods  
     IApplication Init(string? driverName = null);
-    object? Shutdown();
+    void Dispose(); // IDisposable
     
     // Runnable methods
-    RunnableSessionToken Begin(IRunnable runnable);
-    void Run(IRunnable runnable, Func<Exception, bool>? errorHandler = null);
+    SessionToken? Begin(IRunnable runnable);
+    object? Run(IRunnable runnable, Func<Exception, bool>? errorHandler = null);
     IApplication Run<TRunnable>(Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new();
     void RequestStop(IRunnable? runnable);
-    void End(RunnableSessionToken sessionToken);
-    
-    // Legacy Toplevel methods
-    SessionToken? Begin(Toplevel toplevel);
-    void Run(Toplevel view, Func<Exception, bool>? errorHandler = null);
     void End(SessionToken sessionToken);
+    
+    // Result extraction
+    object? GetResult();
+    T? GetResult<T>() where T : class;
     
     // ... other members
 }
@@ -384,28 +398,32 @@ Terminal.Gui v2 modernized its terminology for clarity:
 
 ### Application.TopRunnable (formerly "Current", and before that "Top")
 
-The `TopRunnable` property represents the Toplevel on the top of the session stack (the active runnable session):
+The `TopRunnable` property represents the `IRunnable` on the top of the session stack (the active runnable session):
 
 ```csharp
 // Access the top runnable session
-Toplevel? topRunnable = app.TopRunnable;
+IRunnable? topRunnable = app.TopRunnable;
 
-// From within a view
-Toplevel? topRunnable = App?.TopRunnable;
+// From within a view  
+IRunnable? topRunnable = App?.TopRunnable;
+
+// Cast to View if needed
+View? topView = app.TopRunnableView;
 ```
 
 **Why "TopRunnable"?**
 - Clearly indicates it's the top of the runnable session stack
-- Aligns with the IRunnable architecture proposal
+- Aligns with the IRunnable architecture
 - Distinguishes from other concepts like "Current" which could be ambiguous
+- Works with any view that implements `IRunnable`, not just `Runnable`
 
-### Application.SessionStack (formerly "TopLevels")
+### Application.SessionStack (formerly "Runnables")
 
 The `SessionStack` property is the stack of running sessions:
 
 ```csharp
 // Access all running sessions
-foreach (var toplevel in app.SessionStack)
+foreach (var runnable in app.SessionStack)
 {
     // Process each session
 }
@@ -414,7 +432,7 @@ foreach (var toplevel in app.SessionStack)
 int sessionCount = App?.SessionStack.Count ?? 0;
 ```
 
-**Why "SessionStack" instead of "TopLevels"?**
+**Why "SessionStack" instead of "Runnables"?**
 - Describes both content (sessions) and structure (stack)
 - Aligns with `SessionToken` terminology
 - Follows .NET naming patterns (descriptive + collection type)
@@ -427,10 +445,13 @@ The static `Application` class delegates to `ApplicationImpl.Instance` (a single
 public static partial class Application
 {
     [Obsolete("The legacy static Application object is going away.")]
-    public static Toplevel? Current => ApplicationImpl.Instance.Current;
+    public static View? TopRunnableView => ApplicationImpl.Instance.TopRunnableView;
     
     [Obsolete("The legacy static Application object is going away.")]
-    public static ConcurrentStack<Runnable<bool>> SessionStack => ApplicationImpl.Instance.SessionStack;
+    public static IRunnable? TopRunnable => ApplicationImpl.Instance.TopRunnable;
+    
+    [Obsolete("The legacy static Application object is going away.")]
+    public static ConcurrentStack<SessionToken>? SessionStack => ApplicationImpl.Instance.SessionStack;
     
     // ... other obsolete static members
 }
@@ -452,7 +473,7 @@ void MyMethod()
 // NEW:
 void MyMethod(View view)
 {
-    view.App?.Current?.SetNeedsDraw();
+    view.App?.TopRunnableView?.SetNeedsDraw();
 }
 ```
 
@@ -462,7 +483,7 @@ void MyMethod(View view)
 // OLD:
 void ProcessSessions()
 {
-    foreach (var toplevel in Application.SessionStack)
+    foreach (var runnable in Application.SessionStack)
     {
         // Process
     }
@@ -471,7 +492,7 @@ void ProcessSessions()
 // NEW:
 void ProcessSessions(IApplication app)
 {
-    foreach (var toplevel in app.SessionStack)
+    foreach (var runnable in app.SessionStack)
     {
         // Process
     }
@@ -532,22 +553,29 @@ finally
 }
 ```
 
-### Shutdown() vs Dispose()
+### Dispose() and Result Retrieval
 
-- **`Shutdown()`** - Obsolete method that calls `Dispose()` and returns the result
-- **`Dispose()`** - Recommended IDisposable pattern for resource cleanup
-- **`GetResult()`** / **`GetResult<T>()`** - Retrieve results after `Dispose()`
+- **`Dispose()`** - Standard IDisposable pattern for resource cleanup (required)
+- **`GetResult()`** / **`GetResult<T>()`** - Retrieve results after run completes
+- **`Shutdown()`** - Obsolete (use `Dispose()` instead)
 
 ```csharp
-// OLD (Shutdown returns result):
-var result = app.Run<MyDialog>().Shutdown() as MyResult;
-
-// NEW (Dispose + GetResult):
+// RECOMMENDED (using statement):
 using (var app = Application.Create().Init())
 {
     app.Run<MyDialog>();
     var result = app.GetResult<MyResult>();
+    // app.Dispose() called automatically here
 }
+
+// ALTERNATIVE (manual disposal):
+var app = Application.Create().Init();
+app.Run<MyDialog>();
+var result = app.GetResult<MyResult>();
+app.Dispose(); // Must call explicitly
+
+// OLD (obsolete - do not use):
+var result = app.Run<MyDialog>().Shutdown() as MyResult;
 ```
 
 ### Input Thread Lifecycle
@@ -585,11 +613,11 @@ The legacy static `Application` singleton can be re-initialized after disposal (
 ```csharp
 // Test 1
 Application.Init();
-Application.Shutdown();
+Application.Shutdown(); // Obsolete but still works for legacy singleton
 
 // Test 2 - singleton resets and can be re-initialized
 Application.Init(); // ✅ Works!
-Application.Shutdown();
+Application.Shutdown(); // Obsolete but still works for legacy singleton
 ```
 
 However, instance-based applications follow standard `IDisposable` semantics and cannot be reused after disposal:
@@ -609,16 +637,16 @@ app.Init(); // ❌ Throws ObjectDisposedException
 Applications manage sessions through `Begin()` and `End()`:
 
 ```csharp
-var app = Application.Create ();
+using var app = Application.Create ();
 app.Init();
 
-var toplevel = new Toplevel();
+var window = new Window();
 
 // Begin a new session - pushes to SessionStack
-SessionToken? token = app.Begin(toplevel);
+SessionToken? token = app.Begin(window);
 
-// Current now points to this toplevel
-Debug.Assert(app.Current == toplevel);
+// TopRunnable now points to this window
+Debug.Assert(app.TopRunnable == window);
 
 // End the session - pops from SessionStack
 if (token != null)
@@ -626,7 +654,7 @@ if (token != null)
     app.End(token);
 }
 
-// Current restored to previous toplevel (if any)
+// TopRunnable restored to previous runnable (if any)
 ```
 
 ### Nested Sessions
@@ -634,26 +662,26 @@ if (token != null)
 Multiple sessions can run nested:
 
 ```csharp
-var app = Application.Create ();
+using var app = Application.Create ();
 app.Init();
 
 // Session 1
-var main = new Toplevel { Title = "Main" };
+var main = new Window { Title = "Main" };
 var token1 = app.Begin(main);
-// app.Current == main, SessionStack.Count == 1
+// app.TopRunnable == main, SessionStack.Count == 1
 
 // Session 2 (nested)
 var dialog = new Dialog { Title = "Dialog" };
 var token2 = app.Begin(dialog);
-// app.Current == dialog, SessionStack.Count == 2
+// app.TopRunnable == dialog, SessionStack.Count == 2
 
 // End dialog
 app.End(token2);
-// app.Current == main, SessionStack.Count == 1
+// app.TopRunnable == main, SessionStack.Count == 1
 
 // End main
 app.End(token1);
-// app.Current == null, SessionStack.Count == 0
+// app.TopRunnable == null, SessionStack.Count == 0
 ```
 
 ## View.Driver Property
@@ -699,7 +727,7 @@ public void MyView_DisplaysCorrectly()
 {
     // Create mock application
     var mockApp = new Mock<IApplication>();
-    mockApp.Setup(a => a.Current).Returns(new Toplevel());
+    mockApp.Setup(a => a.Current).Returns(new Runnable());
     
     // Create view with mock app
     var view = new MyView { App = mockApp.Object };
@@ -718,29 +746,21 @@ public void MyView_DisplaysCorrectly()
 [Fact]
 public void MyView_WorksWithRealApplication()
 {
-    var app = Application.Create ();
-    try
-    {
-        app.Init(new FakeDriver());
-        
-        var view = new MyView();
-        var top = new Toplevel();
-        top.Add(view);
-        
-        app.Begin(top);
-        
-        // View.App automatically set
-        Assert.NotNull(view.App);
-        Assert.Same(app, view.App);
-        
-        // Test view behavior
-        view.DoSomething();
-        
-    }
-    finally
-    {
-        app.Shutdown();
-    }
+    using var app = Application.Create ();
+    app.Init("fake");
+    
+    var view = new MyView();
+    var top = new Window();
+    top.Add(view);
+    
+    app.Begin(top);
+    
+    // View.App automatically set
+    Assert.NotNull(view.App);
+    Assert.Same(app, view.App);
+    
+    // Test view behavior
+    view.DoSomething();
 }
 ```
 
@@ -752,7 +772,7 @@ public void MyView_WorksWithRealApplication()
 ✅ GOOD:
 public void Refresh()
 {
-    App?.Current?.SetNeedsDraw();
+    App?.TopRunnableView?.SetNeedsDraw();
 }
 ```
 
@@ -762,7 +782,7 @@ public void Refresh()
 ❌ AVOID:
 public void Refresh()
 {
-    Application.TopRunnable?.SetNeedsDraw(); // Obsolete!
+    Application.TopRunnableView?.SetNeedsDraw(); // Obsolete!
 }
 ```
 
@@ -782,13 +802,13 @@ public class Service
 ❌ AVOID (obsolete pattern):
 public void Refresh()
 {
-    Application.TopRunnable?.SetNeedsDraw(); // Obsolete static access
+    Application.TopRunnableView?.SetNeedsDraw(); // Obsolete static access
 }
 
 ✅ PREFERRED:
 public void Refresh()
 {
-    App?.Current?.SetNeedsDraw(); // Use View.App property
+    App?.TopRunnableView?.SetNeedsDraw(); // Use View.App property
 }
 ```
 
@@ -815,15 +835,15 @@ The instance-based architecture enables multiple applications:
 
 ```csharp
 // Application 1
-var app1 = Application.Create ();
-app1.Init(new WindowsDriver());
-var top1 = new Toplevel { Title = "App 1" };
+using var app1 = Application.Create ();
+app1.Init("windows");
+var top1 = new Window { Title = "App 1" };
 // ... configure top1
 
 // Application 2 (different driver!)
-var app2 = Application.Create ();
-app2.Init(new CursesDriver());
-var top2 = new Toplevel { Title = "App 2" };
+using var app2 = Application.Create ();
+app2.Init("unix");
+var top2 = new Window { Title = "App 2" };
 // ... configure top2
 
 // Views in top1 use app1

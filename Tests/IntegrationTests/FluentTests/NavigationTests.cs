@@ -11,7 +11,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void Toplevel_TabGroup_Forward_Backward (TestDriver d)
+    public void Runnable_TabGroup_Forward_Backward (TestDriver d)
     {
         var v1 = new View { Id = "v1", CanFocus = true };
         var v2 = new View { Id = "v2", CanFocus = true };

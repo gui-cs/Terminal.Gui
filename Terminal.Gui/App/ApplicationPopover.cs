@@ -41,7 +41,6 @@ public sealed class ApplicationPopover : IDisposable
     {
         if (popover is { } && !IsRegistered (popover))
         {
-            // When created, set IPopover.Toplevel to the current Application.TopRunnable
             popover.Current ??= App?.TopRunnableView as IRunnable;
 
             if (popover is View popoverView)

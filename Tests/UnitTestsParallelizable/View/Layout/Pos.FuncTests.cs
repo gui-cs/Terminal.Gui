@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿#nullable disable
+using Xunit.Abstractions;
 
 namespace UnitTests_Parallelizable.ViewTests;
 

@@ -266,20 +266,13 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
         IDriver driver = CreateFakeDriver ();
 
         var sizeChangedFired = false;
-        var screenChangedFired = false;
 
-#pragma warning disable CS0618 // Type or member is obsolete
         driver.SizeChanged += (sender, args) => { sizeChangedFired = true; };
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        driver.SizeChanged += (sender, args) => { screenChangedFired = true; };
 
         // Trigger resize using FakeResize
         driver?.SetScreenSize (90, 35);
 
-        // Both events should fire for compatibility
         Assert.True (sizeChangedFired);
-        Assert.True (screenChangedFired);
     }
 
     #endregion

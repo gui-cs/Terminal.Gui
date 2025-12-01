@@ -294,7 +294,7 @@ public class Buttons : Scenario
             X = 2,
             Y = Pos.Bottom (osAlignment) + 1,
             Width = Dim.Width (computedFrame) - 2,
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Text = mhkb
         };
         moveHotKeyBtn.Accepting += (s, e) =>
@@ -311,7 +311,7 @@ public class Buttons : Scenario
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (osAlignment) + 1,
             Width = Dim.Width (absoluteFrame) - 2,
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Text = muhkb
         };
         moveUnicodeHotKeyBtn.Accepting += (s, e) =>

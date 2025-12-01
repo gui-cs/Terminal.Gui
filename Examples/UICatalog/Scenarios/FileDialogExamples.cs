@@ -243,7 +243,7 @@ public class FileDialogExamples : Scenario
             IReadOnlyList<string> multiSelected = fd.MultiSelected;
             string path = fd.Path;
 
-            // This needs to be disposed before opening other toplevel
+            // This needs to be disposed before opening other runnable
             fd.Dispose ();
 
             if (canceled)

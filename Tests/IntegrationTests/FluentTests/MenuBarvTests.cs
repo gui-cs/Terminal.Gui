@@ -386,8 +386,8 @@ public class MenuBarTests
                                             {
                                                 app = a;
                                                 menuBar = new MenuBar ();
-                                                View? toplevel = app.TopRunnableView;
-                                                menuBar.EnableForDesign (ref toplevel!);
+                                                View? runnable = app.TopRunnableView;
+                                                menuBar.EnableForDesign (ref runnable!);
                                                 app.TopRunnableView!.Add (menuBar);
                                             })
                                      .WaitIteration ()

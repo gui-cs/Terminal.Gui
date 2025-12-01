@@ -214,7 +214,7 @@ public class ClearViewportTests (ITestOutputHelper output)
                                    view.SetClip (savedClip);
                                    e.Cancel = true;
                                };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 10);
@@ -280,7 +280,7 @@ public class ClearViewportTests (ITestOutputHelper output)
                                    view.SetClip (savedClip);
                                    e.Cancel = true;
                                };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 10);

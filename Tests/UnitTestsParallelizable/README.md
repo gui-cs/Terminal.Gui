@@ -93,7 +93,7 @@ public void Event_Fires_When_Property_Changes ()
 public void Focus_Test ()
 {
     var view = new Button ();
-    var top = new Toplevel ();
+    var top = new Runnable ();
     top.Add (view);
     Application.Begin (top);
     view.SetFocus ();

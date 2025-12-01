@@ -14,7 +14,7 @@ public class LabelTests (ITestOutputHelper output)
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
@@ -55,7 +55,7 @@ public class LabelTests (ITestOutputHelper output)
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
@@ -101,7 +101,7 @@ public class LabelTests (ITestOutputHelper output)
         TextFormatter tf2 = new () { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize, FillRemaining = true };
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label);
         SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -173,7 +173,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
     public void Label_Draw_Horizontal_Simple_Runes ()
     {
         var label = new Label { Text = "Demo Simple Text" };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (label);
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -194,7 +194,7 @@ Demo Simple Text
     public void Label_Draw_Vertical_Simple_Text ()
     {
         var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "Demo Simple Text" };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (label);
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -230,7 +230,7 @@ t
     public void Label_Draw_Vertical_Wide_Runes ()
     {
         var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "デモエムポンズ" };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (label);
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -257,7 +257,7 @@ t
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Assert.False (label.IsInitialized);
@@ -289,7 +289,7 @@ t
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Assert.False (label.IsInitialized);
@@ -681,7 +681,7 @@ t
 
         win.Add (label);
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
@@ -729,7 +729,7 @@ t
 
         win.Add (label);
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
@@ -762,7 +762,7 @@ t
     [AutoInitShutdown]
     public void Dim_Subtract_Operator_With_Text ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View
         {
@@ -946,7 +946,7 @@ t
     [AutoInitShutdown]
     public void Dim_Add_Operator_With_Text ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View
         {
@@ -1043,7 +1043,7 @@ t
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
@@ -1102,7 +1102,7 @@ t
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);

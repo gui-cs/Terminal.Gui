@@ -127,7 +127,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Contains (Command.HotKey, btn.GetSupportedCommands ());
         Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (btn);
         Application.Begin (top);
 
@@ -173,7 +173,7 @@ public class ButtonTests (ITestOutputHelper output)
         var clicked = false;
         var btn = new Button { Text = "_Test" };
         btn.Accepting += (s, e) => clicked = true;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (btn);
         Application.Begin (top);
 
@@ -208,7 +208,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (clicked);
         clicked = false;
 
-        // Toplevel does not handle Enter, so it should get passed on to button
+        // Runnable does not handle Enter, so it should get passed on to button
         Assert.False (Application.TopRunnableView.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
@@ -243,7 +243,7 @@ public class ButtonTests (ITestOutputHelper output)
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Assert.False (btn.IsInitialized);

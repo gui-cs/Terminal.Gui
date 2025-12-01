@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
@@ -9,7 +8,16 @@ public partial class ApplicationImpl
     // Lock object to protect session stack operations and cached state updates
     private readonly object _sessionStackLock = new ();
 
-    #region Begin->Run->Stop->End
+    #region Session State - Stack and TopRunnable
+
+    /// <inheritdoc/>
+    public ConcurrentStack<SessionToken>? SessionStack { get; } = new ();
+
+    /// <inheritdoc/>
+    public IRunnable? TopRunnable { get; private set; }
+
+    /// <inheritdoc/>
+    public View? TopRunnableView => TopRunnable as View;
 
     /// <inheritdoc/>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
@@ -17,50 +25,20 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public event EventHandler<SessionTokenEventArgs>? SessionEnded;
 
+    #endregion Session State - Stack and TopRunnable
+
+    #region Main Loop Iteration
+
     /// <inheritdoc/>
     public bool StopAfterFirstIteration { get; set; }
 
     /// <inheritdoc/>
-    public void RaiseIteration ()
-    {
-        Iteration?.Invoke (null, new (this));
-    }
-
-    /// <inheritdoc/>
     public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
-
-    private IRunnable? _topRunnable;
-
-    /// <inheritdoc />
-    public IRunnable? TopRunnable
-    {
-        get => _topRunnable;
-        set => _topRunnable = value;
-    }
-
-
     /// <inheritdoc/>
-    public View? TopRunnableView
-    {
-        get => _topRunnable as View;
-        set
-        {
-            if (_topRunnable is View runnableView)
-            {
-                runnableView.App = this;
-            }
-        }
-    }
+    public void RaiseIteration () { Iteration?.Invoke (null, new (this)); }
 
-    /// <inheritdoc/>
-    public ConcurrentStack<SessionToken>? SessionStack { get; } = new ();
-
-
-    /// <inheritdoc/>
-    public void RequestStop () { RequestStop (null); }
-
-    #endregion Begin->Run->Stop->End
+    #endregion Main Loop Iteration
 
     #region Timeouts and Invoke
 
@@ -121,7 +99,7 @@ public partial class ApplicationImpl
 
     #endregion Timeouts and Invoke
 
-    #region IRunnable Support
+    #region Session Lifecycle - Begin
 
     /// <inheritdoc/>
     public SessionToken? Begin (IRunnable runnable)
@@ -136,12 +114,6 @@ public partial class ApplicationImpl
         // Create session token
         SessionToken token = new (runnable);
 
-        // Set the App property if the runnable is a View (needed for IsRunning/IsModal checks)
-        if (runnable is View runnableView)
-        {
-            runnableView.App = this;
-        }
-
         // Get old IsRunning value BEFORE any stack changes (safe - cached value)
         bool oldIsRunning = runnable.IsRunning;
 
@@ -152,11 +124,11 @@ public partial class ApplicationImpl
             return null;
         }
 
+        // Set the application reference in the runnable
+        runnable.SetApp (this);
+
         // Ensure the mouse is ungrabbed
-        if (Mouse.MouseGrabView is { })
-        {
-            Mouse.UngrabMouse ();
-        }
+        Mouse.UngrabMouse ();
 
         IRunnable? previousTop = null;
 
@@ -190,6 +162,7 @@ public partial class ApplicationImpl
                 previousTop.SetIsModal (false);
             }
         }
+
         // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
 
         // Fire events AFTER lock released (avoid deadlocks in event handlers)
@@ -201,32 +174,15 @@ public partial class ApplicationImpl
         runnable.RaiseIsRunningChangedEvent (true);
         runnable.RaiseIsModalChangedEvent (true);
 
-        // Initialize if needed
-        if (runnable is View { IsInitialized: false } view)
-        {
-            view.BeginInit ();
-            view.EndInit ();
-
-            // Initialized event is raised by View.EndInit()
-        }
-
-        // Initial Layout and draw
-        LayoutAndDraw (true);
-
-        // Set focus
-        if (runnable is View { HasFocus: false } viewToFocus)
-        {
-            viewToFocus.SetFocus ();
-        }
-
-        if (PositionCursor ())
-        {
-            Driver?.UpdateCursor ();
-        }
+        // Note: Initialization, layout, focus, and cursor positioning are now handled
+        // by Runnable.RaiseIsRunningChangedEvent and Runnable.RaiseIsModalChangedEvent
 
         return token;
     }
 
+    #endregion Session Lifecycle - Begin
+
+    #region Session Lifecycle - Run
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
@@ -248,14 +204,15 @@ public partial class ApplicationImpl
         TRunnable runnable = new ();
         object? result = Run (runnable, errorHandler);
 
-        // We created the runnable, so dispose it
-        if (runnable is View runnableView)
+        // We created the runnable, so dispose it if it's disposable
+        if (runnable is IDisposable disposable)
         {
-            runnableView.Dispose ();
+            disposable.Dispose ();
         }
 
         return this;
     }
+
     /// <inheritdoc/>
     public object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null)
     {
@@ -268,6 +225,7 @@ public partial class ApplicationImpl
 
         // Begin the session (adds to stack, raises IsRunningChanging/IsRunningChanged)
         SessionToken? token;
+
         if (runnable.IsRunning)
         {
             // Find it on the stack
@@ -281,6 +239,7 @@ public partial class ApplicationImpl
         if (token is null)
         {
             Logging.Trace (@"Run - Begin session failed or was cancelled.");
+
             return null;
         }
 
@@ -336,6 +295,10 @@ public partial class ApplicationImpl
         }
     }
 
+    #endregion Session Lifecycle - Run
+
+    #region Session Lifecycle - End
+
     /// <inheritdoc/>
     public void End (SessionToken token)
     {
@@ -346,6 +309,8 @@ public partial class ApplicationImpl
             return; // Already ended
         }
 
+        // TODO: Move Poppover to utilize IRunnable arch; Get all refs to anyting
+        // TODO: View-related out of ApplicationImpl.
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
@@ -370,20 +335,16 @@ public partial class ApplicationImpl
         // CRITICAL SECTION - Atomic stack + cached state update
         lock (_sessionStackLock)
         {
-            if (wasModal)
+            // Pop token from SessionStack
+            if (wasModal && SessionStack?.TryPop (out SessionToken? popped) == true && popped == token)
             {
-                // Pop token from SessionStack
-                if (SessionStack?.TryPop (out SessionToken? popped) == true && popped == token)
+                // Restore previous top runnable
+                if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
                 {
-                    // Restore previous top runnable
-                    if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
-                    {
+                    previousRunnable = previousToken.Runnable;
 
-                        previousRunnable = previousToken.Runnable;
-
-                        // Previous runnable becomes modal again
-                        previousRunnable.SetIsModal (true);
-                    }
+                    // Previous runnable becomes modal again
+                    previousRunnable.SetIsModal (true);
                 }
             }
 
@@ -391,6 +352,7 @@ public partial class ApplicationImpl
             runnable.SetIsRunning (false);
             runnable.SetIsModal (false);
         }
+
         // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
 
         // Fire events AFTER lock released
@@ -400,6 +362,7 @@ public partial class ApplicationImpl
         }
 
         TopRunnable = null;
+
         if (previousRunnable != null)
         {
             TopRunnable = previousRunnable;
@@ -412,17 +375,17 @@ public partial class ApplicationImpl
 
         _result = token.Result;
 
-        // Set focus to new TopRunnable if exists
-        if (TopRunnableView is View viewToFocus && !viewToFocus.HasFocus)
-        {
-            viewToFocus.SetFocus ();
-        }
-
         // Clear the Runnable from the token
         token.Runnable = null;
         SessionEnded?.Invoke (this, new (token));
     }
 
+    #endregion Session Lifecycle - End
+
+    #region Session Lifecycle - RequestStop
+
+    /// <inheritdoc/>
+    public void RequestStop () { RequestStop (null); }
 
     /// <inheritdoc/>
     public void RequestStop (IRunnable? runnable)
@@ -447,5 +410,5 @@ public partial class ApplicationImpl
         // and that's where IsRunningChanging/IsRunningChanged will be raised
     }
 
-    #endregion IRunnable Support
+    #endregion Session Lifecycle - RequestStop
 }

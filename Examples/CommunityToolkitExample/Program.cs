@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Terminal.Gui.Configuration;
 using Terminal.Gui.App;
-using Terminal.Gui.ViewBase;
-
+using Terminal.Gui.Configuration;
 
 namespace CommunityToolkitExample;
 
@@ -14,10 +12,10 @@ public static class Program
     {
         ConfigurationManager.Enable (ConfigLocations.All);
         Services = ConfigureServices ();
-        Application.Init ();
-        Application.Run (Services.GetRequiredService<LoginView> ());
-        Application.TopRunnableView?.Dispose ();
-        Application.Shutdown ();
+        using IApplication app = Application.Create ();
+        app.Init ();
+        using var loginView = Services.GetRequiredService<LoginView> ();
+        app.Run (loginView);
     }
 
     private static IServiceProvider ConfigureServices ()
@@ -25,6 +23,7 @@ public static class Program
         var services = new ServiceCollection ();
         services.AddTransient<LoginView> ();
         services.AddTransient<LoginViewModel> ();
+
         return services.BuildServiceProvider ();
     }
 }

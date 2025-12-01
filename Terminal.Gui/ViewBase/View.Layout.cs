@@ -440,7 +440,7 @@ public partial class View // Layout APIs
         if (App is { TopRunnableView: { } } && App.TopRunnableView == this
                                         && App.SessionStack!.Select (r => r.Runnable as View).Count() == 1)
         {
-            // If this is the only TopLevel, we need to redraw the screen
+            // If this is the only Runnable, we need to redraw the screen
             App.ClearScreenNextIteration = true;
         }
     }
@@ -1251,7 +1251,7 @@ public partial class View // Layout APIs
         // PopoverHost - If visible, start with it instead of Top
         if (App?.Popover?.GetActivePopover () is View { Visible: true } visiblePopover)
         {
-            // BUGBUG: We do not traverse all visible toplevels if there's an active popover. This may be a bug.
+            // BUGBUG: We do not traverse all visible runnables if there's an active popover. This may be a bug.
             List<View?> result = [];
 
             result.AddRange (GetViewsUnderLocation (visiblePopover, screenLocation, excludeViewportSettingsFlags));
@@ -1264,14 +1264,14 @@ public partial class View // Layout APIs
 
         var checkedTop = false;
 
-        // Traverse all visible toplevels, topmost first (reverse stack order)
+        // Traverse all visible runnables, topmost first (reverse stack order)
         if (App?.SessionStack!.Count > 0)
         {
-            foreach (View? toplevel in App.SessionStack!.Select(r => r.Runnable as View))
+            foreach (View? runnable in App.SessionStack!.Select(r => r.Runnable as View))
             {
-                if (toplevel!.Visible && toplevel.Contains (screenLocation))
+                if (runnable!.Visible && runnable.Contains (screenLocation))
                 {
-                    List<View?> result = GetViewsUnderLocation (toplevel, screenLocation, excludeViewportSettingsFlags);
+                    List<View?> result = GetViewsUnderLocation (runnable, screenLocation, excludeViewportSettingsFlags);
 
                     // Only return if the result is not empty
                     if (result.Count > 0)
@@ -1280,17 +1280,17 @@ public partial class View // Layout APIs
                     }
                 }
 
-                if (toplevel == App.TopRunnableView)
+                if (runnable == App.TopRunnableView)
                 {
                     checkedTop = true;
                 }
             }
         }
 
-        // Fallback: If TopLevels is empty or Top is not in TopLevels, check Top directly (for test compatibility)
+        // Fallback: If Runnables is empty or Top is not in Runnables, check Top directly (for test compatibility)
         if (!checkedTop && App?.TopRunnableView is { Visible: true } top)
         {
-            // For root toplevels, allow hit-testing even if location is outside bounds (for drag/move)
+            // For root runnables, allow hit-testing even if location is outside bounds (for drag/move)
             List<View?> result = GetViewsUnderLocation (top, screenLocation, excludeViewportSettingsFlags);
 
             if (result.Count > 0)

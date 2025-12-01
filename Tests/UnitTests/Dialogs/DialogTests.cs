@@ -1142,7 +1142,7 @@ public class DialogTests (ITestOutputHelper output)
 
         Application.Iteration += OnApplicationOnIteration;
 
-        Application.Run<Toplevel> ();
+        Application.Run<Runnable> ();
         Application.Iteration -= OnApplicationOnIteration;
         Application.Shutdown ();
 
@@ -1301,7 +1301,7 @@ public class DialogTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Modal_Captures_All_Mouse ()
     {
-        var top = new Toplevel
+        var top = new Runnable
         {
             Id = "top"
         };
@@ -1385,7 +1385,7 @@ public class DialogTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Run_Does_Not_Dispose_Dialog ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         Dialog dlg = new () { };
 

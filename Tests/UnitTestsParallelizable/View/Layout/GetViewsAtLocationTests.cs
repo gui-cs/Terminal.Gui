@@ -1095,7 +1095,7 @@ public class GetViewsAtLocationTests
     }
 
     [Fact]
-    public void Returns_TopToplevel_When_Point_Inside_Only_TopToplevel ()
+    public void Returns_TopRunnable_When_Point_Inside_Only_TopToplevel ()
     {
         IApplication? app = Application.Create ();
 
@@ -1105,27 +1105,27 @@ public class GetViewsAtLocationTests
             Frame = new (0, 0, 20, 20)
         };
 
-        Runnable<bool> secondaryToplevel = new ()
+        Runnable<bool> secondaryRunnable = new ()
         {
-            Id = "secondaryToplevel",
+            Id = "secondaryRunnable",
             Frame = new (5, 5, 10, 10)
         };
-        secondaryToplevel.Margin!.Thickness = new (1);
-        secondaryToplevel.Layout ();
+        secondaryRunnable.Margin!.Thickness = new (1);
+        secondaryRunnable.Layout ();
 
         app.Begin (runnable);
-        app.Begin (secondaryToplevel);
+        app.Begin (secondaryRunnable);
 
         List<View?> found = runnable.GetViewsUnderLocation (new (2, 2), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v?.Id == runnable.Id);
         Assert.Contains (found, v => v == runnable);
 
         runnable.Dispose ();
-        secondaryToplevel.Dispose ();
+        secondaryRunnable.Dispose ();
     }
 
     [Fact]
-    public void Returns_SecondaryToplevel_When_Point_Inside_Only_SecondaryToplevel ()
+    public void Returns_SecondaryRunnable_When_Point_Inside_Only_SecondaryToplevel ()
     {
         IApplication? app = Application.Create ();
 
@@ -1135,23 +1135,23 @@ public class GetViewsAtLocationTests
             Frame = new (0, 0, 20, 20)
         };
 
-        Runnable<bool> secondaryToplevel = new ()
+        Runnable<bool> secondaryRunnable = new ()
         {
-            Id = "secondaryToplevel",
+            Id = "secondaryRunnable",
             Frame = new (5, 5, 10, 10)
         };
-        secondaryToplevel.Margin!.Thickness = new (1);
-        secondaryToplevel.Layout ();
+        secondaryRunnable.Margin!.Thickness = new (1);
+        secondaryRunnable.Layout ();
 
         app.Begin (runnable);
-        app.Begin (secondaryToplevel);
+        app.Begin (secondaryRunnable);
 
         List<View?> found = runnable.GetViewsUnderLocation (new (7, 7), ViewportSettingsFlags.TransparentMouse);
-        Assert.Contains (found, v => v?.Id == secondaryToplevel.Id);
+        Assert.Contains (found, v => v?.Id == secondaryRunnable.Id);
         Assert.DoesNotContain (found, v => v?.Id == runnable.Id);
 
         runnable.Dispose ();
-        secondaryToplevel.Dispose ();
+        secondaryRunnable.Dispose ();
     }
 
     [Fact]
@@ -1165,35 +1165,35 @@ public class GetViewsAtLocationTests
             Frame = new (0, 0, 20, 20)
         };
 
-        Runnable<bool> secondaryToplevel = new ()
+        Runnable<bool> secondaryRunnable = new ()
         {
-            Id = "secondaryToplevel",
+            Id = "secondaryRunnable",
             Frame = new (5, 5, 10, 10)
         };
-        secondaryToplevel.Margin!.Thickness = new (1);
+        secondaryRunnable.Margin!.Thickness = new (1);
 
         app.Begin (runnable);
-        app.Begin (secondaryToplevel);
+        app.Begin (secondaryRunnable);
 
-        secondaryToplevel.Margin!.ViewportSettings = ViewportSettingsFlags.None;
+        secondaryRunnable.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
         List<View?> found = runnable.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
-        Assert.Contains (found, v => v == secondaryToplevel);
-        Assert.Contains (found, v => v == secondaryToplevel.Margin);
+        Assert.Contains (found, v => v == secondaryRunnable);
+        Assert.Contains (found, v => v == secondaryRunnable.Margin);
         Assert.DoesNotContain (found, v => v?.Id == runnable.Id);
 
-        secondaryToplevel.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        secondaryRunnable.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         found = runnable.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
-        Assert.DoesNotContain (found, v => v == secondaryToplevel);
-        Assert.DoesNotContain (found, v => v == secondaryToplevel.Margin);
+        Assert.DoesNotContain (found, v => v == secondaryRunnable);
+        Assert.DoesNotContain (found, v => v == secondaryRunnable.Margin);
         Assert.Contains (found, v => v?.Id == runnable.Id);
 
         runnable.Dispose ();
-        secondaryToplevel.Dispose ();
+        secondaryRunnable.Dispose ();
     }
 
     [Fact]
-    public void Returns_Empty_When_Point_Outside_All_Toplevels ()
+    public void Returns_Empty_When_Point_Outside_All_Runnables ()
     {
         IApplication? app = Application.Create ();
 
@@ -1203,21 +1203,21 @@ public class GetViewsAtLocationTests
             Frame = new (0, 0, 20, 20)
         };
 
-        Runnable<bool> secondaryToplevel = new ()
+        Runnable<bool> secondaryRunnable = new ()
         {
-            Id = "secondaryToplevel",
+            Id = "secondaryRunnable",
             Frame = new (5, 5, 10, 10)
         };
-        secondaryToplevel.Margin!.Thickness = new (1);
-        secondaryToplevel.Layout ();
+        secondaryRunnable.Margin!.Thickness = new (1);
+        secondaryRunnable.Layout ();
 
         app.Begin (runnable);
-        app.Begin (secondaryToplevel);
+        app.Begin (secondaryRunnable);
 
         List<View?> found = runnable.GetViewsUnderLocation (new (20, 20), ViewportSettingsFlags.TransparentMouse);
         Assert.Empty (found);
 
         runnable.Dispose ();
-        secondaryToplevel.Dispose ();
+        secondaryRunnable.Dispose ();
     }
 }

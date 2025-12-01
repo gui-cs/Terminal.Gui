@@ -159,7 +159,7 @@ public class TreeTableSourceTests : IDisposable
     [AutoInitShutdown]
     public void TestTreeTableSource_CombinedWithCheckboxes ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
         TableView tv = GetTreeTable (out TreeView<IDescribedThing> treeSource);
 
         CheckBoxTableSourceWrapperByIndex checkSource;
@@ -243,7 +243,7 @@ public class TreeTableSourceTests : IDisposable
         {
             Driver = ApplicationImpl.Instance.Driver,
         };
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
 
         tableView.Style.ShowHorizontalHeaderUnderline = true;
@@ -297,7 +297,7 @@ public class TreeTableSourceTests : IDisposable
         tableView.EndInit ();
         tableView.LayoutSubViews ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         top.SetFocus ();
         Assert.Equal (tableView, top.MostFocused);

@@ -32,7 +32,7 @@ public class DimTests
         Button.DefaultShadow = ShadowStyle.None;
 
         // Testing with the Button because it properly handles the Dim class.
-        Toplevel t = new ();
+        Runnable t = new ();
 
         var w = new Window { Width = 100, Height = 100 };
 

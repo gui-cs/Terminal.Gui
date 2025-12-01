@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿#nullable disable
+using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
 namespace UnitTests_Parallelizable.ViewTests;

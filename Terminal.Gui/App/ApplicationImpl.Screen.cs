@@ -143,7 +143,6 @@ public partial class ApplicationImpl
                 runnableView.SetNeedsLayout ();
             }
         }
-//        LayoutAndDraw (true);
     }
 
     private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { RaiseScreenChangedEvent (new (new (0, 0), e.Size!.Value)); }
@@ -151,7 +150,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. SessionStack!.Select(r => r.Runnable! as View)!];
+        List<View?> tops = [.. SessionStack!.Select(r => r.Runnable! as View)!];
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
@@ -160,7 +159,7 @@ public partial class ApplicationImpl
             tops.Insert (0, visiblePopover);
         }
 
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse ()!, Screen.Size);
 
         if (ClearScreenNextIteration)
         {
@@ -176,7 +175,8 @@ public partial class ApplicationImpl
         if (Driver is { })
         {
             Driver.Clip = new (Screen);
-            View.Draw (tops, neededLayout || forceRedraw);
+
+            View.Draw (views: tops!, neededLayout || forceRedraw);
             Driver.Clip = new (Screen);
             Driver?.Refresh ();
         }

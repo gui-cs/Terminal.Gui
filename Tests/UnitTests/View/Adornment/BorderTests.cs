@@ -729,7 +729,7 @@ public class BorderTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void HasSuperView ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
@@ -756,7 +756,7 @@ public class BorderTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void HasSuperView_Title ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.BorderStyle = LineStyle.Double;
 
         var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };

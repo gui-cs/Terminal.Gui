@@ -102,7 +102,7 @@ public class SpinnerViewTests (ITestOutputHelper output)
     {
         var view = new SpinnerView ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
 

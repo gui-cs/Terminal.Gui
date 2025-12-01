@@ -107,7 +107,7 @@ public class TextTests ()
         Assert.Contains (
                          typeof (IsExternalInit),
                          typeof (View).GetMethod ("set_TextFormatter")
-                                      .ReturnParameter.GetRequiredCustomModifiers ());
+                                      ?.ReturnParameter.GetRequiredCustomModifiers ()!);
     }
 
     // Test that the Text property is set correctly.

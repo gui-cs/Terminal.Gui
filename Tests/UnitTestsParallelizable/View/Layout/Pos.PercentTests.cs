@@ -39,7 +39,7 @@ public class PosPercentTests (ITestOutputHelper output)
         };
 
         container.Add (view);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (container);
         top.LayoutSubViews ();
 

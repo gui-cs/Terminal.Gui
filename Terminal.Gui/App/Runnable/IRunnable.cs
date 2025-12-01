@@ -54,6 +54,12 @@ public interface IRunnable
     #region Running or not (added to/removed from RunnableSessionStack)
 
     /// <summary>
+    ///     Sets the application context for this runnable. Called from <see cref="IApplication.Begin(IRunnable)"/>.
+    /// </summary>
+    /// <param name="app"></param>
+    void SetApp (IApplication app);
+
+    /// <summary>
     ///     Gets whether this runnable session is currently running (i.e., on the
     ///     <see cref="IApplication.SessionStack"/>).
     /// </summary>

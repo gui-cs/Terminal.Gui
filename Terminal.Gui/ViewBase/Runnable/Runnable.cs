@@ -1,26 +1,28 @@
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     Base implementation of <see cref="IRunnable{TResult}"/> for views that can be run as blocking sessions.
+///     Base implementation of <see cref="IRunnable"/> for views that can be run as blocking sessions without returning a result.
 /// </summary>
-/// <typeparam name="TResult">The type of result data returned when the session completes.</typeparam>
 /// <remarks>
 ///     <para>
-///         Views can derive from this class or implement <see cref="IRunnable{TResult}"/> directly.
+///         Views that don't need to return a result can derive from this class instead of <see cref="Runnable{TResult}"/>.
 ///     </para>
 ///     <para>
-///         This class provides default implementations of the <see cref="IRunnable{TResult}"/> interface
+///         This class provides default implementations of the <see cref="IRunnable"/> interface
 ///         following the Terminal.Gui Cancellable Work Pattern (CWP).
 ///     </para>
+///     <para>
+///         For views that need to return a result, use <see cref="Runnable{TResult}"/> instead.
+///     </para>
 /// </remarks>
-public class Runnable<TResult> : View, IRunnable<TResult>
+public class Runnable : View, IRunnable
 {
     // Cached state - eliminates race conditions from stack queries
     private bool _isRunning;
     private bool _isModal;
 
     /// <summary>
-    ///     Constructs a new instance of the <see cref="Runnable{TResult}"/> class,
+    ///     Constructs a new instance of the <see cref="Runnable"/> class.
     /// </summary>
     public Runnable ()
     {
@@ -29,24 +31,19 @@ public class Runnable<TResult> : View, IRunnable<TResult>
         Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
-
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable);
     }
 
     /// <inheritdoc/>
-    public TResult? Result { get; set; }
-
-    /// <summary>
-    ///     Explicit implementation of the non-generic Result property from <see cref="IRunnable"/>.
-    ///     This allows polymorphic access to results without knowing the concrete type.
-    /// </summary>
-    object? IRunnable.Result
-    {
-        get => Result;
-        set => Result = value is TResult typedValue ? typedValue : default;
-    }
+    public object? Result { get; set; }
 
     #region IRunnable Implementation - IsRunning (from base interface)
+
+    /// <inheritdoc />
+    public void SetApp (IApplication app)
+    {
+        App = app;
+    }
 
     /// <inheritdoc/>
     public bool IsRunning => _isRunning;
@@ -64,10 +61,11 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     /// <inheritdoc/>
     public bool RaiseIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
-        // Clear previous result when starting
+        // Clear previous result when starting (for non-generic Runnable)
+        // Derived Runnable<TResult> will clear its typed Result in OnIsRunningChanging override
         if (newIsRunning)
         {
-            Result = default (TResult);
+            Result = null;
         }
 
         // CWP Phase 1: Virtual method (pre-notification)
@@ -90,6 +88,14 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     /// <inheritdoc/>
     public void RaiseIsRunningChangedEvent (bool newIsRunning)
     {
+        // Initialize if needed when starting
+        if (newIsRunning && !IsInitialized)
+        {
+            BeginInit ();
+            EndInit ();
+            // Initialized event is raised by View.EndInit()
+        }
+
         // CWP Phase 3: Post-notification (work already done by Application.Begin/End)
         OnIsRunningChanged (newIsRunning);
 
@@ -101,8 +107,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     public event EventHandler<EventArgs<bool>>? IsRunningChanged;
 
     /// <summary>
-    ///     Called before <see cref="IsRunningChanging"/> event. Override to cancel state change or extract
-    ///     <see cref="Result"/>.
+    ///     Called before <see cref="IsRunningChanging"/> event. Override to cancel state change or perform cleanup.
     /// </summary>
     /// <param name="oldIsRunning">The current value of <see cref="IsRunning"/>.</param>
     /// <param name="newIsRunning">The new value of <see cref="IsRunning"/> (true = starting, false = stopping).</param>
@@ -113,10 +118,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     ///     </para>
     ///     <para>
     ///         <b>IMPORTANT</b>: When <paramref name="newIsRunning"/> is <see langword="false"/> (stopping), this is the ideal
-    ///         place
-    ///         to extract <see cref="Result"/> from views before the runnable is removed from the stack.
-    ///         At this point, all views are still alive and accessible, and subscribers can inspect the result
-    ///         and optionally cancel the stop.
+    ///         place to perform cleanup or validation before the runnable is removed from the stack.
     ///     </para>
     ///     <example>
     ///         <code>
@@ -124,10 +126,7 @@ public class Runnable<TResult> : View, IRunnable<TResult>
     /// {
     ///     if (!newIsRunning)  // Stopping
     ///     {
-    ///         // Extract result before removal from stack
-    ///         Result = _textField.Text;
-    /// 
-    ///         // Or check if user wants to save first
+    ///         // Check if user wants to save first
     ///         if (HasUnsavedChanges ())
     ///         {
     ///             int result = MessageBox.Query (App, "Save?", "Save changes?", "Yes", "No", "Cancel");
@@ -176,6 +175,27 @@ public class Runnable<TResult> : View, IRunnable<TResult>
 
         EventArgs<bool> args = new (newIsModal);
         IsModalChanged?.Invoke (this, args);
+
+        // Layout may need to change when modal state changes
+        SetNeedsLayout ();
+
+        if (newIsModal)
+        {
+            // Initial Layout and draw when becoming modal
+            App?.LayoutAndDraw (true);
+
+            // Set focus to self if becoming modal
+            if (HasFocus is false)
+            {
+                SetFocus ();
+            }
+
+            // Position cursor and update driver
+            if (App?.PositionCursor () == true)
+            {
+                App?.Driver?.UpdateCursor ();
+            }
+        }
     }
 
     /// <inheritdoc/>

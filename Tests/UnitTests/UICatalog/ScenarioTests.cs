@@ -205,7 +205,7 @@ public class ScenarioTests : TestsAllViews
 
         Application.Init ("fake");
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         Dictionary<string, Type> viewClasses = GetAllViewClasses ().ToDictionary (t => t.Name);
 
@@ -217,7 +217,7 @@ public class ScenarioTests : TestsAllViews
             Width = 15,
             Height = Dim.Fill (1), // for status bar
             CanFocus = false,
-            SchemeName = "TopLevel"
+            SchemeName = "Runnable"
         };
 
         ListView classListView = new ()
@@ -227,7 +227,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             AllowsMarking = false,
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (new (viewClasses.Keys.ToList ()))
         };
         leftPane.Add (classListView);
@@ -239,7 +239,7 @@ public class ScenarioTests : TestsAllViews
             Width = Dim.Fill (),
             Height = 10,
             CanFocus = false,
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Title = "Settings"
         };
 

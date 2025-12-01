@@ -53,7 +53,7 @@ public class ShadowStyleTests
         superView.BeginInit ();
         superView.EndInit ();
 
-        Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
+        Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin!.Thickness);
     }
 
 

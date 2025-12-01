@@ -427,7 +427,7 @@ Nice       Work")]
 
         TextFormatter tf = new ()
         {
-            Text = UICatalogTop.GetAboutBoxMessage (),
+            Text = UICatalogRunnable.GetAboutBoxMessage (),
             Alignment = Alignment.Center,
             VerticalAlignment = Alignment.Start,
             WordWrap = false,

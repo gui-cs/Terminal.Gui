@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Games")]
 public class Mazing : Scenario
 {
-    private Toplevel? _top;
+    private Window? _top;
     private MazeGenerator? _m;
 
     private List<Point>? _potions;
@@ -33,17 +33,17 @@ public class Mazing : Scenario
         _top.KeyBindings.Add (Key.CursorDown, Command.Down);
 
         // Changing the key-bindings of a View is not allowed, however,
-        // by default, Toplevel doesn't bind any of our movement keys, so
+        // by default, Runnable doesn't bind any of our movement keys, so
         // we can take advantage of the CommandNotBound event to handle them
         // 
-        // An alternative implementation would be to create a TopLevel subclass that
+        // An alternative implementation would be to create a Runnable subclass that
         // calls AddCommand/KeyBindings.Add in the constructor. See the Snake game scenario
         // for an example.
         _top.CommandNotBound += TopCommandNotBound;
 
         _top.DrawingContent += (s, _) =>
                                {
-                                   if (s is not Toplevel top)
+                                   if (s is not Runnable top)
                                    {
                                        return;
                                    }

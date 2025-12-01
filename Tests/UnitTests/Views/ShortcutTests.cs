@@ -337,7 +337,7 @@ public class ShortcutTests
     [AutoInitShutdown]
     public void KeyDown_Invokes_Action (bool canFocus, KeyCode key, int expectedAction)
     {
-        var current = new Toplevel ();
+        var current = new Runnable ();
 
         var shortcut = new Shortcut
         {

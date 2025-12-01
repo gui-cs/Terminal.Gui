@@ -38,7 +38,7 @@ public class MouseTests : TestsAllViews
         testView.Border!.Thickness = new (borderThickness);
         testView.Padding!.Thickness = new (paddingThickness);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (testView);
 
         SessionToken rs = Application.Begin (top);

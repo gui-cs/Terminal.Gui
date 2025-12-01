@@ -60,7 +60,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -107,7 +107,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -162,7 +162,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -216,7 +216,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -229,7 +229,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         try
         {
             int iterations = -1;
-            var top = new Toplevel ();
+            var top = new Runnable ();
             top.BorderStyle = LineStyle.None;
             app.Driver!.SetScreenSize (20, 10);
 
@@ -300,7 +300,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -313,7 +313,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         try
         {
             int iterations = -1;
-            var top = new Toplevel ();
+            var top = new Runnable ();
             top.BorderStyle = LineStyle.None;
             app.Driver!.SetScreenSize (20, 10);
 
@@ -392,7 +392,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -434,7 +434,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -475,7 +475,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -512,7 +512,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -535,7 +535,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
             app.Iteration += OnApplicationOnIteration;
 
-            var top = new Toplevel ();
+            var top = new Runnable ();
             top.BorderStyle = LineStyle.Single;
             try
             {
@@ -556,7 +556,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                     MessageBox.Query (
                                       app,
                                       "",
-                                      UICatalogTop.GetAboutBoxMessage (),
+                                      UICatalogRunnable.GetAboutBoxMessage (),
                                       wrapMessage: false,
                                       buttons: "_Ok");
 
@@ -590,7 +590,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -613,7 +613,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 

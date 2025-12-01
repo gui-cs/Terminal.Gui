@@ -448,7 +448,7 @@ public class ViewTests
         Assert.Equal (0, view.Height);
         var win = new Window ();
         win.Add (view);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
 
@@ -496,7 +496,7 @@ public class ViewTests
         var button = new Button { Text = "Click Me" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         var iterations = 0;

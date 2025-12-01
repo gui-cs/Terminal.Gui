@@ -14,7 +14,7 @@ public class Bars : Scenario
     public override void Main ()
     {
         Application.Init ();
-        Toplevel app = new ();
+        Runnable app = new ();
 
         app.IsModalChanged += App_Loaded;
 
@@ -37,7 +37,7 @@ public class Bars : Scenario
             X = Pos.AnchorEnd (),
             Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
-            SchemeName = "Toplevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);
@@ -383,7 +383,7 @@ public class Bars : Scenario
 
     //    contextMenu.Add (newMenu, open, save, saveAs);
 
-    //    contextMenu.KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+    //    contextMenu.KeyBindings.Add (Key.Esc, Command.Quit);
 
     //    contextMenu.Initialized += Menu_Initialized;
 

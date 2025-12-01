@@ -51,8 +51,8 @@ public interface IPopover
 {
     /// <summary>
     ///     Gets or sets the <see cref="Current"/> that this Popover is associated with. If null, it is not associated with
-    ///     any Toplevel and will receive all keyboard
-    ///     events from the <see cref="IApplication"/>. If set, it will only receive keyboard events the Toplevel would normally
+    ///     any Runnable and will receive all keyboard
+    ///     events from the <see cref="IApplication"/>. If set, it will only receive keyboard events the Runnable would normally
     ///     receive.
     ///     When <see cref="ApplicationPopover.Register"/> is called, the <see cref="Current"/> is set to the current
     ///     <see cref="IApplication.TopRunnableView"/> if not already set.

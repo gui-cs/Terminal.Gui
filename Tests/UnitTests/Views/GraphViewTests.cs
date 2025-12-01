@@ -1499,7 +1499,7 @@ public class PathAnnotationTests
     {
         // create a wide window
         var mount = new View { Width = 100, Height = 100 };
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         try
         {
@@ -1519,7 +1519,7 @@ public class PathAnnotationTests
             //put label into view
             mount.Add (view);
 
-            //putting mount into Toplevel since changing size
+            //putting mount into Runnable since changing size
             top.Add (mount);
             Application.Begin (top);
 

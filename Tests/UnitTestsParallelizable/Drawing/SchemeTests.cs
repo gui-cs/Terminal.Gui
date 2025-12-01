@@ -36,7 +36,7 @@ public class SchemeTests
         Assert.True (schemes.ContainsKey ("Dialog"));
         Assert.True (schemes.ContainsKey ("Error"));
         Assert.True (schemes.ContainsKey ("Menu"));
-        Assert.True (schemes.ContainsKey ("TopLevel"));
+        Assert.True (schemes.ContainsKey ("Runnable"));
     }
 
 
@@ -66,10 +66,10 @@ public class SchemeTests
         Assert.NotNull (menuScheme);
         Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme!.Normal);
 
-        // Toplevel
-        var toplevelScheme = schemes ["Toplevel"];
-        Assert.NotNull (toplevelScheme);
-        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString (), toplevelScheme!.Normal.ToString ());
+        // Runnable
+        var runnableScheme = schemes ["Runnable"];
+        Assert.NotNull (runnableScheme);
+        Assert.Equal (new Attribute (StandardColor.CadetBlue, StandardColor.Charcoal).ToString (), runnableScheme!.Normal.ToString ());
     }
 
 
