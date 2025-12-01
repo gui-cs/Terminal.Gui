@@ -148,11 +148,11 @@ public class WizardAsView : Scenario
         lastStep.HelpText =
             "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
-        Window topLevel = new ();
-        topLevel.Add (menu, wizard);
+        Window window = new ();
+        window.Add (menu, wizard);
 
-        Application.Run (topLevel);
-        topLevel.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
     }
 }

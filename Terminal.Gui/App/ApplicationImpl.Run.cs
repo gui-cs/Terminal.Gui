@@ -201,28 +201,8 @@ public partial class ApplicationImpl
         runnable.RaiseIsRunningChangedEvent (true);
         runnable.RaiseIsModalChangedEvent (true);
 
-        // Initialize if needed
-        if (runnable is View { IsInitialized: false } view)
-        {
-            view.BeginInit ();
-            view.EndInit ();
-
-            // Initialized event is raised by View.EndInit()
-        }
-
-        // Initial Layout and draw
-        LayoutAndDraw (true);
-
-        // Set focus
-        if (runnable is View { HasFocus: false } viewToFocus)
-        {
-            viewToFocus.SetFocus ();
-        }
-
-        if (PositionCursor ())
-        {
-            Driver?.UpdateCursor ();
-        }
+        // Note: Initialization, layout, focus, and cursor positioning are now handled
+        // by Runnable.RaiseIsRunningChangedEvent and Runnable.RaiseIsModalChangedEvent
 
         return token;
     }
@@ -346,6 +326,8 @@ public partial class ApplicationImpl
             return; // Already ended
         }
 
+        // TODO: Move Poppover to utilize IRunnable arch; Get all refs to anyting
+        // TODO: View-related out of ApplicationImpl.
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
@@ -408,12 +390,6 @@ public partial class ApplicationImpl
         token.Result = runnable.Result;
 
         _result = token.Result;
-
-        // Set focus to new TopRunnable if exists
-        if (TopRunnableView is { HasFocus: false } viewToFocus)
-        {
-            viewToFocus.SetFocus ();
-        }
 
         // Clear the Runnable from the token
         token.Runnable = null;

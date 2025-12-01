@@ -280,7 +280,6 @@ All events follow Terminal.Gui's Cancellable Work Pattern:
 |-------|-------------|------|----------|
 | `IsRunningChanging` | ✓ | Before add/remove from stack | Extract result, prevent close |
 | `IsRunningChanged` | ✗ | After stack change | Post-start/stop cleanup |
-| `IsModalChanging` | ✓ | Before becoming/leaving top | Prevent activation |
 | `IsModalChanged` | ✗ | After modal state change | Update UI after focus change |
 
 **Example - Result Extraction:**

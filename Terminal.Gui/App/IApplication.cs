@@ -437,8 +437,7 @@ public interface IApplication : IDisposable
     ///     </para>
     ///     <para>
     ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
-    ///         and <see cref="IRunnable.IsModalChanged"/> events. NOTE:
-    ///         ending cannot be cancelled.
+    ///         and <see cref="IRunnable.IsModalChanged"/> events.
     ///     </para>
     /// </remarks>
     void End (SessionToken sessionToken);

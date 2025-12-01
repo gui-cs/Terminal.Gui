@@ -55,7 +55,8 @@ public class Runnable : View, IRunnable
     /// <inheritdoc/>
     public bool RaiseIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
-        // Clear previous result when starting
+        // Clear previous result when starting (for non-generic Runnable)
+        // Derived Runnable<TResult> will clear its typed Result in OnIsRunningChanging override
         if (newIsRunning)
         {
             Result = null;
@@ -81,6 +82,14 @@ public class Runnable : View, IRunnable
     /// <inheritdoc/>
     public void RaiseIsRunningChangedEvent (bool newIsRunning)
     {
+        // Initialize if needed when starting
+        if (newIsRunning && !IsInitialized)
+        {
+            BeginInit ();
+            EndInit ();
+            // Initialized event is raised by View.EndInit()
+        }
+
         // CWP Phase 3: Post-notification (work already done by Application.Begin/End)
         OnIsRunningChanged (newIsRunning);
 
@@ -163,6 +172,24 @@ public class Runnable : View, IRunnable
 
         // Layout may need to change when modal state changes
         SetNeedsLayout ();
+
+        if (newIsModal)
+        {
+            // Initial Layout and draw when becoming modal
+            App?.LayoutAndDraw (true);
+
+            // Set focus to self if becoming modal
+            if (HasFocus is false)
+            {
+                SetFocus ();
+            }
+
+            // Position cursor and update driver
+            if (App?.PositionCursor () == true)
+            {
+                App?.Driver?.UpdateCursor ();
+            }
+        }
     }
 
     /// <inheritdoc/>

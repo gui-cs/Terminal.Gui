@@ -674,7 +674,6 @@ protected override bool OnIsRunningChanging(bool oldIsRunning, bool newIsRunning
 
 - **`IsRunningChanging`** - Cancellable event before added/removed from stack
 - **`IsRunningChanged`** - Non-cancellable event after stack change
-- **`IsModalChanging`** - Cancellable event before becoming/leaving top of stack
 - **`IsModalChanged`** - Non-cancellable event after modal state change
 
 ---
