@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Terminal.Gui.Examples;
 
 namespace Terminal.Gui.Drivers;
 
@@ -29,30 +28,7 @@ public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
     /// <inheritdoc/>
     public override IInput<ConsoleKeyInfo> CreateInput ()
     {
-        // Use provided input instance or create a new one if none was provided
-        FakeInput fakeInput = _input ?? new FakeInput ();
-
-        // Check for test context in environment variable
-        string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME);
-
-        if (!string.IsNullOrEmpty (contextJson))
-        {
-            ExampleContext? context = ExampleContext.FromJson (contextJson);
-
-            if (context is { })
-            {
-                foreach (string keyStr in context.KeysToInject)
-                {
-                    if (Key.TryParse (keyStr, out Key? key) && key is { })
-                    {
-                        ConsoleKeyInfo consoleKeyInfo = ConvertKeyToConsoleKeyInfo (key);
-                        fakeInput.AddInput (consoleKeyInfo);
-                    }
-                }
-            }
-        }
-
-        return fakeInput;
+        return _input ?? new FakeInput ();
     }
 
     /// <inheritdoc/>
@@ -65,106 +41,5 @@ public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
     public override ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)
     {
         return _sizeMonitor ?? new SizeMonitorImpl (consoleOutput);
-    }
-
-    private static ConsoleKeyInfo ConvertKeyToConsoleKeyInfo (Key key)
-    {
-        ConsoleModifiers modifiers = 0;
-
-        if (key.IsShift)
-        {
-            modifiers |= ConsoleModifiers.Shift;
-        }
-
-        if (key.IsAlt)
-        {
-            modifiers |= ConsoleModifiers.Alt;
-        }
-
-        if (key.IsCtrl)
-        {
-            modifiers |= ConsoleModifiers.Control;
-        }
-
-        // Remove the modifier masks to get the base key code
-        KeyCode baseKeyCode = key.KeyCode & KeyCode.CharMask;
-
-        // Map KeyCode to ConsoleKey
-        ConsoleKey consoleKey = baseKeyCode switch
-                                {
-                                    KeyCode.A => ConsoleKey.A,
-                                    KeyCode.B => ConsoleKey.B,
-                                    KeyCode.C => ConsoleKey.C,
-                                    KeyCode.D => ConsoleKey.D,
-                                    KeyCode.E => ConsoleKey.E,
-                                    KeyCode.F => ConsoleKey.F,
-                                    KeyCode.G => ConsoleKey.G,
-                                    KeyCode.H => ConsoleKey.H,
-                                    KeyCode.I => ConsoleKey.I,
-                                    KeyCode.J => ConsoleKey.J,
-                                    KeyCode.K => ConsoleKey.K,
-                                    KeyCode.L => ConsoleKey.L,
-                                    KeyCode.M => ConsoleKey.M,
-                                    KeyCode.N => ConsoleKey.N,
-                                    KeyCode.O => ConsoleKey.O,
-                                    KeyCode.P => ConsoleKey.P,
-                                    KeyCode.Q => ConsoleKey.Q,
-                                    KeyCode.R => ConsoleKey.R,
-                                    KeyCode.S => ConsoleKey.S,
-                                    KeyCode.T => ConsoleKey.T,
-                                    KeyCode.U => ConsoleKey.U,
-                                    KeyCode.V => ConsoleKey.V,
-                                    KeyCode.W => ConsoleKey.W,
-                                    KeyCode.X => ConsoleKey.X,
-                                    KeyCode.Y => ConsoleKey.Y,
-                                    KeyCode.Z => ConsoleKey.Z,
-                                    KeyCode.D0 => ConsoleKey.D0,
-                                    KeyCode.D1 => ConsoleKey.D1,
-                                    KeyCode.D2 => ConsoleKey.D2,
-                                    KeyCode.D3 => ConsoleKey.D3,
-                                    KeyCode.D4 => ConsoleKey.D4,
-                                    KeyCode.D5 => ConsoleKey.D5,
-                                    KeyCode.D6 => ConsoleKey.D6,
-                                    KeyCode.D7 => ConsoleKey.D7,
-                                    KeyCode.D8 => ConsoleKey.D8,
-                                    KeyCode.D9 => ConsoleKey.D9,
-                                    KeyCode.Enter => ConsoleKey.Enter,
-                                    KeyCode.Esc => ConsoleKey.Escape,
-                                    KeyCode.Space => ConsoleKey.Spacebar,
-                                    KeyCode.Tab => ConsoleKey.Tab,
-                                    KeyCode.Backspace => ConsoleKey.Backspace,
-                                    KeyCode.Delete => ConsoleKey.Delete,
-                                    KeyCode.Home => ConsoleKey.Home,
-                                    KeyCode.End => ConsoleKey.End,
-                                    KeyCode.PageUp => ConsoleKey.PageUp,
-                                    KeyCode.PageDown => ConsoleKey.PageDown,
-                                    KeyCode.CursorUp => ConsoleKey.UpArrow,
-                                    KeyCode.CursorDown => ConsoleKey.DownArrow,
-                                    KeyCode.CursorLeft => ConsoleKey.LeftArrow,
-                                    KeyCode.CursorRight => ConsoleKey.RightArrow,
-                                    KeyCode.F1 => ConsoleKey.F1,
-                                    KeyCode.F2 => ConsoleKey.F2,
-                                    KeyCode.F3 => ConsoleKey.F3,
-                                    KeyCode.F4 => ConsoleKey.F4,
-                                    KeyCode.F5 => ConsoleKey.F5,
-                                    KeyCode.F6 => ConsoleKey.F6,
-                                    KeyCode.F7 => ConsoleKey.F7,
-                                    KeyCode.F8 => ConsoleKey.F8,
-                                    KeyCode.F9 => ConsoleKey.F9,
-                                    KeyCode.F10 => ConsoleKey.F10,
-                                    KeyCode.F11 => ConsoleKey.F11,
-                                    KeyCode.F12 => ConsoleKey.F12,
-                                    _ => 0
-                                };
-
-        var keyChar = '\0';
-        Rune rune = key.AsRune;
-
-        if (Rune.IsValid (rune.Value))
-        {
-            keyChar = (char)rune.Value;
-        }
-
-        return new (keyChar, consoleKey, key.IsShift, key.IsAlt, key.IsCtrl);
     }
 }
