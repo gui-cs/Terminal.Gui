@@ -13,6 +13,9 @@ using Terminal.Gui.Views;
 [assembly: ExampleDemoKeyStrokes (KeyStrokes = ["CursorDown", "CursorDown", "CursorRight", "Enter"], Order = 1)]
 [assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Esc"], DelayMs = 100, Order = 2)]
 
+// Setup automatic key injection for testing
+ExampleContextInjector.SetupAutomaticInjection ();
+
 // Check for test context to determine driver
 string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME);
 string? driverName = null;

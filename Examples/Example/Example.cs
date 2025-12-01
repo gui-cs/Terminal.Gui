@@ -20,6 +20,9 @@ using Terminal.Gui.Views;
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
 ConfigurationManager.Enable (ConfigLocations.All);
 
+// Setup automatic key injection for testing
+ExampleContextInjector.SetupAutomaticInjection ();
+
 // Check for test context to determine driver
 string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME);
 string? driverName = null;
