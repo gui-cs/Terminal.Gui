@@ -66,7 +66,7 @@ public class MouseDragTests
         Assert.Equal (10, movableView.Frame.Width);
         Assert.Equal (10, movableView.Frame.Height);
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -125,7 +125,7 @@ public class MouseDragTests
         Assert.Equal (13, movableView.Frame.X); // 10 + 3
         Assert.Equal (13, movableView.Frame.Y); // 10 + 3
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -191,7 +191,7 @@ public class MouseDragTests
         Assert.Equal (15, movableView.Frame.X);
         Assert.Equal (15, movableView.Frame.Y);
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -254,7 +254,7 @@ public class MouseDragTests
         Assert.Equal (15, resizableView.Frame.Width); // Width increased by 5
         Assert.Equal (10, resizableView.Frame.Height); // Height unchanged
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -313,7 +313,7 @@ public class MouseDragTests
         Assert.Equal (10, resizableView.Frame.Width); // Width unchanged
         Assert.Equal (15, resizableView.Frame.Height); // Height increased by 5
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -372,7 +372,7 @@ public class MouseDragTests
         Assert.Equal (13, resizableView.Frame.Width); // Width increased by 3
         Assert.Equal (10, resizableView.Frame.Height); // Height unchanged
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -431,7 +431,7 @@ public class MouseDragTests
         Assert.Equal (10, resizableView.Frame.Width); // Width unchanged
         Assert.Equal (12, resizableView.Frame.Height); // Height increased by 2
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -494,7 +494,7 @@ public class MouseDragTests
         Assert.Equal (15, resizableView.Frame.Width); // Width increased by 5
         Assert.Equal (15, resizableView.Frame.Height); // Height increased by 5
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -553,7 +553,7 @@ public class MouseDragTests
         Assert.Equal (13, resizableView.Frame.Width); // Width increased by 3
         Assert.Equal (12, resizableView.Frame.Height); // Height increased by 2
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -608,7 +608,7 @@ public class MouseDragTests
         int expectedMinWidth = resizableView.Border!.Thickness.Horizontal + resizableView.Margin!.Thickness.Right;
         Assert.True (resizableView.Frame.Width >= expectedMinWidth);
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
@@ -658,7 +658,7 @@ public class MouseDragTests
         int expectedMinHeight = resizableView.Border!.Thickness.Vertical + resizableView.Margin!.Thickness.Bottom;
         Assert.True (resizableView.Frame.Height >= expectedMinHeight);
 
-        app.End (app.SessionStack.First ());
+        app.End (app.SessionStack!.First ());
         runnable.Dispose ();
         superView.Dispose ();
     }
