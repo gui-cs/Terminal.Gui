@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace ViewBaseTests.Adornments;
+namespace ViewBaseTests.Arrangement;
 
 
 public class ArrangementTests (ITestOutputHelper output)
@@ -224,13 +224,24 @@ public class ArrangementTests (ITestOutputHelper output)
 
         // Verify other directions are not set
         if (arrangement != ViewArrangement.LeftResizable)
+        {
             Assert.False (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
+        }
+
         if (arrangement != ViewArrangement.RightResizable)
+        {
             Assert.False (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
+        }
+
         if (arrangement != ViewArrangement.TopResizable)
+        {
             Assert.False (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
+        }
+
         if (arrangement != ViewArrangement.BottomResizable)
+        {
             Assert.False (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
+        }
     }
 
     #endregion
