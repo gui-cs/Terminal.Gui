@@ -1,4 +1,5 @@
-﻿// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
+﻿#nullable enable
+// A simple Terminal.Gui example in C# - using C# 9.0 Top-level statements
 
 // This is a simple example application.  For the full range of functionality
 // see the UICatalog project

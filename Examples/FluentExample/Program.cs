@@ -1,3 +1,4 @@
+#nullable enable
 // Fluent API example demonstrating IRunnable with automatic disposal and result extraction
 
 using Terminal.Gui.App;

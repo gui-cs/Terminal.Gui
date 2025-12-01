@@ -1,3 +1,4 @@
+#nullable enable
 // Example demonstrating how to make ANY View runnable without implementing IRunnable
 
 using Terminal.Gui.App;
