@@ -1,8 +1,8 @@
-name: Build and publish API docs
+name: Build and publish v2 API docs
 
 on:
   push:
-    branches: [v1_release, v2_develop]
+    branches: [v2_develop]
 
 permissions:
   id-token: write 
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Build and Deploy API docs to github-pages ${{ github.ref_name }}
+    name: Build and Deploy v2 API docs to github-pages ${{ github.ref_name }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -20,7 +20,6 @@ jobs:
       uses: actions/checkout@v4
 
     - name: DocFX Build
-      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       working-directory: docfx
       run: |
         dotnet tool install -g docfx
@@ -30,27 +29,15 @@ jobs:
       continue-on-error: false
 
     - name: Setup Pages
-      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       uses: actions/configure-pages@v5
       
     - name: Upload artifact
-      #if: github.ref_name == 'v1_release' ||  github.ref_name == 'v1_develop'
       uses: actions/upload-pages-artifact@v3
       with:
         path: docfx/_site
        
     - name: Deploy to GitHub Pages
-      if: github.ref_name == 'v2_release' ||  github.ref_name == 'v2_develop'
       id: deployment
       uses: actions/deploy-pages@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-
-    # - name: v1_release Repository Dispatch ${{ github.ref_name }}
-    #   if: github.ref_name == 'v2_develop'
-    #   uses: peter-evans/repository-dispatch@v3
-    #   with:
-    #     token: ${{ secrets.V2DOCS_TOKEN }}
-    #     repository: gui-cs/Terminal.GuiV1Docs
-    #     event-type: v2_develop_push
-    #     client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
