@@ -86,7 +86,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyList)
         };
-        appKeyListView.SchemeName = "TopLevel";
+        appKeyListView.SchemeName = "Runnable";
         win.Add (appKeyListView);
 
         // View key events...
@@ -114,7 +114,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyDownList)
         };
-        appKeyListView.SchemeName = "TopLevel";
+        appKeyListView.SchemeName = "Runnable";
         win.Add (onKeyDownListView);
 
         // KeyDownNotHandled
@@ -134,7 +134,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyDownNotHandledList)
         };
-        appKeyListView.SchemeName = "TopLevel";
+        appKeyListView.SchemeName = "Runnable";
         win.Add (onKeyDownNotHandledListView);
 
 
@@ -155,7 +155,7 @@ public class Keys : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (swallowedList)
         };
-        appKeyListView.SchemeName = "TopLevel";
+        appKeyListView.SchemeName = "Runnable";
         win.Add (onSwallowedListView);
 
         Application.Driver!.InputProcessor.AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };

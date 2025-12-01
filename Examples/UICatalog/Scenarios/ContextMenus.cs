@@ -26,7 +26,7 @@ public class ContextMenus : Scenario
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
-            SchemeName = "Toplevel"
+            SchemeName = "Runnable"
         };
 
         _appWindow.Initialized += AppWindowOnInitialized;

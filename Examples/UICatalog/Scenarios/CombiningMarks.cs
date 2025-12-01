@@ -8,7 +8,7 @@ public class CombiningMarks : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         top.DrawComplete += (s, e) =>
         {

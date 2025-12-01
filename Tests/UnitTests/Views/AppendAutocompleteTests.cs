@@ -264,7 +264,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         top.Add (tf2);
 

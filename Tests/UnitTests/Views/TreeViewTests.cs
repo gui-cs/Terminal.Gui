@@ -100,7 +100,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n1);
         tv.AddObject (n2);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 

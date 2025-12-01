@@ -1,28 +1,29 @@
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     Base implementation of <see cref="IRunnable"/> for views that can be run as blocking sessions without returning a result.
+///     Base implementation of <see cref="IRunnable{TResult}"/> for views that can be run as blocking sessions.
 /// </summary>
+/// <typeparam name="TResult">The type of result data returned when the session completes.</typeparam>
 /// <remarks>
 ///     <para>
-///         Views that don't need to return a result can derive from this class instead of <see cref="Runnable{TResult}"/>.
+///         Views can derive from this class or implement <see cref="IRunnable{TResult}"/> directly.
 ///     </para>
 ///     <para>
-///         This class provides default implementations of the <see cref="IRunnable"/> interface
+///         This class provides default implementations of the <see cref="IRunnable{TResult}"/> interface
 ///         following the Terminal.Gui Cancellable Work Pattern (CWP).
 ///     </para>
 ///     <para>
-///         For views that need to return a result, use <see cref="Runnable{TResult}"/> instead.
+///         For views that don't need to return a result, use <see cref="Runnable"/> instead.
 ///     </para>
 /// </remarks>
-public class Runnable : View, IRunnable
+public class Runnable<TResult> : View, IRunnable<TResult>
 {
     // Cached state - eliminates race conditions from stack queries
     private bool _isRunning;
     private bool _isModal;
 
     /// <summary>
-    ///     Constructs a new instance of the <see cref="Runnable"/> class.
+    ///     Constructs a new instance of the <see cref="Runnable{TResult}"/> class,
     /// </summary>
     public Runnable ()
     {
@@ -35,7 +36,17 @@ public class Runnable : View, IRunnable
     }
 
     /// <inheritdoc/>
-    public object? Result { get; set; }
+    public TResult? Result { get; set; }
+
+    /// <summary>
+    ///     Explicit implementation of the non-generic Result property from <see cref="IRunnable"/>.
+    ///     This allows polymorphic access to results without knowing the concrete type.
+    /// </summary>
+    object? IRunnable.Result
+    {
+        get => Result;
+        set => Result = value is TResult typedValue ? typedValue : default;
+    }
 
     #region IRunnable Implementation - IsRunning (from base interface)
 
@@ -58,7 +69,7 @@ public class Runnable : View, IRunnable
         // Clear previous result when starting
         if (newIsRunning)
         {
-            Result = null;
+            Result = default (TResult);
         }
 
         // CWP Phase 1: Virtual method (pre-notification)
@@ -92,7 +103,8 @@ public class Runnable : View, IRunnable
     public event EventHandler<EventArgs<bool>>? IsRunningChanged;
 
     /// <summary>
-    ///     Called before <see cref="IsRunningChanging"/> event. Override to cancel state change or perform cleanup.
+    ///     Called before <see cref="IsRunningChanging"/> event. Override to cancel state change or extract
+    ///     <see cref="Result"/>.
     /// </summary>
     /// <param name="oldIsRunning">The current value of <see cref="IsRunning"/>.</param>
     /// <param name="newIsRunning">The new value of <see cref="IsRunning"/> (true = starting, false = stopping).</param>
@@ -103,7 +115,10 @@ public class Runnable : View, IRunnable
     ///     </para>
     ///     <para>
     ///         <b>IMPORTANT</b>: When <paramref name="newIsRunning"/> is <see langword="false"/> (stopping), this is the ideal
-    ///         place to perform cleanup or validation before the runnable is removed from the stack.
+    ///         place
+    ///         to extract <see cref="Result"/> from views before the runnable is removed from the stack.
+    ///         At this point, all views are still alive and accessible, and subscribers can inspect the result
+    ///         and optionally cancel the stop.
     ///     </para>
     ///     <example>
     ///         <code>
@@ -111,7 +126,10 @@ public class Runnable : View, IRunnable
     /// {
     ///     if (!newIsRunning)  // Stopping
     ///     {
-    ///         // Check if user wants to save first
+    ///         // Extract result before removal from stack
+    ///         Result = _textField.Text;
+    /// 
+    ///         // Or check if user wants to save first
     ///         if (HasUnsavedChanges ())
     ///         {
     ///             int result = MessageBox.Query (App, "Save?", "Save changes?", "Yes", "No", "Cancel");

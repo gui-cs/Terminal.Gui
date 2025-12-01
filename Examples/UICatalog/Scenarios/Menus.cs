@@ -21,7 +21,7 @@ public class Menus : Scenario
         Logging.Logger = CreateLogger ();
 
         Application.Init ();
-        Toplevel app = new ();
+        Runnable app = new ();
         app.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
@@ -32,7 +32,7 @@ public class Menus : Scenario
             X = Pos.AnchorEnd (),
             Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);

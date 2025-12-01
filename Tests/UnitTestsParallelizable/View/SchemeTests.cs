@@ -198,7 +198,7 @@ public class SchemeTests : FakeDriverBase
         Assert.Contains ("Dialog", schemes.Keys);
         Assert.Contains ("Error", schemes.Keys);
         Assert.Contains ("Menu", schemes.Keys);
-        Assert.Contains ("Toplevel", schemes.Keys);
+        Assert.Contains ("Runnable", schemes.Keys);
     }
 
 

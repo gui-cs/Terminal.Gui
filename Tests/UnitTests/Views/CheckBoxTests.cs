@@ -34,7 +34,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
@@ -95,7 +95,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox1, checkBox2);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         SessionToken rs = Application.Begin (top);
@@ -156,7 +156,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
@@ -207,7 +207,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);

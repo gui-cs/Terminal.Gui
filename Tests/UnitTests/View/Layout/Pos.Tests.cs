@@ -10,7 +10,7 @@ public class PosTests ()
     {
         Application.Init ("fake");
 
-        Toplevel t = new ();
+        Runnable t = new ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Absolute (2) };
 
@@ -41,7 +41,7 @@ public class PosTests ()
     {
         Application.Init ("fake");
 
-        Toplevel t = new Toplevel ();
+        Runnable t = new Runnable ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Top (t) + 2 };
         var f = new FrameView ();
@@ -69,7 +69,7 @@ public class PosTests ()
     [SetupFakeApplication]
     public void Pos_Add_Operator ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };
@@ -130,7 +130,7 @@ public class PosTests ()
     {
         Application.Init ("fake");
 
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };
@@ -204,7 +204,7 @@ public class PosTests ()
     {
         Application.Init ("fake");
 
-        Toplevel t = new ();
+        Runnable t = new ();
 
         var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
         t.Add (w);
@@ -230,7 +230,7 @@ public class PosTests ()
     {
         Application.Init ("fake");
 
-        Toplevel t = new Toplevel ();
+        Runnable t = new Runnable ();
 
         var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
         t.Add (w);

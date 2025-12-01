@@ -14,7 +14,7 @@ namespace UICatalog;
 ///     This is the main UI Catalog app view. It is run fresh when the app loads (if a Scenario has not been passed on
 ///     the command line) and each time a Scenario ends.
 /// </summary>
-public class UICatalogTop : Toplevel
+public class UICatalogRunnable : Runnable
 {
     // When a scenario is run, the main app is killed. The static
     // members are cached so that when the scenario exits the
@@ -23,12 +23,12 @@ public class UICatalogTop : Toplevel
     // Note, we used to pass this to scenarios that run, but it just added complexity
     // So that was removed. But we still have this here to demonstrate how changing
     // the scheme works.
-    public static string? CachedTopLevelScheme { get; set; }
+    public static string? CachedRunnableScheme { get; set; }
 
     // Diagnostics
     private static ViewDiagnosticFlags _diagnosticFlags;
 
-    public UICatalogTop ()
+    public UICatalogRunnable ()
     {
         _diagnosticFlags = Diagnostics;
 
@@ -50,7 +50,7 @@ public class UICatalogTop : Toplevel
         }
         _scenarioList.SelectedRow = _cachedScenarioIndex;
 
-        SchemeName = CachedTopLevelScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         ConfigurationManager.Applied += ConfigAppliedHandler;
     }
 
@@ -248,14 +248,14 @@ public class UICatalogTop : Toplevel
                                                         {
                                                             return;
                                                         }
-                                                        CachedTopLevelScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [(int)args.Value];
-                                                        SchemeName = CachedTopLevelScheme;
+                                                        CachedRunnableScheme = SchemeManager.GetSchemesForCurrentTheme ()!.Keys.ToArray () [(int)args.Value];
+                                                        SchemeName = CachedRunnableScheme;
                                                         SetNeedsDraw ();
                                                     };
 
                 menuItem = new ()
                 {
-                    Title = "Scheme for Toplevel",
+                    Title = "Scheme for Runnable",
                     SubMenu = new (
                                    [
                                        new ()
@@ -400,12 +400,12 @@ public class UICatalogTop : Toplevel
         _topSchemesSelector.Labels = SchemeManager.GetSchemeNames ().ToArray ();
         _topSchemesSelector.Value = selectedScheme;
 
-        if (CachedTopLevelScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedTopLevelScheme))
+        if (CachedRunnableScheme is null || !SchemeManager.GetSchemeNames ().Contains (CachedRunnableScheme))
         {
-            CachedTopLevelScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
+            CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedTopLevelScheme!);
+        int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedRunnableScheme!);
         // if the item is in bounds then select it
         if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
         {
@@ -694,7 +694,7 @@ public class UICatalogTop : Toplevel
     {
         UpdateThemesMenu ();
 
-        SchemeName = CachedTopLevelScheme;
+        SchemeName = CachedRunnableScheme;
 
         if (_shQuit is { })
         {

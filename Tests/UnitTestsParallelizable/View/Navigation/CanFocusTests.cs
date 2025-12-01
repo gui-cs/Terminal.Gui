@@ -181,7 +181,7 @@ public class CanFocusTests () : TestsAllViews
     [Fact]
     public void CanFocus_Faced_With_Container ()
     {
-        var t = new Toplevel ();
+        var t = new Runnable ();
         var w = new Window ();
         var f = new FrameView ();
         var v = new View { CanFocus = true };

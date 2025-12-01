@@ -65,7 +65,7 @@ Y
         var viewX = new View { Text = "X", X = Pos.Right (label), Width = 1, Height = 1 };
         var viewY = new View { Text = "Y", Y = Pos.Bottom (label), Width = 1, Height = 1 };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (label, viewX, viewY);
         SessionToken rs = Application.Begin (top);
 
@@ -119,7 +119,7 @@ Y
 
         var view = new View ();
         win.Add (view);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         SessionToken rs = Application.Begin (top);
@@ -386,7 +386,7 @@ Y
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (view);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (4, 10);
@@ -513,7 +513,7 @@ w ";
             Text = "Window"
         };
         win.Add (horizontalView, verticalView);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 20);
@@ -602,7 +602,7 @@ w ";
         };
         var win = new Window { Id = "win", Width = Dim.Fill (), Height = Dim.Fill (), Text = "Window" };
         win.Add (horizontalView, verticalView);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (22, 22);
@@ -682,7 +682,7 @@ w ";
     public void Excess_Text_Is_Erased_When_The_Width_Is_Reduced ()
     {
         var lbl = new Label { Text = "123" };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lbl);
         SessionToken rs = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -787,7 +787,7 @@ w ";
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (frame);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (width + 2, 6);
@@ -918,7 +918,7 @@ w ";
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (frame);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (9, height + 2);

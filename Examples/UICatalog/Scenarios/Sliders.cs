@@ -590,7 +590,7 @@ public class Sliders : Scenario
             Y = Pos.Bottom (spacingOptions),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource)
         };
         configView.Add (eventLog);

@@ -20,7 +20,7 @@ public class TransparentMouseTests
     {
         // Arrange
         IApplication? app = Application.Create ();
-        var top = new Toplevel ()
+        var top = new Runnable ()
         {
             Id = "top",
         };
@@ -52,7 +52,7 @@ public class TransparentMouseTests
     {
         // Arrange
         IApplication? app = Application.Create ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         app.Begin (top);
 
         var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10 };
@@ -82,7 +82,7 @@ public class TransparentMouseTests
     {
         // Arrange
         IApplication? app = Application.Create ();
-        var top = new Toplevel ()
+        var top = new Runnable ()
         {
             Id = "top",
         };

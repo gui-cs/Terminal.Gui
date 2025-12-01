@@ -519,7 +519,7 @@ public class ApplicationImplTests
         IApplication? app = Application.Create ();
         app.Init ("fake");
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         SessionToken? sessionToken = app.Begin (top);
         Assert.NotNull (sessionToken);
 
@@ -545,7 +545,7 @@ public class ApplicationImplTests
         app.StopAfterFirstIteration = true;
 
         // Init has been called, but Driver has been set to null. Bad.
-        Assert.Throws<InvalidOperationException> (() => app.Run<Toplevel> ());
+        Assert.Throws<InvalidOperationException> (() => app.Run<Runnable> ());
     }
 
     [Fact]

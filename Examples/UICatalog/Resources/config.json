@@ -11,7 +11,7 @@
       "Hot Dog Stand": {
         "Schemes": [
           {
-            "Toplevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "Black",
                 "Background": "#FFFF00"
@@ -177,7 +177,7 @@
             }
           },
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "DarkGray",
                 "Background": "White"

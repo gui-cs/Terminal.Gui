@@ -40,7 +40,7 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.False (timeoutFired);
 
         app.StopAfterFirstIteration = true;
-        app.Run<Toplevel> ();
+        app.Run<Runnable> ();
 
         // The timeout should have fired
         Assert.True (timeoutFired);
@@ -49,12 +49,12 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Begin_Null_Toplevel_Throws ()
+    public void Begin_Null_Runnable_Throws ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        // Test null Toplevel
+        // Test null Runnable
         Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
 
         app.Shutdown ();
@@ -68,7 +68,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.Null (app.TopRunnableView);
         app.Driver!.SetScreenSize (80, 25);
-        Toplevel top = new ();
+        Runnable top = new ();
         SessionToken? token = app.Begin (top);
         Assert.Equal (new (0, 0, 80, 25), app.TopRunnableView!.Frame);
         app.Driver!.SetScreenSize (5, 5);
@@ -250,7 +250,7 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        Toplevel top = new ();
+        Runnable top = new ();
         SessionToken? rs = app.Begin (top);
 
         var actionCalled = 0;
@@ -271,7 +271,7 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Init ("fake");
 
         app.Iteration += Application_Iteration;
-        app.Run<Toplevel> ();
+        app.Run<Runnable> ();
         app.Iteration -= Application_Iteration;
 
         Assert.Equal (1, iteration);
@@ -328,16 +328,16 @@ public class ApplicationTests (ITestOutputHelper output)
     #region RunTests
 
     [Fact]
-    public void Run_T_After_InitWithDriver_with_TopLevel_and_Driver_Does_Not_Throw ()
+    public void Run_T_After_InitWithDriver_with_Runnable_and_Driver_Does_Not_Throw ()
     {
         IApplication app = Application.Create ();
         app.StopAfterFirstIteration = true;
 
-        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Window is derived from Toplevel)
-        // Using another type not derived from Toplevel will throws at compile time
+        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Window is derived from Runnable)
+        // Using another type not derived from Runnable will throws at compile time
         app.Run<Window> (null, "fake");
 
-        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Dialog is derived from Toplevel)
+        // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Dialog is derived from Runnable)
         app.Run<Dialog> (null, "fake");
 
         app.Shutdown ();
@@ -349,13 +349,13 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        // Init doesn't create a Toplevel and assigned it to app.TopRunnable
+        // Init doesn't create a Runnable and assigned it to app.TopRunnable
         // but Begin does
-        var initTop = new Toplevel ();
+        var initTop = new Runnable ();
 
         app.Iteration += OnApplicationOnIteration;
 
-        app.Run<Toplevel> ();
+        app.Run<Runnable> ();
         app.Iteration -= OnApplicationOnIteration;
 
 #if DEBUG_IDISPOSABLE
@@ -380,26 +380,26 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Run_T_After_InitWithDriver_with_TestTopLevel_DoesNotThrow ()
+    public void Run_T_After_InitWithDriver_with_TestRunnable_DoesNotThrow ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
         app.StopAfterFirstIteration = true;
 
-        // Init has been called and we're passing no driver to Run<TestTopLevel>. This is ok.
+        // Init has been called and we're passing no driver to Run<TestRunnable>. This is ok.
         app.Run<Window> ();
 
         app.Shutdown ();
     }
 
     [Fact]
-    public void Run_T_After_InitNullDriver_with_TestTopLevel_DoesNotThrow ()
+    public void Run_T_After_InitNullDriver_with_TestRunnable_DoesNotThrow ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
         app.StopAfterFirstIteration = true;
 
-        // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestTopLevel>. Should be fine.
+        // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestRunnable>. Should be fine.
         app.Run<Window> ();
 
         app.Shutdown ();
@@ -422,8 +422,8 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.StopAfterFirstIteration = true;
 
-        // Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
-        app.Run<Toplevel> (null, "fake");
+        // Init has NOT been called and we're passing a valid driver to Run<TestRunnable>. This is ok.
+        app.Run<Runnable> (null, "fake");
 
         app.Shutdown ();
     }
@@ -434,7 +434,7 @@ public class ApplicationTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         SessionToken? rs = app.Begin (top);
         Assert.NotNull (rs);
 
@@ -456,7 +456,7 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
+    public void Run_A_Modal_Runnable_Refresh_Background_On_Moving ()
     {
         IApplication app = Application.Create ();
         app.Init ("fake");

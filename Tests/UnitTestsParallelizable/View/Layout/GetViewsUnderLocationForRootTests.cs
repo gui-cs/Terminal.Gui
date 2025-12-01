@@ -8,7 +8,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsRoot_WhenPointInsideRoot_NoSubviews ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -19,7 +19,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsEmpty_WhenPointOutsideRoot ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -30,7 +30,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsSubview_WhenPointInsideSubview ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -49,7 +49,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsTop_WhenPointInsideSubview_With_TransparentMouse ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -73,7 +73,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsAdornment_WhenPointInMargin ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -87,7 +87,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void Returns_WhenPointIn_TransparentToMouseMargin_None ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -101,7 +101,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void Returns_WhenPointIn_NotTransparentToMouseMargin_Top_And_Margin ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -115,7 +115,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsAdornment_WhenPointInBorder ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -128,7 +128,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsAdornment_WhenPointInPadding ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -143,7 +143,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void HonorsIgnoreTransparentMouseParam ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10),
             ViewportSettings = ViewportSettingsFlags.TransparentMouse
@@ -158,7 +158,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void ReturnsDeepestSubview_WhenNested ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -182,7 +182,7 @@ public class GetViewsUnderLocationForRootTests
     [Fact]
     public void Returns_Subview_WhenPointIn_TransparentToMouseMargin_Top ()
     {
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 20, 20)
         };
@@ -216,7 +216,7 @@ public class GetViewsUnderLocationForRootTests
     public void Returns_Subview_Of_Adornment (string adornmentType)
     {
         // Arrange: top -> subView -> subView.[Adornment] -> adornmentSubView
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Frame = new (0, 0, 10, 10)
         };
@@ -277,7 +277,7 @@ public class GetViewsUnderLocationForRootTests
     public void Returns_OnlyParentsSuperView_Of_Adornment_If_TransparentMouse (string adornmentType)
     {
         // Arrange: top -> subView -> subView.[Adornment] -> adornmentSubView
-        Toplevel top = new ()
+        Runnable top = new ()
         {
             Id = "top",
             Frame = new (0, 0, 10, 10)

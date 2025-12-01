@@ -232,7 +232,7 @@ public partial class ApplicationImpl
         // === 0. Stop all timers ===
         TimedEvents?.StopAll ();
 
-        // === 1. Stop all running toplevels ===
+        // === 1. Stop all running runnables ===
         foreach (SessionToken token in SessionStack!.Reverse ())
         {
             if (token.Runnable is { })
@@ -253,7 +253,7 @@ public partial class ApplicationImpl
         Popover?.Dispose ();
         Popover = null;
 
-        // === 3. Clean up toplevels ===
+        // === 3. Clean up runnables ===
         SessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE

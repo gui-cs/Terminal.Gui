@@ -8,8 +8,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     The Wizard can be displayed either as a modal (pop-up) <see cref="Window"/> (like <see cref="Dialog"/>) or as
-///     an embedded <see cref="View"/>. By default, <see cref="Wizard.Modal"/> is <c>true</c>. In this case launch the
-///     Wizard with <c>Application.Run(wizard)</c>. See <see cref="Wizard.Modal"/> for more details.
+///     an embedded <see cref="View"/>.
 /// </remarks>
 /// <example>
 ///     <code>
@@ -110,7 +109,7 @@ public class Wizard : Dialog
     ///// <summary>
     /////     Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not. The default is
     /////     <see langword="true"/>. The Wizard will be shown with a frame and title and will behave like any
-    /////     <see cref="Toplevel"/> window. If set to <c>false</c> the Wizard will have no frame and will behave like any
+    /////     <see cref="Runnable"/> window. If set to <c>false</c> the Wizard will have no frame and will behave like any
     /////     embedded <see cref="View"/>. To use Wizard as an embedded View
     /////     <list type="number">
     /////         <item>
@@ -183,7 +182,6 @@ public class Wizard : Dialog
 
     /// <summary>
     ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressing the Esc key. To prevent a modal (
-    ///     <see cref="Wizard.Modal"/> is <c>true</c>) Wizard from closing, cancel the event by setting
     ///     <see cref="WizardButtonEventArgs.Cancel"/> to <c>true</c> before returning from the event handler.
     /// </summary>
     public event EventHandler<WizardButtonEventArgs>? Cancelled;
@@ -374,7 +372,7 @@ public class Wizard : Dialog
     ///     <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
     ///     <see cref="IApplication.RequestStop(IRunnable)"/>, closing the Dialog. Wizard overrides
     ///     <see cref="OnKeyDownNotHandled"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
-    ///     non-modal (see <see cref="Wizard.Modal"/>).
+    ///     non-modal.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>

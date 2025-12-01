@@ -45,7 +45,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_End_Does_Not_Reset_PopoverManager ()
     {
-        Toplevel? top = null;
+        Runnable? top = null;
 
         try
         {
@@ -73,7 +73,7 @@ public class ApplicationPopoverTests
     [Fact]
     public void Application_End_Hides_Active ()
     {
-        Toplevel? top = null;
+        Runnable? top = null;
 
         try
         {
@@ -190,7 +190,7 @@ public class ApplicationPopoverTests
     }
 
     [Fact]
-    public void Register_SetsTopLevel ()
+    public void Register_SetsRunnable ()
     {
         try
         {

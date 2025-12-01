@@ -46,7 +46,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             new (fg.GetDimColor (), bg.GetDimColor ())
         };
 
-        var superView = new Toplevel
+        var superView = new Runnable
         {
             Driver = ApplicationImpl.Instance.Driver,
             Height = 3,
@@ -104,7 +104,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     {
         Application.Driver!.SetScreenSize (5, 5);
 
-        var superView = new Toplevel
+        var superView = new Runnable
         {
             Driver = ApplicationImpl.Instance.Driver,
             Width = 4,

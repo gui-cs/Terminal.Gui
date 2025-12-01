@@ -280,7 +280,7 @@ public class ComputedLayout : Scenario
             Y = Pos.Percent (50),
             Width = Dim.Percent (80),
             Height = Dim.Percent (10),
-            SchemeName = "TopLevel"
+            SchemeName = "Runnable"
         };
 
         textView.Text =

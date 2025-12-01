@@ -12,7 +12,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
-    public void Begin_WithNullToplevel_ThrowsArgumentNullException ()
+    public void Begin_WithNullRunnable_ThrowsArgumentNullException ()
     {
         IApplication app = Application.Create ();
 
@@ -30,22 +30,22 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void Begin_SetsCurrent_WhenCurrentIsNull ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel = null;
+        Runnable? runnable = null;
 
         try
         {
-            toplevel = new ();
+            runnable = new ();
             Assert.Null (app.TopRunnableView);
 
-            app.Begin (toplevel);
+            app.Begin (runnable);
 
             Assert.NotNull (app.TopRunnableView);
-            Assert.Same (toplevel, app.TopRunnableView);
+            Assert.Same (runnable, app.TopRunnableView);
             Assert.Single (app.SessionStack!);
         }
         finally
         {
-            toplevel?.Dispose ();
+            runnable?.Dispose ();
             app.Dispose ();
         }
     }
@@ -54,26 +54,26 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void Begin_PushesToSessionStack ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel1 = null;
-        Toplevel? toplevel2 = null;
+        Runnable? runnable1 = null;
+        Runnable? runnable2 = null;
 
         try
         {
-            toplevel1 = new () { Id = "1" };
-            toplevel2 = new () { Id = "2" };
+            runnable1 = new () { Id = "1" };
+            runnable2 = new () { Id = "2" };
 
-            app.Begin (toplevel1);
+            app.Begin (runnable1);
             Assert.Single (app.SessionStack!);
-            Assert.Same (toplevel1, app.TopRunnableView);
+            Assert.Same (runnable1, app.TopRunnableView);
 
-            app.Begin (toplevel2);
+            app.Begin (runnable2);
             Assert.Equal (2, app.SessionStack!.Count);
-            Assert.Same (toplevel2, app.TopRunnableView);
+            Assert.Same (runnable2, app.TopRunnableView);
         }
         finally
         {
-            toplevel1?.Dispose ();
-            toplevel2?.Dispose ();
+            runnable1?.Dispose ();
+            runnable2?.Dispose ();
             app.Dispose ();
         }
     }
@@ -97,23 +97,23 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void End_PopsSessionStack ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel1 = null;
-        Toplevel? toplevel2 = null;
+        Runnable? runnable1 = null;
+        Runnable? runnable2 = null;
 
         try
         {
-            toplevel1 = new () { Id = "1" };
-            toplevel2 = new () { Id = "2" };
+            runnable1 = new () { Id = "1" };
+            runnable2 = new () { Id = "2" };
 
-            SessionToken token1 = app.Begin (toplevel1)!;
-            SessionToken token2 = app.Begin (toplevel2)!;
+            SessionToken token1 = app.Begin (runnable1)!;
+            SessionToken token2 = app.Begin (runnable2)!;
 
             Assert.Equal (2, app.SessionStack!.Count);
 
             app.End (token2);
 
             Assert.Single (app.SessionStack!);
-            Assert.Same (toplevel1, app.TopRunnableView);
+            Assert.Same (runnable1, app.TopRunnableView);
 
             app.End (token1);
 
@@ -121,8 +121,8 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         }
         finally
         {
-            toplevel1?.Dispose ();
-            toplevel2?.Dispose ();
+            runnable1?.Dispose ();
+            runnable2?.Dispose ();
             app.Dispose ();
         }
     }
@@ -131,16 +131,16 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void End_ThrowsArgumentException_WhenNotBalanced ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel1 = null;
-        Toplevel? toplevel2 = null;
+        Runnable? runnable1 = null;
+        Runnable? runnable2 = null;
 
         try
         {
-            toplevel1 = new () { Id = "1" };
-            toplevel2 = new () { Id = "2" };
+            runnable1 = new () { Id = "1" };
+            runnable2 = new () { Id = "2" };
 
-            SessionToken? token1 = app.Begin (toplevel1);
-            SessionToken? token2 = app.Begin (toplevel2);
+            SessionToken? token1 = app.Begin (runnable1);
+            SessionToken? token2 = app.Begin (runnable2);
 
             // Trying to end token1 when token2 is on top should throw
             // NOTE: This throws but has the side effect of popping token2 from the stack
@@ -151,9 +151,9 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         }
         finally
         {
-            // Dispose toplevels BEFORE Shutdown to satisfy DEBUG_IDISPOSABLE assertions
-            toplevel1?.Dispose ();
-            toplevel2?.Dispose ();
+            // Dispose runnables BEFORE Shutdown to satisfy DEBUG_IDISPOSABLE assertions
+            runnable1?.Dispose ();
+            runnable2?.Dispose ();
 
             // Shutdown will call ResetState which clears any remaining state
             app.Dispose ();
@@ -161,38 +161,38 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void End_RestoresCurrentToPreviousToplevel ()
+    public void End_RestoresCurrentToPreviousRunnable ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel1 = null;
-        Toplevel? toplevel2 = null;
-        Toplevel? toplevel3 = null;
+        Runnable? runnable1 = null;
+        Runnable? runnable2 = null;
+        Runnable? runnable3 = null;
 
         try
         {
-            toplevel1 = new () { Id = "1" };
-            toplevel2 = new () { Id = "2" };
-            toplevel3 = new () { Id = "3" };
+            runnable1 = new () { Id = "1" };
+            runnable2 = new () { Id = "2" };
+            runnable3 = new () { Id = "3" };
 
-            SessionToken? token1 = app.Begin (toplevel1);
-            SessionToken? token2 = app.Begin (toplevel2);
-            SessionToken? token3 = app.Begin (toplevel3);
+            SessionToken? token1 = app.Begin (runnable1);
+            SessionToken? token2 = app.Begin (runnable2);
+            SessionToken? token3 = app.Begin (runnable3);
 
-            Assert.Same (toplevel3, app.TopRunnableView);
+            Assert.Same (runnable3, app.TopRunnableView);
 
             app.End (token3!);
-            Assert.Same (toplevel2, app.TopRunnableView);
+            Assert.Same (runnable2, app.TopRunnableView);
 
             app.End (token2!);
-            Assert.Same (toplevel1, app.TopRunnableView);
+            Assert.Same (runnable1, app.TopRunnableView);
 
             app.End (token1!);
         }
         finally
         {
-            toplevel1?.Dispose ();
-            toplevel2?.Dispose ();
-            toplevel3?.Dispose ();
+            runnable1?.Dispose ();
+            runnable2?.Dispose ();
+            runnable3?.Dispose ();
             app.Dispose ();
         }
     }
@@ -201,22 +201,22 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void MultipleBeginEnd_MaintainsStackIntegrity ()
     {
         IApplication app = Application.Create ();
-        List<Toplevel> toplevels = new ();
+        List<Runnable> runnables = new ();
         List<SessionToken> tokens = new ();
 
         try
         {
-            // Begin multiple toplevels
+            // Begin multiple runnables
             for (var i = 0; i < 5; i++)
             {
-                var toplevel = new Toplevel { Id = $"toplevel-{i}" };
-                toplevels.Add (toplevel);
-                SessionToken? token = app.Begin (toplevel);
+                var runnable = new Runnable { Id = $"runnable-{i}" };
+                runnables.Add (runnable);
+                SessionToken? token = app.Begin (runnable);
                 tokens.Add (token!);
             }
 
             Assert.Equal (5, app.SessionStack!.Count);
-            Assert.Same (toplevels [4], app.TopRunnableView);
+            Assert.Same (runnables [4], app.TopRunnableView);
 
             // End them in reverse order (LIFO)
             for (var i = 4; i >= 0; i--)
@@ -226,7 +226,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
                 if (i > 0)
                 {
                     Assert.Equal (i, app.SessionStack.Count);
-                    Assert.Same (toplevels [i - 1], app.TopRunnableView);
+                    Assert.Same (runnables [i - 1], app.TopRunnableView);
                 }
                 else
                 {
@@ -236,9 +236,9 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         }
         finally
         {
-            foreach (Toplevel toplevel in toplevels)
+            foreach (Runnable runnable in runnables)
             {
-                toplevel.Dispose ();
+                runnable.Dispose ();
             }
 
             app.Dispose ();
@@ -246,17 +246,17 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void End_NullsSessionTokenToplevel ()
+    public void End_NullsSessionTokenRunnable ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel = null;
+        Runnable? runnable = null;
 
         try
         {
-            toplevel = new ();
+            runnable = new ();
 
-            SessionToken? token = app.Begin (toplevel);
-            Assert.Same (toplevel, token!.Runnable);
+            SessionToken? token = app.Begin (runnable);
+            Assert.Same (runnable, token!.Runnable);
 
             app.End (token);
 
@@ -264,7 +264,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         }
         finally
         {
-            toplevel?.Dispose ();
+            runnable?.Dispose ();
             app.Dispose ();
         }
     }
@@ -273,25 +273,25 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void ResetState_ClearsSessionStack ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel1 = null;
-        Toplevel? toplevel2 = null;
+        Runnable? runnable1 = null;
+        Runnable? runnable2 = null;
 
         try
         {
-            toplevel1 = new () { Id = "1" };
-            toplevel2 = new () { Id = "2" };
+            runnable1 = new () { Id = "1" };
+            runnable2 = new () { Id = "2" };
 
-            app.Begin (toplevel1);
-            app.Begin (toplevel2);
+            app.Begin (runnable1);
+            app.Begin (runnable2);
 
             Assert.Equal (2, app.SessionStack!.Count);
             Assert.NotNull (app.TopRunnableView);
         }
         finally
         {
-            // Dispose toplevels BEFORE Shutdown to satisfy DEBUG_IDISPOSABLE assertions
-            toplevel1?.Dispose ();
-            toplevel2?.Dispose ();
+            // Dispose runnables BEFORE Shutdown to satisfy DEBUG_IDISPOSABLE assertions
+            runnable1?.Dispose ();
+            runnable2?.Dispose ();
 
             // Shutdown calls ResetState, which will clear SessionStack and set Current to null
             app.Dispose ();
@@ -303,102 +303,102 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void ResetState_StopsAllRunningToplevels ()
+    public void ResetState_StopsAllRunningRunnables ()
     {
         IApplication app = Application.Create ();
-        Toplevel? toplevel1 = null;
-        Toplevel? toplevel2 = null;
+        Runnable? runnable1 = null;
+        Runnable? runnable2 = null;
 
         try
         {
-            toplevel1 = new () { Id = "1" };
-            toplevel2 = new () { Id = "2" };
+            runnable1 = new () { Id = "1" };
+            runnable2 = new () { Id = "2" };
 
-            app.Begin (toplevel1);
-            app.Begin (toplevel2);
+            app.Begin (runnable1);
+            app.Begin (runnable2);
 
-            Assert.True (toplevel1.IsRunning);
-            Assert.True (toplevel2.IsRunning);
+            Assert.True (runnable1.IsRunning);
+            Assert.True (runnable2.IsRunning);
         }
         finally
         {
-            // Dispose toplevels BEFORE Shutdown to satisfy DEBUG_IDISPOSABLE assertions
-            toplevel1?.Dispose ();
-            toplevel2?.Dispose ();
+            // Dispose runnables BEFORE Shutdown to satisfy DEBUG_IDISPOSABLE assertions
+            runnable1?.Dispose ();
+            runnable2?.Dispose ();
 
-            // Shutdown calls ResetState, which will stop all running toplevels
+            // Shutdown calls ResetState, which will stop all running runnables
             app.Dispose ();
 
-            // Verify toplevels were stopped
-            Assert.False (toplevel1!.IsRunning);
-            Assert.False (toplevel2!.IsRunning);
+            // Verify runnables were stopped
+            Assert.False (runnable1!.IsRunning);
+            Assert.False (runnable2!.IsRunning);
         }
     }
 
     //[Fact]
-    //public void Begin_ActivatesNewToplevel_WhenCurrentExists ()
+    //public void Begin_ActivatesNewRunnable_WhenCurrentExists ()
     //{
     //    IApplication app = Application.Create ();
-    //    Toplevel? toplevel1 = null;
-    //    Toplevel? toplevel2 = null;
+    //    Runnable? runnable1 = null;
+    //    Runnable? runnable2 = null;
 
     //    try
     //    {
-    //        toplevel1 = new () { Id = "1" };
-    //        toplevel2 = new () { Id = "2" };
+    //        runnable1 = new () { Id = "1" };
+    //        runnable2 = new () { Id = "2" };
 
-    //        var toplevel1Deactivated = false;
-    //        var toplevel2Activated = false;
+    //        var runnable1Deactivated = false;
+    //        var runnable2Activated = false;
 
-    //        toplevel1.Deactivate += (s, e) => toplevel1Deactivated = true;
-    //        toplevel2.Activate += (s, e) => toplevel2Activated = true;
+    //        runnable1.Deactivate += (s, e) => runnable1Deactivated = true;
+    //        runnable2.Activate += (s, e) => runnable2Activated = true;
 
-    //        app.Begin (toplevel1);
-    //        app.Begin (toplevel2);
+    //        app.Begin (runnable1);
+    //        app.Begin (runnable2);
 
-    //        Assert.True (toplevel1Deactivated);
-    //        Assert.True (toplevel2Activated);
-    //        Assert.Same (toplevel2, app.TopRunnable);
+    //        Assert.True (runnable1Deactivated);
+    //        Assert.True (runnable2Activated);
+    //        Assert.Same (runnable2, app.TopRunnable);
     //    }
     //    finally
     //    {
-    //        toplevel1?.Dispose ();
-    //        toplevel2?.Dispose ();
+    //        runnable1?.Dispose ();
+    //        runnable2?.Dispose ();
     //        app.Dispose ();
     //    }
     //}
 
     [Fact]
-    public void SessionStack_ContainsAllBegunToplevels ()
+    public void SessionStack_ContainsAllBegunRunnables ()
     {
         IApplication app = Application.Create ();
-        List<Toplevel> toplevels = new ();
+        List<Runnable> runnables = new ();
 
         try
         {
             for (var i = 0; i < 10; i++)
             {
-                var toplevel = new Toplevel { Id = $"toplevel-{i}" };
-                toplevels.Add (toplevel);
-                app.Begin (toplevel);
+                var runnable = new Runnable { Id = $"runnable-{i}" };
+                runnables.Add (runnable);
+                app.Begin (runnable);
             }
 
-            // All toplevels should be in the stack
+            // All runnables should be in the stack
             Assert.Equal (10, app.SessionStack!.Count);
 
-            // Verify stack contains all toplevels
+            // Verify stack contains all runnables
             List<SessionToken> stackList = app.SessionStack.ToList ();
 
-            foreach (Toplevel toplevel in toplevels)
+            foreach (Runnable runnable in runnables)
             {
-                Assert.Contains (toplevel, stackList.Select (r => r.Runnable));
+                Assert.Contains (runnable, stackList.Select (r => r.Runnable));
             }
         }
         finally
         {
-            foreach (Toplevel toplevel in toplevels)
+            foreach (Runnable runnable in runnables)
             {
-                toplevel.Dispose ();
+                runnable.Dispose ();
             }
 
             app.Dispose ();

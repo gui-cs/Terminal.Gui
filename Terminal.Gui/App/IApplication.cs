@@ -271,7 +271,7 @@ public interface IApplication : IDisposable
     /// <summary>
     ///     Raised when <see cref="End(SessionToken)"/> was called and the session is stopping. The event args contain a
     ///     reference to the <see cref="IRunnable"/>
-    ///     that was active during the session. This can be used to ensure the Toplevel is disposed of properly.
+    ///     that was active during the session. This can be used to ensure the Runnable is disposed of properly.
     /// </summary>
     /// <remarks>
     ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
@@ -282,7 +282,7 @@ public interface IApplication : IDisposable
 
     #endregion Begin->Run->Iteration->Stop->End
 
-    #region Toplevel Management
+    #region Runnable Management
 
     /// <summary>Gets or sets the View that is on the top of the <see cref="SessionStack"/>.</summary>
     /// <remarks>
@@ -293,7 +293,7 @@ public interface IApplication : IDisposable
     View? TopRunnableView { get; set; }
 
 
-    /// <summary>Gets or sets the Toplevel that is on the top of the <see cref="SessionStack"/>.</summary>
+    /// <summary>Gets or sets the Runnable that is on the top of the <see cref="SessionStack"/>.</summary>
     /// <remarks>
     ///     <para>
     ///         The top runnable in the session stack captures all mouse and keyboard input.
@@ -302,7 +302,7 @@ public interface IApplication : IDisposable
     /// </remarks>
     IRunnable? TopRunnable { get; set; }
 
-    #endregion Toplevel Management
+    #endregion Runnable Management
 
     #region IRunnable Management
 
@@ -557,7 +557,7 @@ public interface IApplication : IDisposable
     #region Layout and Drawing
 
     /// <summary>
-    ///     Causes any Toplevels that need layout to be laid out, then draws any Toplevels that need display. Only Views
+    ///     Causes any Runnables that need layout to be laid out, then draws any Runnables that need display. Only Views
     ///     that need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out. Only Views that need to be drawn
     ///     (see <see cref="View.NeedsDraw"/>) will be drawn.
     /// </summary>

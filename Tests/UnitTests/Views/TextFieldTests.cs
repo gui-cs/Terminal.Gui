@@ -15,7 +15,7 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
         var tf = new TextField { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
         var fv = new FrameView
@@ -452,7 +452,7 @@ public class TextFieldTests (ITestOutputHelper output)
                                oldText = tf.Text;
                            };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -836,7 +836,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // Proves #3022 is fixed (TextField selected text does not show in v2)
 
         _textField.CursorPosition = 0;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (_textField);
         SessionToken rs = Application.Begin (top);
 
@@ -919,7 +919,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var clickCounter = 0;
         tf.MouseClick += (s, m) => { clickCounter++; };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -1661,7 +1661,7 @@ Les Miśerables",
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         top.Add (tf2);
 

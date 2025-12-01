@@ -14,7 +14,7 @@ public class WindowTests ()
         Assert.NotNull (defaultWindow);
         Assert.Equal (string.Empty, defaultWindow.Title);
 
-        // Toplevels have Width/Height set to Dim.Fill
+        // Runnables have Width/Height set to Dim.Fill
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());

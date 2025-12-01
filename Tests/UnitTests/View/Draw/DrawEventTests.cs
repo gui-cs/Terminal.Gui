@@ -18,7 +18,7 @@ public class DrawEventTests
         var tv = new TextView { Y = 11, Width = 10, Height = 10 };
         tv.DrawComplete += (s, e) => tvCalled = true;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view, tv);
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();

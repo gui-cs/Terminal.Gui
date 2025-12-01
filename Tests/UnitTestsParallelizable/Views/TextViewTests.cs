@@ -2070,7 +2070,7 @@ public class TextViewTests
             new () { Grapheme = new ("t") }
         };
         TextView tv = CreateTextView ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         tv.Load (cells);
 

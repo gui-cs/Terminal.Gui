@@ -73,8 +73,8 @@ public class UICatalog
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
         }
 
-        UICatalogTop.CachedScenarios = Scenario.GetScenarios ();
-        UICatalogTop.CachedCategories = Scenario.GetAllCategories ();
+        UICatalogRunnable.CachedScenarios = Scenario.GetScenarios ();
+        UICatalogRunnable.CachedCategories = Scenario.GetAllCategories ();
 
         // Process command line args
 
@@ -136,7 +136,7 @@ public class UICatalog
                                                                   "The name of the Scenario to run. If not provided, the UI Catalog UI will be shown.",
                                                                   getDefaultValue: () => "none"
                                                                  ).FromAmong (
-                                                                              UICatalogTop.CachedScenarios.Select (s => s.GetName ())
+                                                                              UICatalogRunnable.CachedScenarios.Select (s => s.GetName ())
                                                                                           .Append ("none")
                                                                                           .ToArray ()
                                                                              );
@@ -249,7 +249,7 @@ public class UICatalog
     ///     killed and the Scenario is run as though it were Application.TopRunnable. When the Scenario exits, this function exits.
     /// </summary>
     /// <returns></returns>
-    private static Scenario RunUICatalogTopLevel ()
+    private static Scenario RunUICatalogRunnable ()
     {
         // Run UI Catalog UI. When it exits, if _selectedScenario is != null then
         // a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
@@ -261,11 +261,11 @@ public class UICatalog
 
         _uiCatalogDriver = Application.Driver!.GetName ();
 
-        Application.Run<UICatalogTop> ();
+        Application.Run<UICatalogRunnable> ();
         Application.Shutdown ();
         VerifyObjectsWereDisposed ();
 
-        return UICatalogTop.CachedSelectedScenario!;
+        return UICatalogRunnable.CachedSelectedScenario!;
     }
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
@@ -371,15 +371,15 @@ public class UICatalog
                 ConfigurationManager.Enable (ConfigLocations.All);
             }
 
-            int item = UICatalogTop.CachedScenarios!.IndexOf (
-                                                              UICatalogTop.CachedScenarios!.FirstOrDefault (
+            int item = UICatalogRunnable.CachedScenarios!.IndexOf (
+                                                              UICatalogRunnable.CachedScenarios!.FirstOrDefault (
                                                                    s =>
                                                                        s.GetName ()
                                                                         .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
                                                                   )!);
-            UICatalogTop.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogTop.CachedScenarios [item].GetType ())!;
+            UICatalogRunnable.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogRunnable.CachedScenarios [item].GetType ())!;
 
-            BenchmarkResults? results = RunScenario (UICatalogTop.CachedSelectedScenario, options.Benchmark);
+            BenchmarkResults? results = RunScenario (UICatalogRunnable.CachedSelectedScenario, options.Benchmark);
 
             if (results is { })
             {
@@ -415,7 +415,7 @@ public class UICatalog
             StartConfigWatcher ();
         }
 
-        while (RunUICatalogTopLevel () is { } scenario)
+        while (RunUICatalogRunnable () is { } scenario)
         {
 #if DEBUG_IDISPOSABLE
             VerifyObjectsWereDisposed ();
@@ -494,7 +494,7 @@ public class UICatalog
 
         var maxScenarios = 5;
 
-        foreach (Scenario s in UICatalogTop.CachedScenarios!)
+        foreach (Scenario s in UICatalogRunnable.CachedScenarios!)
         {
             resultsList.Add (RunScenario (s, true)!);
             maxScenarios--;

@@ -383,7 +383,7 @@ dotnet build --configuration Release --no-restore
 See `/docfx/docs/` for deep dives on:
 
 - **Application Lifecycle** - How `Application.Init`, `Application.Run`, and `Application.Shutdown` work
-- **View Hierarchy** - Understanding `View`, `Toplevel`, `Window`, and view containment
+- **View Hierarchy** - Understanding `View`, `Runnable`, `Window`, and view containment
 - **Layout System** - Pos, Dim, and automatic layout
 - **Event System** - How keyboard, mouse, and application events flow
 - **Driver Architecture** - How console drivers abstract platform differences

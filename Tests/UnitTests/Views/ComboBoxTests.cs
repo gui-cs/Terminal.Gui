@@ -77,7 +77,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         string [] source = Enumerable.Range (0, 15).Select (x => x.ToString ()).ToArray ();
         comboBox.SetSource (new ObservableCollection<string> (source.ToList ()));
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (comboBox);
 
         foreach (KeyCode key in (KeyCode [])Enum.GetValues (typeof (KeyCode)))
@@ -96,7 +96,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         cb.Expanded += (s, e) => cb.SetSource (list);
         cb.Collapsed += (s, e) => cb.Source = null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -127,7 +127,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = false };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -182,7 +182,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = false };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -219,7 +219,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = false, ReadOnly = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -278,7 +278,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5 };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -382,7 +382,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -501,7 +501,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Width = 6, Height = 4, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         var otherView = new View { CanFocus = true };
 
@@ -677,7 +677,7 @@ Three ",
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -740,7 +740,7 @@ Three ",
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -798,7 +798,7 @@ Three ",
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -832,7 +832,7 @@ Three ",
     {
         ObservableCollection<string> source = ["One", "Two", "Three"];
         var cb = new ComboBox { Width = 10 };
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         top.Add (cb);
 

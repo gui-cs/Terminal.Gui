@@ -102,7 +102,7 @@ public class ViewportSettings : Scenario
             Title = GetQuitKeyAndName (),
 
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-            SchemeName = "Toplevel",
+            SchemeName = "Runnable",
             BorderStyle = LineStyle.None
         };
 

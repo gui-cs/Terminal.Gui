@@ -74,7 +74,7 @@ public class PosCombineTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        var t = new Toplevel ();
+        var t = new Runnable ();
 
         var w = new Window { X = Left (t) + 2, Y = Top (t) + 2 };
         var f = new FrameView ();
@@ -101,7 +101,7 @@ public class PosCombineTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init ("fake");
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         var w = new Window { X = Left (top) + 2, Y = Top (top) + 2 };
         var f = new FrameView ();
         var v1 = new View { X = Left (w) + 2, Y = Top (w) + 2 };

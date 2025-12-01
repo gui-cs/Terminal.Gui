@@ -94,7 +94,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     }
 }
 
-public class TestTop : Toplevel
+public class TestTop : Runnable
 {
     /// <inheritdoc/>
     public override void BeginInit ()

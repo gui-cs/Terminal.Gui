@@ -38,7 +38,7 @@ public class Shortcuts : Scenario
             X = Pos.AnchorEnd (),
             Y = 0,
             Height = Dim.Fill (4),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource),
             BorderStyle = LineStyle.Double,
             Title = "E_vents"
@@ -339,7 +339,7 @@ public class Shortcuts : Scenario
             framedShortcut.KeyView.SchemeName = framedShortcut.KeyView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
+        framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable);
         Application.TopRunnableView.Add (framedShortcut);
 
         // Horizontal

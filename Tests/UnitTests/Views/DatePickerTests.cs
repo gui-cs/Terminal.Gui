@@ -12,7 +12,7 @@ public class DatePickerTests
         var date = new DateTime (9999, 11, 15);
         var datePicker = new DatePicker (date);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (datePicker);
         Application.Begin (top);
 
@@ -42,7 +42,7 @@ public class DatePickerTests
     {
         var date = new DateTime (1, 2, 15);
         var datePicker = new DatePicker (date);
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         // Move focus to previous month button
         top.Add (datePicker);

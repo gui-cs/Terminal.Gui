@@ -419,11 +419,11 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tableView = new TableView ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         SessionToken rs = Application.Begin (top);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 25 characters can be printed into table
         tableView.Viewport = new (0, 0, 25, 5);
@@ -610,7 +610,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.AlwaysShowHeaders = false;
 
         // ensure that TableView has the input focus
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         Application.Begin (top);
 
@@ -688,7 +688,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -770,7 +770,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
         tableView.LayoutSubViews ();
 
         // 3 columns are visibile
@@ -835,7 +835,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -949,7 +949,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -980,7 +980,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -1012,7 +1012,7 @@ public class TableViewTests (ITestOutputHelper output)
         var tv = new TableView (BuildTable (1, 1));
         tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row, c.Col].ToString ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1073,7 +1073,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         bStyle.ColorGetter = a => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         SessionToken rs = Application.Begin (top);
 
@@ -1169,7 +1169,7 @@ public class TableViewTests (ITestOutputHelper output)
         // when B is 2 use the custom highlight color for the row
         tv.Style.RowColorGetter += e => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         SessionToken rs = Application.Begin (top);
 
@@ -1250,7 +1250,7 @@ public class TableViewTests (ITestOutputHelper output)
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1581,7 +1581,7 @@ public class TableViewTests (ITestOutputHelper output)
         {
             App = ApplicationImpl.Instance
         };
-        tv.SchemeName = "TopLevel";
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
@@ -1619,7 +1619,7 @@ public class TableViewTests (ITestOutputHelper output)
         Assert.Equal (0, tv.SelectedRow);
 
         // ensure that TableView has the input focus
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -2228,7 +2228,7 @@ public class TableViewTests (ITestOutputHelper output)
         {
             App = ApplicationImpl.Instance
         };
-        tv.SchemeName = "TopLevel";
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
@@ -2437,7 +2437,7 @@ A B C
         };
 
         //tv.BeginInit (); tv.EndInit ();
-        tv.SchemeName = "TopLevel";
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 25, 4);
 
         tv.Style = new ()
@@ -3280,7 +3280,7 @@ A B C
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3308,7 +3308,7 @@ A B C
         var tv = new TableView ()
         {
             App = ApplicationImpl.Instance,
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Viewport = new (0, 0, 25, 6)
         };
 
@@ -3340,7 +3340,7 @@ A B C
         {
             App = ApplicationImpl.Instance
         };
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);

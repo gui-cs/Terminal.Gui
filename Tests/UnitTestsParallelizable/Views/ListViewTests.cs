@@ -895,7 +895,7 @@ public class ListViewTests (ITestOutputHelper output)
         };
         lv.SetSource (["One", "Two", "Three", "Four"]);
         lv.SelectedItemChanged += (s, e) => selected = e.Value!.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -971,7 +971,7 @@ public class ListViewTests (ITestOutputHelper output)
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper<string> (source) };
         var win = new Window ();
         win.Add (lv);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         app.Begin (top);
 
@@ -1222,7 +1222,7 @@ public class ListViewTests (ITestOutputHelper output)
         }
 
         var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1264,7 +1264,7 @@ Item 6",
         ObservableCollection<string> source = ["First", "Second"];
         var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper<string> (source) };
         lv.SelectedItem = 1;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1314,7 +1314,7 @@ Item 6",
         };
         lv.Height = lv.Source.Count;
         lv.Width = lv.MaxLength;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1352,7 +1352,7 @@ Item 6",
         ObservableCollection<string> source = ["one", "two", "three"];
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
         lv.RowRender += (s, _) => rendered = true;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
         Assert.False (rendered);
@@ -1377,7 +1377,7 @@ Item 6",
         };
         lv.VerticalScrollBar.AutoShow = true;
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1417,7 +1417,7 @@ Five ",
             Height = 3,
         };
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1480,7 +1480,7 @@ Three",
             Height = 3,
         };
         lv.SetSource (["One", "Two", "Three - long", "Four", "Five"]);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 

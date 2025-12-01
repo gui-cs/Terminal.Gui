@@ -669,10 +669,10 @@ public class ArrangementTests (ITestOutputHelper output)
     #region View-Specific Arrangement Tests
 
     [Fact]
-    public void Toplevel_DefaultsToOverlapped ()
+    public void Runnable_DefaultsToOverlapped ()
     {
-        var toplevel = new Toplevel ();
-        Assert.True (toplevel.Arrangement.HasFlag (ViewArrangement.Overlapped));
+        var runnable = new Runnable ();
+        Assert.True (runnable.Arrangement.HasFlag (ViewArrangement.Overlapped));
     }
 
     [Fact]

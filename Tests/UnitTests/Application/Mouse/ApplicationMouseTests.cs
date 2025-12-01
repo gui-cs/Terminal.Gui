@@ -126,7 +126,7 @@ public class ApplicationMouseTests
                                clicked = true;
                            };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
 
@@ -149,7 +149,7 @@ public class ApplicationMouseTests
         //sv.SetContentSize (new (100, 100));
 
         //sv.Add (tf);
-        //var top = new Toplevel ();
+        //var top = new Runnable ();
         //top.Add (sv);
 
         //int iterations = -1;
@@ -174,7 +174,7 @@ public class ApplicationMouseTests
         //                             else if (iterations == 1)
         //                             {
         //                                 // Application.Mouse.MouseGrabView is null because
-        //                                 // another toplevel (Dialog) was opened
+        //                                 // another runnable (Dialog) was opened
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
 
         //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.ReportMousePosition });
@@ -290,7 +290,7 @@ public class ApplicationMouseTests
         var count = 0;
         var view = new View { Width = 1, Height = 1 };
         view.MouseEvent += (s, e) => count++;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
 
@@ -339,7 +339,7 @@ public class ApplicationMouseTests
         View? receivedView = null;
         grabView.MouseEvent += (_, e) => receivedView = e.View;
 
-        var top = new Toplevel { Width = 20, Height = 10 };
+        var top = new Runnable { Width = 20, Height = 10 };
         top.Add (grabView);
         top.Add (targetView); // deepestViewUnderMouse = targetView
         Application.Begin (top);

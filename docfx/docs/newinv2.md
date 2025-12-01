@@ -34,7 +34,7 @@ Terminal.Gui v2 introduces an instance-based application architecture that decou
 // Recommended v2 pattern (instance-based)
 var app = Application.Create();
 app.Init();
-var top = new Toplevel { Title = "My App" };
+var top = new Runnable { Title = "My App" };
 top.Add(myView);
 app.Run(top);
 top.Dispose();
@@ -42,7 +42,7 @@ app.Shutdown();
 
 // Static pattern (obsolete but still works)
 Application.Init();
-var top = new Toplevel { Title = "My App" };
+var top = new Runnable { Title = "My App" };
 top.Add(myView);
 Application.Run(top);
 top.Dispose();
@@ -158,7 +158,7 @@ See the [Drawing Deep Dive](drawing.md) for complete details on LineCanvas and t
 
 ### Deterministic View Lifetime Management
 - **v1 Issue**: Lifetime rules for `View` objects were unclear, leading to memory leaks or premature disposal, especially with `Application.Run`.
-- **v2 Solution**: v2 defines explicit rules for view disposal and ownership, enforced by unit tests. `Application.Run` now clearly manages the lifecycle of `Toplevel` views, ensuring deterministic cleanup.
+- **v2 Solution**: v2 defines explicit rules for view disposal and ownership, enforced by unit tests. `Application.Run` now clearly manages the lifecycle of `Runnable` views, ensuring deterministic cleanup.
 - **Impact**: Developers can predict when resources are released, reducing bugs related to dangling references or uninitialized states.
 
 ### Adornments Framework
@@ -293,7 +293,7 @@ See the [Keyboard Deep Dive](keyboard.md) and [Command Deep Dive](command.md) fo
 - **Example**: [TextField](~/api/Terminal.Gui.Views.TextField.yml) in v2 binds `Key.Tab` to text insertion rather than focus change, customizable by developers.
 
 ### Default Close Key
-- **Change**: Changed from `Ctrl+Q` in v1 to `Esc` in v2 for closing apps or [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) views, accessible via [Application.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey).
+- **Change**: Changed from `Ctrl+Q` in v1 to `Esc` in v2 for closing apps or [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) views, accessible via [Application.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey).
 - **Impact**: Aligns with common user expectations, improving UX consistency across terminal applications.
 
 ## Updated Mouse API - Enhanced Interaction

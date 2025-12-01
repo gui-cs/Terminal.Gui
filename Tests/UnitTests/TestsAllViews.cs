@@ -189,7 +189,7 @@ public class TestsAllViews : FakeDriverBase
         }
         else if (paramType.Name == "View")
         {
-            var top = new Toplevel ();
+            var top = new Runnable ();
             var view = new View ();
             top.Add (view);
             pTypes.Add (view);

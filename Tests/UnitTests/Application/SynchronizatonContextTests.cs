@@ -64,7 +64,7 @@ public class SyncrhonizationContextTests
                      );
 
             // blocks here until the RequestStop is processed at the end of the test
-            Application.Run<Toplevel> ();
+            Application.Run<Runnable> ();
             Assert.True (success);
 
             Application.Shutdown ();
@@ -100,7 +100,7 @@ public class SyncrhonizationContextTests
                  );
 
         // blocks here until the RequestStop is processed at the end of the test
-        Application.Run<Toplevel> ();
+        Application.Run<Runnable> ();
         Assert.True (success);
         Application.Shutdown ();
     }

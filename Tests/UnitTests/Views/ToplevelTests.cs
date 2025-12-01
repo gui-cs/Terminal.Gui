@@ -7,7 +7,7 @@ public class ToplevelTests
     public void Mouse_Drag_On_Top_With_Superview_Null ()
     {
         var win = new Window ();
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         int iterations = -1;
         Window testWindow;
@@ -123,7 +123,7 @@ public class ToplevelTests
     public void Mouse_Drag_On_Top_With_Superview_Not_Null ()
     {
         var win = new Window { X = 3, Y = 2, Width = 10, Height = 5, Arrangement = ViewArrangement.Movable };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         int iterations = -1;

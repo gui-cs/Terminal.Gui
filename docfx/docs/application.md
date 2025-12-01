@@ -5,7 +5,7 @@ Terminal.Gui v2 uses an instance-based application architecture with the **IRunn
 ## Key Features
 
 - **Instance-Based**: Use `Application.Create()` to get an `IApplication` instance instead of static methods
-- **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Toplevel`
+- **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Runnable`
 - **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for elegant, concise code  
 - **IDisposable Pattern**: Proper resource cleanup with `Dispose()` or `using` statements
 - **Automatic Disposal**: Framework-created runnables are automatically disposed
@@ -35,8 +35,8 @@ graph TB
     subgraph Stack["app.SessionStack"]
         direction TB
         S1[Window<br/>Currently Active]
-        S2[Previous Toplevel<br/>Waiting]
-        S3[Base Toplevel<br/>Waiting]
+        S2[Previous Runnable<br/>Waiting]
+        S3[Base Runnable<br/>Waiting]
         
         S1 -.-> S2 -.-> S3
     end
@@ -178,11 +178,11 @@ public class MyView : View
 
 ## IRunnable Architecture
 
-Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples runnable behavior from the `Toplevel` class hierarchy. Views can implement `IRunnable<TResult>` to participate in session management without inheritance constraints.
+Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples runnable behavior from the `Runnable` class hierarchy. Views can implement `IRunnable<TResult>` to participate in session management without inheritance constraints.
 
 ### Key Benefits
 
-- **Interface-Based**: No forced inheritance from `Toplevel`
+- **Interface-Based**: No forced inheritance from `Runnable`
 - **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
 - **Fluent API**: Method chaining for elegant, concise code
 - **Automatic Disposal**: Framework manages lifecycle of created runnables
@@ -335,7 +335,7 @@ public interface IApplication
 
 ## IApplication Interface
 
-The `IApplication` interface defines the application contract with support for both legacy `Toplevel` and modern `IRunnable` patterns:
+The `IApplication` interface defines the application contract with support for both legacy `Runnable` and modern `IRunnable` patterns:
 
 ```csharp
 public interface IApplication
@@ -392,15 +392,15 @@ View? topView = app.TopRunnableView;
 - Clearly indicates it's the top of the runnable session stack
 - Aligns with the IRunnable architecture
 - Distinguishes from other concepts like "Current" which could be ambiguous
-- Works with any view that implements `IRunnable`, not just `Toplevel`
+- Works with any view that implements `IRunnable`, not just `Runnable`
 
-### Application.SessionStack (formerly "TopLevels")
+### Application.SessionStack (formerly "Runnables")
 
 The `SessionStack` property is the stack of running sessions:
 
 ```csharp
 // Access all running sessions
-foreach (var toplevel in app.SessionStack)
+foreach (var runnable in app.SessionStack)
 {
     // Process each session
 }
@@ -409,7 +409,7 @@ foreach (var toplevel in app.SessionStack)
 int sessionCount = App?.SessionStack.Count ?? 0;
 ```
 
-**Why "SessionStack" instead of "TopLevels"?**
+**Why "SessionStack" instead of "Runnables"?**
 - Describes both content (sessions) and structure (stack)
 - Aligns with `SessionToken` terminology
 - Follows .NET naming patterns (descriptive + collection type)
@@ -460,7 +460,7 @@ void MyMethod(View view)
 // OLD:
 void ProcessSessions()
 {
-    foreach (var toplevel in Application.SessionStack)
+    foreach (var runnable in Application.SessionStack)
     {
         // Process
     }
@@ -469,7 +469,7 @@ void ProcessSessions()
 // NEW:
 void ProcessSessions(IApplication app)
 {
-    foreach (var toplevel in app.SessionStack)
+    foreach (var runnable in app.SessionStack)
     {
         // Process
     }
@@ -697,7 +697,7 @@ public void MyView_DisplaysCorrectly()
 {
     // Create mock application
     var mockApp = new Mock<IApplication>();
-    mockApp.Setup(a => a.Current).Returns(new Toplevel());
+    mockApp.Setup(a => a.Current).Returns(new Runnable());
     
     // Create view with mock app
     var view = new MyView { App = mockApp.Object };

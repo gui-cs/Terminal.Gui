@@ -32,7 +32,7 @@ public class ApplicationScreenTests
     [AutoInitShutdown]
     public void ClearContents_Called_When_Top_Frame_Changes ()
     {
-        Toplevel top = new Toplevel ();
+        Runnable top = new Runnable ();
         SessionToken rs = Application.Begin (top);
         // Arrange
         var clearedContentsRaised = 0;

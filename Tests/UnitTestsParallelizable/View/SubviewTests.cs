@@ -423,7 +423,7 @@ public class SubViewTests
         var tf1 = new TextField ();
         var w1 = new Window ();
         w1.Add (fv1, tf1);
-        var top1 = new Toplevel ();
+        var top1 = new Runnable ();
         top1.Add (w1);
 
         var v2 = new View ();
@@ -432,7 +432,7 @@ public class SubViewTests
         var tf2 = new TextField ();
         var w2 = new Window ();
         w2.Add (fv2, tf2);
-        var top2 = new Toplevel ();
+        var top2 = new Runnable ();
         top2.Add (w2);
 
         Assert.Equal (top1, v1.GetTopSuperView ());
@@ -454,7 +454,7 @@ public class SubViewTests
     [Fact]
     public void Initialized_Event_Comparing_With_Added_Event ()
     {
-        var top = new Toplevel { Id = "0" }; // Frame: 0, 0, 80, 25; Viewport: 0, 0, 80, 25
+        var top = new Runnable { Id = "0" }; // Frame: 0, 0, 80, 25; Viewport: 0, 0, 80, 25
 
         var winAddedToTop = new Window
         {

@@ -9,7 +9,7 @@ public class SessionTokenTests
     public void Begin_Throws_On_Null ()
     {
         IApplication? app = Application.Create ();
-        // Test null Toplevel
+        // Test null Runnable
         Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
     }
 
@@ -37,7 +37,7 @@ public class SessionTokenTests
         var rs = new SessionToken (null!);
         Assert.Null (rs.Runnable);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         rs = new (top);
         Assert.Equal (top, rs.Runnable);
     }
