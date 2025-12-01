@@ -1,8 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using Moq;
 using Terminal.Gui.App;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 public class ApplicationPopoverTests
 {
@@ -191,6 +191,6 @@ public class ApplicationPopoverTests
         }
 
         /// <inheritdoc />
-        public Toplevel? Current { get; set; }
+        public IRunnable? Current { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "View.Scheme")]
 public class SchemeTests

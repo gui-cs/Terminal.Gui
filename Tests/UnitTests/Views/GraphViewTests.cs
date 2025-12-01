@@ -607,7 +607,10 @@ public class MultiBarSeriesTests
     [AutoInitShutdown]
     public void TestRendering_MultibarSeries ()
     {
-        var gv = new GraphView ();
+        var gv = new GraphView ()
+        {
+            App = ApplicationImpl.Instance,
+        };
         //gv.Scheme = new Scheme ();
 
         // y axis goes from 0.1 to 1 across 10 console rows
@@ -851,7 +854,7 @@ public class BarSeriesTests : FakeDriverBase
         // y axis goes from 0.1 to 1 across 10 console rows
         // x axis goes from 0 to 10 across 20 console columns
         gv.Viewport = new Rectangle (0, 0, 20, 10);
-       //gv.Scheme = new Scheme ();
+        //gv.Scheme = new Scheme ();
         gv.CellSize = new PointF (0.5f, 0.1f);
 
         gv.Series.Add (series = new FakeBarSeries ());
@@ -890,7 +893,7 @@ public class AxisTests
     {
         var gv = new GraphView ();
         gv.Viewport = new Rectangle (0, 0, 50, 30);
-       // gv.Scheme = new Scheme ();
+        // gv.Scheme = new Scheme ();
 
         // graph can't be completely empty or it won't draw
         gv.Series.Add (new ScatterSeries ());
@@ -1496,7 +1499,7 @@ public class PathAnnotationTests
     {
         // create a wide window
         var mount = new View { Width = 100, Height = 100 };
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         try
         {
@@ -1516,7 +1519,7 @@ public class PathAnnotationTests
             //put label into view
             mount.Add (view);
 
-            //putting mount into Toplevel since changing size
+            //putting mount into Runnable since changing size
             top.Add (mount);
             Application.Begin (top);
 
@@ -1549,7 +1552,11 @@ public class PathAnnotationTests
     [AutoInitShutdown]
     public void XAxisLabels_With_MarginLeft ()
     {
-        var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView
+        {
+            App = ApplicationImpl.Instance,
+            Viewport = new Rectangle (0, 0, 10, 7)
+        };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;
@@ -1588,7 +1595,11 @@ public class PathAnnotationTests
     [AutoInitShutdown]
     public void YAxisLabels_With_MarginBottom ()
     {
-        var gv = new GraphView { Viewport = new Rectangle (0, 0, 10, 7) };
+        var gv = new GraphView
+        {
+            App = ApplicationImpl.Instance,
+            Viewport = new Rectangle (0, 0, 10, 7)
+        };
 
         gv.CellSize = new PointF (1, 0.5f);
         gv.AxisY.Increment = 1;

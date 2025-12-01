@@ -1,9 +1,7 @@
 ﻿using System.Reactive.Concurrency;
 using ReactiveUI;
-using ReactiveUI.SourceGenerators;
-using Terminal.Gui.Configuration;
 using Terminal.Gui.App;
-using Terminal.Gui.ViewBase;
+using Terminal.Gui.Configuration;
 
 namespace ReactiveExample;
 
@@ -12,11 +10,12 @@ public static class Program
     private static void Main (string [] args)
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-        RxApp.MainThreadScheduler = TerminalScheduler.Default;
+        using IApplication app = Application.Create ();
+        app.Init ();
+        RxApp.MainThreadScheduler = new TerminalScheduler (app);
         RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
-        Application.Run (new LoginView (new LoginViewModel ()));
-        Application.Current.Dispose ();
-        Application.Shutdown ();
+        var loginView = new LoginView (new ());
+        app.Run (loginView);
+        loginView.Dispose ();
     }
 }

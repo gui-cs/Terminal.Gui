@@ -9,15 +9,25 @@ namespace Terminal.Gui.App;
 ///         enabling better testability and parallel test execution.
 ///     </para>
 /// </summary>
-internal class MouseImpl : IMouse
+internal class MouseImpl : IMouse, IDisposable
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseImpl"/> class.
+    ///     Initializes a new instance of the <see cref="MouseImpl"/> class and subscribes to Application configuration property events.
     /// </summary>
-    public MouseImpl () { }
+    public MouseImpl ()
+    {
+        // Subscribe to Application static property change events
+        Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
+    }
+
+    private IApplication? _app;
 
     /// <inheritdoc/>
-    public IApplication? App { get; set; }
+    public IApplication? App
+    {
+        get => _app;
+        set => _app = value;
+    }
 
     /// <inheritdoc/>
     public Point? LastMousePosition { get; set; }
@@ -67,7 +77,7 @@ internal class MouseImpl : IMouse
         //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        List<View?>? currentViewsUnderMouse = App?.Current?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
+        List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();
 
@@ -114,9 +124,9 @@ internal class MouseImpl : IMouse
             return;
         }
 
-        // if the mouse is outside the Application.Current or Popover hierarchy, we don't want to
+        // if the mouse is outside the Application.TopRunnable or Popover hierarchy, we don't want to
         // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (App?.Current, deepestViewUnderMouse, true) && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
+        if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true) && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }
@@ -254,6 +264,7 @@ internal class MouseImpl : IMouse
         // Do not clear LastMousePosition; Popover's require it to stay set with last mouse pos.
         CachedViewsUnderMouse.Clear ();
         MouseEvent = null;
+        MouseGrabView = null;
     }
 
     // Mouse grab functionality merged from MouseGrabHandler
@@ -389,5 +400,18 @@ internal class MouseImpl : IMouse
         }
 
         return false;
+    }
+
+    // Event handler for Application static property changes
+    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e)
+    {
+        IsMouseDisabled = e.NewValue;
+    }
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        // Unsubscribe from Application static property change events
+        Application.IsMouseDisabledChanged -= OnIsMouseDisabledChanged;
     }
 }

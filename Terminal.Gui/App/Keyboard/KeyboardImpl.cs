@@ -1,7 +1,10 @@
+using System.Collections.Concurrent;
+
 namespace Terminal.Gui.App;
 
 /// <summary>
 ///     INTERNAL: Implements <see cref="IKeyboard"/> to manage keyboard input and key bindings at the Application level.
+///     This implementation is thread-safe for all public operations.
 ///     <para>
 ///         This implementation decouples keyboard handling state from the static <see cref="App"/> class,
 ///         enabling parallelizable unit tests and better testability.
@@ -10,19 +13,61 @@ namespace Terminal.Gui.App;
 ///         See <see cref="IKeyboard"/> for usage details.
 ///     </para>
 /// </summary>
-internal class KeyboardImpl : IKeyboard
+internal class KeyboardImpl : IKeyboard, IDisposable
 {
-    private Key _quitKey = Key.Esc; // Resources/config.json overrides
-    private Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrides
-    private Key _nextTabGroupKey = Key.F6; // Resources/config.json overrides
-    private Key _nextTabKey = Key.Tab; // Resources/config.json overrides
-    private Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrides
-    private Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrides
+    /// <summary>
+    ///     Initializes keyboard bindings and subscribes to Application configuration property events.
+    /// </summary>
+    public KeyboardImpl ()
+    {
+        // DON'T access Application static properties here - they trigger ApplicationImpl.Instance
+        // which sets ModelUsage to LegacyStatic, breaking parallel tests.
+        // These will be initialized from Application static properties in Init() or when accessed.
+
+        // Initialize to reasonable defaults that match Application defaults
+        // These will be updated by property change events if Application properties change
+        _quitKey = Key.Esc;
+        _arrangeKey = Key.F5.WithCtrl;
+        _nextTabGroupKey = Key.F6;
+        _nextTabKey = Key.Tab;
+        _prevTabGroupKey = Key.F6.WithShift;
+        _prevTabKey = Key.Tab.WithShift;
+
+        // Subscribe to Application static property change events
+        // so we get updated if they change
+        Application.QuitKeyChanged += OnQuitKeyChanged;
+        Application.ArrangeKeyChanged += OnArrangeKeyChanged;
+        Application.NextTabGroupKeyChanged += OnNextTabGroupKeyChanged;
+        Application.NextTabKeyChanged += OnNextTabKeyChanged;
+        Application.PrevTabGroupKeyChanged += OnPrevTabGroupKeyChanged;
+        Application.PrevTabKeyChanged += OnPrevTabKeyChanged;
+
+        AddKeyBindings ();
+    }
 
     /// <summary>
-    ///     Commands for Application.
+    ///     Commands for Application. Thread-safe for concurrent access.
     /// </summary>
-    private readonly Dictionary<Command, View.CommandImplementation> _commandImplementations = new ();
+    private readonly ConcurrentDictionary<Command, View.CommandImplementation> _commandImplementations = new ();
+
+    private Key _quitKey;
+    private Key _arrangeKey;
+    private Key _nextTabGroupKey;
+    private Key _nextTabKey;
+    private Key _prevTabGroupKey;
+    private Key _prevTabKey;
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        // Unsubscribe from Application static property change events
+        Application.QuitKeyChanged -= OnQuitKeyChanged;
+        Application.ArrangeKeyChanged -= OnArrangeKeyChanged;
+        Application.NextTabGroupKeyChanged -= OnNextTabGroupKeyChanged;
+        Application.NextTabKeyChanged -= OnNextTabKeyChanged;
+        Application.PrevTabGroupKeyChanged -= OnPrevTabGroupKeyChanged;
+        Application.PrevTabKeyChanged -= OnPrevTabKeyChanged;
+    }
 
     /// <inheritdoc/>
     public IApplication? App { get; set; }
@@ -102,20 +147,9 @@ internal class KeyboardImpl : IKeyboard
     /// <inheritdoc/>
     public event EventHandler<Key>? KeyUp;
 
-    /// <summary>
-    ///     Initializes keyboard bindings.
-    /// </summary>
-    public KeyboardImpl ()
-    {
-        AddKeyBindings ();
-    }
-
     /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
-        //ebug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
-        //Logging.Debug ($"{key}");
-
         // TODO: Add a way to ignore certain keys, esp for debugging.
         //#if DEBUG
         //        if (key == Key.Empty.WithAlt || key == Key.Empty.WithCtrl)
@@ -138,18 +172,18 @@ internal class KeyboardImpl : IKeyboard
             return true;
         }
 
-        if (App?.Current is null)
+        if (App?.TopRunnableView is null)
         {
             if (App?.SessionStack is { })
             {
-                foreach (Toplevel topLevel in App.SessionStack.ToList ())
+                foreach (IRunnable? runnable in App.SessionStack.Select(r => r.Runnable))
                 {
-                    if (topLevel.NewKeyDownEvent (key))
+                    if (runnable is View view && view.NewKeyDownEvent (key))
                     {
                         return true;
                     }
 
-                    if (topLevel.Modal)
+                    if (runnable!.IsModal)
                     {
                         break;
                     }
@@ -158,14 +192,15 @@ internal class KeyboardImpl : IKeyboard
         }
         else
         {
-            if (App.Current.NewKeyDownEvent (key))
+            if (App.TopRunnableView.NewKeyDownEvent (key))
             {
                 return true;
             }
         }
 
         bool? commandHandled = InvokeCommandsBoundToKey (key);
-        if(commandHandled is true)
+
+        if (commandHandled is true)
         {
             return true;
         }
@@ -188,19 +223,18 @@ internal class KeyboardImpl : IKeyboard
             return true;
         }
 
-
         // TODO: Add Popover support
 
         if (App?.SessionStack is { })
         {
-            foreach (Toplevel topLevel in App.SessionStack.ToList ())
+            foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
             {
-                if (topLevel.NewKeyUpEvent (key))
+                if (runnable is View view && view.NewKeyUpEvent (key))
                 {
                     return true;
                 }
 
-                if (topLevel.Modal)
+                if (runnable!.IsModal)
                 {
                     break;
                 }
@@ -214,6 +248,7 @@ internal class KeyboardImpl : IKeyboard
     public bool? InvokeCommandsBoundToKey (Key key)
     {
         bool? handled = null;
+
         // Invoke any Application-scoped KeyBindings.
         // The first view that handles the key will stop the loop.
         // foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.GetBindings (key))
@@ -264,24 +299,6 @@ internal class KeyboardImpl : IKeyboard
         return null;
     }
 
-    /// <summary>
-    ///     <para>
-    ///         Sets the function that will be invoked for a <see cref="Command"/>.
-    ///     </para>
-    ///     <para>
-    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
-    ///         replace the old one.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This version of AddCommand is for commands that do not require a <see cref="ICommandContext"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="command">The command.</param>
-    /// <param name="f">The function.</param>
-    private void AddCommand (Command command, Func<bool?> f) { _commandImplementations [command] = ctx => f (); }
-
     internal void AddKeyBindings ()
     {
         _commandImplementations.Clear ();
@@ -296,6 +313,7 @@ internal class KeyboardImpl : IKeyboard
                         return true;
                     }
                    );
+
         AddCommand (
                     Command.Suspend,
                     () =>
@@ -305,6 +323,7 @@ internal class KeyboardImpl : IKeyboard
                         return true;
                     }
                    );
+
         AddCommand (
                     Command.NextTabStop,
                     () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
@@ -351,31 +370,64 @@ internal class KeyboardImpl : IKeyboard
                         return false;
                     });
 
-        //SetKeysToHardCodedDefaults ();
-
         // Need to clear after setting the above to ensure actually clear
-        // because set_QuitKey etc.. may call Add
-        KeyBindings.Clear ();
+        // because set_QuitKey etc. may call Add
+        //KeyBindings.Clear ();
 
-        KeyBindings.Add (QuitKey, Command.Quit);
-        KeyBindings.Add (NextTabKey, Command.NextTabStop);
-        KeyBindings.Add (PrevTabKey, Command.PreviousTabStop);
-        KeyBindings.Add (NextTabGroupKey, Command.NextTabGroup);
-        KeyBindings.Add (PrevTabGroupKey, Command.PreviousTabGroup);
-        KeyBindings.Add (ArrangeKey, Command.Arrange);
+        // Use ReplaceCommands instead of Add, because it's possible that
+        // during construction the Application static properties changed, and
+        // we added those keys already.
+        KeyBindings.ReplaceCommands (QuitKey, Command.Quit);
+        KeyBindings.ReplaceCommands (NextTabKey, Command.NextTabStop);
+        KeyBindings.ReplaceCommands (PrevTabKey, Command.PreviousTabStop);
+        KeyBindings.ReplaceCommands (NextTabGroupKey, Command.NextTabGroup);
+        KeyBindings.ReplaceCommands (PrevTabGroupKey, Command.PreviousTabGroup);
+        KeyBindings.ReplaceCommands (ArrangeKey, Command.Arrange);
 
-        KeyBindings.Add (Key.CursorRight, Command.NextTabStop);
-        KeyBindings.Add (Key.CursorDown, Command.NextTabStop);
-        KeyBindings.Add (Key.CursorLeft, Command.PreviousTabStop);
-        KeyBindings.Add (Key.CursorUp, Command.PreviousTabStop);
+        // TODO: Should these be configurable?
+        KeyBindings.ReplaceCommands (Key.CursorRight, Command.NextTabStop);
+        KeyBindings.ReplaceCommands (Key.CursorDown, Command.NextTabStop);
+        KeyBindings.ReplaceCommands (Key.CursorLeft, Command.PreviousTabStop);
+        KeyBindings.ReplaceCommands (Key.CursorUp, Command.PreviousTabStop);
 
         // TODO: Refresh Key should be configurable
-        KeyBindings.Add (Key.F5, Command.Refresh);
+        KeyBindings.ReplaceCommands (Key.F5, Command.Refresh);
 
         // TODO: Suspend Key should be configurable
         if (Environment.OSVersion.Platform == PlatformID.Unix)
         {
-            KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+            KeyBindings.ReplaceCommands (Key.Z.WithCtrl, Command.Suspend);
         }
     }
+
+    /// <summary>
+    ///     <para>
+    ///         Sets the function that will be invoked for a <see cref="Command"/>.
+    ///     </para>
+    ///     <para>
+    ///         If AddCommand has already been called for <paramref name="command"/> <paramref name="f"/> will
+    ///         replace the old one.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This version of AddCommand is for commands that do not require a <see cref="ICommandContext"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="command">The command.</param>
+    /// <param name="f">The function.</param>
+    private void AddCommand (Command command, Func<bool?> f) { _commandImplementations [command] = ctx => f (); }
+
+    private void OnArrangeKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { ArrangeKey = e.NewValue; }
+
+    private void OnNextTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { NextTabGroupKey = e.NewValue; }
+
+    private void OnNextTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { NextTabKey = e.NewValue; }
+
+    private void OnPrevTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { PrevTabGroupKey = e.NewValue; }
+
+    private void OnPrevTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { PrevTabKey = e.NewValue; }
+
+    // Event handlers for Application static property changes
+    private void OnQuitKeyChanged (object? sender, ValueChangedEventArgs<Key> e) { QuitKey = e.NewValue; }
 }

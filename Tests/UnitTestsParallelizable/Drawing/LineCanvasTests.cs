@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 /// <summary>
 ///     Pure unit tests for <see cref="LineCanvas"/> that don't require Application.Driver or View context.
@@ -1410,7 +1410,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         foreach (Cell? cell in cellMap.Values)
         {
             Assert.NotNull (cell);
-            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (foregroundColor, cell.Value.Attribute!.Value.Foreground);
             Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
         }
     }
@@ -1439,7 +1439,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         foreach (Cell? cell in cellMap.Values)
         {
             Assert.NotNull (cell);
-            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (foregroundColor, cell.Value.Attribute!.Value.Foreground);
             Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
         }
     }
@@ -1468,7 +1468,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         foreach (Cell? cell in cellMap.Values)
         {
             Assert.NotNull (cell);
-            Assert.Equal (foregroundColor, cell.Value.Attribute.Value.Foreground);
+            Assert.Equal (foregroundColor, cell.Value.Attribute!.Value.Foreground);
             Assert.Equal (backgroundColor, cell.Value.Attribute.Value.Background);
         }
     }

@@ -100,7 +100,7 @@ public class TreeViewTests (ITestOutputHelper output)
         tv.AddObject (n1);
         tv.AddObject (n2);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -979,10 +979,10 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("├-root one", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ ├─leaf 1", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("│ └─leaf 2", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("└─root two", eventArgs [3].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("├-root one", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("│ ├─leaf 1", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("│ └─leaf 2", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("└─root two", eventArgs [3].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
 
         Assert.Equal (1, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (3, eventArgs [1].IndexOfExpandCollapseSymbol);
@@ -1092,9 +1092,9 @@ oot two
         Assert.All (eventArgs, ea => Assert.Equal (ea.Tree, tv));
         Assert.All (eventArgs, ea => Assert.False (ea.Handled));
 
-        Assert.Equal ("─leaf 1", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("─leaf 2", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
-        Assert.Equal ("oot two", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Rune).TrimEnd ());
+        Assert.Equal ("─leaf 1", eventArgs [0].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("─leaf 2", eventArgs [1].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
+        Assert.Equal ("oot two", eventArgs [2].Cells.Aggregate ("", (s, n) => s += n.Grapheme).TrimEnd ());
 
         Assert.Equal (0, eventArgs [0].IndexOfExpandCollapseSymbol);
         Assert.Equal (0, eventArgs [1].IndexOfExpandCollapseSymbol);

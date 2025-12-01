@@ -13,23 +13,43 @@ public static partial class Application // Driver abstractions
         internal set => ApplicationImpl.Instance.Driver = value;
     }
 
+    private static bool _force16Colors = false; // Resources/config.json overrides
+
     /// <inheritdoc cref="IApplication.Force16Colors"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     [Obsolete ("The legacy static Application object is going away.")]
     public static bool Force16Colors
     {
-        get => ApplicationImpl.Instance.Force16Colors;
-        set => ApplicationImpl.Instance.Force16Colors = value;
+        get => _force16Colors;
+        set
+        {
+            bool oldValue = _force16Colors;
+            _force16Colors = value;
+            Force16ColorsChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, _force16Colors));
+        }
     }
+
+    /// <summary>Raised when <see cref="Force16Colors"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<bool>>? Force16ColorsChanged;
+
+    private static string _forceDriver = string.Empty; // Resources/config.json overrides
 
     /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     [Obsolete ("The legacy static Application object is going away.")]
     public static string ForceDriver
     {
-        get => ApplicationImpl.Instance.ForceDriver;
-        set => ApplicationImpl.Instance.ForceDriver = value;
+        get => _forceDriver;
+        set
+        {
+            string oldValue = _forceDriver;
+            _forceDriver = value;
+            ForceDriverChanged?.Invoke (null, new ValueChangedEventArgs<string> (oldValue, _forceDriver));
+        }
     }
+
+    /// <summary>Raised when <see cref="ForceDriver"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<string>>? ForceDriverChanged;
 
     /// <inheritdoc cref="IApplication.Sixel"/>
     [Obsolete ("The legacy static Application object is going away.")] 

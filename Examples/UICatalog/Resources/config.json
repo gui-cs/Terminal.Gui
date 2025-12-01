@@ -11,7 +11,7 @@
       "Hot Dog Stand": {
         "Schemes": [
           {
-            "Toplevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "Black",
                 "Background": "#FFFF00"
@@ -149,8 +149,8 @@
         "FrameView.DefaultBorderStyle": "Double",
         "MessageBox.DefaultMinimumHeight": 0,
         "Button.DefaultHighlightStates": "In, Pressed",
-        "Menuv2.DefaultBorderStyle": "Heavy",
-        "MenuBarv2.DefaultBorderStyle": "Heavy",
+        "Menu.DefaultBorderStyle": "Heavy",
+        "MenuBar.DefaultBorderStyle": "Heavy",
         "Schemes": [
           {
             "UI Catalog Scheme": {
@@ -177,7 +177,7 @@
             }
           },
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "DarkGray",
                 "Background": "White"

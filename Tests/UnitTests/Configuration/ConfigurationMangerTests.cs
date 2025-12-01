@@ -550,7 +550,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""TopLevel"": {
+            ""Runnable"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""
@@ -1245,7 +1245,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""TopLevel"": {
+            ""Runnable"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""
@@ -1398,5 +1398,21 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Disable (true);
         }
+    }
+
+    [ConfigurationProperty (Scope = typeof (CMTestsScope))]
+    public static bool? TestProperty { get; set; }
+
+    private class CMTestsScope : Scope<CMTestsScope>
+    {
+    }
+
+    [Fact]
+    public void GetConfigPropertiesByScope_Gets ()
+    {
+        var props = GetUninitializedConfigPropertiesByScope ("CMTestsScope");
+
+        Assert.NotNull (props);
+        Assert.NotEmpty (props);
     }
 }

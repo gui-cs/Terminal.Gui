@@ -102,7 +102,7 @@ public class ViewportSettings : Scenario
             Title = GetQuitKeyAndName (),
 
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-            SchemeName = "Toplevel",
+            SchemeName = "Runnable",
             BorderStyle = LineStyle.None
         };
 
@@ -169,13 +169,13 @@ public class ViewportSettings : Scenario
         };
 
         charMap.Accepting += (s, e) =>
-                              MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
+                              MessageBox.Query ((s as View)?.App, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
         var buttonAnchored = new Button
         {
             X = Pos.AnchorEnd () - 10, Y = Pos.AnchorEnd () - 4, Text = "Bottom Rig_ht"
         };
-        buttonAnchored.Accepting += (sender, args) => MessageBox.Query ("Hi", $"You pressed {((Button)sender)?.Text}", "_Ok");
+        buttonAnchored.Accepting += (sender, args) => MessageBox.Query ((sender as View)?.App, "Hi", $"You pressed {((Button)sender)?.Text}", "_Ok");
 
         view.Margin!.Data = "Margin";
         view.Margin!.Thickness = new (0);

@@ -1,5 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿#nullable enable
 
 namespace UnitTests.ViewsTests;
 public class StatusBarTests
@@ -21,7 +20,7 @@ public class StatusBarTests
         Assert.Equal ("Close", sb.SubViews.ElementAt (2).Title);
         Assert.Equal ("Quit", sb.SubViews.ToArray () [^1].Title);
 
-        Assert.Equal ("Save", sb.RemoveShortcut (1).Title);
+        Assert.Equal ("Save", sb.RemoveShortcut (1)!.Title);
 
         Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
         Assert.Equal ("Close", sb.SubViews.ElementAt (1).Title);
@@ -57,7 +56,7 @@ public class StatusBarTests
     //                                           )
     //                                   }
     //                                  );
-    //    Toplevel top = new ();
+    //    Runnable top = new ();
     //    top.Add (statusBar);
 
     //    bool CanExecuteNew () { return win == null; }
@@ -101,12 +100,12 @@ public class StatusBarTests
         var iteration = 0;
 
         Application.Iteration += OnApplicationOnIteration;
-        Application.Run ().Dispose ();
+        Application.Run<Runnable> ();
         Application.Iteration -= OnApplicationOnIteration;
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             if (iteration == 0)
             {

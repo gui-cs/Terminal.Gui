@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Text;
 using Moq;
 using Terminal.Gui;
 using UnitTests;
@@ -10,7 +11,7 @@ using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class ListViewTests (ITestOutputHelper output)
 {
@@ -893,16 +894,17 @@ public class ListViewTests (ITestOutputHelper output)
             BorderStyle = LineStyle.Single
         };
         lv.SetSource (["One", "Two", "Three", "Four"]);
-        lv.SelectedItemChanged += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        lv.SelectedItemChanged += (s, e) => selected = e.Value!.ToString ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
-        //AutoInitShutdownAttribute.RunIteration ();
+        //AutoInitDisposeAttribute.RunIteration ();
 
         Assert.Equal (new (1), lv.Border!.Thickness);
         Assert.Null (lv.SelectedItem);
         Assert.Equal ("", lv.Text);
+        app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -950,7 +952,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Equal (2, lv.SelectedItem);
         top.Dispose ();
 
-        app.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]
@@ -970,11 +972,12 @@ public class ListViewTests (ITestOutputHelper output)
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper<string> (source) };
         var win = new Window ();
         win.Add (lv);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         app.Begin (top);
 
         Assert.Null (lv.SelectedItem);
+        app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1203,7 +1206,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                        _output, app.Driver
                                                       );
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1221,9 +1224,10 @@ public class ListViewTests (ITestOutputHelper output)
         }
 
         var lv = new ListView { Width = 10, Height = 5, Source = new ListWrapper<string> (source) };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
+        app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1249,7 +1253,7 @@ Item 6",
                                                        _output, app.Driver
                                                       );
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1258,14 +1262,15 @@ Item 6",
         IApplication? app = Application.Create ();
         app.Init ("fake");
         IDriver? driver = app.Driver;
-        driver.SetScreenSize (8, 2);
+        driver?.SetScreenSize (8, 2);
 
         ObservableCollection<string> source = ["First", "Second"];
         var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper<string> (source) };
         lv.SelectedItem = 1;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
+        app.LayoutAndDraw ();
 
         Assert.Equal ("Second ", GetContents (0));
         Assert.Equal (new (' ', 7), GetContents (1));
@@ -1278,18 +1283,18 @@ Item 6",
 
         string GetContents (int line)
         {
-            var item = "";
+            var sb = new StringBuilder ();
 
             for (var i = 0; i < 7; i++)
             {
-                item += app.Driver?.Contents [line, i].Rune;
+                sb.Append ((app?.Driver?.Contents!) [line, i].Grapheme);
             }
 
-            return item;
+            return sb.ToString ();
         }
 
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1313,7 +1318,7 @@ Item 6",
         };
         lv.Height = lv.Source.Count;
         lv.Width = lv.MaxLength;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1338,7 +1343,7 @@ Item 6",
  tem 4",
                                                        _output, app.Driver);
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1351,7 +1356,7 @@ Item 6",
         ObservableCollection<string> source = ["one", "two", "three"];
         var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
         lv.RowRender += (s, _) => rendered = true;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
         Assert.False (rendered);
@@ -1360,7 +1365,7 @@ Item 6",
         lv.Draw ();
         Assert.True (rendered);
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1376,7 +1381,7 @@ Item 6",
         };
         lv.VerticalScrollBar.AutoShow = true;
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1401,7 +1406,7 @@ Four
 Five ",
                                                        _output, app?.Driver);
         top.Dispose ();
-        app?.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]
@@ -1416,7 +1421,7 @@ Five ",
             Height = 3,
         };
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
 
@@ -1430,8 +1435,8 @@ Three",
                                                        _output, app?.Driver);
 
         // Scroll down
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledDown });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledDown });
+        app?.LayoutAndDraw ();
         Assert.Equal (1, lv.TopItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1441,8 +1446,8 @@ Four ",
                                                        _output, app?.Driver);
 
         // Scroll up
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledUp });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledUp });
+        app?.LayoutAndDraw ();
         Assert.Equal (0, lv.TopItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1452,7 +1457,7 @@ Three",
                                                        _output, app?.Driver);
 
         top.Dispose ();
-        app.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]
@@ -1479,9 +1484,10 @@ Three",
             Height = 3,
         };
         lv.SetSource (["One", "Two", "Three - long", "Four", "Five"]);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
+        app.LayoutAndDraw ();
 
         Assert.Equal (0, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1492,7 +1498,7 @@ Three - lo",
                                                        _output, app?.Driver);
 
         lv.ScrollHorizontal (1);
-        app.LayoutAndDraw ();
+        app?.LayoutAndDraw ();
         Assert.Equal (1, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1502,8 +1508,8 @@ hree - lon",
                                                        _output, app?.Driver);
 
         // Scroll right with mouse
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledRight });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledRight });
+        app?.LayoutAndDraw ();
         Assert.Equal (2, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1513,8 +1519,8 @@ ree - long",
                                                        _output, app?.Driver);
 
         // Scroll left with mouse
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledLeft });
-        app.LayoutAndDraw ();
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.WheeledLeft });
+        app?.LayoutAndDraw ();
         Assert.Equal (1, lv.LeftItem);
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -1524,7 +1530,7 @@ hree - lon",
                                                        _output, app?.Driver);
 
         top.Dispose ();
-        app.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]

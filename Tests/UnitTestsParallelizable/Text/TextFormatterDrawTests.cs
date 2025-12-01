@@ -1,11 +1,12 @@
 ﻿#nullable enable
 using System.Text;
 using UICatalog;
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests.TextTests;
+namespace TextTests;
 
 public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -426,7 +427,7 @@ Nice       Work")]
 
         TextFormatter tf = new ()
         {
-            Text = UICatalogTop.GetAboutBoxMessage (),
+            Text = UICatalogRunnable.GetAboutBoxMessage (),
             Alignment = Alignment.Center,
             VerticalAlignment = Alignment.Start,
             WordWrap = false,
@@ -653,6 +654,33 @@ Nice       Work")]
         Assert.Equal (new (expectedWidth, expectedHeight), size);
 
         tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
+
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
+    }
+
+    [Theory]
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 2, 1, TextDirection.LeftRight_TopBottom, "👨‍👩‍👧‍👦")]
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", 2, 1, TextDirection.TopBottom_LeftRight, "👨‍👩‍👧‍👦")]
+    public void Draw_Emojis_With_Zero_Width_Joiner (
+        string text,
+        int width,
+        int height,
+        TextDirection direction,
+        string expectedDraw
+    )
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        TextFormatter tf = new ()
+        {
+            Direction = direction,
+            ConstrainToSize = new (width, height),
+            Text = text,
+            WordWrap = false
+        };
+        Assert.Equal (width, text.GetColumns ());
+
+        tf.Draw (driver, new (0, 0, width, height), Attribute.Default, Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedDraw, output, driver);
     }

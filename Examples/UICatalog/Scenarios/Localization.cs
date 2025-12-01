@@ -1,7 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
 using System.Globalization;
-using System.Linq;
-using System.Threading;
 
 namespace UICatalog.Scenarios;
 
@@ -10,11 +9,11 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public class Localization : Scenario
 {
-    private CheckBox _allowAnyCheckBox;
-    private string [] _cultureInfoNameSource;
-    private CultureInfo [] _cultureInfoSource;
+    private CheckBox? _allowAnyCheckBox;
+    private string []? _cultureInfoNameSource;
+    private CultureInfo []? _cultureInfoSource;
     private OpenMode _currentOpenMode = OpenMode.File;
-    private ComboBox _languageComboBox;
+    private ComboBox? _languageComboBox;
     public CultureInfo CurrentCulture { get; private set; } = Thread.CurrentThread.CurrentUICulture;
 
     public void Quit ()
@@ -25,6 +24,11 @@ public class Localization : Scenario
 
     public void SetCulture (CultureInfo culture)
     {
+        if (_languageComboBox is null || _cultureInfoSource is null)
+        {
+            return;
+        }
+
         if (_cultureInfoSource [_languageComboBox.SelectedItem] != culture)
         {
             _languageComboBox.SelectedItem = Array.IndexOf (_cultureInfoSource, culture);
@@ -43,70 +47,67 @@ public class Localization : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var top = new Toplevel ();
-        var win = new Window { Title = GetQuitKeyAndName () };
-        _cultureInfoSource = Application.SupportedCultures.Append (CultureInfo.InvariantCulture).ToArray ();
 
-        _cultureInfoNameSource = Application.SupportedCultures.Select (c => $"{c.NativeName} ({c.Name})")
+        Window win = new ()
+        {
+            Title = GetQuitKeyAndName (),
+            BorderStyle = LineStyle.None
+        };
+
+        _cultureInfoSource = Application.SupportedCultures!.Append (CultureInfo.InvariantCulture).ToArray ();
+
+        _cultureInfoNameSource = Application.SupportedCultures!.Select (c => $"{c.NativeName} ({c.Name})")
                                             .Append ("Invariant")
                                             .ToArray ();
 
-        MenuItem [] languageMenus = Application.SupportedCultures
-                                               .Select (
-                                                        c => new MenuItem (
-                                                                           $"{c.NativeName} ({c.Name})",
-                                                                           "",
-                                                                           () => SetCulture (c)
-                                                                          )
+        MenuItem [] languageMenus = Application.SupportedCultures!
+                                               .Select (c => new MenuItem
+                                                        {
+                                                            Title = $"{c.NativeName} ({c.Name})",
+                                                            Action = () => SetCulture (c)
+                                                        }
                                                        )
                                                .Concat (
-                                                        new MenuItem []
-                                                        {
-                                                            null,
-                                                            new (
-                                                                 "Invariant",
-                                                                 "",
-                                                                 () =>
-                                                                     SetCulture (
-                                                                                 CultureInfo
-                                                                                     .InvariantCulture
-                                                                                )
-                                                                )
-                                                        }
+                                                        [
+                                                            new ()
+                                                            {
+                                                                Title = "Invariant",
+                                                                Action = () => SetCulture (CultureInfo.InvariantCulture)
+                                                            }
+                                                        ]
                                                        )
                                                .ToArray ();
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_File",
-                     new MenuItem []
-                     {
-                         new MenuBarItem (
-                                          "_Language",
-                                          languageMenus
-                                         ),
-                         null,
-                         new ("_Quit", "", Quit)
-                     }
-                    )
-            ]
-        };
-        top.Add (menu);
+        // MenuBar
+        MenuBar menu = new ();
 
-        var selectLanguageLabel = new Label
+        menu.Add (
+                  new MenuBarItem (
+                                   "_File",
+                                   [
+                                       new MenuBarItem (
+                                                        "_Language",
+                                                        languageMenus
+                                                       ),
+                                       new MenuItem
+                                       {
+                                           Title = "_Quit",
+                                           Action = Quit
+                                       }
+                                   ]
+                                  )
+                 );
+
+        Label selectLanguageLabel = new ()
         {
             X = 2,
-            Y = 1,
-
+            Y = Pos.Bottom (menu) + 1,
             Width = Dim.Fill (2),
             Text = "Please select a language."
         };
         win.Add (selectLanguageLabel);
 
-        _languageComboBox = new()
+        _languageComboBox = new ()
         {
             X = 2,
             Y = Pos.Bottom (selectLanguageLabel) + 1,
@@ -120,11 +121,10 @@ public class Localization : Scenario
         _languageComboBox.SelectedItemChanged += LanguageComboBox_SelectChanged;
         win.Add (_languageComboBox);
 
-        var textAndFileDialogLabel = new Label
+        Label textAndFileDialogLabel = new ()
         {
             X = 2,
             Y = Pos.Top (_languageComboBox) + 3,
-
             Width = Dim.Fill (2),
             Height = 1,
             Text =
@@ -132,13 +132,16 @@ public class Localization : Scenario
         };
         win.Add (textAndFileDialogLabel);
 
-        var textField = new TextView
+        TextView textField = new ()
         {
-            X = 2, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Width = Dim.Fill (32), Height = 1
+            X = 2,
+            Y = Pos.Bottom (textAndFileDialogLabel) + 1,
+            Width = Dim.Fill (32),
+            Height = 1
         };
         win.Add (textField);
 
-        _allowAnyCheckBox = new()
+        _allowAnyCheckBox = new ()
         {
             X = Pos.Right (textField) + 1,
             Y = Pos.Bottom (textAndFileDialogLabel) + 1,
@@ -147,46 +150,53 @@ public class Localization : Scenario
         };
         win.Add (_allowAnyCheckBox);
 
-        var openDialogButton = new Button
+        Button openDialogButton = new ()
         {
-            X = Pos.Right (_allowAnyCheckBox) + 1, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Text = "Open"
+            X = Pos.Right (_allowAnyCheckBox) + 1,
+            Y = Pos.Bottom (textAndFileDialogLabel) + 1,
+            Text = "Open"
         };
         openDialogButton.Accepting += (sender, e) => ShowFileDialog (false);
         win.Add (openDialogButton);
 
-        var saveDialogButton = new Button
+        Button saveDialogButton = new ()
         {
-            X = Pos.Right (openDialogButton) + 1, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Text = "Save"
+            X = Pos.Right (openDialogButton) + 1,
+            Y = Pos.Bottom (textAndFileDialogLabel) + 1,
+            Text = "Save"
         };
         saveDialogButton.Accepting += (sender, e) => ShowFileDialog (true);
         win.Add (saveDialogButton);
 
-        var wizardLabel = new Label
+        Label wizardLabel = new ()
         {
             X = 2,
             Y = Pos.Bottom (textField) + 1,
-
             Width = Dim.Fill (2),
             Text = "Click the button to open a wizard."
         };
         win.Add (wizardLabel);
 
-        var wizardButton = new Button { X = 2, Y = Pos.Bottom (wizardLabel) + 1, Text = "Open _wizard" };
+        Button wizardButton = new () { X = 2, Y = Pos.Bottom (wizardLabel) + 1, Text = "Open _wizard" };
         wizardButton.Accepting += (sender, e) => ShowWizard ();
         win.Add (wizardButton);
 
-        win.Unloaded += (sender, e) => Quit ();
+        win.IsRunningChanged += (sender, e) => Quit ();
 
-        win.Y = Pos.Bottom (menu);
-        top.Add (win);
+        win.Add (menu);
 
-        Application.Run (top);
-        top.Dispose ();
+        Application.Run (win);
+        win.Dispose ();
         Application.Shutdown ();
     }
 
     public void ShowFileDialog (bool isSaveFile)
     {
+        if (_allowAnyCheckBox is null)
+        {
+            return;
+        }
+
         FileDialog dialog = isSaveFile ? new SaveDialog () : new OpenDialog { OpenMode = _currentOpenMode };
 
         dialog.AllowedTypes =
@@ -213,16 +223,21 @@ public class Localization : Scenario
 
     public void ShowWizard ()
     {
-        var wizard = new Wizard { Height = 8, Width = 36, Title = "The wizard" };
-        wizard.AddStep (new() { HelpText = "Wizard first step" });
-        wizard.AddStep (new() { HelpText = "Wizard step 2", NextButtonText = ">>> (_N)" });
-        wizard.AddStep (new() { HelpText = "Wizard last step" });
+        Wizard wizard = new () { Height = 8, Width = 36, Title = "The wizard" };
+        wizard.AddStep (new () { HelpText = "Wizard first step" });
+        wizard.AddStep (new () { HelpText = "Wizard step 2", NextButtonText = ">>> (_N)" });
+        wizard.AddStep (new () { HelpText = "Wizard last step" });
         Application.Run (wizard);
         wizard.Dispose ();
     }
 
-    private void LanguageComboBox_SelectChanged (object sender, ListViewItemEventArgs e)
+    private void LanguageComboBox_SelectChanged (object? sender, ListViewItemEventArgs e)
     {
+        if (_cultureInfoNameSource is null || _cultureInfoSource is null)
+        {
+            return;
+        }
+
         if (e.Value is string cultureName)
         {
             int index = Array.IndexOf (_cultureInfoNameSource, cultureName);

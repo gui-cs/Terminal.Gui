@@ -76,25 +76,6 @@ public abstract class OutputBase
 
                     outputWidth++;
 
-                    // Handle special cases that AppendCellAnsi doesn't cover
-                    Rune rune = cell.Rune;
-                    if (cell.CombiningMarks.Count > 0)
-                    {
-                        // AtlasEngine does not support NON-NORMALIZED combining marks in a way
-                        // compatible with the driver architecture. Any CMs (except in the first col)
-                        // are correctly combined with the base char, but are ALSO treated as 1 column
-                        // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
-                        // 
-                        // For now, we just ignore the list of CMs.
-                        //foreach (var combMark in Contents [row, col].CombiningMarks) {
-                        //	output.Append (combMark);
-                    }
-                    else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
-                    {
-                        WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        SetCursorPositionImpl (col - 1, row);
-                    }
-
                     buffer.Contents [row, col].IsDirty = false;
                 }
             }
@@ -109,14 +90,16 @@ public abstract class OutputBase
             }
         }
 
-        foreach (SixelToRender s in Application.Sixel)
-        {
-            if (!string.IsNullOrWhiteSpace (s.SixelData))
-            {
-                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Console.Out.Write (s.SixelData);
-            }
-        }
+        // BUGBUG: The Sixel impl depends on the legacy static Application object
+        // BUGBUG: Disabled for now
+        //foreach (SixelToRender s in  Application.Sixel)
+        //{
+        //    if (!string.IsNullOrWhiteSpace (s.SixelData))
+        //    {
+        //        SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+        //        Console.Out.Write (s.SixelData);
+        //    }
+        //}
 
         SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
         _cachedCursorVisibility = savedVisibility;
@@ -216,16 +199,12 @@ public abstract class OutputBase
             redrawTextStyle = attribute.Value.Style;
         }
 
-        // Add the character
-        const int MAX_CHARS_PER_RUNE = 2;
-        Span<char> runeBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
-        Rune rune = cell.Rune;
-        int runeCharsWritten = rune.EncodeToUtf16 (runeBuffer);
-        ReadOnlySpan<char> runeChars = runeBuffer [..runeCharsWritten];
-        output.Append (runeChars);
+        // Add the grapheme
+        string grapheme = cell.Grapheme;
+        output.Append (grapheme);
 
-        // Handle wide characters
-        if (rune.GetColumns () > 1 && currentCol + 1 < maxCol)
+        // Handle wide grapheme
+        if (grapheme.GetColumns () > 1 && currentCol + 1 < maxCol)
         {
             currentCol++; // Skip next cell for wide character
         }

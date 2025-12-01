@@ -34,7 +34,7 @@ public class ViewDisposalTest (ITestOutputHelper output)
     {
         GetSpecialParams ();
         var container = new View () { Id = "container" };
-        Toplevel top = new () { Id = "top" };
+        Runnable top = new () { Id = "top" };
         List<Type> views = GetViews ();
 
         foreach (Type view in views)

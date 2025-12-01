@@ -362,12 +362,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     #endregion AddRemove
 
-    // TODO: This drives a weird coupling of Application.Current and View. It's not clear why this is needed.
+    // TODO: This drives a weird coupling of Application.TopRunnable and View. It's not clear why this is needed.
     /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
     /// <returns>The superview view.</returns>
     internal View? GetTopSuperView (View? view = null, View? superview = null)
     {
-        View? top = superview ?? App?.Current;
+        View? top = superview ?? App?.TopRunnableView;
 
         for (View? v = view?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
         {

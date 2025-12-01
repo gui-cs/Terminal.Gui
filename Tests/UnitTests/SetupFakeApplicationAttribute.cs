@@ -19,7 +19,6 @@ public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
-        _appDispose?.Dispose ();
         var appFactory = new FakeApplicationFactory ();
         _appDispose = appFactory.SetupFakeApplication ();
 

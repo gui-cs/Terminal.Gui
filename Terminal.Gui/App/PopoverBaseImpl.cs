@@ -73,16 +73,16 @@ public abstract class PopoverBaseImpl : View, IPopover
         }
     }
 
-    private Toplevel? _current;
+    private IRunnable? _current;
 
     /// <inheritdoc/>
-    public Toplevel? Current
+    public IRunnable? Current
     {
         get => _current;
         set
         {
             _current = value;
-            App ??= _current?.App;
+            App ??= (_current as View)?.App;
         }
     }
 
@@ -119,7 +119,7 @@ public abstract class PopoverBaseImpl : View, IPopover
             // Whenever visible is changing to false, we need to reset the focus
             if (ApplicationNavigation.IsInHierarchy (this, App?.Navigation?.GetFocused ()))
             {
-                App?.Navigation?.SetFocused (App?.Current?.MostFocused);
+                App?.Navigation?.SetFocused (App?.TopRunnableView?.MostFocused);
             }
         }
 

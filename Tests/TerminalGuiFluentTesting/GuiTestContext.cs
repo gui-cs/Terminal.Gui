@@ -68,7 +68,7 @@ public partial class GuiTestContext : IDisposable
 
         try
         {
-            InitializeApplication ();
+            App?.Init (GetDriverName ());
             _booting.Release ();
 
             // After Init, Application.Screen should be set by the driver
@@ -105,7 +105,7 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     Constructor for tests that need to run the application with Application.Run.
     /// </summary>
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    internal GuiTestContext (Func<IRunnable> runnableBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
         _logWriter = logWriter;
         _runApplication = true;
@@ -119,21 +119,45 @@ public partial class GuiTestContext : IDisposable
                              {
                                  try
                                  {
-                                     InitializeApplication ();
+                                     try
+                                     {
+                                         App?.Init (GetDriverName ());
+                                     }
+                                     catch (Exception e)
+                                     {
+                                         Logging.Error(e.Message);
+                                         _runCancellationTokenSource.Cancel ();
+                                     }
+                                     finally
+                                     {
+                                         _booting.Release ();
+                                     }
 
-                                     _booting.Release ();
+                                     if (App is { Initialized: true })
+                                     {
+                                         IRunnable runnable = runnableBuilder ();
+                                         runnable.IsRunningChanged += (s, e) =>
+                                                                      {
+                                                                          if (!e.Value)
+                                                                          {
+                                                                              Finished = true;
+                                                                          }
+                                                                      };
+                                         App?.Run (runnable); // This will block, but it's on a background thread now
 
-                                     Toplevel t = topLevelBuilder ();
-                                     t.Closed += (s, e) => { Finished = true; };
-                                     App?.Run (t); // This will block, but it's on a background thread now
-
-                                     t.Dispose ();
-                                     Logging.Trace ("Application.Run completed");
-                                     App?.Shutdown ();
-                                     _runCancellationTokenSource.Cancel ();
+                                         if (runnable is View runnableView)
+                                         {
+                                             runnableView.Dispose ();
+                                         }
+                                         Logging.Trace ("Application.Run completed");
+                                         App?.Dispose ();
+                                         _runCancellationTokenSource.Cancel ();
+                                     }
                                  }
                                  catch (OperationCanceledException)
-                                 { }
+                                 {
+                                     Logging.Trace ("OperationCanceledException");
+                                 }
                                  catch (Exception ex)
                                  {
                                      _backgroundException = ex;
@@ -142,7 +166,6 @@ public partial class GuiTestContext : IDisposable
                                  finally
                                  {
                                      CleanupApplication ();
-
                                      if (_logWriter != null)
                                      {
                                          WriteOutLogs (_logWriter);
@@ -165,18 +188,13 @@ public partial class GuiTestContext : IDisposable
         }
     }
 
-    private void InitializeApplication ()
-    {
-        App?.Init (GetDriverName ());
-    }
-
 
     /// <summary>
     ///     Common initialization for both constructors.
     /// </summary>
     private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
     {
-        _timeout = timeout ?? TimeSpan.FromSeconds (10);
+        _timeout = timeout ?? TimeSpan.FromSeconds (30);
         _originalLogger = Logging.Logger;
         _logsSb = new ();
         _driverType = driverType;
@@ -316,7 +334,7 @@ public partial class GuiTestContext : IDisposable
             throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
 
-        Logging.Trace ($"WaitIteration started");
+        //Logging.Trace ($"WaitIteration started");
         if (action is null)
         {
             action = (app) => { };
@@ -358,8 +376,9 @@ public partial class GuiTestContext : IDisposable
         GuiTestContext? c = null;
         var sw = Stopwatch.StartNew ();
 
-        //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+        Logging.Trace ($"WaitUntil started with timeout {_timeout}");
 
+        int count = 0;
         while (!condition ())
         {
             if (sw.Elapsed > _timeout)
@@ -368,8 +387,10 @@ public partial class GuiTestContext : IDisposable
             }
 
             c = WaitIteration ();
+            count++;
         }
 
+        Logging.Trace ($"WaitUntil completed after {sw.ElapsedMilliseconds}ms and {count} iterations");
         return c ?? this;
     }
 
@@ -386,7 +407,10 @@ public partial class GuiTestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); }); }
+    public GuiTestContext ResizeConsole (int width, int height)
+    {
+        return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); });
+    }
 
     public GuiTestContext ScreenShot (string title, TextWriter? writer)
     {
@@ -426,7 +450,7 @@ public partial class GuiTestContext : IDisposable
             {
                 try
                 {
-                    App?.Shutdown ();
+                    App?.Dispose ();
                 }
                 catch
                 {
@@ -455,7 +479,7 @@ public partial class GuiTestContext : IDisposable
             try
             {
                 App?.RequestStop ();
-                App?.Shutdown ();
+                App?.Dispose ();
             }
             catch (Exception ex)
             {
@@ -521,6 +545,7 @@ public partial class GuiTestContext : IDisposable
     internal void Fail (string reason)
     {
         Logging.Error ($"{reason}");
+        WriteOutLogs (_logWriter);
 
         throw new (reason);
     }

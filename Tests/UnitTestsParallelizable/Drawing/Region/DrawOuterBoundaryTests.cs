@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 /// <summary>
 ///     Tests for <see cref="Region.DrawOuterBoundary"/>.
