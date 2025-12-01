@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class DrawTests (ITestOutputHelper output)
@@ -14,31 +14,32 @@ public class DrawTests (ITestOutputHelper output)
     [Trait ("Category", "Unicode")]
     public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
     {
-        const string us = "\U0000f900";
+        const string s = "\U0000f900";
         var r = (Rune)0xf900;
 
-        Assert.Equal ("豈", us);
+        Assert.Equal ("豈", s);
         Assert.Equal ("豈", r.ToString ());
-        Assert.Equal (us, r.ToString ());
+        Assert.Equal (s, r.ToString ());
 
-        Assert.Equal (2, us.GetColumns ());
+        Assert.Equal (2, s.GetColumns ());
         Assert.Equal (2, r.GetColumns ());
 
-        var win = new Window { Title = us };
+        var win = new Window { Title = s };
         var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill () };
-        var tf = new TextField { Text = us, Y = 1, Width = 3 };
+        var tf = new TextField { Text = s, Y = 1, Width = 3 };
         win.Add (view, tf);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4)) ;
+        Application.Driver!.SetScreenSize (10, 4);
+        Application.LayoutAndDraw ();
 
         const string expectedOutput = """
 
-                                      ┌┤豈├────┐
-                                      │豈      │
-                                      │豈      │
+                                      ┌┤豈├────┐
+                                      │豈      │
+                                      │豈      │
                                       └────────┘
                                       """;
         DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, output);
@@ -71,11 +72,11 @@ public class DrawTests (ITestOutputHelper output)
             Height = 6,
             VerticalTextAlignment = Alignment.End,
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (viewRight, viewBottom);
 
         var rs = Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(7, 7));
+        Application.Driver!.SetScreenSize (7, 7);
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -111,10 +112,14 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport ()
     {
-        var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 2, Height = 2, BorderStyle = LineStyle.Single
+        };
         Assert.True (view.NeedsLayout);
         Assert.True (view.NeedsDraw);
         view.Layout ();
@@ -136,10 +141,14 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Bottom ()
     {
-        var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 2, Height = 1, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (1, 1, 1, 0);
         view.BeginInit ();
         view.EndInit ();
@@ -154,10 +163,14 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Left ()
     {
-        var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 1, Height = 2, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (0, 1, 1, 1);
         view.BeginInit ();
         view.EndInit ();
@@ -179,10 +192,14 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Right ()
     {
-        var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 1, Height = 2, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (1, 1, 0, 1);
         view.BeginInit ();
         view.EndInit ();
@@ -204,10 +221,14 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Top ()
     {
-        var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 2, Height = 1, BorderStyle = LineStyle.Single
+        };
         view.Border!.Thickness = new (1, 0, 1, 1);
 
         view.BeginInit ();
@@ -284,7 +305,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 5
         };
         container.Add (content);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (container);
         var rs = Application.Begin (top);
 
@@ -401,7 +422,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 5
         };
         container.Add (content);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (container);
 
         // BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
@@ -492,7 +513,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 5
         };
         container.Add (content);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (container);
         Application.Begin (top);
 
@@ -582,12 +603,16 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData ("𝔽𝕆𝕆𝔹𝔸R")]
     [InlineData ("a𐐀b")]
     public void DrawHotString_NonBmp (string expected)
     {
-        var view = new View { Width = 10, Height = 1 };
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = 10, Height = 1
+        };
         view.DrawHotString (expected, Attribute.Default, Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
@@ -612,12 +637,12 @@ public class DrawTests (ITestOutputHelper output)
         var view = new Label { Text = r.ToString () };
         var tf = new TextField { Text = us, Y = 1, Width = 3 };
         win.Add (view, tf);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         Application.Begin (top);
-        AutoInitShutdownAttribute.FakeResize(new Size(10, 4));
-
+        Application.Driver!.SetScreenSize (10, 4);
+        Application.LayoutAndDraw ();
 
         var expected = """
 
@@ -635,22 +660,15 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Application.Init (new FakeDriver ());
-
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View { X = -2, Text = "view" };
         top.Add (view);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     Assert.Equal (-2, view.X);
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         try
         {
@@ -661,11 +679,24 @@ public class DrawTests (ITestOutputHelper output)
             // After the fix this exception will not be caught.
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
+        finally
+        {
+            Application.Iteration -= OnApplicationOnIteration;
+        }
 
         top.Dispose ();
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
+        {
+            Assert.Equal (-2, view.X);
+
+            Application.RequestStop ();
+        }
     }
 
 
@@ -683,9 +714,9 @@ public class DrawTests (ITestOutputHelper output)
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -713,7 +744,7 @@ At 0,0
    A text wit",
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -731,9 +762,9 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
 
         top.Draw ();
 
@@ -754,7 +785,7 @@ At 0,0
         Assert.Equal (new (3, 3, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
-        View.SetClipToScreen ();
+        view.SetClipToScreen ();
         top.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -766,7 +797,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -784,9 +815,9 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -812,7 +843,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -830,9 +861,9 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
 
         top.Draw ();
 
@@ -853,7 +884,7 @@ At 0,0
         Assert.Equal (new (1, 1, 10, 1), view.Frame);
         Assert.Equal (new (0, 0, 10, 1), view.Viewport);
         Assert.Equal (new (0, 0, 10, 1), view.NeedsDrawRect);
-        View.SetClipToScreen ();
+        view.SetClipToScreen ();
 
         top.Draw ();
 
@@ -864,7 +895,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
     public class DerivedView : View

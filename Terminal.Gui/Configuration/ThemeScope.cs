@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Configuration;
 
@@ -16,7 +15,7 @@ namespace Terminal.Gui.Configuration;
 /// 	"Default": {
 /// 		"Schemes": [
 /// 		{
-/// 		"TopLevel": {
+/// 		"Runnable": {
 /// 		"Normal": {
 /// 			"Foreground": "BrightGreen",
 /// 			"Background": "Black"

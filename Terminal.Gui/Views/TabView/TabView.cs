@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.Views;
 
@@ -112,7 +111,7 @@ public class TabView : View
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            // Let toplevel handle it
+                                            // Let runnable handle it
                                             return false;
                                         }
                                     }
@@ -146,7 +145,7 @@ public class TabView : View
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            // Let toplevel handle it
+                                            // Let runnable handle it
                                             return false;
                                         }
                                     }
@@ -244,7 +243,9 @@ public class TabView : View
 
     private bool TabCanSetFocus ()
     {
+#pragma warning disable CS8629 // Nullable value type may be null.
         return IsInitialized && SelectedTab is { } && (HasFocus || (bool)_containerView?.HasFocus) && (_selectedTabHasFocus || !_containerView.CanFocus);
+#pragma warning restore CS8629 // Nullable value type may be null.
     }
 
     private void ContainerViewCanFocus (object sender, EventArgs eventArgs)

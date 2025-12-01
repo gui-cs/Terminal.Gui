@@ -1,11 +1,10 @@
-﻿#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Helper class for console drivers to invoke shell commands to interact with the clipboard. Used primarily by
-///     UnixDriver, but also used in Unit tests which is why it is in IConsoleDriver.cs.
+///     UnixDriver, but also used in Unit tests which is why it is in IDriver.cs.
 /// </summary>
 internal static class ClipboardProcessRunner
 {
@@ -45,7 +44,6 @@ internal static class ClipboardProcessRunner
             CreateNoWindow = true
         };
 
-        TaskCompletionSource<bool> eventHandled = new ();
         process.Start ();
 
         if (!string.IsNullOrEmpty (input))

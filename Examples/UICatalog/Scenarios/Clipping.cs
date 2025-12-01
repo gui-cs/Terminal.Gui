@@ -118,7 +118,7 @@ public class Clipping : Scenario
             Height = Dim.Auto (minimumContentDim: 4),
             Width = Dim.Auto (minimumContentDim: 14),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = SchemeManager.SchemesToSchemeName(Schemes.Toplevel),
+            SchemeName = SchemeManager.SchemesToSchemeName(Schemes.Runnable),
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
@@ -151,7 +151,7 @@ public class Clipping : Scenario
         //tiled.Padding.Thickness = new (1);
         //tiled.Padding.Diagnostics =  ViewDiagnosticFlags.Thickness;
 
-        //tiled.Margin.Thickness = new (1);
+        //tiled.Margin!.Thickness = new (1);
 
         FrameView fv = new ()
         {

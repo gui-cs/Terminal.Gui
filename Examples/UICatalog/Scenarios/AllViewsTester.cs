@@ -28,7 +28,7 @@ public class AllViewsTester : Scenario
 
     public override void Main ()
     {
-        // Don't create a sub-win (Scenario.Win); just use Application.Top
+        // Don't create a sub-win (Scenario.Win); just use Application.TopRunnable
         Application.Init ();
 
         var app = new Window
@@ -38,7 +38,7 @@ public class AllViewsTester : Scenario
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
         app.Border!.LineStyle = LineStyle.Heavy;
-        app.Border.Thickness = new (0);
+        app.Border!.Thickness = new (0);
 
 
         _viewClasses = GetAllViewClassesCollection ()
@@ -65,7 +65,7 @@ public class AllViewsTester : Scenario
                                                   // Dispose existing current View, if any
                                                   DisposeCurrentView ();
 
-                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
+                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem.Value]);
 
                                                   // Force ViewToEdit to be the view and not a subview
                                                   if (_adornmentsEditor is { })
@@ -158,16 +158,13 @@ public class AllViewsTester : Scenario
 
         _eventLog = new ()
         {
-            // X = Pos.Right(_layoutEditor),
+            X = Pos.AnchorEnd () - 1,
+            Y = 0,
+            Width = 30,
+            Height = Dim.Fill (),
             SuperViewRendersLineCanvas = true
         };
         _eventLog.Border!.Thickness = new (1);
-        _eventLog.X = Pos.AnchorEnd () - 1;
-        _eventLog.Y = 0;
-
-        _eventLog.Height = Dim.Height (_classListView);
-
-        //_eventLog.Width = 30;
 
         _layoutEditor.Width = Dim.Fill (
                                         Dim.Func (
@@ -194,7 +191,6 @@ public class AllViewsTester : Scenario
             Height = Dim.Fill (),
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            //SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
             Arrangement = ViewArrangement.LeftResizable | ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
@@ -224,11 +220,18 @@ public class AllViewsTester : Scenario
     {
         Debug.Assert (_curView is null);
 
+        // Skip RunnableWrapper types as they have generic constraints that cannot be satisfied
+        if (type.IsGenericType && type.GetGenericTypeDefinition().Name.StartsWith("RunnableWrapper"))
+        {
+            Logging.Warning ($"Cannot create an instance of {type.Name} because it is a RunnableWrapper with unsatisfiable generic constraints.");
+            return;
+        }
+
         // If we are to create a generic Type
         if (type.IsGenericType)
         {
             // For each of the <T> arguments
-            List<Type> typeArguments = new ();
+            List<Type> typeArguments = [];
 
             // use <object> or the original type if applicable
             foreach (Type arg in type.GetGenericArguments ())

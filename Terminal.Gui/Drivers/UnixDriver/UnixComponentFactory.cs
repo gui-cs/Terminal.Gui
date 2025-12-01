@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
@@ -7,10 +6,10 @@ namespace Terminal.Gui.Drivers;
 /// <see cref="IComponentFactory{T}"/> implementation for native unix console I/O.
 /// This factory creates instances of internal classes <see cref="UnixInput"/>, <see cref="UnixOutput"/> etc.
 /// </summary>
-public class UnixComponentFactory : ComponentFactory<char>
+public class UnixComponentFactory : ComponentFactoryImpl<char>
 {
     /// <inheritdoc />
-    public override IConsoleInput<char> CreateInput ()
+    public override IInput<char> CreateInput ()
     {
         return new UnixInput ();
     }
@@ -22,7 +21,7 @@ public class UnixComponentFactory : ComponentFactory<char>
     }
 
     /// <inheritdoc />
-    public override IConsoleOutput CreateOutput ()
+    public override IOutput CreateOutput ()
     {
         return new UnixOutput ();
     }

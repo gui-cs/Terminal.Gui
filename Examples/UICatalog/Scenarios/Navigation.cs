@@ -59,7 +59,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
-        button.Accepting += (sender, args) => MessageBox.Query ("hi", button.Title, "_Ok");
+        button.Accepting += (sender, args) => MessageBox.Query (ApplicationImpl.Instance, "hi", button.Title, "_Ok");
 
         testFrame.Add (button);
 
@@ -107,18 +107,7 @@ public class Navigation : Scenario
         //                 };
         //timer.Start ();
 
-        Application.Iteration += (sender, args) =>
-                                 {
-                                     if (progressBar.Fraction == 1.0)
-                                     {
-                                         progressBar.Fraction = 0;
-                                     }
-
-                                     progressBar.Fraction += 0.01f;
-
-                                     Application.Invoke (() => { });
-
-                                 };
+        Application.Iteration += OnApplicationIteration;
 
         View overlappedView2 = CreateOverlappedView (3, 8, 10);
 
@@ -191,7 +180,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -214,11 +203,24 @@ public class Navigation : Scenario
 
         testFrame.SetFocus ();
         Application.Run (app);
+        Application.Iteration -= OnApplicationIteration;
         // timer.Close ();
         app.Dispose ();
         Application.Shutdown ();
 
         return;
+
+        void OnApplicationIteration (object sender, EventArgs<IApplication> args)
+        {
+            if (progressBar.Fraction == 1.0)
+            {
+                progressBar.Fraction = 0;
+            }
+
+            progressBar.Fraction += 0.01f;
+
+            Application.Invoke ((_) => { });
+        }
 
         void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
         {
@@ -235,7 +237,7 @@ public class Navigation : Scenario
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,

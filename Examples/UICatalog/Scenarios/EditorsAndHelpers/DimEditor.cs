@@ -18,7 +18,7 @@ public class DimEditor : EditorBase
     }
 
     private int _value;
-    private RadioGroup? _dimRadioGroup;
+    private OptionSelector? _dimOptionSelector;
     private TextField? _valueEdit;
 
     /// <inheritdoc />
@@ -44,7 +44,7 @@ public class DimEditor : EditorBase
 
         try
         {
-            _dimRadioGroup!.SelectedItem = _dimNames.IndexOf (_dimNames.First (s => dim!.ToString ().StartsWith (s)));
+            _dimOptionSelector!.Value = _dimNames.IndexOf (_dimNames.First (s => dim!.ToString ().StartsWith (s)));
         }
         catch (InvalidOperationException e)
         {
@@ -92,13 +92,13 @@ public class DimEditor : EditorBase
             Text = $"{Title}:"
         };
         Add (label);
-        _dimRadioGroup = new () { X = 0, Y = Pos.Bottom (label), RadioLabels = _radioItems };
-        _dimRadioGroup.SelectedItemChanged += OnRadioGroupOnSelectedItemChanged;
+        _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };
+        _dimOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
         _valueEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = 0,
-            Width = Dim.Func (_ => _radioItems.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
+            Width = Dim.Func (_ => _optionLabels.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
             Text = $"{_value}"
         };
 
@@ -117,15 +117,15 @@ public class DimEditor : EditorBase
         };
         Add (_valueEdit);
 
-        Add (_dimRadioGroup);
+        Add (_dimOptionSelector);
 
     }
 
-    private void OnRadioGroupOnSelectedItemChanged (object? s, SelectedItemChangedArgs selected) { DimChanged (); }
+    private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { DimChanged (); }
 
     // These need to have same order 
     private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent",];
-    private readonly string [] _radioItems = ["Absolute(n)", "Auto", "Fill(n)", "Func(()=>n)", "Percent(n)",];
+    private readonly string [] _optionLabels = ["Absolute(n)", "Auto", "Fill(n)", "Func(()=>n)", "Percent(n)",];
 
     private void DimChanged ()
     {
@@ -136,7 +136,7 @@ public class DimEditor : EditorBase
 
         try
         {
-            Dim? dim = _dimRadioGroup!.SelectedItem switch
+            Dim? dim = _dimOptionSelector!.Value switch
             {
                 0 => Dim.Absolute (_value),
                 1 => Dim.Auto (),
@@ -157,7 +157,7 @@ public class DimEditor : EditorBase
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
+            MessageBox.ErrorQuery (App, "Exception", e.Message, "Ok");
         }
     }
 }

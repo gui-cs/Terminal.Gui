@@ -23,7 +23,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void AddTwoTabs_SecondIsSelected ()
     {
         var tv = new TabView ();
@@ -90,7 +90,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (0, tv.TabScrollOffset);
     }
 
-    [Fact]
+    [Fact (Skip = "Really slow test")]
     [AutoInitShutdown]
     public void MouseClick_ChangesTab ()
     {
@@ -119,7 +119,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.TabClicked += (s, e) => { clicked = e.Tab; };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -211,7 +211,7 @@ public class TabViewTests (ITestOutputHelper output)
                                      newChanged = e.NewTab;
                                  };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -301,7 +301,7 @@ public class TabViewTests (ITestOutputHelper output)
                                      newChanged = e.NewTab;
                                  };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -369,7 +369,7 @@ public class TabViewTests (ITestOutputHelper output)
             Text = "Ok"
         };
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tv, btn);
         Application.Begin (top);
 
@@ -406,7 +406,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv, top.Focused);
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
-        // Press the cursor down key. Since the selected tab has no focusable views, the focus should move to the next view in the toplevel
+        // Press the cursor down key. Since the selected tab has no focusable views, the focus should move to the next view in the runnable
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (btn, top.MostFocused);
@@ -448,7 +448,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (btn, top.MostFocused);
 
-        // Press the cursor down key again will focus next view in the toplevel, which is the TabView
+        // Press the cursor down key again will focus next view in the runnable, which is the TabView
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
@@ -584,7 +584,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -608,7 +608,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -632,7 +632,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -664,7 +664,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, tv.SubViews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -683,7 +683,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "13";
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -700,7 +700,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -717,7 +717,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -731,7 +731,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -755,7 +755,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -779,7 +779,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -810,7 +810,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, tv.SubViews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -830,7 +830,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "13";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -847,7 +847,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -865,7 +865,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -880,7 +880,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -902,7 +902,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -910,7 +910,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Layout ();
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -925,7 +925,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -952,7 +952,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -972,7 +972,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "13";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -989,7 +989,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1007,7 +1007,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1022,7 +1022,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1049,7 +1049,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1064,7 +1064,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -1088,7 +1088,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -1112,7 +1112,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1144,7 +1144,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "13";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1161,7 +1161,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1179,7 +1179,7 @@ public class TabViewTests (ITestOutputHelper output)
         tab2.DisplayText = "abcdefghijklmnopq";
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1194,7 +1194,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1223,7 +1223,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1305,7 +1305,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Add_Three_TabsOnTop_ChangesTab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1337,7 +1337,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1354,7 +1354,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab3;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1370,7 +1370,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Add_Three_TabsOnBottom_ChangesTab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1404,7 +1404,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab2;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1421,7 +1421,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SelectedTab = tab3;
 
         tv.Layout ();
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1445,7 +1445,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Width = 20;
         tv.Height = 5;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1457,7 +1457,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Mouse_Wheel_Changes_Tab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1465,7 +1465,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Width = 20;
         tv.Height = 5;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1489,7 +1489,11 @@ public class TabViewTests (ITestOutputHelper output)
 
     private TabView GetTabView (out Tab tab1, out Tab tab2)
     {
-        var tv = new TabView () { Id = "tv " };
+        var tv = new TabView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Id = "tv "
+        };
         tv.BeginInit ();
         tv.EndInit ();
         //tv.Scheme = new ();

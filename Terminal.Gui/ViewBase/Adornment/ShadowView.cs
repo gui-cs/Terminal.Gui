@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.ViewBase;
 
@@ -95,12 +95,12 @@ internal class ShadowView : View
         {
             for (int c = Math.Max (0, screen.X + 1); c < screen.X + screen.Width; c++)
             {
-                Driver.Move (c, r);
+                Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
                 if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
                 {
-                    AddRune (ScreenContents [r, c].Rune);
+                    AddStr (ScreenContents [r, c].Grapheme);
                 }
             }
         }
@@ -129,12 +129,12 @@ internal class ShadowView : View
         {
             for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
             {
-                Driver.Move (c, r);
+                Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
                 if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
                 {
-                    AddRune (ScreenContents [r, c].Rune);
+                    AddStr (ScreenContents [r, c].Grapheme);
                 }
             }
         }
@@ -142,11 +142,11 @@ internal class ShadowView : View
 
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not Adornment adornment
+        if (SuperView is not Adornment
             || location.X < 0
-            || location.X >= Application.Screen.Width
+            || location.X >= App?.Screen.Width
             || location.Y < 0
-            || location.Y >= Application.Screen.Height)
+            || location.Y >= App?.Screen.Height)
         {
             return Attribute.Default;
         }
@@ -170,8 +170,8 @@ internal class ShadowView : View
         // use the Normal attribute from the View under the shadow.
         if (newAttribute.Background == Color.DarkGray)
         {
-            List<View?> currentViewsUnderMouse = View.GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
-            View? underView = currentViewsUnderMouse!.LastOrDefault ();
+            List<View?> currentViewsUnderMouse = GetViewsUnderLocation (location, ViewportSettingsFlags.Transparent);
+            View? underView = currentViewsUnderMouse.LastOrDefault ();
             attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 
             newAttribute = new (

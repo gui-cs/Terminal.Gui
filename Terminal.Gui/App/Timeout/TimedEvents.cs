@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui.App;
@@ -55,7 +54,13 @@ public class TimedEvents : ITimedEvents
     {
         // Convert Stopwatch ticks to TimeSpan ticks (100-nanosecond units)
         // Stopwatch.Frequency gives ticks per second, so we need to scale appropriately
-        return Stopwatch.GetTimestamp () * TimeSpan.TicksPerSecond / Stopwatch.Frequency;
+        // To avoid overflow, we perform the operation in double precision first and then cast to long.
+        var ticks = (long)((double)Stopwatch.GetTimestamp () * TimeSpan.TicksPerSecond / Stopwatch.Frequency);
+
+        // Ensure ticks is positive and not overflowed (very unlikely now)
+        Debug.Assert (ticks > 0);
+
+        return ticks;
     }
 
     /// <inheritdoc/>
@@ -139,6 +144,22 @@ public class TimedEvents : ITimedEvents
         return false;
     }
 
+    /// <inheritdoc/>
+    public TimeSpan? GetTimeout (object token)
+    {
+        lock (_timeoutsLockToken)
+        {
+            int idx = _timeouts.IndexOfValue ((token as Timeout)!);
+
+            if (idx == -1)
+            {
+                return null;
+            }
+
+            return _timeouts.Values [idx].Span;
+        }
+    }
+
     private void AddTimeout (TimeSpan time, Timeout timeout)
     {
         lock (_timeoutsLockToken)
@@ -196,7 +217,7 @@ public class TimedEvents : ITimedEvents
         {
             if (k < now)
             {
-                if (timeout.Callback ())
+                if (timeout.Callback! ())
                 {
                     AddTimeout (timeout.Span, timeout);
                 }
@@ -208,6 +229,15 @@ public class TimedEvents : ITimedEvents
                     _timeouts.Add (NudgeToUniqueKey (k), timeout);
                 }
             }
+        }
+    }
+
+    /// <inheritdoc/>
+    public void StopAll ()
+    {
+        lock (_timeoutsLockToken)
+        {
+            _timeouts.Clear ();
         }
     }
 }

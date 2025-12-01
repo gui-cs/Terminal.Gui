@@ -1,4 +1,3 @@
-#nullable enable
 using System.Diagnostics;
 
 
@@ -30,6 +29,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
+        //Logging.Trace ($"{Id} - {direction} {behavior}");
         if (!CanBeVisible (this)) // TODO: is this check needed?
         {
             return false;
@@ -395,7 +395,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public event EventHandler<HasFocusEventArgs>? FocusedChanged;
 
     /// <summary>Returns a value indicating if this View is currently on Top (Active)</summary>
-    public bool IsCurrentTop => Application.Top == this;
+    public bool IsCurrentTop => App?.TopRunnableView == this;
 
     /// <summary>
     ///     Returns the most focused SubView down the subview-hierarchy.
@@ -519,7 +519,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             if (value)
             {
                 // NOTE: If Application.Navigation is null, we pass null to FocusChanging. For unit tests.
-                (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
+                (bool focusSet, bool _) = SetHasFocusTrue (App?.Navigation?.GetFocused ());
 
                 if (focusSet)
                 {
@@ -556,7 +556,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <returns><see langword="true"/> if the focus changed; <see langword="true"/> false otherwise.</returns>
     public bool SetFocus ()
     {
-        (bool focusSet, bool _) = SetHasFocusTrue (Application.Navigation?.GetFocused ());
+        (bool focusSet, bool _) = SetHasFocusTrue (App?.Navigation?.GetFocused ());
 
         return focusSet;
     }
@@ -582,6 +582,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         Debug.Assert (SuperView is null || IsInHierarchy (SuperView, this));
 
+        //Logging.Trace ($"{Id} - {currentFocusedView?.Id} -> {Id}");
+
         // Pre-conditions
         if (_hasFocus)
         {
@@ -604,7 +606,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (CanFocus && superViewOrParent is { CanFocus: false })
         {
-            Debug.WriteLine ($@"WARNING: Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
+            Logging.Warning ($@"Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
 
             return (false, false);
         }
@@ -719,17 +721,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return true;
         }
 
-        View? appFocused = Application.Navigation?.GetFocused ();
+        View? appFocused = App?.Navigation?.GetFocused ();
 
         if (appFocused == currentFocused)
         {
             if (newFocused is { HasFocus: true })
             {
-                Application.Navigation?.SetFocused (newFocused);
+                App?.Navigation?.SetFocused (newFocused);
             }
             else
             {
-                Application.Navigation?.SetFocused (null);
+                App?.Navigation?.SetFocused (null);
             }
         }
 
@@ -832,7 +834,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // Application.Navigation.GetFocused?
-            View? applicationFocused = Application.Navigation?.GetFocused ();
+            View? applicationFocused = App?.Navigation?.GetFocused ();
 
             if (newFocusedView is null && applicationFocused != this && applicationFocused is { CanFocus: true })
             {
@@ -851,18 +853,18 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 }
             }
 
-            // Application.Top?
-            if (newFocusedView is null && Application.Top is { CanFocus: true, HasFocus: false })
+            // Application.TopRunnable?
+            if (newFocusedView is null && App?.TopRunnableView is { CanFocus: true, HasFocus: false })
             {
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
                 _canFocus = false;
-                bool restoredFocus = Application.Top.RestoreFocus ();
+                bool restoredFocus = App?.TopRunnableView.RestoreFocus () ?? false;
                 _canFocus = prevCanFocus;
 
-                if (Application.Top is { CanFocus: true, HasFocus: true })
+                if (App?.TopRunnableView is { CanFocus: true, HasFocus: true })
                 {
-                    newFocusedView = Application.Top;
+                    newFocusedView = App?.TopRunnableView;
                 }
                 else if (restoredFocus)
                 {
@@ -949,7 +951,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // If we are the most focused view, we need to set the focused view in Application.Navigation
         if (newHasFocus && focusedView?.Focused is null)
         {
-            Application.Navigation?.SetFocused (focusedView);
+            App?.Navigation?.SetFocused (focusedView);
         }
 
         // Call the virtual method

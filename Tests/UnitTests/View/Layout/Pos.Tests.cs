@@ -1,7 +1,4 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
-using static Terminal.Gui.ViewBase.Dim;
-using static Terminal.Gui.ViewBase.Pos;
+﻿#nullable enable
 
 namespace UnitTests.LayoutTests;
 
@@ -11,9 +8,9 @@ public class PosTests ()
     public void
         Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init ("fake");
 
-        Toplevel t = new ();
+        Runnable t = new ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Absolute (2) };
 
@@ -22,14 +19,14 @@ public class PosTests ()
         w.Add (v);
         t.Add (w);
 
-        t.Ready += (s, e) =>
+        t.IsModalChanged += (s, e) =>
                    {
                        v.Frame = new Rectangle (2, 2, 10, 10);
                        Assert.Equal (2, v.X = 2);
                        Assert.Equal (2, v.Y = 2);
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Application.Run (t);
         t.Dispose ();
@@ -40,12 +37,11 @@ public class PosTests ()
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
     public void PosCombine_WHY_Throws ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init ("fake");
 
-        Toplevel t = new Toplevel ();
+        Runnable t = new Runnable ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Top (t) + 2 };
         var f = new FrameView ();
@@ -66,101 +62,14 @@ public class PosTests ()
         v2.Dispose ();
     }
 
-    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
-    // TODO: A new test that calls SetRelativeLayout directly is needed.
-    // See: https://github.com/gui-cs/Terminal.Gui/issues/504
-    [Fact(Skip = "Test never ends")]
-    [TestRespondersDisposed]
-    public void LeftTopBottomRight_Win_ShouldNotThrow ()
-    {
-        // Test cases:
-        (Toplevel top, Window win, Button button) app = Setup ();
-        app.button.Y = Pos.Left (app.win);
-        RunState rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        Cleanup (rs);
-
-        app = Setup ();
-        app.button.Y = Pos.X (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        Cleanup (rs);
-
-        app = Setup ();
-        app.button.Y = Pos.Top (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        Cleanup (rs);
-
-        app = Setup ();
-        app.button.Y = Pos.Y (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        Cleanup (rs);
-
-        app = Setup ();
-        app.button.Y = Pos.Bottom (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        Cleanup (rs);
-
-        app = Setup ();
-        app.button.Y = Pos.Right (app.win);
-        rs = Application.Begin (app.top);
-
-        // If Application.RunState is used then we must use Application.RunLoop with the rs parameter
-        Application.RunLoop (rs);
-        Cleanup (rs);
-
-        return;
-
-        void Cleanup (RunState rs)
-        {
-            // Cleanup
-            Application.End (rs);
-
-            Application.Top.Dispose ();
-
-            // Shutdown must be called to safely clean up Application if Init has been called
-            Application.Shutdown ();
-        }
-
-        // Setup Fake driver
-        (Toplevel top, Window win, Button button) Setup ()
-        {
-            Application.Init (new FakeDriver ());
-            Application.Iteration += (s, a) => { Application.RequestStop (); };
-            var win = new Window { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
-            var top = new Toplevel ();
-            top.Add (win);
-
-            var button = new Button { X = Pos.Center (), Text = "button" };
-            win.Add (button);
-
-            return (top, win, button);
-        }
-    }
-
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
+    [SetupFakeApplication]
     public void Pos_Add_Operator ()
     {
-        Application.Init (new FakeDriver ());
-
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };
@@ -183,15 +92,7 @@ public class PosTests ()
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count < 20)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnInstanceOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -200,6 +101,7 @@ public class PosTests ()
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnInstanceOnIteration;
 
         Assert.Equal (20, count);
 
@@ -207,17 +109,28 @@ public class PosTests ()
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnInstanceOnIteration (object? s, EventArgs<IApplication?> a)
+        {
+            while (count < 20)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
     public void Pos_Subtract_Operator ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init ("fake");
 
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };
@@ -253,15 +166,7 @@ public class PosTests ()
                              }
                          };
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     while (count > 0)
-                                     {
-                                         field.NewKeyDownEvent (Key.Enter);
-                                     }
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         var win = new Window ();
         win.Add (view);
@@ -270,6 +175,7 @@ public class PosTests ()
         top.Add (win);
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
 
         Assert.Equal (0, count);
 
@@ -277,6 +183,18 @@ public class PosTests ()
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
+        {
+            while (count > 0)
+            {
+                field.NewKeyDownEvent (Key.Enter);
+            }
+
+            Application.RequestStop ();
+        }
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -284,20 +202,20 @@ public class PosTests ()
     [Fact]
     public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init ("fake");
 
-        Toplevel t = new ();
+        Runnable t = new ();
 
         var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
         t.Add (w);
 
-        t.Ready += (s, e) =>
+        t.IsModalChanged += (s, e) =>
                    {
                        Assert.Equal (2, w.X = 2);
                        Assert.Equal (2, w.Y = 2);
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Application.Run (t);
         t.Dispose ();
@@ -310,20 +228,20 @@ public class PosTests ()
     [Fact]
     public void Validation_Does_Not_Throw_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init ("fake");
 
-        Toplevel t = new Toplevel ();
+        Runnable t = new Runnable ();
 
         var w = new Window { X = 1, Y = 2, Width = 3, Height = 5 };
         t.Add (w);
 
-        t.Ready += (s, e) =>
+        t.IsModalChanged += (s, e) =>
                    {
                        Assert.Equal (2, w.X = 2);
                        Assert.Equal (2, w.Y = 2);
                    };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Application.Run (t);
         t.Dispose ();

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿#nullable enable
+
 using System.Text;
-using Application = Terminal.Gui.App.Application;
 
 namespace UICatalog.Scenarios;
 
@@ -13,144 +10,53 @@ namespace UICatalog.Scenarios;
 public class GraphViewExample : Scenario
 {
     private readonly Thickness _thickness = new (1, 1, 1, 1);
-    private TextView _about;
+    private TextView? _about;
     private int _currentGraph;
-    private Action [] _graphs;
-    private GraphView _graphView;
-    private MenuItem _miDiags;
-    private MenuItem _miShowBorder;
+    private Action []? _graphs;
+    private GraphView? _graphView;
+    private CheckBox? _diagCheckBox;
+    private CheckBox? _showBorderCheckBox;
     private ViewDiagnosticFlags _viewDiagnostics;
 
     public override void Main ()
     {
         Application.Init ();
-        Toplevel app = new ();
 
-        _graphs = new []
+        Window app = new ()
         {
-            () => SetupPeriodicTableScatterPlot (), //0
-            () => SetupLifeExpectancyBarGraph (true), //1
-            () => SetupLifeExpectancyBarGraph (false), //2
-            () => SetupPopulationPyramid (), //3
-            () => SetupLineGraph (), //4
-            () => SetupSineWave (), //5
-            () => SetupDisco (), //6
-            () => MultiBarGraph () //7
+            BorderStyle = LineStyle.None
         };
 
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new (
-                     "_File",
-                     new MenuItem []
-                     {
-                         new (
-                              "Scatter _Plot",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 0] ()
-                             ),
-                         new (
-                              "_V Bar Graph",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 1] ()
-                             ),
-                         new (
-                              "_H Bar Graph",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 2] ()
-                             ),
-                         new (
-                              "P_opulation Pyramid",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 3] ()
-                             ),
-                         new (
-                              "_Line Graph",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 4] ()
-                             ),
-                         new (
-                              "Sine _Wave",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 5] ()
-                             ),
-                         new (
-                              "Silent _Disco",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 6] ()
-                             ),
-                         new (
-                              "_Multi Bar Graph",
-                              "",
-                              () => _graphs [_currentGraph =
-                                                 7] ()
-                             ),
-                         new ("_Quit", "", () => Quit ())
-                     }
-                    ),
-                new (
-                     "_View",
-                     new []
-                     {
-                         new ("Zoom _In", "", () => Zoom (0.5f)),
-                         new ("Zoom _Out", "", () => Zoom (2f)),
-                         new ("MarginLeft++", "", () => Margin (true, true)),
-                         new ("MarginLeft--", "", () => Margin (true, false)),
-                         new ("MarginBottom++", "", () => Margin (false, true)),
-                         new ("MarginBottom--", "", () => Margin (false, false)),
-                         _miShowBorder = new (
-                                              "_Enable Margin, Border, and Padding",
-                                              "",
-                                              () => ShowBorder ()
-                                             )
-                         {
-                             Checked = true,
-                             CheckType = MenuItemCheckStyle
-                                 .Checked
-                         },
-                         _miDiags = new (
-                                         "_Diagnostics",
-                                         "",
-                                         () => ToggleDiagnostics ()
-                                        )
-                         {
-                             Checked = View.Diagnostics
-                                       == (ViewDiagnosticFlags
-                                               .Thickness
-                                           | ViewDiagnosticFlags
-                                               .Ruler),
-                             CheckType = MenuItemCheckStyle.Checked
-                         }
-                     }
-                    )
-            ]
-        };
-        app.Add (menu);
+        _graphs =
+        [
+            SetupPeriodicTableScatterPlot,
+            () => SetupLifeExpectancyBarGraph (true),
+            () => SetupLifeExpectancyBarGraph (false),
+            SetupPopulationPyramid,
+            SetupLineGraph,
+            SetupSineWave,
+            SetupDisco,
+            MultiBarGraph
+        ];
 
+        // MenuBar
+        MenuBar menu = new ();
+
+        // GraphView
         _graphView = new ()
         {
             X = 0,
-            Y = 1,
+            Y = Pos.Bottom (menu),
             Width = Dim.Percent (70),
             Height = Dim.Fill (1),
             BorderStyle = LineStyle.Single
         };
-        _graphView.Border.Thickness = _thickness;
-        _graphView.Margin.Thickness = _thickness;
-        _graphView.Padding.Thickness = _thickness;
+        _graphView.Border!.Thickness = _thickness;
+        _graphView.Margin!.Thickness = _thickness;
+        _graphView.Padding!.Thickness = _thickness;
 
-        app.Add (_graphView);
-
-        var frameRight = new FrameView
+        // About TextView
+        FrameView frameRight = new ()
         {
             X = Pos.Right (_graphView),
             Y = Pos.Top (_graphView),
@@ -159,23 +65,24 @@ public class GraphViewExample : Scenario
             Title = "About"
         };
 
-        frameRight.Add (
-                        _about = new () { Width = Dim.Fill (), Height = Dim.Fill (), ReadOnly = true }
-                       );
+        _about = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            ReadOnly = true
+        };
+        frameRight.Add (_about);
 
-        app.Add (frameRight);
+        // StatusBar
+        StatusBar statusBar = new (
+                                   [
+                                       new (Key.G.WithCtrl, "Next Graph", () => _graphs! [_currentGraph++ % _graphs.Length] ()),
+                                       new (Key.PageUp, "Zoom In", () => Zoom (0.5f)),
+                                       new (Key.PageDown, "Zoom Out", () => Zoom (2f))
+                                   ]
+                                  );
 
-        var statusBar = new StatusBar (
-                                       new Shortcut []
-                                       {
-                                           new (Key.G.WithCtrl, "Next Graph", () => _graphs [_currentGraph++ % _graphs.Length] ()),
-                                           new (Key.PageUp, "Zoom In", () => Zoom (0.5f)),
-                                           new (Key.PageDown, "Zoom Out", () => Zoom (2f))
-                                       }
-                                      );
-        app.Add (statusBar);
-
-        var diagShortcut = new Shortcut
+        Shortcut? diagShortcut = new ()
         {
             Key = Key.F10,
             CommandView = new CheckBox
@@ -184,7 +91,128 @@ public class GraphViewExample : Scenario
                 CanFocus = false
             }
         };
-        statusBar.Add (diagShortcut).Accepting += DiagShortcut_Accept;
+        
+        statusBar.Add (diagShortcut);
+        diagShortcut.Accepting += DiagShortcut_Accept;
+
+        // Menu setup
+        _showBorderCheckBox = new ()
+        {
+            Title = "_Enable Margin, Border, and Padding",
+            CheckedState = CheckState.Checked
+        };
+        _showBorderCheckBox.CheckedStateChanged += (s, e) => ShowBorder ();
+
+        _diagCheckBox = new ()
+        {
+            Title = "_Diagnostics",
+            CheckedState = View.Diagnostics == (ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler)
+                               ? CheckState.Checked
+                               : CheckState.UnChecked
+        };
+        _diagCheckBox.CheckedStateChanged += (s, e) => ToggleDiagnostics ();
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_File",
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = "Scatter _Plot",
+                                           Action = () => _graphs [_currentGraph = 0] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_V Bar Graph",
+                                           Action = () => _graphs [_currentGraph = 1] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_H Bar Graph",
+                                           Action = () => _graphs [_currentGraph = 2] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "P_opulation Pyramid",
+                                           Action = () => _graphs [_currentGraph = 3] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Line Graph",
+                                           Action = () => _graphs [_currentGraph = 4] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "Sine _Wave",
+                                           Action = () => _graphs [_currentGraph = 5] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "Silent _Disco",
+                                           Action = () => _graphs [_currentGraph = 6] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Multi Bar Graph",
+                                           Action = () => _graphs [_currentGraph = 7] ()
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "_Quit",
+                                           Action = Quit
+                                       }
+                                   ]
+                                  )
+                 );
+
+        menu.Add (
+                  new MenuBarItem (
+                                   "_View",
+                                   [
+                                       new MenuItem
+                                       {
+                                           Title = "Zoom _In",
+                                           Action = () => Zoom (0.5f)
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "Zoom _Out",
+                                           Action = () => Zoom (2f)
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "MarginLeft++",
+                                           Action = () => Margin (true, true)
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "MarginLeft--",
+                                           Action = () => Margin (true, false)
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "MarginBottom++",
+                                           Action = () => Margin (false, true)
+                                       },
+                                       new MenuItem
+                                       {
+                                           Title = "MarginBottom--",
+                                           Action = () => Margin (false, false)
+                                       },
+                                       new MenuItem
+                                       {
+                                           CommandView = _showBorderCheckBox
+                                       },
+                                       new MenuItem
+                                       {
+                                           CommandView = _diagCheckBox
+                                       }
+                                   ]
+                                  )
+                 );
+
+        // Add views in order of visual appearance
+        app.Add (menu, _graphView, frameRight, statusBar);
 
         _graphs [_currentGraph++ % _graphs.Length] ();
 
@@ -195,29 +223,31 @@ public class GraphViewExample : Scenario
         Application.Shutdown ();
     }
 
-    private void DiagShortcut_Accept (object sender, CommandEventArgs e)
+    private void DiagShortcut_Accept (object? sender, CommandEventArgs e)
     {
         ToggleDiagnostics ();
 
         if (sender is Shortcut shortcut && shortcut.CommandView is CheckBox checkBox)
         {
-            checkBox.CheckedState = _miDiags.Checked ?? false ? CheckState.Checked : CheckState.UnChecked;
+            checkBox.CheckedState = _diagCheckBox?.CheckedState ?? CheckState.UnChecked;
         }
     }
 
     private void ToggleDiagnostics ()
     {
-        _miDiags.Checked = !_miDiags.Checked;
-
-        View.Diagnostics = _miDiags.Checked == true
-                               ? ViewDiagnosticFlags.Thickness
-                                 | ViewDiagnosticFlags.Ruler
+        View.Diagnostics = _diagCheckBox?.CheckedState == CheckState.Checked
+                               ? ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler
                                : ViewDiagnosticFlags.Off;
         Application.LayoutAndDraw ();
     }
 
     private void Margin (bool left, bool increase)
     {
+        if (_graphView is null)
+        {
+            return;
+        }
+
         if (left)
         {
             _graphView.MarginLeft = (uint)Math.Max (0, _graphView.MarginLeft + (increase ? 1 : -1));
@@ -232,6 +262,11 @@ public class GraphViewExample : Scenario
 
     private void MultiBarGraph ()
     {
+        if (_graphView is null || _about is null)
+        {
+            return;
+        }
+
         _graphView.Reset ();
 
         _graphView.Title = "Multi Bar";
@@ -241,14 +276,14 @@ public class GraphViewExample : Scenario
         Color fore = _graphView.GetAttributeForRole (VisualRole.Normal).Foreground == Color.Black
                          ? Color.White
                          : _graphView.GetAttributeForRole (VisualRole.Normal).Foreground;
-        var black = new Attribute (fore, Color.Black);
-        var cyan = new Attribute (Color.BrightCyan, Color.Black);
-        var magenta = new Attribute (Color.BrightMagenta, Color.Black);
-        var red = new Attribute (Color.BrightRed, Color.Black);
+        Attribute black = new (fore, Color.Black);
+        Attribute cyan = new (Color.BrightCyan, Color.Black);
+        Attribute magenta = new (Color.BrightMagenta, Color.Black);
+        Attribute red = new (Color.BrightRed, Color.Black);
 
         _graphView.GraphColor = black;
 
-        var series = new MultiBarSeries (3, 1, 0.25f, new [] { magenta, cyan, red });
+        MultiBarSeries series = new (3, 1, 0.25f, [magenta, cyan, red]);
 
         Rune stiple = Glyphs.Stipple;
 
@@ -277,20 +312,20 @@ public class GraphViewExample : Scenario
 
         _graphView.AxisY.Minimum = 0;
 
-        var legend = new LegendAnnotation (new (_graphView.Viewport.Width - 20, 0, 20, 5));
+        LegendAnnotation legend = new (new (_graphView.Viewport.Width - 20, 0, 20, 5));
 
         legend.AddEntry (
-                         new (stiple, series.SubSeries.ElementAt (0).OverrideBarColor),
+                         new (stiple, series.SubSeries.ElementAt (0).OverrideBarColor ?? black),
                          "Lower Third"
                         );
 
         legend.AddEntry (
-                         new (stiple, series.SubSeries.ElementAt (1).OverrideBarColor),
+                         new (stiple, series.SubSeries.ElementAt (1).OverrideBarColor ?? cyan),
                          "Middle Third"
                         );
 
         legend.AddEntry (
-                         new (stiple, series.SubSeries.ElementAt (2).OverrideBarColor),
+                         new (stiple, series.SubSeries.ElementAt (2).OverrideBarColor ?? red),
                          "Upper Third"
                         );
         _graphView.Annotations.Add (legend);
@@ -300,6 +335,11 @@ public class GraphViewExample : Scenario
 
     private void SetupDisco ()
     {
+        if (_graphView is null || _about is null)
+        {
+            return;
+        }
+
         _graphView.Reset ();
 
         _graphView.Title = "Graphic Equalizer";
@@ -308,11 +348,11 @@ public class GraphViewExample : Scenario
 
         _graphView.GraphColor = new Attribute (Color.White, Color.Black);
 
-        var stiple = new GraphCellToRender ((Rune)'\u2593');
+        GraphCellToRender stiple = new ((Rune)'\u2593');
 
-        var r = new Random ();
-        var series = new DiscoBarSeries ();
-        List<BarSeriesBar> bars = new ();
+        Random r = new ();
+        DiscoBarSeries series = new ();
+        List<BarSeriesBar> bars = [];
 
         Func<bool> genSample = () =>
                                {
@@ -323,16 +363,13 @@ public class GraphViewExample : Scenario
                                    {
                                        bars.Add (
                                                  new (null, stiple, r.Next (0, 100))
-                                                 {
-                                                     //ColorGetter = colorDelegate
-                                                 }
                                                 );
                                    }
 
-                                   _graphView.SetNeedsDraw ();
+                                   _graphView?.SetNeedsDraw ();
 
                                    // while the equaliser is showing
-                                   return _graphView.Series.Contains (series);
+                                   return _graphView is { } && _graphView.Series.Contains (series);
                                };
 
         Application.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
@@ -351,120 +388,45 @@ public class GraphViewExample : Scenario
 
         _graphView.SetNeedsDraw ();
     }
-    /*
-    Country,Both,Male,Female
-
-"Switzerland",83.4,81.8,85.1
-"South Korea",83.3,80.3,86.1
-"Singapore",83.2,81,85.5
-"Spain",83.2,80.7,85.7
-"Cyprus",83.1,81.1,85.1
-"Australia",83,81.3,84.8
-"Italy",83,80.9,84.9
-"Norway",83,81.2,84.7
-"Israel",82.6,80.8,84.4
-"France",82.5,79.8,85.1
-"Luxembourg",82.4,80.6,84.2
-"Sweden",82.4,80.8,84
-"Iceland",82.3,80.8,83.9
-"Canada",82.2,80.4,84.1
-"New Zealand",82,80.4,83.5
-"Malta,81.9",79.9,83.8
-"Ireland",81.8,80.2,83.5
-"Netherlands",81.8,80.4,83.1
-"Germany",81.7,78.7,84.8
-"Austria",81.6,79.4,83.8
-"Finland",81.6,79.2,84
-"Portugal",81.6,78.6,84.4
-"Belgium",81.4,79.3,83.5
-"United Kingdom",81.4,79.8,83
-"Denmark",81.3,79.6,83
-"Slovenia",81.3,78.6,84.1
-"Greece",81.1,78.6,83.6
-"Kuwait",81,79.3,83.9
-"Costa Rica",80.8,78.3,83.4*/
 
     private void SetupLifeExpectancyBarGraph (bool verticalBars)
     {
+        if (_graphView is null || _about is null)
+        {
+            return;
+        }
+
         _graphView.Reset ();
 
         _graphView.Title = $"Life Expectancy - {(verticalBars ? "Vertical" : "Horizontal")}";
 
         _about.Text = "This graph shows the life expectancy at birth of a range of countries";
 
-        var softStiple = new GraphCellToRender ((Rune)'\u2591');
-        var mediumStiple = new GraphCellToRender ((Rune)'\u2592');
+        GraphCellToRender softStiple = new ((Rune)'\u2591');
+        GraphCellToRender mediumStiple = new ((Rune)'\u2592');
 
-        var barSeries = new BarSeries
+        BarSeries barSeries = new ()
         {
-            Bars = new ()
-            {
+            Bars =
+            [
                 new ("Switzerland", softStiple, 83.4f),
-                new (
-                     "South Korea",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     83.3f
-                    ),
+                new ("South Korea", !verticalBars ? mediumStiple : softStiple, 83.3f),
                 new ("Singapore", softStiple, 83.2f),
-                new (
-                     "Spain",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     83.2f
-                    ),
+                new ("Spain", !verticalBars ? mediumStiple : softStiple, 83.2f),
                 new ("Cyprus", softStiple, 83.1f),
-                new (
-                     "Australia",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     83
-                    ),
+                new ("Australia", !verticalBars ? mediumStiple : softStiple, 83),
                 new ("Italy", softStiple, 83),
-                new (
-                     "Norway",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     83
-                    ),
+                new ("Norway", !verticalBars ? mediumStiple : softStiple, 83),
                 new ("Israel", softStiple, 82.6f),
-                new (
-                     "France",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     82.5f
-                    ),
+                new ("France", !verticalBars ? mediumStiple : softStiple, 82.5f),
                 new ("Luxembourg", softStiple, 82.4f),
-                new (
-                     "Sweden",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     82.4f
-                    ),
+                new ("Sweden", !verticalBars ? mediumStiple : softStiple, 82.4f),
                 new ("Iceland", softStiple, 82.3f),
-                new (
-                     "Canada",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     82.2f
-                    ),
+                new ("Canada", !verticalBars ? mediumStiple : softStiple, 82.2f),
                 new ("New Zealand", softStiple, 82),
-                new (
-                     "Malta",
-                     !verticalBars
-                         ? mediumStiple
-                         : softStiple,
-                     81.9f
-                    ),
+                new ("Malta", !verticalBars ? mediumStiple : softStiple, 81.9f),
                 new ("Ireland", softStiple, 81.8f)
-            }
+            ]
         };
 
         _graphView.Series.Add (barSeries);
@@ -526,50 +488,62 @@ public class GraphViewExample : Scenario
 
     private void SetupLineGraph ()
     {
+        if (_graphView is null || _about is null)
+        {
+            return;
+        }
+
         _graphView.Reset ();
 
         _graphView.Title = "Line";
 
         _about.Text = "This graph shows random points";
 
-        var black = new Attribute (_graphView.GetAttributeForRole (VisualRole.Normal).Foreground, Color.Black, _graphView.GetAttributeForRole (VisualRole.Normal).Style);
-        var cyan = new Attribute (Color.BrightCyan, Color.Black);
-        var magenta = new Attribute (Color.BrightMagenta, Color.Black);
-        var red = new Attribute (Color.BrightRed, Color.Black);
+        Attribute black = new (
+                               _graphView.GetAttributeForRole (VisualRole.Normal).Foreground,
+                               Color.Black,
+                               _graphView.GetAttributeForRole (VisualRole.Normal).Style);
+        Attribute cyan = new (Color.BrightCyan, Color.Black);
+        Attribute magenta = new (Color.BrightMagenta, Color.Black);
+        Attribute red = new (Color.BrightRed, Color.Black);
 
         _graphView.GraphColor = black;
 
-        List<PointF> randomPoints = new ();
+        List<PointF> randomPoints = [];
 
-        var r = new Random ();
+        Random r = new ();
 
         for (var i = 0; i < 10; i++)
         {
             randomPoints.Add (new (r.Next (100), r.Next (100)));
         }
 
-        var points = new ScatterSeries { Points = randomPoints };
+        ScatterSeries points = new () { Points = randomPoints };
 
-        var line = new PathAnnotation
+        PathAnnotation line = new ()
         {
-            LineColor = cyan, Points = randomPoints.OrderBy (p => p.X).ToList (), BeforeSeries = true
+            LineColor = cyan,
+            Points = randomPoints.OrderBy (p => p.X).ToList (),
+            BeforeSeries = true
         };
 
         _graphView.Series.Add (points);
         _graphView.Annotations.Add (line);
 
-        randomPoints = new ();
+        randomPoints = [];
 
         for (var i = 0; i < 10; i++)
         {
             randomPoints.Add (new (r.Next (100), r.Next (100)));
         }
 
-        var points2 = new ScatterSeries { Points = randomPoints, Fill = new ((Rune)'x', red) };
+        ScatterSeries points2 = new () { Points = randomPoints, Fill = new ((Rune)'x', red) };
 
-        var line2 = new PathAnnotation
+        PathAnnotation line2 = new ()
         {
-            LineColor = magenta, Points = randomPoints.OrderBy (p => p.X).ToList (), BeforeSeries = true
+            LineColor = magenta,
+            Points = randomPoints.OrderBy (p => p.X).ToList (),
+            BeforeSeries = true
         };
 
         _graphView.Series.Add (points2);
@@ -609,6 +583,11 @@ public class GraphViewExample : Scenario
 
     private void SetupPeriodicTableScatterPlot ()
     {
+        if (_graphView is null || _about is null)
+        {
+            return;
+        }
+
         _graphView.Reset ();
 
         _graphView.Title = "Scatter Plot";
@@ -620,8 +599,8 @@ public class GraphViewExample : Scenario
         _graphView.Series.Add (
                                new ScatterSeries
                                {
-                                   Points = new ()
-                                   {
+                                   Points =
+                                   [
                                        new (1, 1.007f),
                                        new (2, 4.002f),
                                        new (3, 6.941f),
@@ -737,7 +716,7 @@ public class GraphViewExample : Scenario
                                        new (116, 292),
                                        new (117, 295),
                                        new (118, 294)
-                                   }
+                                   ]
                                }
                               );
 
@@ -764,29 +743,10 @@ public class GraphViewExample : Scenario
 
     private void SetupPopulationPyramid ()
     {
-        /*
-        Age,M,F
-0-4,2009363,1915127
-5-9,2108550,2011016
-10-14,2022370,1933970
-15-19,1880611,1805522
-20-24,2072674,2001966
-25-29,2275138,2208929
-30-34,2361054,2345774
-35-39,2279836,2308360
-40-44,2148253,2159877
-45-49,2128343,2167778
-50-54,2281421,2353119
-55-59,2232388,2306537
-60-64,1919839,1985177
-65-69,1647391,1734370
-70-74,1624635,1763853
-75-79,1137438,1304709
-80-84,766956,969611
-85-89,438663,638892
-90-94,169952,320625
-95-99,34524,95559
-100+,3016,12818*/
+        if (_graphView is null || _about is null)
+        {
+            return;
+        }
 
         _about.Text = "This graph shows population of each age divided by gender";
 
@@ -816,16 +776,16 @@ public class GraphViewExample : Scenario
         _graphView.AxisY.ShowLabelsEvery = 0;
         _graphView.AxisY.Minimum = 0;
 
-        var stiple = new GraphCellToRender (Glyphs.Stipple);
+        GraphCellToRender stiple = new (Glyphs.Stipple);
 
         // Bars in 2 directions
 
         // Males (negative to make the bars go left)
-        var malesSeries = new BarSeries
+        BarSeries malesSeries = new ()
         {
             Orientation = Orientation.Horizontal,
-            Bars = new ()
-            {
+            Bars =
+            [
                 new ("0-4", stiple, -2009363),
                 new ("5-9", stiple, -2108550),
                 new ("10-14", stiple, -2022370),
@@ -847,16 +807,16 @@ public class GraphViewExample : Scenario
                 new ("90-94", stiple, -169952),
                 new ("95-99", stiple, -34524),
                 new ("100+", stiple, -3016)
-            }
+            ]
         };
         _graphView.Series.Add (malesSeries);
 
         // Females
-        var femalesSeries = new BarSeries
+        BarSeries femalesSeries = new ()
         {
             Orientation = Orientation.Horizontal,
-            Bars = new ()
-            {
+            Bars =
+            [
                 new ("0-4", stiple, 1915127),
                 new ("5-9", stiple, 2011016),
                 new ("10-14", stiple, 1933970),
@@ -878,11 +838,11 @@ public class GraphViewExample : Scenario
                 new ("90-94", stiple, 320625),
                 new ("95-99", stiple, 95559),
                 new ("100+", stiple, 12818)
-            }
+            ]
         };
 
-        var softStiple = new GraphCellToRender ((Rune)'\u2591');
-        var mediumStiple = new GraphCellToRender ((Rune)'\u2592');
+        GraphCellToRender softStiple = new ((Rune)'\u2591');
+        GraphCellToRender mediumStiple = new ((Rune)'\u2592');
 
         for (var i = 0; i < malesSeries.Bars.Count; i++)
         {
@@ -903,14 +863,19 @@ public class GraphViewExample : Scenario
 
     private void SetupSineWave ()
     {
+        if (_graphView is null || _about is null)
+        {
+            return;
+        }
+
         _graphView.Reset ();
 
         _graphView.Title = "Sine Wave";
 
         _about.Text = "This graph shows a sine wave";
 
-        var points = new ScatterSeries ();
-        var line = new PathAnnotation ();
+        ScatterSeries points = new ();
+        PathAnnotation line = new ();
 
         // Draw line first so it does not draw over top of points or axis labels
         line.BeforeSeries = true;
@@ -950,25 +915,33 @@ public class GraphViewExample : Scenario
 
     private void ShowBorder ()
     {
-        _miShowBorder.Checked = !_miShowBorder.Checked;
+        if (_graphView is null)
+        {
+            return;
+        }
 
-        if (_miShowBorder.Checked == true)
+        if (_showBorderCheckBox?.CheckedState == CheckState.Checked)
         {
             _graphView.BorderStyle = LineStyle.Single;
-            _graphView.Border.Thickness = _thickness;
-            _graphView.Margin.Thickness = _thickness;
-            _graphView.Padding.Thickness = _thickness;
+            _graphView.Border!.Thickness = _thickness;
+            _graphView.Margin!.Thickness = _thickness;
+            _graphView.Padding!.Thickness = _thickness;
         }
         else
         {
             _graphView.BorderStyle = LineStyle.None;
-            _graphView.Margin.Thickness = Thickness.Empty;
-            _graphView.Padding.Thickness = Thickness.Empty;
+            _graphView.Margin!.Thickness = Thickness.Empty;
+            _graphView.Padding!.Thickness = Thickness.Empty;
         }
     }
 
     private void Zoom (float factor)
     {
+        if (_graphView is null)
+        {
+            return;
+        }
+
         _graphView.CellSize = new (
                                    _graphView.CellSize.X * factor,
                                    _graphView.CellSize.Y * factor
@@ -980,7 +953,7 @@ public class GraphViewExample : Scenario
         _graphView.SetNeedsDraw ();
     }
 
-    private class DiscoBarSeries : BarSeries
+    private sealed class DiscoBarSeries : BarSeries
     {
         private readonly Attribute _brightgreen;
         private readonly Attribute _brightred;
@@ -999,35 +972,22 @@ public class GraphViewExample : Scenario
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
         {
-            IConsoleDriver driver = Application.Driver;
-
             int x = start.X;
 
             for (int y = end.Y; y <= start.Y; y++)
             {
                 float height = graph.ScreenToGraphSpace (x, y).Y;
 
-                if (height >= 85)
-                {
-                    graph.SetAttribute (_red);
-                }
-                else if (height >= 66)
-                {
-                    graph.SetAttribute (_brightred);
-                }
-                else if (height >= 45)
-                {
-                    graph.SetAttribute (_brightyellow);
-                }
-                else if (height >= 25)
-                {
-                    graph.SetAttribute (_brightgreen);
-                }
-                else
-                {
-                    graph.SetAttribute (_green);
-                }
+                Attribute attr = height switch
+                                 {
+                                     >= 85 => _red,
+                                     >= 66 => _brightred,
+                                     >= 45 => _brightyellow,
+                                     >= 25 => _brightgreen,
+                                     _ => _green
+                                 };
 
+                graph.SetAttribute (attr);
                 graph.AddRune (x, y, beingDrawn.Fill.Rune);
             }
         }

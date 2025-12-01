@@ -1,4 +1,3 @@
-#nullable enable
 
 using System.Runtime.InteropServices;
 
@@ -174,14 +173,14 @@ public class LineCanvas : IDisposable
                 intersectionsBufferList.Clear ();
                 foreach (var line in _lines)
                 {
-                    if (line.Intersects (x, y) is IntersectionDefinition intersect)
+                    if (line.Intersects (x, y) is { } intersect)
                     {
                         intersectionsBufferList.Add (intersect);
                     }
                 }
                 // Safe as long as the list is not modified while the span is in use.
                 ReadOnlySpan<IntersectionDefinition> intersects = CollectionsMarshal.AsSpan(intersectionsBufferList);
-                Cell? cell = GetCellForIntersects (Application.Driver, intersects);
+                Cell? cell = GetCellForIntersects (intersects);
                 // TODO: Can we skip the whole nested looping if _exclusionRegion is null?
                 if (cell is { } && _exclusionRegion?.Contains (x, y) is null or false)
                 {
@@ -218,12 +217,11 @@ public class LineCanvas : IDisposable
             for (int x = inArea.X; x < inArea.X + inArea.Width; x++)
             {
                 IntersectionDefinition [] intersects = _lines
-                    // ! nulls are filtered out by the next Where filter
-                    .Select (l => l.Intersects (x, y)!)
-                    .Where (i => i is not null)
+                    .Select (l => l.Intersects (x, y))
+                    .OfType<IntersectionDefinition> () // automatically filters nulls and casts
                     .ToArray ();
 
-                Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
+                Rune? rune = GetRuneForIntersects (intersects);
 
                 if (rune is { } && _exclusionRegion?.Contains (x, y) is null or false)
                 {
@@ -402,7 +400,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Cell? GetCellForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
+    private Cell? GetCellForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
     {
         if (intersects.IsEmpty)
         {
@@ -410,11 +408,11 @@ public class LineCanvas : IDisposable
         }
 
         var cell = new Cell ();
-        Rune? rune = GetRuneForIntersects (driver, intersects);
+        Rune? rune = GetRuneForIntersects (intersects);
 
         if (rune.HasValue)
         {
-            cell.Rune = rune.Value;
+            cell.Grapheme = rune.ToString ()!;
         }
 
         cell.Attribute = GetAttributeForIntersects (intersects);
@@ -422,7 +420,7 @@ public class LineCanvas : IDisposable
         return cell;
     }
 
-    private Rune? GetRuneForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
+    private Rune? GetRuneForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
     {
         if (intersects.IsEmpty)
         {
@@ -432,7 +430,7 @@ public class LineCanvas : IDisposable
         IntersectionRuneType runeType = GetRuneTypeForIntersects (intersects);
         if (_runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
         {
-            return resolver.GetRuneForIntersects (driver, intersects);
+            return resolver.GetRuneForIntersects (intersects);
         }
 
         // TODO: Remove these once we have all of the below ported to IntersectionRuneResolvers
@@ -769,7 +767,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickV;
         protected IntersectionRuneResolver () { SetGlyphs (); }
 
-        public Rune? GetRuneForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
+        public Rune? GetRuneForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
         {
             // Note that there aren't any glyphs for intersections of double lines with heavy lines
 

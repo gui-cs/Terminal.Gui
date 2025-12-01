@@ -1,15 +1,19 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class AdornmentTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Is_Cleared_After_Margin_Thickness_Change ()
     {
-        View view = new () { Text = "View", Width = 6, Height = 3, BorderStyle = LineStyle.Rounded };
+        View view = new ()
+        {
+            App = ApplicationImpl.Instance,
+            Text = "View", Width = 6, Height = 3, BorderStyle = LineStyle.Rounded
+        };
 
         // Remove border bottom thickness
         view.Border!.Thickness = new (1, 1, 1, 0);
@@ -59,7 +63,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (6, view.Width);
         Assert.Equal (3, view.Height);
 
-        View.SetClipToScreen ();
+        view.SetClipToScreen ();
         view.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (

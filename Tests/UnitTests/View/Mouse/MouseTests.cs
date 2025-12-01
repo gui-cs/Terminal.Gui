@@ -1,7 +1,6 @@
-﻿using Moq;
-using UnitTests;
+﻿using Timeout = Terminal.Gui.App.Timeout;
 
-namespace UnitTests.ViewMouseTests;
+namespace UnitTests.ViewBaseTests.MouseTests;
 
 [Trait ("Category", "Input")]
 public class MouseTests : TestsAllViews
@@ -35,14 +34,14 @@ public class MouseTests : TestsAllViews
             Height = 10,
             Arrangement = ViewArrangement.Movable
         };
-        testView.Margin.Thickness = new (marginThickness);
-        testView.Border.Thickness = new (borderThickness);
-        testView.Padding.Thickness = new (paddingThickness);
+        testView.Margin!.Thickness = new (marginThickness);
+        testView.Border!.Thickness = new (borderThickness);
+        testView.Padding!.Thickness = new (paddingThickness);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (testView);
 
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
         Assert.Equal (4, testView.Frame.X);
 
         Assert.Equal (new (4, 4), testView.Frame.Location);
@@ -187,7 +186,7 @@ public class MouseTests : TestsAllViews
         view.MouseHeldDown.MouseIsHeldDownTick += (_, _) => clickedCount++;
 
         // Mouse is currently not held down so should be no timers running
-        Assert.Empty(timed.Timeouts);
+        Assert.Empty (timed.Timeouts);
 
         // When mouse is held down
         me.Flags = pressed;
@@ -196,14 +195,14 @@ public class MouseTests : TestsAllViews
         me.Handled = false;
 
         // A timer should begin
-        var t = Assert.Single (timed.Timeouts);
+        KeyValuePair<long, Timeout> t = Assert.Single (timed.Timeouts);
 
         // Invoke the timer
         t.Value.Callback.Invoke ();
 
         // Event should have been raised
         Assert.Equal (1, clickedCount);
-        Assert.NotEmpty(timed.Timeouts);
+        Assert.NotEmpty (timed.Timeouts);
 
         // When mouse is released
         me.Flags = released;
@@ -253,7 +252,7 @@ public class MouseTests : TestsAllViews
         Assert.Equal (0, clickedCount);
         me.Handled = false;
 
-        Assert.NotEmpty(timed.Timeouts);
+        Assert.NotEmpty (timed.Timeouts);
         Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
 
         me.Flags = pressed;
@@ -308,11 +307,11 @@ public class MouseTests : TestsAllViews
 
         // Mouse is held down so timer should be ticking
         Assert.NotEmpty (timed.Timeouts);
-        Assert.Equal (clickedCount,0);
+        Assert.Equal (0, clickedCount);
 
         // Don't wait, just force it to expire
         Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
-        Assert.Equal (clickedCount, 1);
+        Assert.Equal (1, clickedCount);
 
         // Move out of Viewport
         me.Flags = MouseFlags.Button1Pressed;
@@ -320,7 +319,7 @@ public class MouseTests : TestsAllViews
         view.NewMouseEvent (me);
 
         Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
-        Assert.Equal (clickedCount, 2);
+        Assert.Equal (2, clickedCount);
 
         me.Handled = false;
 
@@ -571,7 +570,6 @@ public class MouseTests : TestsAllViews
         Application.ResetState (true);
     }
 
-
     [Theory]
     [InlineData (0)]
     [InlineData (1)]
@@ -634,6 +632,7 @@ public class MouseTests : TestsAllViews
         // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
         Application.ResetState (true);
     }
+
     private class MouseEventTestView : View
     {
         public int MouseEnterCount { get; private set; }

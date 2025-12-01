@@ -99,7 +99,7 @@ public class AdornmentsEditor : EditorBase
             SuperViewRendersLineCanvas = true,
             BorderStyle = LineStyle.Single
         };
-        MarginEditor.Border!.Thickness = MarginEditor.Border.Thickness with { Bottom = 0 };
+        MarginEditor.Border!.Thickness = MarginEditor.Border!.Thickness with { Bottom = 0 };
         Add (MarginEditor);
 
         BorderEditor = new ()
@@ -109,7 +109,7 @@ public class AdornmentsEditor : EditorBase
             SuperViewRendersLineCanvas = true,
             BorderStyle = LineStyle.Single
         };
-        BorderEditor.Border!.Thickness = BorderEditor.Border.Thickness with { Bottom = 0 };
+        BorderEditor.Border!.Thickness = BorderEditor.Border!.Thickness with { Bottom = 0 };
         Add (BorderEditor);
 
         PaddingEditor = new ()
@@ -119,7 +119,7 @@ public class AdornmentsEditor : EditorBase
             SuperViewRendersLineCanvas = true,
             BorderStyle = LineStyle.Single
         };
-        PaddingEditor.Border!.Thickness = PaddingEditor.Border.Thickness with { Bottom = 0 };
+        PaddingEditor.Border!.Thickness = PaddingEditor.Border!.Thickness with { Bottom = 0 };
         Add (PaddingEditor);
 
         Width = Dim.Auto (maximumContentDim: Dim.Func (_ => MarginEditor.Frame.Width - 2));

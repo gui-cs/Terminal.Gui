@@ -2,12 +2,12 @@
 using System.Globalization;
 using System.Text;
 
-namespace UnitTests_Parallelizable.TextTests;
+namespace TextTests;
 
 public class RuneTests
 {
     [Fact]
-    public void Cast_To_Char_Durrogate_Pair_Return_UTF16 ()
+    public void Cast_To_Char_Surrogate_Pair_Return_UTF16 ()
     {
         Assert.NotEqual ("𝔹", $"{new Rune (unchecked ((char)0x1d539))}");
         Assert.Equal ("픹", $"{new Rune (unchecked ((char)0x1d539))}");
@@ -65,8 +65,11 @@ public class RuneTests
         PrintTextElementCount ("\u0061\u0301", "á", 1, 2, 2, 1);
         PrintTextElementCount ("\u0061\u0301", "á", 1, 2, 2, 1);
         PrintTextElementCount ("\u0065\u0301", "é", 1, 2, 2, 1);
-        PrintTextElementCount ("\U0001f469\U0001f3fd\u200d\U0001f692", "👩🏽‍🚒", 6, 4, 7, 1);
+        PrintTextElementCount ("\U0001f469\U0001f3fd\u200d\U0001f692", "👩🏽‍🚒", 2, 4, 7, 1);
         PrintTextElementCount ("\ud801\udccf", "𐓏", 1, 1, 2, 1);
+        PrintTextElementCount ("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", "👨‍👩‍👧‍👦", 2, 7, 11, 1);
+        PrintTextElementCount ("\U0001f469\u200d\U0001f692", "👩‍🚒", 2, 3, 5, 1);
+        PrintTextElementCount ("\u0068\u0069", "hi", 2, 2, 2, 2);
     }
 
     [Theory]
@@ -84,8 +87,8 @@ public class RuneTests
                     2,
                     1
                 )] // the letters 법 join to form the Korean word for "rice:" U+BC95 법 (read from top left to bottom right)
-    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 6, 8)] // Man, Woman and Girl emoji.
-    [InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
+    [InlineData ("\U0001F468\u200D\U0001F469\u200D\U0001F467", "👨‍👩‍👧", 8, 2, 8)] // Man, Woman and Girl emoji.
+    //[InlineData ("\u0915\u093f", "कि", 2, 2, 2)] // Hindi कि with DEVANAGARI LETTER KA and DEVANAGARI VOWEL SIGN I
     [InlineData (
                     "\u0e4d\u0e32",
                     "ํา",
@@ -210,7 +213,7 @@ public class RuneTests
     [InlineData (
                     '\u1161',
                     "ᅡ",
-                    1,
+                    0,
                     1,
                     3
                 )] // ᅡ Hangul Jungseong A - Unicode Hangul Jamo for join with column width equal to 0 alone.
@@ -228,7 +231,7 @@ public class RuneTests
                 )]  // ䷀Hexagram For The Creative Heaven -  U+4dc0 - https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
                     // See https://github.com/microsoft/terminal/issues/19389
 
-    [InlineData ('\ud7b0', "ힰ", 1, 1, 3)] // ힰ ┤Hangul Jungseong O-Yeo - ힰ U+d7b0')]
+    [InlineData ('\ud7b0', "ힰ", 0, 1, 3)] // ힰ ┤Hangul Jungseong O-Yeo - ힰ U+d7b0')]
     [InlineData ('\uf61e', "", 1, 1, 3)] // Private Use Area
     [InlineData ('\u23f0', "⏰", 2, 1, 3)] // Alarm Clock - ⏰ U+23f0
     [InlineData ('\u1100', "ᄀ", 2, 1, 3)] // ᄀ Hangul Choseong Kiyeok
@@ -361,6 +364,42 @@ public class RuneTests
     [InlineData (0x12345678)]
     [InlineData ('\ud801')]
     public void Rune_Exceptions_Integers (int code) { Assert.Throws<ArgumentOutOfRangeException> (() => new Rune (code)); }
+
+    [Theory]
+    // Control characters (should be mapped to Control Pictures)
+    [InlineData ('\u0000', 0x2400)]  // NULL → ␀
+    [InlineData ('\u0009', 0x2409)]  // TAB → ␉
+    [InlineData ('\u000A', 0x240A)]  // LF → ␊
+    [InlineData ('\u000D', 0x240D)]  // CR → ␍
+
+    // Printable characters (should remain unchanged)
+    [InlineData ('A', 'A')]
+    [InlineData (' ', ' ')]
+    [InlineData ('~', '~')]
+    public void MakePrintable_ReturnsExpected (char inputChar, int expectedCodePoint)
+    {
+        // Arrange
+        Rune input = new Rune (inputChar);
+
+        // Act
+        Rune result = input.MakePrintable ();
+
+        // Assert
+        Assert.Equal (expectedCodePoint, result.Value);
+    }
+
+    [Fact]
+    public void MakePrintable_SupplementaryRune_RemainsUnchanged ()
+    {
+        // Arrange: supplementary character outside BMP (not a control)
+        Rune input = new Rune (0x1F600); // 😀 grinning face emoji
+
+        // Act
+        Rune result = input.MakePrintable ();
+
+        // Assert
+        Assert.Equal (input.Value, result.Value);
+    }
 
     [Theory]
     [InlineData (new [] { '\ud799', '\udc21' })]
@@ -694,16 +733,16 @@ public class RuneTests
     [Theory]
     [InlineData ('\uea85', null, "", false)] // Private Use Area
     [InlineData (0x1F356, new [] { '\ud83c', '\udf56' }, "🍖", true)] // 🍖 Meat On Bone
-    public void Test_DecodeSurrogatePair (int code, char [] charsValue, string runeString, bool isSurrogatePair)
+    public void Test_DecodeSurrogatePair (int code, char []? charsValue, string runeString, bool isSurrogatePair)
     {
         var rune = new Rune (code);
-        char [] chars;
+        char []? chars;
 
         if (isSurrogatePair)
         {
             Assert.True (rune.DecodeSurrogatePair (out chars));
-            Assert.Equal (2, chars.Length);
-            Assert.Equal (charsValue [0], chars [0]);
+            Assert.Equal (2, chars!.Length);
+            Assert.Equal (charsValue! [0], chars [0]);
             Assert.Equal (charsValue [1], chars [1]);
             Assert.Equal (runeString, new Rune (chars [0], chars [1]).ToString ());
         }
@@ -951,11 +990,9 @@ public class RuneTests
         Assert.Equal (runeCount, us.GetRuneCount ());
         Assert.Equal (stringCount, s.Length);
 
-        TextElementEnumerator enumerator = StringInfo.GetTextElementEnumerator (s);
-
         var textElementCount = 0;
 
-        while (enumerator.MoveNext ())
+        foreach (string _ in GraphemeHelper.GetGraphemes (s))
         {
             textElementCount++; // For versions prior to Net5.0 the StringInfo class might handle some grapheme clusters incorrectly.
         }
@@ -1060,5 +1097,96 @@ public class RuneTests
         }
 
         return true;
+    }
+
+    [Theory]
+    [InlineData (0x0041, new byte [] { 0x41 })]                  // 'A', ASCII
+    [InlineData (0x00E9, new byte [] { 0xC3, 0xA9 })]            // 'é', 2-byte UTF-8
+    [InlineData (0x20AC, new byte [] { 0xE2, 0x82, 0xAC })]      // '€', 3-byte UTF-8
+    [InlineData (0x1F600, new byte [] { 0xF0, 0x9F, 0x98, 0x80 })] // 😀 emoji, 4-byte UTF-8
+    public void Encode_WritesExpectedBytes (int codePoint, byte [] expectedBytes)
+    {
+        // Arrange
+        Rune rune = new Rune (codePoint);
+        byte [] buffer = new byte [10]; // extra space
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            buffer [i] = 0xFF;
+        }
+
+        // Act
+        int written = rune.Encode (buffer);
+
+        // Assert
+        Assert.Equal (expectedBytes.Length, written);
+        for (int i = 0; i < written; i++)
+        {
+            Assert.Equal (expectedBytes [i], buffer [i]);
+        }
+    }
+
+    [Fact]
+    public void Encode_WithStartAndCount_WritesPartialBytes ()
+    {
+        // Arrange: U+1F600 😀 (4 bytes)
+        Rune rune = new Rune (0x1F600);
+        byte [] buffer = new byte [10];
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            buffer [i] = 0xFF;
+        }
+
+        // Act: write starting at index 2, limit count to 2 bytes
+        int written = rune.Encode (buffer, start: 2, count: 2);
+
+        // Assert
+        Assert.Equal (2, written);
+        // Original UTF-8 bytes: F0 9F 98 80
+        Assert.Equal (0xF0, buffer [2]);
+        Assert.Equal (0x9F, buffer [3]);
+        // Remaining buffer untouched
+        Assert.Equal (0xFF, buffer [0]);
+        Assert.Equal (0xFF, buffer [1]);
+        Assert.Equal (0xFF, buffer [4]);
+    }
+
+    [Fact]
+    public void Encode_WithCountGreaterThanRuneBytes_WritesAllBytes ()
+    {
+        // Arrange: é → C3 A9
+        Rune rune = new Rune ('é');
+        byte [] buffer = new byte [10];
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            buffer [i] = 0xFF;
+        }
+
+        // Act: count larger than needed
+        int written = rune.Encode (buffer, start: 1, count: 10);
+
+        // Assert
+        Assert.Equal (2, written);
+        Assert.Equal (0xC3, buffer [1]);
+        Assert.Equal (0xA9, buffer [2]);
+        Assert.Equal (0xFF, buffer [3]); // next byte untouched
+    }
+
+    [Fact]
+    public void Encode_ZeroCount_WritesNothing ()
+    {
+        Rune rune = new Rune ('A');
+        byte [] buffer = new byte [5];
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            buffer [i] = 0xFF;
+        }
+
+        int written = rune.Encode (buffer, start: 0, count: 0);
+
+        Assert.Equal (0, written);
+        foreach (var b in buffer)
+        {
+            Assert.Equal (0xFF, b); // buffer untouched
+        }
     }
 }

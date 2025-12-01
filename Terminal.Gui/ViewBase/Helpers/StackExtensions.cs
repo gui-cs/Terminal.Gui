@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.ViewBase;
 
 /// <summary>Extension of <see cref="Stack{T}"/> helper to work with specific <see cref="IEqualityComparer{T}"/></summary>

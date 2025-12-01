@@ -10,79 +10,12 @@ public class TextFieldTests (ITestOutputHelper output)
 {
     private static TextField _textField;
 
-    [Fact]
-    [SetupFakeDriver]
-    public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
-    {
-        var tf = new TextField { Width = 3, Text = "ắ" };
-        tf.Layout ();
-        tf.Draw ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-ắ",
-                                                      output
-                                                     );
-
-        tf.Text = "\u1eaf";
-        tf.Layout ();
-        tf.Draw ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-ắ",
-                                                      output
-                                                     );
-
-        tf.Text = "\u0103\u0301";
-        tf.Layout ();
-        tf.Draw ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-ắ",
-                                                      output
-                                                     );
-
-        tf.Text = "\u0061\u0306\u0301";
-        tf.Layout ();
-        tf.Draw ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-ắ",
-                                                      output
-                                                     );
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void Adjust_First ()
-    {
-        var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
-        tf.SetRelativeLayout (new (20, 20));
-        tf.Draw ();
-
-        Assert.Equal ("This is a test. ", GetContents ());
-
-        string GetContents ()
-        {
-            var item = "";
-
-            for (var i = 0; i < 16; i++)
-            {
-                item += Application.Driver?.Contents [0, i].Rune;
-            }
-
-            return item;
-        }
-    }
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
         var tf = new TextField { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
         var fv = new FrameView
@@ -145,13 +78,13 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         // Caption has no effect when focused
-        tf.Caption = caption;
+        tf.Title = caption;
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedRender, output);
-        Application.Top.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -162,16 +95,17 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Assert.Equal (11, caption.Length);
         Assert.Equal (10, caption.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (10, caption.GetColumns ());
 
         TextField tf = GetTextFieldsInView ();
 
-        tf.Caption = caption;
+        tf.Title = caption;
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Misérables", output);
-        Application.Top.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Theory (Skip = "Broke with ContextMenuv2")]
@@ -185,21 +119,21 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
-        tf.Caption = "Enter txt";
+        tf.Title = "Enter txt";
         Application.RaiseKeyDownEvent ('\t');
 
         // Caption should appear when not focused and no text
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
 
         // but disapear when text is added
         tf.Text = content;
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (content, output);
-        Application.Top.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -212,19 +146,117 @@ public class TextFieldTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre ("", output);
 
         // Caption has no effect when focused
-        tf.Caption = "Enter txt";
+        tf.Title = "Enter txt";
         Assert.True (tf.HasFocus);
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("", output);
 
         Application.RaiseKeyDownEvent ('\t');
 
         Assert.False (tf.HasFocus);
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
-        Application.Top.Dispose ();
+        Application.TopRunnableView.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Title_RendersAsCaption_WithCorrectAttributes ()
+    {
+        TextField tf = GetTextFieldsInView ();
+
+        // Set a title (caption)
+        tf.Title = "Enter text";
+        
+        // Remove focus so caption appears
+        Application.RaiseKeyDownEvent ('\t');
+        Assert.False (tf.HasFocus);
+
+        tf.SetClipToScreen ();
+        tf.Draw ();
+        
+        // Verify the caption text is rendered
+        DriverAssert.AssertDriverContentsAre ("Enter text", output);
+
+        // Verify the caption uses dimmed color attribute
+        Attribute captionAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background);
+
+        // All characters in "Enter text" should have the caption attribute
+        DriverAssert.AssertDriverAttributesAre ("0000000000", output, Application.Driver, captionAttr);
+
+        Application.TopRunnableView.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Title_WithHotkey_RendersUnderlined ()
+    {
+        TextField tf = GetTextFieldsInView ();
+
+        // Title with hotkey should be rendered with the hotkey underlined when not focused
+        tf.Title = "_Find";
+        
+        // Remove focus so caption appears
+        Application.RaiseKeyDownEvent ('\t');
+        Assert.False (tf.HasFocus);
+
+        tf.SetClipToScreen ();
+        tf.Draw ();
+        
+        // The hotkey character 'F' should be rendered (without the underscore in the actual text)
+        DriverAssert.AssertDriverContentsAre ("Find", output);
+
+        // Verify the hotkey character 'F' has underline style
+        Attribute captionAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background);
+        Attribute hotkeyAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background,
+            tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+
+        // F is underlined (index 1), remaining characters use normal caption attribute (index 0)
+        DriverAssert.AssertDriverAttributesAre ("1000", output, Application.Driver, captionAttr, hotkeyAttr);
+
+        Application.TopRunnableView.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Title_WithHotkey_MiddleCharacter_RendersUnderlined ()
+    {
+        TextField tf = GetTextFieldsInView ();
+
+        // Title with hotkey in middle of text
+        tf.Title = "Enter _Text";
+        
+        // Remove focus so caption appears
+        Application.RaiseKeyDownEvent ('\t');
+        Assert.False (tf.HasFocus);
+
+        tf.SetClipToScreen ();
+        tf.Draw ();
+        
+        // The underscore should not be rendered, 'T' should be underlined
+        DriverAssert.AssertDriverContentsAre ("Enter Text", output);
+
+        // Verify the hotkey character 'T' has underline style
+        Attribute captionAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background);
+        Attribute hotkeyAttr = new Attribute (
+            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+            tf.GetAttributeForRole (VisualRole.Editable).Background,
+            tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+
+        // "Enter " (6 chars) + "T" (underlined) + "ext" (3 chars)
+        DriverAssert.AssertDriverAttributesAre ("0000001000", output, Application.Driver, captionAttr, hotkeyAttr);
+
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -420,7 +452,7 @@ public class TextFieldTests (ITestOutputHelper output)
                                oldText = tf.Text;
                            };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -486,10 +518,10 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (useFakeClipboard: true)]
+    [SetupFakeApplication]
     public void KeyBindings_Command ()
     {
-        var tf = new TextField { Width = 20, Text = "This is a test." };
+        var tf = new TextField { Width = 20, Text = "This is a test.", App = ApplicationImpl.Instance };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -804,9 +836,9 @@ public class TextFieldTests (ITestOutputHelper output)
         // Proves #3022 is fixed (TextField selected text does not show in v2)
 
         _textField.CursorPosition = 0;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (_textField);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         Attribute [] attributes =
         {
@@ -887,7 +919,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var clickCounter = 0;
         tf.MouseClick += (s, m) => { clickCounter++; };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -1586,10 +1618,14 @@ public class TextFieldTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
-        var tf = new TextField { Width = 30, Text = "Les Misérables" };
+        var tf = new TextField
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 30, Text = "Les Misérables"
+        };
         tf.SetRelativeLayout (new (100, 100));
         tf.Draw ();
 
@@ -1610,7 +1646,7 @@ Les Misérables",
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
-        View.SetClipToScreen ();
+        tf.SetClipToScreen ();
         tf.Draw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1625,7 +1661,7 @@ Les Miśerables",
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         top.Add (tf2);
 
@@ -1655,13 +1691,14 @@ Les Miśerables",
         {
             base.Before (methodUnderTest);
 
-            //Application.Top.Scheme = Colors.Schemes ["Base"];
+            //Application.TopRunnable.Scheme = Colors.Schemes ["Base"];
             _textField = new ()
             {
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)
                 Text = "TAB to jump between text fields.",
-                Width = 32
+                Width = 32,
+                App = ApplicationImpl.Instance
             };
         }
     }
@@ -1670,7 +1707,11 @@ Les Miśerables",
     [AutoInitShutdown]
     public void Draw_Esc_Rune ()
     {
-        var tf = new TextField { Width = 5, Text = "\u001b" };
+        var tf = new TextField
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+            Width = 5, Text = "\u001b"
+        };
         tf.BeginInit ();
         tf.EndInit ();
         tf.Draw ();

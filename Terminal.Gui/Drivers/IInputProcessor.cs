@@ -1,60 +1,22 @@
-﻿#nullable enable
-
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Interface for main loop class that will process the queued input buffer contents.
+///     Interface for main loop class that will process the queued input.
 ///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
 ///     events and data models.
 /// </summary>
 public interface IInputProcessor
 {
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.</summary>
-    event EventHandler<Key>? KeyDown;
-
-    /// <summary>Event fired when a key is released.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is
-    ///     complete.
-    /// </remarks>
-    event EventHandler<Key>? KeyUp;
-
-    /// <summary>Event fired when a terminal sequence read from input is not recognized and therefore ignored.</summary>
+    /// <summary>Event raised when a terminal sequence read from input is not recognized and therefore ignored.</summary>
     public event EventHandler<string>? AnsiSequenceSwallowed;
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    event EventHandler<MouseEventArgs>? MouseEvent;
-
     /// <summary>
-    /// Gets the name of the driver associated with this input processor.
+    ///     Gets the name of the driver associated with this input processor.
     /// </summary>
-    string DriverName { get; init; }
+    string? DriverName { get; init; }
 
     /// <summary>
-    ///     Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to
-    ///     <see cref="OnKeyUp"/>.
-    /// </summary>
-    /// <param name="key">The key event data.</param>
-    void OnKeyDown (Key key);
-
-    /// <summary>
-    ///     Called when a key is released. Fires the <see cref="KeyUp"/> event.
-    /// </summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will call this method after <see cref="OnKeyDown"/> processing
-    ///     is complete.
-    /// </remarks>
-    /// <param name="key">The key event data.</param>
-    void OnKeyUp (Key key);
-
-    /// <summary>
-    ///     Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
-    /// </summary>
-    /// <param name="mouseEventArgs">The mouse event data.</param>
-    void OnMouseEvent (MouseEventArgs mouseEventArgs);
-
-    /// <summary>
-    ///     Drains the input buffer, processing all available keystrokes
+    ///     Drains the input queue, processing all available keystrokes. To be called on the main loop thread.
     /// </summary>
     void ProcessQueue ();
 
@@ -74,4 +36,63 @@ public interface IInputProcessor
     ///     <see langword="false"/>.
     /// </returns>
     bool IsValidInput (Key key, out Key result);
+
+    /// <summary>
+    ///     Called when a key down event has been dequeued. Raises the <see cref="KeyDown"/> event. This is a precursor to
+    ///     <see cref="RaiseKeyUpEvent"/>.
+    /// </summary>
+    /// <param name="key">The key event data.</param>
+    void RaiseKeyDownEvent (Key key);
+
+    /// <summary>Event raised when a key down event has been dequeued. This is a precursor to <see cref="KeyUp"/>.</summary>
+    event EventHandler<Key>? KeyDown;
+
+    /// <summary>
+    ///     Adds a key up event to the input queue. For unit tests.
+    /// </summary>
+    /// <param name="key"></param>
+    void EnqueueKeyDownEvent (Key key);
+
+    /// <summary>
+    ///     Called when a key up event has been dequeued. Raises the <see cref="KeyUp"/> event.
+    /// </summary>
+    /// <remarks>
+    ///     Drivers that do not support key release events will call this method after <see cref="RaiseKeyDownEvent"/>
+    ///     processing
+    ///     is complete.
+    /// </remarks>
+    /// <param name="key">The key event data.</param>
+    void RaiseKeyUpEvent (Key key);
+
+    /// <summary>Event raised when a key up event has been dequeued.</summary>
+    /// <remarks>
+    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is
+    ///     complete.
+    /// </remarks>
+    event EventHandler<Key>? KeyUp;
+
+    /// <summary>
+    ///     Adds a key up event to the input queue. For unit tests.
+    /// </summary>
+    /// <param name="key"></param>
+    void EnqueueKeyUpEvent (Key key);
+
+    /// <summary>
+    ///     Called when a mouse event has been dequeued. Raises the <see cref="MouseEvent"/> event.
+    /// </summary>
+    /// <param name="mouseEventArgs">The mouse event data.</param>
+    void RaiseMouseEvent (MouseEventArgs mouseEventArgs);
+
+    /// <summary>Event raised when a mouse event has been dequeued.</summary>
+    event EventHandler<MouseEventArgs>? MouseEvent;
+
+    /// <summary>
+    ///     Adds a mouse input event to the input queue. For unit tests.
+    /// </summary>
+    /// <param name="app">
+    ///     The application instance to use. Used to use Invoke to raise the mouse
+    ///     event in the case where this method is not called on the main thread.
+    /// </param>
+    /// <param name="mouseEvent"></param>
+    void EnqueueMouseEvent (IApplication? app,  MouseEventArgs mouseEvent);
 }

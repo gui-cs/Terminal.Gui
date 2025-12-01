@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
-public class TextValidateField_NET_Provider_Tests : UnitTests.Parallelizable.ParallelizableBase
+public class TextValidateField_NET_Provider_Tests : FakeDriverBase
 {
     [Fact]
     public void Backspace_Key_Deletes_Previous_Character ()
@@ -56,7 +57,7 @@ public class TextValidateField_NET_Provider_Tests : UnitTests.Parallelizable.Par
         Assert.True (field.IsValid);
 
         var provider = field.Provider as NetMaskedTextProvider;
-        provider.Mask = "--------(00000000)--------";
+        provider!.Mask = "--------(00000000)--------";
         Assert.Equal ("--------(1234____)--------", field.Provider.DisplayText);
         Assert.False (field.IsValid);
     }
@@ -425,7 +426,7 @@ public class TextValidateField_NET_Provider_Tests : UnitTests.Parallelizable.Par
     }
 }
 
-public class TextValidateField_Regex_Provider_Tests : UnitTests.Parallelizable.ParallelizableBase
+public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
 {
     [Fact]
     public void End_Key_End_Of_Input ()

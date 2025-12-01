@@ -1,20 +1,15 @@
-﻿#nullable enable
+﻿using System.Collections.Concurrent;
+
 namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Abstract class for <see cref="KeyBindings"/> and <see cref="MouseBindings"/>.
+///     This class is thread-safe for all public operations.
 /// </summary>
 /// <typeparam name="TEvent">The type of the event (e.g. <see cref="Key"/> or <see cref="MouseFlags"/>).</typeparam>
 /// <typeparam name="TBinding">The binding type (e.g. <see cref="KeyBinding"/>).</typeparam>
-public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBinding, new () where TEvent : notnull
+public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBinding, new() where TEvent : notnull
 {
-    /// <summary>
-    ///     The bindings.
-    /// </summary>
-    private readonly Dictionary<TEvent, TBinding> _bindings;
-
-    private readonly Func<Command [], TEvent, TBinding> _constructBinding;
-
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
@@ -27,11 +22,11 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     }
 
     /// <summary>
-    ///     Tests whether <paramref name="eventArgs"/> is valid or not.
+    ///     The bindings.
     /// </summary>
-    /// <param name="eventArgs"></param>
-    /// <returns></returns>
-    public abstract bool IsValid (TEvent eventArgs);
+    private readonly ConcurrentDictionary<TEvent, TBinding> _bindings;
+
+    private readonly Func<Command [], TEvent, TBinding> _constructBinding;
 
     /// <summary>Adds a <typeparamref name="TEvent"/> bound to <typeparamref name="TBinding"/> to the collection.</summary>
     /// <param name="eventArgs"></param>
@@ -43,24 +38,21 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (eventArgs));
         }
 
-#pragma warning disable CS8601 // Possible null reference assignment.
-        if (TryGet (eventArgs, out TBinding _))
+        // IMPORTANT: Add a COPY of the eventArgs. This is needed because ConfigurationManager.Apply uses DeepMemberWiseCopy
+        // IMPORTANT: update the memory referenced by the key, and Dictionary uses caching for performance, and thus
+        // IMPORTANT: Apply will update the Dictionary with the new eventArgs, but the old eventArgs will still be in the dictionary.
+        // IMPORTANT: See the ConfigurationManager.Illustrate_DeepMemberWiseCopy_Breaks_Dictionary test for details.
+        if (!_bindings.TryAdd (eventArgs, binding))
         {
             throw new InvalidOperationException (@$"A binding for {eventArgs} exists ({binding}).");
         }
-#pragma warning restore CS8601 // Possible null reference assignment.
-
-        // IMPORTANT: Add a COPY of the eventArgs. This is needed because ConfigurationManager.Apply uses DeepMemberWiseCopy 
-        // IMPORTANT: update the memory referenced by the key, and Dictionary uses caching for performance, and thus 
-        // IMPORTANT: Apply will update the Dictionary with the new eventArgs, but the old eventArgs will still be in the dictionary.
-        // IMPORTANT: See the ConfigurationManager.Illustrate_DeepMemberWiseCopy_Breaks_Dictionary test for details.
-        _bindings.Add (eventArgs, binding);
     }
 
     /// <summary>
     ///     <para>Adds a new <typeparamref name="TEvent"/> that will trigger the commands in <paramref name="commands"/>.</para>
     ///     <para>
-    ///         If the <typeparamref name="TEvent"/> is already bound to a different set of <see cref="Command"/>s it will be rebound
+    ///         If the <typeparamref name="TEvent"/> is already bound to a different set of <see cref="Command"/>s it will be
+    ///         rebound
     ///         <paramref name="commands"/>.
     ///     </para>
     /// </summary>
@@ -78,31 +70,32 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"At least one command must be specified", nameof (commands));
         }
 
-        if (TryGet (eventArgs, out TBinding? binding))
+        if (!IsValid (eventArgs))
+        {
+            throw new ArgumentException (@"Invalid newEventArgs", nameof (eventArgs));
+        }
+
+        TBinding binding = _constructBinding (commands, eventArgs);
+
+        if (!_bindings.TryAdd (eventArgs, binding))
         {
             throw new InvalidOperationException (@$"A binding for {eventArgs} exists ({binding}).");
         }
-
-        Add (eventArgs, _constructBinding (commands, eventArgs));
     }
-
-    /// <summary>
-    ///     Gets the bindings.
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerable<KeyValuePair<TEvent, TBinding>> GetBindings () { return _bindings; }
 
     /// <summary>Removes all <typeparamref name="TEvent"/> objects from the collection.</summary>
     public void Clear () { _bindings.Clear (); }
 
     /// <summary>
-    ///     Removes all bindings that trigger the given command set. Views can have multiple different <typeparamref name="TEvent"/>
+    ///     Removes all bindings that trigger the given command set. Views can have multiple different
+    ///     <typeparamref name="TEvent"/>
     ///     bound to
     ///     the same command sets and this method will clear all of them.
     /// </summary>
     /// <param name="command"></param>
     public void Clear (params Command [] command)
     {
+        // ToArray() creates a snapshot to avoid modification during enumeration
         KeyValuePair<TEvent, TBinding> [] kvps = _bindings
                                                  .Where (kvp => kvp.Value.Commands.SequenceEqual (command))
                                                  .ToArray ();
@@ -126,16 +119,29 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
         throw new InvalidOperationException ($"{eventArgs} is not bound.");
     }
 
-    /// <summary>Gets the commands bound with the specified <typeparamref name="TEvent"/>.</summary>
-    /// <remarks></remarks>
-    /// <param name="eventArgs">The <typeparamref name="TEvent"/> to check.</param>
-    /// <param name="binding">
-    ///     When this method returns, contains the commands bound with the <typeparamref name="TEvent"/>, if the <typeparamref name="TEvent"/> is
-    ///     not
-    ///     found; otherwise, null. This parameter is passed uninitialized.
-    /// </param>
-    /// <returns><see langword="true"/> if the <typeparamref name="TEvent"/> is bound; otherwise <see langword="false"/>.</returns>
-    public bool TryGet (TEvent eventArgs, out TBinding? binding) { return _bindings.TryGetValue (eventArgs, out binding); }
+    /// <summary>Gets all <typeparamref name="TEvent"/> bound to the set of commands specified by <paramref name="commands"/>.</summary>
+    /// <param name="commands">The set of commands to search.</param>
+    /// <returns>
+    ///     The <typeparamref name="TEvent"/>s bound to the set of commands specified by <paramref name="commands"/>. An empty
+    ///     list if
+    ///     the
+    ///     set of commands was not found.
+    /// </returns>
+    public IEnumerable<TEvent> GetAllFromCommands (params Command [] commands)
+    {
+        // ToList() creates a snapshot to ensure thread-safe enumeration
+        return _bindings.Where (a => a.Value.Commands.SequenceEqual (commands)).Select (a => a.Key).ToList ();
+    }
+
+    /// <summary>
+    ///     Gets the bindings.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<KeyValuePair<TEvent, TBinding>> GetBindings ()
+    {
+        // ConcurrentDictionary provides a snapshot enumeration that is safe for concurrent access
+        return _bindings;
+    }
 
     /// <summary>Gets the array of <see cref="Command"/>s bound to <paramref name="eventArgs"/> if it exists.</summary>
     /// <param name="eventArgs">The <typeparamref name="TEvent"/> to check.</param>
@@ -164,17 +170,16 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// </returns>
     public TEvent? GetFirstFromCommands (params Command [] commands) { return _bindings.FirstOrDefault (a => a.Value.Commands.SequenceEqual (commands)).Key; }
 
-    /// <summary>Gets all <typeparamref name="TEvent"/> bound to the set of commands specified by <paramref name="commands"/>.</summary>
-    /// <param name="commands">The set of commands to search.</param>
-    /// <returns>
-    ///     The <typeparamref name="TEvent"/>s bound to the set of commands specified by <paramref name="commands"/>. An empty list if
-    ///     the
-    ///     set of commands was not found.
-    /// </returns>
-    public IEnumerable<TEvent> GetAllFromCommands (params Command [] commands)
-    {
-        return _bindings.Where (a => a.Value.Commands.SequenceEqual (commands)).Select (a => a.Key);
-    }
+    /// <summary>
+    ///     Tests whether <paramref name="eventArgs"/> is valid or not.
+    /// </summary>
+    /// <param name="eventArgs"></param>
+    /// <returns></returns>
+    public abstract bool IsValid (TEvent eventArgs);
+
+    /// <summary>Removes a <typeparamref name="TEvent"/> from the collection.</summary>
+    /// <param name="eventArgs"></param>
+    public void Remove (TEvent eventArgs) { _bindings.TryRemove (eventArgs, out _); }
 
     /// <summary>Replaces a <typeparamref name="TEvent"/> combination already bound to a set of <see cref="Command"/>s.</summary>
     /// <remarks></remarks>
@@ -189,15 +194,28 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
             throw new ArgumentException (@"Invalid newEventArgs", nameof (newEventArgs));
         }
 
-        if (TryGet (oldEventArgs, out TBinding? binding))
+        // Thread-safe: Handle the case where oldEventArgs == newEventArgs
+        if (EqualityComparer<TEvent>.Default.Equals (oldEventArgs, newEventArgs))
         {
-            Remove (oldEventArgs);
-            Add (newEventArgs, binding!);
+            // Same key - nothing to do, binding stays as-is
+            return;
         }
-        else
-        {
-            Add (newEventArgs, binding!);
-        }
+
+        // Thread-safe: Get the binding from oldEventArgs, or create default if it doesn't exist
+        // This is atomic - either gets existing or adds new
+        TBinding binding = _bindings.GetOrAdd (oldEventArgs, _ => new TBinding ());
+
+        // Thread-safe: Atomically add/update newEventArgs with the binding from oldEventArgs
+        // The updateValueFactory is only called if the key already exists, ensuring we don't
+        // accidentally overwrite a binding that was added by another thread
+        _bindings.AddOrUpdate (
+            newEventArgs,
+            binding, // Add this binding if newEventArgs doesn't exist
+            (_, _) => binding);
+
+        // Thread-safe: Remove oldEventArgs only after newEventArgs has been set
+        // This ensures we don't lose the binding if another thread is reading it
+        _bindings.TryRemove (oldEventArgs, out _);
     }
 
     /// <summary>Replaces the commands already bound to a combination of <typeparamref name="TEvent"/>.</summary>
@@ -210,28 +228,21 @@ public abstract class InputBindings<TEvent, TBinding> where TBinding : IInputBin
     /// <param name="newCommands">The set of commands to replace the old ones with.</param>
     public void ReplaceCommands (TEvent eventArgs, params Command [] newCommands)
     {
-#pragma warning disable CS8601 // Possible null reference assignment.
-        if (TryGet (eventArgs, out TBinding _))
-        {
-            Remove (eventArgs);
-            Add (eventArgs, newCommands);
-        }
-        else
-        {
-            Add (eventArgs, newCommands);
-        }
-#pragma warning restore CS8601 // Possible null reference assignment.
+        TBinding newBinding = _constructBinding (newCommands, eventArgs);
+
+        // Thread-safe: Add or update atomically
+        _bindings.AddOrUpdate (eventArgs, newBinding, (_, _) => newBinding);
     }
 
-    /// <summary>Removes a <typeparamref name="TEvent"/> from the collection.</summary>
-    /// <param name="eventArgs"></param>
-    public void Remove (TEvent eventArgs)
-    {
-        if (!TryGet (eventArgs, out _))
-        {
-            return;
-        }
-
-        _bindings.Remove (eventArgs);
-    }
+    /// <summary>Gets the commands bound with the specified <typeparamref name="TEvent"/>.</summary>
+    /// <remarks></remarks>
+    /// <param name="eventArgs">The <typeparamref name="TEvent"/> to check.</param>
+    /// <param name="binding">
+    ///     When this method returns, contains the commands bound with the <typeparamref name="TEvent"/>, if the
+    ///     <typeparamref name="TEvent"/> is
+    ///     not
+    ///     found; otherwise, null. This parameter is passed uninitialized.
+    /// </param>
+    /// <returns><see langword="true"/> if the <typeparamref name="TEvent"/> is bound; otherwise <see langword="false"/>.</returns>
+    public bool TryGet (TEvent eventArgs, out TBinding? binding) { return _bindings.TryGetValue (eventArgs, out binding); }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ColorPicker", "Color Picker.")]
+[ScenarioMetadata ("ColorPicker", "Color Picker and TrueColor demonstration.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Controls")]
 public class ColorPickers : Scenario
@@ -125,26 +125,25 @@ public class ColorPickers : Scenario
         app.Add (_demoView);
 
 
-        // Radio for switching color models
-        var rgColorModel = new RadioGroup ()
+        var osColorModel = new OptionSelector ()
         {
             Y = Pos.Bottom (_demoView),
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            RadioLabels = new []
-            {
+            Labels =
+            [
                 "_RGB",
                 "_HSV",
                 "H_SL",
                 "_16 Colors"
-            },
-            SelectedItem = (int)foregroundColorPicker.Style.ColorModel,
+            ],
+            Value = (int)foregroundColorPicker.Style.ColorModel,
         };
 
-        rgColorModel.SelectedItemChanged += (_, e) =>
+        osColorModel.ValueChanged += (_, e) =>
                                             {
                                                 // 16 colors
-                                                if (e.SelectedItem == 3)
+                                                if (e.Value == 3)
                                                 {
 
                                                     foregroundColorPicker16.Visible = true;
@@ -161,12 +160,17 @@ public class ColorPickers : Scenario
                                                 {
                                                     foregroundColorPicker16.Visible = false;
                                                     foregroundColorPicker.Visible = true;
-                                                    foregroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
-                                                    foregroundColorPicker.ApplyStyleChanges ();
 
-                                                    backgroundColorPicker16.Visible = false;
-                                                    backgroundColorPicker.Visible = true;
-                                                    backgroundColorPicker.Style.ColorModel = (ColorModel)e.SelectedItem;
+                                                    if (e.Value is { })
+                                                    {
+                                                        foregroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                                                        foregroundColorPicker.ApplyStyleChanges ();
+
+                                                        backgroundColorPicker16.Visible = false;
+                                                        backgroundColorPicker.Visible = true;
+                                                        backgroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                                                    }
+
                                                     backgroundColorPicker.ApplyStyleChanges ();
 
 
@@ -176,13 +180,13 @@ public class ColorPickers : Scenario
                                                 }
                                             };
 
-        app.Add (rgColorModel);
+        app.Add (osColorModel);
 
         // Checkbox for switching show text fields on and off
         var cbShowTextFields = new CheckBox ()
         {
             Text = "Show _Text Fields",
-            Y = Pos.Bottom (rgColorModel) + 1,
+            Y = Pos.Bottom (osColorModel) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             CheckedState = foregroundColorPicker.Style.ShowTextFields ? CheckState.Checked : CheckState.UnChecked,
@@ -216,6 +220,33 @@ public class ColorPickers : Scenario
                                            };
         app.Add (cbShowName);
 
+        var lblDriverName = new Label
+        {
+            Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{Application.Driver?.GetName ()}`:"
+        };
+        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
+
+        var cbSupportsTrueColor = new CheckBox
+        {
+            X = Pos.Right (lblDriverName) + 1,
+            Y = Pos.Top (lblDriverName),
+            CheckedState = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
+            CanFocus = false,
+            Enabled = false,
+            Text = "SupportsTrueColor"
+        };
+        app.Add (cbSupportsTrueColor);
+
+        var cbUseTrueColor = new CheckBox
+        {
+            X = Pos.Right (cbSupportsTrueColor) + 1,
+            Y = Pos.Top (lblDriverName),
+            CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            Enabled = canTrueColor,
+            Text = "Force16Colors"
+        };
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Force16Colors = evt.Result == CheckState.Checked; };
+        app.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
         // Set default colors.
         foregroundColorPicker.SelectedColor = _demoView.SuperView!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
         backgroundColorPicker.SelectedColor = _demoView.SuperView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();

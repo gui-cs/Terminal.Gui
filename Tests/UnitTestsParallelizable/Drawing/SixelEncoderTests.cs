@@ -1,5 +1,5 @@
 ﻿
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class SixelEncoderTests
 {

@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using Tui = Terminal.Gui.Drivers;
 
-namespace Terminal.Gui.Benchmarks.ConsoleDrivers.EscSeqUtils;
+namespace Terminal.Gui.Benchmarks.Drivers.EscSeqUtils;
 
 /// <summary>
 /// Compares the Set and Append implementations in combination.

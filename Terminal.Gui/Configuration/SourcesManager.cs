@@ -1,4 +1,4 @@
-﻿#nullable enable
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -14,7 +14,7 @@ public class SourcesManager
     /// <summary>
     ///     Provides a map from each of the <see cref="ConfigLocations"/> to file system and resource paths that have been loaded by <see cref="ConfigurationManager"/>.
     /// </summary>
-    public Dictionary<ConfigLocations, string> Sources { get; } = new ();
+    public ConcurrentDictionary<ConfigLocations, string> Sources { get; } = new ();
 
     /// <summary>INTERNAL: Loads <paramref name="stream"/> into the specified <see cref="SettingsScope"/>.</summary>
     /// <param name="settingsScope">The Settings Scope object that <paramref name="stream"/> will be loaded into.</param>
@@ -63,11 +63,8 @@ public class SourcesManager
 
     internal void AddSource (ConfigLocations location, string source)
     {
-        if (!Sources.TryAdd (location, source))
-        {
-            //Logging.Warning ($"{location} has already been added to Sources.");
-            Sources [location] = source;
-        }
+        // ConcurrentDictionary's AddOrUpdate is thread-safe
+        Sources.AddOrUpdate (location, source, (key, oldValue) => source);
     }
 
 

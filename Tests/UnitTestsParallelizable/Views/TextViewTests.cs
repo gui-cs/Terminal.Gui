@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿#nullable disable
+using System.Text;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TextViewTests
 {
@@ -1444,23 +1445,23 @@ public class TextViewTests
     public void Internal_Tests ()
     {
         var txt = "This is a text.";
-        List<Cell> txtRunes = Cell.StringToCells (txt);
-        Assert.Equal (txt.Length, txtRunes.Count);
-        Assert.Equal ('T', txtRunes [0].Rune.Value);
-        Assert.Equal ('h', txtRunes [1].Rune.Value);
-        Assert.Equal ('i', txtRunes [2].Rune.Value);
-        Assert.Equal ('s', txtRunes [3].Rune.Value);
-        Assert.Equal (' ', txtRunes [4].Rune.Value);
-        Assert.Equal ('i', txtRunes [5].Rune.Value);
-        Assert.Equal ('s', txtRunes [6].Rune.Value);
-        Assert.Equal (' ', txtRunes [7].Rune.Value);
-        Assert.Equal ('a', txtRunes [8].Rune.Value);
-        Assert.Equal (' ', txtRunes [9].Rune.Value);
-        Assert.Equal ('t', txtRunes [10].Rune.Value);
-        Assert.Equal ('e', txtRunes [11].Rune.Value);
-        Assert.Equal ('x', txtRunes [12].Rune.Value);
-        Assert.Equal ('t', txtRunes [13].Rune.Value);
-        Assert.Equal ('.', txtRunes [^1].Rune.Value);
+        List<Cell> txtStrings = Cell.StringToCells (txt);
+        Assert.Equal (txt.Length, txtStrings.Count);
+        Assert.Equal ("T", txtStrings [0].Grapheme);
+        Assert.Equal ("h", txtStrings [1].Grapheme);
+        Assert.Equal ("i", txtStrings [2].Grapheme);
+        Assert.Equal ("s", txtStrings [3].Grapheme);
+        Assert.Equal (" ", txtStrings [4].Grapheme);
+        Assert.Equal ("i", txtStrings [5].Grapheme);
+        Assert.Equal ("s", txtStrings [6].Grapheme);
+        Assert.Equal (" ", txtStrings [7].Grapheme);
+        Assert.Equal ("a", txtStrings [8].Grapheme);
+        Assert.Equal (" ", txtStrings [9].Grapheme);
+        Assert.Equal ("t", txtStrings [10].Grapheme);
+        Assert.Equal ("e", txtStrings [11].Grapheme);
+        Assert.Equal ("x", txtStrings [12].Grapheme);
+        Assert.Equal ("t", txtStrings [13].Grapheme);
+        Assert.Equal (".", txtStrings [^1].Grapheme);
 
         var col = 0;
         Assert.True (TextModel.SetCol (ref col, 80, 79));
@@ -1469,19 +1470,19 @@ public class TextViewTests
 
         var start = 0;
         var x = 8;
-        Assert.Equal (8, TextModel.GetColFromX (txtRunes, start, x));
-        Assert.Equal ('a', txtRunes [start + x].Rune.Value);
+        Assert.Equal (8, TextModel.GetColFromX (txtStrings, start, x));
+        Assert.Equal ("a", txtStrings [start + x].Grapheme);
         start = 1;
         x = 7;
-        Assert.Equal (7, TextModel.GetColFromX (txtRunes, start, x));
-        Assert.Equal ('a', txtRunes [start + x].Rune.Value);
+        Assert.Equal (7, TextModel.GetColFromX (txtStrings, start, x));
+        Assert.Equal ("a", txtStrings [start + x].Grapheme);
 
-        Assert.Equal ((15, 15), TextModel.DisplaySize (txtRunes));
-        Assert.Equal ((6, 6), TextModel.DisplaySize (txtRunes, 1, 7));
+        Assert.Equal ((15, 15), TextModel.DisplaySize (txtStrings));
+        Assert.Equal ((6, 6), TextModel.DisplaySize (txtStrings, 1, 7));
 
-        Assert.Equal (0, TextModel.CalculateLeftColumn (txtRunes, 0, 7, 8));
-        Assert.Equal (1, TextModel.CalculateLeftColumn (txtRunes, 0, 8, 8));
-        Assert.Equal (2, TextModel.CalculateLeftColumn (txtRunes, 0, 9, 8));
+        Assert.Equal (0, TextModel.CalculateLeftColumn (txtStrings, 0, 7, 8));
+        Assert.Equal (1, TextModel.CalculateLeftColumn (txtStrings, 0, 8, 8));
+        Assert.Equal (2, TextModel.CalculateLeftColumn (txtStrings, 0, 9, 8));
 
         var tm = new TextModel ();
         tm.AddLine (0, Cell.StringToCells ("This is first line."));
@@ -2050,9 +2051,9 @@ public class TextViewTests
         Assert.True (c1.Equals (c2));
         Assert.True (c2.Equals (c1));
 
-        c1.Rune = new ('a');
+        c1.Grapheme = new ("a");
         c1.Attribute = new ();
-        c2.Rune = new ('a');
+        c2.Grapheme = new ("a");
         c2.Attribute = new ();
         Assert.True (c1.Equals (c2));
         Assert.True (c2.Equals (c1));
@@ -2063,13 +2064,13 @@ public class TextViewTests
     {
         List<Cell> cells = new ()
         {
-            new () { Rune = new ('T') },
-            new () { Rune = new ('e') },
-            new () { Rune = new ('s') },
-            new () { Rune = new ('t') }
+            new () { Grapheme = new ("T") },
+            new () { Grapheme = new ("e") },
+            new () { Grapheme = new ("s") },
+            new () { Grapheme = new ("t") }
         };
         TextView tv = CreateTextView ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         tv.Load (cells);
 

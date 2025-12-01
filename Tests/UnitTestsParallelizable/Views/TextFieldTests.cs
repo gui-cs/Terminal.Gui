@@ -1,8 +1,10 @@
 ﻿using System.Text;
+using UnitTests;
+using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
-public class TextFieldTests
+public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Cancel_TextChanging_ThenBackspace ()
@@ -49,7 +51,7 @@ public class TextFieldTests
 
         tf.Selecting += (sender, args) => Assert.Fail ("Selected should not be raied.");
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Space);
@@ -65,7 +67,7 @@ public class TextFieldTests
         var selectingCount = 0;
         tf.Selecting += (sender, args) => selectingCount++;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Enter);
@@ -83,7 +85,7 @@ public class TextFieldTests
         var acceptedCount = 0;
         tf.Accepting += (sender, args) => acceptedCount++;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Enter);
@@ -116,7 +118,7 @@ public class TextFieldTests
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -131,7 +133,7 @@ public class TextFieldTests
 
         return;
 
-        void Accept (object sender, CommandEventArgs e) { accepted = true; }
+        void Accept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -170,7 +172,7 @@ public class TextFieldTests
 
         return;
 
-        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object? sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Fact]
@@ -197,7 +199,7 @@ public class TextFieldTests
 
         return;
 
-        void TextViewAccept (object sender, CommandEventArgs e)
+        void TextViewAccept (object? sender, CommandEventArgs e)
         {
             tfAcceptedInvoked = true;
             e.Handled = handle;
@@ -207,7 +209,7 @@ public class TextFieldTests
     [Fact]
     public void OnEnter_Does_Not_Throw_If_Not_IsInitialized_SetCursorVisibility ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
         var tf = new TextField { Width = 10 };
         top.Add (tf);
 
@@ -289,7 +291,7 @@ public class TextFieldTests
 
         return;
 
-        void HandleJKey (object s, Key arg)
+        void HandleJKey (object? s, Key arg)
         {
             if (arg.AsRune == new Rune ('j'))
             {
@@ -553,5 +555,81 @@ public class TextFieldTests
         Assert.Equal (2, tf.CursorPosition);
         Assert.Equal (new (3, 0), tf.PositionCursor ());
         Assert.Equal ("📄a", tf.Text);
+    }
+
+    [Fact]
+    public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        var tf = new TextField { Width = 3, Text = "ắ" };
+        tf.Driver = driver;
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+
+        tf.Text = "\u1eaf";
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+
+        tf.Text = "\u0103\u0301";
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+
+        tf.Text = "\u0061\u0306\u0301";
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+    }
+
+    [Fact]
+    public void Adjust_First ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
+        tf.Driver = driver;
+        tf.SetRelativeLayout (new (20, 20));
+        tf.Draw ();
+
+        Assert.Equal ("This is a test. ", GetContents ());
+
+        string GetContents ()
+        {
+            var sb = new StringBuilder ();
+
+            for (var i = 0; i < 16; i++)
+            {
+                sb.Append (driver.Contents! [0, i]!.Grapheme);
+            }
+
+            return sb.ToString ();
+        }
     }
 }

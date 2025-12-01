@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Frozen;
+﻿using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -597,15 +595,53 @@ public static class ConfigurationManager
                                                                                   TypeInfoResolver = SourceGenerationContext.Default
                                                                               });
 
+    private static SourcesManager? _sourcesManager = new ();
+    private static readonly object _sourcesManagerLock = new ();
+
     /// <summary>
     ///     Gets the Sources Manager - manages the loading of configuration sources from files and resources.
     /// </summary>
-    public static SourcesManager? SourcesManager { get; internal set; } = new ();
+    public static SourcesManager? SourcesManager
+    {
+        get
+        {
+            lock (_sourcesManagerLock)
+            {
+                return _sourcesManager;
+            }
+        }
+        internal set
+        {
+            lock (_sourcesManagerLock)
+            {
+                _sourcesManager = value;
+            }
+        }
+    }
+
+    private static string? _runtimeConfig = """{  }""";
+    private static readonly object _runtimeConfigLock = new ();
 
     /// <summary>
     ///     Gets or sets the in-memory config.json. See <see cref="ConfigLocations.Runtime"/>.
     /// </summary>
-    public static string? RuntimeConfig { get; set; } = """{  }""";
+    public static string? RuntimeConfig
+    {
+        get
+        {
+            lock (_runtimeConfigLock)
+            {
+                return _runtimeConfig;
+            }
+        }
+        set
+        {
+            lock (_runtimeConfigLock)
+            {
+                _runtimeConfig = value;
+            }
+        }
+    }
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly string _configFilename = "config.json";
@@ -680,13 +716,32 @@ public static class ConfigurationManager
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static StringBuilder _jsonErrors = new ();
 
+    private static bool? _throwOnJsonErrors = false;
+    private static readonly object _throwOnJsonErrorsLock = new ();
+
     /// <summary>
     ///     Gets or sets whether the <see cref="ConfigurationManager"/> should throw an exception if it encounters an
     ///     error on deserialization. If <see langword="false"/> (the default), the error is logged and printed to the console
     ///     when <see cref="Application.Shutdown"/> is called.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool? ThrowOnJsonErrors { get; set; } = false;
+    public static bool? ThrowOnJsonErrors
+    {
+        get
+        {
+            lock (_throwOnJsonErrorsLock)
+            {
+                return _throwOnJsonErrors;
+            }
+        }
+        set
+        {
+            lock (_throwOnJsonErrorsLock)
+            {
+                _throwOnJsonErrors = value;
+            }
+        }
+    }
 
 #pragma warning disable IDE1006 // Naming Styles
     private static readonly object _jsonErrorsLock = new ();
@@ -760,8 +815,27 @@ public static class ConfigurationManager
         return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext!);
     }
 
+    private static string _appName = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
+    private static readonly object _appNameLock = new ();
+
     /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
-    public static string AppName { get; set; } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
+    public static string AppName
+    {
+        get
+        {
+            lock (_appNameLock)
+            {
+                return _appName;
+            }
+        }
+        set
+        {
+            lock (_appNameLock)
+            {
+                _appName = value;
+            }
+        }
+    }
 
     /// <summary>
     ///     INTERNAL: Retrieves all uninitialized configuration properties that belong to a specific scope from the cache.

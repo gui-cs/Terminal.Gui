@@ -1,3 +1,4 @@
+#nullable disable
 using System.Globalization;
 
 namespace Terminal.Gui.Views;
@@ -16,7 +17,7 @@ public class TextField : View, IDesignable
     private int _selectedStart; // -1 represents there is no text selection.
     private string _selectedText;
     private int _start;
-    private List<Rune> _text;
+    private List<string> _text;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextField"/> class.
@@ -28,9 +29,6 @@ public class TextField : View, IDesignable
         _selectedStart = -1;
         _text = new ();
 
-        // TODO: Determine if this is a good choice. Previously this was hard coded to 
-        // TODO: DarkGray which was NOT a good choice.
-        CaptionColor = GetAttributeForRole (VisualRole.Normal).Foreground.GetBrighterColor();
         ReadOnly = false;
         Autocomplete = new TextFieldAutocomplete ();
         Height = Dim.Auto (DimAutoStyle.Text, 1);
@@ -39,9 +37,6 @@ public class TextField : View, IDesignable
         CursorVisibility = CursorVisibility.Default;
         Used = true;
         WantMousePositionReports = true;
-
-        // By default, disable hotkeys (in case someome sets Title)
-        HotKeySpecifier = new ('\xffff');
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -324,6 +319,30 @@ public class TextField : View, IDesignable
                     }
                    );
 
+        AddCommand (
+                    Command.HotKey,
+                    ctx =>
+                    {
+                        if (RaiseHandlingHotKey (ctx) is true)
+                        {
+                            return true;
+                        }
+
+                        // If we have focus, then ignore the hotkey because the user
+                        // means to enter it
+                        if (HasFocus)
+                        {
+                            return false;
+                        }
+
+                        // This is what the default HotKey handler does:
+                        SetFocus ();
+
+                        // Always return true on hotkey, even if SetFocus fails because 
+                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
+                        return true;
+                    });
+
         // Default keybindings for this view
         // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
         KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
@@ -400,9 +419,6 @@ public class TextField : View, IDesignable
         KeyBindings.Remove (Key.Space);
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-        CreateContextMenu ();
-        KeyBindings.Add (ContextMenu.Key, Command.Context);
     }
 
     /// <summary>
@@ -410,15 +426,6 @@ public class TextField : View, IDesignable
     ///     <see cref="ISuggestionGenerator"/> to enable this feature.
     /// </summary>
     public IAutocomplete Autocomplete { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the text to render in control when no value has been entered yet and the <see cref="View"/> does
-    ///     not yet have input focus.
-    /// </summary>
-    public string Caption { get; set; }
-
-    /// <summary>Gets or sets the foreground <see cref="Color"/> to use when rendering <see cref="Caption"/>.</summary>
-    public Color CaptionColor { get; set; }
 
     /// <summary>Get the Context Menu for this view.</summary>
     [CanBeNull]
@@ -534,7 +541,7 @@ public class TextField : View, IDesignable
             ClearAllSelection ();
 
             // Note we use NewValue here; TextChanging subscribers may have changed it
-            _text = args.Result.EnumerateRunes ().ToList ();
+            _text = args.Result.ToStringList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -610,7 +617,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        Clipboard.Contents = SelectedText;
+        App?.Clipboard?.SetClipboardData (SelectedText);
     }
 
     /// <summary>Cut the selected text to the clipboard.</summary>
@@ -621,8 +628,8 @@ public class TextField : View, IDesignable
             return;
         }
 
-        Clipboard.Contents = SelectedText;
-        List<Rune> newText = DeleteSelectedText ();
+        App?.Clipboard?.SetClipboardData (SelectedText);
+        List<string> newText = DeleteSelectedText ();
         Text = StringExtensions.ToString (newText);
         Adjust ();
     }
@@ -693,7 +700,7 @@ public class TextField : View, IDesignable
         }
         else
         {
-            List<Rune> newText = DeleteSelectedText ();
+            List<string> newText = DeleteSelectedText ();
             Text = StringExtensions.ToString (newText);
             Adjust ();
         }
@@ -727,7 +734,7 @@ public class TextField : View, IDesignable
         }
         else
         {
-            List<Rune> newText = DeleteSelectedText ();
+            List<string> newText = DeleteSelectedText ();
             Text = StringExtensions.ToString (newText);
             Adjust ();
         }
@@ -855,16 +862,16 @@ public class TextField : View, IDesignable
             _isButtonReleased = false;
             PrepareSelection (x);
 
-            if (Application.Mouse.MouseGrabView is null)
+            if (App?.Mouse.MouseGrabView is null)
             {
-                Application.Mouse.GrabMouse (this);
+                App?.Mouse.GrabMouse (this);
             }
         }
         else if (ev.Flags == MouseFlags.Button1Released)
         {
             _isButtonReleased = true;
             _isButtonPressed = false;
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
         }
         else if (ev.Flags == MouseFlags.Button1DoubleClicked)
         {
@@ -920,7 +927,7 @@ public class TextField : View, IDesignable
         _isDrawing = true;
 
         // Cache attributes as GetAttributeForRole might raise events
-        Attribute selectedAttribute = new Attribute (GetAttributeForRole (VisualRole.Active));
+        var selectedAttribute = new Attribute (GetAttributeForRole (VisualRole.Active));
         Attribute readonlyAttribute = GetAttributeForRole (VisualRole.ReadOnly);
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Editable);
 
@@ -936,14 +943,14 @@ public class TextField : View, IDesignable
 
         for (int idx = p; idx < tcount; idx++)
         {
-            Rune rune = _text [idx];
-            int cols = rune.GetColumns ();
+            string text = _text [idx];
+            int cols = text.GetColumns ();
 
             if (!Enabled)
             {
                 // Disabled
                 SetAttributeForRole (VisualRole.Disabled);
-            } 
+            }
             else if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
             {
                 // Selected text
@@ -973,7 +980,7 @@ public class TextField : View, IDesignable
 
             if (col + cols <= width)
             {
-                AddRune (Secret ? Glyphs.Dot : rune);
+                AddStr (Secret ? Glyphs.Dot.ToString () : text);
             }
 
             if (!TextModel.SetCol (ref col, width, cols))
@@ -1007,13 +1014,10 @@ public class TextField : View, IDesignable
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
-        if (Application.Mouse.MouseGrabView is { } && Application.Mouse.MouseGrabView == this)
+        if (App?.Mouse.MouseGrabView is { } && App?.Mouse.MouseGrabView == this)
         {
-            Application.Mouse.UngrabMouse ();
+            App?.Mouse.UngrabMouse ();
         }
-
-        //if (SelectedLength != 0 && !(Application.Mouse.MouseGrabView is MenuBar))
-        //	ClearAllSelection ();
     }
 
     /// <inheritdoc/>
@@ -1075,7 +1079,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        string cbTxt = Clipboard.Contents.Split ("\n") [0] ?? "";
+        string cbTxt = App?.Clipboard?.GetClipboardData ()?.Split ("\n") [0];
 
         if (string.IsNullOrEmpty (cbTxt))
         {
@@ -1157,7 +1161,6 @@ public class TextField : View, IDesignable
     ///// </summary>
     //public event EventHandler<StateEventArgs<string>> TextChanged;
 
-
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
     {
@@ -1230,7 +1233,7 @@ public class TextField : View, IDesignable
         DisposeContextMenu ();
 
         PopoverMenu menu = new (
-                                new List<MenuItemv2>
+                                new List<MenuItem>
                                 {
                                     new (this, Command.SelectAll, Strings.ctxSelectAll),
                                     new (this, Command.DeleteAll, Strings.ctxDeleteAll),
@@ -1246,11 +1249,12 @@ public class TextField : View, IDesignable
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
+        App?.Popover.Register (ContextMenu);
     }
 
     private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
 
-    private List<Rune> DeleteSelectedText ()
+    private List<string> DeleteSelectedText ()
     {
         SetSelectedStartSelectedLength ();
         int selStart = SelectedStart > -1 ? _start : _cursorPosition;
@@ -1266,7 +1270,7 @@ public class TextField : View, IDesignable
         ClearAllSelection ();
         _cursorPosition = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 
-        return newText.ToRuneList ();
+        return newText.ToStringList ();
     }
 
     private void GenerateSuggestions ()
@@ -1314,7 +1318,7 @@ public class TextField : View, IDesignable
                           new (_cursorPosition, 0)
                          );
 
-        List<Rune> newText = _text;
+        List<string> newText = _text;
 
         if (SelectedLength > 0)
         {
@@ -1335,7 +1339,7 @@ public class TextField : View, IDesignable
 
             if (_cursorPosition == newText.Count + 1)
             {
-                SetText (newText.Concat (kbstr).ToList ());
+                SetText (newText.Concat (kbstr.Select (r => r.ToString ())).ToList ());
             }
             else
             {
@@ -1346,7 +1350,7 @@ public class TextField : View, IDesignable
 
                 SetText (
                          newText.GetRange (0, _preTextChangedCursorPos)
-                                .Concat (kbstr)
+                                .Concat (kbstr.Select (r => r.ToString ()))
                                 .Concat (
                                          newText.GetRange (
                                                            _preTextChangedCursorPos,
@@ -1363,7 +1367,7 @@ public class TextField : View, IDesignable
         {
             SetText (
                      newText.GetRange (0, _preTextChangedCursorPos)
-                            .Concat (kbstr)
+                            .Concat (kbstr.Select (r => r.ToString ()))
                             .Concat (
                                      newText.GetRange (
                                                        Math.Min (_preTextChangedCursorPos + 1, newText.Count),
@@ -1699,32 +1703,37 @@ public class TextField : View, IDesignable
     private void RenderCaption ()
     {
         if (HasFocus
-            || Caption == null
-            || Caption.Length == 0
+            || string.IsNullOrEmpty (Title)
             || Text?.Length > 0)
         {
             return;
         }
 
-        var color = new Attribute (CaptionColor, GetAttributeForRole (VisualRole.Editable).Background, GetAttributeForRole (VisualRole.Editable).Style);
-        SetAttribute (color);
-
-        Move (0, 0);
-        string render = Caption;
-
-        if (render.GetColumns () > Viewport.Width)
+        // Ensure TitleTextFormatter has the current Title text
+        // (should already be set by the Title property setter, but being defensive)
+        if (TitleTextFormatter.Text != Title)
         {
-            render = render [..Viewport.Width];
+            TitleTextFormatter.Text = Title;
         }
 
-        AddStr (render);
+        var captionAttribute = new Attribute (
+                                              GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                              GetAttributeForRole (VisualRole.Editable).Background);
+
+        var hotKeyAttribute = new Attribute (
+                                             GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
+                                             GetAttributeForRole (VisualRole.Editable).Background,
+                                             GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+
+        // Use TitleTextFormatter to render the caption with hotkey support
+        TitleTextFormatter.Draw (driver: Driver, screen: ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), normalColor: captionAttribute, hotColor: hotKeyAttribute);
     }
 
-    private void SetClipboard (IEnumerable<Rune> text)
+    private void SetClipboard (IEnumerable<string> text)
     {
-        if (!Secret)
+        if (!Secret && App?.Clipboard is { })
         {
-            Clipboard.Contents = StringExtensions.ToString (text.ToList ());
+            App.Clipboard.SetClipboardData (StringExtensions.ToString (text.ToList ()));
         }
     }
 
@@ -1746,19 +1755,14 @@ public class TextField : View, IDesignable
         }
     }
 
-    private void SetText (List<Rune> newText) { Text = StringExtensions.ToString (newText); }
-    private void SetText (IEnumerable<Rune> newText) { SetText (newText.ToList ()); }
+    private void SetText (List<string> newText) { Text = StringExtensions.ToString (newText); }
+    private void SetText (IEnumerable<string> newText) { SetText (newText.ToList ()); }
 
     private void ShowContextMenu (bool keyboard)
     {
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
-
-            if (ContextMenu is { })
-            {
-                CreateContextMenu ();
-            }
         }
 
         if (keyboard)
@@ -1801,6 +1805,10 @@ public class TextField : View, IDesignable
             Autocomplete.HostControl = this;
             Autocomplete.PopupInsideContainer = false;
         }
+
+        CreateContextMenu ();
+        KeyBindings.Add (ContextMenu?.Key, Command.Context);
+
     }
 
     private void DisposeContextMenu ()
@@ -1814,11 +1822,11 @@ public class TextField : View, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Text = "This is a test.";
-        Caption = "Caption";
+        Title = "Caption";
 
         return true;
     }

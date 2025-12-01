@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Drawing;
 using System.Reflection;
 
 namespace UnitTests;
@@ -7,7 +6,7 @@ namespace UnitTests;
 /// <summary>
 ///     Base class for tests that need to test all views.
 /// </summary>
-public class TestsAllViews
+public class TestsAllViews : FakeDriverBase
 {
     /// <summary>
     ///     Gets all view types.
@@ -15,13 +14,12 @@ public class TestsAllViews
     public static IEnumerable<object []> AllViewTypes =>
         typeof (View).Assembly
                      .GetTypes ()
-                     .Where (
-                             type => type is { IsClass: true, IsAbstract: false, IsPublic: true }
+                     .Where (type => type is { IsClass: true, IsAbstract: false, IsPublic: true }
                                      && (type.IsSubclassOf (typeof (View)) || type == typeof (View)))
                      .Select (type => new object [] { type });
 
     /// <summary>
-    ///    Creates an instance of a view if it is not a generic type.
+    ///     Creates an instance of a view if it is not a generic type.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -43,8 +41,7 @@ public class TestsAllViews
     public static List<Type> GetAllViewClasses ()
     {
         return typeof (View).Assembly.GetTypes ()
-                            .Where (
-                                    myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
+                            .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
                                               && myType.IsSubclassOf (typeof (View))
                                    )
                             .ToList ();
@@ -67,7 +64,15 @@ public class TestsAllViews
             // use <object> or the original type if applicable
             foreach (Type arg in type.GetGenericArguments ())
             {
-                if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
+                // Check if this type parameter has constraints that object can't satisfy
+                Type [] constraints = arg.GetGenericParameterConstraints ();
+
+                // If there's a View constraint, use View instead of object
+                if (constraints.Any (c => c == typeof (View) || c.IsSubclassOf (typeof (View))))
+                {
+                    typeArguments.Add (typeof (View));
+                }
+                else if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
                 {
                     typeArguments.Add (arg);
                 }
@@ -83,7 +88,16 @@ public class TestsAllViews
             if (type.ContainsGenericParameters)
             {
                 Logging.Warning ($"Cannot create an instance of {type} because it contains generic parameters.");
+
                 //throw new ArgumentException ($"Cannot create an instance of {type} because it contains generic parameters.");
+                return null;
+            }
+
+            // Check if the type has required properties that can't be satisfied by Activator.CreateInstance
+            // This handles cases like RunnableWrapper which has a required WrappedView property
+            if (HasRequiredProperties (type))
+            {
+                Logging.Warning ($"Cannot create an instance of {type} because it has required properties that must be set.");
                 return null;
             }
 
@@ -141,6 +155,16 @@ public class TestsAllViews
         return viewType;
     }
 
+    /// <summary>
+    ///     Checks if a type has required properties (C# 11 feature).
+    /// </summary>
+    private static bool HasRequiredProperties (Type type)
+    {
+        // Check all public instance properties for the RequiredMemberAttribute
+        return type.GetProperties (BindingFlags.Public | BindingFlags.Instance)
+                   .Any (p => p.GetCustomAttributes (typeof (System.Runtime.CompilerServices.RequiredMemberAttribute), true).Any ());
+    }
+
     private static void AddArguments (Type paramType, List<object> pTypes)
     {
         if (paramType == typeof (Rectangle))
@@ -165,7 +189,7 @@ public class TestsAllViews
         }
         else if (paramType.Name == "View")
         {
-            var top = new Toplevel ();
+            var top = new Runnable ();
             var view = new View ();
             top.Add (view);
             pTypes.Add (view);

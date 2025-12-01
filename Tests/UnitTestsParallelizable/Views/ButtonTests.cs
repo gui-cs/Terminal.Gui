@@ -1,10 +1,13 @@
-namespace UnitTests_Parallelizable.ViewsTests;
+#nullable disable
+using UnitTests;
+
+namespace ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="Button"/> that don't require Application static dependencies.
 /// These tests can run in parallel without interference.
 /// </summary>
-public class ButtonTests : UnitTests.Parallelizable.ParallelizableBase
+public class ButtonTests : FakeDriverBase
 {
     [Fact]
     public void Text_Mirrors_Title ()

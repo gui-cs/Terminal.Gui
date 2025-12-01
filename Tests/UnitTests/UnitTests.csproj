@@ -27,6 +27,11 @@
 		<Optimize>true</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Drivers\**" />
+	  <EmbeddedResource Remove="Drivers\**" />
+	  <None Remove="Drivers\**" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
 		<PackageReference Include="Moq" />
@@ -58,26 +63,4 @@
 		<Using Include="Terminal.Gui" />
 		<Using Include="Xunit" />
 	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Input\Mouse\" />
-	</ItemGroup>
-	<PropertyGroup Label="FineCodeCoverage">
-		<Enabled>
-			False
-		</Enabled>
-		<Exclude>
-			[UICatalog]*
-		</Exclude>
-		<Include></Include>
-		<ExcludeByFile>
-			<!--**/Migrations/*
-      **/Hacks/*.cs-->
-		</ExcludeByFile>
-		<ExcludeByAttribute>
-			<!--MyCustomExcludeFromCodeCoverage-->
-		</ExcludeByAttribute>
-		<IncludeTestAssembly>
-			False
-		</IncludeTestAssembly>
-	</PropertyGroup>
 </Project>

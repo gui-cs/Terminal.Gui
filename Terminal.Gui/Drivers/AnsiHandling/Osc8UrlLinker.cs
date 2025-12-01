@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.Drivers;
 
@@ -33,7 +32,7 @@ internal static class Osc8UrlLinker
 
     internal static StringBuilder WrapOsc8 (StringBuilder input, Options options)
     {
-        if (input is null || input.Length == 0)
+        if (input.Length == 0)
         {
             return input;
         }

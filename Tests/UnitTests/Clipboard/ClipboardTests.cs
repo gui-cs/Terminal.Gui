@@ -21,6 +21,27 @@ public class ClipboardTests
     }
 
     [Fact, AutoInitShutdown (useFakeClipboard: true)]
+    public void IApplication_Clipboard_Property_Works ()
+    {
+        if (Application.Clipboard?.IsSupported != true)
+        {
+            output.WriteLine ($"The Clipboard not supported on this platform.");
+            return;
+        }
+
+        string clipText = "The IApplication_Clipboard_Property_Works unit test pasted this to the OS clipboard.";
+        
+        // Use the new IApplication.Clipboard property
+        Application.Clipboard.SetClipboardData (clipText);
+
+        ApplicationImpl.Instance.Iteration += (s, a) => ApplicationImpl.Instance.RequestStop ();
+        ApplicationImpl.Instance.Run<Runnable<bool>>().Dispose();
+
+        Assert.True(Application.Clipboard.TryGetClipboardData(out string result));
+        Assert.Equal (clipText, result);
+    }
+
+    [Fact, AutoInitShutdown (useFakeClipboard: true)]
     public void Contents_Fake_Gets_Sets ()
     {
         if (!Clipboard.IsSupported)
@@ -33,7 +54,7 @@ public class ClipboardTests
         string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
         Clipboard.Contents = clipText;
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
         Application.Run ();
 
         Assert.Equal (clipText, Clipboard.Contents);
@@ -52,7 +73,7 @@ public class ClipboardTests
         string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
         Clipboard.Contents = clipText;
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
         Application.Run ();
 
         Assert.Equal (clipText, Clipboard.Contents);
@@ -71,7 +92,7 @@ public class ClipboardTests
         string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
         Clipboard.Contents = clipText;
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
         Application.Run ();
 
         Assert.Equal (clipText, Clipboard.Contents);
@@ -90,7 +111,7 @@ public class ClipboardTests
         string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
         Clipboard.Contents = clipText;
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
         Application.Run ();
 
         Assert.Equal (clipText, Clipboard.Contents);
@@ -115,7 +136,7 @@ public class ClipboardTests
         string clipText = "The TryGetClipboardData_Gets_From_OS_Clipboard unit test pasted this to the OS clipboard.";
         Clipboard.Contents = clipText;
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         Application.Run ();
 
@@ -145,7 +166,7 @@ public class ClipboardTests
             Assert.False (Clipboard.TrySetClipboardData (clipText));
         }
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        ApplicationImpl.Instance.Iteration += (s, a) => Application.RequestStop ();
 
         Application.Run ();
 
@@ -173,7 +194,7 @@ public class ClipboardTests
 			var failed = false;
 			var getClipText = "";
 
-			Application.Iteration += (s, a) => {
+			ApplicationImpl.Instance.Iteration += (s, a) => {
 				int exitCode = 0;
 				string result = "";
 				output.WriteLine ($"Pasting to OS clipboard: {clipText}...");
@@ -247,7 +268,7 @@ public class ClipboardTests
 			var clipReadText = "";
 			var failed = false;
 
-			Application.Iteration += (s, a) => {
+			ApplicationImpl.Instance.Iteration += (s, a) => {
 				Clipboard.Contents = clipText;
 
 				int exitCode = 0;

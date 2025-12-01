@@ -31,17 +31,17 @@ A scrollable map of the Unicode codepoints.
 
 ```text
 0  1  2  3  4  5  6  7  8  9  a  b  c  d
-U+00000_                                         ▲
-U+00001_                                         █
+U+00000_ ␀  ␁  ␂  ␃  ␄  ␅  ␆  ␇  ␈  ␉  ␊  ␋  ␌  ␍▲
+U+00001_ ␐  ␑  ␒  ␓  ␔  ␕  ␖  ␗  ␘  ␙  ␚  ␛  ␜  ␝█
 U+00002_    !  "  #  $  %  &  '  (  )  *  +  ,  -░
 U+00003_ 0  1  2  3  4  5  6  7  8  9  :  ;  <  =░
 U+00004_ @  A  B  C  D  E  F  G  H  I  J  K  L  M░
 U+00005_ P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]░
 U+00006_ `  a  b  c  d  e  f  g  h  i  j  k  l  m░
 U+00007_ p  q  r  s  t  u  v  w  x  y  z  {  |  }░
-U+00008_                                         ░
-U+00009_                                         ░
-U+0000a_    ¡  ¢  £  ¤  ¥  ¦  §  ¨  ©  ª  «  ¬  ­░
+U+00008_ ⒀  ⒁  ⒂  ⒃  ⒄  ⒅  ⒆  ⒇  ⒈  ⒉  ⒊  ⒋  ⒌  ⒍░
+U+00009_ ⒐  ⒑  ⒒  ⒓  ⒔  ⒕  ⒖  ⒗  ⒘  ⒙  ⒚  ⒛  ⒜  ⒝░
+U+0000a_    ¡  ¢  £  ¤  ¥  ¦  §  ¨  ©  ª  «  ¬  F░
 U+0000b_ °  ±  ²  ³  ´  µ  ¶  ·  ¸  ¹  º  »  ¼  ½░
 U+0000c_ À  Á  Â  Ã  Ä  Å  Æ  Ç  È  É  Ê  Ë  Ì  Í░
 U+0000d_ Ð  Ñ  Ò  Ó  Ô  Õ  Ö  ×  Ø  Ù  Ú  Û  Ü  Ý░
@@ -49,7 +49,7 @@ U+0000e_ à  á  â  ã  ä  å  æ  ç  è  é  ê  ë  ì  í░
 U+0000f_ ð  ñ  ò  ó  ô  õ  ö  ÷  ø  ù  ú  û  ü  ý░
 U+00010_ Ā  ā  Ă  ă  Ą  ą  Ć  ć  Ĉ  ĉ  Ċ  ċ  Č  č░
 U+00011_ Đ  đ  Ē  ē  Ĕ  ĕ  Ė  ė  Ę  ę  Ě  ě  Ĝ  ĝ▼
-        ◄█████████████████████████████████░░░░░░►
+        ◄████████████████████████████░░░░░░░░░░░►
 ```
 
 ## [CheckBox](~/api/Terminal.Gui.Views.CheckBox.yml)
@@ -102,15 +102,15 @@ Lets the user pick a date from a visual calendar.
 
 ```text
 ┌┤Demo Title├────────────────┐
-│Date:  05/31/2025           │
+│Date:  10/31/2025           │
 │┌───┬───┬───┬───┬───┬───┬──┐│
 ││Sun│Mon│Tue│Wed│Thu│Fri│Sa││
 │├───┼───┼───┼───┼───┼───┼──┤│
-││-  │-  │-  │-  │1  │2  │3 ││
-││4  │5  │6  │7  │8  │9  │10││
-││11 │12 │13 │14 │15 │16 │17││
-││18 │19 │20 │21 │22 │23 │24││
-││25 │26 │27 │28 │29 │30 │31││
+││-  │-  │-  │1  │2  │3  │4 ││
+││5  │6  │7  │8  │9  │10 │11││
+││12 │13 │14 │15 │16 │17 │18││
+││19 │20 │21 │22 │23 │24 │25││
+││26 │27 │28 │29 │30 │31 │- ││
 ││-  │-  │-  │-  │-  │-  │- ││
 │└───┴───┴───┴───┴───┴───┴──┘│
 │           ◄◄  ►►           │
@@ -119,7 +119,7 @@ Lets the user pick a date from a visual calendar.
 
 ## [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
 
-A [Toplevel.Modal](~/api/Terminal.Gui.Views.Toplevel.Modal.yml) [Window](~/api/Terminal.Gui.Views.Window.yml). Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
+A [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.Modal.yml) [Window](~/api/Terminal.Gui.Views.Window.yml). Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
 
 ```text
 ┏┥Demo Title┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -157,11 +157,11 @@ The base-class for [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) and [Sa
 ┃│\_exported_templates│               │┃
 ┃│\_site              │               │┃
 ┃│\api                │               │┃
+┃│\apispec            │               │┃
 ┃│\docs               │               │┃
 ┃│\images             │               │┃
-┃│\schemas            │               │┃
-┃│\scripts            │               │┃
-┃⟦ ►► ⟧ Enter Search⟦► OK ◄⟧ ⟦ Cancel ⟧┃
+┃Find                                  ┃
+┃⟦►Tree⟧            ⟦► OK ◄⟧ ⟦ Cancel ⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
@@ -172,6 +172,7 @@ Provides a user interface for displaying and selecting non-mutually-exclusive fl
 ```text
 ☒ No Style
 ☐ Show None Value Style
+☐ ShowAllFlag
 ☐ Show Value Editor Style
 ☐ All Styles
 0
@@ -307,6 +308,12 @@ Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.y
 ──────────────────────────────────────────────────
 ```
 
+## [LineView](~/api/Terminal.Gui.Views.LineView.yml)
+
+A straight line control either horizontal or vertical
+
+
+
 ## [ListView](~/api/Terminal.Gui.Views.ListView.yml)
 
 Provides a scrollable list of data where each item can be activated to perform an action.
@@ -320,7 +327,7 @@ Last List Item
 
 ## [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml)
 
-Provides a menu bar that spans the top of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) View with drop-down and cascading menus.  By default, any sub-sub-menus (sub-menus of the [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)s added to [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting [MenuBar.UseSubMenusSingleFrame](~/api/Terminal.Gui.Views.MenuBar.UseSubMenusSingleFrame.yml) to true, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar. 
+Provides a menu bar that spans the top of a [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) View with drop-down and cascading menus.  By default, any sub-sub-menus (sub-menus of the [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)s added to [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting [MenuBar.UseSubMenusSingleFrame](~/api/Terminal.Gui.Views.MenuBar.UseSubMenusSingleFrame.yml) to true, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar. 
 
 ```text
 File  Edit  About (Top-Level)
@@ -391,11 +398,11 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 ┃│\_exported_templates│               │┃
 ┃│\_site              │               │┃
 ┃│\api                │               │┃
+┃│\apispec            │               │┃
 ┃│\docs               │               │┃
 ┃│\images             │               │┃
-┃│\schemas            │               │┃
-┃│\scripts            │               │┃
-┃⟦ ►► ⟧ Enter Search⟦► OK ◄⟧ ⟦ Cancel ⟧┃
+┃Find                                  ┃
+┃⟦►Tree⟧            ⟦► OK ◄⟧ ⟦ Cancel ⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
@@ -404,7 +411,7 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time.
 
 ```text
-○ Option 1
+◉ Option 1
 ○ Option 2
 ○ Third Option
 ○ Option Quattro
@@ -428,11 +435,7 @@ A Progress Bar view that can indicate progress of an activity visually.
 
 Displays a list of mutually-exclusive items. Each items can have its own hotkey.
 
-```text
-◉ Option 1
-○ Option 2
-○ Option 3
-```
+
 
 ## [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml)
 
@@ -449,11 +452,11 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 ┃│\_exported_templates│               │┃
 ┃│\_site              │               │┃
 ┃│\api                │               │┃
+┃│\apispec            │               │┃
 ┃│\docs               │               │┃
 ┃│\images             │               │┃
-┃│\schemas            │               │┃
-┃│\scripts            │               │┃
-┃⟦ ►► ⟧ Enter Sear⟦► Save ◄⟧ ⟦ Cancel ⟧┃
+┃Find                                  ┃
+┃⟦►Tree⟧          ⟦► Save ◄⟧ ⟦ Cancel ⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
@@ -515,7 +518,7 @@ Demo Text
 
 ## [Slider\<T\>](~/api/Terminal.Gui.Views.Slider-1.yml)
 
-Provides a tpe-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
+Provides a type-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
 
 
@@ -529,7 +532,7 @@ Displays a spinning glyph or combinations of glyphs to indicate progress or acti
 
 ## [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml)
 
-A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
+A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of a [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
 
 ```text
 Ctrl+Z  Quit  Quit │ F1  Help Text  Help │ F10  ☐
@@ -628,6 +631,12 @@ TextView provides a fully featured multi-line text
 It supports word wrap and history for undo.
 ```
 
+## [TileView](~/api/Terminal.Gui.Views.TileView.yml)
+
+A [View](~/api/Terminal.Gui.ViewBase.View.yml) consisting of a moveable bar that divides the display area into resizeable [TileView.Tiles](~/api/Terminal.Gui.Views.TileView.Tiles.yml).
+
+
+
 ## [TimeField](~/api/Terminal.Gui.Views.TimeField.yml)
 
 Provides time editing functionality with mouse support
@@ -636,9 +645,9 @@ Provides time editing functionality with mouse support
 02:48:05
 ```
 
-## [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml)
+## [Runnable](~/api/Terminal.Gui.Views.Runnable.yml)
 
-Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as [Dialog](~/api/Terminal.Gui.Views.Dialog.yml), [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml), and [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)).
+Runnable views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as [Dialog](~/api/Terminal.Gui.Views.Dialog.yml), [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml), and [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)).
 
 ```text
 Demo Text
@@ -710,7 +719,7 @@ Provides navigation and a user interface (UI) to collect related data across mul
 ║                                        ║
 ║                                        ║
 ║                                        ║
-║────────────────────────────────────────║
+╟────────────────────────────────────────╢
 ║⟦ Back ⟧                    ⟦► Finish ◄⟧║
 ╚════════════════════════════════════════╝
 ```

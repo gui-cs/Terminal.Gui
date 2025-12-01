@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
@@ -141,6 +139,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
             bool isEscape = currentChar == ESCAPE;
 
+            // Logging.Trace($"Processing character '{currentChar}' (isEscape: {isEscape})");
             switch (State)
             {
                 case AnsiResponseParserState.Normal:
@@ -261,7 +260,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
-                    Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
+                    //Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
                 }
             }
         }
@@ -342,7 +341,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
                 {
                     _heldContent.ClearHeld ();
 
-                    Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
+                    //Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
 
                     // Do not send back to input stream
                     return false;
@@ -403,7 +402,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
         if (matchingResponse?.Response != null)
         {
-            Logging.Trace ($"AnsiResponseParser processed '{cur}'");
+            //Logging.Trace ($"AnsiResponseParser processed '{cur}'");
 
             if (invokeCallback)
             {
@@ -479,16 +478,14 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 }
 
-internal class AnsiResponseParser<T> : AnsiResponseParserBase
+internal class AnsiResponseParser<TInputRecord> () : AnsiResponseParserBase (new GenericHeld<TInputRecord> ())
 {
-    public AnsiResponseParser () : base (new GenericHeld<T> ()) { }
-
     /// <inheritdoc cref="AnsiResponseParser.UnknownResponseHandler"/>
-    public Func<IEnumerable<Tuple<char, T>>, bool> UnexpectedResponseHandler { get; set; } = _ => false;
+    public Func<IEnumerable<Tuple<char, TInputRecord>>, bool> UnexpectedResponseHandler { get; set; } = _ => false;
 
-    public IEnumerable<Tuple<char, T>> ProcessInput (params Tuple<char, T> [] input)
+    public IEnumerable<Tuple<char, TInputRecord>> ProcessInput (params Tuple<char, TInputRecord> [] input)
     {
-        List<Tuple<char, T>> output = new ();
+        List<Tuple<char, TInputRecord>> output = [];
 
         ProcessInputBase (
                           i => input [i].Item1,
@@ -499,22 +496,22 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
         return output;
     }
 
-    private void AppendOutput (List<Tuple<char, T>> output, object c)
+    private void AppendOutput (List<Tuple<char, TInputRecord>> output, object c)
     {
-        Tuple<char, T> tuple = (Tuple<char, T>)c;
+        Tuple<char, TInputRecord> tuple = (Tuple<char, TInputRecord>)c;
 
-        Logging.Trace ($"AnsiResponseParser releasing '{tuple.Item1}'");
+        //Logging.Trace ($"AnsiResponseParser releasing '{tuple.Item1}'");
         output.Add (tuple);
     }
 
-    public Tuple<char, T> [] Release ()
+    public Tuple<char, TInputRecord> [] Release ()
     {
         // Lock in case Release is called from different Thread from parse
         lock (_lockState)
         {
             TryLastMinuteSequences ();
 
-            Tuple<char, T> [] result = HeldToEnumerable ().ToArray ();
+            Tuple<char, TInputRecord> [] result = HeldToEnumerable ().ToArray ();
 
             ResetState ();
 
@@ -522,7 +519,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
         }
     }
 
-    private IEnumerable<Tuple<char, T>> HeldToEnumerable () { return (IEnumerable<Tuple<char, T>>)_heldContent.HeldToObjects (); }
+    private IEnumerable<Tuple<char, TInputRecord>> HeldToEnumerable () { return (IEnumerable<Tuple<char, TInputRecord>>)_heldContent.HeldToObjects (); }
 
     /// <summary>
     ///     'Overload' for specifying an expectation that requires the metadata as well as characters. Has
@@ -532,7 +529,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
     /// <param name="response"></param>
     /// <param name="abandoned"></param>
     /// <param name="persistent"></param>
-    public void ExpectResponseT (string? terminator, Action<IEnumerable<Tuple<char, T>>> response, Action? abandoned, bool persistent)
+    public void ExpectResponseT (string? terminator, Action<IEnumerable<Tuple<char, TInputRecord>>> response, Action? abandoned, bool persistent)
     {
         lock (_lockExpectedResponses)
         {
@@ -581,7 +578,7 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
 
     private void AppendOutput (StringBuilder output, char c)
     {
-        Logging.Trace ($"AnsiResponseParser releasing '{c}'");
+       // Logging.Trace ($"AnsiResponseParser releasing '{c}'");
         output.Append (c);
     }
 

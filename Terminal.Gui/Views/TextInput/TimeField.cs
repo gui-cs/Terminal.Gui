@@ -5,6 +5,7 @@
 //
 // Licensed under the MIT license
 
+#nullable disable
 using System.Globalization;
 
 namespace Terminal.Gui.Views;
@@ -124,7 +125,7 @@ public class TimeField : TextField
             TimeSpan oldTime = _time;
             _time = value;
             Text = " " + value.ToString (Format.Trim ());
-            DateTimeEventArgs<TimeSpan> args = new (oldTime, value, Format);
+            EventArgs<TimeSpan>  args = new (value);
 
             if (oldTime != value)
             {
@@ -200,15 +201,11 @@ public class TimeField : TextField
 
     /// <summary>Event firing method that invokes the <see cref="TimeChanged"/> event.</summary>
     /// <param name="args">The event arguments</param>
-    public virtual void OnTimeChanged (DateTimeEventArgs<TimeSpan> args) { TimeChanged?.Invoke (this, args); }
+    public virtual void OnTimeChanged (EventArgs<TimeSpan> args) { TimeChanged?.Invoke (this, args); }
 
     /// <summary>TimeChanged event, raised when the Date has changed.</summary>
     /// <remarks>This event is raised when the <see cref="Time"/> changes.</remarks>
-    /// <remarks>
-    ///     The passed <see cref="EventArgs"/> is a <see cref="DateTimeEventArgs{T}"/> containing the old value, new
-    ///     value, and format string.
-    /// </remarks>
-    public event EventHandler<DateTimeEventArgs<TimeSpan>> TimeChanged;
+    public event EventHandler<EventArgs<TimeSpan>> TimeChanged;
 
     private void AdjCursorPosition (int point, bool increment = true)
     {

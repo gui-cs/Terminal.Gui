@@ -1,762 +1,16 @@
-#nullable enable
-using System.Collections.Concurrent;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-#pragma warning disable IDE1006// Naming rule violation: Prefix '_' is not expected
+
+// ReSharper disable InconsistentNaming
 
 namespace Terminal.Gui.Drivers;
 
-public partial class WindowsConsole
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+/// <summary>
+///     Definitions for Windows Console API structures and constants.
+/// </summary>
+public class WindowsConsole
 {
-    private CancellationTokenSource? _inputReadyCancellationTokenSource;
-    private readonly BlockingCollection<InputRecord> _inputQueue = new (new ConcurrentQueue<InputRecord> ());
-
-    public const int STD_OUTPUT_HANDLE = -11;
-    public const int STD_INPUT_HANDLE = -10;
-
-    private readonly nint _inputHandle;
-    private nint _outputHandle;
-    private nint _screenBuffer;
-    private readonly uint _originalConsoleMode;
-    private CursorVisibility? _initialCursorVisibility;
-    private CursorVisibility? _currentCursorVisibility;
-    private CursorVisibility? _pendingCursorVisibility;
-    private readonly StringBuilder _stringBuilder = new (256 * 1024);
-    private string _lastWrite = string.Empty;
-
-    public WindowsConsole ()
-    {
-        _inputHandle = GetStdHandle (STD_INPUT_HANDLE);
-        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
-        _originalConsoleMode = ConsoleMode;
-        uint newConsoleMode = _originalConsoleMode;
-        newConsoleMode |= (uint)(ConsoleModes.EnableMouseInput | ConsoleModes.EnableExtendedFlags);
-        newConsoleMode &= ~(uint)ConsoleModes.EnableQuickEditMode;
-        newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
-        ConsoleMode = newConsoleMode;
-
-        IsVirtualTerminal = GetConsoleMode (_outputHandle, out uint mode) && (mode & (uint)ConsoleModes.EnableVirtualTerminalProcessing) != 0;
-
-        if (!IsVirtualTerminal)
-        {
-            CreateConsoleScreenBuffer ();
-            Size bufferSize = GetConsoleBufferWindow (out _);
-            SmallRect window = new ()
-            {
-                Top = 0,
-                Left = 0,
-                Bottom = (short)bufferSize.Height,
-                Right = (short)bufferSize.Width
-            };
-
-            ReadFromConsoleOutput (bufferSize, new ((short)bufferSize.Width, (short)bufferSize.Height), ref window);
-
-            if (!GetConsoleMode (_screenBuffer, out mode))
-            {
-                throw new ApplicationException ($"Failed to get screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
-            }
-
-            const uint ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002;
-
-            mode &= ~ENABLE_WRAP_AT_EOL_OUTPUT; // Disable wrap
-
-            if (!SetConsoleMode (_screenBuffer, mode))
-            {
-                throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
-            }
-        }
-
-        SetInitialCursorVisibility ();
-
-        _inputReadyCancellationTokenSource = new ();
-        Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
-    }
-
-    private void CreateConsoleScreenBuffer ()
-    {
-        _screenBuffer = CreateConsoleScreenBuffer (
-                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
-                                                   nint.Zero,
-                                                   1,
-                                                   nint.Zero
-                                                  );
-
-        if (_screenBuffer == INVALID_HANDLE_VALUE)
-        {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
-        }
-
-        if (!SetConsoleActiveScreenBuffer (_screenBuffer))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-    }
-
-    public InputRecord? DequeueInput ()
-    {
-        while (_inputReadyCancellationTokenSource is { })
-        {
-            try
-            {
-                return _inputQueue.Take (_inputReadyCancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                return null;
-            }
-        }
-
-        return null;
-    }
-
-    public InputRecord? ReadConsoleInput ()
-    {
-        const int BUFFER_SIZE = 1;
-        InputRecord inputRecord = default;
-        uint numberEventsRead = 0;
-
-        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
-        {
-            try
-            {
-                // Peek to check if there is any input available
-                if (PeekConsoleInput (_inputHandle, out _, BUFFER_SIZE, out uint eventsRead) && eventsRead > 0)
-                {
-                    // Read the input since it is available
-                    ReadConsoleInput (
-                                      _inputHandle,
-                                      out inputRecord,
-                                      BUFFER_SIZE,
-                                      out numberEventsRead);
-                }
-
-                if (numberEventsRead > 0)
-                {
-                    return inputRecord;
-                }
-
-                try
-                {
-                    Task.Delay (100, _inputReadyCancellationTokenSource.Token).Wait (_inputReadyCancellationTokenSource.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is OperationCanceledException or ObjectDisposedException)
-                {
-                    return null;
-                }
-
-                throw;
-            }
-        }
-
-        return null;
-    }
-
-    private void ProcessInputQueue ()
-    {
-        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
-        {
-            try
-            {
-                if (_inputQueue.Count == 0)
-                {
-                    while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
-                    {
-                        try
-                        {
-                            InputRecord? inpRec = ReadConsoleInput ();
-
-                            if (inpRec is { })
-                            {
-                                _inputQueue.Add (inpRec.Value);
-
-                                break;
-                            }
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-        }
-    }
-
-
-    // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
-    private TextStyle _redrawTextStyle = TextStyle.None;
-
-    private CharInfo []? _originalStdOutChars;
-
-    private struct Run
-    {
-        public ushort attr;
-        public string text;
-
-        public Run (ushort attr, string text)
-        {
-            this.attr = attr;
-            this.text = text;
-        }
-    }
-
-    public bool WriteToConsole (Size size, ExtendedCharInfo [] charInfoBuffer, Coord bufferSize, SmallRect window, bool force16Colors)
-    {
-        //Debug.WriteLine ("WriteToConsole");
-
-        Attribute? prev = null;
-        var result = false;
-
-        if (force16Colors)
-        {
-            _stringBuilder.Clear ();
-
-            var i = 0;
-            List<Run> runs = [];
-            Run? current = null;
-            SetCursorPosition (new Coord (0, 0));
-
-            foreach (ExtendedCharInfo info in charInfoBuffer)
-            {
-                if (IsVirtualTerminal)
-                {
-                    Attribute attr = info.Attribute;
-                    AnsiColorCode fgColor = info.Attribute.Foreground.GetAnsiColorCode ();
-                    AnsiColorCode bgColor = info.Attribute.Background.GetAnsiColorCode ();
-
-                    if (attr != prev)
-                    {
-                        prev = attr;
-                        _stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (fgColor));
-                        _stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (bgColor));
-
-                        EscSeqUtils.CSI_AppendTextStyleChange (_stringBuilder, _redrawTextStyle, attr.Style);
-                        _redrawTextStyle = attr.Style;
-                    }
-
-                    if (info.Char [0] != '\x1b')
-                    {
-                        if (!info.Empty)
-                        {
-                            _stringBuilder.Append (info.Char);
-                        }
-                    }
-                    else
-                    {
-                        _stringBuilder.Append (' ');
-                    }
-                }
-                else
-                {
-                    if (info.Empty)
-                    {
-                        i++;
-                        continue;
-                    }
-
-                    if (!info.Empty)
-                    {
-                        var attr = (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor16 ()
-                                            | ((int)info.Attribute.Background.GetClosestNamedColor16 () << 4));
-
-                        // Start new run if needed
-                        if (current == null || attr != current.Value.attr)
-                        {
-                            if (current != null)
-                            {
-                                runs.Add (new (current.Value.attr, _stringBuilder.ToString ()));
-                            }
-
-                            _stringBuilder.Clear ();
-                            current = new Run (attr, "");
-                        }
-
-                        _stringBuilder!.Append (info.Char);
-                    }
-
-                    i++;
-
-                    if (i > 0 && i <= charInfoBuffer.Length && i % bufferSize.X == 0)
-                    {
-                        if (i < charInfoBuffer.Length)
-                        {
-                            _stringBuilder.AppendLine ();
-                        }
-
-                        runs.Add (new (current!.Value.attr, _stringBuilder.ToString ()));
-                        _stringBuilder.Clear ();
-                    }
-                }
-            }
-
-            if (IsVirtualTerminal)
-            {
-                _stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-                _stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
-
-                var s = _stringBuilder.ToString ();
-
-                // TODO: requires extensive testing if we go down this route
-                // If console output has changed
-                if (s != _lastWrite)
-                {
-                    // supply console with the new content
-                    result = WriteConsole (_outputHandle, s, (uint)s.Length, out uint _, nint.Zero);
-                }
-
-                _lastWrite = s;
-
-                foreach (var sixel in Application.Sixel)
-                {
-                    SetCursorPosition (new Coord ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y));
-                    WriteConsole (IsVirtualTerminal ? _outputHandle : _screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
-                }
-            }
-            else
-            {
-                foreach (var run in runs)
-                {
-                    SetConsoleTextAttribute (IsVirtualTerminal ? _outputHandle : _screenBuffer, run.attr);
-                    result = WriteConsole (IsVirtualTerminal ? _outputHandle : _screenBuffer, run.text, (uint)run.text.Length, out _, nint.Zero);
-                }
-            }
-        }
-        else
-        {
-            _stringBuilder.Clear ();
-
-            _stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            EscSeqUtils.CSI_AppendCursorPosition (_stringBuilder, 0, 0);
-
-            foreach (ExtendedCharInfo info in charInfoBuffer)
-            {
-                Attribute attr = info.Attribute;
-
-                if (attr != prev)
-                {
-                    prev = attr;
-                    EscSeqUtils.CSI_AppendForegroundColorRGB (_stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-                    EscSeqUtils.CSI_AppendBackgroundColorRGB (_stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
-                    EscSeqUtils.CSI_AppendTextStyleChange (_stringBuilder, _redrawTextStyle, attr.Style);
-                    _redrawTextStyle = attr.Style;
-                }
-
-                if (info.Char [0] != '\x1b')
-                {
-                    if (!info.Empty)
-                    {
-                        _stringBuilder.Append (info.Char);
-                    }
-                }
-                else
-                {
-                    _stringBuilder.Append (' ');
-                }
-            }
-
-            _stringBuilder.Append (EscSeqUtils.CSI_RestoreCursorPosition);
-            _stringBuilder.Append (EscSeqUtils.CSI_HideCursor);
-
-            var s = _stringBuilder.ToString ();
-
-            // TODO: requires extensive testing if we go down this route
-            // If console output has changed
-            if (s != _lastWrite)
-            {
-                // supply console with the new content
-                result = WriteConsole (_outputHandle, s, (uint)s.Length, out uint _, nint.Zero);
-            }
-
-            _lastWrite = s;
-
-            foreach (var sixel in Application.Sixel)
-            {
-                SetCursorPosition (new Coord ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y));
-                WriteConsole (IsVirtualTerminal ? _outputHandle : _screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
-            }
-        }
-
-        if (!result)
-        {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
-        }
-
-        return result;
-    }
-
-    internal bool WriteANSI (string ansi)
-    {
-        if (WriteConsole (_outputHandle, ansi, (uint)ansi.Length, out uint _, nint.Zero))
-        {
-            // Flush the output to make sure it's sent immediately
-            return FlushFileBuffers (_outputHandle);
-        }
-
-        return false;
-    }
-
-    public void ReadFromConsoleOutput (Size size, Coord coords, ref SmallRect window)
-    {
-        _originalStdOutChars = new CharInfo [size.Height * size.Width];
-
-        if (!ReadConsoleOutput (_screenBuffer, _originalStdOutChars, coords, new Coord { X = 0, Y = 0 }, ref window))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-    }
-
-    public bool SetCursorPosition (Coord position)
-    {
-        return SetConsoleCursorPosition (IsVirtualTerminal ? _outputHandle : _screenBuffer, position);
-    }
-
-    public void SetInitialCursorVisibility ()
-    {
-        if (_initialCursorVisibility.HasValue == false && GetCursorVisibility (out CursorVisibility visibility))
-        {
-            _initialCursorVisibility = visibility;
-        }
-    }
-
-    public bool GetCursorVisibility (out CursorVisibility visibility)
-    {
-        if ((IsVirtualTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
-        {
-            visibility = CursorVisibility.Invisible;
-
-            return false;
-        }
-
-        if (!GetConsoleCursorInfo (IsVirtualTerminal ? _outputHandle : _screenBuffer, out ConsoleCursorInfo info))
-        {
-            int err = Marshal.GetLastWin32Error ();
-
-            if (err != 0)
-            {
-                throw new Win32Exception (err);
-            }
-
-            visibility = CursorVisibility.Default;
-
-            return false;
-        }
-
-        if (!info.bVisible)
-        {
-            visibility = CursorVisibility.Invisible;
-        }
-        else if (info.dwSize > 50)
-        {
-            visibility = CursorVisibility.Default;
-        }
-        else
-        {
-            visibility = CursorVisibility.Default;
-        }
-
-        return visibility != CursorVisibility.Invisible;
-    }
-
-    public bool EnsureCursorVisibility ()
-    {
-        if (_initialCursorVisibility.HasValue && _pendingCursorVisibility.HasValue && SetCursorVisibility (_pendingCursorVisibility.Value))
-        {
-            _pendingCursorVisibility = null;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public void ForceRefreshCursorVisibility ()
-    {
-        if (_currentCursorVisibility.HasValue)
-        {
-            _pendingCursorVisibility = _currentCursorVisibility;
-            _currentCursorVisibility = null;
-        }
-    }
-
-    public bool SetCursorVisibility (CursorVisibility visibility)
-    {
-        if (_initialCursorVisibility.HasValue == false)
-        {
-            _pendingCursorVisibility = visibility;
-
-            return false;
-        }
-
-        if (_currentCursorVisibility.HasValue == false || _currentCursorVisibility.Value != visibility)
-        {
-            var info = new ConsoleCursorInfo
-            {
-                dwSize = (uint)visibility & 0x00FF,
-                bVisible = ((uint)visibility & 0xFF00) != 0
-            };
-
-            if (!SetConsoleCursorInfo (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref info))
-            {
-                return false;
-            }
-
-            _currentCursorVisibility = visibility;
-        }
-
-        return true;
-    }
-
-    public void Cleanup ()
-    {
-        if (_initialCursorVisibility.HasValue)
-        {
-            SetCursorVisibility (_initialCursorVisibility.Value);
-        }
-
-        //SetConsoleOutputWindow (out _);
-
-        ConsoleMode = _originalConsoleMode;
-
-        _outputHandle = CreateConsoleScreenBuffer (
-                                                   DesiredAccess.GenericRead | DesiredAccess.GenericWrite,
-                                                   ShareMode.FileShareRead | ShareMode.FileShareWrite,
-                                                   nint.Zero,
-                                                   1,
-                                                   nint.Zero
-                                                  );
-
-        if (!SetConsoleActiveScreenBuffer (_outputHandle))
-        {
-            int err = Marshal.GetLastWin32Error ();
-            Console.WriteLine ("Error: {0}", err);
-        }
-
-        if (_screenBuffer != nint.Zero)
-        {
-            CloseHandle (_screenBuffer);
-        }
-
-        _screenBuffer = nint.Zero;
-
-        _inputReadyCancellationTokenSource?.Cancel ();
-        _inputReadyCancellationTokenSource?.Dispose ();
-        _inputReadyCancellationTokenSource = null;
-    }
-
-    internal Size GetConsoleBufferWindow (out Point position)
-    {
-        if ((IsVirtualTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
-        {
-            position = Point.Empty;
-
-            return Size.Empty;
-        }
-
-        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
-        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-
-        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
-        {
-            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
-            position = Point.Empty;
-
-            return Size.Empty;
-        }
-
-        Size sz = new (
-                       csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                       csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
-        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
-
-        return sz;
-    }
-
-    internal Size GetConsoleOutputWindow (out Point position)
-    {
-        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
-        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-
-        if (!GetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-
-        Size sz = new (
-                       csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                       csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
-        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
-
-        return sz;
-    }
-
-    internal Size SetConsoleWindow (short cols, short rows)
-    {
-        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
-        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-
-        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-
-        Coord maxWinSize = GetLargestConsoleWindowSize (IsVirtualTerminal ? _outputHandle : _screenBuffer);
-        short newCols = Math.Min (cols, maxWinSize.X);
-        short newRows = Math.Min (rows, maxWinSize.Y);
-        csbi.dwSize = new Coord (newCols, Math.Max (newRows, (short)1));
-        csbi.srWindow = new SmallRect (0, 0, newCols, newRows);
-        csbi.dwMaximumWindowSize = new Coord (newCols, newRows);
-
-        if (!SetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-
-        var winRect = new SmallRect (0, 0, (short)(newCols - 1), (short)Math.Max (newRows - 1, 0));
-
-        if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
-        {
-            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
-            return new (cols, rows);
-        }
-
-        SetConsoleOutputWindow (csbi);
-
-        return new (winRect.Right + 1, newRows - 1 < 0 ? 0 : winRect.Bottom + 1);
-    }
-
-    internal Size GetLargestConsoleWindowSize ()
-    {
-        Coord maxWinSize = GetLargestConsoleWindowSize (IsVirtualTerminal ? _outputHandle : _screenBuffer);
-
-        return new (maxWinSize.X, maxWinSize.Y);
-    }
-
-    private void SetConsoleOutputWindow (CONSOLE_SCREEN_BUFFER_INFOEX csbi)
-    {
-        if ((IsVirtualTerminal
-                ? _outputHandle
-                : _screenBuffer) != nint.Zero && !SetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-    }
-
-    internal Size SetConsoleOutputWindow (out Point position)
-    {
-        if ((IsVirtualTerminal ? _outputHandle : _screenBuffer) == nint.Zero)
-        {
-            position = Point.Empty;
-
-            return Size.Empty;
-        }
-
-        var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
-        csbi.cbSize = (uint)Marshal.SizeOf (csbi);
-
-        if (!GetConsoleScreenBufferInfoEx (IsVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-
-        Size sz = new (
-                           csbi.srWindow.Right - csbi.srWindow.Left + 1,
-                           Math.Max (csbi.srWindow.Bottom - csbi.srWindow.Top + 1, 0));
-        position = new (csbi.srWindow.Left, csbi.srWindow.Top);
-        SetConsoleOutputWindow (csbi);
-        var winRect = new SmallRect (0, 0, (short)(sz.Width - 1), (short)Math.Max (sz.Height - 1, 0));
-
-        if (!SetConsoleScreenBufferInfoEx (_outputHandle, ref csbi))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-
-        if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
-        {
-            throw new Win32Exception (Marshal.GetLastWin32Error ());
-        }
-
-        return sz;
-    }
-
-    internal bool IsVirtualTerminal { get; init; }
-
-    private uint ConsoleMode
-    {
-        get
-        {
-            GetConsoleMode (_inputHandle, out uint v);
-
-            return v;
-        }
-        set => SetConsoleMode (_inputHandle, value);
-    }
-
-    [Flags]
-    public enum ConsoleModes : uint
-    {
-        EnableProcessedInput = 1,
-        EnableVirtualTerminalProcessing = 4,
-        EnableMouseInput = 16,
-        EnableQuickEditMode = 64,
-        EnableExtendedFlags = 128
-    }
-
-    [StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
-    public struct KeyEventRecord
-    {
-        [FieldOffset (0)]
-        [MarshalAs (UnmanagedType.Bool)]
-        public bool bKeyDown;
-
-        [FieldOffset (4)]
-        [MarshalAs (UnmanagedType.U2)]
-        public ushort wRepeatCount;
-
-        [FieldOffset (6)]
-        [MarshalAs (UnmanagedType.U2)]
-        public ConsoleKeyMapping.VK wVirtualKeyCode;
-
-        [FieldOffset (8)]
-        [MarshalAs (UnmanagedType.U2)]
-        public ushort wVirtualScanCode;
-
-        [FieldOffset (10)]
-        public char UnicodeChar;
-
-        [FieldOffset (12)]
-        [MarshalAs (UnmanagedType.U4)]
-        public ControlKeyState dwControlKeyState;
-
-        public readonly override string ToString ()
-        {
-            return
-                $"[KeyEventRecord({(bKeyDown ? "down" : "up")},{wRepeatCount},{wVirtualKeyCode},{wVirtualScanCode},{new Rune (UnicodeChar).MakePrintable ()},{dwControlKeyState})]";
-        }
-    }
-
     [Flags]
     public enum ButtonState
     {
@@ -766,6 +20,19 @@ public partial class WindowsConsole
         Button3Pressed = 8,
         Button4Pressed = 16,
         RightmostButtonPressed = 2
+    }
+
+    /// <summary>
+    ///     Windows Console mode flags.
+    /// </summary>
+    [Flags]
+    public enum ConsoleModes : uint
+    {
+        EnableProcessedInput = 1,
+        EnableVirtualTerminalProcessing = 4,
+        EnableMouseInput = 16,
+        EnableQuickEditMode = 64,
+        EnableExtendedFlags = 128
     }
 
     [Flags]
@@ -793,45 +60,6 @@ public partial class WindowsConsole
         MouseHorizontalWheeled = 8
     }
 
-    [StructLayout (LayoutKind.Explicit)]
-    public struct MouseEventRecord
-    {
-        [FieldOffset (0)]
-        public Coord MousePosition;
-
-        [FieldOffset (4)]
-        public ButtonState ButtonState;
-
-        [FieldOffset (8)]
-        public ControlKeyState ControlKeyState;
-
-        [FieldOffset (12)]
-        public EventFlags EventFlags;
-
-        public readonly override string ToString () { return $"[Mouse{MousePosition},{ButtonState},{ControlKeyState},{EventFlags}]"; }
-    }
-
-    public struct WindowBufferSizeRecord
-    {
-        public Coord _size;
-
-        public WindowBufferSizeRecord (short x, short y) { _size = new Coord (x, y); }
-
-        public readonly override string ToString () { return $"[WindowBufferSize{_size}"; }
-    }
-
-    [StructLayout (LayoutKind.Sequential)]
-    public struct MenuEventRecord
-    {
-        public uint dwCommandId;
-    }
-
-    [StructLayout (LayoutKind.Sequential)]
-    public struct FocusEventRecord
-    {
-        public uint bSetFocus;
-    }
-
     public enum EventType : ushort
     {
         Focus = 0x10,
@@ -839,6 +67,170 @@ public partial class WindowsConsole
         Menu = 0x8,
         Mouse = 2,
         WindowBufferSize = 4
+    }
+
+    /// <summary>
+    ///     Standard input handle constant.
+    /// </summary>
+    public const int STD_INPUT_HANDLE = -10;
+
+    public static ConsoleKeyInfoEx ToConsoleKeyInfoEx (KeyEventRecord keyEvent)
+    {
+        ControlKeyState state = keyEvent.dwControlKeyState;
+
+        bool shift = (state & ControlKeyState.ShiftPressed) != 0;
+        bool alt = (state & (ControlKeyState.LeftAltPressed | ControlKeyState.RightAltPressed)) != 0;
+        bool control = (state & (ControlKeyState.LeftControlPressed | ControlKeyState.RightControlPressed)) != 0;
+        bool capslock = (state & ControlKeyState.CapslockOn) != 0;
+        bool numlock = (state & ControlKeyState.NumlockOn) != 0;
+        bool scrolllock = (state & ControlKeyState.ScrolllockOn) != 0;
+
+        var cki = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+
+        return new (cki, capslock, numlock, scrolllock);
+    }
+
+    [StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
+    public struct CharInfo
+    {
+        [FieldOffset (0)]
+        public CharUnion Char;
+
+        [FieldOffset (2)]
+        public ushort Attributes;
+    }
+
+    [StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
+    public struct CharUnion
+    {
+        [FieldOffset (0)]
+        public char UnicodeChar;
+
+        [FieldOffset (0)]
+        public byte AsciiChar;
+    }
+
+    [StructLayout (LayoutKind.Explicit, Size = 4)]
+    public struct COLORREF
+    {
+        public COLORREF (byte r, byte g, byte b)
+        {
+            Value = 0;
+            R = r;
+            G = g;
+            B = b;
+        }
+
+        public COLORREF (uint value)
+        {
+            R = 0;
+            G = 0;
+            B = 0;
+            Value = value & 0x00FFFFFF;
+        }
+
+        [FieldOffset (0)]
+        public byte R;
+
+        [FieldOffset (1)]
+        public byte G;
+
+        [FieldOffset (2)]
+        public byte B;
+
+        [FieldOffset (0)]
+        public uint Value;
+    }
+
+    // See: https://github.com/gui-cs/Terminal.Gui/issues/357
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct CONSOLE_SCREEN_BUFFER_INFOEX
+    {
+        public uint cbSize;
+        public Coord dwSize;
+        public Coord dwCursorPosition;
+        public ushort wAttributes;
+        public SmallRect srWindow;
+        public Coord dwMaximumWindowSize;
+        public ushort wPopupAttributes;
+        public bool bFullscreenSupported;
+
+        [MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)]
+        public COLORREF [] ColorTable;
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct ConsoleCursorInfo
+    {
+        /// <summary>
+        ///     The percentage of the character cell that is filled by the cursor.This value is between 1 and 100.
+        ///     The cursor appearance varies, ranging from completely filling the cell to showing up as a horizontal
+        ///     line at the bottom of the cell.
+        /// </summary>
+        public uint dwSize;
+
+        public bool bVisible;
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct ConsoleKeyInfoEx
+    {
+        public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock, bool scrolllock)
+        {
+            ConsoleKeyInfo = consoleKeyInfo;
+            CapsLock = capslock;
+            NumLock = numlock;
+            ScrollLock = scrolllock;
+        }
+
+        public ConsoleKeyInfo ConsoleKeyInfo;
+        public bool CapsLock;
+        public bool NumLock;
+        public bool ScrollLock;
+
+        /// <summary>
+        ///     Prints a ConsoleKeyInfoEx structure
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        public readonly string ToString (ConsoleKeyInfoEx ex)
+        {
+            var ke = new Key ((KeyCode)ex.ConsoleKeyInfo.KeyChar);
+            var sb = new StringBuilder ();
+            sb.Append ($"Key: {(KeyCode)ex.ConsoleKeyInfo.Key} ({ex.ConsoleKeyInfo.Key})");
+            sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0 ? " | Shift" : string.Empty);
+            sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0 ? " | Control" : string.Empty);
+            sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0 ? " | Alt" : string.Empty);
+            sb.Append ($", KeyChar: {ke.AsRune.MakePrintable ()} ({(uint)ex.ConsoleKeyInfo.KeyChar}) ");
+            sb.Append (ex.CapsLock ? "caps," : string.Empty);
+            sb.Append (ex.NumLock ? "num," : string.Empty);
+            sb.Append (ex.ScrollLock ? "scroll," : string.Empty);
+            string s = sb.ToString ().TrimEnd (',').TrimEnd (' ');
+
+            return $"[ConsoleKeyInfoEx({s})]";
+        }
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct Coord
+    {
+        public Coord (short x, short y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public short X;
+        public short Y;
+
+        public readonly override string ToString () { return $"({X},{Y})"; }
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct FocusEventRecord
+    {
+        public uint bSetFocus;
     }
 
     [StructLayout (LayoutKind.Explicit)]
@@ -865,98 +257,80 @@ public partial class WindowsConsole
         public readonly override string ToString ()
         {
             return (EventType switch
-            {
-                EventType.Focus => FocusEvent.ToString (),
-                EventType.Key => KeyEvent.ToString (),
-                EventType.Menu => MenuEvent.ToString (),
-                EventType.Mouse => MouseEvent.ToString (),
-                EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
-                _ => "Unknown event type: " + EventType
-            })!;
+                    {
+                        EventType.Focus => FocusEvent.ToString (),
+                        EventType.Key => KeyEvent.ToString (),
+                        EventType.Menu => MenuEvent.ToString (),
+                        EventType.Mouse => MouseEvent.ToString (),
+                        EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
+                        _ => "Unknown event type: " + EventType
+                    })!;
         }
     }
 
-    [Flags]
-    private enum ShareMode : uint
-    {
-        FileShareRead = 1,
-        FileShareWrite = 2
-    }
-
-    [Flags]
-    private enum DesiredAccess : uint
-    {
-        GenericRead = 2147483648,
-        GenericWrite = 1073741824
-    }
-
-    [StructLayout (LayoutKind.Sequential)]
-    public struct ConsoleScreenBufferInfo
-    {
-        public Coord dwSize;
-        public Coord dwCursorPosition;
-        public ushort wAttributes;
-        public SmallRect srWindow;
-        public Coord dwMaximumWindowSize;
-    }
-
-    [StructLayout (LayoutKind.Sequential)]
-    public struct Coord
-    {
-        public short X;
-        public short Y;
-
-        public Coord (short x, short y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public readonly override string ToString () { return $"({X},{Y})"; }
-    }
-
+    /// <summary>
+    ///     Key event record structure.
+    /// </summary>
     [StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
-    public struct CharUnion
+    public struct KeyEventRecord
     {
         [FieldOffset (0)]
+        [MarshalAs (UnmanagedType.Bool)]
+        public bool bKeyDown;
+
+        [FieldOffset (4)]
+        [MarshalAs (UnmanagedType.U2)]
+        public ushort wRepeatCount;
+
+        [FieldOffset (6)]
+        [MarshalAs (UnmanagedType.U2)]
+        public VK wVirtualKeyCode;
+
+        [FieldOffset (8)]
+        [MarshalAs (UnmanagedType.U2)]
+        public ushort wVirtualScanCode;
+
+        [FieldOffset (10)]
         public char UnicodeChar;
 
-        [FieldOffset (0)]
-        public byte AsciiChar;
-    }
+        [FieldOffset (12)]
+        [MarshalAs (UnmanagedType.U4)]
+        public ControlKeyState dwControlKeyState;
 
-    [StructLayout (LayoutKind.Explicit, CharSet = CharSet.Unicode)]
-    public struct CharInfo
-    {
-        [FieldOffset (0)]
-        public CharUnion Char;
-
-        [FieldOffset (2)]
-        public ushort Attributes;
-    }
-
-    public struct ExtendedCharInfo
-    {
-        public char [] Char { get; set; }
-        public Attribute Attribute { get; set; }
-        public bool Empty { get; set; } // TODO: Temp hack until virtual terminal sequences
-
-        public ExtendedCharInfo (char [] character, Attribute attribute)
+        public readonly override string ToString ()
         {
-            Char = character;
-            Attribute = attribute;
-            Empty = false;
+            return
+                $"[KeyEventRecord({(bKeyDown ? "down" : "up")},{wRepeatCount},{wVirtualKeyCode},{wVirtualScanCode},{new Rune (UnicodeChar).MakePrintable ()},{dwControlKeyState})]";
         }
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    public struct MenuEventRecord
+    {
+        public uint dwCommandId;
+    }
+
+    [StructLayout (LayoutKind.Explicit)]
+    public struct MouseEventRecord
+    {
+        [FieldOffset (0)]
+        public Coord MousePosition;
+
+        [FieldOffset (4)]
+        public ButtonState ButtonState;
+
+        [FieldOffset (8)]
+        public ControlKeyState ControlKeyState;
+
+        [FieldOffset (12)]
+        public EventFlags EventFlags;
+
+        public readonly override string ToString () { return $"[Mouse{MousePosition},{ButtonState},{ControlKeyState},{EventFlags}]"; }
     }
 
     [StructLayout (LayoutKind.Sequential)]
     public struct SmallRect
     {
-        public short Left;
-        public short Top;
-        public short Right;
-        public short Bottom;
-
         public SmallRect (short left, short top, short right, short bottom)
         {
             Left = left;
@@ -965,7 +339,14 @@ public partial class WindowsConsole
             Bottom = bottom;
         }
 
+        public short Left;
+        public short Top;
+        public short Right;
+        public short Bottom;
+
         public static void MakeEmpty (ref SmallRect rect) { rect.Left = -1; }
+
+        public readonly override string ToString () { return $"Left={Left},Top={Top},Right={Right},Bottom={Bottom}"; }
 
         public static void Update (ref SmallRect rect, short col, short row)
         {
@@ -1002,255 +383,12 @@ public partial class WindowsConsole
                 rect.Bottom = row;
             }
         }
-
-        public readonly override string ToString () { return $"Left={Left},Top={Top},Right={Right},Bottom={Bottom}"; }
     }
 
-    [StructLayout (LayoutKind.Sequential)]
-    public struct ConsoleKeyInfoEx
+    public struct WindowBufferSizeRecord (short x, short y)
     {
-        public ConsoleKeyInfo ConsoleKeyInfo;
-        public bool CapsLock;
-        public bool NumLock;
-        public bool ScrollLock;
+        public Coord _size = new (x, y);
 
-        public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock, bool scrolllock)
-        {
-            ConsoleKeyInfo = consoleKeyInfo;
-            CapsLock = capslock;
-            NumLock = numlock;
-            ScrollLock = scrolllock;
-        }
-
-        /// <summary>
-        ///     Prints a ConsoleKeyInfoEx structure
-        /// </summary>
-        /// <param name="ex"></param>
-        /// <returns></returns>
-        public readonly string ToString (ConsoleKeyInfoEx ex)
-        {
-            var ke = new Key ((KeyCode)ex.ConsoleKeyInfo.KeyChar);
-            var sb = new StringBuilder ();
-            sb.Append ($"Key: {(KeyCode)ex.ConsoleKeyInfo.Key} ({ex.ConsoleKeyInfo.Key})");
-            sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0 ? " | Shift" : string.Empty);
-            sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0 ? " | Control" : string.Empty);
-            sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0 ? " | Alt" : string.Empty);
-            sb.Append ($", KeyChar: {ke.AsRune.MakePrintable ()} ({(uint)ex.ConsoleKeyInfo.KeyChar}) ");
-            sb.Append (ex.CapsLock ? "caps," : string.Empty);
-            sb.Append (ex.NumLock ? "num," : string.Empty);
-            sb.Append (ex.ScrollLock ? "scroll," : string.Empty);
-            string s = sb.ToString ().TrimEnd (',').TrimEnd (' ');
-
-            return $"[ConsoleKeyInfoEx({s})]";
-        }
+        public readonly override string ToString () { return $"[WindowBufferSize{_size}"; }
     }
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool CloseHandle (nint handle);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    public static extern bool PeekConsoleInput (nint hConsoleInput, out InputRecord lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
-
-    [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
-    public static extern bool ReadConsoleInput (
-        nint hConsoleInput,
-        out InputRecord lpBuffer,
-        uint nLength,
-        out uint lpNumberOfEventsRead
-    );
-
-    [DllImport ("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool ReadConsoleOutput (
-        nint hConsoleOutput,
-        [Out] CharInfo [] lpBuffer,
-        Coord dwBufferSize,
-        Coord dwBufferCoord,
-        ref SmallRect lpReadRegion
-    );
-
-    // TODO: This API is obsolete. See https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput
-    [DllImport ("kernel32.dll", EntryPoint = "WriteConsoleOutputW", SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern bool WriteConsoleOutput (
-        nint hConsoleOutput,
-        CharInfo [] lpBuffer,
-        Coord dwBufferSize,
-        Coord dwBufferCoord,
-        ref SmallRect lpWriteRegion
-    );
-
-    [LibraryImport ("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
-    [return: MarshalAs (UnmanagedType.Bool)]
-    private static partial bool WriteConsole (
-        nint hConsoleOutput,
-        ReadOnlySpan<char> lpbufer,
-        uint NumberOfCharsToWriten,
-        out uint lpNumberOfCharsWritten,
-        nint lpReserved
-    );
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleTextAttribute (
-        nint hConsoleOutput,
-        ushort wAttributes
-    );
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool FlushFileBuffers (nint hFile);
-
-    [DllImport ("kernel32.dll")]
-    private static extern bool SetConsoleCursorPosition (nint hConsoleOutput, Coord dwCursorPosition);
-
-    [StructLayout (LayoutKind.Sequential)]
-    public struct ConsoleCursorInfo
-    {
-        /// <summary>
-        /// The percentage of the character cell that is filled by the cursor.This value is between 1 and 100.
-        /// The cursor appearance varies, ranging from completely filling the cell to showing up as a horizontal
-        /// line at the bottom of the cell.
-        /// </summary>
-        public uint dwSize;
-        public bool bVisible;
-    }
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleCursorInfo (nint hConsoleOutput, [In] ref ConsoleCursorInfo lpConsoleCursorInfo);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool GetConsoleCursorInfo (nint hConsoleOutput, out ConsoleCursorInfo lpConsoleCursorInfo);
-
-    [DllImport ("kernel32.dll")]
-    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
-
-    [DllImport ("kernel32.dll")]
-    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint CreateConsoleScreenBuffer (
-        DesiredAccess dwDesiredAccess,
-        ShareMode dwShareMode,
-        nint secutiryAttributes,
-        uint flags,
-        nint screenBufferData
-    );
-
-    internal static nint INVALID_HANDLE_VALUE = new (-1);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleActiveScreenBuffer (nint handle);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool GetNumberOfConsoleInputEvents (nint handle, out uint lpcNumberOfEvents);
-
-    internal uint GetNumberOfConsoleInputEvents ()
-    {
-        if (!GetNumberOfConsoleInputEvents (_inputHandle, out uint numOfEvents))
-        {
-            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
-
-            return 0;
-        }
-
-        return numOfEvents;
-    }
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool FlushConsoleInputBuffer (nint handle);
-
-    internal void FlushConsoleInputBuffer ()
-    {
-        if (!FlushConsoleInputBuffer (_inputHandle))
-        {
-            Console.WriteLine ($"Error: {Marshal.GetLastWin32Error ()}");
-        }
-    }
-
-#if false // Not needed on the constructor. Perhaps could be used on resizing. To study.
-		[DllImport ("kernel32.dll", ExactSpelling = true)]
-		static extern IntPtr GetConsoleWindow ();
-
-		[DllImport ("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		static extern bool ShowWindow (IntPtr hWnd, int nCmdShow);
-
-		public const int HIDE = 0;
-		public const int MAXIMIZE = 3;
-		public const int MINIMIZE = 6;
-		public const int RESTORE = 9;
-
-		internal void ShowWindow (int state)
-		{
-			IntPtr thisConsole = GetConsoleWindow ();
-			ShowWindow (thisConsole, state);
-		}
-#endif
-
-    // See: https://github.com/gui-cs/Terminal.Gui/issues/357
-
-    [StructLayout (LayoutKind.Sequential)]
-    public struct CONSOLE_SCREEN_BUFFER_INFOEX
-    {
-        public uint cbSize;
-        public Coord dwSize;
-        public Coord dwCursorPosition;
-        public ushort wAttributes;
-        public SmallRect srWindow;
-        public Coord dwMaximumWindowSize;
-        public ushort wPopupAttributes;
-        public bool bFullscreenSupported;
-
-        [MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)]
-        public COLORREF [] ColorTable;
-    }
-
-    [StructLayout (LayoutKind.Explicit, Size = 4)]
-    public struct COLORREF
-    {
-        public COLORREF (byte r, byte g, byte b)
-        {
-            Value = 0;
-            R = r;
-            G = g;
-            B = b;
-        }
-
-        public COLORREF (uint value)
-        {
-            R = 0;
-            G = 0;
-            B = 0;
-            Value = value & 0x00FFFFFF;
-        }
-
-        [FieldOffset (0)]
-        public byte R;
-
-        [FieldOffset (1)]
-        public byte G;
-
-        [FieldOffset (2)]
-        public byte B;
-
-        [FieldOffset (0)]
-        public uint Value;
-    }
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool GetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX csbi);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleScreenBufferInfoEx (nint hConsoleOutput, ref CONSOLE_SCREEN_BUFFER_INFOEX consoleScreenBufferInfo);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleWindowInfo (
-        nint hConsoleOutput,
-        bool bAbsolute,
-        [In] ref SmallRect lpConsoleWindow
-    );
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern Coord GetLargestConsoleWindowSize (
-        nint hConsoleOutput
-    );
 }

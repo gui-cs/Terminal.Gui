@@ -6,8 +6,21 @@ namespace Terminal.Gui.Drawing;
 ///     Uses Ansi escape sequences to detect whether sixel is supported
 ///     by the terminal.
 /// </summary>
-public class SixelSupportDetector
+public class SixelSupportDetector ()
 {
+    private readonly IDriver? _driver;
+
+    /// <summary>
+    ///     Creates a new instance of the <see cref="SixelSupportDetector"/> class.
+    /// </summary>
+    /// <param name="driver"></param>
+    public SixelSupportDetector (IDriver? driver) : this ()
+    {
+        ArgumentNullException.ThrowIfNull (driver);
+
+        _driver = driver;
+    }
+
     /// <summary>
     ///     Sends Ansi escape sequences to the console to determine whether
     ///     sixel is supported (and <see cref="SixelSupportResult.Resolution"/>
@@ -53,21 +66,21 @@ public class SixelSupportDetector
 
     private void TryComputeResolution (SixelSupportResult result, Action<SixelSupportResult> resultCallback)
     {
-        string windowSize;
+        string consoleSize;
         string sizeInChars;
 
         QueueRequest (
                       EscSeqUtils.CSI_RequestWindowSizeInPixels,
                       r1 =>
                       {
-                          windowSize = r1;
+                          consoleSize = r1;
 
                           QueueRequest (
-                                        EscSeqUtils.CSI_ReportTerminalSizeInChars,
+                                        EscSeqUtils.CSI_ReportWindowSizeInChars,
                                         r2 =>
                                         {
                                             sizeInChars = r2;
-                                            ComputeResolution (result, windowSize, sizeInChars);
+                                            ComputeResolution (result, consoleSize, sizeInChars);
                                             resultCallback (result);
                                         },
                                         () => resultCallback (result));
@@ -75,11 +88,11 @@ public class SixelSupportDetector
                       () => resultCallback (result));
     }
 
-    private void ComputeResolution (SixelSupportResult result, string windowSize, string sizeInChars)
+    private void ComputeResolution (SixelSupportResult result, string consoleSize, string sizeInChars)
     {
         // Fallback to window size in pixels and characters
         // Example [4;600;1200t
-        Match pixelMatch = Regex.Match (windowSize, @"\[\d+;(\d+);(\d+)t$");
+        Match pixelMatch = Regex.Match (consoleSize, @"\[\d+;(\d+);(\d+)t$");
 
         // Example [8;30;120t
         Match charMatch = Regex.Match (sizeInChars, @"\[\d+;(\d+);(\d+)t$");
@@ -127,17 +140,17 @@ public class SixelSupportDetector
                       () => resultCallback (result));
     }
 
-    private static void QueueRequest (AnsiEscapeSequence req, Action<string> responseCallback, Action abandoned)
+    private void QueueRequest (AnsiEscapeSequence req, Action<string> responseCallback, Action abandoned)
     {
         var newRequest = new AnsiEscapeSequenceRequest
         {
             Request = req.Request,
             Terminator = req.Terminator,
-            ResponseReceived = responseCallback,
+            ResponseReceived = responseCallback!,
             Abandoned = abandoned
         };
 
-        Application.Driver?.QueueAnsiRequest (newRequest);
+        _driver?.QueueAnsiRequest (newRequest);
     }
 
     private static bool ResponseIndicatesSupport (string response) { return response.Split (';').Contains ("4"); }
@@ -145,14 +158,12 @@ public class SixelSupportDetector
     private static bool IsVirtualTerminal ()
     {
         return !string.IsNullOrWhiteSpace (Environment.GetEnvironmentVariable ("WT_SESSION"));
-
-        ;
     }
 
     private static bool IsXtermWithTransparency ()
     {
         // Check if running in real xterm (XTERM_VERSION is more reliable than TERM)
-        string xtermVersionStr = Environment.GetEnvironmentVariable ("XTERM_VERSION");
+        string xtermVersionStr = Environment.GetEnvironmentVariable (@"XTERM_VERSION")!;
 
         // If XTERM_VERSION exists, we are in a real xterm
         if (!string.IsNullOrWhiteSpace (xtermVersionStr) && int.TryParse (xtermVersionStr, out int xtermVersion) && xtermVersion >= 370)

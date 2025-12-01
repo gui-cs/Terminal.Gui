@@ -1,12 +1,13 @@
 using System.Globalization;
+using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 /// Pure unit tests for <see cref="DatePicker"/> that don't require Application.Driver or View context.
 /// These tests can run in parallel without interference.
 /// </summary>
-public class DatePickerTests : UnitTests.Parallelizable.ParallelizableBase
+public class DatePickerTests : FakeDriverBase
 {
     [Fact]
     public void DatePicker_ChangingCultureChangesFormat ()

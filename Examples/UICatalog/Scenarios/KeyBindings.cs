@@ -164,17 +164,17 @@ public class KeyBindingsDemo : View
 
         AddCommand (Command.Save, ctx =>
                                  {
-                                     MessageBox.Query ($"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
+                                     MessageBox.Query (ApplicationImpl.Instance, $"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
                                      return true;
                                  });
         AddCommand (Command.New, ctx =>
                                 {
-                                    MessageBox.Query ($"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
+                                    MessageBox.Query (ApplicationImpl.Instance, $"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
                                     return true;
                                 });
         AddCommand (Command.HotKey, ctx =>
         {
-            MessageBox.Query ($"{ctx.Command}", $"Ctx: {ctx}\nCommand: {ctx.Command}", buttons: "Ok");
+            MessageBox.Query (ApplicationImpl.Instance, $"{ctx.Command}", $"Ctx: {ctx}\nCommand: {ctx.Command}", buttons: "Ok");
             SetFocus ();
             return true;
         });
@@ -189,7 +189,7 @@ public class KeyBindingsDemo : View
                                              {
                                                  return false;
                                              }
-                                             MessageBox.Query ($"{keyCommandContext.Binding}", $"Key: {keyCommandContext.Binding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
+                                             MessageBox.Query (ApplicationImpl.Instance, $"{keyCommandContext.Binding}", $"Key: {keyCommandContext.Binding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
                                              Application.RequestStop ();
                                              return true;
                                          });

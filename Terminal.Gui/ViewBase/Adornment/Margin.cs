@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 using System.Runtime.InteropServices;
 
@@ -79,12 +79,12 @@ public class Margin : Adornment
 
             if (view.Margin?.GetCachedClip () != null)
             {
-                view.Margin.NeedsDraw = true;
-                Region? saved = GetClip ();
-                View.SetClip (view.Margin.GetCachedClip ());
-                view.Margin.Draw ();
-                View.SetClip (saved);
-                view.Margin.ClearCachedClip ();
+                view.Margin!.NeedsDraw = true;
+                Region? saved = view.GetClip ();
+                view.SetClip (view.Margin!.GetCachedClip ());
+                view.Margin!.Draw (); 
+                view.SetClip (saved);
+                view.Margin!.ClearCachedClip ();
             }
 
             view.NeedsDraw = false;
@@ -128,7 +128,7 @@ public class Margin : Adornment
             // This just draws/clears the thickness, not the insides.
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
             //SetAttribute (GetAttributeForRole (VisualRole.Normal));
-            Thickness.Draw (screen, Diagnostics, ToString ());
+            Thickness.Draw (Driver, screen, Diagnostics, ToString ());
         }
 
         if (ShadowStyle != ShadowStyle.None)
@@ -292,14 +292,14 @@ public class Margin : Adornment
             {
                 case ShadowStyle.Transparent:
                     // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).Y + 1 : 0;
+                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
 
                     break;
 
                 case ShadowStyle.Opaque:
                     // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).Y + 1 : 0;
-                    _bottomShadow.X = Parent.Border.Thickness.Left > 0 ? ScreenToViewport (Parent.Border.GetBorderRectangle ().Location).X + 1 : 0;
+                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
+                    _bottomShadow.X = Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).X + 1 : 0;
 
                     break;
 

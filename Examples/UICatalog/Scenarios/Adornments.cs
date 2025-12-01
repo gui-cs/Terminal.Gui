@@ -11,7 +11,7 @@ public class Adornments : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -26,9 +26,9 @@ public class Adornments : Scenario
             X = Pos.AnchorEnd ()
         };
 
-        editor.Border.Thickness = new (1, 2, 1, 1);
+        editor.Border!.Thickness = new (1, 2, 1, 1);
 
-        app.Add (editor);
+        appWindow.Add (editor);
 
         var window = new Window
         {
@@ -38,7 +38,7 @@ public class Adornments : Scenario
             Width = Dim.Fill (Dim.Func (_ => editor.Frame.Width)),
             Height = Dim.Fill ()
         };
-        app.Add (window);
+        appWindow.Add (window);
 
         var tf1 = new TextField { Width = 10, Text = "TextField" };
         var color = new ColorPicker16 { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
@@ -60,7 +60,7 @@ public class Adornments : Scenario
         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
         button.Accepting += (s, e) =>
-                             MessageBox.Query (20, 7, "Hi", $"Am I a {window.GetType ().Name}?", "Yes", "No");
+                             MessageBox.Query (appWindow.App, 20, 7, "Hi", $"Am I a {window.GetType ().Name}?", "Yes", "No");
 
         var label = new TextView
         {
@@ -71,7 +71,7 @@ public class Adornments : Scenario
             Width = 40,
             Height = 6 // TODO: Use Dim.Auto
         };
-        label.Border.Thickness = new (1, 3, 1, 1);
+        label.Border!.Thickness = new (1, 3, 1, 1);
 
         var btnButtonInWindow = new Button { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
 
@@ -84,13 +84,13 @@ public class Adornments : Scenario
             SchemeName = "Dialog"
         };
 
-        window.Margin.Data = "Margin";
-        window.Margin.Text = "Margin Text";
-        window.Margin.Thickness = new (0);
+        window.Margin!.Data = "Margin";
+        window.Margin!.Text = "Margin Text";
+        window.Margin!.Thickness = new (0);
 
-        window.Border.Data = "Border";
-        window.Border.Text = "Border Text";
-        window.Border.Thickness = new (0);
+        window.Border!.Data = "Border";
+        window.Border!.Text = "Border Text";
+        window.Border!.Thickness = new (0);
 
         window.Padding.Data = "Padding";
         window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
@@ -121,7 +121,7 @@ public class Adornments : Scenario
                                       Text = "text (Y = 1)",
                                       CanFocus = true
                                   };
-                                  textFieldInPadding.Accepting += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
+                                  textFieldInPadding.Accepting += (s, e) => MessageBox.Query (appWindow.App, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
                                   var btnButtonInPadding = new Button
@@ -132,16 +132,16 @@ public class Adornments : Scenario
                                       CanFocus = true,
                                       HighlightStates = MouseState.None,
                                   };
-                                  btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                  btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (appWindow.App, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                  btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
+                                  btnButtonInPadding.Border!.Thickness = new (1, 1, 1, 1);
                                   window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
-                                btnButtonInPadding.Border.CloseButton.Visible = true;
+                                btnButtonInPadding.Border!.CloseButton.Visible = true;
 
-                                view.Border.CloseButton.Visible = true;
-                                view.Border.CloseButton.Accept += (s, e) =>
+                                view.Border!.CloseButton.Visible = true;
+                                view.Border!.CloseButton.Accept += (s, e) =>
                                                                   {
                                                                       MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
                                                                       e.Handled = true;
@@ -155,8 +155,8 @@ public class Adornments : Scenario
         editor.AutoSelectSuperView = window;
         editor.AutoSelectAdornments = true;
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (appWindow);
+        appWindow.Dispose ();
 
         Application.Shutdown ();
     }

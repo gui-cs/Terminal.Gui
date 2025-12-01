@@ -1,268 +1,329 @@
-﻿namespace UnitTests.ApplicationTests;
+﻿#nullable enable
+namespace UnitTests.ApplicationTests;
 
 public class ApplicationPopoverTests
 {
     [Fact]
     public void Application_Init_Initializes_PopoverManager ()
     {
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        try
+        {
+            // Arrange
+            Application.Init ("fake");
 
-        // Act
-        Assert.NotNull (Application.Popover);
-
-        Application.ResetState (true);
+            // Act
+            Assert.NotNull (Application.Popover);
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
     public void Application_Shutdown_Resets_PopoverManager ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        try
+        {
+            // Arrange
 
-        // Act
-        Assert.NotNull (Application.Popover);
+            Application.Init ("fake");
 
-        Application.Shutdown ();
+            // Act
+            Assert.NotNull (Application.Popover);
 
-        // Test
-        Assert.Null (Application.Popover);
+            Application.Shutdown ();
+
+            // Test
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
     public void Application_End_Does_Not_Reset_PopoverManager ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
-        Assert.NotNull (Application.Popover);
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Runnable? top = null;
 
-        var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        try
+        {
+            // Arrange
+            Application.Init ("fake");
+            Assert.NotNull (Application.Popover);
+            Application.StopAfterFirstIteration = true;
 
-        // Act
-        Application.End (rs);
+            top = new ();
+            SessionToken rs = Application.Begin (top);
 
-        // Test
-        Assert.NotNull (Application.Popover);
+            // Act
+            Application.End (rs);
 
-        top.Dispose ();
-        Application.Shutdown ();
+            // Test
+            Assert.NotNull (Application.Popover);
+        }
+        finally
+        {
+            top?.Dispose ();
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
     public void Application_End_Hides_Active ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Runnable? top = null;
 
-        var top = new Toplevel ();
-        RunState rs = Application.Begin (top);
+        try
+        {
+            // Arrange
+            Application.Init ("fake");
+            Application.StopAfterFirstIteration = true;
 
-        PopoverTestClass popover = new ();
+            top = new ();
+            SessionToken rs = Application.Begin (top);
 
-        Application.Popover?.Show (popover);
-        Assert.True (popover.Visible);
+            PopoverTestClass? popover = new ();
 
-        // Act
-        Application.End (rs);
-        top.Dispose ();
+            Application.Popover?.Register (popover);
+            Application.Popover?.Show (popover);
+            Assert.True (popover.Visible);
 
-        // Test
-        Assert.False (popover.Visible);
-        Assert.NotNull (Application.Popover);
+            // Act
+            Application.End (rs);
 
-        Application.Shutdown ();
-        Assert.Equal (1, popover.DisposedCount);
+            // Test
+            Assert.False (popover.Visible);
+            Assert.NotNull (Application.Popover);
+
+            popover.Dispose ();
+            Assert.Equal (1, popover.DisposedCount);
+        }
+        finally
+        {
+            top?.Dispose ();
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
     public void Application_Shutdown_Disposes_Registered_Popovers ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        try
+        {
+            // Arrange
 
-        PopoverTestClass popover = new ();
+            Application.Init ("fake");
 
-        // Act
-        Application.Popover?.Register (popover);
-        Application.Shutdown ();
+            PopoverTestClass? popover = new ();
 
-        // Test
-        Assert.Equal (1, popover.DisposedCount);
+            // Act
+            Application.Popover?.Register (popover);
+            Application.Shutdown ();
+
+            // Test
+            Assert.Equal (1, popover.DisposedCount);
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
     public void Application_Shutdown_Does_Not_Dispose_DeRegistered_Popovers ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        try
+        {
+            // Arrange
 
-        PopoverTestClass popover = new ();
+            Application.Init ("fake");
 
-        Application.Popover?.Register (popover);
+            PopoverTestClass? popover = new ();
 
-        // Act
-        Application.Popover?.DeRegister (popover);
-        Application.Shutdown ();
+            Application.Popover?.Register (popover);
 
-        // Test
-        Assert.Equal (0, popover.DisposedCount);
+            // Act
+            Application.Popover?.DeRegister (popover);
+            Application.Shutdown ();
 
-        popover.Dispose ();
-        Assert.Equal (1, popover.DisposedCount);
+            // Test
+            Assert.Equal (0, popover.DisposedCount);
+
+            popover.Dispose ();
+            Assert.Equal (1, popover.DisposedCount);
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
     public void Application_Shutdown_Does_Not_Dispose_ActiveNotRegistered_Popover ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
+        try
+        {
+            // Arrange
 
-        PopoverTestClass popover = new ();
+            Application.Init ("fake");
 
-        Application.Popover?.Show (popover);
-        Application.Popover?.DeRegister (popover);
+            PopoverTestClass? popover = new ();
+            Application.Popover?.Register (popover);
+            Application.Popover?.Show (popover);
+            Application.Popover?.DeRegister (popover);
 
-        // Act
-        Application.Shutdown ();
+            // Act
+            Application.Shutdown ();
 
-        // Test
-        Assert.Equal (0, popover.DisposedCount);
+            // Test
+            Assert.Equal (0, popover.DisposedCount);
 
-        popover.Dispose ();
-        Assert.Equal (1, popover.DisposedCount);
+            popover.Dispose ();
+            Assert.Equal (1, popover.DisposedCount);
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
-    public void Register_SetsTopLevel ()
+    public void Register_SetsRunnable ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
-        Application.Top = new Toplevel ();
-        PopoverTestClass popover = new ();
+        try
+        {
+            // Arrange
 
-        // Act
-        Application.Popover?.Register (popover);
+            Application.Init ("fake");
+            Application.Begin (new Runnable ());
+            PopoverTestClass? popover = new ();
 
-        // Assert
-        Assert.Equal (Application.Top, popover.Toplevel);
+            // Act
+            Application.Popover?.Register (popover);
 
-        Application.ResetState (true);
+            // Assert
+            Assert.Equal (Application.TopRunnableView as IRunnable, popover.Current);
+        }
+        finally
+        {
+            Application.TopRunnableView?.Dispose ();
+            Application.Shutdown ();
+        }
     }
 
     [Fact]
-    public void Keyboard_Events_Go_Only_To_Popover_Associated_With_Toplevel ()
+    public void Keyboard_Events_Go_Only_To_Popover_Associated_With_Runnable ()
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
-        Application.Top = new Toplevel () { Id = "initialTop" };
-        PopoverTestClass popover = new ();
-        int keyDownEvents = 0;
-        popover.KeyDown += (s, e) =>
-                           {
-                               keyDownEvents++;
-                               e.Handled = true;
-                           }; // Ensure it handles the key
+        try
+        {
+            // Arrange
+            Application.Init ("fake");
 
-        Application.Popover?.Register (popover);
+            Runnable<bool>? initialRunnable = new () { Id = "initialRunnable" };
+            Application.Begin (initialRunnable);
+            PopoverTestClass? popover = new ();
+            var keyDownEvents = 0;
 
-        // Act
-        Application.RaiseKeyDownEvent (Key.A); // Goes to initialTop
+            popover.KeyDown += (s, e) =>
+                               {
+                                   keyDownEvents++;
+                                   e.Handled = true;
+                               }; // Ensure it handles the key
 
-        Application.Top = new Toplevel () { Id = "secondaryTop" };
-        Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryTop
+            Application.Popover?.Register (popover);
 
-        // Test
-        Assert.Equal (1, keyDownEvents);
+            // Act
+            Application.RaiseKeyDownEvent (Key.A); // Goes to initialRunnable
 
+            Runnable<bool>? secondaryRunnable = new () { Id = "secondaryRunnable" };
+            Application.Begin (secondaryRunnable);
 
-        popover.Dispose ();
-        Assert.Equal (1, popover.DisposedCount);
-        Application.ResetState (true);
+            Application.RaiseKeyDownEvent (Key.A); // Goes to secondaryRunnable
+
+            // Test
+            Assert.Equal (1, keyDownEvents);
+
+            popover.Dispose ();
+            Assert.Equal (1, popover.DisposedCount);
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
     }
 
     // See: https://github.com/gui-cs/Terminal.Gui/issues/4122
     [Theory]
-    [InlineData (0, 0, new [] { "top" })]
+    [InlineData (0, 0, new [] { "runnable" })]
     [InlineData (10, 10, new string [] { })]
-    [InlineData (1, 1, new [] { "top", "view" })]
-    [InlineData (5, 5, new [] { "top" })]
+    [InlineData (1, 1, new [] { "runnable", "view" })]
+    [InlineData (5, 5, new [] { "runnable" })]
     [InlineData (6, 6, new [] { "popoverSubView" })]
-    [InlineData (7, 7, new [] { "top" })]
-    [InlineData (3, 3, new [] { "top" })]
+    [InlineData (7, 7, new [] { "runnable" })]
+    [InlineData (3, 3, new [] { "runnable" })]
     public void GetViewsUnderMouse_Supports_ActivePopover (int mouseX, int mouseY, string [] viewIdStrings)
     {
-        Application.ResetState (true);
-        // Arrange
-        Assert.Null (Application.Popover);
-        Application.Init (new FakeDriver ());
-        Application.Top = new ()
+        PopoverTestClass? popover = null;
+
+        try
         {
-            Frame = new (0, 0, 10, 10),
-            Id = "top"
-        };
+            // Arrange
+            Application.Init ("fake");
 
-        View view = new ()
+            Runnable<bool>? runnable = new ()
+            {
+                Frame = new (0, 0, 10, 10),
+                Id = "runnable"
+            };
+            Application.Begin (runnable);
+
+            View? view = new ()
+            {
+                Id = "view",
+                X = 1,
+                Y = 1,
+                Width = 2,
+                Height = 2
+            };
+
+            runnable.Add (view);
+
+            popover = new ()
+            {
+                Id = "popover",
+                X = 5,
+                Y = 5,
+                Width = 3,
+                Height = 3
+            }; // at 5,5 to 8,8 (screen)
+
+            View? popoverSubView = new ()
+            {
+                Id = "popoverSubView",
+                X = 1,
+                Y = 1,
+                Width = 1,
+                Height = 1
+            };
+
+            popover.Add (popoverSubView);
+            Application.Popover?.Register (popover);
+
+            Application.Popover?.Show (popover);
+
+            List<View?> found = view.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
+
+            string [] foundIds = found.Select (v => v!.Id).ToArray ();
+
+            Assert.Equal (viewIdStrings, foundIds);
+        }
+        finally
         {
-            Id = "view",
-            X = 1,
-            Y = 1,
-            Width = 2,
-            Height = 2,
-        }; // at 1,1 to 3,2 (screen)
-
-        Application.Top.Add (view);
-
-        PopoverTestClass popover = new ()
-        {
-            Id = "popover",
-            X = 5,
-            Y = 5,
-            Width = 3,
-            Height = 3,
-        }; // at 5,5 to 8,8 (screen)
-
-        View popoverSubView = new ()
-        {
-            Id = "popoverSubView",
-            X = 1,
-            Y = 1,
-            Width = 1,
-            Height = 1,
-        }; // at 6,6 to 7,7 (screen)
-
-        popover.Add (popoverSubView);
-
-        Application.Popover?.Show (popover);
-
-        List<View?> found = View.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
-
-        string [] foundIds = found.Select (v => v!.Id).ToArray ();
-
-        Assert.Equal (viewIdStrings, foundIds);
-
-        popover.Dispose ();
-        Application.Top.Dispose ();
-        Application.ResetState (true);
+            popover?.Dispose ();
+            Application.Shutdown ();
+        }
     }
 
     public class PopoverTestClass : PopoverBaseImpl
@@ -276,7 +337,7 @@ public class ApplicationPopoverTests
         public PopoverTestClass ()
         {
             CanFocus = true;
-            AddCommand (Command.New, NewCommandHandler);
+            AddCommand (Command.New, NewCommandHandler!);
             HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
 
             return;

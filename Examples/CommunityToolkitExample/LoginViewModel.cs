@@ -12,7 +12,7 @@ internal partial class LoginViewModel : ObservableObject
     private const string INVALID_LOGIN_MESSAGE = "Please enter a valid user name and password.";
     private const string LOGGING_IN_PROGRESS_MESSAGE = "Logging in...";
     private const string VALID_LOGIN_MESSAGE = "The input is valid!";
-    
+
     [ObservableProperty]
     private bool _canLogin;
 
@@ -28,7 +28,7 @@ internal partial class LoginViewModel : ObservableObject
 
     [ObservableProperty]
     private string _usernameLengthMessage;
-    
+
     [ObservableProperty]
     private Scheme? _validationScheme;
 
@@ -105,7 +105,7 @@ internal partial class LoginViewModel : ObservableObject
     {
         switch (loginAction)
         {
-             case LoginActions.Clear:
+            case LoginActions.Clear:
                 LoginProgressMessage = message;
                 ValidationMessage = INVALID_LOGIN_MESSAGE;
                 ValidationScheme = SchemeManager.GetScheme ("Error");
@@ -115,7 +115,7 @@ internal partial class LoginViewModel : ObservableObject
                 break;
             case LoginActions.Validation:
                 ValidationMessage = CanLogin ? VALID_LOGIN_MESSAGE : INVALID_LOGIN_MESSAGE;
-                ValidationScheme = CanLogin ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme("Error");
+                ValidationScheme = CanLogin ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme ("Error");
                 break;
         }
         WeakReferenceMessenger.Default.Send (new Message<LoginActions> { Value = loginAction });

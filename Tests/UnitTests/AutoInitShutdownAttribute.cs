@@ -20,45 +20,22 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     are automatically called Before/After a test runs.
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
-    /// <param name="consoleDriverType">
-    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, UnixDriver, DotNetDriver)
-    ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
+    /// <param name="forceDriver">
+    ///     Forces the specified driver ("windows", "dotnet", "unix", or "fake") to
+    ///     be used when Application.Init is called. If not specified FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
-    /// <param name="useFakeClipboard">
-    ///     If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only
-    ///     valid if <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardIsSupportedAlwaysTrue">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
-        Type consoleDriverType = null,
-        bool useFakeClipboard = true,
-        bool fakeClipboardAlwaysThrowsNotSupportedException = false,
-        bool fakeClipboardIsSupportedAlwaysTrue = false,
-        bool verifyShutdown = false
+        string forceDriver = null
     )
     {
-        AutoInit = autoInit;
+        _autoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
-        _driverType = consoleDriverType;
-        FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
-        FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
-            fakeClipboardAlwaysThrowsNotSupportedException;
-        FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
-        _verifyShutdown = verifyShutdown;
+        _forceDriver = forceDriver;
     }
 
-    private readonly bool _verifyShutdown;
-    private readonly Type _driverType;
+    private readonly string _forceDriver;
     private IDisposable _v2Cleanup;
 
     public override void After (MethodInfo methodUnderTest)
@@ -70,15 +47,10 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         _v2Cleanup?.Dispose ();
 
-        if (AutoInit)
+        if (_autoInit)
         {
-            // try
+            try
             {
-                if (!_verifyShutdown)
-                {
-                    Application.ResetState (ignoreDisposed: true);
-                }
-
                 Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
                 if (View.Instances.Count == 0)
@@ -93,21 +65,22 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
             }
             //catch (Exception e)
             //{
-            //    Assert.Fail ($"Application.Shutdown threw an exception after the test exited: {e}");
+            //    Debug.WriteLine ($"Application.Shutdown threw an exception after the test exited: {e}");
             //}
-            //finally
+            finally
             {
 #if DEBUG_IDISPOSABLE
                 View.Instances.Clear ();
                 Application.ResetState (true);
 #endif
+                ApplicationImpl.SetInstance (null);
             }
         }
 
         Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
 
         // Force the ConfigurationManager to reset to its hardcoded defaults
-        CM.Disable(true);
+        CM.Disable (true);
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -121,7 +94,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
 
         //Debug.Assert(!CM.IsEnabled, "Some other test left ConfigurationManager enabled.");
 
-        if (AutoInit)
+        if (_autoInit)
         {
 #if DEBUG_IDISPOSABLE
             View.EnableDebugIDisposableAsserts = true;
@@ -136,53 +109,28 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            if (_driverType == null)
+            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
             {
-                Application.Top = null;
-                Application.TopLevels.Clear ();
-
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();
-                AutoInitShutdownAttribute.FakeResize (new Size (80,25));
+
             }
             else
             {
-                Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
+                Assert.Fail ("Specifying driver name not yet supported");
+                //Application.Init ((IDriver)Activator.CreateInstance (_forceDriver));
             }
         }
     }
 
-    private bool AutoInit { get; }
-
-    /// <summary>
-    /// 'Resizes' the application and forces layout. Only works if your test uses <see cref="AutoInitShutdownAttribute"/>
-    /// </summary>
-    /// <param name="size"></param>
-    public static void FakeResize (Size size)
-    {
-        var d = (IConsoleDriverFacade)Application.Driver!;
-        d.OutputBuffer.SetWindowSize (size.Width, size.Height);
-        
-        // Handle both FakeSizeMonitor (from test project) and FakeWindowSizeMonitor (from main library)
-        if (d.WindowSizeMonitor is FakeSizeMonitor fakeSizeMonitor)
-        {
-            fakeSizeMonitor.RaiseSizeChanging (size);
-        }
-        else if (d.WindowSizeMonitor is FakeWindowSizeMonitor fakeWindowSizeMonitor)
-        {
-            // For FakeWindowSizeMonitor, use the RaiseSizeChanging method
-            fakeWindowSizeMonitor.RaiseSizeChanging (size);
-        }
-
-        Application.LayoutAndDraw (true);
-    }
+    private bool _autoInit { get; }
 
     /// <summary>
     /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)
     /// </summary>
     public static void RunIteration ()
     {
-        var a = (ApplicationImpl)ApplicationImpl.Instance;
+        ApplicationImpl a = (ApplicationImpl)ApplicationImpl.Instance;
         a.Coordinator?.RunIteration ();
     }
 }

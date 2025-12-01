@@ -14,9 +14,9 @@ public class Bars : Scenario
     public override void Main ()
     {
         Application.Init ();
-        Toplevel app = new ();
+        Runnable app = new ();
 
-        app.Loaded += App_Loaded;
+        app.IsModalChanged += App_Loaded;
 
         Application.Run (app);
         app.Dispose ();
@@ -28,7 +28,7 @@ public class Bars : Scenario
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object sender, EventArgs e)
     {
-        Application.Top!.Title = GetQuitKeyAndName ();
+        Application.TopRunnableView!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
         ListView eventLog = new ListView ()
@@ -37,11 +37,11 @@ public class Bars : Scenario
             X = Pos.AnchorEnd (),
             Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
-            SchemeName = "Toplevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource)
         };
-        eventLog.Border.Thickness = new (0, 1, 0, 0);
-        Application.Top.Add (eventLog);
+        eventLog.Border!.Thickness = new (0, 1, 0, 0);
+        Application.TopRunnableView.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()
         {
@@ -51,7 +51,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent(33),
         };
-        Application.Top.Add (menuBarLikeExamples);
+        Application.TopRunnableView.Add (menuBarLikeExamples);
 
         Label label = new Label ()
         {
@@ -80,7 +80,7 @@ public class Bars : Scenario
         };
         menuBarLikeExamples.Add (label);
 
-        //bar = new MenuBarv2
+        //bar = new MenuBar
         //{
         //    Id = "menuBar",
         //    X = Pos.Right (label),
@@ -98,7 +98,7 @@ public class Bars : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             Height = Dim.Percent (33),
         };
-        Application.Top.Add (menuLikeExamples);
+        Application.TopRunnableView.Add (menuLikeExamples);
 
         label = new Label ()
         {
@@ -128,7 +128,7 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
-        bar = new Menuv2
+        bar = new Menu
         {
             Id = "menu",
             X = Pos.Left (label),
@@ -147,7 +147,7 @@ public class Bars : Scenario
         };
         menuLikeExamples.Add (label);
 
-        Menuv2 popOverMenu  = new Menuv2
+        Menu popOverMenu  = new Menu
         {
             Id = "popupMenu",
             X = Pos.Left (label),
@@ -185,9 +185,9 @@ public class Bars : Scenario
 
         menuLikeExamples.Add (popOverMenu);
 
-        menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
+        menuLikeExamples.MouseEvent += MenuLikeExamplesMouseEvent;
 
-        void MenuLikeExamplesMouseClick (object sender, MouseEventArgs e)
+        void MenuLikeExamplesMouseEvent (object _, MouseEventArgs e)
         {
             if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
@@ -212,7 +212,7 @@ public class Bars : Scenario
             Width = Dim.Width (menuLikeExamples),
             Height = Dim.Percent (33),
         };
-        Application.Top.Add (statusBarLikeExamples);
+        Application.TopRunnableView.Add (statusBarLikeExamples);
 
         label = new Label ()
         {
@@ -249,7 +249,7 @@ public class Bars : Scenario
         ConfigStatusBar (bar);
         statusBarLikeExamples.Add (bar);
 
-        foreach (FrameView frameView in Application.Top.SubViews.Where (f => f is FrameView)!)
+        foreach (FrameView frameView in Application.TopRunnableView.SubViews.Where (f => f is FrameView)!)
         {
             foreach (Bar barView in frameView.SubViews.Where (b => b is Bar)!)
             {
@@ -269,8 +269,8 @@ public class Bars : Scenario
 
     //private void SetupContentMenu ()
     //{
-    //    Application.Top.Add (new Label { Text = "Right Click for Context Menu", X = Pos.Center (), Y = 4 });
-    //    Application.Top.MouseClick += ShowContextMenu;
+    //    Application.TopRunnable.Add (new Label { Text = "Right Click for Context Menu", X = Pos.Center (), Y = 4 });
+    //    Application.TopRunnable.MouseClick += ShowContextMenu;
     //}
 
     //private void ShowContextMenu (object s, MouseEventEventArgs e)
@@ -309,7 +309,7 @@ public class Bars : Scenario
     //                                                  new TimeSpan (0),
     //                                                  () =>
     //                                                  {
-    //                                                      MessageBox.Query ("File", "New");
+    //                                                      MessageBox.Query (App, "File", "New");
 
     //                                                      return false;
     //                                                  });
@@ -331,7 +331,7 @@ public class Bars : Scenario
     //                                               new TimeSpan (0),
     //                                               () =>
     //                                               {
-    //                                                   MessageBox.Query ("File", "Open");
+    //                                                   MessageBox.Query (App, "File", "Open");
 
     //                                                   return false;
     //                                               });
@@ -353,7 +353,7 @@ public class Bars : Scenario
     //                                               new TimeSpan (0),
     //                                               () =>
     //                                               {
-    //                                                   MessageBox.Query ("File", "Save");
+    //                                                   MessageBox.Query (App, "File", "Save");
 
     //                                                   return false;
     //                                               });
@@ -375,7 +375,7 @@ public class Bars : Scenario
     //                                                 new TimeSpan (0),
     //                                                 () =>
     //                                                 {
-    //                                                     MessageBox.Query ("File", "Save As");
+    //                                                     MessageBox.Query (App, "File", "Save As");
 
     //                                                     return false;
     //                                                 });
@@ -383,7 +383,7 @@ public class Bars : Scenario
 
     //    contextMenu.Add (newMenu, open, save, saveAs);
 
-    //    contextMenu.KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+    //    contextMenu.KeyBindings.Add (Key.Esc, Command.Quit);
 
     //    contextMenu.Initialized += Menu_Initialized;
 
@@ -555,7 +555,7 @@ public class Bars : Scenario
 
         return;
 
-        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void Button_Clicked (object sender, EventArgs e) { MessageBox.Query ((sender as View)?.App, "Hi", $"You clicked {sender}"); }
 
     }
 

@@ -1,49 +1,49 @@
-#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// <see cref="IComponentFactory{T}"/> implementation for fake/mock console I/O used in unit tests.
-/// This factory creates instances that simulate console behavior without requiring a real terminal.
+///     <see cref="IComponentFactory{T}"/> implementation for fake/mock console I/O used in unit tests.
+///     This factory creates instances that simulate console behavior without requiring a real terminal.
 /// </summary>
-public class FakeComponentFactory : ComponentFactory<ConsoleKeyInfo>
+public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
 {
-    private readonly ConcurrentQueue<ConsoleKeyInfo>? _predefinedInput;
-    private readonly FakeConsoleOutput? _output;
+    private readonly FakeInput? _input;
+    private readonly IOutput? _output;
+    private readonly ISizeMonitor? _sizeMonitor;
 
     /// <summary>
-    /// Creates a new FakeComponentFactory with optional predefined input and output capture.
+    ///     Creates a new FakeComponentFactory with optional output capture.
     /// </summary>
-    /// <param name="predefinedInput">Optional queue of predefined input events to simulate.</param>
+    /// <param name="input"></param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
-    public FakeComponentFactory (ConcurrentQueue<ConsoleKeyInfo>? predefinedInput = null, FakeConsoleOutput? output = null)
+    /// <param name="sizeMonitor"></param>
+    public FakeComponentFactory (FakeInput? input = null, IOutput? output = null, ISizeMonitor? sizeMonitor = null)
     {
-        _predefinedInput = predefinedInput;
+        _input = input;
         _output = output;
+        _sizeMonitor = sizeMonitor;
+    }
+
+
+    /// <inheritdoc/>
+    public override ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)
+    {
+        return _sizeMonitor ?? new SizeMonitorImpl (consoleOutput);
     }
 
     /// <inheritdoc/>
-    public override IConsoleInput<ConsoleKeyInfo> CreateInput ()
+    public override IInput<ConsoleKeyInfo> CreateInput ()
     {
-        return new FakeConsoleInput (_predefinedInput);
+        return _input ?? new FakeInput ();
     }
 
-    /// <inheritdoc />
-    public override IConsoleOutput CreateOutput ()
-    {
-        return _output ?? new FakeConsoleOutput ();
-    }
+    /// <inheritdoc/>
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) { return new FakeInputProcessor (inputBuffer); }
 
-    /// <inheritdoc />
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
+    /// <inheritdoc/>
+    public override IOutput CreateOutput ()
     {
-        return new NetInputProcessor (inputBuffer);
-    }
-
-    /// <inheritdoc />
-    public override IWindowSizeMonitor CreateWindowSizeMonitor (IConsoleOutput consoleOutput, IOutputBuffer outputBuffer)
-    {
-        return new FakeWindowSizeMonitor(consoleOutput, outputBuffer);
+        return _output ?? new FakeOutput ();
     }
 }

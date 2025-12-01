@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Describes a request to render a given <see cref="SixelData"/> at a given <see cref="ScreenPosition"/>.
-///     Requires that the terminal and <see cref="IConsoleDriver"/> both support sixel.
+///     Requires that the terminal and <see cref="IDriver"/> both support sixel.
 /// </summary>
 public class SixelToRender
 {
@@ -10,7 +10,7 @@ public class SixelToRender
     ///     gets or sets the encoded sixel data. Use <see cref="SixelEncoder"/> to convert bitmaps
     ///     into encoded sixel data.
     /// </summary>
-    public string SixelData { get; set; }
+    public string? SixelData { get; set; }
 
     /// <summary>
     ///     gets or sets where to move the cursor to before outputting the <see cref="SixelData"/>.

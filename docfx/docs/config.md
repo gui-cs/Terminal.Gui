@@ -231,7 +231,7 @@ ThemeManager.ThemeChanged += (sender, e) =>
 
 ### Scheme System
 
-A **Scheme** defines the colors and text styles for a specific UI context (e.g., Dialog, Menu, TopLevel).
+A **Scheme** defines the colors and text styles for a specific UI context (e.g., Dialog, Menu, Runnable).
 
 See the [Scheme Deep Dive](scheme.md) for complete details on the scheme system.
 
@@ -239,7 +239,7 @@ See the [Scheme Deep Dive](scheme.md) for complete details on the scheme system.
 
 [Schemes](~/api/Terminal.Gui.Drawing.Schemes.yml) enum defines the standard schemes:
 
-- **TopLevel** - Top-level application windows
+- **Runnable** - Top-level application windows
 - **Base** - Default for most views
 - **Dialog** - Dialogs and message boxes
 - **Menu** - Menus and status bars
@@ -277,7 +277,7 @@ Each [Scheme](~/api/Terminal.Gui.Drawing.Scheme.yml) maps [VisualRole](~/api/Ter
 
 ```json
 {
-  "TopLevel": {
+  "Runnable": {
     "Normal": {
       "Foreground": "BrightGreen",
       "Background": "Black",
@@ -459,7 +459,8 @@ ThemeManager.ThemeChanged += (sender, e) =>
 {
     // Theme has changed
     // Refresh all views to use new theme
-    Application.Top?.SetNeedsDraw();
+    // From within a View, use: App?.Current?.SetNeedsDraw();
+    // Or access via IApplication instance: app.Current?.SetNeedsDraw();
 };
 ```
 
@@ -575,7 +576,7 @@ A theme is a named collection bundling visual settings and schemes:
         "Button.DefaultShadow": "Opaque",
         "Schemes": [
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": { "Foreground": "BrightGreen", "Background": "Black" },
               "Focus": { "Foreground": "White", "Background": "Cyan" }
             },

@@ -1,4 +1,4 @@
-﻿#nullable enable
+﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
@@ -7,36 +7,452 @@ namespace Terminal.Gui.App;
 ///     Interface for instances that provide backing functionality to static
 ///     gateway class <see cref="Application"/>.
 /// </summary>
-public interface IApplication
+/// <remarks>
+///     <para>
+///         Implements <see cref="IDisposable"/> to support automatic resource cleanup via using statements.
+///         Call <see cref="IDisposable.Dispose"/> or use a using statement to properly clean up resources.
+///     </para>
+/// </remarks>
+public interface IApplication : IDisposable
 {
-    /// <summary>Adds a timeout to the application.</summary>
+    #region Lifecycle - App Initialization and Shutdown
+
+    /// <summary>
+    ///     Gets or sets the managed thread ID of the application's main UI thread, which is set during
+    ///     <see cref="Init"/> and used to determine if code is executing on the main thread.
+    /// </summary>
+    /// <value>
+    ///     The managed thread ID of the main UI thread, or <see langword="null"/> if the application is not initialized.
+    /// </value>
+    public int? MainThreadId { get; internal set; }
+
+    /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
+    /// <param name="driverName">
+    ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
+    ///     <see cref="IDriver"/> to use. If not specified the default driver for the platform will be used.
+    /// </param>
+    /// <returns>This instance for fluent API chaining.</returns>
     /// <remarks>
-    ///     When time specified passes, the callback will be invoked. If the callback returns true, the timeout will be
-    ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
-    ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
+    ///     <para>Call this method once per instance (or after <see cref="IDisposable.Dispose"/> has been called).</para>
+    ///     <para>
+    ///         This function loads the right <see cref="IDriver"/> for the platform, creates a main loop coordinator,
+    ///         initializes keyboard and mouse handlers, and subscribes to driver events.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="IDisposable.Dispose"/> must be called when the application is closing (typically after
+    ///         <see cref="Run{TRunnable}"/> has returned) to ensure all resources are cleaned up (disposed) and
+    ///         terminal settings are restored.
+    ///     </para>
+    ///     <para>
+    ///         Supports fluent API with automatic resource management:
+    ///     </para>
+    ///     <para>
+    ///         Recommended pattern (using statement):
+    ///         <code>
+    ///         using (var app = Application.Create().Init())
+    ///         {
+    ///             app.Run&lt;MyDialog&gt;();
+    ///             var result = app.GetResult&lt;MyResultType&gt;();
+    ///         } // app.Dispose() called automatically
+    ///         </code>
+    ///     </para>
+    ///     <para>
+    ///         Alternative pattern (manual disposal):
+    ///         <code>
+    ///         var app = Application.Create().Init();
+    ///         app.Run&lt;MyDialog&gt;();
+    ///         var result = app.GetResult&lt;MyResultType&gt;();
+    ///         app.Dispose(); // Must call explicitly
+    ///         </code>
+    ///     </para>
+    ///     <para>
+    ///         Note: Runnables created by <see cref="Run{TRunnable}"/> are automatically disposed when
+    ///         that method returns. Runnables passed to <see cref="Run(IRunnable, Func{Exception, bool})"/>
+    ///         must be disposed by the caller.
+    ///     </para>
     /// </remarks>
-    object AddTimeout (TimeSpan time, Func<bool> callback);
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public IApplication Init (string? driverName = null);
 
     /// <summary>
-    /// Handles keyboard input and key bindings at the Application level.
+    ///     This event is raised after the <see cref="Init"/> and <see cref="IDisposable.Dispose"/> methods have been called.
     /// </summary>
-    IKeyboard Keyboard { get; set; }
-
-    /// <summary>
-    ///     Handles mouse event state and processing.
-    /// </summary>
-    IMouse Mouse { get; set; }
-
-    /// <summary>Gets or sets the console driver being used.</summary>
-    IConsoleDriver? Driver { get; set; }
+    /// <remarks>
+    ///     Intended to support unit tests that need to know when the application has been initialized.
+    /// </remarks>
+    public event EventHandler<EventArgs<bool>>? InitializedChanged;
 
     /// <summary>Gets or sets whether the application has been initialized.</summary>
     bool Initialized { get; set; }
 
     /// <summary>
+    ///     INTERNAL: Resets the state of this instance. Called by Dispose.
+    /// </summary>
+    /// <param name="ignoreDisposed">If true, ignores disposed state checks during reset.</param>
+    /// <remarks>
+    ///     <para>
+    ///         Encapsulates all setting of initial state for Application; having this in a function like this ensures we
+    ///         don't make mistakes in guaranteeing that the state of this singleton is deterministic when <see cref="Init"/>
+    ///         starts running and after <see cref="IDisposable.Dispose"/> returns.
+    ///     </para>
+    ///     <para>
+    ///         IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
+    ///     </para>
+    /// </remarks>
+    internal void ResetState (bool ignoreDisposed = false);
+
+    #endregion App Initialization and Shutdown
+
+    #region Session Management - Begin->Run->Iteration->Stop->End
+
+    /// <summary>
+    ///     Gets the stack of all active runnable session tokens.
+    ///     Sessions execute serially - the top of stack is the currently modal session.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Session tokens are pushed onto the stack when <see cref="Run(IRunnable, Func{Exception, bool})"/> is called and
+    ///         popped when
+    ///         <see cref="RequestStop(IRunnable)"/> completes. The stack grows during nested modal calls and
+    ///         shrinks as they complete.
+    ///     </para>
+    ///     <para>
+    ///         Only the top session (<see cref="TopRunnableView"/>) has exclusive keyboard/mouse input (
+    ///         <see cref="IRunnable.IsModal"/> = true).
+    ///         All other sessions on the stack continue to be laid out, drawn, and receive iteration events (
+    ///         <see cref="IRunnable.IsRunning"/> = true),
+    ///         but they don't receive user input.
+    ///     </para>
+    ///     <example>
+    ///         Stack during nested modals:
+    ///         <code>
+    /// RunnableSessionStack (top to bottom):
+    /// - MessageBox (TopRunnable, IsModal=true, IsRunning=true, has input)
+    /// - FileDialog (IsModal=false, IsRunning=true, continues to update/draw)
+    /// - MainWindow (IsModal=false, IsRunning=true, continues to update/draw)
+    /// </code>
+    ///     </example>
+    /// </remarks>
+    ConcurrentStack<SessionToken>? SessionStack { get; }
+
+    /// <summary>
+    ///     Raised when <see cref="Begin(IRunnable)"/> has been called and has created a new <see cref="SessionToken"/>.
+    /// </summary>
+    /// <remarks>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
+    ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
+    ///     when the application is done.
+    /// </remarks>
+    public event EventHandler<SessionTokenEventArgs>? SessionBegun;
+
+    #region TopRunnable Properties
+
+    /// <summary>Gets the Runnable that is on the top of the <see cref="SessionStack"/>.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The top runnable in the session stack captures all mouse and keyboard input.
+    ///         This is set by <see cref="Begin(IRunnable)"/> and cleared by <see cref="End(SessionToken)"/>.
+    ///     </para>
+    /// </remarks>
+    IRunnable? TopRunnable { get; }
+
+    /// <summary>Gets the View that is on the top of the <see cref="SessionStack"/>.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a convenience property that casts <see cref="TopRunnable"/> to a <see cref="View"/>.
+    ///     </para>
+    /// </remarks>
+    View? TopRunnableView { get; }
+
+    #endregion TopRunnable Properties
+
+    /// <summary>
+    ///     Building block API: Creates a <see cref="SessionToken"/> and prepares the provided <see cref="IRunnable"/>
+    ///     for
+    ///     execution. Not usually called directly by applications. Use <see cref="Run(IRunnable, Func{Exception, bool})"/>
+    ///     instead.
+    /// </summary>
+    /// <param name="runnable">The <see cref="IRunnable"/> to prepare execution for.</param>
+    /// <returns>
+    ///     The <see cref="SessionToken"/> that needs to be passed to the <see cref="End(SessionToken)"/>
+    ///     method upon
+    ///     completion.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method prepares the provided <see cref="IRunnable"/> for running. It adds this to the
+    ///         <see cref="SessionStack"/>, lays out the SubViews, focuses the first element, and draws the
+    ///         runnable on the screen. This is usually followed by starting the main loop, and then the
+    ///         <see cref="End(SessionToken)"/> method upon termination which will undo these changes.
+    ///     </para>
+    ///     <para>
+    ///         Raises the <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
+    ///         and <see cref="IRunnable.IsModalChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    /// <returns>The session token. <see langword="null"/> if the operation was cancelled.</returns>
+    SessionToken? Begin (IRunnable runnable);
+
+    /// <summary>
+    ///     Runs a new Session with the provided runnable view.
+    /// </summary>
+    /// <param name="runnable">The runnable to execute.</param>
+    /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <remarks>
+    ///     <para>
+    ///         This method is used to start processing events for the main application, but it is also used to run other
+    ///         modal views such as dialogs.
+    ///     </para>
+    ///     <para>
+    ///         To make <see cref="Run(IRunnable, Func{Exception, bool})"/> stop execution, call
+    ///         <see cref="RequestStop()"/> or <see cref="RequestStop(IRunnable)"/>.
+    ///     </para>
+    ///     <para>
+    ///         Calling <see cref="Run(IRunnable, Func{Exception, bool})"/> is equivalent to calling
+    ///         <see cref="Begin(IRunnable)"/>, followed by starting the main loop, and then calling
+    ///         <see cref="End(SessionToken)"/>.
+    ///     </para>
+    ///     <para>
+    ///         In RELEASE builds: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
+    ///         rethrown. Otherwise, <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
+    ///         returns <see langword="true"/> the main loop will resume; otherwise this method will exit.
+    ///     </para>
+    /// </remarks>
+    object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null);
+
+    /// <summary>
+    ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
+    ///     and calling <see cref="Run(IRunnable, Func{Exception, bool})"/>. When the session is stopped,
+    ///     <see cref="End(SessionToken)"/> will be called.
+    /// </summary>
+    /// <typeparam name="TRunnable"></typeparam>
+    /// <param name="errorHandler">Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <param name="driverName">
+    ///     The driver name. If not specified the default driver for the platform will be used. Must be
+    ///     <see langword="null"/> if <see cref="Init"/> has already been called.
+    /// </param>
+    /// <returns>
+    ///     The created <see name="IApplication"/> object. The caller is responsible for calling
+    ///     <see cref="IDisposable.Dispose"/> on this
+    ///     object.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method is used to start processing events for the main application, but it is also used to run other
+    ///         modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
+    ///     </para>
+    ///     <para>
+    ///         To make <see cref="Run(IRunnable, Func{Exception, bool})"/> stop execution, call
+    ///         <see cref="RequestStop()"/> or <see cref="RequestStop(IRunnable)"/>.
+    ///     </para>
+    ///     <para>
+    ///         In RELEASE builds: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
+    ///         rethrown. Otherwise, <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
+    ///         returns <see langword="true"/> the main loop will resume; otherwise this method will exit.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="IDisposable.Dispose"/> must be called when the application is closing (typically after Run has
+    ///         returned) to
+    ///         ensure resources are cleaned up and terminal settings restored.
+    ///     </para>
+    ///     <para>
+    ///         In RELEASE builds: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
+    ///         rethrown. Otherwise, <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
+    ///         returns <see langword="true"/> the main loop will resume; otherwise this method will exit.
+    ///     </para>
+    ///     <para>
+    ///         The caller is responsible for disposing the object returned by this method.
+    ///     </para>
+    /// </remarks>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
+        where TRunnable : IRunnable, new ();
+
+    #region Iteration & Invoke
+
+    /// <summary>
+    ///     Raises the <see cref="Iteration"/> event.
+    /// </summary>
+    /// <remarks>
+    ///     This is called once per main loop iteration, before processing input, timeouts, or rendering.
+    /// </remarks>
+    public void RaiseIteration ();
+
+    /// <summary>This event is raised on each iteration of the main loop.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is raised before input processing, timeout callbacks, and rendering occur each iteration.
+    ///     </para>
+    ///     <para>The event args contain the current application instance.</para>
+    /// </remarks>
+    /// <seealso cref="AddTimeout"/>
+    /// <seealso cref="TimedEvents"/>
+    /// .
+    public event EventHandler<EventArgs<IApplication?>>? Iteration;
+
+    /// <summary>Runs <paramref name="action"/> on the main UI loop thread.</summary>
+    /// <param name="action">The action to be invoked on the main processing thread.</param>
+    /// <remarks>
+    ///     <para>
+    ///         If called from the main thread, the action is executed immediately. Otherwise, it is queued via
+    ///         <see cref="AddTimeout"/> with <see cref="TimeSpan.Zero"/> and will be executed on the next main loop
+    ///         iteration.
+    ///     </para>
+    /// </remarks>
+    void Invoke (Action<IApplication>? action);
+
+    /// <summary>Runs <paramref name="action"/> on the main UI loop thread.</summary>
+    /// <param name="action">The action to be invoked on the main processing thread.</param>
+    /// <remarks>
+    ///     <para>
+    ///         If called from the main thread, the action is executed immediately. Otherwise, it is queued via
+    ///         <see cref="AddTimeout"/> with <see cref="TimeSpan.Zero"/> and will be executed on the next main loop
+    ///         iteration.
+    ///     </para>
+    /// </remarks>
+    void Invoke (Action action);
+
+    #endregion Iteration & Invoke
+
+    /// <summary>
+    ///     Set to <see langword="true"/> to cause the session to stop running after first iteration.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Used primarily for unit testing. When <see langword="true"/>, <see cref="End(SessionToken)"/> will be
+    ///         called
+    ///         automatically after the first main loop iteration.
+    ///     </para>
+    /// </remarks>
+    bool StopAfterFirstIteration { get; set; }
+
+    /// <summary>Requests that the currently running Session stop. The Session will stop after the current iteration completes.</summary>
+    /// <remarks>
+    ///     <para>This will cause <see cref="Run(IRunnable, Func{Exception, bool})"/> to return.</para>
+    ///     <para>
+    ///         This is equivalent to calling <see cref="RequestStop(IRunnable)"/> with <see cref="TopRunnableView"/> as the
+    ///         parameter.
+    ///     </para>
+    /// </remarks>
+    void RequestStop ();
+
+    /// <summary>
+    ///     Requests that the specified runnable session stop.
+    /// </summary>
+    /// <param name="runnable">
+    ///     The runnable to stop. If <see langword="null"/>, stops the current <see cref="TopRunnableView"/>
+    ///     .
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         This will cause <see cref="Run(IRunnable, Func{Exception, bool})"/> to return.
+    ///     </para>
+    ///     <para>
+    ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
+    ///         and <see cref="IRunnable.IsModalChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    void RequestStop (IRunnable? runnable);
+
+    /// <summary>
+    ///     Building block API: Ends the session associated with the token and completes the execution of an
+    ///     <see cref="IRunnable"/>.
+    ///     Not usually called directly by applications. <see cref="Run(IRunnable, Func{Exception, bool})"/>
+    ///     will automatically call this method when the session is stopped.
+    /// </summary>
+    /// <param name="sessionToken">
+    ///     The <see cref="SessionToken"/> returned by the <see cref="Begin(IRunnable)"/>
+    ///     method.
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         This method removes the <see cref="IRunnable"/> from the <see cref="SessionStack"/>,
+    ///         raises the lifecycle events, and disposes the <paramref name="sessionToken"/>.
+    ///     </para>
+    ///     <para>
+    ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
+    ///         and <see cref="IRunnable.IsModalChanged"/> events.
+    ///     </para>
+    /// </remarks>
+    void End (SessionToken sessionToken);
+
+    /// <summary>
+    ///     Raised when <see cref="End(SessionToken)"/> was called and the session is stopping. The event args contain a
+    ///     reference to the <see cref="IRunnable"/>
+    ///     that was active during the session. This can be used to ensure the Runnable is disposed of properly.
+    /// </summary>
+    /// <remarks>
+    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
+    ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
+    ///     when the application is done.
+    /// </remarks>
+    public event EventHandler<SessionTokenEventArgs>? SessionEnded;
+
+    #endregion Session Management - Begin->Run->Iteration->Stop->End
+
+    #region Result Management
+
+    /// <summary>
+    ///     Gets the result from the last <see cref="Run(IRunnable, Func{Exception, bool})"/> or
+    ///     <see cref="Run{TRunnable}(Func{Exception, bool}, string)"/> call.
+    /// </summary>
+    /// <returns>
+    ///     The result from the last run session, or <see langword="null"/> if no session has been run or the result was null.
+    /// </returns>
+    object? GetResult ();
+
+    /// <summary>
+    ///     Gets the result from the last <see cref="Run(IRunnable, Func{Exception, bool})"/> or
+    ///     <see cref="Run{TRunnable}(Func{Exception, bool}, string)"/> call, cast to type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The expected result type.</typeparam>
+    /// <returns>
+    ///     The result cast to <typeparamref name="T"/>, or <see langword="null"/> if the result is null or cannot be cast.
+    /// </returns>
+    /// <example>
+    ///     <code>
+    ///     using (var app = Application.Create().Init())
+    ///     {
+    ///         app.Run&lt;ColorPickerDialog&gt;();
+    ///         var selectedColor = app.GetResult&lt;Color&gt;();
+    ///         if (selectedColor.HasValue)
+    ///         {
+    ///             // Use the color
+    ///         }
+    ///     }
+    ///     </code>
+    /// </example>
+    T? GetResult<T> () where T : class => GetResult () as T;
+
+    #endregion Result Management
+
+    #region Screen and Driver
+
+    /// <summary>Gets or sets the console driver being used.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set by <see cref="Init"/> based on the driver parameter or platform default.
+    ///     </para>
+    /// </remarks>
+    IDriver? Driver { get; set; }
+
+    /// <summary>
+    ///     Gets the clipboard for this application instance.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Provides access to the OS clipboard through the driver. Returns <see langword="null"/> if
+    ///         <see cref="Driver"/> is not initialized.
+    ///     </para>
+    /// </remarks>
+    IClipboard? Clipboard { get; }
+
+    /// <summary>
     ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in
-    ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be output
-    ///     as long as the selected <see cref="IConsoleDriver"/> supports TrueColor.
+    ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be
+    ///     output as long as the selected <see cref="IDriver"/> supports TrueColor.
     /// </summary>
     bool Force16Colors { get; set; }
 
@@ -47,214 +463,178 @@ public interface IApplication
     string ForceDriver { get; set; }
 
     /// <summary>
-    /// Collection of sixel images to write out to screen when updating.
-    /// Only add to this collection if you are sure terminal supports sixel format.
+    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the
+    ///     <see cref="IDriver"/>.
     /// </summary>
-    List<SixelToRender> Sixel { get; }
-
-    /// <summary>
-    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IConsoleDriver"/>.
-    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If the <see cref="IDriver"/> has not been initialized, this will return a default size of 2048x2048; useful
+    ///         for unit tests.
+    ///     </para>
+    /// </remarks>
     Rectangle Screen { get; set; }
+
+    /// <summary>Raised when the terminal's size changed. The new size of the terminal is provided.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is raised when the driver detects a screen size change. The event provides the new screen
+    ///         rectangle.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
 
     /// <summary>
     ///     Gets or sets whether the screen will be cleared, and all Views redrawn, during the next Application iteration.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is typically set to <see langword="true"/> when a View's <see cref="View.Frame"/> changes and that view
+    ///         has no SuperView (e.g. when <see cref="TopRunnableView"/> is moved or resized).
+    ///     </para>
+    ///     <para>
+    ///         Automatically reset to <see langword="false"/> after <see cref="LayoutAndDraw"/> processes it.
+    ///     </para>
+    /// </remarks>
     bool ClearScreenNextIteration { get; set; }
 
-    /// <summary>Gets or sets the popover manager.</summary>
-    ApplicationPopover? Popover { get; set; }
+    /// <summary>
+    ///     Collection of sixel images to write out to screen when updating.
+    ///     Only add to this collection if you are sure terminal supports sixel format.
+    /// </summary>
+    List<SixelToRender> Sixel { get; }
 
-    /// <summary>Gets or sets the navigation manager.</summary>
-    ApplicationNavigation? Navigation { get; set; }
+    #endregion Screen and Driver
 
-    /// <summary>Gets the currently active Toplevel.</summary>
-    Toplevel? Top { get; set; }
-
-    /// <summary>Gets the stack of all Toplevels.</summary>
-    System.Collections.Concurrent.ConcurrentStack<Toplevel> TopLevels { get; }
-
-    /// <summary>Requests that the application stop running.</summary>
-    void RequestStop ();
+    #region Keyboard
 
     /// <summary>
-    ///     Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that
-    ///     need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
-    ///     Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
+    ///     Handles keyboard input and key bindings at the Application level.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Provides access to keyboard state, key bindings, and keyboard event handling. Set during <see cref="Init"/>.
+    ///     </para>
+    /// </remarks>
+    IKeyboard Keyboard { get; set; }
+
+    #endregion Keyboard
+
+    #region Mouse
+
+    /// <summary>
+    ///     Handles mouse event state and processing.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Provides access to mouse state, mouse grabbing, and mouse event handling. Set during <see cref="Init"/>.
+    ///     </para>
+    /// </remarks>
+    IMouse Mouse { get; set; }
+
+    #endregion Mouse
+
+    #region Layout and Drawing
+
+    /// <summary>
+    ///     Causes any Runnables that need layout to be laid out, then draws any Runnables that need display. Only Views
+    ///     that need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out. Only Views that need to be drawn
+    ///     (see <see cref="View.NeedsDraw"/>) will be drawn.
     /// </summary>
     /// <param name="forceRedraw">
     ///     If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and
-    ///     should only be overriden for testing.
+    ///     should only be overridden for testing.
     /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called automatically each main loop iteration when any views need layout or drawing.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="ClearScreenNextIteration"/> is <see langword="true"/>, the screen will be cleared before
+    ///         drawing and the flag will be reset to <see langword="false"/>.
+    ///     </para>
+    /// </remarks>
     public void LayoutAndDraw (bool forceRedraw = false);
 
-    /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
-    /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
-    /// <para>
-    ///     This function loads the right <see cref="IConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
-    ///     assigns it to <see cref="Application.Top"/>
-    /// </para>
-    /// <para>
-    ///     <see cref="Shutdown"/> must be called when the application is closing (typically after
-    ///     <see cref="Run{T}"/> has returned) to ensure resources are cleaned up and
-    ///     terminal settings
-    ///     restored.
-    /// </para>
-    /// <para>
-    ///     The <see cref="Run{T}"/> function combines
-    ///     <see cref="Init(IConsoleDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
-    ///     into a single
-    ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
-    ///     <see cref="Init(IConsoleDriver,string)"/>.
-    /// </para>
-    /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or
-    ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
-    /// </param>
-    /// <param name="driverName">
-    ///     The driver name (e.g. "dotnet", "windows", "fake", or "unix") of the
-    ///     <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
-    ///     specified the default driver for the platform will be used.
-    /// </param>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    public void Init (IConsoleDriver? driver = null, string? driverName = null);
-
-    /// <summary>Runs <paramref name="action"/> on the main UI loop thread</summary>
-    /// <param name="action">the action to be invoked on the main processing thread.</param>
-    void Invoke (Action action);
-
     /// <summary>
-    ///     <see langword="true"/> if implementation is 'old'. <see langword="false"/> if implementation
-    ///     is cutting edge.
+    ///     Calls <see cref="View.PositionCursor"/> on the most focused view.
     /// </summary>
-    bool IsLegacy { get; }
+    /// <remarks>
+    ///     <para>Does nothing if there is no most focused view.</para>
+    ///     <para>
+    ///         If the most focused view is not visible within its superview, the cursor will be hidden.
+    ///     </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
+    public bool PositionCursor ();
 
-    /// <summary>Removes a previously scheduled timeout</summary>
-    /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
+    #endregion Layout and Drawing
+
+    #region Navigation and Popover
+
+    /// <summary>Gets or sets the navigation manager.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Manages focus navigation and tracking of the most focused view. Initialized during <see cref="Init"/>.
+    ///     </para>
+    /// </remarks>
+    ApplicationNavigation? Navigation { get; set; }
+
+    /// <summary>Gets or sets the popover manager.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Manages application-level popover views. Initialized during <see cref="Init"/>.
+    ///     </para>
+    /// </remarks>
+    ApplicationPopover? Popover { get; set; }
+
+    #endregion Navigation and Popover
+
+    #region Timeouts
+
+    /// <summary>Adds a timeout to the application.</summary>
+    /// <param name="time">The time span to wait before invoking the callback.</param>
+    /// <param name="callback">
+    ///     The callback to invoke. If it returns <see langword="true"/>, the timeout will be reset and repeat. If it
+    ///     returns <see langword="false"/>, the timeout will stop and be removed.
+    /// </param>
     /// <returns>
-    ///     <see langword="true"/>
-    ///     if the timeout is successfully removed; otherwise,
-    ///     <see langword="false"/>
-    ///     .
-    ///     This method also returns
-    ///     <see langword="false"/>
-    ///     if the timeout is not found.
+    ///     Call <see cref="RemoveTimeout(object)"/> with the returned value to stop the timeout.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         When the time specified passes, the callback will be invoked on the main UI thread.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="IDisposable.Dispose"/> calls StopAll on <see cref="TimedEvents"/> to remove all timeouts.
+    ///     </para>
+    /// </remarks>
+    object? AddTimeout (TimeSpan time, Func<bool> callback);
+
+    /// <summary>Removes a previously scheduled timeout.</summary>
+    /// <param name="token">The token returned by <see cref="AddTimeout"/>.</param>
+    /// <returns>
+    ///     <see langword="true"/> if the timeout is successfully removed; otherwise, <see langword="false"/>.
+    ///     This method also returns <see langword="false"/> if the timeout is not found.
     /// </returns>
     bool RemoveTimeout (object token);
-
-    /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
-    /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
-    /// <remarks>
-    ///     <para>This will cause <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to return.</para>
-    ///     <para>
-    ///         Calling <see cref="RequestStop(Toplevel)"/> is equivalent to setting the <see cref="Toplevel.Running"/>
-    ///         property on the currently running <see cref="Toplevel"/> to false.
-    ///     </para>
-    /// </remarks>
-    void RequestStop (Toplevel? top);
-
-    /// <summary>
-    ///     Runs the application by creating a <see cref="Toplevel"/> object and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
-    ///     <para>
-    ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
-    ///         ensure resources are cleaned up and terminal settings restored.
-    ///     </para>
-    ///     <para>
-    ///         The caller is responsible for disposing the object returned by this method.
-    ///     </para>
-    /// </remarks>
-    /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    public Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null);
-
-    /// <summary>
-    ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
-    ///     <see cref="Run(Toplevel, Func{Exception, bool})"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Calling <see cref="Init"/> first is not needed as this function will initialize the application.</para>
-    ///     <para>
-    ///         <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has returned) to
-    ///         ensure resources are cleaned up and terminal settings restored.
-    ///     </para>
-    ///     <para>
-    ///         The caller is responsible for disposing the object returned by this method.
-    ///     </para>
-    /// </remarks>
-    /// <param name="errorHandler"></param>
-    /// <param name="driver">
-    ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
-    ///     be used. Must be
-    ///     <see langword="null"/> if <see cref="Init"/> has already been called.
-    /// </param>
-    /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
-    public T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new();
-
-    /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         This method is used to start processing events for the main application, but it is also used to run other
-    ///         modal <see cref="View"/>s such as <see cref="Dialog"/> boxes.
-    ///     </para>
-    ///     <para>
-    ///         To make a <see cref="Run(Toplevel,System.Func{System.Exception,bool})"/> stop execution, call
-    ///         <see cref="Application.RequestStop"/>.
-    ///     </para>
-    ///     <para>
-    ///         Calling <see cref="Run(Toplevel,System.Func{System.Exception,bool})"/> is equivalent to calling
-    ///         <see cref="Application.Begin(Toplevel)"/>, followed by <see cref="Application.RunLoop(RunState)"/>, and then
-    ///         calling
-    ///         <see cref="Application.End(RunState)"/>.
-    ///     </para>
-    ///     <para>
-    ///         Alternatively, to have a program control the main loop and process events manually, call
-    ///         <see cref="Application.Begin(Toplevel)"/> to set things up manually and then repeatedly call
-    ///         <see cref="Application.RunLoop(RunState)"/> with the wait parameter set to false. By doing this the
-    ///         <see cref="Application.RunLoop(RunState)"/> method will only process any pending events, timers handlers and
-    ///         then
-    ///         return control immediately.
-    ///     </para>
-    ///     <para>
-    ///         When using <see cref="Run{T}"/> or
-    ///         <see cref="Run(System.Func{System.Exception,bool},IConsoleDriver)"/>
-    ///         <see cref="Init"/> will be called automatically.
-    ///     </para>
-    ///     <para>
-    ///         RELEASE builds only: When <paramref name="errorHandler"/> is <see langword="null"/> any exceptions will be
-    ///         rethrown. Otherwise, if <paramref name="errorHandler"/> will be called. If <paramref name="errorHandler"/>
-    ///         returns <see langword="true"/> the <see cref="Application.RunLoop(RunState)"/> will resume; otherwise this
-    ///         method will
-    ///         exit.
-    ///     </para>
-    /// </remarks>
-    /// <param name="view">The <see cref="Toplevel"/> to run as a modal.</param>
-    /// <param name="errorHandler">
-    ///     RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true,
-    ///     rethrows when null).
-    /// </param>
-    public void Run (Toplevel view, Func<Exception, bool>? errorHandler = null);
-
-    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    /// <remarks>
-    ///     Shutdown must be called for every call to <see cref="Init"/> or
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> to ensure all resources are cleaned
-    ///     up (Disposed)
-    ///     and terminal settings are restored.
-    /// </remarks>
-    public void Shutdown ();
 
     /// <summary>
     ///     Handles recurring events. These are invoked on the main UI thread - allowing for
     ///     safe updates to <see cref="View"/> instances.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Provides low-level access to the timeout management system. Most applications should use
+    ///         <see cref="AddTimeout"/> and <see cref="RemoveTimeout"/> instead.
+    ///     </para>
+    /// </remarks>
     ITimedEvents? TimedEvents { get; }
+
+    #endregion Timeouts
+
+    /// <summary>
+    ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
+    /// </summary>
+    /// <returns>A string representation of the Application </returns>
+    public string ToString ();
 }

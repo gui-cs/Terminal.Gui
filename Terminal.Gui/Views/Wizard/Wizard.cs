@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -10,8 +8,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     The Wizard can be displayed either as a modal (pop-up) <see cref="Window"/> (like <see cref="Dialog"/>) or as
-///     an embedded <see cref="View"/>. By default, <see cref="Wizard.Modal"/> is <c>true</c>. In this case launch the
-///     Wizard with <c>Application.Run(wizard)</c>. See <see cref="Wizard.Modal"/> for more details.
+///     an embedded <see cref="View"/>.
 /// </remarks>
 /// <example>
 ///     <code>
@@ -44,7 +41,7 @@ namespace Terminal.Gui.Views;
 ///     Application.RequestStop();
 /// };
 /// 
-/// Application.Top.Add (wizard);
+/// Application.TopRunnable.Add (wizard);
 /// Application.Run ();
 /// Application.Shutdown ();
 /// </code>
@@ -88,8 +85,8 @@ public class Wizard : Dialog
         BackButton.Accepting += BackBtn_Accepting;
         NextFinishButton.Accepting += NextFinishBtn_Accepting;
 
-        Loaded += Wizard_Loaded;
-        Closing += Wizard_Closing;
+        IsModalChanged += Wizard_IsModalChanged;
+        IsRunningChanged += Wizard_IsRunningChanged;
         TitleChanged += Wizard_TitleChanged;
 
         SetNeedsLayout ();
@@ -109,51 +106,51 @@ public class Wizard : Dialog
         set => GoToStep (value);
     }
 
-    /// <summary>
-    ///     Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not. The default is
-    ///     <see langword="true"/>. The Wizard will be shown with a frame and title and will behave like any
-    ///     <see cref="Toplevel"/> window. If set to <c>false</c> the Wizard will have no frame and will behave like any
-    ///     embedded <see cref="View"/>. To use Wizard as an embedded View
-    ///     <list type="number">
-    ///         <item>
-    ///             <description>Set <see cref="Modal"/> to <c>false</c>.</description>
-    ///         </item>
-    ///         <item>
-    ///             <description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description>
-    ///         </item>
-    ///     </list>
-    ///     If a non-Modal Wizard is added to the application after
-    ///     <see cref="Application.Run(Toplevel, Func{Exception, bool})"/> has
-    ///     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
-    ///     <see cref="GetNextStep()"/>:
-    ///     <code>
-    ///    wizard.CurrentStep = wizard.GetNextStep();
-    /// </code>
-    /// </summary>
-    public new bool Modal
-    {
-        get => base.Modal;
-        set
-        {
-            base.Modal = value;
+    ///// <summary>
+    /////     Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not. The default is
+    /////     <see langword="true"/>. The Wizard will be shown with a frame and title and will behave like any
+    /////     <see cref="Runnable"/> window. If set to <c>false</c> the Wizard will have no frame and will behave like any
+    /////     embedded <see cref="View"/>. To use Wizard as an embedded View
+    /////     <list type="number">
+    /////         <item>
+    /////             <description>Set <see cref="Modal"/> to <c>false</c>.</description>
+    /////         </item>
+    /////         <item>
+    /////             <description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description>
+    /////         </item>
+    /////     </list>
+    /////     If a non-Modal Wizard is added to the application after
+    /////     <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/> has
+    /////     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
+    /////     <see cref="GetNextStep()"/>:
+    /////     <code>
+    /////    wizard.CurrentStep = wizard.GetNextStep();
+    ///// </code>
+    ///// </summary>
+    //public new bool Modal
+    //{
+    //    get => base.Modal;
+    //    set
+    //    {
+    //        base.Modal = value;
 
-            foreach (WizardStep step in _steps)
-            {
-                SizeStep (step);
-            }
+    //        foreach (WizardStep step in _steps)
+    //        {
+    //            SizeStep (step);
+    //        }
 
-            if (base.Modal)
-            {
-                SchemeName = "Dialog";
-                BorderStyle = LineStyle.Rounded;
-            }
-            else
-            {
-                CanFocus = true;
-                BorderStyle = LineStyle.None;
-            }
-        }
-    }
+    //        if (base.Modal)
+    //        {
+    //            SchemeName = "Dialog";
+    //            BorderStyle = LineStyle.Rounded;
+    //        }
+    //        else
+    //        {
+    //            CanFocus = true;
+    //            BorderStyle = LineStyle.None;
+    //        }
+    //    }
+    //}
 
     /// <summary>
     ///     If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes the <see cref="Finished"/>
@@ -185,7 +182,6 @@ public class Wizard : Dialog
 
     /// <summary>
     ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressing the Esc key. To prevent a modal (
-    ///     <see cref="Wizard.Modal"/> is <c>true</c>) Wizard from closing, cancel the event by setting
     ///     <see cref="WizardButtonEventArgs.Cancel"/> to <c>true</c> before returning from the event handler.
     /// </summary>
     public event EventHandler<WizardButtonEventArgs>? Cancelled;
@@ -374,16 +370,16 @@ public class Wizard : Dialog
 
     /// <summary>
     ///     <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
-    ///     <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides
+    ///     <see cref="IApplication.RequestStop(IRunnable)"/>, closing the Dialog. Wizard overrides
     ///     <see cref="OnKeyDownNotHandled"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
-    ///     non-modal (see <see cref="Wizard.Modal"/>).
+    ///     non-modal.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     protected override bool OnKeyDownNotHandled (Key key)
     {
-        //// BUGBUG: Why is this not handled by a key binding???
-        if (!Modal)
+        // BUGBUG: Why is this not handled by a key binding???
+        if (!IsModal)
         {
             if (key == Key.Esc)
             {
@@ -460,7 +456,7 @@ public class Wizard : Dialog
 
                 if (IsCurrentTop)
                 {
-                    Application.RequestStop (this);
+                    (sender as View)?.App?.RequestStop (this);
                     e.Handled = true;
                 }
 
@@ -482,7 +478,7 @@ public class Wizard : Dialog
 
     private void SizeStep (WizardStep step)
     {
-        if (Modal)
+        if (IsModal)
         {
             // If we're modal, then we expand the WizardStep so that the top and side 
             // borders and not visible. The bottom border is the separator above the buttons.
@@ -543,20 +539,22 @@ public class Wizard : Dialog
         SetNeedsLayout ();
     }
 
-    private void Wizard_Closing (object? sender, ToplevelClosingEventArgs obj)
+    private void Wizard_IsRunningChanged (object? sender, EventArgs<bool> args)
     {
         if (!_finishedPressed)
         {
-            var args = new WizardButtonEventArgs ();
-            Cancelled?.Invoke (this, args);
+            var a = new WizardButtonEventArgs ();
+            Cancelled?.Invoke (this, a);
         }
     }
 
-    private void Wizard_Loaded (object? sender, EventArgs args)
+    private void Wizard_IsModalChanged (object? sender, EventArgs<bool> args)
     {
-        CurrentStep = GetFirstStep ();
-
-        // gets the first step if CurrentStep == null
+        if (args.Value)
+        {
+            CurrentStep = GetFirstStep ();
+            // gets the first step if CurrentStep == null
+        }
     }
 
     private void Wizard_TitleChanged (object? sender, EventArgs<string> e)

@@ -16,9 +16,9 @@ public class WindowsAndFrameViews : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        static int About ()
+        static int? About ()
         {
-            return MessageBox.Query (
+            return MessageBox.Query (ApplicationImpl.Instance,
                                      "About UI Catalog",
                                      "UI Catalog is a comprehensive sample library for Terminal.Gui",
                                      "Ok"
@@ -43,7 +43,7 @@ public class WindowsAndFrameViews : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
         };
         win.Padding.Thickness = new (padding);
-        win.Margin.Thickness = new (margin);
+        win.Margin!.Thickness = new (margin);
 
         var paddingButton = new Button
         {
@@ -69,7 +69,7 @@ public class WindowsAndFrameViews : Scenario
         // add it to our list
         listWin.Add (win);
 
-        // create 3 more Windows in a loop, adding them Application.Top
+        // create 3 more Windows in a loop, adding them Application.TopRunnable
         // Each with a
         //	button
         //  sub Window with
@@ -99,7 +99,7 @@ public class WindowsAndFrameViews : Scenario
             };
 
             pressMeButton.Accepting += (s, e) =>
-                                        MessageBox.ErrorQuery (loopWin.Title, "Neat?", "Yes", "No");
+                                        MessageBox.ErrorQuery ((s as View)?.App, loopWin.Title, "Neat?", "Yes", "No");
             loopWin.Add (pressMeButton);
 
             var subWin = new Window

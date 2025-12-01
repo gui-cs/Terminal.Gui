@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Buffers;
+﻿using System.Buffers;
 
 namespace Terminal.Gui.Text;
 
@@ -54,8 +53,39 @@ public static class StringExtensions
     /// <summary>Gets the number of columns the string occupies in the terminal.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
     /// <param name="str">The string to measure.</param>
+    /// <param name="ignoreLessThanZero">Indicates whether to ignore values ​​less than zero, such as control keys.</param>
     /// <returns></returns>
-    public static int GetColumns (this string str) { return str is null ? 0 : str.EnumerateRunes ().Sum (r => Math.Max (r.GetColumns (), 0)); }
+    public static int GetColumns (this string str, bool ignoreLessThanZero = true)
+    {
+        if (string.IsNullOrEmpty (str))
+        {
+            return 0;
+        }
+
+        var total = 0;
+
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (str))
+        {
+            // Get the maximum rune width within this grapheme cluster
+            int clusterWidth = grapheme.EnumerateRunes ()
+                                       .Sum (r =>
+                                             {
+                                                 int w = r.GetColumns ();
+
+                                                 return ignoreLessThanZero && w < 0 ? 0 : w;
+                                             });
+
+            // Clamp to realistic max display width
+            if (clusterWidth > 2)
+            {
+                clusterWidth = 2;
+            }
+
+            total += clusterWidth;
+        }
+
+        return total;
+    }
 
     /// <summary>Gets the number of runes in the string.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
@@ -72,7 +102,7 @@ public static class StringExtensions
     ///     A <see langword="bool"/> indicating if all elements of the <see cref="ReadOnlySpan{T}"/> are ASCII digits (
     ///     <see langword="true"/>) or not (<see langword="false"/>
     /// </returns>
-    public static bool IsAllAsciiDigits (this ReadOnlySpan<char> stringSpan) { return stringSpan.ToString ().All (char.IsAsciiDigit); }
+    public static bool IsAllAsciiDigits (this ReadOnlySpan<char> stringSpan) { return !stringSpan.IsEmpty && stringSpan.ToString ().All (char.IsAsciiDigit); }
 
     /// <summary>
     ///     Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII
@@ -83,7 +113,7 @@ public static class StringExtensions
     ///     A <see langword="bool"/> indicating if all elements of the <see cref="ReadOnlySpan{T}"/> are ASCII digits (
     ///     <see langword="true"/>) or not (<see langword="false"/>
     /// </returns>
-    public static bool IsAllAsciiHexDigits (this ReadOnlySpan<char> stringSpan) { return stringSpan.ToString ().All (char.IsAsciiHexDigit); }
+    public static bool IsAllAsciiHexDigits (this ReadOnlySpan<char> stringSpan) { return !stringSpan.IsEmpty && stringSpan.ToString ().All (char.IsAsciiHexDigit); }
 
     /// <summary>Repeats the string <paramref name="n"/> times.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
@@ -183,5 +213,61 @@ public static class StringExtensions
         encoding ??= Encoding.UTF8;
 
         return encoding.GetString (bytes.ToArray ());
+    }
+
+    /// <summary>Converts a <see cref="string"/> generic collection into a string.</summary>
+    /// <param name="strings">The enumerable string to convert.</param>
+    /// <returns></returns>
+    public static string ToString (IEnumerable<string> strings) { return string.Concat (strings); }
+
+    /// <summary>Converts the string into a <see cref="List{String}"/>.</summary>
+    /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
+    /// <param name="str">The string to convert.</param>
+    /// <returns></returns>
+    public static List<string> ToStringList (this string str)
+    {
+        List<string> strings = [];
+
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (str))
+        {
+            strings.Add (grapheme);
+        }
+
+        return strings;
+    }
+
+    /// <summary>Reports whether a string is a surrogate code point.</summary>
+    /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
+    /// <param name="str">The string to probe.</param>
+    /// <returns><see langword="true"/> if the string is a surrogate code point; <see langword="false"/> otherwise.</returns>
+    public static bool IsSurrogatePair (this string str)
+    {
+        if (str.Length != 2)
+        {
+            return false;
+        }
+
+        Rune rune = Rune.GetRuneAt (str, 0);
+
+        return rune.IsSurrogatePair ();
+    }
+
+    /// <summary>
+    ///     Ensures the text is not a control character and can be displayed by translating characters below 0x20 to
+    ///     equivalent, printable, Unicode chars.
+    /// </summary>
+    /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
+    /// <param name="str">The text.</param>
+    /// <returns></returns>
+    public static string MakePrintable (this string str)
+    {
+        if (str.Length > 1)
+        {
+            return str;
+        }
+
+        char ch = str [0];
+
+        return char.IsControl (ch) ? new ((char)(ch + 0x2400), 1) : str;
     }
 }

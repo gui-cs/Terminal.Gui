@@ -27,7 +27,7 @@ public class ProgressBarStyles : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window win = new ()
         {
             Title = GetQuitKeyAndName (), BorderStyle = LineStyle.Single,
         };
@@ -38,7 +38,7 @@ public class ProgressBarStyles : Scenario
             ShowViewIdentifier = true
 
         };
-        app.Add (editor);
+        win.Add (editor);
 
         View container = new ()
         {
@@ -47,7 +47,7 @@ public class ProgressBarStyles : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
         };
-        app.Add (container);
+        win.Add (container);
 
         const float fractionStep = 0.01F;
 
@@ -132,15 +132,15 @@ public class ProgressBarStyles : Scenario
         List<ProgressBarFormat> pbFormatEnum =
             Enum.GetValues (typeof (ProgressBarFormat)).Cast<ProgressBarFormat> ().ToList ();
 
-        var rbPBFormat = new RadioGroup
+        OptionSelector<ProgressBarFormat> osPbFormat = new ()
         {
             BorderStyle = LineStyle.Single,
             Title = "ProgressBarFormat",
             X = Pos.Center (),
             Y = Pos.Align (Alignment.Start),
-            RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
+            AssignHotKeys = true
         };
-        container.Add (rbPBFormat);
+        container.Add (osPbFormat);
 
         var button = new Button
         {
@@ -161,7 +161,7 @@ public class ProgressBarStyles : Scenario
         };
         container.Add (blocksPB);
 
-        rbPBFormat.SelectedItem = (int)blocksPB.ProgressBarFormat;
+        osPbFormat.Value = blocksPB.ProgressBarFormat;
 
         var continuousPB = new ProgressBar
         {
@@ -256,13 +256,19 @@ public class ProgressBarStyles : Scenario
                                       };
 
 
-        rbPBFormat.SelectedItemChanged += (s, e) =>
-                                          {
-                                              blocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                              continuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                              marqueesBlocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                              marqueesContinuousPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
-                                          };
+        osPbFormat.ValueChanged += (s, e) =>
+                                   {
+                                       if (e.Value is null)
+                                       {
+                                           return;
+                                       }
+
+                                       blocksPB.ProgressBarFormat = e.Value.Value;
+                                       continuousPB.ProgressBarFormat = e.Value.Value;
+                                       marqueesBlocksPB.ProgressBarFormat = e.Value.Value;
+                                       marqueesContinuousPB.ProgressBarFormat = e.Value.Value;
+
+                                   };
 
         ckbBidirectional.CheckedStateChanging += (s, e) =>
                                    {
@@ -272,8 +278,8 @@ public class ProgressBarStyles : Scenario
 
 
 
-        app.Initialized += App_Initialized;
-        app.Unloaded += App_Unloaded;
+        win.Initialized += Win_Initialized;
+        win.IsRunningChanged += Win_IsRunningChanged;
 
         _pulseTimer = new Timer (
                                  _ =>
@@ -286,14 +292,18 @@ public class ProgressBarStyles : Scenario
                                  0,
                                  300
                                 );
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (win);
+        win.Dispose ();
         Application.Shutdown ();
 
         return;
 
-        void App_Unloaded (object sender, EventArgs args)
+        void Win_IsRunningChanged (object sender, EventArgs<bool> args)
         {
+            if (args.Value)
+            {
+                return;
+            }
             if (_fractionTimer != null)
             {
                 _fractionTimer.Dispose ();
@@ -306,11 +316,11 @@ public class ProgressBarStyles : Scenario
                 _pulseTimer = null;
             }
 
-            app.Unloaded -= App_Unloaded;
+            win.IsRunningChanged -= Win_IsRunningChanged;
         }
     }
 
-    private void App_Initialized (object sender, EventArgs e)
+    private void Win_Initialized (object sender, EventArgs e)
     {
         _pbList.SelectedItem = 0;
     }

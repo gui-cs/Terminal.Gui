@@ -1,3 +1,4 @@
+#nullable disable
 ﻿using System.Diagnostics;
 
 namespace Terminal.Gui.App;
@@ -103,7 +104,7 @@ public abstract class ClipboardBase : IClipboard
     }
 
     /// <summary>
-    ///     Returns the contents of the OS clipboard if possible. Implemented by <see cref="IConsoleDriver"/>-specific
+    ///     Returns the contents of the OS clipboard if possible. Implemented by <see cref="IDriver"/>-specific
     ///     subclasses.
     /// </summary>
     /// <returns>The contents of the OS clipboard if successful.</returns>
@@ -111,7 +112,7 @@ public abstract class ClipboardBase : IClipboard
     protected abstract string GetClipboardDataImpl ();
 
     /// <summary>
-    ///     Pastes the <paramref name="text"/> to the OS clipboard if possible. Implemented by <see cref="IConsoleDriver"/>
+    ///     Pastes the <paramref name="text"/> to the OS clipboard if possible. Implemented by <see cref="IDriver"/>
     ///     -specific subclasses.
     /// </summary>
     /// <param name="text">The text to paste to the OS clipboard.</param>

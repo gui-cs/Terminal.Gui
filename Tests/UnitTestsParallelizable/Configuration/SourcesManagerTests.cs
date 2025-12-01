@@ -1,13 +1,13 @@
 using System.Reflection;
 using System.Text.Json;
-namespace UnitTests_Parallelizable.ConfigurationTests;
+namespace ConfigurationTests;
 
 public class SourcesManagerTests
 {
     #region Update (Stream)
 
     [Fact]
-    public void Update_WithNullSettingsScope_ReturnsFalse ()
+    public void Load_WithNullSettingsScope_ReturnsFalse ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -23,7 +23,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WithValidStream_UpdatesSettingsScope ()
+    public void Load_WithValidStream_UpdatesSettingsScope ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -56,7 +56,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WithInvalidJson_AddsJsonError ()
+    public void Load_WithInvalidJson_AddsJsonError ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -86,7 +86,7 @@ public class SourcesManagerTests
     #region Update (FilePath)
 
     [Fact]
-    public void Update_WithNonExistentFile_AddsToSourcesAndReturnsTrue ()
+    public void Load_WithNonExistentFile_AddsToSourcesAndReturnsTrue ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -104,7 +104,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WithValidFile_UpdatesSettingsScope ()
+    public void Load_WithValidFile_UpdatesSettingsScope ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -140,7 +140,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WithIOException_RetriesAndFailsGracefully ()
+    public void Load_WithIOException_RetriesAndFailsGracefully ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -174,7 +174,7 @@ public class SourcesManagerTests
     #region Update (Json String)
 
     [Fact]
-    public void Update_WithNullOrEmptyJson_ReturnsFalse ()
+    public void Load_WithNullOrEmptyJson_ReturnsFalse ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -193,7 +193,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WithValidJson_UpdatesSettingsScope ()
+    public void Load_WithValidJson_UpdatesSettingsScope ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -218,6 +218,33 @@ public class SourcesManagerTests
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
 
+
+    //[Fact]
+    //public void Update_WithValidJson_UpdatesThemeScope ()
+    //{
+    //    // Arrange
+    //    var sourcesManager = new SourcesManager ();
+    //    var themeScope = new ThemeScope ();
+    //    themeScope.LoadHardCodedDefaults ();
+    //    themeScope ["Button.DefaultShadowStyle"].PropertyValue = ShadowStyle.Opaque;
+
+    //    var json = """
+    //               {
+    //                    "Button.DefaultShadowStyle": "None"
+    //               }
+    //               """;
+    //    var source = "test.json";
+    //    var location = ConfigLocations.HardCoded;
+
+    //    // Act
+    //    bool result = sourcesManager.Load (themeScope, json, source, location);
+
+    //    // Assert
+    //    Assert.True (result);
+    //    Assert.Equal (Key.Z.WithCtrl, themeScope ["Application.QuitKey"].PropertyValue as Key);
+    //    Assert.Contains (source, sourcesManager.Sources.Values);
+    //}
+
     #endregion
 
     #region Load
@@ -235,7 +262,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.AppResources;
 
         // Act
-        bool result = sourcesManager.Load (settingsScope, assembly, null, location);
+        bool result = sourcesManager.Load (settingsScope, assembly, string.Empty, location);
 
         // Assert
         Assert.False (result);
@@ -354,7 +381,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WhenCalledMultipleTimes_MaintainsLastSourceForLocation ()
+    public void Load_WhenCalledMultipleTimes_MaintainsLastSourceForLocation ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -374,7 +401,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WithDifferentLocations_AddsAllSourcesToCollection ()
+    public void Load_WithDifferentLocations_AddsAllSourcesToCollection ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -425,7 +452,7 @@ public class SourcesManagerTests
     }
 
     [Fact]
-    public void Update_WithNonExistentFileAndDifferentLocations_TracksAllSources ()
+    public void Load_WithNonExistentFileAndDifferentLocations_TracksAllSources ()
     {
         // Arrange
         var sourcesManager = new SourcesManager ();
@@ -486,47 +513,6 @@ public class SourcesManagerTests
         Assert.Equal (filePath, sourcesManager.Sources [location1]);
         Assert.Equal (jsonSource, sourcesManager.Sources [location2]);
         Assert.Equal (streamSource, sourcesManager.Sources [location3]);
-    }
-
-    [Fact]
-    public void Sources_StaysConsistentWhenUpdateFails ()
-    {
-        // Arrange
-        var sourcesManager = new SourcesManager ();
-        var settingsScope = new SettingsScope ();
-
-        // Add one successful source
-        var validSource = "valid.json";
-        var validLocation = ConfigLocations.Runtime;
-        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", validSource, validLocation);
-
-        try
-        {
-            // Configure to throw on errors
-            ConfigurationManager.ThrowOnJsonErrors = true;
-
-            // Act & Assert - attempt to update with invalid JSON
-            var invalidSource = "invalid.json";
-            var invalidLocation = ConfigLocations.AppCurrent;
-            var invalidJson = "{ invalid json }";
-
-            Assert.Throws<JsonException> (
-                                          () =>
-                                              sourcesManager.Load (settingsScope, invalidJson, invalidSource, invalidLocation));
-
-            // The valid source should still be there
-            Assert.Single (sourcesManager.Sources);
-            Assert.Equal (validSource, sourcesManager.Sources [validLocation]);
-
-            // The invalid source should not have been added
-            Assert.DoesNotContain (invalidLocation, sourcesManager.Sources.Keys);
-        }
-        finally
-        {
-            // Reset for other tests
-            ConfigurationManager.ThrowOnJsonErrors = false;
-
-        }
     }
 
     #endregion

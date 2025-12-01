@@ -1,7 +1,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class ViewTests
 {
@@ -332,6 +332,7 @@ public class ViewTests
     public void Test_Nested_Views_With_Height_Equal_To_One ()
     {
         var v = new View { Width = 11, Height = 3 };
+        v.App = ApplicationImpl.Instance;
 
         var top = new View { Width = Dim.Fill (), Height = 1 };
         var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };
@@ -447,16 +448,17 @@ public class ViewTests
         Assert.Equal (0, view.Height);
         var win = new Window ();
         win.Add (view);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
         Assert.True (view.Visible);
-        AutoInitShutdownAttribute.FakeResize(new Size(30, 5));
+        Application.Driver!.SetScreenSize (30, 5);
+        Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -494,47 +496,52 @@ public class ViewTests
         var button = new Button { Text = "Click Me" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         var iterations = 0;
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iterations++;
-
-                                     Assert.True (button.Visible);
-                                     Assert.True (button.CanFocus);
-                                     Assert.True (button.HasFocus);
-                                     Assert.True (win.Visible);
-                                     Assert.True (win.CanFocus);
-                                     Assert.True (win.HasFocus);
-
-                                     win.Visible = false;
-                                     Assert.True (button.Visible);
-                                     Assert.True (button.CanFocus);
-                                     Assert.False (button.HasFocus);
-                                     Assert.False (win.Visible);
-                                     Assert.True (win.CanFocus);
-                                     Assert.False (win.HasFocus);
-
-                                     button.SetFocus ();
-                                     Assert.False (button.HasFocus);
-                                     Assert.False (win.HasFocus);
-
-                                     win.SetFocus ();
-                                     Assert.False (button.HasFocus);
-                                     Assert.False (win.HasFocus);
-
-                                     win.Visible = true;
-                                     Assert.True (button.HasFocus);
-                                     Assert.True (win.HasFocus);
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         Application.Run (top);
+        Application.Iteration -= OnApplicationOnIteration;
         top.Dispose ();
         Assert.Equal (1, iterations);
+
+        return;
+
+        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
+        {
+            iterations++;
+
+            Assert.True (button.Visible);
+            Assert.True (button.CanFocus);
+            Assert.True (button.HasFocus);
+            Assert.True (win.Visible);
+            Assert.True (win.CanFocus);
+            Assert.True (win.HasFocus);
+
+            win.Visible = false;
+            Assert.True (button.Visible);
+            Assert.True (button.CanFocus);
+            Assert.False (button.HasFocus);
+            Assert.False (win.Visible);
+            Assert.True (win.CanFocus);
+            Assert.False (win.HasFocus);
+
+            button.SetFocus ();
+            Assert.False (button.HasFocus);
+            Assert.False (win.HasFocus);
+
+            win.SetFocus ();
+            Assert.False (button.HasFocus);
+            Assert.False (win.HasFocus);
+
+            win.Visible = true;
+            Assert.True (button.HasFocus);
+            Assert.True (win.HasFocus);
+
+            Application.RequestStop ();
+        }
     }
 }

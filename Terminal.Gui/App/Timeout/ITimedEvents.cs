@@ -1,4 +1,3 @@
-﻿#nullable enable
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -23,21 +22,9 @@ public interface ITimedEvents
 
     /// <summary>
     ///     Invoked when a new timeout is added. To be used in the case when
-    ///     <see cref="Application.EndAfterFirstIteration"/> is <see langword="true"/>.
+    ///     <see cref="IApplication.StopAfterFirstIteration"/> is <see langword="true"/>.
     /// </summary>
     event EventHandler<TimeoutEventArgs>? Added;
-
-    /// <summary>
-    ///     Called from <see cref="IMainLoopDriver.EventsPending"/> to check if there are any outstanding timer handlers.
-    /// </summary>
-    /// <param name="waitTimeout">
-    ///     Returns the number of milliseconds remaining in the current timer (if any). Will be -1 if
-    ///     there are no active timers.
-    /// </param>
-    /// <returns>
-    ///     <see langword="true"/> if there is a timer active; otherwise, <see langword="false"/>.
-    /// </returns>
-    bool CheckTimers (out int waitTimeout);
 
     /// <summary>
     ///     Removes a previously scheduled timeout.
@@ -61,4 +48,14 @@ public interface ITimedEvents
     ///     for each timeout that is not actively executing.
     /// </summary>
     SortedList<long, Timeout> Timeouts { get; }
+
+    /// <summary>
+    ///     Gets the timeout for the specified event.
+    /// </summary>
+    /// <param name="token">The token of the event.</param>
+    /// <returns>The <see cref="TimeSpan"/> for the event, or <see lang="null"/> if the event is not found.</returns>
+    TimeSpan? GetTimeout (object token);
+
+    /// <summary>Stops and removes all timed events.</summary>
+    void StopAll ();
 }

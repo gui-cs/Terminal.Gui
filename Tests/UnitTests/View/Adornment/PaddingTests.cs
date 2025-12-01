@@ -1,16 +1,20 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class PaddingTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Padding_Uses_Parent_Scheme ()
     {
-        ((IFakeConsoleDriver)Application.Driver!).SetBufferSize (5, 5);
-        var view = new View { Height = 3, Width = 3 };
+        ApplicationImpl.Instance.Driver!.SetScreenSize (5, 5);
+        var view = new View
+        {
+            App = ApplicationImpl.Instance,
+            Height = 3, Width = 3
+        };
         view.Padding!.Thickness = new (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
 

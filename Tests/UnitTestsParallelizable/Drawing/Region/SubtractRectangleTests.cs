@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.DrawingTests;
+﻿namespace DrawingTests;
 
 using Xunit;
 

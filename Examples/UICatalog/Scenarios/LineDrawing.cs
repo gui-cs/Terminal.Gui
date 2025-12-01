@@ -210,7 +210,7 @@ public class ToolsView : Window
 {
     private Button _addLayerBtn;
     private readonly AttributeView _colors;
-    private RadioGroup _stylePicker;
+    private OptionSelector<LineStyle> _stylePicker;
 
     public Attribute CurrentColor
     {
@@ -236,10 +236,16 @@ public class ToolsView : Window
 
         _stylePicker = new ()
         {
-            X = 0, Y = Pos.Bottom (_colors), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
+            X = 0, Y = Pos.Bottom (_colors), AssignHotKeys = true
         };
-        _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
-        _stylePicker.SelectedItem = 1;
+        _stylePicker.ValueChanged += (s, a) =>
+                                     {
+                                         if (a.Value is { })
+                                         {
+                                             SetStyle?.Invoke ((LineStyle)a.Value);
+                                         }
+                                     };
+        _stylePicker.Value = LineStyle.Single;
 
         _addLayerBtn = new () { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
@@ -278,7 +284,7 @@ public class DrawingArea : View
                     SetCurrentAttribute (c.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
 
                     // TODO: #2616 - Support combining sequences that don't normalize
-                    AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
+                    AddStr (c.Key.X, c.Key.Y, c.Value.Value.Grapheme);
                 }
             }
         }

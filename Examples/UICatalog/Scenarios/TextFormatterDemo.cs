@@ -30,7 +30,7 @@ public class TextFormatterDemo : Scenario
 
         var blockText = new Label
         {
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             X = 0,
             Y = 0,
 

@@ -1,6 +1,5 @@
 ﻿
 namespace Terminal.Gui.Drawing;
-#nullable enable
 
 // TODO: Add events that notify when StraightLine changes to enable dynamic layout
 /// <summary>A line between two points on a horizontal or vertical <see cref="Orientation"/> and a given style/color.</summary>

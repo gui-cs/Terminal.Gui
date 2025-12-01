@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.InputTests;
+﻿namespace InputTests;
 
 public class MouseEventArgsTests
 {

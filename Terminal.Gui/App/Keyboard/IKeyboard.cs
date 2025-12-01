@@ -1,10 +1,9 @@
-﻿#nullable enable
 namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Defines a contract for managing keyboard input and key bindings at the Application level.
 ///     <para>
-///         This interface decouples keyboard handling state from the static <see cref="Application"/> class,
+///         This interface decouples keyboard handling state from the static <see cref="App"/> class,
 ///         enabling parallelizable unit tests and better testability.
 ///     </para>
 /// </summary>
@@ -14,10 +13,10 @@ public interface IKeyboard
     /// Sets the application instance that this keyboard handler is associated with.
     /// This provides access to application state without coupling to static Application class.
     /// </summary>
-    IApplication? Application { get; set; }
+    IApplication? App { get; set; }
 
     /// <summary>
-    ///     Called when the user presses a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable
+    ///     Called when the user presses a key (by the <see cref="IDriver"/>). Raises the cancelable
     ///     <see cref="KeyDown"/> event, then calls <see cref="View.NewKeyDownEvent"/> on all top level views, and finally
     ///     if the key was not handled, invokes any Application-scoped <see cref="KeyBindings"/>.
     /// </summary>
@@ -27,7 +26,7 @@ public interface IKeyboard
     bool RaiseKeyDownEvent (Key key);
 
     /// <summary>
-    ///     Called when the user releases a key (by the <see cref="IConsoleDriver"/>). Raises the cancelable
+    ///     Called when the user releases a key (by the <see cref="IDriver"/>). Raises the cancelable
     ///     <see cref="KeyUp"/>
     ///     event
     ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="RaiseKeyDownEvent"/>.

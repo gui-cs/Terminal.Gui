@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.Views;
 
@@ -72,7 +71,7 @@ internal class TextModel
         for (int i = first; i < last; i++)
         {
             List<Cell> line = GetLine (i);
-            int tabSum = line.Sum (c => c.Rune.Value == '\t' ? Math.Max (tabWidth - 1, 0) : 0);
+            int tabSum = line.Sum (c => c.Grapheme == "\t" ? Math.Max (tabWidth - 1, 0) : 0);
             int l = line.Count + tabSum;
 
             if (l > maxLength)
@@ -223,7 +222,7 @@ internal class TextModel
 
             if (cell is { })
             {
-                rune = cell.Value.Rune;
+                rune = Rune.GetRuneAt (cell.Value.Grapheme, 0);
             }
             else
             {
@@ -300,10 +299,11 @@ internal class TextModel
                     }
 
                     List<Cell> line = GetLine (nRow);
+                    Rune firstRune = Rune.GetRuneAt (line [0].Grapheme, 0);
 
                     if (nCol == 0
                         && nRow == fromRow
-                        && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune)))
+                        && (Rune.IsLetterOrDigit (firstRune) || Rune.IsPunctuation (firstRune) || Rune.IsSymbol (firstRune)))
                     {
                         return;
                     }
@@ -367,7 +367,7 @@ internal class TextModel
 
         try
         {
-            Rune rune = _lines [row].Count > 0 ? RuneAt (col, row)!.Value.Rune : default (Rune);
+            Rune rune = _lines [row].Count > 0 ? Rune.GetRuneAt (RuneAt (col, row)!.Value.Grapheme, 0) : default (Rune);
             RuneType runeType = GetRuneType (rune);
 
             int lastValidCol = IsSameRuneType (rune, runeType, useSameRuneType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune))
@@ -426,10 +426,11 @@ internal class TextModel
                     }
 
                     List<Cell> line = GetLine (nRow);
+                    Rune firstRune = Rune.GetRuneAt (line [0].Grapheme, 0);
 
                     if (nCol == line.Count
                         && nRow == fromRow
-                        && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune)))
+                        && (Rune.IsLetterOrDigit (firstRune) || Rune.IsPunctuation (firstRune) || Rune.IsSymbol (firstRune)))
                     {
                         return;
                     }
@@ -476,10 +477,10 @@ internal class TextModel
         }
 
         if (startCol > 0
-            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ()).Trim () == ""
-            && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Rune == (Rune)' ')))
+            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Grapheme).ToList ()).Trim () == ""
+            && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Grapheme == " ")))
         {
-            while (startCol > 0 && line [startCol - 1].Rune == (Rune)' ')
+            while (startCol > 0 && line [startCol - 1].Grapheme == " ")
             {
                 startCol--;
             }
@@ -496,13 +497,13 @@ internal class TextModel
 
         if (selectWordOnly)
         {
-            List<Rune> selRunes = line.GetRange (startCol, col - startCol).Select (c => c.Rune).ToList ();
+            List<string> selText = line.GetRange (startCol, col - startCol).Select (c => c.Grapheme).ToList ();
 
-            if (StringExtensions.ToString (selRunes).Trim () != "")
+            if (StringExtensions.ToString (selText).Trim () != "")
             {
-                for (int i = selRunes.Count - 1; i > -1; i--)
+                for (int i = selText.Count - 1; i > -1; i--)
                 {
-                    if (selRunes [i] == (Rune)' ')
+                    if (selText [i] == " ")
                     {
                         col--;
                     }
@@ -520,18 +521,18 @@ internal class TextModel
 
     internal static int CalculateLeftColumn (List<Cell> t, int start, int end, int width, int tabWidth = 0)
     {
-        List<Rune> runes = new ();
+        List<string> strings = new ();
 
         foreach (Cell cell in t)
         {
-            runes.Add (cell.Rune);
+            strings.Add (cell.Grapheme);
         }
 
-        return CalculateLeftColumn (runes, start, end, width, tabWidth);
+        return CalculateLeftColumn (strings, start, end, width, tabWidth);
     }
 
     // Returns the left column in a range of the string.
-    internal static int CalculateLeftColumn (List<Rune> t, int start, int end, int width, int tabWidth = 0)
+    internal static int CalculateLeftColumn (List<string> t, int start, int end, int width, int tabWidth = 0)
     {
         if (t is null || t.Count == 0)
         {
@@ -539,15 +540,15 @@ internal class TextModel
         }
 
         var size = 0;
-        int tcount = end > t.Count - 1 ? t.Count - 1 : end;
+        int tCount = end > t.Count - 1 ? t.Count - 1 : end;
         var col = 0;
 
-        for (int i = tcount; i >= 0; i--)
+        for (int i = tCount; i >= 0; i--)
         {
-            Rune rune = t [i];
-            size += rune.GetColumns ();
+            string text = t [i];
+            size += text.GetColumns (false);
 
-            if (rune.Value == '\t')
+            if (text == "\t")
             {
                 size += tabWidth + 1;
             }
@@ -577,23 +578,23 @@ internal class TextModel
         List<Cell> t,
         int start = -1,
         int end = -1,
-        bool checkNextRune = true,
+        bool checkNextText = true,
         int tabWidth = 0
     )
     {
-        List<Rune> runes = new ();
+        List<string> strings = new ();
 
         foreach (Cell cell in t)
         {
-            runes.Add (cell.Rune);
+            strings.Add (cell.Grapheme);
         }
 
-        return DisplaySize (runes, start, end, checkNextRune, tabWidth);
+        return DisplaySize (strings, start, end, checkNextText, tabWidth);
     }
 
     // Returns the size and length in a range of the string.
     internal static (int size, int length) DisplaySize (
-        List<Rune> t,
+        List<string> t,
         int start = -1,
         int end = -1,
         bool checkNextRune = true,
@@ -608,35 +609,35 @@ internal class TextModel
         var size = 0;
         var len = 0;
 
-        int tcount = end == -1 ? t.Count :
+        int tCount = end == -1 ? t.Count :
                      end > t.Count ? t.Count : end;
         int i = start == -1 ? 0 : start;
 
-        for (; i < tcount; i++)
+        for (; i < tCount; i++)
         {
-            Rune rune = t [i];
-            size += rune.GetColumns ();
-            len += rune.GetEncodingLength (Encoding.Unicode);
+            string text = t [i];
+            size += text.GetColumns (false);
+            len += text.Length;
 
-            if (rune.Value == '\t')
+            if (text == "\t")
             {
                 size += tabWidth + 1;
                 len += tabWidth - 1;
             }
 
-            if (checkNextRune && i == tcount - 1 && t.Count > tcount && IsWideRune (t [i + 1], tabWidth, out int s, out int l))
+            if (checkNextRune && i == tCount - 1 && t.Count > tCount && IsWideText (t [i + 1], tabWidth, out int s, out int l))
             {
                 size += s;
                 len += l;
             }
         }
 
-        bool IsWideRune (Rune r, int tWidth, out int s, out int l)
+        bool IsWideText (string s1, int tWidth, out int s, out int l)
         {
-            s = r.GetColumns ();
-            l = r.GetEncodingLength ();
+            s = s1.GetColumns ();
+            l = Encoding.Unicode.GetByteCount (s1);
 
-            if (r.Value == '\t')
+            if (s1 == "\t")
             {
                 s += tWidth + 1;
                 l += tWidth - 1;
@@ -745,17 +746,17 @@ internal class TextModel
 
     internal static int GetColFromX (List<Cell> t, int start, int x, int tabWidth = 0)
     {
-        List<Rune> runes = new ();
+        List<string> strings = new ();
 
         foreach (Cell cell in t)
         {
-            runes.Add (cell.Rune);
+            strings.Add (cell.Grapheme);
         }
 
-        return GetColFromX (runes, start, x, tabWidth);
+        return GetColFromX (strings, start, x, tabWidth);
     }
 
-    internal static int GetColFromX (List<Rune> t, int start, int x, int tabWidth = 0)
+    internal static int GetColFromX (List<string> t, int start, int x, int tabWidth = 0)
     {
         if (x < 0)
         {
@@ -767,10 +768,10 @@ internal class TextModel
 
         for (int i = start; i < t.Count; i++)
         {
-            Rune r = t [i];
-            size += r.GetColumns ();
+            string s = t [i];
+            size += s.GetColumns ();
 
-            if (r.Value == '\t')
+            if (s == "\t")
             {
                 size += tabWidth + 1;
             }
@@ -1056,18 +1057,21 @@ internal class TextModel
         if (col + 1 < line.Count)
         {
             col++;
-            rune = line [col].Rune;
+            rune = Rune.GetRuneAt (line [col].Grapheme, 0);
+            Rune prevRune = Rune.GetRuneAt (line [col - 1].Grapheme, 0);
 
             if (col + 1 == line.Count
                 && !Rune.IsLetterOrDigit (rune)
-                && !Rune.IsWhiteSpace (line [col - 1].Rune)
-                && IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType))
+                && !Rune.IsWhiteSpace (prevRune)
+                                       && IsSameRuneType (prevRune, GetRuneType (rune), useSameRuneType))
             {
                 col++;
             }
 
+            prevRune = Rune.GetRuneAt (line [col - 1].Grapheme, 0);
+
             if (!Rune.IsWhiteSpace (rune)
-                && (Rune.IsWhiteSpace (line [col - 1].Rune) || !IsSameRuneType (line [col - 1].Rune, GetRuneType (rune), useSameRuneType)))
+                && (Rune.IsWhiteSpace (prevRune) || !IsSameRuneType (prevRune, GetRuneType (rune), useSameRuneType)))
             {
                 return false;
             }
@@ -1098,12 +1102,13 @@ internal class TextModel
         if (col > 0)
         {
             col--;
-            rune = line [col].Rune;
+            rune = Rune.GetRuneAt (line [col].Grapheme, 0);
+            Rune nextRune = Rune.GetRuneAt (line [col + 1].Grapheme, 0);
 
             if ((!Rune.IsWhiteSpace (rune)
-                 && !Rune.IsWhiteSpace (line [col + 1].Rune)
-                 && !IsSameRuneType (line [col + 1].Rune, GetRuneType (rune), useSameRuneType))
-                || (Rune.IsWhiteSpace (rune) && !Rune.IsWhiteSpace (line [col + 1].Rune)))
+                 && !Rune.IsWhiteSpace (nextRune)
+                 && !IsSameRuneType (nextRune, GetRuneType (rune), useSameRuneType))
+                || (Rune.IsWhiteSpace (rune) && !Rune.IsWhiteSpace (nextRune)))
             {
                 return false;
             }

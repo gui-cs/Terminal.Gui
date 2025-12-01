@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
