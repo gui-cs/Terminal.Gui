@@ -15,7 +15,7 @@ public class Shortcuts : Scenario
         var quitKey = Application.QuitKey;
         Window app = new ();
 
-        app.Loaded += App_Loaded;
+        app.IsModalChanged += App_Loaded;
 
         Application.Run (app);
         app.Dispose ();
@@ -28,7 +28,7 @@ public class Shortcuts : Scenario
     private void App_Loaded (object? sender, EventArgs e)
     {
         Application.QuitKey = Key.F4.WithCtrl;
-        Application.Current!.Title = GetQuitKeyAndName ();
+        Application.TopRunnableView!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
 
@@ -38,7 +38,7 @@ public class Shortcuts : Scenario
             X = Pos.AnchorEnd (),
             Y = 0,
             Height = Dim.Fill (4),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource),
             BorderStyle = LineStyle.Double,
             Title = "E_vents"
@@ -46,14 +46,14 @@ public class Shortcuts : Scenario
 
         eventLog.Width = Dim.Func (
                                    _ => Math.Min (
-                                                  Application.Current.Viewport.Width / 2,
+                                                  Application.TopRunnableView.Viewport.Width / 2,
                                                   eventLog?.MaxLength + eventLog!.GetAdornmentsThickness ().Horizontal ?? 0));
 
         eventLog.Width = Dim.Func (
                                    _ => Math.Min (
                                                   eventLog.SuperView!.Viewport.Width / 2,
                                                   eventLog?.MaxLength + eventLog!.GetAdornmentsThickness ().Horizontal ?? 0));
-        Application.Current.Add (eventLog);
+        Application.TopRunnableView.Add (eventLog);
 
         var alignKeysShortcut = new Shortcut
         {
@@ -86,7 +86,7 @@ public class Shortcuts : Scenario
                                                                           };
 
 
-        Application.Current.Add (alignKeysShortcut);
+        Application.TopRunnableView.Add (alignKeysShortcut);
 
         var commandFirstShortcut = new Shortcut
         {
@@ -115,7 +115,7 @@ public class Shortcuts : Scenario
                                                                                                       $"{commandFirstShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
                                                                                      eventLog.MoveDown ();
 
-                                                                                     IEnumerable<View> toAlign = Application.Current.SubViews.OfType<Shortcut> ();
+                                                                                     IEnumerable<View> toAlign = Application.TopRunnableView.SubViews.OfType<Shortcut> ();
                                                                                      IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
                                                                                      foreach (View view in enumerable)
@@ -134,7 +134,7 @@ public class Shortcuts : Scenario
                                                                                  }
                                                                              };
 
-        Application.Current.Add (commandFirstShortcut);
+        Application.TopRunnableView.Add (commandFirstShortcut);
 
         var canFocusShortcut = new Shortcut
         {
@@ -159,7 +159,7 @@ public class Shortcuts : Scenario
                                                                                  SetCanFocus (e.Result == CheckState.Checked);
                                                                              }
                                                                          };
-        Application.Current.Add (canFocusShortcut);
+        Application.TopRunnableView.Add (canFocusShortcut);
 
         var appShortcut = new Shortcut
         {
@@ -173,7 +173,7 @@ public class Shortcuts : Scenario
             BindKeyToApplication = true
         };
 
-        Application.Current.Add (appShortcut);
+        Application.TopRunnableView.Add (appShortcut);
 
         var buttonShortcut = new Shortcut
         {
@@ -193,7 +193,7 @@ public class Shortcuts : Scenario
         var button = (Button)buttonShortcut.CommandView;
         buttonShortcut.Accepting += Button_Clicked;
 
-        Application.Current.Add (buttonShortcut);
+        Application.TopRunnableView.Add (buttonShortcut);
 
         var optionSelectorShortcut = new Shortcut
         {
@@ -221,7 +221,7 @@ public class Shortcuts : Scenario
                                                                                     }
                                                                                 };
 
-        Application.Current.Add (optionSelectorShortcut);
+        Application.TopRunnableView.Add (optionSelectorShortcut);
 
         var sliderShortcut = new Shortcut
         {
@@ -248,7 +248,7 @@ public class Shortcuts : Scenario
                                                                            eventLog.MoveDown ();
                                                                        };
 
-        Application.Current.Add (sliderShortcut);
+        Application.TopRunnableView.Add (sliderShortcut);
 
         ListView listView = new ListView ()
         {
@@ -270,7 +270,7 @@ public class Shortcuts : Scenario
             Key = Key.F5.WithCtrl,
         };
 
-        Application.Current.Add (listViewShortcut);
+        Application.TopRunnableView.Add (listViewShortcut);
 
         var noCommandShortcut = new Shortcut
         {
@@ -282,7 +282,7 @@ public class Shortcuts : Scenario
             Key = Key.D0
         };
 
-        Application.Current.Add (noCommandShortcut);
+        Application.TopRunnableView.Add (noCommandShortcut);
 
         var noKeyShortcut = new Shortcut
         {
@@ -295,7 +295,7 @@ public class Shortcuts : Scenario
             HelpText = "Keyless"
         };
 
-        Application.Current.Add (noKeyShortcut);
+        Application.TopRunnableView.Add (noKeyShortcut);
 
         var noHelpShortcut = new Shortcut
         {
@@ -308,7 +308,7 @@ public class Shortcuts : Scenario
             HelpText = ""
         };
 
-        Application.Current.Add (noHelpShortcut);
+        Application.TopRunnableView.Add (noHelpShortcut);
         noHelpShortcut.SetFocus ();
 
         var framedShortcut = new Shortcut
@@ -339,8 +339,8 @@ public class Shortcuts : Scenario
             framedShortcut.KeyView.SchemeName = framedShortcut.KeyView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
-        Application.Current.Add (framedShortcut);
+        framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable);
+        Application.TopRunnableView.Add (framedShortcut);
 
         // Horizontal
         var progressShortcut = new Shortcut
@@ -387,7 +387,7 @@ public class Shortcuts : Scenario
                          };
         timer.Start ();
 
-        Application.Current.Add (progressShortcut);
+        Application.TopRunnableView.Add (progressShortcut);
 
         var textField = new TextField
         {
@@ -408,7 +408,7 @@ public class Shortcuts : Scenario
         };
         textField.CanFocus = true;
 
-        Application.Current.Add (textFieldShortcut);
+        Application.TopRunnableView.Add (textFieldShortcut);
 
         var bgColorShortcut = new Shortcut
         {
@@ -450,19 +450,19 @@ public class Shortcuts : Scenario
                                         eventSource.Add ($"ColorChanged: {o.GetType ().Name} - {args.Result}");
                                         eventLog.MoveDown ();
 
-                                        Application.Current.SetScheme (
-                                                                   new (Application.Current.GetScheme ())
+                                        Application.TopRunnableView.SetScheme (
+                                                                   new (Application.TopRunnableView.GetScheme ())
                                                                    {
                                                                        Normal = new (
-                                                                                     Application.Current!.GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                                     Application.TopRunnableView!.GetAttributeForRole (VisualRole.Normal).Foreground,
                                                                                      args.Result,
-                                                                                     Application.Current!.GetAttributeForRole (VisualRole.Normal).Style)
+                                                                                     Application.TopRunnableView!.GetAttributeForRole (VisualRole.Normal).Style)
                                                                    });
                                     }
                                 };
         bgColorShortcut.CommandView = bgColor;
 
-        Application.Current.Add (bgColorShortcut);
+        Application.TopRunnableView.Add (bgColorShortcut);
 
         var appQuitShortcut = new Shortcut
         {
@@ -476,9 +476,9 @@ public class Shortcuts : Scenario
         };
         appQuitShortcut.Accepting += (o, args) => { Application.RequestStop (); };
 
-        Application.Current.Add (appQuitShortcut);
+        Application.TopRunnableView.Add (appQuitShortcut);
 
-        foreach (Shortcut shortcut in Application.Current.SubViews.OfType<Shortcut> ())
+        foreach (Shortcut shortcut in Application.TopRunnableView.SubViews.OfType<Shortcut> ())
         {
             shortcut.Selecting += (o, args) =>
                                   {
@@ -529,7 +529,7 @@ public class Shortcuts : Scenario
 
         void SetCanFocus (bool canFocus)
         {
-            foreach (Shortcut peer in Application.Current!.SubViews.OfType<Shortcut> ())
+            foreach (Shortcut peer in Application.TopRunnableView!.SubViews.OfType<Shortcut> ())
             {
                 if (peer.CanFocus)
                 {
@@ -542,7 +542,7 @@ public class Shortcuts : Scenario
         {
             var max = 0;
 
-            IEnumerable<Shortcut> toAlign = Application.Current!.SubViews.OfType<Shortcut> ().Where(s => !s.Y.Has<PosAnchorEnd>(out _)).Cast<Shortcut>();
+            IEnumerable<Shortcut> toAlign = Application.TopRunnableView!.SubViews.OfType<Shortcut> ().Where(s => !s.Y.Has<PosAnchorEnd>(out _)).Cast<Shortcut>();
             IEnumerable<Shortcut> enumerable = toAlign as Shortcut [] ?? toAlign.ToArray ();
 
             if (align)
@@ -566,6 +566,6 @@ public class Shortcuts : Scenario
     {
         e.Handled = true;
         var view = sender as View;
-        MessageBox.Query ("Hi", $"You clicked {view?.Text}", "_Ok");
+        MessageBox.Query ((sender as View)?.App, "Hi", $"You clicked {view?.Text}", "_Ok");
     }
 }

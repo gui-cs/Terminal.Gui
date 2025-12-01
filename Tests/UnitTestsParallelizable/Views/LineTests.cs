@@ -1,6 +1,6 @@
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class LineTests : FakeDriverBase
 {

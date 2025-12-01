@@ -21,7 +21,7 @@ public class Menus : Scenario
         Logging.Logger = CreateLogger ();
 
         Application.Init ();
-        Toplevel app = new ();
+        Runnable app = new ();
         app.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();
@@ -32,7 +32,7 @@ public class Menus : Scenario
             X = Pos.AnchorEnd (),
             Width = Dim.Auto (),
             Height = Dim.Fill (), // Make room for some wide things
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (eventSource)
         };
         eventLog.Border!.Thickness = new (0, 1, 0, 0);
@@ -189,7 +189,7 @@ public class Menus : Scenario
             Application.KeyBindings.Remove (Key.F5);
             Application.KeyBindings.Add (Key.F5, this, Command.Edit);
 
-            var menuBar = new MenuBarv2
+            var menuBar = new MenuBar
             {
                 Title = "MenuHost MenuBar"
             };
@@ -257,7 +257,7 @@ public class Menus : Scenario
 
             menuBar.Accepted += (o, args) =>
                                 {
-                                    if (args.Context?.Source is MenuItemv2 mi && mi.CommandView == enableOverwriteMenuItemCb)
+                                    if (args.Context?.Source is MenuItem mi && mi.CommandView == enableOverwriteMenuItemCb)
                                     {
                                         Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
 
@@ -302,7 +302,7 @@ public class Menus : Scenario
 
             menuBar.Accepted += (o, args) =>
                                 {
-                                    if (args.Context?.Source is MenuItemv2 mi && mi.CommandView == editModeMenuItemCb)
+                                    if (args.Context?.Source is MenuItem mi && mi.CommandView == editModeMenuItemCb)
                                     {
                                         Logging.Debug ($"menuBar.Accepted: {args.Context.Source?.Title}");
 

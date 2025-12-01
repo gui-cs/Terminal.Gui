@@ -1,10 +1,9 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <inheritdoc/>
 internal abstract class CollectionNavigatorBase : ICollectionNavigator
 {
+    private readonly object _lock = new ();
     private DateTime _lastKeystroke = DateTime.Now;
     private string _searchString = "";
 
@@ -14,10 +13,20 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
     /// <inheritdoc/>
     public string SearchString
     {
-        get => _searchString;
+        get
+        {
+            lock (_lock)
+            {
+                return _searchString;
+            }
+        }
         private set
         {
-            _searchString = value;
+            lock (_lock)
+            {
+                _searchString = value;
+            }
+
             OnSearchStringChanged (new (value));
         }
     }
@@ -40,15 +49,22 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
             // but if we find none then we must fallback on cycling
             // d instead and discard the candidate state
             var candidateState = "";
-            TimeSpan elapsedTime = DateTime.Now - _lastKeystroke;
+            TimeSpan elapsedTime;
+            string currentSearchString;
+
+            lock (_lock)
+            {
+                elapsedTime = DateTime.Now - _lastKeystroke;
+                currentSearchString = _searchString;
+            }
 
             Logging.Debug ($"CollectionNavigator began processing '{keyStruck}', it has been {elapsedTime} since last keystroke");
 
             // is it a second or third (etc) keystroke within a short time
-            if (SearchString.Length > 0 && elapsedTime < TimeSpan.FromMilliseconds (TypingDelay))
+            if (currentSearchString.Length > 0 && elapsedTime < TimeSpan.FromMilliseconds (TypingDelay))
             {
                 // "dd" is a candidate
-                candidateState = SearchString + keyStruck;
+                candidateState = currentSearchString + keyStruck;
                 Logging.Debug ($"Appending, search is now for '{candidateState}'");
             }
             else
@@ -72,7 +88,11 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
             if (idxCandidate is { })
             {
                 // found "dd" so candidate search string is accepted
-                _lastKeystroke = DateTime.Now;
+                lock (_lock)
+                {
+                    _lastKeystroke = DateTime.Now;
+                }
+
                 SearchString = candidateState;
 
                 Logging.Debug ($"Found collection item that matched search:{idxCandidate}");
@@ -82,7 +102,11 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
 
             //// nothing matches "dd" so discard it as a candidate
             //// and just cycle "d" instead
-            _lastKeystroke = DateTime.Now;
+            lock (_lock)
+            {
+                _lastKeystroke = DateTime.Now;
+            }
+
             idxCandidate = GetNextMatchingItem (currentIndex, candidateState);
 
             Logging.Debug ($"CollectionNavigator searching (any match) matched:{idxCandidate}");
@@ -206,6 +230,10 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
     private void ClearSearchString ()
     {
         SearchString = "";
-        _lastKeystroke = DateTime.Now;
+
+        lock (_lock)
+        {
+            _lastKeystroke = DateTime.Now;
+        }
     }
 }

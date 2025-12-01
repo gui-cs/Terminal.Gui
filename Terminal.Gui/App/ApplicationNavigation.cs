@@ -13,7 +13,7 @@ public class ApplicationNavigation
     /// </summary>
     public ApplicationNavigation ()
     {
-        // TODO: Move navigation key bindings here from AddApplicationKeyBindings
+        // TODO: Move navigation key bindings here from KeyboardImpl
     }
 
     /// <summary>
@@ -113,6 +113,6 @@ public class ApplicationNavigation
         {
             return visiblePopover.AdvanceFocus (direction, behavior);
         }
-        return App?.Current is { } && App.Current.AdvanceFocus (direction, behavior);
+        return App?.TopRunnableView is { } && App.TopRunnableView.AdvanceFocus (direction, behavior);
     }
 }

@@ -82,11 +82,6 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     }
 
     /// <summary>
-    ///     Handles raising events and setting required draw status etc when <see cref="IApplication.Current"/> changes
-    /// </summary>
-    public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
-
-    /// <summary>
     ///     Initializes the class with the provided subcomponents
     /// </summary>
     /// <param name="timedEvents"></param>
@@ -142,13 +137,10 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        ToplevelTransitionManager.RaiseReadyEventIfNeeded (App);
-        ToplevelTransitionManager.HandleTopMaybeChanging (App);
-
-        if (App?.Current != null)
+        if (App?.TopRunnableView != null)
         {
             bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (App?.Current)
+                                     || AnySubViewsNeedDrawn (App?.TopRunnableView)
                                      || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
 
             bool sizeChanged = SizeMonitor.Poll ();
@@ -176,7 +168,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     private void SetCursor ()
     {
-        View? mostFocused = App?.Current!.MostFocused;
+        View? mostFocused = App?.TopRunnableView!.MostFocused;
 
         if (mostFocused == null)
         {

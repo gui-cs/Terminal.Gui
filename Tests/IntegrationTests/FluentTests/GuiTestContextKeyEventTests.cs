@@ -15,12 +15,12 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     [ClassData (typeof (TestDrivers))]
     public void QuitKey_ViaApplication_Stops (TestDriver d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d);
-        Assert.True (context.App?.Current!.Running);
-
-        Toplevel? top = context.App?.Current;
-        context.Then ((_) => context!.App?.Keyboard.RaiseKeyDownEvent (Application.QuitKey));
-        Assert.False (top!.Running);
+        using GuiTestContext context = With.A<Window> (40, 10, d)
+                                           .Then ((app) =>
+                                                  {
+                                                      app?.Keyboard.RaiseKeyDownEvent (Application.QuitKey);
+                                                      Assert.False (app!.TopRunnable!.IsRunning);
+                                                  });
     }
 
     [Theory]
@@ -28,12 +28,13 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     public void QuitKey_ViaEnqueueKey_Stops (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
-        Assert.True (context.App?.Current!.Running);
+        Assert.True (context.App?.TopRunnable!.IsRunning);
 
-        Toplevel? top = context.App?.Current;
+        IRunnable? top = context.App?.TopRunnable;
         context.EnqueueKeyEvent (Application.QuitKey);
+        context.App?.Dispose ();
 
-        Assert.False (top!.Running);
+        Assert.False (top!.IsRunning);
     }
 
     [Theory]

@@ -35,7 +35,7 @@ public class ListsAndCombos : Scenario
         // ListView
         var lbListView = new Label
         {
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             X = 0,
 
             Width = Dim.Percent (40),
@@ -91,7 +91,7 @@ public class ListsAndCombos : Scenario
         // ComboBox
         var lbComboBox = new Label
         {
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             X = Pos.Right (lbListView) + 1,
 
             Width = Dim.Percent (40),

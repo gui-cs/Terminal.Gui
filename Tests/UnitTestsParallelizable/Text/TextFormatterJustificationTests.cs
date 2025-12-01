@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests.TextTests;
+namespace TextTests;
 
 public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDriverBase
 {

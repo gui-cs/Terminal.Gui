@@ -3,117 +3,8 @@ using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 
-public class WindowTests (ITestOutputHelper output)
+public class WindowTests ()
 {
-    [Fact]
-    [AutoInitShutdown]
-    public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
-    {
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem ("Child", new MenuItem [] { new ("_Create Child", "", null) })
-            ]
-        };
-        var win = new Window ();
-        win.Add (menu);
-        var top = new Toplevel ();
-        top.Add (win);
-        Application.Begin (top);
-
-        Exception exception = Record.Exception (() => win.NewKeyDownEvent (KeyCode.AltMask));
-        Assert.Null (exception);
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void MenuBar_And_StatusBar_Inside_Window ()
-    {
-        var menu = new MenuBar
-        {
-            Menus =
-            [
-                new MenuBarItem ("File", new MenuItem [] { new ("Open", "", null), new ("Quit", "", null) }),
-                new MenuBarItem (
-                                 "Edit",
-                                 new MenuItem [] { new ("Copy", "", null) }
-                                )
-            ]
-        };
-
-        var sb = new StatusBar ();
-
-        var fv = new FrameView { Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1), Title = "Frame View", BorderStyle = LineStyle.Single };
-        var win = new Window ();
-        win.Add (menu, sb, fv);
-        Toplevel top = new ();
-        top.Add (win);
-        Application.Begin (top);
-        Application.Driver!.SetScreenSize (20, 10);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│ File  Edit       │
-│┌┤Frame View├────┐│
-││                ││
-││                ││
-││                ││
-││                ││
-│└────────────────┘│
-│                  │
-└──────────────────┘",
-                                                      output
-                                                     );
-
-        Application.Driver!.SetScreenSize (40, 20);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────────────────────────┐
-│ File  Edit                           │
-│┌┤Frame View├────────────────────────┐│
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-││                                    ││
-│└────────────────────────────────────┘│
-│                                      │
-└──────────────────────────────────────┘",
-                                                      output
-                                                     );
-
-        Application.Driver!.SetScreenSize (20, 10);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
-┌──────────────────┐
-│ File  Edit       │
-│┌┤Frame View├────┐│
-││                ││
-││                ││
-││                ││
-││                ││
-│└────────────────┘│
-│                  │
-└──────────────────┘",
-                                                      output
-                                                     );
-        top.Dispose ();
-    }
-
     [Fact]
     public void New_Initializes ()
     {
@@ -123,7 +14,7 @@ public class WindowTests (ITestOutputHelper output)
         Assert.NotNull (defaultWindow);
         Assert.Equal (string.Empty, defaultWindow.Title);
 
-        // Toplevels have Width/Height set to Dim.Fill
+        // Runnables have Width/Height set to Dim.Fill
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
         Assert.Equal ($"Window(){defaultWindow.Frame}", defaultWindow.ToString ());

@@ -6,7 +6,7 @@ using System.Resources;
 using System.Runtime.CompilerServices;
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ResourcesTests;
+namespace ResourcesTests;
 
 public class ResourceManagerTests : FakeDriverBase
 {

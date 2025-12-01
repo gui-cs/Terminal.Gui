@@ -29,7 +29,7 @@ public sealed class Generic : Scenario
                             {
                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
                                 e.Handled = true;
-                                MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
+                                MessageBox.ErrorQuery (ApplicationImpl.Instance, "Error", "You pressed the button!", "_Ok");
                             };
 
         appWindow.Add (button);

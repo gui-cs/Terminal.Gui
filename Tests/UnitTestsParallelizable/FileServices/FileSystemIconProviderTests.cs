@@ -3,7 +3,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace UnitTests_Parallelizable.FileServicesTests;
+namespace FileServicesTests;
 
 public class FileSystemIconProviderTests
 {

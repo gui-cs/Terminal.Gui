@@ -1121,6 +1121,7 @@ public class TextView : View, IDesignable
     public void PromptForColors ()
     {
         if (!ColorPicker.Prompt (
+                                 App!,
                                  "Colors",
                                  GetSelectedCellAttribute (),
                                  out Attribute newAttribute
@@ -1481,7 +1482,7 @@ public class TextView : View, IDesignable
     }
 
     /// <summary>Loads the contents of the <see cref="Cell"/> list into the <see cref="TextView"/>.</summary>
-    /// <param name="cells">Rune cells list to load the contents from.</param>
+    /// <param name="cells">Text cells list to load the contents from.</param>
     public void Load (List<Cell> cells)
     {
         SetWrapModel ();
@@ -1801,8 +1802,8 @@ public class TextView : View, IDesignable
 
             for (int idxCol = _leftColumn; idxCol < lineRuneCount; idxCol++)
             {
-                Rune rune = idxCol >= lineRuneCount ? (Rune)' ' : line [idxCol].Rune;
-                int cols = rune.GetColumns ();
+                string text = idxCol >= lineRuneCount ? " " : line [idxCol].Grapheme;
+                int cols = text.GetColumns (false);
 
                 if (idxCol < line.Count && IsSelecting && PointInSelection (idxCol, idxRow))
                 {
@@ -1821,7 +1822,7 @@ public class TextView : View, IDesignable
                     OnDrawNormalColor (line, idxCol, idxRow);
                 }
 
-                if (rune.Value == '\t')
+                if (text == "\t")
                 {
                     cols += TabWidth + 1;
 
@@ -1840,7 +1841,7 @@ public class TextView : View, IDesignable
                 }
                 else
                 {
-                    AddRune (col, row, rune);
+                    AddStr (col, row, text);
 
                     // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
                     cols = Math.Max (cols, 1);
@@ -1851,7 +1852,7 @@ public class TextView : View, IDesignable
                     break;
                 }
 
-                if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].Rune.GetColumns () > right)
+                if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].Grapheme.GetColumns () > right)
                 {
                     break;
                 }
@@ -1960,7 +1961,7 @@ public class TextView : View, IDesignable
         }
 
         SetWrapModel ();
-        string? contents = Clipboard.Contents;
+        string? contents = App?.Clipboard?.GetClipboardData ();
 
         if (_copyWithoutSelection && contents!.FirstOrDefault (x => x is '\n' or '\r') == 0)
         {
@@ -2047,9 +2048,9 @@ public class TextView : View, IDesignable
                     break;
                 }
 
-                int cols = line [idx].Rune.GetColumns ();
+                int cols = line [idx].Grapheme.GetColumns ();
 
-                if (line [idx].Rune.Value == '\t')
+                if (line [idx].Grapheme == "\t")
                 {
                     cols += TabWidth + 1;
                 }
@@ -2363,20 +2364,20 @@ public class TextView : View, IDesignable
         OnUnwrappedCursorPosition ();
     }
 
-    private void AppendClipboard (string text) { Clipboard.Contents += text; }
+    private void AppendClipboard (string text) { App?.Clipboard?.SetClipboardData (App?.Clipboard?.GetClipboardData () + text); }
 
     private PopoverMenu CreateContextMenu ()
     {
         PopoverMenu menu = new (
                                 new List<View>
                                 {
-                                    new MenuItemv2 (this, Command.SelectAll, Strings.ctxSelectAll),
-                                    new MenuItemv2 (this, Command.DeleteAll, Strings.ctxDeleteAll),
-                                    new MenuItemv2 (this, Command.Copy, Strings.ctxCopy),
-                                    new MenuItemv2 (this, Command.Cut, Strings.ctxCut),
-                                    new MenuItemv2 (this, Command.Paste, Strings.ctxPaste),
-                                    new MenuItemv2 (this, Command.Undo, Strings.ctxUndo),
-                                    new MenuItemv2 (this, Command.Redo, Strings.ctxRedo)
+                                    new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
+                                    new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
+                                    new MenuItem (this, Command.Copy, Strings.ctxCopy),
+                                    new MenuItem (this, Command.Cut, Strings.ctxCut),
+                                    new MenuItem (this, Command.Paste, Strings.ctxPaste),
+                                    new MenuItem (this, Command.Undo, Strings.ctxUndo),
+                                    new MenuItem (this, Command.Redo, Strings.ctxRedo)
                                 });
 
         menu.KeyChanged += ContextMenu_KeyChanged;
@@ -2806,12 +2807,12 @@ public class TextView : View, IDesignable
             cells = line.GetRange (startCol, endCol - startCol);
             cellsList.Add (cells);
 
-            return StringFromRunes (cells);
+            return StringFromCells (cells);
         }
 
         cells = line.GetRange (startCol, line.Count - startCol);
         cellsList.Add (cells);
-        string res = StringFromRunes (cells);
+        string res = StringFromCells (cells);
 
         for (int row = startRow + 1; row < maxRow; row++)
         {
@@ -2821,14 +2822,14 @@ public class TextView : View, IDesignable
 
             res = res
                   + Environment.NewLine
-                  + StringFromRunes (cells);
+                  + StringFromCells (cells);
         }
 
         line = model is null ? _model.GetLine (maxRow) : model.GetLine (maxRow);
         cellsList.AddRange ([]);
         cells = line.GetRange (0, endCol);
         cellsList.Add (cells);
-        res = res + Environment.NewLine + StringFromRunes (cells);
+        res = res + Environment.NewLine + StringFromCells (cells);
 
         return res;
     }
@@ -3108,7 +3109,7 @@ public class TextView : View, IDesignable
         {
             if (Used)
             {
-                Insert (new () { Rune = a.AsRune, Attribute = attribute });
+                Insert (new () { Grapheme = a.AsRune.ToString (), Attribute = attribute });
                 CurrentColumn++;
 
                 if (CurrentColumn >= _leftColumn + Viewport.Width)
@@ -3119,7 +3120,7 @@ public class TextView : View, IDesignable
             }
             else
             {
-                Insert (new () { Rune = a.AsRune, Attribute = attribute });
+                Insert (new () { Grapheme = a.AsRune.ToString (), Attribute = attribute });
                 CurrentColumn++;
             }
         }
@@ -3207,7 +3208,7 @@ public class TextView : View, IDesignable
             int restCount = currentLine.Count - CurrentColumn;
             List<Cell> rest = currentLine.GetRange (CurrentColumn, restCount);
             var val = string.Empty;
-            val += StringFromRunes (rest);
+            val += StringFromCells (rest);
 
             if (_lastWasKill)
             {
@@ -3313,7 +3314,7 @@ public class TextView : View, IDesignable
             int restCount = CurrentColumn;
             List<Cell> rest = currentLine.GetRange (0, restCount);
             var val = string.Empty;
-            val += StringFromRunes (rest);
+            val += StringFromCells (rest);
 
             if (_lastWasKill)
             {
@@ -3842,7 +3843,7 @@ public class TextView : View, IDesignable
 
             List<Cell> currentLine = GetCurrentLine ();
 
-            if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Rune.Value == '\t')
+            if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Grapheme == "\t")
             {
                 _historyText.Add (new () { new (currentLine) }, CursorPosition);
 
@@ -4470,7 +4471,7 @@ public class TextView : View, IDesignable
     {
         if (text is { })
         {
-            Clipboard.Contents = text;
+            App?.Clipboard?.SetClipboardData (text);
         }
     }
 
@@ -4601,29 +4602,28 @@ public class TextView : View, IDesignable
         _isButtonShift = false;
     }
 
-    private string StringFromRunes (List<Cell> cells)
+    private string StringFromCells (List<Cell> cells)
     {
-        if (cells is null)
-        {
-            throw new ArgumentNullException (nameof (cells));
-        }
+        ArgumentNullException.ThrowIfNull (cells);
 
         var size = 0;
-
         foreach (Cell cell in cells)
         {
-            size += cell.Rune.GetEncodingLength ();
+            string t = cell.Grapheme;
+            size += Encoding.Unicode.GetByteCount (t);
         }
 
-        var encoded = new byte [size];
+        byte [] encoded = new byte [size];
         var offset = 0;
-
         foreach (Cell cell in cells)
         {
-            offset += cell.Rune.Encode (encoded, offset);
+            string t = cell.Grapheme;
+            int bytesWritten = Encoding.Unicode.GetBytes (t, 0, t.Length, encoded, offset);
+            offset += bytesWritten;
         }
 
-        return StringExtensions.ToString (encoded);
+        // decode using the same encoding and the bytes actually written
+        return Encoding.Unicode.GetString (encoded, 0, offset);
     }
 
     private void TextView_SuperViewChanged (object sender, SuperViewChangedEventArgs e)

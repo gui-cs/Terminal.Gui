@@ -25,9 +25,18 @@ Use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.template
 
 ## Sample Usage in C#
 
-The following example shows a basic Terminal.Gui application in C# (this is `./Example/Example.cs`):
+The following example shows a basic Terminal.Gui application using the modern instance-based model (this is `./Example/Example.cs`):
 
 [!code-csharp[Program.cs](../../Examples/Example/Example.cs)]
+
+### Key aspects of the modern model:
+
+- Use `Application.Create()` to create an `IApplication` instance
+- The application initializes automatically when you call `Run<T>()`  
+- Use `app.Run<ExampleWindow>()` to run a window that implements `IRunnable`
+- Call `app.Dispose()` to clean up resources and restore the terminal
+- Event handling uses `Accepting` event instead of legacy `Accept` event
+- Set `e.Handled = true` in event handlers to prevent further processing
 
 When run the application looks as follows:
 

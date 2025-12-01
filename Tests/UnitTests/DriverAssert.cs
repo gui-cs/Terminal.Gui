@@ -42,7 +42,12 @@ internal partial class DriverAssert
         }
 
         expectedLook = expectedLook.Trim ();
-        driver ??= Application.Driver;
+
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull(driver);
 
         Cell [,] contents = driver!.Contents!;
 
@@ -152,8 +157,11 @@ internal partial class DriverAssert
     )
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
-        driver ??= Application.Driver!;
-
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver);
         var actualLook = driver.ToString ();
 
         if (string.Equals (expectedLook, actualLook))
@@ -198,10 +206,13 @@ internal partial class DriverAssert
         IDriver? driver = null
     )
     {
-        List<List<Rune>> lines = [];
+        List<List<string>> lines = [];
         var sb = new StringBuilder ();
-        driver ??= Application.Driver!;
-
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver);
         int x = -1;
         int y = -1;
         int w = -1;
@@ -211,13 +222,13 @@ internal partial class DriverAssert
 
         for (var rowIndex = 0; rowIndex < driver.Rows; rowIndex++)
         {
-            List<Rune> runes = [];
+            List<string> strings = [];
 
             for (var colIndex = 0; colIndex < driver.Cols; colIndex++)
             {
-                Rune runeAtCurrentLocation = contents! [rowIndex, colIndex].Rune;
+                string textAtCurrentLocation = contents! [rowIndex, colIndex].Grapheme;
 
-                if (runeAtCurrentLocation != _spaceRune)
+                if (textAtCurrentLocation != _spaceRune.ToString ())
                 {
                     if (x == -1)
                     {
@@ -226,11 +237,11 @@ internal partial class DriverAssert
 
                         for (var i = 0; i < colIndex; i++)
                         {
-                            runes.InsertRange (i, [_spaceRune]);
+                            strings.InsertRange (i, [_spaceRune.ToString ()]);
                         }
                     }
 
-                    if (runeAtCurrentLocation.GetColumns () > 1)
+                    if (textAtCurrentLocation.GetColumns () > 1)
                     {
                         colIndex++;
                     }
@@ -245,18 +256,13 @@ internal partial class DriverAssert
 
                 if (x > -1)
                 {
-                    runes.Add (runeAtCurrentLocation);
+                    strings.Add (textAtCurrentLocation);
                 }
-
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	runes.Add (combMark);
-                //}
             }
 
-            if (runes.Count > 0)
+            if (strings.Count > 0)
             {
-                lines.Add (runes);
+                lines.Add (strings);
             }
         }
 
@@ -270,13 +276,13 @@ internal partial class DriverAssert
         }
 
         // Remove trailing whitespace on each line
-        foreach (List<Rune> row in lines)
+        foreach (List<string> row in lines)
         {
             for (int c = row.Count - 1; c >= 0; c--)
             {
-                Rune rune = row [c];
+                string text = row [c];
 
-                if (rune != (Rune)' ' || row.Sum (x => x.GetColumns ()) == w)
+                if (text != " " || row.Sum (x => x.GetColumns ()) == w)
                 {
                     break;
                 }
@@ -285,7 +291,7 @@ internal partial class DriverAssert
             }
         }
 
-        // Convert Rune list to string
+        // Convert Text list to string
         for (var r = 0; r < lines.Count; r++)
         {
             var line = StringExtensions.ToString (lines [r]);
@@ -343,8 +349,11 @@ internal partial class DriverAssert
     /// <param name="expectedColors"></param>
     internal static void AssertDriverUsedColors (IDriver? driver = null, params Attribute [] expectedColors)
     {
-        driver ??= Application.Driver;
-        Cell [,] contents = driver?.Contents!;
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver); Cell [,] contents = driver?.Contents!;
 
         List<Attribute> toFind = expectedColors.ToList ();
 

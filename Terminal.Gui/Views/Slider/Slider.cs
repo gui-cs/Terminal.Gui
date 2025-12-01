@@ -74,13 +74,13 @@ public class Slider<T> : View, IOrientation
         switch (_config._sliderOrientation)
         {
             case Orientation.Horizontal:
-                Style.SpaceChar = new () { Rune = Glyphs.HLine }; // '─'
-                Style.OptionChar = new () { Rune = Glyphs.BlackCircle }; // '┼●🗹□⏹'
+                Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () }; // '─'
+                Style.OptionChar = new () { Grapheme = Glyphs.BlackCircle.ToString () }; // '┼●🗹□⏹'
 
                 break;
             case Orientation.Vertical:
-                Style.SpaceChar = new () { Rune = Glyphs.VLine };
-                Style.OptionChar = new () { Rune = Glyphs.BlackCircle };
+                Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
+                Style.OptionChar = new () { Grapheme = Glyphs.BlackCircle.ToString () };
 
                 break;
         }
@@ -105,12 +105,12 @@ public class Slider<T> : View, IOrientation
         */
 
         _config._legendsOrientation = _config._sliderOrientation;
-        Style.EmptyChar = new () { Rune = new (' ') };
-        Style.SetChar = new () { Rune = Glyphs.ContinuousMeterSegment }; // ■
-        Style.RangeChar = new () { Rune = Glyphs.Stipple }; // ░ ▒ ▓   // Medium shade not blinking on curses.
-        Style.StartRangeChar = new () { Rune = Glyphs.ContinuousMeterSegment };
-        Style.EndRangeChar = new () { Rune = Glyphs.ContinuousMeterSegment };
-        Style.DragChar = new () { Rune = Glyphs.Diamond };
+        Style.EmptyChar = new () { Grapheme = " " };
+        Style.SetChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () }; // ■
+        Style.RangeChar = new () { Grapheme = Glyphs.Stipple.ToString () }; // ░ ▒ ▓   // Medium shade not blinking on curses.
+        Style.StartRangeChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
+        Style.EndRangeChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
+        Style.DragChar = new () { Grapheme = Glyphs.Diamond.ToString () };
 
         // TODO: Support left & right (top/bottom)
         // First = '├',
@@ -256,11 +256,11 @@ public class Slider<T> : View, IOrientation
         switch (_config._sliderOrientation)
         {
             case Orientation.Horizontal:
-                Style.SpaceChar = new () { Rune = Glyphs.HLine }; // '─'
+                Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () }; // '─'
 
                 break;
             case Orientation.Vertical:
-                Style.SpaceChar = new () { Rune = Glyphs.VLine };
+                Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
 
                 break;
         }
@@ -799,7 +799,7 @@ public class Slider<T> : View, IOrientation
 
         if (_dragPosition.HasValue && _moveRenderPosition.HasValue)
         {
-            AddRune (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, Style.DragChar.Rune);
+            AddStr (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, Style.DragChar.Grapheme);
         }
 
         return true;
@@ -875,11 +875,11 @@ public class Slider<T> : View, IOrientation
                                       ? Style.RangeChar.Attribute ?? normalAttr
                                       : Style.SpaceChar.Attribute ?? normalAttr
                                  );
-            Rune rune = isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
+            string text = isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
 
             for (var i = 0; i < _config._startSpacing; i++)
             {
-                MoveAndAdd (x, y, rune);
+                MoveAndAdd (x, y, text);
 
                 if (isVertical)
                 {
@@ -897,7 +897,7 @@ public class Slider<T> : View, IOrientation
 
             for (var i = 0; i < _config._startSpacing; i++)
             {
-                MoveAndAdd (x, y, Style.EmptyChar.Rune);
+                MoveAndAdd (x, y, Style.EmptyChar.Grapheme);
 
                 if (isVertical)
                 {
@@ -951,25 +951,25 @@ public class Slider<T> : View, IOrientation
                                       drawRange ? Style.RangeChar.Attribute ?? setAttr : Style.OptionChar.Attribute ?? normalAttr
                                      );
 
-                Rune rune = drawRange ? Style.RangeChar.Rune : Style.OptionChar.Rune;
+                string text = drawRange ? Style.RangeChar.Grapheme : Style.OptionChar.Grapheme;
 
                 if (isSet)
                 {
                     if (_setOptions [0] == i)
                     {
-                        rune = Style.StartRangeChar.Rune;
+                        text = Style.StartRangeChar.Grapheme;
                     }
                     else if (_setOptions.Count > 1 && _setOptions [1] == i)
                     {
-                        rune = Style.EndRangeChar.Rune;
+                        text = Style.EndRangeChar.Grapheme;
                     }
                     else if (_setOptions.Contains (i))
                     {
-                        rune = Style.SetChar.Rune;
+                        text = Style.SetChar.Grapheme;
                     }
                 }
 
-                MoveAndAdd (x, y, rune);
+                MoveAndAdd (x, y, text);
 
                 if (isVertical)
                 {
@@ -992,7 +992,7 @@ public class Slider<T> : View, IOrientation
 
                     for (var s = 0; s < _config._cachedInnerSpacing; s++)
                     {
-                        MoveAndAdd (x, y, drawRange && isSet ? Style.RangeChar.Rune : Style.SpaceChar.Rune);
+                        MoveAndAdd (x, y, drawRange && isSet ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme);
 
                         if (isVertical)
                         {
@@ -1017,11 +1017,11 @@ public class Slider<T> : View, IOrientation
                                       ? Style.RangeChar.Attribute ?? normalAttr
                                       : Style.SpaceChar.Attribute ?? normalAttr
                                  );
-            Rune rune = isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
+            string text = isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
 
             for (var i = 0; i < remaining; i++)
             {
-                MoveAndAdd (x, y, rune);
+                MoveAndAdd (x, y, text);
 
                 if (isVertical)
                 {
@@ -1039,7 +1039,7 @@ public class Slider<T> : View, IOrientation
 
             for (var i = 0; i < remaining; i++)
             {
-                MoveAndAdd (x, y, Style.EmptyChar.Rune);
+                MoveAndAdd (x, y, Style.EmptyChar.Grapheme);
 
                 if (isVertical)
                 {

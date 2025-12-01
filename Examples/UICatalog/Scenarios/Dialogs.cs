@@ -266,7 +266,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [1..]),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [0..]),
 
                 Buttons = buttons.ToArray ()
             };
@@ -340,7 +340,13 @@ public class Dialogs : Scenario
                               };
             dialog.Add (addChar);
 
-            dialog.Closed += (s, e) => { buttonPressedLabel.Text = $"{clicked}"; };
+            dialog.IsRunningChanged += (s, e) =>
+                                       {
+                                           if (!e.Value)
+                                           {
+                                               buttonPressedLabel.Text = $"{clicked}";
+                                           }
+                                       };
         }
         catch (FormatException)
         {

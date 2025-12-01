@@ -27,6 +27,11 @@
 		<Optimize>true</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Drivers\**" />
+	  <EmbeddedResource Remove="Drivers\**" />
+	  <None Remove="Drivers\**" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
 		<PackageReference Include="Moq" />

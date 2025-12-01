@@ -26,7 +26,7 @@ public class ContextMenus : Scenario
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
-            SchemeName = "Toplevel"
+            SchemeName = "Runnable"
         };
 
         _appWindow.Initialized += AppWindowOnInitialized;
@@ -49,7 +49,7 @@ public class ContextMenus : Scenario
             var text = "Context Menu";
             var width = 20;
 
-            CreateWinContextMenu ();
+            CreateWinContextMenu (ApplicationImpl.Instance);
 
             var label = new Label
             {
@@ -84,7 +84,11 @@ public class ContextMenus : Scenario
             _appWindow.MouseClick += OnAppWindowOnMouseClick;
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
-            _appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
+            _appWindow.IsRunningChanged += (s, e) => {
+                                               if (!e.Value)
+                                               {
+                                                   Thread.CurrentThread.CurrentUICulture = originalCulture;
+                                               } };
         }
 
         void OnAppWindowOnMouseClick (object? s, MouseEventArgs e)
@@ -108,21 +112,21 @@ public class ContextMenus : Scenario
         }
     }
 
-    private void CreateWinContextMenu ()
+    private void CreateWinContextMenu (IApplication? app)
     {
         _winContextMenu = new (
                                [
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
                                        Title = "C_ultures",
                                        SubMenu = GetSupportedCultureMenu (),
                                    },
                                    new Line (),
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
                                        Title = "_Configuration...",
                                        HelpText = "Show configuration",
-                                       Action = () => MessageBox.Query (
+                                       Action = () => MessageBox.Query (app,
                                                                         50,
                                                                         10,
                                                                         "Configuration",
@@ -130,17 +134,17 @@ public class ContextMenus : Scenario
                                                                         "Ok"
                                                                        )
                                    },
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
                                        Title = "M_ore options",
                                        SubMenu = new (
                                                       [
-                                                          new MenuItemv2
+                                                          new MenuItem
                                                           {
                                                               Title = "_Setup...",
                                                               HelpText = "Perform setup",
                                                               Action = () => MessageBox
-                                                                           .Query (
+                                                                           .Query (app,
                                                                                    50,
                                                                                    10,
                                                                                    "Setup",
@@ -149,12 +153,12 @@ public class ContextMenus : Scenario
                                                                                   ),
                                                               Key = Key.T.WithCtrl
                                                           },
-                                                          new MenuItemv2
+                                                          new MenuItem
                                                           {
                                                               Title = "_Maintenance...",
                                                               HelpText = "Maintenance mode",
                                                               Action = () => MessageBox
-                                                                           .Query (
+                                                                           .Query (app,
                                                                                    50,
                                                                                    10,
                                                                                    "Maintenance",
@@ -165,7 +169,7 @@ public class ContextMenus : Scenario
                                                       ])
                                    },
                                    new Line (),
-                                   new MenuItemv2
+                                   new MenuItem
                                    {
                                        Title = "_Quit",
                                        Action = () => Application.RequestStop ()
@@ -177,14 +181,14 @@ public class ContextMenus : Scenario
         Application.Popover?.Register (_winContextMenu);
     }
 
-    private Menuv2 GetSupportedCultureMenu ()
+    private Menu GetSupportedCultureMenu ()
     {
-        List<MenuItemv2> supportedCultures = [];
+        List<MenuItem> supportedCultures = [];
         int index = -1;
 
         foreach (CultureInfo c in _cultureInfos!)
         {
-            MenuItemv2 culture = new ();
+            MenuItem culture = new ();
 
             culture.CommandView = new CheckBox { CanFocus = false };
 
@@ -215,17 +219,17 @@ public class ContextMenus : Scenario
             supportedCultures.Add (culture);
         }
 
-        Menuv2 menu = new (supportedCultures.ToArray ());
+        Menu menu = new (supportedCultures.ToArray ());
 
         return menu;
 
-        void CreateAction (List<MenuItemv2> cultures, MenuItemv2 culture)
+        void CreateAction (List<MenuItem> cultures, MenuItem culture)
         {
             culture.Action += () =>
                               {
                                   Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
 
-                                  foreach (MenuItemv2 item in cultures)
+                                  foreach (MenuItem item in cultures)
                                   {
                                       ((CheckBox)item.CommandView).CheckedState =
                                           Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;

@@ -15,7 +15,7 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void CanFocus_False_Wont_Focus_With_Mouse ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
         var tf = new TextField { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
         var fv = new FrameView
@@ -84,7 +84,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedRender, output);
-        Application.Current.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -95,6 +95,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Assert.Equal (11, caption.Length);
         Assert.Equal (10, caption.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (10, caption.GetColumns ());
 
         TextField tf = GetTextFieldsInView ();
 
@@ -104,7 +105,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Misérables", output);
-        Application.Current.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Theory (Skip = "Broke with ContextMenuv2")]
@@ -132,7 +133,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre (content, output);
-        Application.Current.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -157,7 +158,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("Enter txt", output);
-        Application.Current.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -187,7 +188,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // All characters in "Enter text" should have the caption attribute
         DriverAssert.AssertDriverAttributesAre ("0000000000", output, Application.Driver, captionAttr);
 
-        Application.Current.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -221,7 +222,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // F is underlined (index 1), remaining characters use normal caption attribute (index 0)
         DriverAssert.AssertDriverAttributesAre ("1000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.Current.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -255,7 +256,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // "Enter " (6 chars) + "T" (underlined) + "ext" (3 chars)
         DriverAssert.AssertDriverAttributesAre ("0000001000", output, Application.Driver, captionAttr, hotkeyAttr);
 
-        Application.Current.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -451,7 +452,7 @@ public class TextFieldTests (ITestOutputHelper output)
                                oldText = tf.Text;
                            };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -520,7 +521,7 @@ public class TextFieldTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void KeyBindings_Command ()
     {
-        var tf = new TextField { Width = 20, Text = "This is a test." };
+        var tf = new TextField { Width = 20, Text = "This is a test.", App = ApplicationImpl.Instance };
         tf.BeginInit ();
         tf.EndInit ();
 
@@ -835,7 +836,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // Proves #3022 is fixed (TextField selected text does not show in v2)
 
         _textField.CursorPosition = 0;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (_textField);
         SessionToken rs = Application.Begin (top);
 
@@ -918,7 +919,7 @@ public class TextFieldTests (ITestOutputHelper output)
         var clickCounter = 0;
         tf.MouseClick += (s, m) => { clickCounter++; };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tf);
         Application.Begin (top);
 
@@ -1660,7 +1661,7 @@ Les Miśerables",
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         top.Add (tf2);
 
@@ -1690,13 +1691,14 @@ Les Miśerables",
         {
             base.Before (methodUnderTest);
 
-            //Application.Current.Scheme = Colors.Schemes ["Base"];
+            //Application.TopRunnable.Scheme = Colors.Schemes ["Base"];
             _textField = new ()
             {
                 //                1         2         3 
                 //      01234567890123456789012345678901=32 (Length)
                 Text = "TAB to jump between text fields.",
-                Width = 32
+                Width = 32,
+                App = ApplicationImpl.Instance
             };
         }
     }

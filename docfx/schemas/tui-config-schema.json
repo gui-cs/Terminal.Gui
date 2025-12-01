@@ -572,7 +572,7 @@
           ],
           "description": "Default shadow style for Button controls, often used for 3D effect."
         },
-        "Menuv2.DefaultBorderStyle": {
+        "Menu.DefaultBorderStyle": {
           "type": "string",
           "enum": [
             "None",
@@ -581,9 +581,9 @@
             "Heavy",
             "Rounded"
           ],
-          "description": "Default border style for the newer Menuv2 control and its sub-menus."
+          "description": "Default border style for the newer Menu control and its sub-menus."
         },
-        "MenuBarv2.DefaultBorderStyle": {
+        "MenuBar.DefaultBorderStyle": {
           "type": "string",
           "enum": [
             "None",
@@ -592,7 +592,7 @@
             "Heavy",
             "Rounded"
           ],
-          "description": "Default border style for the MenuBarv2 control."
+          "description": "Default border style for the MenuBar control."
         },
         "StatusBar.DefaultSeparatorLineStyle": {
           "type": "string",
@@ -606,7 +606,7 @@
         },
         "Schemes": {
           "type": "array",
-          "description": "A list of scheme definitions for this theme. Each item in the array is an object containing one or more named schemes (e.g., 'TopLevel', 'Base', 'Menu').",
+          "description": "A list of scheme definitions for this theme. Each item in the array is an object containing one or more named schemes (e.g., 'Runnable', 'Base', 'Menu').",
           "items": {
             "type": "object",
             "description": "An object where each key is a scheme name (e.g., 'Base', 'Error') and its value is the scheme definition.",

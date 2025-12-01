@@ -18,7 +18,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     }
 
     /// <inheritdoc />
-    public override void EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    public override void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent)
     {
         InputQueue.Enqueue (new ()
         {

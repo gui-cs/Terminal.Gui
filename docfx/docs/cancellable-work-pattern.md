@@ -181,7 +181,7 @@ protected bool? RaiseAccepting(ICommandContext? ctx)
 
 #### Propagation Challenge
 
-- `Command.Activate` is local, limiting hierarchical coordination (e.g., `MenuBarv2` popovers). A proposed `PropagatedCommands` property addresses this, as detailed in the appendix.
+- `Command.Activate` is local, limiting hierarchical coordination (e.g., `MenuBar` popovers). A proposed `PropagatedCommands` property addresses this, as detailed in the appendix.
 
 ### 4. Application.Keyboard: Application-Level Keyboard Input
 

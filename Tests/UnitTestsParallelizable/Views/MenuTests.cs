@@ -1,15 +1,15 @@
 ﻿using Xunit.Abstractions;
 
-//using static Terminal.Gui.ViewTests.MenuTests;
+//using static Terminal.Gui.ViewBaseTests.MenuTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class MenuTests ()
 {
     [Fact]
     public void Constructors_Defaults ()
     {
-        var menu = new Menuv2 { };
+        var menu = new Menu { };
         Assert.Empty (menu.Title);
         Assert.Empty (menu.Text);
     }

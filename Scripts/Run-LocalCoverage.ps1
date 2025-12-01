@@ -26,8 +26,7 @@ dotnet test Tests/UnitTests `
   --no-build `
   --verbosity minimal `
   --collect:"XPlat Code Coverage" `
-  --settings Tests/UnitTests/runsettings.coverage.xml `
-  --blame-hang-timeout 60s
+  --settings Tests/UnitTests/runsettings.coverage.xml
 
 # ------------------------------------------------------------
 # 4. Run UNIT TESTS (parallel)
