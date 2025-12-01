@@ -1121,6 +1121,7 @@ public class TextView : View, IDesignable
     public void PromptForColors ()
     {
         if (!ColorPicker.Prompt (
+                                 App!,
                                  "Colors",
                                  GetSelectedCellAttribute (),
                                  out Attribute newAttribute

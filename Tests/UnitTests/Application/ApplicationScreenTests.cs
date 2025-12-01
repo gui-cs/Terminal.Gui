@@ -1,39 +1,18 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.ApplicationTests;
 
 public class ApplicationScreenTests
 {
-    public ApplicationScreenTests (ITestOutputHelper output)
-    {
-    }
-
-
-    [Fact]
-    public void ClearScreenNextIteration_Resets_To_False_After_LayoutAndDraw ()
-    {
-        // Arrange
-        Application.ResetState (true);
-        Application.Init ("fake");
-
-        // Act
-        Application.ClearScreenNextIteration = true;
-        Application.LayoutAndDraw ();
-
-        // Assert
-        Assert.False (Application.ClearScreenNextIteration);
-
-        // Cleanup
-        Application.ResetState (true);
-    }
+    public ApplicationScreenTests (ITestOutputHelper output) { }
 
     [Fact]
     [AutoInitShutdown]
     public void ClearContents_Called_When_Top_Frame_Changes ()
     {
-        Runnable top = new Runnable ();
+        var top = new Runnable ();
         SessionToken rs = Application.Begin (top);
+
         // Arrange
         var clearedContentsRaised = 0;
 
@@ -87,6 +66,24 @@ public class ApplicationScreenTests
         return;
 
         void OnClearedContents (object e, EventArgs a) { clearedContentsRaised++; }
+    }
+
+    [Fact]
+    public void ClearScreenNextIteration_Resets_To_False_After_LayoutAndDraw ()
+    {
+        // Arrange
+        Application.ResetState (true);
+        Application.Init ("fake");
+
+        // Act
+        Application.ClearScreenNextIteration = true;
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.False (Application.ClearScreenNextIteration);
+
+        // Cleanup
+        Application.ResetState (true);
     }
 
     [Fact]
