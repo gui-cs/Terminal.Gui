@@ -230,7 +230,7 @@ The @Terminal.Gui.App.Keyboard class implements @Terminal.Gui.App.IKeyboard and 
 - **Events**: KeyDown, KeyUp events for application-level keyboard monitoring
 - **Command Implementations**: Handlers for Application-scoped commands (Quit, Suspend, Navigation, Refresh, Arrange)
 
-The @Terminal.Gui.App.ApplicationImpl class creates and manages the @Terminal.Gui.App.IKeyboard instance, setting its `IApplication` property to `this` to provide the necessary @Terminal.Gui.App.IApplication reference.
+The @Terminal.Gui.App.IApplication implementations create and manage the @Terminal.Gui.App.IKeyboard instance, setting its `IApplication` property to `this` to provide the necessary @Terminal.Gui.App.IApplication reference.
 
 ## Driver
 
