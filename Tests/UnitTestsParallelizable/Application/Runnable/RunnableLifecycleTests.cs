@@ -1,7 +1,7 @@
 #nullable enable
 using Xunit.Abstractions;
 
-namespace RunnableTests;
+namespace ViewsTests;
 
 /// <summary>
 ///     Tests for IRunnable lifecycle behavior.
