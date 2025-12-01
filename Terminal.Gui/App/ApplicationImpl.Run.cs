@@ -114,12 +114,6 @@ public partial class ApplicationImpl
         // Create session token
         SessionToken token = new (runnable);
 
-        // Set the App property if the runnable is a View (needed for IsRunning/IsModal checks)
-        if (runnable is View runnableView)
-        {
-            runnableView.App = this;
-        }
-
         // Get old IsRunning value BEFORE any stack changes (safe - cached value)
         bool oldIsRunning = runnable.IsRunning;
 
@@ -130,11 +124,11 @@ public partial class ApplicationImpl
             return null;
         }
 
+        // Set the application reference in the runnable
+        runnable.SetApp (this);
+
         // Ensure the mouse is ungrabbed
-        if (Mouse.MouseGrabView is { })
-        {
-            Mouse.UngrabMouse ();
-        }
+        Mouse.UngrabMouse ();
 
         IRunnable? previousTop = null;
 
@@ -194,7 +188,7 @@ public partial class ApplicationImpl
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new ()
+        where TRunnable : IRunnable, new()
     {
         if (!Initialized)
         {

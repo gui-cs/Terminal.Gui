@@ -39,6 +39,12 @@ public class Runnable : View, IRunnable
 
     #region IRunnable Implementation - IsRunning (from base interface)
 
+    /// <inheritdoc />
+    public void SetApp (IApplication app)
+    {
+        App = app;
+    }
+
     /// <inheritdoc/>
     public bool IsRunning => _isRunning;
 
