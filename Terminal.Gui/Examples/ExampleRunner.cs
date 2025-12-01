@@ -71,7 +71,7 @@ public static class ExampleRunner
             // If entry point returns Task, wait for it
             if (result is Task task)
             {
-                task.Wait ();
+                task.GetAwaiter ().GetResult ();
             }
 
             return new ()
@@ -126,7 +126,8 @@ public static class ExampleRunner
         {
             try
             {
-                process.Kill (true);
+                const bool killEntireProcessTree = true;
+                process.Kill (killEntireProcessTree);
             }
             catch
             {

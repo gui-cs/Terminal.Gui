@@ -36,6 +36,7 @@ public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
     /// <inheritdoc/>
     public override IInput<ConsoleKeyInfo> CreateInput ()
     {
+        // Use provided input instance or create a new one if none was provided
         FakeInput fakeInput = _input ?? new FakeInput ();
 
         // Check for test context in environment variable

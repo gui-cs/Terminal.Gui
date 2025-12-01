@@ -25,6 +25,9 @@ public class ExampleTests
     [RequiresDynamicCode ("Calls ExampleDiscovery.DiscoverFromDirectory")]
     public static IEnumerable<object []> AllExamples ()
     {
+        // Navigate from test assembly location to repository root, then to Examples directory
+        // Test output is typically at: Tests/UnitTestsParallelizable/bin/Debug/net8.0/
+        // Examples are at: Examples/
         string examplesDir = Path.GetFullPath (Path.Combine (AppContext.BaseDirectory, "..", "..", "..", "..", "..", "Examples"));
 
         if (!Directory.Exists (examplesDir))
