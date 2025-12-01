@@ -10,10 +10,24 @@ public abstract class OutputBase
     /// </summary>
     internal IDriver? Driver { get; set; }
 
+    private bool _isVirtualTerminal;
+
     /// <summary>
     ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
     /// </summary>
-    internal bool IsVirtualTerminal { get; set; }
+    internal bool IsVirtualTerminal
+    {
+        get => _isVirtualTerminal;
+        set
+        {
+            _isVirtualTerminal = value;
+
+            if (Driver is DriverImpl driverImpl)
+            {
+                driverImpl.IsVirtualTerminal = _isVirtualTerminal;
+            }
+        }
+    }
 
     private CursorVisibility? _cachedCursorVisibility;
 
@@ -59,7 +73,7 @@ public abstract class OutputBase
                 {
                     if (!buffer.Contents! [row, col].IsDirty)
                     {
-                        if (!IsVirtualTerminal && output.Length > 0)
+                        if (output.Length > 0)
                         {
                             WriteToConsole (output, ref lastCol, row, ref outputWidth);
                         }
@@ -107,7 +121,7 @@ public abstract class OutputBase
             }
         }
 
-        if (Driver is { })
+        if (Driver is { } && IsVirtualTerminal)
         {
             foreach (SixelToRender s in Driver?.Sixel!)
             {
@@ -248,9 +262,16 @@ public abstract class OutputBase
     {
         SetCursorPositionImpl (lastCol, row);
 
-        // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-        StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-        Write (processed);
+        if (IsVirtualTerminal)
+        {
+            // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+            Write (processed);
+        }
+        else
+        {
+            Write (output);
+        }
 
         output.Clear ();
         lastCol += outputWidth;

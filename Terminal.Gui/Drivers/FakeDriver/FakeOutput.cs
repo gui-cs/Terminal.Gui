@@ -87,10 +87,21 @@ public class FakeOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        if (Application.Force16Colors)
+        if (Driver?.Force16Colors == true)
         {
-            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+            if (IsVirtualTerminal)
+            {
+                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+
+                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            }
+            else
+            {
+                Write (output);
+                Console.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor16 ();
+                Console.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor16 ();
+            }
         }
         else
         {
@@ -107,9 +118,9 @@ public class FakeOutput : OutputBase, IOutput
                                                       attr.Background.G,
                                                       attr.Background.B
                                                      );
-        }
 
-        EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+        }
     }
 
     /// <inheritdoc/>

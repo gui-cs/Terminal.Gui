@@ -1,9 +1,5 @@
 #nullable enable
 
-using System.Reflection;
-using System.Text;
-using Moq;
-
 namespace UnitTests_Parallelizable.DriverTests;
 
 public class OutputBaseTests
@@ -25,12 +21,27 @@ public class OutputBaseTests
     }
 
     [Theory]
-    [InlineData (true)]
-    [InlineData (false)]
-    public void ToAnsi_WithAttribute_AppendsCorrectColorSequence_BasedOnVirtualTerminal (bool isVirtualTerminal)
+    [InlineData (true, false)]
+    [InlineData (true, true)]
+    [InlineData (false, false)]
+    [InlineData (false, true)]
+    public void ToAnsi_WithAttribute_AppendsCorrectColorSequence_BasedOnVirtualTerminal_And_Force16Colors (bool isVirtualTerminal, bool force16Colors)
     {
         // Arrange
-        var output = new TestFakeOutput (isVirtualTerminal);
+        var output = new FakeOutput { IsVirtualTerminal = isVirtualTerminal };
+
+        // Create DriverImpl and associate it with the FakeOutput to test Sixel output
+        DriverImpl driver = new (
+                                 new FakeInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 output,
+                                 new (new AnsiResponseParser ()),
+                                 new SizeMonitorImpl (output));
+
+        driver.Force16Colors = force16Colors;
+
+        Assert.Equal (output.Driver, driver);
+
         IOutputBuffer buffer = output.LastBuffer!;
         buffer.SetSize (1, 1);
 
@@ -44,14 +55,20 @@ public class OutputBaseTests
         string ansi = output.ToAnsi (buffer);
 
         // Assert: when true color expected, we should see the RGB CSI; otherwise we should see the 16-color CSI
-        if (isVirtualTerminal)
+        if (isVirtualTerminal && !force16Colors)
         {
             Assert.Contains ("\u001b[38;2;1;2;3m", ansi);
         }
-        else
+        else if (isVirtualTerminal && force16Colors)
         {
             var expected16 = EscSeqUtils.CSI_SetForegroundColor (fg.GetAnsiColorCode ());
             Assert.Contains (expected16, ansi);
+        }
+        else
+        {
+            var expected16 = (ConsoleColor)fg.GetClosestNamedColor16 ();
+            Assert.Equal (ConsoleColor.Black, expected16);
+            Assert.DoesNotContain ('\u001b', ansi);
         }
 
         // Grapheme and newline should always be present
@@ -82,11 +99,14 @@ public class OutputBaseTests
         Assert.False (buffer.Contents! [0, 1].IsDirty);
     }
 
-    [Fact]
-    public void Write_NonVirtual_UsesWriteToConsoleAndClearsDirtyFlags ()
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Write_Virtual_Or_NonVirtual_Uses_WriteToConsole_And_Clears_Dirty_Flags (bool isVirtualTerminal)
     {
         // Arrange
-        var output = new FakeOutput ();
+        // FakeOutput exposes this because it's in test scope
+        var output = new FakeOutput { IsVirtualTerminal = isVirtualTerminal };
         IOutputBuffer buffer = output.LastBuffer!;
         buffer.SetSize (3, 1);
 
@@ -96,17 +116,35 @@ public class OutputBaseTests
         buffer.Move (2, 0);
         buffer.AddStr ("C");
 
-        // Confirm some dirtiness before the write
+        // Confirm some dirtiness before to write
         Assert.True (buffer.Contents! [0, 0].IsDirty);
         Assert.True (buffer.Contents! [0, 2].IsDirty);
-
-        // Set IsVirtualTerminal = false (FakeOutput exposes this because it's in test scope)
-        output.IsVirtualTerminal = false;
 
         // Act
         output.Write (buffer);
 
-        // Assert: both characters were written (use Contains to avoid CI side-effects)
+        // Assert: both characters were written (use Contains to avoid CI side effects)
+        Assert.Contains ("A", output.Output);
+        Assert.Contains ("C", output.Output);
+
+        // Dirty flags cleared for the written cells
+        Assert.False (buffer.Contents! [0, 0].IsDirty);
+        Assert.False (buffer.Contents! [0, 2].IsDirty);
+
+        // Verify SetCursorPositionImpl was invoked by WriteToConsole (cursor set to a written column)
+        Assert.Equal (new Point (0, 0), output.GetCursorPosition ());
+
+        // Now write 'X' at col 0 to verify subsequent writes also work
+        buffer.Move (0, 0);
+        buffer.AddStr ("X");
+
+        // Confirm dirtiness state before to write
+        Assert.True (buffer.Contents! [0, 0].IsDirty);
+        Assert.False (buffer.Contents! [0, 2].IsDirty);
+
+        output.Write (buffer);
+
+        // Assert: both characters were written (use Contains to avoid CI side effects)
         Assert.Contains ("A", output.Output);
         Assert.Contains ("C", output.Output);
 
@@ -118,8 +156,10 @@ public class OutputBaseTests
         Assert.Equal (new Point (0, 0), output.GetCursorPosition ());
     }
 
-    [Fact]
-    public void Write_EmitsSixelDataAndPositionsCursor ()
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Write_EmitsSixelDataAndPositionsCursor (bool isVirtualTerminal)
     {
         // Arrange
         var output = new FakeOutput ();
@@ -136,58 +176,40 @@ public class OutputBaseTests
             ScreenPosition = new Point (4, 2)
         };
 
-        // Mock IDriver and set Sixel list
-        var driverMock = new Mock<IDriver> ();
-        driverMock.SetupGet (d => d.Sixel).Returns (new List<SixelToRender> { s });
+        // Create DriverImpl and associate it with the FakeOutput to test Sixel output
+        DriverImpl driver = new (
+                                 new FakeInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 output,
+                                 new (new AnsiResponseParser ()),
+                                 new SizeMonitorImpl (output));
 
-        // Attach mock driver to output via internal property (use reflection if necessary)
-        var driverProp = output.GetType ().GetProperty (
-                                                     "Driver",
-                                                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy
-                                                    );
-        Assert.NotNull (driverProp);
-        driverProp.SetValue (output, driverMock.Object);
+        Assert.Equal (output.Driver, driver);
+
+        // Add the Sixel to the driver
+        driver.Sixel.Add (s);
+
+        // FakeOutput exposes this because it's in test scope
+        output.IsVirtualTerminal = isVirtualTerminal;
 
         // Act
         output.Write (buffer);
 
-        // Assert: Sixel data was emitted (use Contains to avoid equality/side-effects)
-        Assert.Contains ("SIXEL-DATA", output.Output);
-
-        // Cursor was moved to Sixel position
-        Assert.Equal (s.ScreenPosition, output.GetCursorPosition ());
-    }
-
-    /// <summary>
-    ///     Test FakeOutput variant that lets the test opt into emitting true-color RGB CSI sequences
-    ///     or 16-color SGR sequences for attributes without touching static <see cref="Application"/> state.
-    /// </summary>
-    private class TestFakeOutput : FakeOutput
-    {
-        private readonly bool _isVirtualTerminal;
-
-        public TestFakeOutput (bool isVirtualTerminal)
+        if (isVirtualTerminal)
         {
-            _isVirtualTerminal = isVirtualTerminal;
-            IsVirtualTerminal = isVirtualTerminal;
+            // Assert: Sixel data was emitted (use Contains to avoid equality/side-effects)
+            Assert.Contains ("SIXEL-DATA", output.Output);
+
+            // Cursor was moved to Sixel position
+            Assert.Equal (s.ScreenPosition, output.GetCursorPosition ());
         }
-
-        protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
+        else
         {
-            if (_isVirtualTerminal)
-            {
-                // True color path (RGB CSI)
-                EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
-                EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
-                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-            }
-            else
-            {
-                // 16-color SGR path (emit SGR codes for closest 16 colors)
-                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
-                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-            }
+            // Assert: Sixel data was NOT emitted
+            Assert.DoesNotContain ("SIXEL-DATA", output.Output);
+
+            // Cursor was NOT moved to Sixel position
+            Assert.NotEqual (s.ScreenPosition, output.GetCursorPosition ());
         }
     }
 }
