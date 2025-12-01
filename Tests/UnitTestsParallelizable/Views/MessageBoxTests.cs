@@ -60,7 +60,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -107,7 +107,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -162,7 +162,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -216,7 +216,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -300,7 +300,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -392,7 +392,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -434,7 +434,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -475,7 +475,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -512,7 +512,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -590,7 +590,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -613,7 +613,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 

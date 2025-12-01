@@ -49,9 +49,9 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         internal set => ApplicationImpl.Instance.MainThreadId = value;
     }
 
-    /// <inheritdoc cref="IApplication.Shutdown"/>
+    /// <inheritdoc cref="IApplication.Dispose"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static void Shutdown () => ApplicationImpl.Instance.Shutdown ();
+    public static void Shutdown () => ApplicationImpl.Instance.Dispose ();
 
     /// <inheritdoc cref="IApplication.Initialized"/>
     [Obsolete ("The legacy static Application object is going away.")]

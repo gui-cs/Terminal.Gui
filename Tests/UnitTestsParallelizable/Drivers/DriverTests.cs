@@ -55,11 +55,11 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("windows")]
     [InlineData ("dotnet")]
     [InlineData ("unix")]
-    public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName)
+    public void All_Drivers_Init_Dispose_Cross_Platform (string driverName)
     {
         IApplication? app = Application.Create ();
         app.Init (driverName);
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Theory]
@@ -73,7 +73,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
         app.Run<Runnable<bool>> ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Theory]
@@ -90,7 +90,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsWithFrameAre (driverName!, output, app.Driver);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 }
 

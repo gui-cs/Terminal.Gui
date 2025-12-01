@@ -45,7 +45,7 @@ public class ApplicationTests (ITestOutputHelper output)
         // The timeout should have fired
         Assert.True (timeoutFired);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class ApplicationTests (ITestOutputHelper output)
         // Test null Runnable
         Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class ApplicationTests (ITestOutputHelper output)
         }
         top.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -92,17 +92,17 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.NotNull (app.Driver);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
-    public void Init_Shutdown_Cleans_Up ()
+    public void Init_Dispose_Cleans_Up ()
     {
         IApplication app = Application.Create ();
 
         app.Init ("fake");
 
-        app.Shutdown ();
+        app.Dispose ();
 
 #if DEBUG_IDISPOSABLE
         // Validate there are no outstanding Responder-based instances 
@@ -113,10 +113,10 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Init_Shutdown_Fire_InitializedChanged ()
+    public void Init_Dispose_Fire_InitializedChanged ()
     {
         var initialized = false;
-        var shutdown = false;
+        var Dispose = false;
 
         IApplication app = Application.Create ();
 
@@ -124,11 +124,11 @@ public class ApplicationTests (ITestOutputHelper output)
 
         app.Init (driverName: "fake");
         Assert.True (initialized);
-        Assert.False (shutdown);
+        Assert.False (Dispose);
 
-        app.Shutdown ();
+        app.Dispose ();
         Assert.True (initialized);
-        Assert.True (shutdown);
+        Assert.True (Dispose);
 
         app.InitializedChanged -= OnApplicationOnInitializedChanged;
 
@@ -142,7 +142,7 @@ public class ApplicationTests (ITestOutputHelper output)
             }
             else
             {
-                shutdown = true;
+                Dispose = true;
             }
         }
     }
@@ -160,7 +160,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Init_Shutdown_Resets_Instance_Properties ()
+    public void Init_Dispose_Resets_Instance_Properties ()
     {
         IApplication app = Application.Create ();
 
@@ -187,8 +187,8 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.True (app.Initialized);
         Assert.NotNull (app.Driver);
 
-        // Shutdown cleans up
-        app.Shutdown ();
+        // Dispose cleans up
+        app.Dispose ();
 
         // Check reset state on the instance
         CheckReset (app);
@@ -206,8 +206,8 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Mouse.CachedViewsUnderMouse.Clear ();
         app.Mouse.LastMousePosition = new Point (1, 1);
 
-        // Shutdown and check reset
-        app.Shutdown ();
+        // Dispose and check reset
+        app.Dispose ();
         CheckReset (app);
 
         return;
@@ -241,7 +241,7 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.Equal (app.TopRunnable, rs!.Runnable);
         Assert.Null (app.Mouse.MouseGrabView); // public
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -259,7 +259,7 @@ public class ApplicationTests (ITestOutputHelper output)
         Assert.Equal (1, actionCalled);
         top.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Iteration -= Application_Iteration;
 
         Assert.Equal (1, iteration);
-        app.Shutdown ();
+        app.Dispose ();
 
         return;
 
@@ -315,14 +315,14 @@ public class ApplicationTests (ITestOutputHelper output)
         app.Screen = new (0, 0, driver.Cols, driver.Rows);
         Assert.Equal (new (0, 0, 100, 30), driver.Screen);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
-    public void Shutdown_Alone_Does_Nothing ()
+    public void Dispose_Alone_Does_Nothing ()
     {
         IApplication app = Application.Create ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     #region RunTests
@@ -340,7 +340,7 @@ public class ApplicationTests (ITestOutputHelper output)
         // Run<Runnable<bool>> when already initialized or not with a Driver will not throw (because Dialog is derived from Runnable)
         app.Run<Dialog> (null, "fake");
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -365,7 +365,7 @@ public class ApplicationTests (ITestOutputHelper output)
 #endif
         initTop.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
 
         return;
 
@@ -389,7 +389,7 @@ public class ApplicationTests (ITestOutputHelper output)
         // Init has been called and we're passing no driver to Run<TestRunnable>. This is ok.
         app.Run<Window> ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -402,7 +402,7 @@ public class ApplicationTests (ITestOutputHelper output)
         // Init has been called, selecting FakeDriver; we're passing no driver to Run<TestRunnable>. Should be fine.
         app.Run<Window> ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -413,7 +413,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         app.Run<Window> ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -425,7 +425,7 @@ public class ApplicationTests (ITestOutputHelper output)
         // Init has NOT been called and we're passing a valid driver to Run<TestRunnable>. This is ok.
         app.Run<Runnable> (null, "fake");
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -444,7 +444,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         top.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
 
         return;
 
@@ -484,7 +484,7 @@ public class ApplicationTests (ITestOutputHelper output)
         app.End (rs!);
         w.Dispose ();
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -499,7 +499,7 @@ public class ApplicationTests (ITestOutputHelper output)
 
         Assert.Null (app.TopRunnableView);
 
-        app.Shutdown ();
+        app.Dispose ();
         Assert.Null (app.TopRunnableView);
 
         return;
@@ -513,10 +513,10 @@ public class ApplicationTests (ITestOutputHelper output)
 
     #endregion
 
-    #region ShutdownTests
+    #region DisposeTests
 
     [Fact]
-    public async Task Shutdown_Allows_Async ()
+    public async Task Dispose_Allows_Async ()
     {
         var isCompletedSuccessfully = false;
 
@@ -529,7 +529,7 @@ public class ApplicationTests (ITestOutputHelper output)
         }
 
         IApplication app = Application.Create ();
-        app.Shutdown ();
+        app.Dispose ();
 
         Assert.False (isCompletedSuccessfully);
         await TaskWithAsyncContinuation ();
@@ -538,10 +538,10 @@ public class ApplicationTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Shutdown_Resets_SyncContext ()
+    public void Dispose_Resets_SyncContext ()
     {
         IApplication app = Application.Create ();
-        app.Shutdown ();
+        app.Dispose ();
         Assert.Null (SynchronizationContext.Current);
     }
 

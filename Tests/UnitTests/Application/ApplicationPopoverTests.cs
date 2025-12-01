@@ -197,7 +197,7 @@ public class ApplicationPopoverTests
             // Arrange
 
             Application.Init ("fake");
-            Application.TopRunnableView = new ();
+            Application.Begin (new Runnable ());
             PopoverTestClass? popover = new ();
 
             // Act

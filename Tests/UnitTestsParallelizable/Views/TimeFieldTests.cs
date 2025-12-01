@@ -67,7 +67,7 @@ public class TimeFieldTests
         }
         finally
         {
-            app.Shutdown();
+            app.Dispose ();
         }
     }
 

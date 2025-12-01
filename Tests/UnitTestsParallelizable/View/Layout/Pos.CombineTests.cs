@@ -92,7 +92,7 @@ public class PosCombineTests (ITestOutputHelper output)
         Assert.Throws<LayoutException> (() => app.Run (t));
         t.Dispose ();
         v2.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -134,6 +134,6 @@ public class PosCombineTests (ITestOutputHelper output)
         Assert.Throws<LayoutException> (() => app.Run (top));
         app.TopRunnableView?.Dispose ();
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 }

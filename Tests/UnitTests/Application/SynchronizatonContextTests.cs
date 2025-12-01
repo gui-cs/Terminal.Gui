@@ -39,7 +39,7 @@ public class SyncrhonizationContextTests
 
             Task.Run (() =>
                       {
-                          while (Application.TopRunnableView is null || Application.TopRunnable is { IsRunning: false })
+                          while (Application.TopRunnable is { IsRunning: false })
                           {
                               Thread.Sleep (500);
                           }

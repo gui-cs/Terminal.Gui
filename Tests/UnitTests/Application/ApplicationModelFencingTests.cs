@@ -23,7 +23,7 @@ public class ApplicationModelFencingTests
         Assert.Contains ("after using modern instance-based model", ex.Message);
 
         // Clean up
-        app.Shutdown ();
+        app.Dispose ();
         ApplicationImpl.ResetModelUsageTracking ();
     }
 
@@ -48,7 +48,7 @@ public class ApplicationModelFencingTests
         Assert.Contains ("after using legacy static Application model", ex.Message);
 
         // Clean up
-        staticInstance.Shutdown ();
+        staticInstance.Dispose ();
         ApplicationImpl.ResetModelUsageTracking ();
     }
 
@@ -72,7 +72,7 @@ public class ApplicationModelFencingTests
         Assert.Contains ("after using legacy static Application model", ex.Message);
 
         // Clean up
-        staticInstance.Shutdown ();
+        staticInstance.Dispose ();
         ApplicationImpl.ResetModelUsageTracking ();
     }
 
@@ -93,7 +93,7 @@ public class ApplicationModelFencingTests
         Assert.Contains ("after using modern instance-based model", ex.Message);
 
         // Clean up
-        app.Shutdown ();
+        app.Dispose ();
         ApplicationImpl.ResetModelUsageTracking ();
     }
 
@@ -113,9 +113,9 @@ public class ApplicationModelFencingTests
         Assert.NotNull (app3);
 
         // Clean up
-        app1.Shutdown ();
-        app2.Shutdown ();
-        app3.Shutdown ();
+        app1.Dispose ();
+        app2.Dispose ();
+        app3.Dispose ();
         ApplicationImpl.ResetModelUsageTracking ();
     }
 
@@ -135,7 +135,7 @@ public class ApplicationModelFencingTests
         Assert.Same (instance2, instance3);
 
         // Clean up
-        instance1.Shutdown ();
+        instance1.Dispose ();
         ApplicationImpl.ResetModelUsageTracking ();
     }
 
@@ -147,7 +147,7 @@ public class ApplicationModelFencingTests
 
         // Use modern model
         IApplication app1 = Application.Create ();
-        app1.Shutdown ();
+        app1.Dispose ();
 
         // Reset the tracking
         ApplicationImpl.ResetModelUsageTracking ();
@@ -155,7 +155,7 @@ public class ApplicationModelFencingTests
         // Should now be able to use legacy model
         IApplication staticInstance = ApplicationImpl.Instance;
         Assert.NotNull (staticInstance);
-        staticInstance.Shutdown ();
+        staticInstance.Dispose ();
 
         // Reset again
         ApplicationImpl.ResetModelUsageTracking ();
@@ -163,7 +163,7 @@ public class ApplicationModelFencingTests
         // Should be able to use modern model again
         IApplication app2 = Application.Create ();
         Assert.NotNull (app2);
-        app2.Shutdown ();
+        app2.Dispose ();
         ApplicationImpl.ResetModelUsageTracking ();
     }
 }

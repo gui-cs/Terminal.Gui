@@ -68,7 +68,7 @@ public class RunnableTests (ITestOutputHelper output)
         Assert.False (runnable.IsRunning);
 
         // Cleanup
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]

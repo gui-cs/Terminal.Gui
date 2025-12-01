@@ -32,6 +32,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
         IRunnable? top = context.App?.TopRunnable;
         context.EnqueueKeyEvent (Application.QuitKey);
+        context.App?.Dispose ();
 
         Assert.False (top!.IsRunning);
     }

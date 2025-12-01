@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
@@ -9,7 +8,16 @@ public partial class ApplicationImpl
     // Lock object to protect session stack operations and cached state updates
     private readonly object _sessionStackLock = new ();
 
-    #region Begin->Run->Stop->End
+    #region Session State - Stack and TopRunnable
+
+    /// <inheritdoc/>
+    public ConcurrentStack<SessionToken>? SessionStack { get; } = new ();
+
+    /// <inheritdoc/>
+    public IRunnable? TopRunnable { get; private set; }
+
+    /// <inheritdoc/>
+    public View? TopRunnableView => TopRunnable as View;
 
     /// <inheritdoc/>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
@@ -17,50 +25,20 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public event EventHandler<SessionTokenEventArgs>? SessionEnded;
 
+    #endregion Session State - Stack and TopRunnable
+
+    #region Main Loop Iteration
+
     /// <inheritdoc/>
     public bool StopAfterFirstIteration { get; set; }
 
     /// <inheritdoc/>
-    public void RaiseIteration ()
-    {
-        Iteration?.Invoke (null, new (this));
-    }
-
-    /// <inheritdoc/>
     public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
-
-    private IRunnable? _topRunnable;
-
-    /// <inheritdoc />
-    public IRunnable? TopRunnable
-    {
-        get => _topRunnable;
-        set => _topRunnable = value;
-    }
-
-
     /// <inheritdoc/>
-    public View? TopRunnableView
-    {
-        get => _topRunnable as View;
-        set
-        {
-            if (_topRunnable is View runnableView)
-            {
-                runnableView.App = this;
-            }
-        }
-    }
+    public void RaiseIteration () { Iteration?.Invoke (null, new (this)); }
 
-    /// <inheritdoc/>
-    public ConcurrentStack<SessionToken>? SessionStack { get; } = new ();
-
-
-    /// <inheritdoc/>
-    public void RequestStop () { RequestStop (null); }
-
-    #endregion Begin->Run->Stop->End
+    #endregion Main Loop Iteration
 
     #region Timeouts and Invoke
 
@@ -121,7 +99,7 @@ public partial class ApplicationImpl
 
     #endregion Timeouts and Invoke
 
-    #region IRunnable Support
+    #region Session Lifecycle - Begin
 
     /// <inheritdoc/>
     public SessionToken? Begin (IRunnable runnable)
@@ -190,6 +168,7 @@ public partial class ApplicationImpl
                 previousTop.SetIsModal (false);
             }
         }
+
         // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
 
         // Fire events AFTER lock released (avoid deadlocks in event handlers)
@@ -207,12 +186,15 @@ public partial class ApplicationImpl
         return token;
     }
 
+    #endregion Session Lifecycle - Begin
+
+    #region Session Lifecycle - Run
 
     /// <inheritdoc/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new()
+        where TRunnable : IRunnable, new ()
     {
         if (!Initialized)
         {
@@ -236,6 +218,7 @@ public partial class ApplicationImpl
 
         return this;
     }
+
     /// <inheritdoc/>
     public object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null)
     {
@@ -248,6 +231,7 @@ public partial class ApplicationImpl
 
         // Begin the session (adds to stack, raises IsRunningChanging/IsRunningChanged)
         SessionToken? token;
+
         if (runnable.IsRunning)
         {
             // Find it on the stack
@@ -261,6 +245,7 @@ public partial class ApplicationImpl
         if (token is null)
         {
             Logging.Trace (@"Run - Begin session failed or was cancelled.");
+
             return null;
         }
 
@@ -316,6 +301,10 @@ public partial class ApplicationImpl
         }
     }
 
+    #endregion Session Lifecycle - Run
+
+    #region Session Lifecycle - End
+
     /// <inheritdoc/>
     public void End (SessionToken token)
     {
@@ -358,7 +347,6 @@ public partial class ApplicationImpl
                 // Restore previous top runnable
                 if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
                 {
-
                     previousRunnable = previousToken.Runnable;
 
                     // Previous runnable becomes modal again
@@ -370,6 +358,7 @@ public partial class ApplicationImpl
             runnable.SetIsRunning (false);
             runnable.SetIsModal (false);
         }
+
         // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
 
         // Fire events AFTER lock released
@@ -379,6 +368,7 @@ public partial class ApplicationImpl
         }
 
         TopRunnable = null;
+
         if (previousRunnable != null)
         {
             TopRunnable = previousRunnable;
@@ -396,6 +386,12 @@ public partial class ApplicationImpl
         SessionEnded?.Invoke (this, new (token));
     }
 
+    #endregion Session Lifecycle - End
+
+    #region Session Lifecycle - RequestStop
+
+    /// <inheritdoc/>
+    public void RequestStop () { RequestStop (null); }
 
     /// <inheritdoc/>
     public void RequestStop (IRunnable? runnable)
@@ -420,5 +416,5 @@ public partial class ApplicationImpl
         // and that's where IsRunningChanging/IsRunningChanged will be raised
     }
 
-    #endregion IRunnable Support
+    #endregion Session Lifecycle - RequestStop
 }

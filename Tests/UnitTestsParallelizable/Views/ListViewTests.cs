@@ -899,7 +899,7 @@ public class ListViewTests (ITestOutputHelper output)
         top.Add (lv);
         app.Begin (top);
 
-        //AutoInitShutdownAttribute.RunIteration ();
+        //AutoInitDisposeAttribute.RunIteration ();
 
         Assert.Equal (new (1), lv.Border!.Thickness);
         Assert.Null (lv.SelectedItem);
@@ -951,7 +951,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Equal (2, lv.SelectedItem);
         top.Dispose ();
 
-        app?.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]
@@ -1204,7 +1204,7 @@ public class ListViewTests (ITestOutputHelper output)
                                                        _output, app.Driver
                                                       );
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1250,7 +1250,7 @@ Item 6",
                                                        _output, app.Driver
                                                       );
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1290,7 +1290,7 @@ Item 6",
         }
 
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1339,7 +1339,7 @@ Item 6",
  tem 4",
                                                        _output, app.Driver);
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1361,7 +1361,7 @@ Item 6",
         lv.Draw ();
         Assert.True (rendered);
         top.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -1402,7 +1402,7 @@ Four
 Five ",
                                                        _output, app?.Driver);
         top.Dispose ();
-        app?.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]
@@ -1453,7 +1453,7 @@ Three",
                                                        _output, app?.Driver);
 
         top.Dispose ();
-        app?.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]
@@ -1525,7 +1525,7 @@ hree - lon",
                                                        _output, app?.Driver);
 
         top.Dispose ();
-        app?.Shutdown ();
+        app?.Dispose ();
     }
 
     [Fact]

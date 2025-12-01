@@ -150,7 +150,7 @@ public partial class GuiTestContext : IDisposable
                                              runnableView.Dispose ();
                                          }
                                          Logging.Trace ("Application.Run completed");
-                                         App?.Shutdown ();
+                                         App?.Dispose ();
                                          _runCancellationTokenSource.Cancel ();
                                      }
                                  }
@@ -450,7 +450,7 @@ public partial class GuiTestContext : IDisposable
             {
                 try
                 {
-                    App?.Shutdown ();
+                    App?.Dispose ();
                 }
                 catch
                 {
@@ -479,7 +479,7 @@ public partial class GuiTestContext : IDisposable
             try
             {
                 App?.RequestStop ();
-                App?.Shutdown ();
+                App?.Dispose ();
             }
             catch (Exception ex)
             {

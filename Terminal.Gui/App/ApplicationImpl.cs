@@ -27,17 +27,10 @@ public partial class ApplicationImpl : IApplication
 
     private string? _driverName;
 
-    #region Clipboard
-
-    /// <inheritdoc/>
-    public IClipboard? Clipboard => Driver?.Clipboard;
-
-    #endregion Clipboard
-
     /// <inheritdoc/>
     public new string ToString () => Driver?.ToString () ?? string.Empty;
 
-    #region Singleton
+    #region Singleton - Legacy Static Support
 
     /// <summary>
     ///     Lock object for synchronizing access to ModelUsage and _instance.
@@ -166,31 +159,20 @@ public partial class ApplicationImpl : IApplication
         ResetModelUsageTracking ();
     }
 
-    #endregion Singleton
+    #endregion Singleton - Legacy Static Support
 
-    #region Input
+    #region Screen and Driver
 
-    private IMouse? _mouse;
+    /// <inheritdoc/>
+    public IClipboard? Clipboard => Driver?.Clipboard;
 
-    /// <summary>
-    ///     Handles mouse event state and processing.
-    /// </summary>
-    public IMouse Mouse
-    {
-        get
-        {
-            _mouse ??= new MouseImpl { App = this };
+    #endregion Screen and Driver
 
-            return _mouse;
-        }
-        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
-    }
+    #region Keyboard
 
     private IKeyboard? _keyboard;
 
-    /// <summary>
-    ///     Handles keyboard input and key bindings at the Application level
-    /// </summary>
+    /// <inheritdoc/>
     public IKeyboard Keyboard
     {
         get
@@ -202,23 +184,27 @@ public partial class ApplicationImpl : IApplication
         set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion Input
+    #endregion Keyboard
 
-    #region View Management
+    #region Mouse
 
-    private ApplicationPopover? _popover;
+    private IMouse? _mouse;
 
     /// <inheritdoc/>
-    public ApplicationPopover? Popover
+    public IMouse Mouse
     {
         get
         {
-            _popover ??= new () { App = this };
+            _mouse ??= new MouseImpl { App = this };
 
-            return _popover;
+            return _mouse;
         }
-        set => _popover = value;
+        set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
+
+    #endregion Mouse
+
+    #region Navigation and Popover
 
     private ApplicationNavigation? _navigation;
 
@@ -234,5 +220,19 @@ public partial class ApplicationImpl : IApplication
         set => _navigation = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion View Management
+    private ApplicationPopover? _popover;
+
+    /// <inheritdoc/>
+    public ApplicationPopover? Popover
+    {
+        get
+        {
+            _popover ??= new () { App = this };
+
+            return _popover;
+        }
+        set => _popover = value;
+    }
+
+    #endregion Navigation and Popover
 }

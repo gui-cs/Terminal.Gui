@@ -6,7 +6,7 @@ Terminal.Gui v2 uses an instance-based application architecture with the **IRunn
 
 - **Instance-Based**: Use `Application.Create()` to get an `IApplication` instance instead of static methods
 - **IRunnable Interface**: Views implement `IRunnable<TResult>` to participate in session management without inheriting from `Runnable`
-- **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for elegant, concise code  
+- **Fluent API**: Chain `Init()` and `Run()` for elegant, concise code  
 - **IDisposable Pattern**: Proper resource cleanup with `Dispose()` or `using` statements
 - **Automatic Disposal**: Framework-created runnables are automatically disposed
 - **Type-Safe Results**: Generic `TResult` parameter provides compile-time type safety
@@ -87,23 +87,28 @@ var top = new Window();
 top.Add(myView);
 Application.Run(top);
 top.Dispose();
-Application.Shutdown();
+Application.Shutdown(); // Obsolete - use Dispose() instead
 
-// NEW (v2 recommended - instance-based):
-using var app = Application.Create();
-app.Init();
-var top = new Window();
-top.Add(myView);
-app.Run(top);
-top.Dispose();
+// RECOMMENDED (v2 - instance-based with using statement):
+using (var app = Application.Create().Init())
+{
+    var top = new Window();
+    top.Add(myView);
+    app.Run(top);
+    top.Dispose();
+} // app.Dispose() called automatically
 
-// NEWEST (v2 with IRunnable and Fluent API):
-using IApplication app = Application.Create();
-Color? result = app.Run<ColorPickerDialog>().GetResult<Color>();
+// WITH IRunnable (fluent API with automatic disposal):
+using (var app = Application.Create().Init())
+{
+    app.Run<ColorPickerDialog>();
+    Color? result = app.GetResult<Color>();
+}
 
-// SIMPLEST (v2 - automatic Init and Dispose):
-IApplication app = Application.Create();
-Color? result = app.Run<ColorPickerDialog>().GetResult<Color>();
+// SIMPLEST (manual disposal):
+var app = Application.Create().Init();
+app.Run<ColorPickerDialog>();
+Color? result = app.GetResult<Color>();
 app.Dispose();
 ```
 
@@ -193,11 +198,23 @@ Terminal.Gui v2 introduces the **IRunnable** interface pattern that decouples ru
 The fluent API enables elegant method chaining with automatic resource management:
 
 ```csharp
-// All-in-one: Create, initialize, run, shutdown, and extract result
-Color? result = Application.Create()
-                           .Init()
-                           .Run<ColorPickerDialog>()
-                           .Shutdown() as Color?;
+// Recommended: using statement with GetResult
+using (var app = Application.Create().Init())
+{
+    app.Run<ColorPickerDialog>();
+    Color? result = app.GetResult<Color>();
+    
+    if (result is { })
+    {
+        ApplyColor(result);
+    }
+}
+
+// Alternative: Manual disposal
+var app = Application.Create().Init();
+app.Run<ColorPickerDialog>();
+Color? result = app.GetResult<Color>();
+app.Dispose();
 
 if (result is { })
 {
@@ -209,7 +226,8 @@ if (result is { })
 
 - `Init()` - Returns `IApplication` for chaining
 - `Run<TRunnable>()` - Creates and runs runnable, returns `IApplication`
-- `Shutdown()` - Disposes framework-owned runnables, returns `object?` result
+- `GetResult()` / `GetResult<T>()` - Extract typed result after run
+- `Dispose()` - Release all resources (called automatically with `using`)
 
 ### Disposal Semantics
 
@@ -217,18 +235,25 @@ if (result is { })
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|
-| `Run<TRunnable>()` | Framework | Framework | Automatic in `Shutdown()` |
+| `Run<TRunnable>()` | Framework | Framework | Automatic when `Run<T>()` returns |
 | `Run(IRunnable)` | Caller | Caller | Manual by caller |
 
 ```csharp
 // Framework ownership - automatic disposal
-var result = app.Run<MyDialog>().Shutdown();
+using (var app = Application.Create().Init())
+{
+    app.Run<MyDialog>(); // Dialog disposed automatically when Run returns
+    var result = app.GetResult<MyResultType>();
+}
 
 // Caller ownership - manual disposal
-var dialog = new MyDialog();
-app.Run(dialog);
-var result = dialog.Result;
-dialog.Dispose();  // Caller must dispose
+using (var app = Application.Create().Init())
+{
+    var dialog = new MyDialog();
+    app.Run(dialog);
+    var result = dialog.Result;
+    dialog.Dispose();  // Caller must dispose
+}
 ```
 
 ### Creating Runnable Views
@@ -528,22 +553,29 @@ finally
 }
 ```
 
-### Shutdown() vs Dispose()
+### Dispose() and Result Retrieval
 
-- **`Shutdown()`** - Obsolete method that calls `Dispose()` and returns the result
-- **`Dispose()`** - Recommended IDisposable pattern for resource cleanup
-- **`GetResult()`** / **`GetResult<T>()`** - Retrieve results after `Dispose()`
+- **`Dispose()`** - Standard IDisposable pattern for resource cleanup (required)
+- **`GetResult()`** / **`GetResult<T>()`** - Retrieve results after run completes
+- **`Shutdown()`** - Obsolete (use `Dispose()` instead)
 
 ```csharp
-// OLD (Shutdown returns result):
-var result = app.Run<MyDialog>().Shutdown() as MyResult;
-
-// NEW (Dispose + GetResult):
+// RECOMMENDED (using statement):
 using (var app = Application.Create().Init())
 {
     app.Run<MyDialog>();
     var result = app.GetResult<MyResult>();
+    // app.Dispose() called automatically here
 }
+
+// ALTERNATIVE (manual disposal):
+var app = Application.Create().Init();
+app.Run<MyDialog>();
+var result = app.GetResult<MyResult>();
+app.Dispose(); // Must call explicitly
+
+// OLD (obsolete - do not use):
+var result = app.Run<MyDialog>().Shutdown() as MyResult;
 ```
 
 ### Input Thread Lifecycle
@@ -581,11 +613,11 @@ The legacy static `Application` singleton can be re-initialized after disposal (
 ```csharp
 // Test 1
 Application.Init();
-Application.Shutdown();
+Application.Shutdown(); // Obsolete but still works for legacy singleton
 
 // Test 2 - singleton resets and can be re-initialized
 Application.Init(); // ✅ Works!
-Application.Shutdown();
+Application.Shutdown(); // Obsolete but still works for legacy singleton
 ```
 
 However, instance-based applications follow standard `IDisposable` semantics and cannot be reused after disposal:

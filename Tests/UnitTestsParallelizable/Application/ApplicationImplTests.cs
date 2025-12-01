@@ -471,7 +471,7 @@ public class ApplicationImplTests
         Assert.Null (v2.TopRunnableView); // Top is still null until Run
 
         // Shutdown should clean up instance fields
-        v2.Shutdown ();
+        v2.Dispose ();
 
         Assert.Null (v2.Driver);
         Assert.False (v2.Initialized);

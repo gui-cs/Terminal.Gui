@@ -61,7 +61,7 @@ public class DateFieldTests
         }
         finally
         {
-            app.Shutdown();
+            app.Dispose ();
         }
     }
 
