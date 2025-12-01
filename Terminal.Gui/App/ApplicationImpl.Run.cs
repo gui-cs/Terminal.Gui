@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
     // Lock object to protect session stack operations and cached state updates
     private readonly object _sessionStackLock = new ();

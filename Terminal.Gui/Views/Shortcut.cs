@@ -634,7 +634,7 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _bindKeyToApplication;
         set
         {
-            App ??= SuperView?.App ?? ApplicationImpl.Instance; // HACK: Remove once legacy static Application is gone
+            App ??= SuperView?.App ?? Application.Instance; // HACK: Remove once legacy static Application is gone
             Debug.Assert (App is { });
 
             if (value == _bindKeyToApplication)

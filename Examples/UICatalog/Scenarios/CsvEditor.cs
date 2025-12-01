@@ -215,7 +215,7 @@ public class CsvEditor : Scenario
                                       _tableView.Table.Columns
                                      );
 
-            int? result = MessageBox.Query (ApplicationImpl.Instance,
+            int? result = MessageBox.Query (Application.Instance,
                                            "Column Type",
                                            "Pick a data type for the column",
                                            "Date",
@@ -308,7 +308,7 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedColumn == -1)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "No Column", "No column selected", "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "No Column", "No column selected", "Ok");
 
             return;
         }
@@ -320,7 +320,7 @@ public class CsvEditor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "Could not remove column", ex.Message, "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "Could not remove column", ex.Message, "Ok");
         }
     }
 
@@ -342,7 +342,7 @@ public class CsvEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (ApplicationImpl.Instance, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery (Application.Instance, 60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView.Update ();
@@ -388,7 +388,7 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedColumn == -1)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "No Column", "No column selected", "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "No Column", "No column selected", "Ok");
 
             return;
         }
@@ -413,7 +413,7 @@ public class CsvEditor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "Error moving column", ex.Message, "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "Error moving column", ex.Message, "Ok");
         }
     }
 
@@ -426,7 +426,7 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedRow == -1)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "No Rows", "No row selected", "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "No Rows", "No row selected", "Ok");
 
             return;
         }
@@ -462,7 +462,7 @@ public class CsvEditor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "Error moving column", ex.Message, "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "Error moving column", ex.Message, "Ok");
         }
     }
 
@@ -470,7 +470,7 @@ public class CsvEditor : Scenario
     {
         if (_tableView?.Table is null)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "No Table Loaded", "No table has currently be opened", "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "No Table Loaded", "No table has currently be opened", "Ok");
 
             return true;
         }
@@ -582,7 +582,7 @@ public class CsvEditor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance,
+            MessageBox.ErrorQuery (Application.Instance,
                                    "Open Failed",
                                    $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}",
                                    "Ok"
@@ -612,7 +612,7 @@ public class CsvEditor : Scenario
     {
         if (_tableView?.Table is null || string.IsNullOrWhiteSpace (_currentFile) || _currentTable is null)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "No file loaded", "No file is currently loaded", "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "No file loaded", "No file is currently loaded", "Ok");
 
             return;
         }
@@ -674,7 +674,7 @@ public class CsvEditor : Scenario
 
         if (col.DataType == typeof (string))
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance,
+            MessageBox.ErrorQuery (Application.Instance,
                                    "Cannot Format Column",
                                    "String columns cannot be Formatted, try adding a new column to the table with a date/numerical Type",
                                    "Ok"
@@ -711,7 +711,7 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedColumn == -1)
         {
-            MessageBox.ErrorQuery (ApplicationImpl.Instance, "No Column", "No column selected", "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "No Column", "No column selected", "Ok");
 
             return;
         }
