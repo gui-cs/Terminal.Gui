@@ -82,11 +82,6 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     }
 
     /// <summary>
-    ///     Handles raising events and setting required draw status etc when <see cref="IApplication.TopRunnable"/> changes
-    /// </summary>
-    public IToplevelTransitionManager ToplevelTransitionManager = new ToplevelTransitionManager ();
-
-    /// <summary>
     ///     Initializes the class with the provided subcomponents
     /// </summary>
     /// <param name="timedEvents"></param>
@@ -142,18 +137,10 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-
-        // TODO: This whole ToplevelTransitionManager is bogus and over-engineered.
-        // TODO: Remove it and just let subscribers use the IApplication.Iteration
-        // TODO: If the requirement is they know if it's the first iteration, they can
-        // TODO: count invocations.
-        ToplevelTransitionManager.RaiseReadyEventIfNeeded (App);
-        ToplevelTransitionManager.HandleTopMaybeChanging (App);
-
-        if (App?.TopRunnable != null)
+        if (App?.TopRunnableView != null)
         {
             bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (App?.TopRunnable)
+                                     || AnySubViewsNeedDrawn (App?.TopRunnableView)
                                      || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
 
             bool sizeChanged = SizeMonitor.Poll ();
@@ -181,7 +168,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     private void SetCursor ()
     {
-        View? mostFocused = App?.TopRunnable!.MostFocused;
+        View? mostFocused = App?.TopRunnableView!.MostFocused;
 
         if (mostFocused == null)
         {

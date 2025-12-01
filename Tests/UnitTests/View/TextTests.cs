@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 /// <summary>
 ///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties.
@@ -65,7 +65,7 @@ Y
         var viewX = new View { Text = "X", X = Pos.Right (label), Width = 1, Height = 1 };
         var viewY = new View { Text = "Y", Y = Pos.Bottom (label), Width = 1, Height = 1 };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (label, viewX, viewY);
         SessionToken rs = Application.Begin (top);
 
@@ -119,11 +119,12 @@ Y
 
         var view = new View ();
         win.Add (view);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (15, 15);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
         Assert.Equal (new (0, 0, 15, 15), win.Margin!.Frame);
@@ -385,10 +386,11 @@ Y
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (view);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (4, 10);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (5, text.Length);
 
@@ -396,7 +398,7 @@ Y
         Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new () { "Views" }, view.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 4, 10), win.Frame);
-        Assert.Equal (new (0, 0, 4, 10), Application.TopRunnable.Frame);
+        Assert.Equal (new (0, 0, 4, 10), Application.TopRunnableView.Frame);
 
         var expected = @"
 ┌──┐
@@ -511,10 +513,11 @@ w ";
             Text = "Window"
         };
         win.Add (horizontalView, verticalView);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 20);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
@@ -599,10 +602,11 @@ w ";
         };
         var win = new Window { Id = "win", Width = Dim.Fill (), Height = Dim.Fill (), Text = "Window" };
         win.Add (horizontalView, verticalView);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (22, 22);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
@@ -678,7 +682,7 @@ w ";
     public void Excess_Text_Is_Erased_When_The_Width_Is_Reduced ()
     {
         var lbl = new Label { Text = "123" };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (lbl);
         SessionToken rs = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -783,10 +787,11 @@ w ";
 
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (frame);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (width + 2, 6);
+        Application.LayoutAndDraw ();
 
         // frame.Width is width + border wide (20 + 2) and 6 high
 
@@ -913,10 +918,11 @@ w ";
         var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         frame.Add (lblLeft, lblCenter, lblRight, lblJust);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (frame);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (9, height + 2);
+        Application.LayoutAndDraw ();
 
         if (autoSize)
         {

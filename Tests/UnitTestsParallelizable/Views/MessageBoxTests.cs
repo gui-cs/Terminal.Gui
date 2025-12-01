@@ -4,7 +4,7 @@ using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class MessageBoxTests (ITestOutputHelper output)
 {
@@ -21,7 +21,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var btnAcceptCount = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (1, result);
@@ -60,7 +60,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -76,7 +76,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var iteration = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Null (result);
@@ -107,7 +107,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -124,7 +124,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var btnAcceptCount = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (1, result);
@@ -162,7 +162,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -193,7 +193,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             var mbFrame = Rectangle.Empty;
 
             app.Iteration += OnApplicationOnIteration;
-            app.Run<Toplevel> ().Dispose ();
+            app.Run<Runnable<bool>> ();
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (new (expectedX, expectedY, expectedW, expectedH), mbFrame);
@@ -209,14 +209,14 @@ public class MessageBoxTests (ITestOutputHelper output)
                 }
                 else if (iterations == 1)
                 {
-                    mbFrame = app.TopRunnable!.Frame;
+                    mbFrame = app.TopRunnableView!.Frame;
                     app.RequestStop ();
                 }
             }
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -229,7 +229,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         try
         {
             int iterations = -1;
-            var top = new Toplevel ();
+            var top = new Runnable ();
             top.BorderStyle = LineStyle.None;
             app.Driver!.SetScreenSize (20, 10);
 
@@ -300,7 +300,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -313,7 +313,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         try
         {
             int iterations = -1;
-            var top = new Toplevel ();
+            var top = new Runnable ();
             top.BorderStyle = LineStyle.None;
             app.Driver!.SetScreenSize (20, 10);
 
@@ -392,7 +392,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -426,15 +426,15 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  }
                                  else if (iterations == 1)
                                  {
-                                     Assert.IsType<Dialog> (app.TopRunnable);
-                                     Assert.Equal (new (height, width), app.TopRunnable.Frame.Size);
+                                     Assert.IsType<Dialog> (app.TopRunnableView);
+                                     Assert.Equal (new (height, width), app.TopRunnableView.Frame.Size);
                                      app.RequestStop ();
                                  }
                              };
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -467,15 +467,15 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  }
                                  else if (iterations == 1)
                                  {
-                                     Assert.IsType<Dialog> (app.TopRunnable);
-                                     Assert.Equal (new (height, width), app.TopRunnable.Frame.Size);
+                                     Assert.IsType<Dialog> (app.TopRunnableView);
+                                     Assert.Equal (new (height, width), app.TopRunnableView.Frame.Size);
                                      app.RequestStop ();
                                  }
                              };
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -504,15 +504,15 @@ public class MessageBoxTests (ITestOutputHelper output)
                                  }
                                  else if (iterations == 1)
                                  {
-                                     Assert.IsType<Dialog> (app.TopRunnable);
-                                     Assert.Equal (new (height, width), app.TopRunnable.Frame.Size);
+                                     Assert.IsType<Dialog> (app.TopRunnableView);
+                                     Assert.Equal (new (height, width), app.TopRunnableView.Frame.Size);
                                      app.RequestStop ();
                                  }
                              };
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -535,7 +535,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
             app.Iteration += OnApplicationOnIteration;
 
-            var top = new Toplevel ();
+            var top = new Runnable ();
             top.BorderStyle = LineStyle.Single;
             try
             {
@@ -556,7 +556,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                     MessageBox.Query (
                                       app,
                                       "",
-                                      UICatalogTop.GetAboutBoxMessage (),
+                                      UICatalogRunnable.GetAboutBoxMessage (),
                                       wrapMessage: false,
                                       buttons: "_Ok");
 
@@ -590,7 +590,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 
@@ -613,7 +613,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
         finally
         {
-            app.Shutdown ();
+            app.Dispose ();
         }
     }
 

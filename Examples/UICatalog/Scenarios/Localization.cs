@@ -181,7 +181,7 @@ public class Localization : Scenario
         wizardButton.Accepting += (sender, e) => ShowWizard ();
         win.Add (wizardButton);
 
-        win.Unloaded += (sender, e) => Quit ();
+        win.IsRunningChanged += (sender, e) => Quit ();
 
         win.Add (menu);
 

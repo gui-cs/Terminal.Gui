@@ -550,7 +550,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""TopLevel"": {
+            ""Runnable"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""
@@ -1245,7 +1245,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""TopLevel"": {
+            ""Runnable"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""

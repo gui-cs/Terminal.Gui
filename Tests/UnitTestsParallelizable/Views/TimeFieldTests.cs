@@ -1,4 +1,4 @@
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TimeFieldTests
 {
@@ -67,7 +67,7 @@ public class TimeFieldTests
         }
         finally
         {
-            app.Shutdown();
+            app.Dispose ();
         }
     }
 

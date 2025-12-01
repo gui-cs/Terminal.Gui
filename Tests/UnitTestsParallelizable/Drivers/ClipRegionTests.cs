@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class ClipRegionTests (ITestOutputHelper output) : FakeDriverBase
 {

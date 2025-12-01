@@ -3,7 +3,7 @@ using Terminal.Gui.Drivers;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -745,7 +745,7 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
         f.Driver = driver;
         driver.SetScreenSize (45, 20);
 
-        var top = new Toplevel () { Width = driver.Cols, Height = driver.Rows };
+        var top = new Runnable () { Width = driver.Cols, Height = driver.Rows };
         top.Driver = driver;
         top.Add (f);
 

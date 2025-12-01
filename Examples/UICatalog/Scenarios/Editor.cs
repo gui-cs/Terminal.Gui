@@ -170,7 +170,14 @@ public class Editor : Scenario
 
         _appWindow.Add (statusBar);
 
-        _appWindow.Closed += (s, e) => Thread.CurrentThread.CurrentUICulture = new ("en-US");
+        _appWindow.IsRunningChanged += (s, e) =>
+                                       {
+                                           if (!e.Value)
+                                           {
+                                               // BUGBUG: This should restore the original culture info
+                                               Thread.CurrentThread.CurrentUICulture = new ("en-US");
+                                           }
+                                       };
 
         CreateFindReplace ();
 

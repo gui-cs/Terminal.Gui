@@ -34,7 +34,7 @@ Terminal.Gui v2 introduces an instance-based application architecture that decou
 // Recommended v2 pattern (instance-based)
 var app = Application.Create();
 app.Init();
-var top = new Toplevel { Title = "My App" };
+var top = new Runnable { Title = "My App" };
 top.Add(myView);
 app.Run(top);
 top.Dispose();
@@ -42,7 +42,7 @@ app.Shutdown();
 
 // Static pattern (obsolete but still works)
 Application.Init();
-var top = new Toplevel { Title = "My App" };
+var top = new Runnable { Title = "My App" };
 top.Add(myView);
 Application.Run(top);
 top.Dispose();
@@ -55,6 +55,52 @@ Application.Shutdown();
 - **Multiple Contexts**: Multiple `IApplication` instances can coexist (useful for testing or complex scenarios)
 - **Clear Ownership**: Views explicitly know their application context via the `App` property
 - **Reduced Global State**: Less reliance on static singletons improves code maintainability
+- **Proper Resource Management**: IDisposable pattern ensures clean shutdown of input threads and driver resources
+
+### Resource Management
+
+Terminal.Gui v2 implements the `IDisposable` pattern for proper resource cleanup:
+
+```csharp
+// Recommended pattern with using statement
+using (var app = Application.Create().Init())
+{
+    app.Run<MyDialog>();
+    var result = app.GetResult<MyResult>();
+}
+
+// Or with try/finally
+var app = Application.Create();
+try
+{
+    app.Init();
+    app.Run<MyDialog>();
+}
+finally
+{
+    app.Dispose(); // Stops input thread, releases resources
+}
+```
+
+**Key Changes from v1:**
+- **Input Thread Management**: v2 starts a dedicated input thread that polls console input at ~50 polls/second (20ms throttle) to prevent CPU spinning
+- **Clean Shutdown**: `Dispose()` cancels the input thread and waits for it to exit, preventing thread leaks
+- **Test-Friendly**: Always dispose applications in tests to prevent thread pool exhaustion from leaked input threads
+
+**Obsolete `Shutdown()` Method:**
+The `Shutdown()` method is marked obsolete. Use `Dispose()` and `GetResult()` instead:
+
+```csharp
+// OLD (v1/early v2):
+var result = app.Run<MyDialog>().Shutdown() as MyResult;
+
+// NEW (v2 recommended):
+using (var app = Application.Create().Init())
+{
+    app.Run<MyDialog>();
+    var result = app.GetResult<MyResult>();
+}
+```
 
 ## Modern Look & Feel - Technical Details
 
@@ -112,7 +158,7 @@ See the [Drawing Deep Dive](drawing.md) for complete details on LineCanvas and t
 
 ### Deterministic View Lifetime Management
 - **v1 Issue**: Lifetime rules for `View` objects were unclear, leading to memory leaks or premature disposal, especially with `Application.Run`.
-- **v2 Solution**: v2 defines explicit rules for view disposal and ownership, enforced by unit tests. `Application.Run` now clearly manages the lifecycle of `Toplevel` views, ensuring deterministic cleanup.
+- **v2 Solution**: v2 defines explicit rules for view disposal and ownership, enforced by unit tests. `Application.Run` now clearly manages the lifecycle of `Runnable` views, ensuring deterministic cleanup.
 - **Impact**: Developers can predict when resources are released, reducing bugs related to dangling references or uninitialized states.
 
 ### Adornments Framework
@@ -247,7 +293,7 @@ See the [Keyboard Deep Dive](keyboard.md) and [Command Deep Dive](command.md) fo
 - **Example**: [TextField](~/api/Terminal.Gui.Views.TextField.yml) in v2 binds `Key.Tab` to text insertion rather than focus change, customizable by developers.
 
 ### Default Close Key
-- **Change**: Changed from `Ctrl+Q` in v1 to `Esc` in v2 for closing apps or [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) views, accessible via [Application.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey).
+- **Change**: Changed from `Ctrl+Q` in v1 to `Esc` in v2 for closing apps or [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) views, accessible via [Application.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey).
 - **Impact**: Aligns with common user expectations, improving UX consistency across terminal applications.
 
 ## Updated Mouse API - Enhanced Interaction

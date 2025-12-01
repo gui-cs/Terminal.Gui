@@ -6,14 +6,14 @@ namespace Terminal.Gui.Drivers;
 ///     the provided <see cref="CancellationTokenSource"/> and shutting down the application.
 /// </summary>
 /// <param name="hardStop"></param>
-internal class FakeApplicationLifecycle (CancellationTokenSource hardStop) : IDisposable
+internal class FakeApplicationLifecycle (IApplication? app, CancellationTokenSource? hardStop) : IDisposable
 {
     /// <inheritdoc/>
     public void Dispose ()
     {
-        hardStop.Cancel ();
+        hardStop?.Cancel ();
 
-        Application.TopRunnable?.Dispose ();
-        Application.Shutdown ();
+        app?.TopRunnableView?.Dispose ();
+        app?.Dispose ();
     }
 }

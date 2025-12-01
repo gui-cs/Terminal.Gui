@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -51,7 +51,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         tf.Selecting += (sender, args) => Assert.Fail ("Selected should not be raied.");
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Space);
@@ -67,7 +67,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         var selectingCount = 0;
         tf.Selecting += (sender, args) => selectingCount++;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Enter);
@@ -85,7 +85,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         var acceptedCount = 0;
         tf.Accepting += (sender, args) => acceptedCount++;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Enter);
@@ -118,7 +118,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void Accept (object sender, CommandEventArgs e) { accepted = true; }
+        void Accept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object? sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void TextViewAccept (object sender, CommandEventArgs e)
+        void TextViewAccept (object? sender, CommandEventArgs e)
         {
             tfAcceptedInvoked = true;
             e.Handled = handle;
@@ -209,7 +209,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void OnEnter_Does_Not_Throw_If_Not_IsInitialized_SetCursorVisibility ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
         var tf = new TextField { Width = 10 };
         top.Add (tf);
 
@@ -291,7 +291,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void HandleJKey (object s, Key arg)
+        void HandleJKey (object? s, Key arg)
         {
             if (arg.AsRune == new Rune ('j'))
             {

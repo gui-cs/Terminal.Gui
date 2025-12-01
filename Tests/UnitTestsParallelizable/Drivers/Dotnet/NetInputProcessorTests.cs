@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class NetInputProcessorTests
 {

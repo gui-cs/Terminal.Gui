@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 {

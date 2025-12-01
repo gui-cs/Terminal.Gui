@@ -340,7 +340,13 @@ public class Dialogs : Scenario
                               };
             dialog.Add (addChar);
 
-            dialog.Closed += (s, e) => { buttonPressedLabel.Text = $"{clicked}"; };
+            dialog.IsRunningChanged += (s, e) =>
+                                       {
+                                           if (!e.Value)
+                                           {
+                                               buttonPressedLabel.Text = $"{clicked}";
+                                           }
+                                       };
         }
         catch (FormatException)
         {

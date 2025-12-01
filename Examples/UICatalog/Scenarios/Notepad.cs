@@ -110,10 +110,13 @@ public class Notepad : Scenario
         _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
         _tabView.HasFocusChanging += (s, e) => _focusedTabView = _tabView;
 
-        top.Ready += (s, e) =>
+        top.IsModalChanged += (s, e) =>
                      {
-                         New ();
-                         LenShortcut.Title = $"Len:{_focusedTabView?.Text?.Length ?? 0}";
+                         if (e.Value)
+                         {
+                             New ();
+                             LenShortcut.Title = $"Len:{_focusedTabView?.Text?.Length ?? 0}";
+                         }
                      };
 
         Application.Run (top);

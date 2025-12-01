@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Single BackgroundWorker", "A single BackgroundWorker threading opening another Toplevel")]
+[ScenarioMetadata ("Single BackgroundWorker", "A single BackgroundWorker threading opening another Runnable")]
 [ScenarioCategory ("Threading")]
 [ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Runnable")]
@@ -13,7 +13,7 @@ public class SingleBackgroundWorker : Scenario
 {
     public override void Main ()
     {
-        Application.Run<MainApp> ().Dispose ();
+        Application.Run<MainApp> ();
         Application.Shutdown ();
     }
 
@@ -174,7 +174,7 @@ public class SingleBackgroundWorker : Scenario
 
                                                   StagingUIController builderUI =
                                                       new (_startStaging, e.Result as ObservableCollection<string>);
-                                                  Toplevel? top = Application.TopRunnable;
+                                                  View? top = Application.TopRunnableView;
 
                                                   if (top is { })
                                                   {
@@ -200,7 +200,7 @@ public class SingleBackgroundWorker : Scenario
 
     public class StagingUIController : Window
     {
-        private Toplevel? _top;
+        private Runnable? _top;
 
         public StagingUIController (DateTime? start, ObservableCollection<string>? list)
         {
@@ -209,7 +209,6 @@ public class SingleBackgroundWorker : Scenario
                 Title = "_top",
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
-                Modal = true
             };
 
             _top.KeyDown += (s, e) =>

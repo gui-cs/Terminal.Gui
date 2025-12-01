@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class NeedsDrawTests ()
@@ -33,7 +33,7 @@ public class NeedsDrawTests ()
         frame.Width = 40;
         frame.Height = 8;
 
-        Toplevel top = new ();
+        Runnable top = new ();
 
         top.Add (frame);
 

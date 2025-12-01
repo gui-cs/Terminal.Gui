@@ -6,9 +6,10 @@ Right away we use IoC to load our views and view models.
 
 ``` csharp
 // As a public property for access further in the application if needed. 
-public static IServiceProvider Services { get; private set; }
+public static IServiceProvider? Services { get; private set; }
 ...
 // In Main
+ConfigurationManager.Enable (ConfigLocations.All);
 Services = ConfigureServices ();
 ...
 private static IServiceProvider ConfigureServices ()
@@ -20,16 +21,19 @@ private static IServiceProvider ConfigureServices ()
 }
 ```
 
-Now, we start the app and get our main view.
+Now, we start the app using the modern Terminal.Gui model and get our main view.
 
 ``` csharp
-Application.Run (Services.GetRequiredService<LoginView> ());
+using IApplication app = Application.Create ();
+app.Init ();
+using var loginView = Services.GetRequiredService<LoginView> ();
+app.Run (loginView);
 ```
 
 Our view implements `IRecipient<T>` to demonstrate the use of the `WeakReferenceMessenger`. The binding of the view events is then created.
 
 ``` csharp
-internal partial class LoginView : IRecipient<Message<LoginAction>>
+internal partial class LoginView : IRecipient<Message<LoginActions>>
 {
     public LoginView (LoginViewModel viewModel)
     {
@@ -41,15 +45,16 @@ internal partial class LoginView : IRecipient<Message<LoginAction>>
         passwordInput.TextChanged += (_, _) =>
                                      {
                                          ViewModel.Password = passwordInput.Text;
-                                         SetText ();
                                      };
-        loginButton.Accept += (_, _) =>
+        loginButton.Accepting += (_, e) =>
                               {
                                   if (!ViewModel.CanLogin) { return; }
                                   ViewModel.LoginCommand.Execute (null);
+                                  // When Accepting is handled, set e.Handled to true to prevent further processing.
+                                  e.Handled = true;
                               };
         ...
-        // Let the view model know the view is intialized.
+        // Let the view model know the view is initialized.
         Initialized += (_, _) => { ViewModel.Initialized (); };
     }
     ...
@@ -101,54 +106,53 @@ The use of `WeakReferenceMessenger` provides one method of signaling the view fr
 ...
 private async Task Login ()
 {
-    SendMessage (LoginAction.LoginProgress, LOGGING_IN_PROGRESS_MESSAGE);
+    SendMessage (LoginActions.LoginProgress, LOGGING_IN_PROGRESS_MESSAGE);
     await Task.Delay (TimeSpan.FromSeconds (1));
     Clear ();
 }
 
-private void SendMessage (LoginAction loginAction, string message = "")
+private void SendMessage (LoginActions loginAction, string message = "")
 {
     switch (loginAction)
     {
-        case LoginAction.LoginProgress:
+        case LoginActions.LoginProgress:
             LoginProgressMessage = message;
             break;
-        case LoginAction.Validation:
+        case LoginActions.Validation:
             ValidationMessage = CanLogin ? VALID_LOGIN_MESSAGE : INVALID_LOGIN_MESSAGE;
-            ValidationScheme = CanLogin ? Colors.Schemes ["Base"] : Colors.Schemes ["Error"];
+            ValidationScheme = CanLogin ? SchemeManager.GetScheme ("Base") : SchemeManager.GetScheme ("Error");
             break;
     }
-    WeakReferenceMessenger.Default.Send (new Message<LoginAction> { Value = loginAction });
+    WeakReferenceMessenger.Default.Send (new Message<LoginActions> { Value = loginAction });
 }
 
 private void ValidateLogin ()
 {
     CanLogin = !string.IsNullOrEmpty (Username) && !string.IsNullOrEmpty (Password);
-    SendMessage (LoginAction.Validation);
+    SendMessage (LoginActions.Validation);
 }
 ...
 ```
 
-And the view's `Receive` function which provides an `Application.Refresh()` call to update the UI immediately.
+The view's `Receive` function updates the UI based on messages from the view model. In the modern Terminal.Gui model, UI updates are automatically refreshed, so no manual `Application.Refresh()` call is needed.
 
 ``` csharp
-public void Receive (Message<LoginAction> message)
+public void Receive (Message<LoginActions> message)
 {
     switch (message.Value)
     {
-        case LoginAction.LoginProgress:
+        case LoginActions.LoginProgress:
             {
                 loginProgressLabel.Text = ViewModel.LoginProgressMessage;
                 break;
             }
-        case LoginAction.Validation:
+        case LoginActions.Validation:
             {
                 validationLabel.Text = ViewModel.ValidationMessage;
-                validationLabel.Scheme = ViewModel.ValidationScheme;
+                validationLabel.SetScheme (ViewModel.ValidationScheme);
                 break;
             }
     }
-    SetText();
-    Application.Refresh ();
+    SetText ();
 }
 ```

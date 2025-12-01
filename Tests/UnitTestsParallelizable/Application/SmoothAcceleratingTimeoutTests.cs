@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.ApplicationTests;
+﻿namespace ApplicationTests;
 
 
 public class SmoothAcceleratingTimeoutTests

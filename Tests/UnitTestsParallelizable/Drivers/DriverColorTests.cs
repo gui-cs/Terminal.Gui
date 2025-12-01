@@ -2,7 +2,7 @@
 
 using UnitTests;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class DriverColorTests : FakeDriverBase
 {

@@ -15,7 +15,7 @@ public class DynamicStatusBar : Scenario
     public override void Main ()
     {
         Application.Init ();
-        Application.Run<DynamicStatusBarSample> ().Dispose ();
+        Application.Run<DynamicStatusBarSample> ();
         Application.Shutdown ();
     }
 

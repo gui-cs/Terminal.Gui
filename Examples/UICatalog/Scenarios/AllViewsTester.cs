@@ -220,6 +220,13 @@ public class AllViewsTester : Scenario
     {
         Debug.Assert (_curView is null);
 
+        // Skip RunnableWrapper types as they have generic constraints that cannot be satisfied
+        if (type.IsGenericType && type.GetGenericTypeDefinition().Name.StartsWith("RunnableWrapper"))
+        {
+            Logging.Warning ($"Cannot create an instance of {type.Name} because it is a RunnableWrapper with unsatisfiable generic constraints.");
+            return;
+        }
+
         // If we are to create a generic Type
         if (type.IsGenericType)
         {

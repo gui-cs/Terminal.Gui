@@ -1,5 +1,5 @@
 #nullable enable
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class FlagSelectorTests
 {

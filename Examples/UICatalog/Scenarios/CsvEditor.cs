@@ -575,9 +575,9 @@ public class CsvEditor : Scenario
                 _selectedCellTextField.SuperView.Enabled = true;
             }
 
-            if (Application.TopRunnable is { })
+            if (Application.TopRunnableView is { })
             {
-                Application.TopRunnable.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
+                Application.TopRunnableView.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
             }
         }
         catch (Exception ex)

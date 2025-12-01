@@ -247,7 +247,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = 50,
             Height = Dim.Fill (),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
@@ -278,7 +278,7 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (winLogList)
         };
         win.Add (label, winLog);

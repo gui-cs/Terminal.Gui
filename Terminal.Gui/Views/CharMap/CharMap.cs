@@ -281,8 +281,8 @@ public class CharMap : View, IDesignable
         }
     }
 
-    private void CopyCodePoint () { App?.Clipboard?.SetClipboardData($"U+{SelectedCodePoint:x5}"); }
-    private void CopyGlyph () { App?.Clipboard?.SetClipboardData($"{new Rune (SelectedCodePoint)}"); }
+    private void CopyCodePoint () { App?.Clipboard?.SetClipboardData ($"U+{SelectedCodePoint:x5}"); }
+    private void CopyGlyph () { App?.Clipboard?.SetClipboardData ($"{new Rune (SelectedCodePoint)}"); }
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
     {
@@ -375,8 +375,13 @@ public class CharMap : View, IDesignable
         waitIndicator.Add (errorLabel);
         waitIndicator.Add (spinner);
 
-        waitIndicator.Ready += async (s, a) =>
+        waitIndicator.IsModalChanged += async (s, a) =>
                                {
+                                   if (!a.Value)
+                                   {
+                                       return;
+                                   }
+
                                    try
                                    {
                                        decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);

@@ -183,7 +183,7 @@ This method is called from the `Command` handlers bound to the application-scope
 
 **Note:** When accessing from within a View, use `App?.Current` instead of `Application.TopRunnable` (which is obsolete).
 
-This method replaces about a dozen functions in v1 (scattered across `Application` and `Toplevel`).
+This method replaces about a dozen functions in v1 (scattered across `Application` and `Runnable`).
 
 ### Application Navigation Examples
 

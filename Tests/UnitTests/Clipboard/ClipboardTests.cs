@@ -35,7 +35,7 @@ public class ClipboardTests
         Application.Clipboard.SetClipboardData (clipText);
 
         ApplicationImpl.Instance.Iteration += (s, a) => ApplicationImpl.Instance.RequestStop ();
-        ApplicationImpl.Instance.Run<Toplevel>().Dispose();
+        ApplicationImpl.Instance.Run<Runnable<bool>>().Dispose();
 
         Assert.True(Application.Clipboard.TryGetClipboardData(out string result));
         Assert.Equal (clipText, result);
