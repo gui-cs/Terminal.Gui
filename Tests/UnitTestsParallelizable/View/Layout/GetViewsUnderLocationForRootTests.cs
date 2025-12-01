@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace UnitTests_Parallelizable.ViewMouseTests;
+namespace UnitTests_Parallelizable.ViewTests;
 
 [Trait ("Category", "Input")]
 public class GetViewsUnderLocationForRootTests

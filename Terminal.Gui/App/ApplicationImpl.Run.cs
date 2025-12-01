@@ -370,20 +370,17 @@ public partial class ApplicationImpl
         // CRITICAL SECTION - Atomic stack + cached state update
         lock (_sessionStackLock)
         {
-            if (wasModal)
+            // Pop token from SessionStack
+            if (wasModal && SessionStack?.TryPop (out SessionToken? popped) == true && popped == token)
             {
-                // Pop token from SessionStack
-                if (SessionStack?.TryPop (out SessionToken? popped) == true && popped == token)
+                // Restore previous top runnable
+                if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
                 {
-                    // Restore previous top runnable
-                    if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
-                    {
 
-                        previousRunnable = previousToken.Runnable;
+                    previousRunnable = previousToken.Runnable;
 
-                        // Previous runnable becomes modal again
-                        previousRunnable.SetIsModal (true);
-                    }
+                    // Previous runnable becomes modal again
+                    previousRunnable.SetIsModal (true);
                 }
             }
 
@@ -413,7 +410,7 @@ public partial class ApplicationImpl
         _result = token.Result;
 
         // Set focus to new TopRunnable if exists
-        if (TopRunnableView is View viewToFocus && !viewToFocus.HasFocus)
+        if (TopRunnableView is { HasFocus: false } viewToFocus)
         {
             viewToFocus.SetFocus ();
         }

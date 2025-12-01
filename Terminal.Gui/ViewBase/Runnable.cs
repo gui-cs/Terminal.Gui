@@ -30,7 +30,6 @@ public class Runnable<TResult> : View, IRunnable<TResult>
         Width = Dim.Fill ();
         Height = Dim.Fill ();
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Toplevel);
-
     }
 
     /// <inheritdoc/>
@@ -176,6 +175,8 @@ public class Runnable<TResult> : View, IRunnable<TResult>
 
         EventArgs<bool> args = new (newIsModal);
         IsModalChanged?.Invoke (this, args);
+
+        SetNeedsLayout ();
     }
 
     /// <inheritdoc/>
