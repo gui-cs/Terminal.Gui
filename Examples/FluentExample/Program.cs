@@ -2,11 +2,28 @@
 
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Examples;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
+[assembly: ExampleMetadata ("Fluent API Example", "Demonstrates the fluent IApplication API with IRunnable pattern")]
+[assembly: ExampleCategory ("API Patterns")]
+[assembly: ExampleCategory ("Controls")]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "CursorDown", "CursorDown", "CursorRight", "Enter" }, Order = 1)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "Esc" }, DelayMs = 100, Order = 2)]
+
+// Check for test context to determine driver
+string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.EnvironmentVariableName);
+string? driverName = null;
+
+if (!string.IsNullOrEmpty (contextJson))
+{
+    ExampleContext? context = ExampleContext.FromJson (contextJson);
+    driverName = context?.DriverName;
+}
+
 IApplication? app = Application.Create ()
-                               .Init ()
+                               .Init (driverName)
                                .Run<ColorPickerView> ();
 
 // Run the application with fluent API - automatically creates, runs, and disposes the runnable

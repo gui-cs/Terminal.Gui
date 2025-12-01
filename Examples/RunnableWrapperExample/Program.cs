@@ -2,11 +2,31 @@
 
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Examples;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
+[assembly: ExampleMetadata ("Runnable Wrapper Example", "Shows how to wrap any View to make it runnable without implementing IRunnable")]
+[assembly: ExampleCategory ("API Patterns")]
+[assembly: ExampleCategory ("Views")]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "t", "e", "s", "t", "Esc" }, Order = 1)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "Enter", "Esc" }, DelayMs = 100, Order = 2)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "Enter", "Esc" }, DelayMs = 100, Order = 3)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "Enter", "Esc" }, DelayMs = 100, Order = 4)]
+[assembly: ExampleDemoKeyStrokes (KeyStrokes = new [] { "Enter", "Esc" }, DelayMs = 100, Order = 5)]
+
+// Check for test context to determine driver
+string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.EnvironmentVariableName);
+string? driverName = null;
+
+if (!string.IsNullOrEmpty (contextJson))
+{
+    ExampleContext? context = ExampleContext.FromJson (contextJson);
+    driverName = context?.DriverName;
+}
+
 IApplication app = Application.Create ();
-app.Init ();
+app.Init (driverName);
 
 // Example 1: Use extension method with result extraction
 var textField = new TextField { Width = 40, Text = "Default text" };
