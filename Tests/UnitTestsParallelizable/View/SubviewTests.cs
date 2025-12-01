@@ -480,25 +480,25 @@ public class SubViewTests
 
         winAddedToTop.SubViewAdded += (s, e) =>
         {
-            Assert.Equal (e.SuperView.Frame.Width, winAddedToTop.Frame.Width);
+            Assert.Equal (e.SuperView!.Frame.Width, winAddedToTop.Frame.Width);
             Assert.Equal (e.SuperView.Frame.Height, winAddedToTop.Frame.Height);
         };
 
         v1AddedToWin.SubViewAdded += (s, e) =>
                                      {
-                                         Assert.Equal (e.SuperView.Frame.Width, v1AddedToWin.Frame.Width);
+                                         Assert.Equal (e.SuperView!.Frame.Width, v1AddedToWin.Frame.Width);
                                          Assert.Equal (e.SuperView.Frame.Height, v1AddedToWin.Frame.Height);
                                      };
 
         v2AddedToWin.SubViewAdded += (s, e) =>
                                      {
-                                         Assert.Equal (e.SuperView.Frame.Width, v2AddedToWin.Frame.Width);
+                                         Assert.Equal (e.SuperView!.Frame.Width, v2AddedToWin.Frame.Width);
                                          Assert.Equal (e.SuperView.Frame.Height, v2AddedToWin.Frame.Height);
                                      };
 
         svAddedTov1.SubViewAdded += (s, e) =>
                                     {
-                                        Assert.Equal (e.SuperView.Frame.Width, svAddedTov1.Frame.Width);
+                                        Assert.Equal (e.SuperView!.Frame.Width, svAddedTov1.Frame.Width);
                                         Assert.Equal (e.SuperView.Frame.Height, svAddedTov1.Frame.Height);
                                     };
 

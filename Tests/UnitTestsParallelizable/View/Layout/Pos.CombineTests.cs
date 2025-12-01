@@ -1,4 +1,5 @@
-﻿
+﻿#nullable disable
+
 using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 using static Terminal.Gui.ViewBase.Pos;
@@ -35,7 +36,7 @@ public class PosCombineTests (ITestOutputHelper output)
     [Fact]
     public void PosCombine_DimCombine_View_With_SubViews ()
     {
-        IApplication? app = Application.Create ();
+        IApplication app = Application.Create ();
         Runnable<bool> runnable = new () { Width = 80, Height = 25 };
         app.Begin (runnable);
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
@@ -109,7 +110,7 @@ public class PosCombineTests (ITestOutputHelper output)
         f.Add (v1, v2);
         w.Add (f);
         top.Add (w);
-        SessionToken? token = app.Begin (top);
+        SessionToken token = app.Begin (top);
 
         f.X = X (app.TopRunnableView) + X (v2) - X (v1);
         f.Y = Y (app.TopRunnableView) + Y (v2) - Y (v1);

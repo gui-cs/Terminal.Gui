@@ -80,7 +80,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         // Text should appear at the content location
         Point screenPos = view.ContentToScreen (Point.Empty);
 
-        Assert.Equal ("T", driver.Contents [screenPos.Y, screenPos.X].Grapheme);
+        Assert.Equal ("T", driver.Contents! [screenPos.Y, screenPos.X].Grapheme);
         Assert.Equal ("e", driver.Contents [screenPos.Y, screenPos.X + 1].Grapheme);
         Assert.Equal ("s", driver.Contents [screenPos.Y, screenPos.X + 2].Grapheme);
         Assert.Equal ("t", driver.Contents [screenPos.Y, screenPos.X + 3].Grapheme);
@@ -113,7 +113,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         Point screenPos = view.ContentToScreen (Point.Empty);
         Attribute expectedAttr = view.GetAttributeForRole (VisualRole.Focus);
 
-        Assert.Equal (expectedAttr, driver.Contents [screenPos.Y, screenPos.X].Attribute);
+        Assert.Equal (expectedAttr, driver.Contents! [screenPos.Y, screenPos.X].Attribute);
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         Point screenPos = view.ContentToScreen (Point.Empty);
         Attribute expectedAttr = view.GetAttributeForRole (VisualRole.Normal);
 
-        Assert.Equal (expectedAttr, driver.Contents [screenPos.Y, screenPos.X].Attribute);
+        Assert.Equal (expectedAttr, driver.Contents! [screenPos.Y, screenPos.X].Attribute);
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         // Verify the line was drawn (check for horizontal line character)
         for (int i = 0; i < 5; i++)
         {
-            Assert.NotEqual (" ", driver.Contents [screenPos.Y, screenPos.X + i].Grapheme);
+            Assert.NotEqual (" ", driver.Contents! [screenPos.Y, screenPos.X + i].Grapheme);
         }
     }
 
@@ -409,7 +409,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         bool lineRendered = true;
         for (int i = 0; i < 5; i++)
         {
-            if (driver.Contents [screenPos.Y, screenPos.X + i].Grapheme == " ")
+            if (driver.Contents! [screenPos.Y, screenPos.X + i].Grapheme == " ")
             {
                 lineRendered = false;
                 break;

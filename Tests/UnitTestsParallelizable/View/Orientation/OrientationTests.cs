@@ -20,8 +20,8 @@ public class OrientationTests
             set => _orientationHelper.Orientation = value;
         }
 
-        public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
-        public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+        public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
+        public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 
         public bool CancelOnOrientationChanging { get; set; }
 

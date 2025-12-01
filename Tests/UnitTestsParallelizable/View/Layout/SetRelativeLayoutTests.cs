@@ -404,7 +404,7 @@ public class SetRelativeLayoutTests
         };
         view.X = Pos.AnchorEnd (0) - Pos.Func (GetViewWidth);
 
-        int GetViewWidth ([CanBeNull] View _) { return view.Frame.Width; }
+        int GetViewWidth (View? _) { return view.Frame.Width; }
 
         // view will be 3 chars wide. It's X will be 27 (30 - 3).
         // BUGBUG: IsInitialized need to be true before calculate

@@ -9,7 +9,7 @@ public class AdornmentSubViewTests ()
     {
         var view = new View ();
         var subView = new View ();
-        view.Margin.Add (subView);
+        view.Margin!.Add (subView);
         view.BeginInit ();
         view.EndInit ();
         var raised = false;

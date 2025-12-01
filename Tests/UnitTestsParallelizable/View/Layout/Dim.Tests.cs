@@ -1,7 +1,5 @@
-using System.Globalization;
-using System.Text;
-using UnitTests;
-using Xunit.Abstractions;
+#nullable disable
+
 using static Terminal.Gui.ViewBase.Dim;
 
 namespace UnitTests_Parallelizable.ViewTests;

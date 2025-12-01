@@ -1,4 +1,5 @@
-﻿using static Terminal.Gui.ViewBase.Dim;
+﻿#nullable disable
+using static Terminal.Gui.ViewBase.Dim;
 
 namespace UnitTests_Parallelizable.ViewTests;
 

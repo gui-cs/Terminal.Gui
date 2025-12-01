@@ -1,5 +1,6 @@
-﻿using System.Text;
-using Xunit.Abstractions;
+﻿#nullable disable
+
+using System.Text;
 
 namespace UnitTests_Parallelizable.ViewTests;
 

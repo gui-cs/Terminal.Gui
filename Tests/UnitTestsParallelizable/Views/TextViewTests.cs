@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿#nullable disable
+using System.Text;
 
 namespace UnitTests_Parallelizable.ViewsTests;
 
@@ -1766,7 +1767,7 @@ public class TextViewTests
 
         return;
 
-        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Theory]
@@ -1786,7 +1787,7 @@ public class TextViewTests
 
         return;
 
-        void Accept (object? sender, CommandEventArgs e) { acceptedEvents++; }
+        void Accept (object sender, CommandEventArgs e) { acceptedEvents++; }
     }
 
     [Theory]
@@ -1806,7 +1807,7 @@ public class TextViewTests
 
         return;
 
-        void Accept (object? sender, CommandEventArgs e) { accepted++; }
+        void Accept (object sender, CommandEventArgs e) { accepted++; }
     }
 
     [Theory]
@@ -1826,7 +1827,7 @@ public class TextViewTests
 
         return;
 
-        void Accept (object? sender, CommandEventArgs e) { accepted++; }
+        void Accept (object sender, CommandEventArgs e) { accepted++; }
     }
 
     [Fact]
@@ -1880,13 +1881,13 @@ public class TextViewTests
 
         return;
 
-        void TextViewAccept (object? sender, CommandEventArgs e)
+        void TextViewAccept (object sender, CommandEventArgs e)
         {
             textViewAccept++;
             e.Handled = handleAccept;
         }
 
-        void ButtonAccept (object? sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Theory]
@@ -1923,7 +1924,7 @@ public class TextViewTests
 
         return;
 
-        void ButtonAccept (object? sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Fact]
