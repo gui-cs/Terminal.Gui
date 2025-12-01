@@ -1,6 +1,6 @@
 using UnitTests;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TimeFieldTests
 {
@@ -43,7 +43,7 @@ public class TimeFieldTests
     }
 
     [Fact]
-    [AutoInitShutdown (useFakeClipboard: true)]
+    [SetupFakeApplication]
     public void Copy_Paste ()
     {
         var tf1 = new TimeField { Time = TimeSpan.Parse ("12:12:19") };

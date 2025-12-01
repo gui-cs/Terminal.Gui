@@ -431,9 +431,9 @@ public partial class Border
 
         Application.MouseEvent -= ApplicationOnMouseEvent;
 
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        if (Application.Mouse.MouseGrabView == this && _dragPosition.HasValue)
         {
-            Application.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
         }
 
         // Clean up all arrangement buttons
@@ -498,7 +498,7 @@ public partial class Border
                 // Set the start grab point to the Frame coords
                 _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
                 _dragPosition = mouseEvent.Position;
-                Application.GrabMouse (this);
+                Application.Mouse.GrabMouse (this);
 
                 // Determine the mode based on where the click occurred
                 ViewArrangement arrangeMode = DetermineArrangeModeFromClick ();
@@ -511,7 +511,7 @@ public partial class Border
             return true;
         }
 
-        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && Application.MouseGrabView == this)
+        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && Application.Mouse.MouseGrabView == this)
         {
             if (_dragPosition.HasValue)
             {
@@ -523,7 +523,7 @@ public partial class Border
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue)
         {
             _dragPosition = null;
-            Application.UngrabMouse ();
+            Application.Mouse.UngrabMouse ();
 
             EndArrangeMode ();
 
@@ -688,7 +688,7 @@ public partial class Border
                 break;
 
             case ViewArrangement.BottomResizable:
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
                 break;
 
             case ViewArrangement.LeftResizable:
@@ -705,12 +705,12 @@ public partial class Border
                 break;
 
             case ViewArrangement.RightResizable:
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
+                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.RightResizable:
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
+                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.LeftResizable:
@@ -723,7 +723,7 @@ public partial class Border
                     Parent.X = parentLoc.X - _startGrabPoint.X;
                 }
 
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin.Thickness.Bottom + 1);
+                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.RightResizable:
@@ -736,7 +736,7 @@ public partial class Border
                     Parent.Y = parentLoc.Y - _startGrabPoint.Y;
                 }
 
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin.Thickness.Right + 1);
+                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.LeftResizable:
@@ -763,7 +763,7 @@ public partial class Border
 
     private void Application_GrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        if (Application.Mouse.MouseGrabView == this && _dragPosition.HasValue)
         {
             e.Cancel = true;
         }
@@ -771,7 +771,7 @@ public partial class Border
 
     private void Application_UnGrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
-        if (Application.MouseGrabView == this && _dragPosition.HasValue)
+        if (Application.Mouse.MouseGrabView == this && _dragPosition.HasValue)
         {
             e.Cancel = true;
         }
@@ -784,8 +784,8 @@ public partial class Border
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        Application.GrabbingMouse -= Application_GrabbingMouse;
-        Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+        Application.Mouse.GrabbingMouse -= Application_GrabbingMouse;
+        Application.Mouse.UnGrabbingMouse -= Application_UnGrabbingMouse;
 
         _dragPosition = null;
         base.Dispose (disposing);

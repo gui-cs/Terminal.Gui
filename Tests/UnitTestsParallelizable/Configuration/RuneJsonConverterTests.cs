@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace Terminal.Gui.ConfigurationTests;
+namespace UnitTests_Parallelizable.ConfigurationTests;
 
 public class RuneJsonConverterTests
 {

@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewTests.OrientationTests;
+namespace UnitTests_Parallelizable.ViewTests.OrientationTests;
 
 public class OrientationTests
 {
@@ -98,17 +98,17 @@ public class OrientationTests
     public void OrientationChanging_VirtualMethodCalledBeforeEvent ()
     {
         // Arrange
-        var radioGroup = new CustomView ();
+        var optionSelector = new CustomView ();
         bool eventCalled = false;
 
-        radioGroup.OrientationChanging += (sender, e) =>
+        optionSelector.OrientationChanging += (sender, e) =>
                                           {
                                               eventCalled = true;
-                                              Assert.True (radioGroup.OnOrientationChangingCalled, "OnOrientationChanging was not called before the event.");
+                                              Assert.True (optionSelector.OnOrientationChangingCalled, "OnOrientationChanging was not called before the event.");
                                           };
 
         // Act
-        radioGroup.Orientation = Orientation.Horizontal;
+        optionSelector.Orientation = Orientation.Horizontal;
 
         // Assert
         Assert.True (eventCalled, "OrientationChanging event was not called.");

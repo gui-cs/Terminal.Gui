@@ -1,8 +1,10 @@
 ﻿using System.Text;
+using UnitTests;
+using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests_Parallelizable.ViewsTests;
 
-public class TextFieldTests
+public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
     public void Cancel_TextChanging_ThenBackspace ()
@@ -553,5 +555,81 @@ public class TextFieldTests
         Assert.Equal (2, tf.CursorPosition);
         Assert.Equal (new (3, 0), tf.PositionCursor ());
         Assert.Equal ("📄a", tf.Text);
+    }
+
+    [Fact]
+    public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        var tf = new TextField { Width = 3, Text = "ắ" };
+        tf.Driver = driver;
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+
+        tf.Text = "\u1eaf";
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+
+        tf.Text = "\u0103\u0301";
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+
+        tf.Text = "\u0061\u0306\u0301";
+        tf.Layout ();
+        tf.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
+ắ",
+                                                       output,
+                                                       driver
+                                                      );
+    }
+
+    [Fact]
+    public void Adjust_First ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
+        tf.Driver = driver;
+        tf.SetRelativeLayout (new (20, 20));
+        tf.Draw ();
+
+        Assert.Equal ("This is a test. ", GetContents ());
+
+        string GetContents ()
+        {
+            var item = "";
+
+            for (var i = 0; i < 16; i++)
+            {
+                item += driver.Contents [0, i]!.Rune;
+            }
+
+            return item;
+        }
     }
 }

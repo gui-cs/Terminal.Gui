@@ -8,7 +8,7 @@
 /// <remarks>
 ///     <para>
 ///         See the View Arrangement Deep Dive for more information:
-///         <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/arrangement.html"/>
+///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html"/>
 ///     </para>
 ///     <para>
 ///         Sizing or moving a view is only possible if the <see cref="View"/> is part of a <see cref="View.SuperView"/>

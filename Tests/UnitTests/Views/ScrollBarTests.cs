@@ -1,14 +1,14 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ScrollBarTests (ITestOutputHelper output)
 {
     #region Draw
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     #region Horizontal
 
@@ -549,12 +549,12 @@ public class ScrollBarTests (ITestOutputHelper output)
         };
 
         top.Add (scrollBar);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         // Scroll to end
         scrollBar.Position = 19;
         Assert.Equal (10, scrollBar.Position);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (4, scrollBar.GetSliderPosition ());
         Assert.Equal (10, scrollBar.Position);
@@ -570,7 +570,7 @@ public class ScrollBarTests (ITestOutputHelper output)
             Flags = MouseFlags.Button1Clicked
         });
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (initialPos - increment, scrollBar.Position);
 
@@ -598,11 +598,11 @@ public class ScrollBarTests (ITestOutputHelper output)
         };
 
         top.Add (scrollBar);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         // Scroll to top
         scrollBar.Position = 0;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (0, scrollBar.GetSliderPosition ());
         Assert.Equal (0, scrollBar.Position);
@@ -617,7 +617,7 @@ public class ScrollBarTests (ITestOutputHelper output)
             ScreenPosition = btnPoint,
             Flags = MouseFlags.Button1Clicked
         });
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (initialPos + increment, scrollBar.Position);
 

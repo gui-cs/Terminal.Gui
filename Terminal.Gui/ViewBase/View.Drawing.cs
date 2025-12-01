@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -12,7 +13,8 @@ public partial class View // Drawing APIs
     /// <param name="force">If <see langword="true"/>, <see cref="View.SetNeedsDraw()"/> will be called on each view to force it to be drawn.</param>
     internal static void Draw (IEnumerable<View> views, bool force)
     {
-        IEnumerable<View> viewsArray = views as View [] ?? views.ToArray ();
+        // **Snapshot once** — every recursion level gets its own frozen array
+        View [] viewsArray = views.Snapshot ();
 
         // The draw context is used to track the region drawn by each view.
         DrawContext context = new DrawContext ();
@@ -41,7 +43,7 @@ public partial class View // Drawing APIs
     ///         or <see cref="NeedsLayout"/> set.
     ///     </para>
     ///     <para>
-    ///         See the View Drawing Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/drawing.html"/>.
+    ///         See the View Drawing Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/>.
     ///     </para>
     /// </remarks>
     public void Draw (DrawContext? context = null)
@@ -111,6 +113,26 @@ public partial class View // Drawing APIs
             Border?.AdvanceDrawIndicator ();
 
             ClearNeedsDraw ();
+
+            if (this is not Adornment && SuperView is not Adornment)
+            {
+                // Parent
+                Debug.Assert (Margin!.Parent == this);
+                Debug.Assert (Border!.Parent == this);
+                Debug.Assert (Padding!.Parent == this);
+
+                // SubViewNeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (SubViewNeedsDraw == false);
+                Debug.Assert (Margin!.SubViewNeedsDraw == false);
+                Debug.Assert (Border!.SubViewNeedsDraw == false);
+                Debug.Assert (Padding!.SubViewNeedsDraw == false);
+
+                // NeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (NeedsDraw == false);
+                Debug.Assert (Margin!.NeedsDraw == false);
+                Debug.Assert (Border!.NeedsDraw == false);
+                Debug.Assert (Padding!.NeedsDraw == false);
+            }
         }
 
         // ------------------------------------
@@ -355,6 +377,16 @@ public partial class View // Drawing APIs
 
     private void DoDrawText (DrawContext? context = null)
     {
+        if (!NeedsDraw)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty (TextFormatter.Text))
+        {
+            TextFormatter.NeedsFormat = true;
+        }
+
         if (OnDrawingText (context))
         {
             return;
@@ -375,6 +407,9 @@ public partial class View // Drawing APIs
         }
 
         DrawText (context);
+
+        OnDrewText();
+        DrewText?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -403,11 +438,6 @@ public partial class View // Drawing APIs
     /// <param name="context">The draw context to report drawn areas to.</param>
     public void DrawText (DrawContext? context = null)
     {
-        if (!string.IsNullOrEmpty (TextFormatter.Text))
-        {
-            TextFormatter.NeedsFormat = true;
-        }
-
         var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
 
         // Use GetDrawRegion to get precise drawn areas
@@ -415,11 +445,6 @@ public partial class View // Drawing APIs
 
         // Report the drawn area to the context
         context?.AddDrawnRegion (textRegion);
-
-        if (!NeedsDraw)
-        {
-            return;
-        }
 
         TextFormatter?.Draw (
                              drawRect,
@@ -431,6 +456,14 @@ public partial class View // Drawing APIs
         // We assume that the text has been drawn over the entire area; ensure that the subviews are redrawn.
         SetSubViewNeedsDraw ();
     }
+
+    /// <summary>
+    ///     Called when the <see cref="Text"/> of the View has been drawn.
+    /// </summary>
+    protected virtual void OnDrewText () { }
+
+    /// <summary>Raised when the <see cref="Text"/> of the View has been drawn.</summary>
+    public event EventHandler? DrewText;
 
     #endregion DrawText
     #region DrawContent
@@ -549,7 +582,7 @@ public partial class View // Drawing APIs
         }
 
         // Draw the subviews in reverse order to leverage clipping.
-        foreach (View view in InternalSubViews.Where (view => view.Visible).Reverse ())
+        foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
         {
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
@@ -625,7 +658,7 @@ public partial class View // Drawing APIs
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
-                    Driver.AddRune (p.Value.Value.Rune);
+                    AddRune (p.Value.Value.Rune);
                 }
             }
 
@@ -720,8 +753,7 @@ public partial class View // Drawing APIs
     /// </remarks>
     public bool NeedsDraw
     {
-        // TODO: Figure out if we can decouple NeedsDraw from NeedsLayout.
-        get => Visible && (NeedsDrawRect != Rectangle.Empty || NeedsLayout);
+        get => Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
         set
         {
             if (value)
@@ -806,8 +838,8 @@ public partial class View // Drawing APIs
             adornment.Parent?.SetSubViewNeedsDraw ();
         }
 
-        // There was multiple enumeration error here, so calling ToArray - probably a stop gap
-        foreach (View subview in SubViews.ToArray ())
+        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
+        foreach (View subview in InternalSubViews.Snapshot ())
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
@@ -846,22 +878,23 @@ public partial class View // Drawing APIs
         NeedsDrawRect = Rectangle.Empty;
         SubViewNeedsDraw = false;
 
-        if (Margin is { } && Margin.Thickness != Thickness.Empty)
+        if (Margin is { } && (Margin.Thickness != Thickness.Empty || Margin.SubViewNeedsDraw || Margin.NeedsDraw))
         {
             Margin?.ClearNeedsDraw ();
         }
 
-        if (Border is { } && Border.Thickness != Thickness.Empty)
+        if (Border is { } && (Border.Thickness != Thickness.Empty || Border.SubViewNeedsDraw || Border.NeedsDraw))
         {
             Border?.ClearNeedsDraw ();
         }
 
-        if (Padding is { } && Padding.Thickness != Thickness.Empty)
+        if (Padding is { } && (Padding.Thickness != Thickness.Empty || Padding.SubViewNeedsDraw || Padding.NeedsDraw))
         {
             Padding?.ClearNeedsDraw ();
         }
 
-        foreach (View subview in SubViews)
+        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
+        foreach (View subview in InternalSubViews.Snapshot ())
         {
             subview.ClearNeedsDraw ();
         }
@@ -876,7 +909,6 @@ public partial class View // Drawing APIs
         {
             LineCanvas.Clear ();
         }
-
     }
 
     #endregion NeedsDraw

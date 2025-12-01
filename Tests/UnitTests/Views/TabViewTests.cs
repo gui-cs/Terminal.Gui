@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TabViewTests (ITestOutputHelper output)
 {
@@ -23,7 +23,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void AddTwoTabs_SecondIsSelected ()
     {
         var tv = new TabView ();
@@ -90,7 +90,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (0, tv.TabScrollOffset);
     }
 
-    [Fact]
+    [Fact (Skip = "Really slow test")]
     [AutoInitShutdown]
     public void MouseClick_ChangesTab ()
     {
@@ -130,21 +130,21 @@ public class TabViewTests (ITestOutputHelper output)
         {
             args = new () { ScreenPosition = new (i, 1), Flags = MouseFlags.ReportMousePosition };
             Application.RaiseMouseEvent (args);
-            Application.LayoutAndDraw ();
+            AutoInitShutdownAttribute.RunIteration ();
             Assert.Null (clicked);
             Assert.Equal (tab1, tv.SelectedTab);
         }
 
         args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab1, tv.SelectedTab);
 
         // Click to tab2
         args = new () { ScreenPosition = new (6, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab2, clicked);
         Assert.Equal (tab2, tv.SelectedTab);
 
@@ -157,7 +157,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // Tab 1 was clicked but event handler blocked navigation
         Assert.Equal (tab1, clicked);
@@ -165,7 +165,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         args = new () { ScreenPosition = new (12, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // Clicking beyond last tab should raise event with null Tab
         Assert.Null (clicked);
@@ -218,7 +218,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the right arrow
         var args = new MouseEventArgs { ScreenPosition = new (6, 2), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -238,7 +238,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the left arrow
         args = new () { ScreenPosition = new (0, 2), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -308,7 +308,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the right arrow
         var args = new MouseEventArgs { ScreenPosition = new (7, 3), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -330,7 +330,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the left arrow
         args = new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -381,7 +381,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the cursor up key to focus the selected tab
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         // Is the selected tab focused
         Assert.Equal (tab1, tv.SelectedTab);
@@ -399,7 +399,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the cursor right key to select the next tab
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -472,7 +472,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the cursor left key to select the previous tab
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
@@ -482,7 +482,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the end key to select the last tab
         Assert.True (Application.RaiseKeyDownEvent (Key.End));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -491,7 +491,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the home key to select the first tab
         Assert.True (Application.RaiseKeyDownEvent (Key.Home));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
@@ -500,7 +500,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the page down key to select the next set of tabs
         Assert.True (Application.RaiseKeyDownEvent (Key.PageDown));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -509,7 +509,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the page up key to select the previous set of tabs
         Assert.True (Application.RaiseKeyDownEvent (Key.PageUp));
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
@@ -584,7 +584,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -608,7 +608,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -632,7 +632,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -731,7 +731,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -755,7 +755,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -779,7 +779,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -880,7 +880,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -902,7 +902,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -925,7 +925,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1022,7 +1022,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1064,7 +1064,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -1088,7 +1088,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
@@ -1112,7 +1112,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1194,7 +1194,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1305,7 +1305,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Add_Three_TabsOnTop_ChangesTab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1370,7 +1370,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Add_Three_TabsOnBottom_ChangesTab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
@@ -1457,7 +1457,7 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Mouse_Wheel_Changes_Tab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);

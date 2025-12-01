@@ -252,7 +252,7 @@ internal class NumericUpDownEditor<T> : View where T : notnull
             {
                 X = Pos.Center (),
                 Y = Pos.Bottom (_increment) + 1,
-                Increment = (dynamic)1,
+                Increment = NumericUpDown<int>.TryConvert (1, out T? increment) ? increment : default (T?),
             };
 
             _numericUpDown.ValueChanged += NumericUpDownOnValueChanged;
@@ -266,14 +266,14 @@ internal class NumericUpDownEditor<T> : View where T : notnull
 
             void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs)
             {
-                _increment.Text = _numericUpDown.Increment.ToString ();
+                _increment.Text = _numericUpDown!.Increment?.ToString ();
             }
 
             Add (_numericUpDown);
 
             _value.Text = _numericUpDown.Text;
             _format.Text = _numericUpDown.Format;
-            _increment.Text = _numericUpDown.Increment.ToString ();
+            _increment.Text = _numericUpDown!.Increment?.ToString ();
         }
     }
 

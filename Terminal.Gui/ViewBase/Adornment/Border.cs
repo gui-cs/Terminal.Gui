@@ -50,8 +50,8 @@ public partial class Border : Adornment
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
 
-        Application.GrabbingMouse += Application_GrabbingMouse;
-        Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+        Application.Mouse.GrabbingMouse += Application_GrabbingMouse;
+        Application.Mouse.UnGrabbingMouse += Application_UnGrabbingMouse;
 
         ThicknessChanged += OnThicknessChanged;
     }
@@ -152,7 +152,7 @@ public partial class Border : Adornment
 #if SUBVIEW_BASED_BORDER
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
     {
-        _left.Border.LineStyle = LineStyle;
+        _left.Border!.LineStyle = LineStyle;
 
         _left.X = Thickness.Left - 1;
         _left.Y = Thickness.Top - 1;

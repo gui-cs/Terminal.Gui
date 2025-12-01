@@ -1,6 +1,6 @@
 ﻿using UnitTests;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class PosAnchorEndTests ()
 {
@@ -24,7 +24,9 @@ public class PosAnchorEndTests ()
 
         Toplevel top = new ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
+
+        Application.Driver!.SetScreenSize (80,25);
 
         Assert.Equal (new (0, 0, 80, 25), top.Frame);
         Assert.Equal (new (0, 0, 80, 25), win.Frame);
@@ -55,7 +57,7 @@ public class PosAnchorEndTests ()
     //    var status = new StatusBar ();
     //    Toplevel top = new ();
     //    top.Add (win, menu, status);
-    //    RunState rs = Application.Begin (top);
+    //    SessionToken rs = Application.Begin (top);
 
     //    Assert.Equal (new (0, 0, 80, 25), top.Frame);
     //    Assert.Equal (new (0, 0, 80, 1), menu.Frame);

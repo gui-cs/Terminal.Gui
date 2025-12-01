@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 using static Terminal.Gui.ViewBase.Pos;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class PosCombineTests (ITestOutputHelper output)
 {
@@ -13,11 +13,9 @@ public class PosCombineTests (ITestOutputHelper output)
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
     [Fact]
-    [TestRespondersDisposed]
+    [SetupFakeApplication]
     public void PosCombine_Will_Throws ()
     {
-        Application.Init (new FakeDriver ());
-
         Toplevel t = new ();
 
         var w = new Window { X = Pos.Left (t) + 2, Y = Pos.Top (t) + 2 };
@@ -34,14 +32,12 @@ public class PosCombineTests (ITestOutputHelper output)
 
         Assert.Throws<LayoutException> (() => Application.Run (t));
         t.Dispose ();
-        Application.Shutdown ();
-
         v2.Dispose ();
     }
 
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void PosCombine_DimCombine_View_With_SubViews ()
     {
         Application.Top = new Toplevel () { Width = 80, Height = 25 };
@@ -75,14 +71,12 @@ public class PosCombineTests (ITestOutputHelper output)
         var foundView = View.GetViewsUnderLocation (new Point(9, 4), ViewportSettingsFlags.None).LastOrDefault ();
         Assert.Equal (foundView, view2);
         Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
-
     }
 
     [Fact]
     public void PosCombine_Refs_SuperView_Throws ()
     {
-        Application.Init (new FakeDriver ());
+        Application.Init (null, "fake");
 
         var top = new Toplevel ();
         var w = new Window { X = Pos.Left (top) + 2, Y = Pos.Top (top) + 2 };
@@ -112,11 +106,11 @@ public class PosCombineTests (ITestOutputHelper output)
             Assert.Equal (6, v2.Frame.Y);
         };
 
-        Application.Iteration += (s, a) => Application.RequestStop ();
+        Application.StopAfterFirstIteration = true;
 
         Assert.Throws<LayoutException> (() => Application.Run ());
+        Application.Top.Dispose ();
         top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
+        Application.Shutdown ();
     }
-
 }

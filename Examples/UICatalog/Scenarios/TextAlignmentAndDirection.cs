@@ -410,7 +410,7 @@ public class TextAlignmentAndDirection : Scenario
         // Save Alignment in Data
         foreach (View t in multiLineLabels)
         {
-            t.Data = new { h = t.TextAlignment, v = t.VerticalTextAlignment };
+            t.Data = new TextAlignmentData (t.TextAlignment, t.VerticalTextAlignment);
         }
 
         container.Add (txtLabelTL);
@@ -492,18 +492,18 @@ public class TextAlignmentAndDirection : Scenario
 
         // JUSTIFY OPTIONS
 
-        var justifyOptions = new RadioGroup
+        var justifyOptions = new OptionSelector
         {
             X = Pos.Left (justifyCheckbox) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
             Width = Dim.Fill (9),
-            RadioLabels = ["Current direction", "Opposite direction", "FIll Both"],
+            Labels = ["Current direction", "Opposite direction", "FIll Both"],
             Enabled = false
         };
 
         justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.Result != CheckState.Checked);
 
-        justifyOptions.SelectedItemChanged += (s, e) => { ToggleJustify (false, true); };
+        justifyOptions.ValueChanged += (_, _) => { ToggleJustify (false, true); };
 
         app.Add (justifyOptions);
 
@@ -541,17 +541,17 @@ public class TextAlignmentAndDirection : Scenario
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
 
-        var directionOptions = new RadioGroup
+        var directionOptions = new OptionSelector
         {
             X = Pos.Right (container) + 1,
             Y = Pos.Bottom (wrapCheckbox) + 1,
             Width = Dim.Fill (10),
             Height = Dim.Fill (1),
             HotKeySpecifier = (Rune)'\xffff',
-            RadioLabels = directionsEnum.Select (e => e.ToString ()).ToArray ()
+            Labels = directionsEnum.Select (e => e.ToString ()).ToArray ()
         };
 
-        directionOptions.SelectedItemChanged += (s, ev) =>
+        directionOptions.ValueChanged += (s, ev) =>
                                                 {
                                                     bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
 
@@ -560,9 +560,9 @@ public class TextAlignmentAndDirection : Scenario
                                                         ToggleJustify (true);
                                                     }
 
-                                                    foreach (View v in multiLineLabels)
+                                                    foreach (View v in multiLineLabels.Where (v => ev.Value is { }))
                                                     {
-                                                        v.TextDirection = (TextDirection)ev.SelectedItem;
+                                                        v.TextDirection = (TextDirection)ev.Value!.Value;
                                                     }
 
                                                     if (justChecked)
@@ -594,8 +594,9 @@ public class TextAlignmentAndDirection : Scenario
 
                 foreach (View t in multiLineLabels)
                 {
-                    t.TextAlignment = (Alignment)((dynamic)t.Data).h;
-                    t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
+                    var data = (TextAlignmentData)t.Data;
+                    t.TextAlignment = data!.h;
+                    t.VerticalTextAlignment = data.v;
                 }
             }
             else
@@ -607,50 +608,52 @@ public class TextAlignmentAndDirection : Scenario
                         justifyOptions.Enabled = true;
                     }
 
+                    var data = (TextAlignmentData)t.Data;
+
                     if (TextFormatter.IsVerticalDirection (t.TextDirection))
                     {
-                        switch (justifyOptions.SelectedItem)
+                        switch (justifyOptions.Value)
                         {
                             case 0:
                                 t.VerticalTextAlignment = Alignment.Fill;
-                                t.TextAlignment = ((dynamic)t.Data).h;
-
+                                t.TextAlignment = data!.h;
                                 break;
                             case 1:
-                                t.VerticalTextAlignment = (Alignment)((dynamic)t.Data).v;
+                                t.VerticalTextAlignment = data!.v;
                                 t.TextAlignment = Alignment.Fill;
-
                                 break;
                             case 2:
                                 t.VerticalTextAlignment = Alignment.Fill;
                                 t.TextAlignment = Alignment.Fill;
-
                                 break;
                         }
                     }
                     else
                     {
-                        switch (justifyOptions.SelectedItem)
+                        switch (justifyOptions.Value)
                         {
                             case 0:
                                 t.TextAlignment = Alignment.Fill;
-                                t.VerticalTextAlignment = ((dynamic)t.Data).v;
-
+                                t.VerticalTextAlignment = data!.v;
                                 break;
                             case 1:
-                                t.TextAlignment = (Alignment)((dynamic)t.Data).h;
+                                t.TextAlignment = data!.h;
                                 t.VerticalTextAlignment = Alignment.Fill;
-
                                 break;
                             case 2:
                                 t.TextAlignment = Alignment.Fill;
                                 t.VerticalTextAlignment = Alignment.Fill;
-
                                 break;
                         }
                     }
                 }
             }
         }
+    }
+
+    private class TextAlignmentData (Alignment h, Alignment v)
+    {
+        public Alignment h { get; } = h;
+        public Alignment v { get; } = v;
     }
 }

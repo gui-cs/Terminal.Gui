@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class DrawTests (ITestOutputHelper output)
@@ -32,7 +32,7 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
+        Application.Driver!.SetScreenSize (10, 4);
 
         const string expectedOutput = """
 
@@ -75,8 +75,8 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (viewRight, viewBottom);
 
         var rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (7, 7);
-        Application.RunIteration (ref rs);
+        Application.Driver!.SetScreenSize (7, 7);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -111,7 +111,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport ()
     {
         var view = new View { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
@@ -136,7 +136,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Bottom ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
@@ -154,7 +154,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Left ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
@@ -179,7 +179,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Right ()
     {
         var view = new View { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
@@ -204,7 +204,7 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Draw_Minimum_Full_Border_With_Empty_Viewport_Without_Top ()
     {
         var view = new View { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
@@ -302,7 +302,8 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -1;
-        Application.LayoutAndDraw ();
+
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -317,12 +318,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -2;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         content.X = 0;
         content.Y = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -337,7 +338,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -6;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -352,7 +353,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -19;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -363,12 +364,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -20;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         content.X = -2;
         content.Y = 0;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
         top.Dispose ();
     }
@@ -408,7 +409,7 @@ public class DrawTests (ITestOutputHelper output)
         top.SubViewsLaidOut += Top_LayoutComplete;
         Application.Begin (top);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
                                                       
@@ -419,7 +420,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -431,7 +432,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -442,12 +443,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -2;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         content.X = -20;
         content.Y = 0;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
         top.Dispose ();
 
@@ -495,7 +496,7 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (container);
         Application.Begin (top);
 
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
                                                       
@@ -509,7 +510,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -524,12 +525,12 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.X = -2;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         content.X = 0;
         content.Y = -1;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -544,7 +545,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -6;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -559,7 +560,7 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -19;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       """
@@ -570,18 +571,18 @@ public class DrawTests (ITestOutputHelper output)
                                                      );
 
         content.Y = -20;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         content.X = -2;
         content.Y = 0;
-        Application.LayoutAndDraw ();
+        AutoInitShutdownAttribute.RunIteration ();
         DriverAssert.AssertDriverContentsWithFrameAre ("", output);
         top.Dispose ();
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData ("𝔽𝕆𝕆𝔹𝔸R")]
     [InlineData ("a𐐀b")]
     public void DrawHotString_NonBmp (string expected)
@@ -615,7 +616,8 @@ public class DrawTests (ITestOutputHelper output)
         top.Add (win);
 
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
+        Application.Driver!.SetScreenSize (10, 4);
+
 
         var expected = """
 
@@ -633,22 +635,15 @@ public class DrawTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [TestRespondersDisposed]
+    [AutoInitShutdown]
     public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Application.Init (new FakeDriver ());
-
         Toplevel top = new ();
 
         var view = new View { X = -2, Text = "view" };
         top.Add (view);
 
-        Application.Iteration += (s, a) =>
-                                 {
-                                     Assert.Equal (-2, view.X);
-
-                                     Application.RequestStop ();
-                                 };
+        Application.Iteration += OnApplicationOnIteration;
 
         try
         {
@@ -659,11 +654,24 @@ public class DrawTests (ITestOutputHelper output)
             // After the fix this exception will not be caught.
             Assert.IsType<IndexOutOfRangeException> (ex);
         }
+        finally
+        {
+            Application.Iteration -= OnApplicationOnIteration;
+        }
 
         top.Dispose ();
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+
+        return;
+
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
+        {
+            Assert.Equal (-2, view.X);
+
+            Application.RequestStop ();
+        }
     }
 
 
@@ -683,8 +691,8 @@ public class DrawTests (ITestOutputHelper output)
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        SessionToken sessionToken = Application.Begin (top);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -711,7 +719,7 @@ At 0,0
    A text wit",
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -731,7 +739,7 @@ At 0,0
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
 
         top.Draw ();
 
@@ -764,7 +772,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -784,8 +792,8 @@ At 0,0
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        SessionToken sessionToken = Application.Begin (top);
+        AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -810,7 +818,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
 
@@ -830,7 +838,7 @@ At 0,0
         };
         Toplevel top = new ();
         top.Add (label, view);
-        RunState runState = Application.Begin (top);
+        SessionToken sessionToken = Application.Begin (top);
 
         top.Draw ();
 
@@ -862,7 +870,7 @@ At 0,0
         ,
                                                       output
                                                      );
-        Application.End (runState);
+        Application.End (sessionToken);
         top.Dispose ();
     }
     public class DerivedView : View

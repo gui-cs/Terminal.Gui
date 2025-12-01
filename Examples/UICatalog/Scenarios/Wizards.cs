@@ -162,11 +162,11 @@ public class Wizards : Scenario
                                            firstStep.HelpText =
                                                "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
 
-                                           RadioGroup radioGroup = new ()
+                                           OptionSelector optionSelector = new ()
                                            {
-                                               RadioLabels = ["_One", "_Two", "_3"]
+                                               Labels = ["_One", "_Two", "_3"]
                                            };
-                                           firstStep.Add (radioGroup);
+                                           firstStep.Add (optionSelector);
 
                                            wizard.AddStep (firstStep);
 
@@ -184,12 +184,12 @@ public class Wizards : Scenario
                                                Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
                                            };
 
-                                           RadioGroup radioGroup2 = new ()
+                                           OptionSelector optionSelecor2 = new ()
                                            {
-                                               RadioLabels = ["_A", "_B", "_C"],
+                                               Labels = ["_A", "_B", "_C"],
                                                Orientation = Orientation.Horizontal
                                            };
-                                           secondStep.Add (radioGroup2);
+                                           secondStep.Add (optionSelecor2);
 
                                            button.Accepting += (s, e) =>
                                                             {
@@ -282,11 +282,11 @@ public class Wizards : Scenario
 
                                            someText.Height = Dim.Fill (
                                                                        Dim.Func (
-                                                                                 () => someText.SuperView is { IsInitialized: true }
-                                                                                           ? someText.SuperView.SubViews
-                                                                                                     .First (view => view.Y.Has<PosAnchorEnd> (out _))
-                                                                                                     .Frame.Height
-                                                                                           : 1));
+                                                                                 v => someText.SuperView is { IsInitialized: true }
+                                                                                          ? someText.SuperView.SubViews
+                                                                                                    .First (view => view.Y.Has<PosAnchorEnd> (out _))
+                                                                                                    .Frame.Height
+                                                                                          : 1));
                                            var help = "This is helpful.";
                                            fourthStep.Add (someText);
 

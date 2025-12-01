@@ -72,7 +72,7 @@ public class ScrollBarDemo : Scenario
             Text = "_Width/Height:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
         };
         demoFrame.Add (lblWidthHeight);
 
@@ -114,27 +114,23 @@ public class ScrollBarDemo : Scenario
             Text = "_Orientation:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
         };
         demoFrame.Add (lblOrientationLabel);
 
-        var rgOrientation = new RadioGroup
+        OptionSelector<Orientation> osOrientation = new ()
         {
             X = Pos.Right (lblOrientationLabel) + 1,
             Y = Pos.Top (lblOrientationLabel),
-            RadioLabels = ["Vertical", "Horizontal"],
+            AssignHotKeys = true,
             Orientation = Orientation.Horizontal
         };
-        demoFrame.Add (rgOrientation);
+        demoFrame.Add (osOrientation);
 
-        rgOrientation.SelectedItemChanged += (s, e) =>
+        osOrientation.ValueChanged += (s, e) =>
                                              {
-                                                 if (e.SelectedItem == e.PreviousSelectedItem)
-                                                 {
-                                                     return;
-                                                 }
 
-                                                 if (rgOrientation.SelectedItem == 0)
+                                                 if (osOrientation.Value == Orientation.Horizontal)
                                                  {
                                                      scrollBar.Orientation = Orientation.Vertical;
                                                      scrollBar.X = Pos.AnchorEnd () - 5;
@@ -160,7 +156,7 @@ public class ScrollBarDemo : Scenario
             Text = "Scrollable_ContentSize:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
         };
         demoFrame.Add (lblSize);
 
@@ -193,7 +189,7 @@ public class ScrollBarDemo : Scenario
             Text = "_VisibleContentSize:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
         };
         demoFrame.Add (lblVisibleContentSize);
 
@@ -226,7 +222,7 @@ public class ScrollBarDemo : Scenario
             Text = "_Position:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
 
         };
         demoFrame.Add (lblPosition);
@@ -264,7 +260,7 @@ public class ScrollBarDemo : Scenario
             Text = "Options:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
         };
         demoFrame.Add (lblOptions);
         var autoShow = new CheckBox
@@ -282,7 +278,7 @@ public class ScrollBarDemo : Scenario
             Text = "SliderPosition:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
         };
         demoFrame.Add (lblSliderPosition);
 
@@ -299,7 +295,7 @@ public class ScrollBarDemo : Scenario
             Text = "Scrolled:",
             TextAlignment = Alignment.End,
             Y = Pos.Align (Alignment.Start, groupId: 1),
-            Width = Dim.Func (() => GetMaxLabelWidth (1))
+            Width = Dim.Func (_ => GetMaxLabelWidth (1))
 
         };
         demoFrame.Add (lblScrolled);

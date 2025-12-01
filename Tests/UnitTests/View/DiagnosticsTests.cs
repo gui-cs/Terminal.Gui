@@ -1,7 +1,7 @@
 #nullable enable
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 /// <summary>
 ///     Tests <see cref="View.Diagnostics"/> static property and <see cref="ViewDiagnosticFlags"/> enum.

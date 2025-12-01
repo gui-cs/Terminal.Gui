@@ -61,7 +61,7 @@ public class NetMaskedTextProvider : ITextValidateProvider
     public bool Fixed => true;
 
     /// <inheritdoc/>
-    public string DisplayText => _provider.ToDisplayString ();
+    public string DisplayText => _provider!.ToDisplayString ();
 
     /// <inheritdoc/>
     public int Cursor (int pos)

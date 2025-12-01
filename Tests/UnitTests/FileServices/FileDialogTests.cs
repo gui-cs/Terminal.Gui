@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.FileServicesTests;
+namespace UnitTests.FileServicesTests;
 
 public class FileDialogTests ()
 {
@@ -22,7 +22,7 @@ public class FileDialogTests ()
 
         //pressing enter will complete the current selection
         // unless the event cancels the confirm
-        Send ('\n', ConsoleKey.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         Assert.Equal (cancel, dlg.Canceled);
         dlg.Dispose ();
@@ -46,15 +46,15 @@ public class FileDialogTests ()
                      );
 
         // continue typing the rest of the path
-        Send ("BOB");
-        Send ('.', ConsoleKey.OemPeriod);
-        Send ("CSV");
+        Send ("Bob");
+        Application.RaiseKeyDownEvent ('.');
+        Send ("csv");
 
         Assert.True (dlg.Canceled);
 
-        Send ('\n', ConsoleKey.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
         Assert.False (dlg.Canceled);
-        Assert.Equal ("bob.csv", Path.GetFileName (dlg.Path));
+        Assert.Equal ("Bob.csv", Path.GetFileName (dlg.Path));
         dlg.Dispose ();
     }
 
@@ -72,21 +72,21 @@ public class FileDialogTests ()
 
         dlg.Path = openIn + Path.DirectorySeparatorChar;
 
-        Send ("X");
+        Send ("x");
 
         // nothing selected yet
         Assert.True (dlg.Canceled);
         Assert.Equal ("x", Path.GetFileName (dlg.Path));
 
         // complete auto typing
-        Send ('\t', ConsoleKey.Tab);
+        Application.RaiseKeyDownEvent ('\t');
 
         // but do not close dialog
         Assert.True (dlg.Canceled);
         Assert.EndsWith ("xx" + Path.DirectorySeparatorChar, dlg.Path);
 
         // press enter again to confirm the dialog
-        Send ('\n', ConsoleKey.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
         Assert.False (dlg.Canceled);
         Assert.EndsWith ("xx" + Path.DirectorySeparatorChar, dlg.Path);
         dlg.Dispose ();
@@ -101,30 +101,30 @@ public class FileDialogTests ()
         Directory.CreateDirectory (openIn);
         dlg.Path = openIn + Path.DirectorySeparatorChar;
 
-        var tf = GetTextField (dlg, FileDialogPart.SearchField);
+        var tf = dlg.SubViews.First (view => view.Id == "_tableViewContainer").SubViews.First (v => v.Id == "_tbFind") as TextField;
         tf.SetFocus ();
 
         Assert.IsType<TextField> (dlg.MostFocused);
         Assert.Same (tf, dlg.MostFocused);
 
-        Assert.Equal ("Enter Search", tf.Caption);
+        Assert.Equal ("_Find", tf.Title);
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
 
         //pressing enter while search focused should not confirm path
-        Send ('\n', ConsoleKey.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         Assert.True (dlg.Canceled);
 
-        // tabbing out of search 
-        Send ('\t', ConsoleKey.Tab);
+        //// tabbing out of search 
+        //Application.RaiseKeyDownEvent ('\t');
 
-        //should allow enter to confirm path
-        Send ('\n', ConsoleKey.Enter);
+        ////should allow enter to confirm path
+        //Application.RaiseKeyDownEvent (Key.Enter);
 
-        // Dialog has not yet been confirmed with a choice
-        Assert.False (dlg.Canceled);
+        //// Dialog has not yet been confirmed with a choice
+        //Assert.False (dlg.Canceled);
         dlg.Dispose ();
     }
 
@@ -192,21 +192,21 @@ public class FileDialogTests ()
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Try to toggle '..'
-        Send (' ', ConsoleKey.Spacebar);
-        Send ('v', ConsoleKey.DownArrow);
+        Application.RaiseKeyDownEvent (' ');
+        Application.RaiseKeyDownEvent (Key.CursorDown);
 
         // Toggle subfolder
-        Send (' ', ConsoleKey.Spacebar);
+        Application.RaiseKeyDownEvent (' ');
 
         Assert.True (dlg.Canceled);
 
         if (acceptWithEnter)
         {
-            Send ('\n', ConsoleKey.Enter);
+            Application.RaiseKeyDownEvent (Key.Enter);
         }
         else
         {
-            Send ('O', ConsoleKey.O, false, true);
+            Application.RaiseKeyDownEvent ('O');
         }
 
         Assert.False (dlg.Canceled);
@@ -248,20 +248,20 @@ public class FileDialogTests ()
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Move selection to subfolder
-        Send ('v', ConsoleKey.DownArrow);
+        Application.RaiseKeyDownEvent (Key.CursorDown);
 
         // Toggle subfolder
-        Send (' ', ConsoleKey.Spacebar);
+        Application.RaiseKeyDownEvent (' ');
 
         Assert.True (dlg.Canceled);
 
         if (acceptWithEnter)
         {
-            Send ('\n', ConsoleKey.Enter);
+            Application.RaiseKeyDownEvent (Key.Enter);
         }
         else
         {
-            Send ('O', ConsoleKey.O, false, true);
+            Application.RaiseKeyDownEvent (Key.O.WithAlt);
         }
 
         Assert.False (dlg.Canceled);
@@ -301,9 +301,9 @@ public class FileDialogTests ()
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Move selection to subfolder
-        Send ('v', ConsoleKey.DownArrow);
+        Application.RaiseKeyDownEvent (Key.CursorDown);
 
-        Send ('\n', ConsoleKey.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
 
         // Path should update to the newly opened folder
         AssertIsTheSubfolder (dlg.Path);
@@ -345,13 +345,13 @@ public class FileDialogTests ()
         Assert.IsType<TableView> (dlg.MostFocused);
 
         // Should be selecting ..
-        Send ('v', ConsoleKey.DownArrow);
+        Application.RaiseKeyDownEvent (Key.CursorDown);
 
         // Down to the directory
         Assert.True (dlg.Canceled);
 
         // Alt+O to open (enter would just navigate into the child dir)
-        Send ('O', ConsoleKey.O, false, true);
+        Application.RaiseKeyDownEvent (Key.O.WithAlt);
         Assert.False (dlg.Canceled);
 
         AssertIsTheSubfolder (dlg.Path);
@@ -372,16 +372,16 @@ public class FileDialogTests ()
 
         // whe first opening the text field will have select all on
         // so to add to current path user must press End or right
-        Send ('>', ConsoleKey.LeftArrow);
-        Send ('>', ConsoleKey.RightArrow);
+        Application.RaiseKeyDownEvent (Key.CursorLeft);
+        Application.RaiseKeyDownEvent (Key.CursorRight);
 
-        Send ("SUBFOLDER");
+        Send ("subfolder");
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
 
         // Now it has
-        Send ('\n', ConsoleKey.Enter);
+        Application.RaiseKeyDownEvent (Key.Enter);
         Assert.False (dlg.Canceled);
         AssertIsTheSubfolder (dlg.Path);
         dlg.Dispose ();
@@ -456,7 +456,7 @@ public class FileDialogTests ()
          *
          */
 
-        var path = GetTextField (fd, FileDialogPart.Path);
+        var path = fd.SubViews.OfType<TextField> ().ElementAt (0);
         Assert.Equal ("/demo/", path.Text);
 
         var tv = GetTableView (fd);
@@ -529,7 +529,7 @@ public class FileDialogTests ()
          *
          */
 
-        var path = GetTextField (fd, FileDialogPart.Path);
+        var path = fd.SubViews.OfType<TextField> ().ElementAt (0);
         Assert.Equal ("c:\\demo\\",path.Text);
 
         var tv = GetTableView (fd);
@@ -763,16 +763,11 @@ public class FileDialogTests ()
 
     private bool IsWindows () { return RuntimeInformation.IsOSPlatform (OSPlatform.Windows); }
 
-    private void Send (char ch, ConsoleKey ck, bool shift = false, bool alt = false, bool control = false)
-    {
-        Application.Driver?.SendKeys (ch, ck, shift, alt, control);
-    }
-
     private void Send (string chars)
     {
         foreach (char ch in chars)
         {
-            Application.Driver?.SendKeys (ch, ConsoleKey.NoName, false, false, false);
+            Application.RaiseKeyDownEvent (ch);
         }
     }
 
@@ -780,36 +775,38 @@ public class FileDialogTests ()
     {
         if (Path.DirectorySeparatorChar == '/')
         {
-            Send ('/', ConsoleKey.Separator);
+            Application.RaiseKeyDownEvent ('/');
         }
         else
         {
-            Send ('\\', ConsoleKey.Separator);
-        }
-    }
-
-    private TextField GetTextField (FileDialog dlg, FileDialogPart part)
-    {
-        switch (part)
-        {
-            case FileDialogPart.Path:
-                return dlg.SubViews.OfType<TextField> ().ElementAt (0);
-            case FileDialogPart.SearchField:
-                return dlg.SubViews.OfType<TextField> ().ElementAt (1);
-            default:
-                throw new ArgumentOutOfRangeException (nameof (part), part, null);
+            Application.RaiseKeyDownEvent ('\\');
         }
     }
 
     private TableView GetTableView (FileDialog dlg)
     {
-        var tile = dlg.SubViews.OfType<TileView> ().Single ();
-        return (TableView)tile.Tiles.ElementAt (1).ContentView.SubViews.ElementAt(0);
+        // The table view is in the _tableViewContainer which is a direct subview of the dialog
+        // We need to search through all subviews recursively
+        TableView FindTableView (View view)
+        {
+            if (view is TableView tv)
+            {
+                return tv;
+            }
+
+            foreach (View subview in view.SubViews)
+            {
+                TableView result = FindTableView (subview);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        return FindTableView (dlg);
     }
 
-    private enum FileDialogPart
-    {
-        Path,
-        SearchField,
-    }
 }

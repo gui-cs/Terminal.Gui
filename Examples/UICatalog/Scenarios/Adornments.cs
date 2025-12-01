@@ -26,7 +26,7 @@ public class Adornments : Scenario
             X = Pos.AnchorEnd ()
         };
 
-        editor.Border.Thickness = new (1, 2, 1, 1);
+        editor.Border!.Thickness = new (1, 2, 1, 1);
 
         app.Add (editor);
 
@@ -35,7 +35,7 @@ public class Adornments : Scenario
             Title = "The _Window",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable,
 
-            Width = Dim.Fill (Dim.Func (() => editor.Frame.Width)),
+            Width = Dim.Fill (Dim.Func (_ => editor.Frame.Width)),
             Height = Dim.Fill ()
         };
         app.Add (window);
@@ -71,7 +71,7 @@ public class Adornments : Scenario
             Width = 40,
             Height = 6 // TODO: Use Dim.Auto
         };
-        label.Border.Thickness = new (1, 3, 1, 1);
+        label.Border!.Thickness = new (1, 3, 1, 1);
 
         var btnButtonInWindow = new Button { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
 
@@ -84,13 +84,13 @@ public class Adornments : Scenario
             SchemeName = "Dialog"
         };
 
-        window.Margin.Data = "Margin";
-        window.Margin.Text = "Margin Text";
-        window.Margin.Thickness = new (0);
+        window.Margin!.Data = "Margin";
+        window.Margin!.Text = "Margin Text";
+        window.Margin!.Thickness = new (0);
 
-        window.Border.Data = "Border";
-        window.Border.Text = "Border Text";
-        window.Border.Thickness = new (0);
+        window.Border!.Data = "Border";
+        window.Border!.Text = "Border Text";
+        window.Border!.Thickness = new (0);
 
         window.Padding.Data = "Padding";
         window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
@@ -134,14 +134,14 @@ public class Adornments : Scenario
                                   };
                                   btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                  btnButtonInPadding.Border.Thickness = new (1, 1, 1, 1);
+                                  btnButtonInPadding.Border!.Thickness = new (1, 1, 1, 1);
                                   window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
-                                btnButtonInPadding.Border.CloseButton.Visible = true;
+                                btnButtonInPadding.Border!.CloseButton.Visible = true;
 
-                                view.Border.CloseButton.Visible = true;
-                                view.Border.CloseButton.Accept += (s, e) =>
+                                view.Border!.CloseButton.Visible = true;
+                                view.Border!.CloseButton.Accept += (s, e) =>
                                                                   {
                                                                       MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
                                                                       e.Handled = true;

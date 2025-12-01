@@ -1,7 +1,7 @@
 #nullable enable
 using UnitTests;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class DrawEventTests
@@ -20,8 +20,8 @@ public class DrawEventTests
 
         var top = new Toplevel ();
         top.Add (view, tv);
-        RunState runState = Application.Begin (top);
-        Application.RunIteration (ref runState);
+        Application.Begin (top);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.True (viewCalled);
         Assert.True (tvCalled);

@@ -1,5 +1,6 @@
-﻿using System;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿#nullable enable
+
+using System.Diagnostics;
 
 namespace UICatalog.Scenarios;
 
@@ -9,6 +10,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public class Scrolling : Scenario
 {
+    private object? _progressTimer = null;
+
     public override void Main ()
     {
         Application.Init ();
@@ -41,10 +44,6 @@ public class Scrolling : Scenario
 
         app.Add (demoView);
 
-        //// NOTE: This call to EnableScrollBar is technically not needed because the reference
-        //// NOTE: to demoView.HorizontalScrollBar below will cause it to be lazy created.
-        //// NOTE: The call included in this sample to for illustration purposes.
-        //demoView.EnableScrollBar (Orientation.Horizontal);
         var hCheckBox = new CheckBox
         {
             X = Pos.X (demoView),
@@ -55,10 +54,6 @@ public class Scrolling : Scenario
         app.Add (hCheckBox);
         hCheckBox.CheckedStateChanged += (sender, args) => { demoView.HorizontalScrollBar.Visible = args.Value == CheckState.Checked; };
 
-        //// NOTE: This call to EnableScrollBar is technically not needed because the reference
-        //// NOTE: to demoView.HorizontalScrollBar below will cause it to be lazy created.
-        //// NOTE: The call included in this sample to for illustration purposes.
-        //demoView.EnableScrollBar (Orientation.Vertical);
         var vCheckBox = new CheckBox
         {
             X = Pos.Right (hCheckBox) + 3,
@@ -99,8 +94,6 @@ public class Scrolling : Scenario
 
         app.Add (progress);
 
-        var pulsing = true;
-
         app.Initialized += AppOnInitialized;
         app.Unloaded += AppUnloaded;
 
@@ -111,17 +104,25 @@ public class Scrolling : Scenario
 
         return;
 
-        void AppOnInitialized (object sender, EventArgs e)
+        void AppOnInitialized (object? sender, EventArgs e)
         {
             bool TimerFn ()
             {
                 progress.Pulse ();
 
-                return pulsing;
+                return _progressTimer is { };
             }
 
-            Application.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
+            _progressTimer = Application.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
         }
-        void AppUnloaded (object sender, EventArgs args) { pulsing = false; }
+
+        void AppUnloaded (object? sender, EventArgs args)
+        {
+            if (_progressTimer is { })
+            {
+                Application.RemoveTimeout (_progressTimer);
+                _progressTimer = null;
+            }
+        }
     }
 }

@@ -1,12 +1,11 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 public class BorderTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
     {
         var superView = new View { Width = 10, Height = 10, CanFocus = true };
@@ -17,17 +16,18 @@ public class BorderTests (ITestOutputHelper output)
         superView.Add (view);
 
         view.Border!.Thickness = new (0, 1, 0, 0);
-        view.Border.LineStyle = LineStyle.Single;
+        view.Border!.LineStyle = LineStyle.Single;
 
-        view.SetScheme (new ()
-        {
-            Normal = new (Color.Red, Color.Green),
-            Focus = new (Color.Green, Color.Red)
-        });
+        view.SetScheme (
+                        new ()
+                        {
+                            Normal = new (Color.Red, Color.Green),
+                            Focus = new (Color.Green, Color.Red)
+                        });
         Assert.NotEqual (view.GetScheme ().Normal.Foreground, view.GetScheme ().Focus.Foreground);
-        Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (ColorName16.Red, view.Border!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
 
         superView.BeginInit ();
         superView.EndInit ();
@@ -41,28 +41,29 @@ public class BorderTests (ITestOutputHelper output)
         view.SetFocus ();
         View.SetClipToScreen ();
         view.Draw ();
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
-        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground);
-        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground);
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground);
+        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border!.GetAttributeForRole (VisualRole.Normal).Foreground);
         DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.GetScheme ().Normal, view.GetAttributeForRole (VisualRole.Focus));
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Border_Uses_Parent_Scheme ()
     {
         var view = new View { Title = "A", Height = 2, Width = 5 };
-        view.Border.Thickness = new (0, 1, 0, 0);
-        view.Border.LineStyle = LineStyle.Single;
+        view.Border!.Thickness = new (0, 1, 0, 0);
+        view.Border!.LineStyle = LineStyle.Single;
 
-        view.SetScheme (new ()
-        {
-            Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
-        });
-        Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border.GetAttributeForRole (VisualRole.Normal));
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
+        view.SetScheme (
+                        new ()
+                        {
+                            Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
+                        });
+        Assert.Equal (ColorName16.Red, view.Border!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border!.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
 
         view.BeginInit ();
         view.EndInit ();
@@ -92,13 +93,12 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness = win.Border.Thickness with { Top = 4 };
+        win.Border!.Thickness = win.Border!.Thickness with { Top = 4 };
 
-        RunState rs = Application.Begin (win);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (win);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (width, 5);
-        Application.RunIteration (ref rs, firstIteration);
+        Application.Driver!.SetScreenSize (width, 5);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)
@@ -222,16 +222,16 @@ public class BorderTests (ITestOutputHelper output)
     [InlineData (10)]
     public void Border_With_Title_Border_Double_Thickness_Top_Three_Size_Width (int width)
     {
-        var win = new Window
+        Window win = new ()
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness = win.Border.Thickness with { Top = 3 };
+        win.Border!.Thickness = win.Border!.Thickness with { Top = 3 };
 
-        RunState rs = Application.Begin (win);
+        SessionToken rs = Application.Begin (win);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (width, 4);
-        Application.RunIteration (ref rs, false);
+        Application.Driver!.SetScreenSize (width, 4);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)
@@ -359,13 +359,12 @@ public class BorderTests (ITestOutputHelper output)
         {
             Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double
         };
-        win.Border.Thickness = win.Border.Thickness with { Top = 2 };
+        win.Border!.Thickness = win.Border!.Thickness with { Top = 2 };
 
-        RunState rs = Application.Begin (win);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (win);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (width, 4);
-        Application.RunIteration (ref rs, firstIteration);
+        Application.Driver!.SetScreenSize (width, 4);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)
@@ -484,11 +483,10 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (win);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, height);
-        Application.RunIteration (ref rs, firstIteration);
+        Application.Driver!.SetScreenSize (20, height);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (height)
@@ -546,11 +544,10 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (win);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (width, 3);
-        Application.RunIteration (ref rs, firstIteration);
+        Application.Driver!.SetScreenSize (width, 3);
+        AutoInitShutdownAttribute.RunIteration ();
         var expected = string.Empty;
 
         switch (width)
@@ -727,14 +724,13 @@ public class BorderTests (ITestOutputHelper output)
         var top = new Toplevel ();
         top.BorderStyle = LineStyle.Double;
 
-        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single};
+        var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
-        RunState rs = Application.Begin (top);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (top);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
-        Application.RunIteration (ref rs, firstIteration);
+        Application.Driver!.SetScreenSize (5, 5);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ╔═══╗
@@ -758,11 +754,10 @@ public class BorderTests (ITestOutputHelper output)
         var frame = new FrameView { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         top.Add (frame);
-        RunState rs = Application.Begin (top);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (top);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (10, 4);
-        Application.RunIteration (ref rs, firstIteration);
+        Application.Driver!.SetScreenSize (10, 4);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ╔════════╗
@@ -781,11 +776,10 @@ public class BorderTests (ITestOutputHelper output)
     {
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 
-        RunState rs = Application.Begin (win);
-        var firstIteration = false;
+        SessionToken rs = Application.Begin (win);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (3, 3);
-        Application.RunIteration (ref rs, firstIteration);
+        Application.Driver!.SetScreenSize (3, 3);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = @"
 ┌─┐
@@ -801,7 +795,7 @@ public class BorderTests (ITestOutputHelper output)
     {
         var view = new View ();
         Assert.Equal (LineStyle.None, view.BorderStyle);
-        Assert.Equal (Thickness.Empty, view.Border.Thickness);
+        Assert.Equal (Thickness.Empty, view.Border!.Thickness);
         view.Dispose ();
     }
 
@@ -811,35 +805,39 @@ public class BorderTests (ITestOutputHelper output)
         var view = new View ();
         view.BorderStyle = LineStyle.Single;
         Assert.Equal (LineStyle.Single, view.BorderStyle);
-        Assert.Equal (new (1), view.Border.Thickness);
+        Assert.Equal (new (1), view.Border!.Thickness);
 
         view.BorderStyle = LineStyle.Double;
         Assert.Equal (LineStyle.Double, view.BorderStyle);
-        Assert.Equal (new (1), view.Border.Thickness);
+        Assert.Equal (new (1), view.Border!.Thickness);
 
         view.BorderStyle = LineStyle.None;
         Assert.Equal (LineStyle.None, view.BorderStyle);
-        Assert.Equal (Thickness.Empty, view.Border.Thickness);
+        Assert.Equal (Thickness.Empty, view.Border!.Thickness);
         view.Dispose ();
     }
 
     [Theory]
-    [InlineData (false, @"
+    [InlineData (
+                    false,
+                    @"
 ┌───┐
 │ ║ │
 │═┌┄│
 │ ┊ │
 └───┘")]
-    [InlineData (true, @"
+    [InlineData (
+                    true,
+                    @"
 ╔═╦─┐
 ║ ║ │
 ╠═╬┄┤
 │ ┊ ┊
 └─┴┄┘")]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SuperViewRendersLineCanvas_No_SubViews_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
-        View superView = new View ()
+        var superView = new View
         {
             Id = "superView",
             Width = 5,
@@ -847,7 +845,7 @@ public class BorderTests (ITestOutputHelper output)
             BorderStyle = LineStyle.Single
         };
 
-        View view1 = new View ()
+        var view1 = new View
         {
             Id = "view1",
             Width = 3,
@@ -858,7 +856,7 @@ public class BorderTests (ITestOutputHelper output)
             SuperViewRendersLineCanvas = superViewRendersLineCanvas
         };
 
-        View view2 = new View ()
+        var view2 = new View
         {
             Id = "view2",
             Width = 3,
@@ -878,9 +876,10 @@ public class BorderTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
-
     [Theory]
-    [InlineData (false, @"
+    [InlineData (
+                    false,
+                    @"
 ┌┤A├──────┐
 │    ║    │
 │    ║    │
@@ -888,7 +887,9 @@ public class BorderTests (ITestOutputHelper output)
 │    ┊    │
 │    ┊    │
 └─────────┘")]
-    [InlineData (true, @"
+    [InlineData (
+                    true,
+                    @"
 ╔╡A╞═╦────┐
 ║    ║    │
 ║    ║    │
@@ -896,20 +897,20 @@ public class BorderTests (ITestOutputHelper output)
 │    ┊    ┊
 │    ┊    ┊
 └────┴┄┄┄┄┘")]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SuperViewRendersLineCanvas_Title_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
-        View superView = new View ()
+        var superView = new View
         {
             Id = "superView",
             Title = "A",
             Width = 11,
             Height = 7,
             CanFocus = true,
-            BorderStyle = LineStyle.Single,
+            BorderStyle = LineStyle.Single
         };
 
-        View view1 = new View ()
+        var view1 = new View
         {
             Id = "view1",
             Title = "B",
@@ -922,7 +923,7 @@ public class BorderTests (ITestOutputHelper output)
             SuperViewRendersLineCanvas = superViewRendersLineCanvas
         };
 
-        View view2 = new View ()
+        var view2 = new View
         {
             Id = "view2",
             Title = "C",

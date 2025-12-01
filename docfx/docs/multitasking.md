@@ -89,7 +89,7 @@ public class ClockView : View
         Add(timeLabel);
         
         // Update every second
-        timerToken = Application.MainLoop.AddTimeout(
+        timerToken = Application.AddTimeout(
             TimeSpan.FromSeconds(1), 
             UpdateTime
         );
@@ -105,7 +105,7 @@ public class ClockView : View
     {
         if (disposing && timerToken != null)
         {
-            Application.MainLoop.RemoveTimeout(timerToken);
+            Application.RemoveTimeout(timerToken);
         }
         base.Dispose(disposing);
     }
@@ -119,44 +119,6 @@ public class ClockView : View
 - **Keep timer callbacks fast** - they run on the main thread
 - **Use appropriate intervals** - too frequent updates can impact performance
 
-## Idle Processing
-
-Idle handlers run when the application has no events to process, useful for background maintenance:
-
-```csharp
-public class AutoSaveView : View
-{
-    private object idleToken;
-    private DateTime lastSave = DateTime.Now;
-    
-    public AutoSaveView()
-    {
-        idleToken = Application.MainLoop.AddIdle(CheckAutoSave);
-    }
-    
-    private bool CheckAutoSave()
-    {
-        if (DateTime.Now - lastSave > TimeSpan.FromMinutes(5))
-        {
-            if (HasUnsavedChanges())
-            {
-                SaveDocument();
-                lastSave = DateTime.Now;
-            }
-        }
-        return true; // Continue idle processing
-    }
-    
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && idleToken != null)
-        {
-            Application.MainLoop.RemoveIdle(idleToken);
-        }
-        base.Dispose(disposing);
-    }
-}
-```
 
 ## Common Patterns
 
@@ -258,7 +220,7 @@ Task.Run(() =>
 ### ❌ Don't: Forget to clean up timers
 ```csharp
 // Memory leak - timer keeps running after view is disposed
-Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
+Application.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
 ```
 
 ### ✅ Do: Remove timers in Dispose
@@ -267,7 +229,7 @@ protected override void Dispose(bool disposing)
 {
     if (disposing && timerToken != null)
     {
-        Application.MainLoop.RemoveTimeout(timerToken);
+        Application.RemoveTimeout(timerToken);
     }
     base.Dispose(disposing);
 }

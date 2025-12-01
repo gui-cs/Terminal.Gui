@@ -9,7 +9,7 @@
   <Comment CommentText="Shared matching component (users should provide alternative implementations of this class if they want to modify collection navigation behaviour)">
     <Position X="9.448" Y="0.5" Height="0.708" Width="3.169" />
   </Comment>
-  <Class Name="Terminal.Gui.CollectionNavigatorBase" Collapsed="true">
+  <Class Name="Terminal.Gui.Views.CollectionNavigatorBase" Collapsed="true">
     <Position X="6.25" Y="1.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAgEAAAAAAAQAAAIAAEAAgAAAAAABAAEAAAAACwAAAA=</HashCode>
@@ -20,7 +20,7 @@
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.CollectionNavigator" Collapsed="true">
+  <Class Name="Terminal.Gui.Views.CollectionNavigator" Collapsed="true">
     <Position X="4.5" Y="3.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAAAAAAAAgAAAAAAAAAEAAAAAAAAAAA=</HashCode>
@@ -28,7 +28,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.DefaultCollectionNavigatorMatcher">
+  <Class Name="Terminal.Gui.Views.DefaultCollectionNavigatorMatcher">
     <Position X="9.5" Y="2.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAQA=</HashCode>
@@ -36,14 +36,14 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.TableCollectionNavigator" Collapsed="true">
+  <Class Name="Terminal.Gui.Views.TableCollectionNavigator" Collapsed="true">
     <Position X="4.75" Y="6.5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAEAAAAIAAAAAA=</HashCode>
       <FileName>Views\CollectionNavigation\TableCollectionNavigator.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Terminal.Gui.ListView" Collapsed="true">
+  <Class Name="Terminal.Gui.Views.ListView" Collapsed="true">
     <Position X="0.5" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAE+ASAkEnAAABAAKGAggYAZJAIAABEAcBAaAwAQIAA=</HashCode>
@@ -54,25 +54,7 @@
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.FileDialog" Collapsed="true">
-    <Position X="0.5" Y="5.5" Width="1.75" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
-    <TypeIdentifier>
-      <HashCode>iIY4LQFUHDKVIHIESBgigQcFT6GxhBDABGJItBQAwAQ=</HashCode>
-      <FileName>Views\FileDialog.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="Terminal.Gui.FileDialogCollectionNavigator" Collapsed="true">
-    <Position X="4.75" Y="5.5" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAEAAAAAAAAAAA=</HashCode>
-      <FileName>Views\FileDialogCollectionNavigator.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Terminal.Gui.TableView" Collapsed="true" BaseTypeListCollapsed="true">
+  <Class Name="Terminal.Gui.Views.TableView" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="0.5" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QwUeAxwgICIAcABIABeR0oBAkhoFGGOBDABgAN3oPEI=</HashCode>
@@ -80,7 +62,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.TreeView" Collapsed="true">
+  <Class Name="Terminal.Gui.Views.TreeView" Collapsed="true">
     <Position X="0.5" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
@@ -88,7 +70,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Terminal.Gui.TreeView&lt;T&gt;" Collapsed="true">
+  <Class Name="Terminal.Gui.Views.TreeView&lt;T&gt;" Collapsed="true">
     <Position X="0.5" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>UwAGySBgBSBGMAQgIiCaBDUItJIBSAWwRMQOSgQCwJI=</HashCode>
@@ -99,21 +81,39 @@
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
-  <Interface Name="Terminal.Gui.ICollectionNavigatorMatcher" Collapsed="true">
+  <Class Name="Terminal.Gui.Views.FileDialog" Collapsed="true">
+    <Position X="0.5" Y="5.5" Width="1.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>iIY4LQFUHDKVIHIESBoigQcFT6GxhBDABGJItBQAwAQ=</HashCode>
+      <FileName>Views\FileDialogs\FileDialog.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Terminal.Gui.Views.FileDialogCollectionNavigator" Collapsed="true">
+    <Position X="4.75" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Views\FileDialogs\FileDialogCollectionNavigator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Terminal.Gui.Views.ICollectionNavigatorMatcher" Collapsed="true">
     <Position X="9.5" Y="1.5" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
       <FileName>Views\CollectionNavigation\ICollectionNavigatorMatcher.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Terminal.Gui.IListCollectionNavigator" Collapsed="true">
+  <Interface Name="Terminal.Gui.Views.IListCollectionNavigator" Collapsed="true">
     <Position X="3.75" Y="2.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Views\CollectionNavigation\IListCollectionNavigator.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Terminal.Gui.ICollectionNavigator" Collapsed="true">
+  <Interface Name="Terminal.Gui.Views.ICollectionNavigator" Collapsed="true">
     <Position X="3.75" Y="1.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAgAAAAAAAAAAAAIAAAAAAAAAAAABAAAAAAAACgAAAA=</HashCode>

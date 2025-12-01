@@ -1,6 +1,10 @@
-﻿using System.Drawing;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace TerminalGuiFluentTesting;
 
@@ -8,39 +12,102 @@ namespace TerminalGuiFluentTesting;
 ///     Fluent API context for testing a Terminal.Gui application. Create
 ///     an instance using <see cref="With"/> static class.
 /// </summary>
-public class GuiTestContext : IDisposable
+public partial class GuiTestContext : IDisposable
 {
-    private readonly CancellationTokenSource _cts = new ();
-    private readonly CancellationTokenSource _hardStop = new (With.Timeout);
-    private readonly Task _runTask;
-    private Exception _ex;
-    private readonly FakeOutput _output = new ();
-    private readonly FakeWindowsInput _winInput;
-    private readonly FakeNetInput _netInput;
-    private View? _lastView;
-    private readonly StringBuilder _logsSb;
-    private readonly V2TestDriver _driver;
-    private bool _finished;
 
-    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, V2TestDriver driver)
+    // ===== Threading & Synchronization =====
+    private readonly CancellationTokenSource _runCancellationTokenSource = new ();
+    private readonly CancellationTokenSource? _timeoutCts;
+    private readonly Task? _runTask;
+    private readonly SemaphoreSlim _booting;
+    private readonly object _cancellationLock = new ();
+    private volatile bool _finished;
+
+    // ===== Exception Handling =====
+    private readonly object _backgroundExceptionLock = new ();
+    private Exception? _backgroundException;
+
+    // ===== Driver & Application State =====
+    private readonly FakeInput _fakeInput = new ();
+    private IOutput? _output;
+    private SizeMonitorImpl? _sizeMonitor;
+    private ApplicationImpl? _applicationImpl;
+    private TestDriver _driverType;
+
+    // ===== Application State Preservation (for restoration) =====
+    private IApplication? _originalApplicationInstance;
+    private ILogger? _originalLogger;
+
+    // ===== Test Configuration =====
+    private readonly bool _runApplication;
+    private TimeSpan _timeout;
+
+    // ===== Logging =====
+    private readonly object _logsLock = new ();
+    private readonly TextWriter? _logWriter;
+    private StringBuilder? _logsSb;
+
+
+    /// <summary>
+    ///     Constructor for tests that only need Application.Init without running the main loop.
+    ///     Uses the driver's default screen size instead of forcing a specific size.
+    /// </summary>
+    public GuiTestContext (TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
-        IApplication origApp = ApplicationImpl.Instance;
-        ILogger? origLogger = Logging.Logger;
-        _logsSb = new ();
-        _driver = driver;
+        _logWriter = logWriter;
+        _runApplication = false;
+        _booting = new (0, 1);
+        _timeoutCts = new CancellationTokenSource (timeout ?? TimeSpan.FromSeconds (10)); // NEW
 
-        _netInput = new (_cts.Token);
-        _winInput = new (_cts.Token);
+        // Don't force a size - let the driver determine it
+        CommonInit (0, 0, driver, timeout);
 
-        _output.Size = new (width, height);
+        try
+        {
+            InitializeApplication ();
+            _booting.Release ();
 
-        var v2 = new ApplicationV2 (
-                                    () => _netInput,
-                                    () => _output,
-                                    () => _winInput,
-                                    () => _output);
+            // After Init, Application.Screen should be set by the driver
+            if (Application.Screen == Rectangle.Empty)
+            {
+                throw new InvalidOperationException (
+                                                     "Driver bug: Application.Screen is empty after Init. The driver should set the screen size during Init.");
+            }
+        }
+        catch (Exception ex)
+        {
+            lock (_backgroundExceptionLock) // NEW: Thread-safe exception handling
+            {
+                _backgroundException = ex;
+            }
 
-        var booting = new SemaphoreSlim (0, 1);
+            if (_logWriter != null)
+            {
+                WriteOutLogs (_logWriter);
+            }
+
+            throw new ("Application initialization failed", ex);
+        }
+
+        lock (_backgroundExceptionLock) // NEW: Thread-safe check
+        {
+            if (_backgroundException != null)
+            {
+                throw new ("Application initialization failed", _backgroundException);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Constructor for tests that need to run the application with Application.Run.
+    /// </summary>
+    internal GuiTestContext (Func<Toplevel> topLevelBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    {
+        _logWriter = logWriter;
+        _runApplication = true;
+        _booting = new (0, 1);
+
+        CommonInit (width, height, driver, timeout);
 
         // Start the application in a background thread
         _runTask = Task.Run (
@@ -48,209 +115,162 @@ public class GuiTestContext : IDisposable
                              {
                                  try
                                  {
-                                     ApplicationImpl.ChangeInstance (v2);
+                                     InitializeApplication ();
 
-                                     ILogger logger = LoggerFactory.Create (
-                                                                            builder =>
-                                                                                builder.SetMinimumLevel (LogLevel.Trace)
-                                                                                       .AddProvider (new TextWriterLoggerProvider (new StringWriter (_logsSb))))
-                                                                   .CreateLogger ("Test Logging");
-                                     Logging.Logger = logger;
-
-                                     v2.Init (null, GetDriverName ());
-
-                                     booting.Release ();
+                                     _booting.Release ();
 
                                      Toplevel t = topLevelBuilder ();
-                                     t.Closed += (s, e) => { _finished = true; };
+                                     t.Closed += (s, e) => { Finished = true; };
                                      Application.Run (t); // This will block, but it's on a background thread now
 
                                      t.Dispose ();
+                                     Logging.Trace ("Application.Run completed");
                                      Application.Shutdown ();
+                                     _runCancellationTokenSource.Cancel ();
                                  }
                                  catch (OperationCanceledException)
                                  { }
                                  catch (Exception ex)
                                  {
-                                     _ex = ex;
+                                     _backgroundException = ex;
+                                     _fakeInput.ExternalCancellationTokenSource!.Cancel ();
                                  }
                                  finally
                                  {
-                                     ApplicationImpl.ChangeInstance (origApp);
-                                     Logging.Logger = origLogger;
-                                     _finished = true;
+                                     CleanupApplication ();
+
+                                     if (_logWriter != null)
+                                     {
+                                         WriteOutLogs (_logWriter);
+                                     }
                                  }
                              },
-                             _cts.Token);
+                             _runCancellationTokenSource.Token);
 
         // Wait for booting to complete with a timeout to avoid hangs
-        if (!booting.WaitAsync (TimeSpan.FromSeconds (5)).Result)
+        if (!_booting.WaitAsync (_timeout).Result)
         {
-            throw new TimeoutException ("Application failed to start within the allotted time.");
+            throw new TimeoutException ($"Application failed to start within {_timeout}ms.");
         }
 
-        WaitIteration ();
+        ResizeConsole (width, height);
+
+        if (_backgroundException is { })
+        {
+            throw new ("Application crashed", _backgroundException);
+        }
+    }
+
+    private void InitializeApplication ()
+    {
+        ApplicationImpl.ChangeInstance (_applicationImpl);
+
+        _applicationImpl?.Init (null, GetDriverName ());
+    }
+
+
+    /// <summary>
+    ///     Common initialization for both constructors.
+    /// </summary>
+    private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
+    {
+        _timeout = timeout ?? TimeSpan.FromSeconds (10);
+        _originalApplicationInstance = ApplicationImpl.Instance;
+        _originalLogger = Logging.Logger;
+        _logsSb = new ();
+        _driverType = driverType;
+
+        ILogger logger = LoggerFactory.Create (builder =>
+                                                   builder.SetMinimumLevel (LogLevel.Trace)
+                                                          .AddProvider (
+                                                                        new TextWriterLoggerProvider (
+                                                                                                      new ThreadSafeStringWriter (_logsSb, _logsLock))))
+                                      .CreateLogger ("Test Logging");
+        Logging.Logger = logger;
+
+        // ✅ Link _runCancellationTokenSource with a timeout
+        // This creates a token that responds to EITHER the run cancellation OR timeout
+        _fakeInput.ExternalCancellationTokenSource =
+            CancellationTokenSource.CreateLinkedTokenSource (
+                                                             _runCancellationTokenSource.Token,
+                                                             new CancellationTokenSource (_timeout).Token);
+
+        // Now when InputImpl.Run receives this ExternalCancellationTokenSource,
+        // it will create ANOTHER linked token internally that combines:
+        // - Its own runCancellationToken parameter
+        // - The ExternalCancellationTokenSource (which is already linked)
+        // This creates a chain: any of these triggers will stop input:
+        // 1. _runCancellationTokenSource.Cancel() (normal stop)
+        // 2. Timeout expires (test timeout)
+        // 3. Direct cancel of ExternalCancellationTokenSource (hard stop/error)
+
+        // Remove frame limit
+        Application.MaximumIterationsPerSecond = ushort.MaxValue;
+
+        //// Only set size if explicitly provided (width and height > 0)
+        //if (width > 0 && height > 0)
+        //{
+        //    _output.SetSize (width, height);
+        //}
+
+        IComponentFactory? cf = null;
+
+        // TODO: As each drivers' IInput/IOutput implementations are made testable (e.g. 
+        // TODO: safely injectable/mocked), we can expand this switch to use them.
+        switch (driverType)
+        {
+            case TestDriver.DotNet:
+                _output = new FakeOutput ();
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+
+                break;
+            case TestDriver.Windows:
+                _output = new FakeOutput ();
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+
+                break;
+            case TestDriver.Unix:
+                _output = new FakeOutput ();
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+
+                break;
+            case TestDriver.Fake:
+                _output = new FakeOutput ();
+                _sizeMonitor = new (_output);
+                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+
+                break;
+        }
+
+        _applicationImpl = new (cf!);
+        Logging.Trace ($"Driver: {GetDriverName ()}. Timeout: {_timeout}");
     }
 
     private string GetDriverName ()
     {
-        return _driver switch
-               {
-                   V2TestDriver.V2Win => "v2win",
-                   V2TestDriver.V2Net => "v2net",
-                   _ =>
-                       throw new ArgumentOutOfRangeException ()
-               };
-    }
-
-    /// <summary>
-    ///     Stops the application and waits for the background thread to exit.
-    /// </summary>
-    public GuiTestContext Stop ()
-    {
-        if (_runTask.IsCompleted)
+        return _driverType switch
         {
-            return this;
-        }
-
-        Application.Invoke (() => { Application.RequestStop (); });
-
-        // Wait for the application to stop, but give it a 1-second timeout
-        if (!_runTask.Wait (TimeSpan.FromMilliseconds (1000)))
-        {
-            _cts.Cancel ();
-
-            // Timeout occurred, force the task to stop
-            _hardStop.Cancel ();
-
-            throw new TimeoutException ("Application failed to stop within the allotted time.");
-        }
-
-        _cts.Cancel ();
-
-        if (_ex != null)
-        {
-            throw _ex; // Propagate any exception that happened in the background task
-        }
-
-        return this;
+            TestDriver.Windows => "windows",
+            TestDriver.DotNet => "dotnet",
+            TestDriver.Unix => "unix",
+            TestDriver.Fake => "fake",
+            _ =>
+                throw new ArgumentOutOfRangeException ()
+        };
     }
 
     /// <summary>
-    ///     Hard stops the application and waits for the background thread to exit.
+    ///     Gets whether the application has finished running; aka Stop has been called and the main loop has exited.
     /// </summary>
-    public void HardStop ()
+    public bool Finished
     {
-        _hardStop.Cancel ();
-        Stop ();
+        get => _finished;
+        private set => _finished = value;
     }
 
-    /// <summary>
-    ///     Cleanup to avoid state bleed between tests
-    /// </summary>
-    public void Dispose ()
-    {
-        Stop ();
-
-        if (_hardStop.IsCancellationRequested)
-        {
-            throw new (
-                       "Application was hard stopped, typically this means it timed out or did not shutdown gracefully. Ensure you call Stop in your test");
-        }
-
-        _hardStop.Cancel ();
-    }
-
-    /// <summary>
-    ///     Adds the given <paramref name="v"/> to the current top level view
-    ///     and performs layout.
-    /// </summary>
-    /// <param name="v"></param>
-    /// <returns></returns>
-    public GuiTestContext Add (View v)
-    {
-        WaitIteration (
-                       () =>
-                       {
-                           Toplevel top = Application.Top ?? throw new ("Top was null so could not add view");
-                           top.Add (v);
-                           top.Layout ();
-                           _lastView = v;
-                       });
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Simulates changing the console size e.g. by resizing window in your operating system
-    /// </summary>
-    /// <param name="width">new Width for the console.</param>
-    /// <param name="height">new Height for the console.</param>
-    /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height)
-    {
-        _output.Size = new (width, height);
-
-        return WaitIteration ();
-    }
-
-    public GuiTestContext ScreenShot (string title, TextWriter writer)
-    {
-        writer.WriteLine (title + ":");
-        var text = Application.ToString ();
-
-        writer.WriteLine (text);
-
-        return this; //WaitIteration();
-    }
-
-    /// <summary>
-    ///     Writes all Terminal.Gui engine logs collected so far to the <paramref name="writer"/>
-    /// </summary>
-    /// <param name="writer"></param>
-    /// <returns></returns>
-    public GuiTestContext WriteOutLogs (TextWriter writer)
-    {
-        writer.WriteLine (_logsSb.ToString ());
-
-        return this; //WaitIteration();
-    }
-
-    /// <summary>
-    ///     Waits until the end of the current iteration of the main loop. Optionally
-    ///     running a given <paramref name="a"/> action on the UI thread at that time.
-    /// </summary>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    public GuiTestContext WaitIteration (Action? a = null)
-    {
-        // If application has already exited don't wait!
-        if (_finished || _cts.Token.IsCancellationRequested || _hardStop.Token.IsCancellationRequested)
-        {
-            return this;
-        }
-
-        a ??= () => { };
-        var ctsLocal = new CancellationTokenSource ();
-
-        Application.Invoke (
-                            () =>
-                            {
-                                a ();
-                                ctsLocal.Cancel ();
-                            });
-
-        // Blocks until either the token or the hardStopToken is cancelled.
-        WaitHandle.WaitAny (
-                            new []
-                            {
-                                _cts.Token.WaitHandle,
-                                _hardStop.Token.WaitHandle,
-                                ctsLocal.Token.WaitHandle
-                            });
-
-        return this;
-    }
 
     /// <summary>
     ///     Performs the supplied <paramref name="doAction"/> immediately.
@@ -262,10 +282,12 @@ public class GuiTestContext : IDisposable
     {
         try
         {
-            doAction ();
+            Logging.Trace ($"Invoking action via WaitIteration");
+            WaitIteration (doAction);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _backgroundException = ex;
             HardStop ();
 
             throw;
@@ -275,556 +297,270 @@ public class GuiTestContext : IDisposable
     }
 
     /// <summary>
-    ///     Simulates a right click at the given screen coordinates on the current driver.
-    ///     This is a raw input event that goes through entire processing pipeline as though
-    ///     user had pressed the mouse button physically.
+    ///     Waits until the end of the current iteration of the main loop. Optionally
+    ///     running a given <paramref name="action"/> action on the UI thread at that time.
     /// </summary>
-    /// <param name="screenX">0 indexed screen coordinates</param>
-    /// <param name="screenY">0 indexed screen coordinates</param>
+    /// <param name="action"></param>
     /// <returns></returns>
-    public GuiTestContext RightClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button3Pressed, screenX, screenY); }
-
-    /// <summary>
-    ///     Simulates a left click at the given screen coordinates on the current driver.
-    ///     This is a raw input event that goes through entire processing pipeline as though
-    ///     user had pressed the mouse button physically.
-    /// </summary>
-    /// <param name="screenX">0 indexed screen coordinates</param>
-    /// <param name="screenY">0 indexed screen coordinates</param>
-    /// <returns></returns>
-    public GuiTestContext LeftClick (int screenX, int screenY) { return Click (WindowsConsole.ButtonState.Button1Pressed, screenX, screenY); }
-
-    public GuiTestContext LeftClick<T> (Func<T, bool> evaluator) where T : View { return Click (WindowsConsole.ButtonState.Button1Pressed, evaluator); }
-
-    private GuiTestContext Click<T> (WindowsConsole.ButtonState btn, Func<T, bool> evaluator) where T : View
+    public GuiTestContext WaitIteration (Action? action = null)
     {
-        T v = Find (evaluator);
-        Point screen = v.ViewportToScreen (new Point (0, 0));
-
-        return Click (btn, screen.X, screen.Y);
-    }
-
-    private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
-    {
-        switch (_driver)
+        // If application has already exited don't wait!
+        if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
         {
-            case V2TestDriver.V2Win:
-
-                _winInput.InputBuffer.Enqueue (
-                                               new ()
-                                               {
-                                                   EventType = WindowsConsole.EventType.Mouse,
-                                                   MouseEvent = new ()
-                                                   {
-                                                       ButtonState = btn,
-                                                       MousePosition = new ((short)screenX, (short)screenY)
-                                                   }
-                                               });
-
-                _winInput.InputBuffer.Enqueue (
-                                               new ()
-                                               {
-                                                   EventType = WindowsConsole.EventType.Mouse,
-                                                   MouseEvent = new ()
-                                                   {
-                                                       ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
-                                                       MousePosition = new ((short)screenX, (short)screenY)
-                                                   }
-                                               });
-
-                break;
-            case V2TestDriver.V2Net:
-
-                int netButton = btn switch
-                                {
-                                    WindowsConsole.ButtonState.Button1Pressed => 0,
-                                    WindowsConsole.ButtonState.Button2Pressed => 1,
-                                    WindowsConsole.ButtonState.Button3Pressed => 2,
-                                    WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-                                    _ => throw new ArgumentOutOfRangeException (nameof (btn))
-                                };
-
-                foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
-                {
-                    SendNetKey (k);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-
-        ;
-    }
-
-    public GuiTestContext Down ()
-    {
-        switch (_driver)
-        {
-            case V2TestDriver.V2Win:
-                SendWindowsKey (ConsoleKeyMapping.VK.DOWN);
-
-                break;
-            case V2TestDriver.V2Net:
-                foreach (ConsoleKeyInfo k in NetSequences.Down)
-                {
-                    SendNetKey (k);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-
-        ;
-    }
-
-    /// <summary>
-    ///     Simulates the Right cursor key
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Right ()
-    {
-        switch (_driver)
-        {
-            case V2TestDriver.V2Win:
-                SendWindowsKey (ConsoleKeyMapping.VK.RIGHT);
-
-                break;
-            case V2TestDriver.V2Net:
-                foreach (ConsoleKeyInfo k in NetSequences.Right)
-                {
-                    SendNetKey (k);
-                }
-
-                WaitIteration ();
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates the Left cursor key
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Left ()
-    {
-        switch (_driver)
-        {
-            case V2TestDriver.V2Win:
-                SendWindowsKey (ConsoleKeyMapping.VK.LEFT);
-
-                break;
-            case V2TestDriver.V2Net:
-                foreach (ConsoleKeyInfo k in NetSequences.Left)
-                {
-                    SendNetKey (k);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates the up cursor key
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Up ()
-    {
-        switch (_driver)
-        {
-            case V2TestDriver.V2Win:
-                SendWindowsKey (ConsoleKeyMapping.VK.UP);
-
-                break;
-            case V2TestDriver.V2Net:
-                foreach (ConsoleKeyInfo k in NetSequences.Up)
-                {
-                    SendNetKey (k);
-                }
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates pressing the Return/Enter (newline) key.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Enter ()
-    {
-        switch (_driver)
-        {
-            case V2TestDriver.V2Win:
-                SendWindowsKey (
-                                new WindowsConsole.KeyEventRecord
-                                {
-                                    UnicodeChar = '\r',
-                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
-                                    wRepeatCount = 1,
-                                    wVirtualKeyCode = ConsoleKeyMapping.VK.RETURN,
-                                    wVirtualScanCode = 28
-                                });
-
-                break;
-            case V2TestDriver.V2Net:
-                SendNetKey (new ('\r', ConsoleKey.Enter, false, false, false));
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Simulates pressing the Esc (Escape) key.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Escape ()
-    {
-        switch (_driver)
-        {
-            case V2TestDriver.V2Win:
-                SendWindowsKey (
-                                new WindowsConsole.KeyEventRecord
-                                {
-                                    UnicodeChar = '\u001b',
-                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
-                                    wRepeatCount = 1,
-                                    wVirtualKeyCode = ConsoleKeyMapping.VK.ESCAPE,
-                                    wVirtualScanCode = 1
-                                });
-
-                break;
-            case V2TestDriver.V2Net:
-
-                // Note that this accurately describes how Esc comes in. Typically, ConsoleKey is None
-                // even though you would think it would be Escape - it isn't
-                SendNetKey (new ('\u001b', ConsoleKey.None, false, false, false));
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Simulates pressing the Tab key.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public GuiTestContext Tab ()
-    {
-        switch (_driver)
-        {
-            case V2TestDriver.V2Win:
-                SendWindowsKey (
-                                new WindowsConsole.KeyEventRecord
-                                {
-                                    UnicodeChar = '\t',
-                                    dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed,
-                                    wRepeatCount = 1,
-                                    wVirtualKeyCode = 0,
-                                    wVirtualScanCode = 0
-                                });
-
-                break;
-            case V2TestDriver.V2Net:
-
-                // Note that this accurately describes how Tab comes in. Typically, ConsoleKey is None
-                // even though you would think it would be Tab - it isn't
-                SendNetKey (new ('\t', ConsoleKey.None, false, false, false));
-
-                break;
-            default:
-                throw new ArgumentOutOfRangeException ();
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Registers a right click handler on the <see cref="LastView"/> added view (or root view) that
-    ///     will open the supplied <paramref name="contextMenu"/>.
-    /// </summary>
-    /// <param name="contextMenu"></param>
-    /// <returns></returns>
-    public GuiTestContext WithContextMenu (PopoverMenu? contextMenu)
-    {
-        LastView.MouseEvent += (s, e) =>
-                               {
-                                   if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
-                                   {
-                                       // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
-                                       // and the context menu is disposed when it is closed.
-                                       Application.Popover?.Register (contextMenu);
-                                       contextMenu?.MakeVisible (e.ScreenPosition);
-                                   }
-                               };
-
-        return this;
-    }
-
-    /// <summary>
-    ///     The last view added (e.g. with <see cref="Add"/>) or the root/current top.
-    /// </summary>
-    public View LastView => _lastView ?? Application.Top ?? throw new ("Could not determine which view to add to");
-
-    /// <summary>
-    ///     Send a full windows OS key including both down and up.
-    /// </summary>
-    /// <param name="fullKey"></param>
-    private void SendWindowsKey (WindowsConsole.KeyEventRecord fullKey)
-    {
-        WindowsConsole.KeyEventRecord down = fullKey;
-        WindowsConsole.KeyEventRecord up = fullKey; // because struct this is new copy
-
-        down.bKeyDown = true;
-        up.bKeyDown = false;
-
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = down
-                                       });
-
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = up
-                                       });
-
-        WaitIteration ();
-    }
-
-    private void SendNetKey (ConsoleKeyInfo consoleKeyInfo) { _netInput.InputBuffer.Enqueue (consoleKeyInfo); }
-
-    /// <summary>
-    ///     Sends a special key e.g. cursor key that does not map to a specific character
-    /// </summary>
-    /// <param name="specialKey"></param>
-    private void SendWindowsKey (ConsoleKeyMapping.VK specialKey)
-    {
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new ()
-                                           {
-                                               bKeyDown = true,
-                                               wRepeatCount = 0,
-                                               wVirtualKeyCode = specialKey,
-                                               wVirtualScanCode = 0,
-                                               UnicodeChar = '\0',
-                                               dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                           }
-                                       });
-
-        _winInput.InputBuffer.Enqueue (
-                                       new ()
-                                       {
-                                           EventType = WindowsConsole.EventType.Key,
-                                           KeyEvent = new ()
-                                           {
-                                               bKeyDown = false,
-                                               wRepeatCount = 0,
-                                               wVirtualKeyCode = specialKey,
-                                               wVirtualScanCode = 0,
-                                               UnicodeChar = '\0',
-                                               dwControlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed
-                                           }
-                                       });
-
-        WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Sends a key to the application. This goes directly to Application and does not go through
-    ///     a driver.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public GuiTestContext RaiseKeyDownEvent (Key key)
-    {
-        Application.RaiseKeyDownEvent (key);
-
-        return this; //WaitIteration();
-    }
-
-    /// <summary>
-    ///     Sets the input focus to the given <see cref="View"/>.
-    ///     Throws <see cref="ArgumentException"/> if focus did not change due to system
-    ///     constraints e.g. <paramref name="toFocus"/>
-    ///     <see cref="View.CanFocus"/> is <see langword="false"/>
-    /// </summary>
-    /// <param name="toFocus"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public GuiTestContext Focus (View toFocus)
-    {
-        toFocus.FocusDeepest (NavigationDirection.Forward, TabBehavior.TabStop);
-
-        if (!toFocus.HasFocus)
-        {
-            throw new ArgumentException ("Failed to set focus, FocusDeepest did not result in HasFocus becoming true. Ensure view is added and focusable");
-        }
-
-        return WaitIteration ();
-    }
-
-    /// <summary>
-    ///     Tabs through the UI until a View matching the <paramref name="evaluator"/>
-    ///     is found (of Type T) or all views are looped through (back to the beginning)
-    ///     in which case triggers hard stop and Exception
-    /// </summary>
-    /// <param name="evaluator">Delegate that returns true if the passed View is the one
-    /// you are trying to focus. Leave <see langword="null"/> to focus the first view of type
-    /// <typeparamref name="T"/></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
-    {
-        evaluator ??= _ => true;
-        Toplevel? t = Application.Top;
-
-        HashSet<View> seen = new ();
-
-        if (t == null)
-        {
-            Fail ("Application.Top was null when trying to set focus");
+            Logging.Warning ("WaitIteration called after context was stopped");
 
             return this;
         }
 
-        do
+        if (Thread.CurrentThread.ManagedThreadId == Application.MainThreadId)
         {
-            View? next = t.MostFocused;
-
-            // Is view found?
-            if (next is T v && evaluator (v))
-            {
-                return this;
-            }
-
-            // No, try tab to the next (or first)
-            Tab ();
-            WaitIteration ();
-            next = t.MostFocused;
-
-            if (next is null)
-            {
-                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test because MostFocused became or was always null");
-
-                return this;
-            }
-
-            // Track the views we have seen
-            // We have looped around to the start again if it was already there
-            if (!seen.Add (next))
-            {
-                Fail ("Failed to tab to a view which matched the Type and evaluator constraints of the test before looping back to the original View");
-
-                return this;
-            }
+            throw new NotSupportedException ("Cannot WaitIteration during Invoke");
         }
-        while (true);
+
+        Logging.Trace ($"WaitIteration started");
+        action ??= () => { };
+        CancellationTokenSource ctsActionCompleted = new ();
+
+        Application.Invoke (() =>
+        {
+            try
+            {
+                action ();
+
+                //Logging.Trace ("Action completed");
+                ctsActionCompleted.Cancel ();
+            }
+            catch (Exception e)
+            {
+                Logging.Warning ($"Action failed with exception: {e}");
+                _backgroundException = e;
+                _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+            }
+        });
+
+        // Blocks until either the token or the hardStopToken is cancelled.
+        // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
+        // ExternalCancellationTokenSource is redundant because it's linked to _runCancellationTokenSource
+        WaitHandle.WaitAny (
+                            [
+                                _runCancellationTokenSource.Token.WaitHandle,
+                                ctsActionCompleted.Token.WaitHandle
+                            ]);
+
+        // Logging.Trace ($"Return from WaitIteration");
+        return this;
     }
 
-    private T Find<T> (Func<T, bool> evaluator) where T : View
+    public GuiTestContext WaitUntil (Func<bool> condition)
     {
-        Toplevel? t = Application.Top;
+        GuiTestContext? c = null;
+        var sw = Stopwatch.StartNew ();
 
-        if (t == null)
+        //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+
+        while (!condition ())
         {
-            Fail ("Application.Top was null when attempting to find view");
-        }
-
-        T? f = FindRecursive (t!, evaluator);
-
-        if (f == null)
-        {
-            Fail ("Failed to tab to a view which matched the Type and evaluator constraints in any SubViews of top");
-        }
-
-        return f!;
-    }
-
-    private T? FindRecursive<T> (View current, Func<T, bool> evaluator) where T : View
-    {
-        foreach (View subview in current.SubViews)
-        {
-            if (subview is T match && evaluator (match))
+            if (sw.Elapsed > _timeout)
             {
-                return match;
+                throw new TimeoutException ($"Failed to reach condition within {_timeout}ms");
             }
 
-            // Recursive call
-            T? result = FindRecursive (subview, evaluator);
+            c = WaitIteration ();
+        }
 
-            if (result != null)
+        return c ?? this;
+    }
+
+
+    /// <summary>
+    ///     Returns the last set position of the cursor.
+    /// </summary>
+    /// <returns></returns>
+    public Point GetCursorPosition () { return _output!.GetCursorPosition (); }
+
+    /// <summary>
+    ///     Simulates changing the console size e.g. by resizing window in your operating system
+    /// </summary>
+    /// <param name="width">new Width for the console.</param>
+    /// <param name="height">new Height for the console.</param>
+    /// <returns></returns>
+    public GuiTestContext ResizeConsole (int width, int height) { return WaitIteration (() => { Application.Driver!.SetScreenSize (width, height); }); }
+
+    public GuiTestContext ScreenShot (string title, TextWriter? writer)
+    {
+        //Logging.Trace ($"{title}");
+        return WaitIteration (() =>
+                              {
+                                  writer?.WriteLine (title + ":");
+                                  var text = Application.ToString ();
+
+                                  writer?.WriteLine (text);
+                              });
+    }
+
+    /// <summary>
+    ///     Stops the application and waits for the background thread to exit.
+    /// </summary>
+    public GuiTestContext Stop ()
+    {
+        Logging.Trace ($"Stopping application for driver: {GetDriverName ()}");
+
+        if (_runTask is null || _runTask.IsCompleted)
+        {
+            // If we didn't run the application, just cleanup
+            if (!_runApplication && !Finished)
             {
-                return result;
+                try
+                {
+                    Application.Shutdown ();
+                }
+                catch
+                {
+                    // Ignore errors during shutdown
+                }
+
+                CleanupApplication ();
+            }
+
+            return this;
+        }
+
+        WaitIteration (() => { Application.RequestStop (); });
+
+        // Wait for the application to stop, but give it a 1-second timeout
+        const int WAIT_TIMEOUT_MS = 1000;
+
+        if (!_runTask.Wait (TimeSpan.FromMilliseconds (WAIT_TIMEOUT_MS)))
+        {
+            _runCancellationTokenSource.Cancel ();
+
+            // No need to manually cancel ExternalCancellationTokenSource
+
+            // App is having trouble shutting down, try sending some more shutdown stuff from this thread.
+            // If this doesn't work there will be test failures as the main loop continues to run during next test.
+            try
+            {
+                Application.RequestStop ();
+                Application.Shutdown ();
+            }
+            catch (Exception ex)
+            {
+                Logging.Critical ($"Application failed to stop in {WAIT_TIMEOUT_MS}. Then shutdown threw {ex}");
+            }
+            finally
+            {
+                Logging.Critical ($"Application failed to stop in {WAIT_TIMEOUT_MS}. Exception was thrown: {_backgroundException}");
             }
         }
 
-        return null;
-    }
+        _runCancellationTokenSource.Cancel ();
 
-    private void Fail (string reason)
-    {
-        Stop ();
-
-        throw new (reason);
-    }
-
-    public GuiTestContext Send (Key key)
-    {
-        if (Application.Driver is IConsoleDriverFacade facade)
+        if (_backgroundException != null)
         {
-            facade.InputProcessor.OnKeyDown (key);
-            facade.InputProcessor.OnKeyUp (key);
-        }
-        else
-        {
-            Fail ("Expected Application.Driver to be IConsoleDriverFacade");
+            Logging.Critical ($"Exception occurred: {_backgroundException}");
+            //throw _ex; // Propagate any exception that happened in the background task
         }
 
         return this;
     }
 
     /// <summary>
-    /// Returns the last set position of the cursor.
+    ///     Hard stops the application and waits for the background thread to exit.HardStop is used by the source generator for
+    ///     wrapping Xunit assertions.
     /// </summary>
-    /// <returns></returns>
-    public Point GetCursorPosition ()
+    public void HardStop (Exception? ex = null)
     {
-        return _output.CursorPosition;
+        if (ex != null)
+        {
+            _backgroundException = ex;
+        }
+
+        Logging.Critical ($"HardStop called with exception: {_backgroundException}");
+
+        // With linked tokens, just cancelling ExternalCancellationTokenSource
+        // will cascade to stop everything
+        _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+        WriteOutLogs (_logWriter);
+        Stop ();
     }
+
+    /// <summary>
+    ///     Writes all Terminal.Gui engine logs collected so far to the <paramref name="writer"/>
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <returns></returns>
+    public GuiTestContext WriteOutLogs (TextWriter? writer)
+    {
+        if (writer is null)
+        {
+            return this;
+        }
+
+        lock (_logsLock)
+        {
+            writer.WriteLine (_logsSb!.ToString ());
+        }
+
+        return this; //WaitIteration();
+    }
+
+    internal void Fail (string reason)
+    {
+        Logging.Error ($"{reason}");
+
+        throw new (reason);
+    }
+
+    private void CleanupApplication ()
+    {
+        Logging.Trace ("CleanupApplication");
+        _fakeInput.ExternalCancellationTokenSource = null;
+
+        Application.ResetState (true);
+        ApplicationImpl.ChangeInstance (_originalApplicationInstance);
+        Logging.Logger = _originalLogger;
+        Finished = true;
+
+        Application.MaximumIterationsPerSecond = Application.DefaultMaximumIterationsPerSecond;
+    }
+
+
+    /// <summary>
+    ///     Cleanup to avoid state bleed between tests
+    /// </summary>
+    public void Dispose ()
+    {
+        Logging.Trace ($"Disposing GuiTestContext");
+        Stop ();
+
+        bool shouldThrow = false;
+        Exception? exToThrow = null;
+
+        lock (_cancellationLock) // NEW: Thread-safe check
+        {
+            if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
+            {
+                shouldThrow = true;
+                lock (_backgroundExceptionLock)
+                {
+                    exToThrow = _backgroundException;
+                }
+            }
+
+            // ✅ Dispose the linked token source
+            _fakeInput.ExternalCancellationTokenSource?.Dispose ();
+        }
+
+        _timeoutCts?.Dispose (); // NEW: Dispose timeout CTS
+        _runCancellationTokenSource?.Dispose ();
+        _fakeInput.Dispose ();
+        _output?.Dispose ();
+        _booting.Dispose ();
+
+        if (shouldThrow)
+        {
+            throw new ("Application was hard stopped...", exToThrow);
+        }
+    }
+
 }

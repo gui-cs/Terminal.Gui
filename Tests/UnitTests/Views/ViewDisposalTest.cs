@@ -2,7 +2,7 @@ using System.Reflection;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class ViewDisposalTest (ITestOutputHelper output)
 {
@@ -16,16 +16,16 @@ public class ViewDisposalTest (ITestOutputHelper output)
     {
         WeakReference reference = DoTest ();
 
-        for (var i = 0; i < 10 && reference.IsAlive; i++)
+        for (var i = 0; i < 3 && reference.IsAlive; i++)
         {
-            GC.Collect ();
+            GC.Collect (2, GCCollectionMode.Aggressive, blocking: true);
             GC.WaitForPendingFinalizers ();
         }
 #if DEBUG_IDISPOSABLE
         if (reference.IsAlive)
         {
-            Assert.True (((View)reference.Target).WasDisposed);
-            Assert.Fail ($"Some Views didnt get Garbage Collected: {((View)reference.Target).SubViews}");
+            Assert.True ((((View)reference.Target)!).WasDisposed);
+            Assert.Fail ($"Some Views didn't get Garbage Collected: {((View)reference.Target).SubViews}");
         }
 #endif
     }
@@ -60,9 +60,9 @@ public class ViewDisposalTest (ITestOutputHelper output)
         top.Add (container);
 
         // make sure the application is doing to the views whatever its supposed to do to the views
-        for (var i = 0; i < 100; i++)
+        for (var i = 0; i < 10; i++)
         {
-            Application.LayoutAndDraw ();
+            AutoInitShutdownAttribute.RunIteration ();
         }
 
         top.Remove (container);

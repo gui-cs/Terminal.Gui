@@ -31,11 +31,11 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         AddCommand (
                     Command.HotKey,
-                    () =>
+                    (ctx) =>
                     {
                         // Logging.Debug ($"{Title} - Command.HotKey");
 
-                        if (RaiseHandlingHotKey () is true)
+                        if (RaiseHandlingHotKey (ctx) is true)
                         {
                             return true;
                         }
@@ -397,10 +397,10 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         // If the active Application Popover is part of this MenuBar, hide it.
         if (Application.Popover?.GetActivePopover () is PopoverMenu popoverMenu
-            && popoverMenu?.Root?.SuperMenuItem?.SuperView == this)
+            && popoverMenu.Root?.SuperMenuItem?.SuperView == this)
         {
             // Logging.Debug ($"{Title} - Calling Application.Popover?.Hide ({popoverMenu.Title})");
-            Application.Popover?.Hide (popoverMenu);
+            Application.Popover.Hide (popoverMenu);
         }
 
         if (menuBarItem is null)
@@ -416,6 +416,7 @@ public class MenuBarv2 : Menuv2, IDesignable
         if (menuBarItem.PopoverMenu?.Root is { })
         {
             menuBarItem.PopoverMenu.Root.SuperMenuItem = menuBarItem;
+            menuBarItem.PopoverMenu.Root.SchemeName = SchemeName;
         }
 
         // Logging.Debug ($"{Title} - \"{menuBarItem.PopoverMenu?.Title}\".MakeVisible");
@@ -423,14 +424,15 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         menuBarItem.Accepting += OnMenuItemAccepted;
 
-        menuBarItem.PopoverMenu!.Root.SchemeName = SchemeName;
-
         return;
 
         void OnMenuItemAccepted (object? sender, EventArgs args)
         {
             // Logging.Debug ($"{Title} - OnMenuItemAccepted");
-            menuBarItem.PopoverMenu!.VisibleChanged -= OnMenuItemAccepted;
+            if (menuBarItem.PopoverMenu is { })
+            {
+                menuBarItem.PopoverMenu.VisibleChanged -= OnMenuItemAccepted;
+            }
 
             if (Active && menuBarItem.PopoverMenu is { Visible: false })
             {
@@ -524,8 +526,8 @@ public class MenuBarv2 : Menuv2, IDesignable
 
         var mutuallyExclusiveOptionsSelector = new OptionSelector
         {
-            Options = ["G_ood", "_Bad", "U_gly"],
-            SelectedItem = 0
+            Labels = ["G_ood", "_Bad", "U_gly"],
+            Value = 0
         };
 
         var menuBgColorCp = new ColorPicker
@@ -654,7 +656,7 @@ public class MenuBarv2 : Menuv2, IDesignable
                                     new MenuItemv2
                                     {
                                         Title = "_Online Help...",
-                                        Action = () => MessageBox.Query ("Online Help", "https://gui-cs.github.io/Terminal.GuiV2Docs", "Ok")
+                                        Action = () => MessageBox.Query ("Online Help", "https://gui-cs.github.io/Terminal.Gui", "Ok")
                                     },
                                     new MenuItemv2
                                     {

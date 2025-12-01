@@ -38,9 +38,10 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
 #if DEBUG_IDISPOSABLE
         WasDisposed = true;
+
         // Safely remove any disposed views from the Instances list
         List<View> itemsToKeep = Instances.Where (view => !view.WasDisposed).ToList ();
-        Instances = new ConcurrentBag<View> (itemsToKeep);
+        Instances = new (itemsToKeep);
 #endif
     }
 
@@ -71,14 +72,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
             DisposeAdornments ();
             DisposeScrollBars ();
 
-            if (Application.MouseGrabView == this)
+            if (Application.Mouse.MouseGrabView == this)
             {
-                Application.UngrabMouse ();
-            }
-
-            if (Application.WantContinuousButtonPressedView == this)
-            {
-                Application.WantContinuousButtonPressedView = null;
+                Application.Mouse.UngrabMouse ();
             }
 
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
@@ -113,12 +109,14 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
-    private IConsoleDriver? _driver = null;
+    private IDriver? _driver;
+
     /// <summary>
-    ///     INTERNAL: Use <see cref="Application.Driver"/> instead. Points to the current driver in use by the view, it is a convenience property for simplifying the development
+    ///     INTERNAL: Use <see cref="Application.Driver"/> instead. Points to the current driver in use by the view, it is a
+    ///     convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    internal IConsoleDriver? Driver
+    internal IDriver? Driver
     {
         get
         {
@@ -126,10 +124,14 @@ public partial class View : IDisposable, ISupportInitializeNotification
             {
                 return _driver;
             }
+
             return Application.Driver;
         }
         set => _driver = value;
     }
+
+    /// <summary>Gets the screen buffer contents. This is a convenience property for Views that need direct access to the screen buffer.</summary>
+    protected Cell [,]? ScreenContents => Driver?.Contents;
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
@@ -250,12 +252,13 @@ public partial class View : IDisposable, ISupportInitializeNotification
             }
         }
 
-        if (ApplicationImpl.Instance.IsLegacy)
-        {
-            // TODO: Figure out how to move this out of here and just depend on LayoutNeeded in Mainloop
-            Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
-        }
+        // Force a layout each time a View is initialized
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/3951
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/4204
+        Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
 
+        // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
+        // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
         SetNeedsLayout ();
 
         Initialized?.Invoke (this, EventArgs.Empty);
@@ -349,6 +352,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             {
                 // BUGBUG: Ideally we'd reset _previouslyFocused to the first focusable subview
                 _previouslyFocused = SubViews.FirstOrDefault (v => v.CanFocus);
+
                 if (HasFocus)
                 {
                     HasFocus = false;
@@ -377,7 +381,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             }
             else
             {
-                Application.ClearScreenNextIteration = true;
+                NeedsClearScreenNextIteration ();
             }
         }
     }
@@ -453,10 +457,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <value>The title.</value>
     public string Title
     {
-        get
-        {
-            return _title;
-        }
+        get { return _title; }
         set
         {
 #if DEBUG_IDISPOSABLE
@@ -524,6 +525,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     #endregion
 
 #if DEBUG_IDISPOSABLE
+#pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>
     ///     Gets or sets whether failure to appropriately call Dispose() on a View will result in an Assert.
     ///     The default is <see langword="true"/>.
@@ -534,14 +536,14 @@ public partial class View : IDisposable, ISupportInitializeNotification
     public static bool EnableDebugIDisposableAsserts { get; set; } = true;
 
     /// <summary>
-    ///     Gets whether <see cref="Dispose"/> was called on this view or not.
+    ///     Gets whether <see cref="View.Dispose"/> was called on this view or not.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public bool WasDisposed { get; private set; }
 
     /// <summary>
-    ///     Gets the number of times <see cref="Dispose"/> was called on this view.
+    ///     Gets the number of times <see cref="View.Dispose"/> was called on this view.
     ///     For debug purposes to verify objects are being disposed properly.
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
@@ -554,5 +556,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public static ConcurrentBag<View> Instances { get; private set; } = [];
+#pragma warning restore CS0419 // Ambiguous reference in cref attribute
 #endif
 }

@@ -1,3 +1,4 @@
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 #nullable enable
 
 
@@ -19,7 +20,7 @@ internal sealed class Menu : View
         }
 
         Application.MouseEvent += Application_RootMouseEvent;
-        Application.UnGrabbedMouse += Application_UnGrabbedMouse;
+        Application.Mouse.UnGrabbedMouse += Application_UnGrabbedMouse;
 
         // Things this view knows how to do
         AddCommand (Command.Up, () => MoveUp ());
@@ -220,7 +221,7 @@ internal sealed class Menu : View
             return;
         }
 
-        Application.UngrabMouse ();
+        Application.Mouse.UngrabMouse ();
         _host.CloseAllMenus ();
         Application.LayoutAndDraw (true);
 
@@ -238,7 +239,7 @@ internal sealed class Menu : View
         }
 
         Application.MouseEvent -= Application_RootMouseEvent;
-        Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
+        Application.Mouse.UnGrabbedMouse -= Application_UnGrabbedMouse;
         base.Dispose (disposing);
     }
 
@@ -527,7 +528,7 @@ internal sealed class Menu : View
 
     private void Application_UnGrabbedMouse (object? sender, ViewEventArgs a)
     {
-        if (_host.IsMenuOpen)
+        if (_host is { IsMenuOpen: true })
         {
             _host.CloseAllMenus ();
         }
@@ -535,7 +536,7 @@ internal sealed class Menu : View
 
     private void CloseAllMenus ()
     {
-        Application.UngrabMouse ();
+        Application.Mouse.UngrabMouse ();
         _host.CloseAllMenus ();
     }
 
@@ -847,7 +848,7 @@ internal sealed class Menu : View
                 continue;
             }
 
-            if (ViewportToScreen (Viewport).Y + i >= Driver.Rows)
+            if (ViewportToScreen (Viewport).Y + i >= Application.Screen.Height)
             {
                 break;
             }
@@ -863,11 +864,10 @@ internal sealed class Menu : View
 
             if (item is null && BorderStyle != LineStyle.None)
             {
-                Point s = ViewportToScreen (new Point (-1, i));
-                Driver.Move (s.X, s.Y);
-                Driver.AddRune (Glyphs.LeftTee);
+                Move (-1, i);
+                AddRune (Glyphs.LeftTee);
             }
-            else if (Frame.X < Driver.Cols)
+            else if (Frame.X < Application.Screen.Width)
             {
                 Move (0, i);
             }
@@ -882,28 +882,28 @@ internal sealed class Menu : View
                     continue;
                 }
 
-                if (ViewportToScreen (Viewport).X + p >= Driver.Cols)
+                if (ViewportToScreen (Viewport).X + p >= Application.Screen.Width)
                 {
                     break;
                 }
 
                 if (item is null)
                 {
-                    Driver.AddRune (Glyphs.HLine);
+                    AddRune (Glyphs.HLine);
                 }
                 else if (i == 0 && p == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
                 {
-                    Driver.AddRune (Glyphs.LeftArrow);
+                    AddRune (Glyphs.LeftArrow);
                 }
 
                 // This `- 3` is left border + right border + one row in from right
                 else if (p == Frame.Width - 3 && _barItems?.SubMenu (_barItems.Children [i]!) is { })
                 {
-                    Driver.AddRune (Glyphs.RightArrow);
+                    AddRune (Glyphs.RightArrow);
                 }
                 else
                 {
-                    Driver.AddRune ((Rune)' ');
+                    AddRune ((Rune)' ');
                 }
             }
 
@@ -911,9 +911,8 @@ internal sealed class Menu : View
             {
                 if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
                 {
-                    Point s = ViewportToScreen (new Point (Frame.Width - 2, i));
-                    Driver.Move (s.X, s.Y);
-                    Driver.AddRune (Glyphs.RightTee);
+                    Move (Frame.Width - 2, i);
+                    AddRune (Glyphs.RightTee);
                 }
 
                 continue;
@@ -950,9 +949,9 @@ internal sealed class Menu : View
 
             Point screen = ViewportToScreen (new Point (0, i));
 
-            if (screen.X < Driver.Cols)
+            if (screen.X < Application.Screen.Width)
             {
-                Driver.Move (screen.X + 1, screen.Y);
+                Move (1, i);
 
                 if (!item.IsEnabled ())
                 {
@@ -991,16 +990,16 @@ internal sealed class Menu : View
                 int col = Frame.Width - l - 3;
                 screen = ViewportToScreen (new Point (col, i));
 
-                if (screen.X < Driver.Cols)
+                if (screen.X < Application.Screen.Width)
                 {
-                    Driver.Move (screen.X, screen.Y);
-                    Driver.AddStr (item.Help);
+                    Move (col, i);
+                    AddStr (item.Help);
 
                     // The shortcut tag string
                     if (!string.IsNullOrEmpty (item.ShortcutTag))
                     {
-                        Driver.Move (screen.X + l - item.ShortcutTag.GetColumns (), screen.Y);
-                        Driver.AddStr (item.ShortcutTag);
+                        Move (col + l - item.ShortcutTag.GetColumns (), i);
+                        AddStr (item.ShortcutTag);
                     }
                 }
             }

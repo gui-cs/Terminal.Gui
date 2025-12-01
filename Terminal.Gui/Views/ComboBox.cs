@@ -111,7 +111,7 @@ public class ComboBox : View, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme> args)
     {
         _listview.SetScheme(args.NewValue);
         return base.OnSettingScheme (args);
@@ -958,7 +958,7 @@ public class ComboBox : View, IDesignable
                 {
                     _isFocusing = true;
                     _highlighted = _container.SelectedItem;
-                    Application.GrabMouse (this);
+                    Application.Mouse.GrabMouse (this);
                 }
             }
             else
@@ -967,7 +967,7 @@ public class ComboBox : View, IDesignable
                 {
                     _isFocusing = false;
                     _highlighted = _container.SelectedItem;
-                    Application.UngrabMouse ();
+                    Application.Mouse.UngrabMouse ();
                 }
             }
         }

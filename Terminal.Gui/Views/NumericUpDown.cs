@@ -1,5 +1,6 @@
 #nullable enable
 using System.ComponentModel;
+using System.Numerics;
 
 namespace Terminal.Gui.Views;
 
@@ -26,13 +27,7 @@ public class NumericUpDown<T> : View where T : notnull
     {
         Type type = typeof (T);
 
-        if (!(type == typeof (object)
-              || type == typeof (int)
-              || type == typeof (long)
-              || type == typeof (double)
-              || type == typeof (float)
-              || type == typeof (double)
-              || type == typeof (decimal)))
+        if (!(type == typeof (object) || NumericHelper.SupportsType (type)))
         {
             throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
@@ -40,8 +35,11 @@ public class NumericUpDown<T> : View where T : notnull
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
-            Increment = (dynamic)1;
-            Value = (dynamic)0;
+            if (NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
+            {
+                Increment = (T)helper!.One;
+                Value = (T)helper!.Zero;
+            }
         }
 
         Width = Dim.Auto (DimAutoStyle.Content);
@@ -64,7 +62,7 @@ public class NumericUpDown<T> : View where T : notnull
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
             Y = Pos.Top (_down),
-            Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).GetColumns())),
+            Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns())),
             Height = 1,
             TextAlignment = Alignment.Center,
             CanFocus = true,
@@ -106,11 +104,10 @@ public class NumericUpDown<T> : View where T : notnull
                         //    return true;
                         //}
 
-                        if (Value is { } && Increment is { })
+                        if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
-                            Value = (dynamic)Value + (dynamic)Increment;
+                            Value = (T)helper!.Add (v, i);
                         }
-
                         return true;
                     });
 
@@ -129,12 +126,10 @@ public class NumericUpDown<T> : View where T : notnull
                         //    return true;
                         //}
 
-                        if (Value is { } && Increment is { })
+                        if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
-                            Value = (dynamic)Value - (dynamic)Increment;
+                            Value = (T)helper!.Subtract (v, i);
                         }
-
-
                         return true;
                     });
 
@@ -248,7 +243,7 @@ public class NumericUpDown<T> : View where T : notnull
         get => _increment;
         set
         {
-            if (_increment is { } && value is { } && (dynamic)_increment == (dynamic)value)
+            if (_increment is { } oldVal && value is { } newVal && oldVal.Equals (newVal))
             {
                 return;
             }
@@ -267,6 +262,34 @@ public class NumericUpDown<T> : View where T : notnull
     // Prevent the drawing of Text
     /// <inheritdoc />
     protected override bool OnDrawingText () { return true; }
+
+    /// <summary>
+    ///     Attempts to convert the specified <paramref name="value"/> to type <typeparamref name="TValue"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type to which the value should be converted.</typeparam>
+    /// <param name="value">The value to convert.</param>
+    /// <param name="result">
+    ///     When this method returns, contains the converted value if the conversion succeeded,
+    ///     or the default value of <typeparamref name="TValue"/> if the conversion failed.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if the conversion was successful; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool TryConvert<TValue> (object value, out TValue? result)
+    {
+        try
+        {
+            result = (TValue)Convert.ChangeType (value, typeof (TValue));
+
+            return true;
+        }
+        catch
+        {
+            result = default (TValue);
+
+            return false;
+        }
+    }
 }
 
 /// <summary>
@@ -274,3 +297,45 @@ public class NumericUpDown<T> : View where T : notnull
 /// </summary>
 public class NumericUpDown : NumericUpDown<int>
 { }
+
+internal interface INumericHelper
+{
+    object One { get; }
+    object Zero { get; }
+    object Add (object a, object b);
+    object Subtract (object a, object b);
+}
+
+internal static class NumericHelper
+{
+    private static readonly Dictionary<Type, INumericHelper> _helpers = new ();
+
+    static NumericHelper ()
+    {
+        // Register known INumber<T> types
+        Register<int> ();
+        Register<long> ();
+        Register<float> ();
+        Register<double> ();
+        Register<decimal> ();
+        // Add more as needed
+    }
+
+    private static void Register<T> () where T : INumber<T>
+    {
+        _helpers [typeof (T)] = new NumericHelperImpl<T> ();
+    }
+
+    public static bool TryGetHelper (Type t, out INumericHelper? helper)
+        => _helpers.TryGetValue (t, out helper);
+
+    private class NumericHelperImpl<T> : INumericHelper where T : INumber<T>
+    {
+        public object One => T.One;
+        public object Zero => T.Zero;
+        public object Add (object a, object b) => (T)a + (T)b;
+        public object Subtract (object a, object b) => (T)a - (T)b;
+    }
+
+    public static bool SupportsType (Type type) => _helpers.ContainsKey (type);
+}

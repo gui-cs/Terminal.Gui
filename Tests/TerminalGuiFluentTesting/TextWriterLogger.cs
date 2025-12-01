@@ -4,7 +4,7 @@ namespace TerminalGuiFluentTesting;
 
 internal class TextWriterLogger (TextWriter writer) : ILogger
 {
-    public IDisposable? BeginScope<TState> (TState state) { return null; }
+    public IDisposable? BeginScope<TState> (TState state) where TState : notnull { return null; }
 
     public bool IsEnabled (LogLevel logLevel) { return true; }
 

@@ -57,15 +57,16 @@
     <ItemGroup>
         <PackageReference Include="ColorHelper" />
         <PackageReference Include="JetBrains.Annotations" />
-        <PackageReference Include="Microsoft.CodeAnalysis" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Common" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
-        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions " />
         <PackageReference Include="System.IO.Abstractions" />
-        <PackageReference Include="System.Text.Json" />
         <PackageReference Include="Wcwidth" />
-        <!-- Enable Nuget Source Link for github -->
-        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    </ItemGroup>
+	  <ItemGroup>
+    <ProjectReference Include="..\Terminal.Gui.Analyzers\Terminal.Gui.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	  </ItemGroup>
+    <ItemGroup>
+      <!-- Enable Nuget Source Link for github -->
+      <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
     </ItemGroup>
     <!-- =================================================================== -->
     <!-- Global Usings and Type Aliases -->
@@ -156,6 +157,16 @@
         </VisualStudio>
     </ProjectExtensions>
 
+
+    <Target Name="CopyAnalyzersToPackage" AfterTargets="Build">
+	    <ItemGroup>
+		    <AnalyzerFiles Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" />
+	    </ItemGroup>
+    </Target>
+    <ItemGroup>
+	    <None Include="..\Terminal.Gui.Analyzers\bin\$(Configuration)\netstandard2.0\Terminal.Gui.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+
     <!--<Target Name="PreBuildCleanup" BeforeTargets="BeforeBuild" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <Exec Command="rmdir /s /q &quot;$(UserProfile)\.nuget\packages\terminal.gui\2.0.0&quot;" Condition=" '$(OS)' == 'Windows_NT' " />
         <Exec Command="rm -rf ~/.nuget/packages/terminal.gui/2.0.0" Condition=" '$(OS)' != 'Windows_NT' " />
@@ -192,7 +203,7 @@
         <Message Text="Copy completed successfully." Importance="high" />
 
         <!-- Install NuGet Package to Global Cache -->
-        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;$(UserProfile)\.nuget\packages&quot; --skip-duplicate" Condition=" '$(OS)' == 'Windows_NT' "/>
-        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)/Terminal.Gui.$(Version).nupkg&quot; --source ~/.nuget/packages" Condition=" '$(OS)' != 'Windows_NT' "/>
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;$(UserProfile)\.nuget\packages&quot; --skip-duplicate" Condition=" '$(OS)' == 'Windows_NT' " />
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)/Terminal.Gui.$(Version).nupkg&quot; --source ~/.nuget/packages" Condition=" '$(OS)' != 'Windows_NT' " />
     </Target>
 </Project>

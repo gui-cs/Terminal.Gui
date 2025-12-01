@@ -78,8 +78,8 @@ public class Wizard : Dialog
             IsDefault = true
         };
 
-        //// Add a horiz separator
-        var separator = new LineView (Orientation.Horizontal) { Y = Pos.Top (BackButton) - 1 };
+        // Add a horiz separator
+        var separator = new Line { Orientation = Orientation.Horizontal, X = -1, Y = Pos.Top (BackButton) - 1, Length = Dim.Fill (-1) };
 
         base.Add (separator);
         AddButton (BackButton);
@@ -301,7 +301,7 @@ public class Wizard : Dialog
 
         if (previous is { })
         {
-           return GoToStep (previous);
+            return GoToStep (previous);
         }
 
         return false;
@@ -490,7 +490,7 @@ public class Wizard : Dialog
 
             step.Height = Dim.Fill (
                                     Dim.Func (
-                                              () => IsInitialized
+                                              v => IsInitialized
                                                         ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
                                                         : 1)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
@@ -502,9 +502,9 @@ public class Wizard : Dialog
 
             step.Height = Dim.Fill (
                                     Dim.Func (
-                                              () => IsInitialized
-                                                        ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
-                                                        : 2)); // for button frame (+1 for lineView)
+                                              v => IsInitialized
+                                                       ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
+                                                       : 2)); // for button frame (+1 for lineView)
             step.Width = Dim.Fill ();
         }
     }

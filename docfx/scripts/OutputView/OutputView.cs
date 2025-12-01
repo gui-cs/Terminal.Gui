@@ -13,7 +13,6 @@ ConfigurationManager.RuntimeConfig = """
                                              {   
                                                  "Default": {
                                                      "Window.DefaultShadow": "None",
-                                                     "CheckBox.DefaultHighlightStyle": "None",
                                                      "Dialog.DefaultShadow": "None",
                                                      "Button.DefaultShadow": "None",
                                                      "Menuv2.DefaultBorderStyle": "Single"
@@ -61,7 +60,7 @@ if (string.IsNullOrEmpty (viewName))
 ViewDemoWindow.ViewName = viewName;
 
 // Force 16 colors and end after first iteration
-Application.EndAfterFirstIteration = true;
+Application.StopAfterFirstIteration = true;
 
 var demoWindow = Application.Run<ViewDemoWindow> ();
 string? output = demoWindow.Output?.Trim ();

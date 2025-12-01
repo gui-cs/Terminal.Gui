@@ -1,13 +1,11 @@
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace StressTests;
 
-public class ApplicationStressTests : TestsAllViews
+public class ApplicationStressTests
 {
     public ApplicationStressTests (ITestOutputHelper output)
     {
-        ConsoleDriver.RunningUnitTests = true;
     }
 
     private static volatile int _tbCounter;
@@ -19,16 +17,25 @@ public class ApplicationStressTests : TestsAllViews
     private const int NUM_INCREMENTS = 500;
     private const int POLL_MS = 100;
 
-    [Theory]
-    [InlineData (typeof (FakeDriver))]
-    [InlineData (typeof (NetDriver), Skip = "System.IO.IOException: The handle is invalid")]
-    //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver))]
-    [InlineData (typeof (CursesDriver), Skip = "Unable to load DLL 'libc' or one of its dependencies: The specified module could not be found. (0x8007007E)")]
-    public async Task InvokeLeakTest (Type driverType)
+    /// <summary>
+    /// Stress test for Application.Invoke to verify that invocations from background threads
+    /// are not lost or delayed indefinitely. Tests 25,000 concurrent invocations (50 passes × 500 increments).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This test automatically adapts its timeout when running under a debugger (500ms vs 100ms)
+    /// to account for slower iteration times caused by debugger overhead.
+    /// </para>
+    /// <para>
+    /// See InvokeLeakTest_Analysis.md for technical details about the timing improvements made
+    /// to TimedEvents (Stopwatch-based timing) and Application.Invoke (MainLoop wakeup).
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task InvokeLeakTest ()
     {
 
-        Application.Init (driverName: driverType.Name);
+        Application.Init (driverName: "fake");
         Random r = new ();
         TextField tf = new ();
         var top = new Toplevel ();
@@ -63,6 +70,13 @@ public class ApplicationStressTests : TestsAllViews
                 while (_tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
                 {
                     int tbNow = _tbCounter;
+
+                    // Wait for Application.Top to be running to ensure timed events can be processed
+                    while (Application.Top is null || Application.Top is { Running: false })
+                    {
+                        Thread.Sleep (1);
+                    }
+
                     _wakeUp.Wait (pollMs);
 
                     if (_tbCounter != tbNow)

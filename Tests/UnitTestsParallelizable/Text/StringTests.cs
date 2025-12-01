@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.TextTests;
+﻿namespace UnitTests_Parallelizable.TextTests;
 
 #nullable enable
 
@@ -33,11 +33,11 @@ public class StringTests
     [InlineData ("🙂", 2)]
     [InlineData ("a🙂", 3)]
     [InlineData ("🙂a", 3)]
-    [InlineData ("👨‍👩‍👦‍👦", 8)]
-    [InlineData ("👨‍👩‍👦‍👦🙂", 10)]
-    [InlineData ("👨‍👩‍👦‍👦🙂a", 11)]
-    [InlineData ("👨‍👩‍👦‍👦a🙂", 11)]
-    [InlineData ("👨‍👩‍👦‍👦👨‍👩‍👦‍👦", 16)]
+    [InlineData ("👨‍👩‍👦‍👦", 2)]
+    [InlineData ("👨‍👩‍👦‍👦🙂", 4)]
+    [InlineData ("👨‍👩‍👦‍👦🙂a", 5)]
+    [InlineData ("👨‍👩‍👦‍👦a🙂", 5)]
+    [InlineData ("👨‍👩‍👦‍👦👨‍👩‍👦‍👦", 4)]
     [InlineData ("山", 2)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
     [InlineData ("山🙂", 4)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
     //[InlineData ("\ufe20\ufe21", 2)] // Combining Ligature Left Half ︠ - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
@@ -56,5 +56,27 @@ public class StringTests
     {
         var str = "a";
         Assert.Equal (1, str.GetColumns ());
+    }
+
+    [Fact]
+    public void TestGetColumns_Zero_Width ()
+    {
+        var str = "\u200D";
+        Assert.Equal (0, str.GetColumns ());
+    }
+
+    [Theory]
+    [InlineData (null)]
+    [InlineData ("")]
+    public void TestGetColumns_Does_Not_Throws_With_Null_And_Empty_String (string? text)
+    {
+        if (text is null)
+        {
+            Assert.Equal (0, StringExtensions.GetColumns (text!));
+        }
+        else
+        {
+            Assert.Equal (0, text.GetColumns ());
+        }
     }
 }

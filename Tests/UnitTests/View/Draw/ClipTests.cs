@@ -3,13 +3,13 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class ClipTests (ITestOutputHelper _output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Move_Is_Not_Constrained_To_Viewport ()
     {
         var view = new View
@@ -31,7 +31,7 @@ public class ClipTests (ITestOutputHelper _output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void AddRune_Is_Constrained_To_Viewport ()
     {
         var view = new View
@@ -64,7 +64,7 @@ public class ClipTests (ITestOutputHelper _output)
     [InlineData (0, 0, 1, 1)]
     [InlineData (0, 0, 2, 2)]
     [InlineData (-1, -1, 2, 2)]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void FillRect_Fills_HonorsClip (int x, int y, int width, int height)
     {
         var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -167,11 +167,11 @@ public class ClipTests (ITestOutputHelper _output)
 
     // TODO: Simplify this test to just use AddRune directly
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [Trait ("Category", "Unicode")]
     public void Clipping_Wide_Runes ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 1);
+        Application.Driver!.SetScreenSize (30, 1);
 
         var top = new View
         {
@@ -190,7 +190,7 @@ public class ClipTests (ITestOutputHelper _output)
                    """
         };
         frameView.Border!.LineStyle = LineStyle.Single;
-        frameView.Border.Thickness = new (1, 0, 0, 0);
+        frameView.Border!.Thickness = new (1, 0, 0, 0);
 
         top.Add (frameView);
         View.SetClipToScreen ();
@@ -235,7 +235,7 @@ public class ClipTests (ITestOutputHelper _output)
     // TODO: Add more AddRune tests to cover all the cases where wide runes are clipped
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetClip_ClipVisibleContentOnly_VisibleContentIsClipped ()
     {
         // Screen is 25x25
@@ -269,10 +269,11 @@ public class ClipTests (ITestOutputHelper _output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetClip_Default_ClipsToViewport ()
     {
         // Screen is 25x25
+        Application.Driver!.SetScreenSize (25, 25);
         // View is 25x25
         // Viewport is (0, 0, 23, 23)
         // ContentSize is (10, 10)

@@ -124,8 +124,8 @@ public class ViewportSettings : Scenario
         var view = new ViewportSettingsDemoView
         {
             Title = "ViewportSettings Demo View",
-            Width = Dim.Fill (Dim.Func (() => app.IsInitialized ? adornmentsEditor.Frame.Width + 1 : 1)),
-            Height = Dim.Fill (Dim.Func (() => app.IsInitialized ? viewportSettingsEditor.Frame.Height : 1))
+            Width = Dim.Fill (Dim.Func (_ => app.IsInitialized ? adornmentsEditor.Frame.Width + 1 : 1)),
+            Height = Dim.Fill (Dim.Func (_ => app.IsInitialized ? viewportSettingsEditor.Frame.Height : 1))
         };
 
         app.Add (view);
@@ -164,7 +164,7 @@ public class ViewportSettings : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Bottom (textView) + 1,
-            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (() => view.GetContentSize ().Width)),
+            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (_ => view.GetContentSize ().Width)),
             Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20)),
         };
 
@@ -178,10 +178,10 @@ public class ViewportSettings : Scenario
         buttonAnchored.Accepting += (sender, args) => MessageBox.Query ("Hi", $"You pressed {((Button)sender)?.Text}", "_Ok");
 
         view.Margin!.Data = "Margin";
-        view.Margin.Thickness = new (0);
+        view.Margin!.Thickness = new (0);
 
         view.Border!.Data = "Border";
-        view.Border.Thickness = new (3);
+        view.Border!.Thickness = new (3);
 
         view.Padding.Data = "Padding";
 

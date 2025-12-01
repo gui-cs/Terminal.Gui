@@ -93,8 +93,8 @@ public class Menuv2 : Bar
                 }
             case Line line:
                 // Grow line so we get auto-join line
-                line.X = Pos.Func (() => -Border!.Thickness.Left);
-                line.Width = Dim.Fill ()! + Dim.Func (() => Border!.Thickness.Right);
+                line.X = Pos.Func (_ => -Border!.Thickness.Left);
+                line.Width = Dim.Fill ()! + Dim.Func (_ => Border!.Thickness.Right);
 
                 break;
         }

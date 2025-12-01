@@ -93,7 +93,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>Creates an Absolute <see cref="Dim"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Dim"/>.</returns>
     /// <param name="size">The value to convert to the <see cref="Dim"/>.</param>
-    public static Dim? Absolute (int size) { return new DimAbsolute (size); }
+    public static Dim Absolute (int size) { return new DimAbsolute (size); }
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that automatically sizes the view to fit all the view's Content, SubViews, and/or Text.
@@ -119,7 +119,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// </param>
     /// <param name="minimumContentDim">The minimum dimension the View's ContentSize will be constrained to.</param>
     /// <param name="maximumContentDim">The maximum dimension the View's ContentSize will be fit to.</param>
-    public static Dim? Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null)
+    public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim? minimumContentDim = null, Dim? maximumContentDim = null)
     {
         return new DimAuto (
                             MinimumContentDim: minimumContentDim,
@@ -131,22 +131,24 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving no margin.
     /// </summary>
     /// <returns>The Fill dimension.</returns>
-    public static Dim? Fill () { return new DimFill (0); }
+    public static Dim Fill () { return new DimFill (0); }
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified margin.
     /// </summary>
     /// <returns>The Fill dimension.</returns>
     /// <param name="margin">Margin to use.</param>
-    public static Dim? Fill (Dim margin) { return new DimFill (margin); }
+    public static Dim Fill (Dim margin) { return new DimFill (margin); }
 
     /// <summary>
-    ///     Creates a function <see cref="Dim"/> object that computes the dimension by executing the provided function.
+    ///     Creates a function <see cref="Dim"/> object that computes the dimension based on the passed view and by executing
+    ///     the provided function.
     ///     The function will be called every time the dimension is needed.
     /// </summary>
     /// <param name="function">The function to be executed.</param>
-    /// <returns>The <see cref="Dim"/> returned from the function.</returns>
-    public static Dim Func (Func<int> function) { return new DimFunc (function); }
+    /// <param name="view">The view where the data will be retrieved.</param>
+    /// <returns>The <see cref="Dim"/> returned from the function based on the passed view.</returns>
+    public static Dim Func (Func<View?, int> function, View? view = null) { return new DimFunc (function, view); }
 
     /// <summary>Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.</summary>
     /// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
@@ -170,7 +172,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///  };
     ///  </code>
     /// </example>
-    public static Dim? Percent (int percent, DimPercentMode mode = DimPercentMode.ContentSize)
+    public static Dim Percent (int percent, DimPercentMode mode = DimPercentMode.ContentSize)
     {
         ArgumentOutOfRangeException.ThrowIfNegative (percent, nameof (percent));
 

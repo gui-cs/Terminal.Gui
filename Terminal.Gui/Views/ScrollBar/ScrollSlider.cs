@@ -307,9 +307,9 @@ public class ScrollSlider : View, IOrientation, IDesignable
         {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && _lastLocation == -1)
             {
-                if (Application.MouseGrabView != this)
+                if (Application.Mouse.MouseGrabView != this)
                 {
-                    Application.GrabMouse (this);
+                    Application.Mouse.GrabMouse (this);
                     _lastLocation = location;
                 }
             }
@@ -333,9 +333,9 @@ public class ScrollSlider : View, IOrientation, IDesignable
             {
                 _lastLocation = -1;
 
-                if (Application.MouseGrabView == this)
+                if (Application.Mouse.MouseGrabView == this)
                 {
-                    Application.UngrabMouse ();
+                    Application.Mouse.UngrabMouse ();
                 }
             }
 

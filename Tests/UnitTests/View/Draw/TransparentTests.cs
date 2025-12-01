@@ -2,13 +2,13 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 [Trait ("Category", "Output")]
 public class TransparentTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     public void Transparent_Text_Occludes ()
     {
@@ -52,7 +52,7 @@ public class TransparentTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
 
     public void Transparent_SubView_Occludes ()
     {

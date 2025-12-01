@@ -4,7 +4,7 @@ using System.Globalization;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace UnitTests.ViewsTests;
 
 public class TableViewTests (ITestOutputHelper output)
 {
@@ -417,7 +417,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tableView);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         tableView.SchemeName = "TopLevel";
 
@@ -459,7 +459,7 @@ public class TableViewTests (ITestOutputHelper output)
         // is to specify a MinAcceptableWidth for the column
         style.MaxWidth = 10;
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -478,7 +478,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         style.RepresentationGetter = s => { return s.ToString ().Length < 15 ? s.ToString () : s.ToString ().Substring (0, 13) + "..."; };
         tableView.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -505,7 +505,7 @@ public class TableViewTests (ITestOutputHelper output)
         style.MinAcceptableWidth = 5;
         tableView.SetNeedsDraw ();
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -518,11 +518,11 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Now test making the width too small for the MinAcceptableWidth
         // the Column won't fit so should not be rendered
-        var driver = (FakeDriver)Application.Driver;
+        var driver = Application.Driver;
         driver.ClearContents ();
 
         tableView.Viewport = new (0, 0, 9, 5);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -538,7 +538,7 @@ public class TableViewTests (ITestOutputHelper output)
         // meet MinAcceptableWidth of 5.  Column width includes terminator line
         // symbol (e.g. ┤ or │)
         tableView.Viewport = new (0, 0, 10, 5);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -559,7 +559,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.MaxCellWidth = 10;
         tableView.MinCellWidth = 3;
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -575,7 +575,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.MinCellWidth = 10;
         tableView.SetNeedsDraw ();
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected =
             $@"
@@ -630,7 +630,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Redraw_EmptyTable ()
     {
         var tableView = new TableView ();
@@ -674,7 +674,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ScrollIndicators ()
     {
         var tableView = new TableView ();
@@ -753,7 +753,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ScrollRight_SmoothScrolling ()
     {
         var tableView = new TableView ();
@@ -815,7 +815,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ScrollRight_WithoutSmoothScrolling ()
     {
         var tableView = new TableView ();
@@ -930,7 +930,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowHorizontalBottomLine_NoCellLines ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -961,7 +961,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void ShowHorizontalBottomLine_WithVerticalCellLines ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -1061,12 +1061,12 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         var expected = $@"
 ┌─┬─┐
@@ -1099,7 +1099,7 @@ public class TableViewTests (ITestOutputHelper output)
         dt.Rows [0] [1] = 5;
 
         tv.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = $@"
 ┌─┬─┐
@@ -1157,7 +1157,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tv);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
@@ -1194,7 +1194,7 @@ public class TableViewTests (ITestOutputHelper output)
         dt.Rows [0] [1] = 5;
 
         tv.SetNeedsDraw ();
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         expected = $@"
 ┌─┬─┐
@@ -1271,7 +1271,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData (false)]
     [InlineData (true)]
     public void TableView_ColorTests_InvertSelectedCellFirstCharacter (bool focused)
@@ -1316,7 +1316,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableView_ExpandLastColumn_False ()
     {
         TableView tv = SetUpMiniTable ();
@@ -1336,7 +1336,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableView_ExpandLastColumn_False_ExactBounds ()
     {
         TableView tv = SetUpMiniTable ();
@@ -1359,7 +1359,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableView_ExpandLastColumn_True ()
     {
         TableView tv = SetUpMiniTable ();
@@ -1379,7 +1379,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableView_ShowHeadersFalse_AllLines ()
     {
         TableView tv = GetABCDEFTableView (out _);
@@ -1403,7 +1403,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableView_ShowHeadersFalse_AndNoHeaderLines ()
     {
         TableView tv = GetABCDEFTableView (out _);
@@ -1422,7 +1422,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableView_ShowHeadersFalse_OverlineTrue ()
     {
         TableView tv = GetABCDEFTableView (out _);
@@ -1442,7 +1442,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableView_ShowHeadersFalse_UnderlineTrue ()
     {
         TableView tv = GetABCDEFTableView (out _);
@@ -1465,7 +1465,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableViewMultiSelect_CannotFallOffBottom ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1489,7 +1489,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableViewMultiSelect_CannotFallOffLeft ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1512,7 +1512,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableViewMultiSelect_CannotFallOffRight ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1535,7 +1535,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TableViewMultiSelect_CannotFallOffTop ()
     {
         TableView tv = SetUpMiniTable (out DataTable dt);
@@ -1647,7 +1647,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Test_ScreenToCell ()
     {
         TableView tableView = GetTwoRowSixColumnTable ();
@@ -1727,7 +1727,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Test_ScreenToCell_DataColumnOverload ()
     {
         TableView tableView = GetTwoRowSixColumnTable ();
@@ -1838,7 +1838,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_AllColumnsVisibleFalse_BehavesAsTableNull ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1868,7 +1868,7 @@ public class TableViewTests (ITestOutputHelper output)
     [InlineData (true)]
     [InlineData (false)]
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_FirstColumnVisibleFalse_CursorStaysAt1 (bool useHome)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1892,7 +1892,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_FirstColumnVisibleFalse_IsNotRendered ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1916,7 +1916,7 @@ public class TableViewTests (ITestOutputHelper output)
     [InlineData (true)]
     [InlineData (false)]
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_LastColumnVisibleFalse_CursorStaysAt2 (bool useEnd)
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1943,7 +1943,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_PreceedingColumnsInvisible_NoScrollIndicator ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -1995,7 +1995,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_RemainingColumnsInvisible_NoScrollIndicator ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -2033,7 +2033,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_VisibleFalse_CursorStepsOverInvisibleColumns ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -2054,7 +2054,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData (true, true)]
     [InlineData (false, true)]
     [InlineData (true, false)]
@@ -2095,7 +2095,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_VisibleFalse_IsNotRendered ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -2113,7 +2113,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_VisibleFalse_MultiSelected ()
     {
         TableView tableView = GetABCDEFTableView (out DataTable dt);
@@ -2147,7 +2147,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestColumnStyle_VisibleFalse_MultiSelectingStepsOverInvisibleColumns ()
     {
         TableView tableView = GetABCDEFTableView (out _);
@@ -2169,7 +2169,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestControlClick_MultiSelect_ThreeRowTable_FullRowSelect ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2203,10 +2203,10 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestEnumerableDataSource_BasicTypes ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (100, 100);
+        Application.Driver!.SetScreenSize (100, 100);
         var tv = new TableView ();
         tv.SchemeName = "TopLevel";
         tv.Viewport = new (0, 0, 50, 6);
@@ -2237,7 +2237,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestFullRowSelect_AlwaysUseNormalColorForVerticalCellLines ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2293,7 +2293,7 @@ public class TableViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestFullRowSelect_SelectionColorDoesNotStop_WhenShowVerticalCellLinesIsFalse ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2346,7 +2346,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestFullRowSelect_SelectionColorStopsAtTableEdge_WithCellLines ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2402,7 +2402,7 @@ A B C
     }
 
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     [InlineData (Orientation.Horizontal, false)]
     [InlineData (Orientation.Vertical, false)]
     [InlineData (Orientation.Horizontal, true)]
@@ -2488,7 +2488,7 @@ A B C
     [InlineData (true)]
     [InlineData (false)]
     [Theory]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestMoveStartEnd_WithFullRowSelect (bool withFullRowSelect)
     {
         TableView tableView = GetTwoRowSixColumnTable ();
@@ -2532,7 +2532,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestShiftClick_MultiSelect_TwoRowTable_FullRowSelect ()
     {
         TableView tv = GetTwoRowSixColumnTable ();
@@ -2563,7 +2563,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTableViewCheckboxes_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
@@ -2656,7 +2656,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTableViewCheckboxes_MultiSelectIsUnion_WhenToggling ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2723,7 +2723,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTableViewCheckboxes_SelectAllToggle ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2774,7 +2774,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTableViewCheckboxes_SelectAllToggle_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
@@ -2835,7 +2835,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTableViewCheckboxes_Simple ()
     {
         TableView tv = GetTwoRowSixColumnTable (out DataTable dt);
@@ -2919,7 +2919,7 @@ A B C
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void TestTableViewRadioBoxes_Simple_ByObject ()
     {
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
@@ -3116,7 +3116,9 @@ A B C
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorUp });
 
+#pragma warning disable xUnit2031
         Assert.Single (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
+#pragma warning restore xUnit2031
 
         // Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.Space });

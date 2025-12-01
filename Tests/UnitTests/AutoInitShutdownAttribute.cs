@@ -20,52 +20,36 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     ///     are automatically called Before/After a test runs.
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
-    /// <param name="consoleDriverType">
-    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver)
-    ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
+    /// <param name="forceDriver">
+    ///     Forces the specified driver ("windows", "dotnet", "unix", or "fake") to
+    ///     be used when Application.Init is called. If not specified FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="useFakeClipboard">
-    ///     If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only
-    ///     valid if <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
-    /// </param>
-    /// <param name="fakeClipboardIsSupportedAlwaysTrue">
-    ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
-    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
     public AutoInitShutdownAttribute (
         bool autoInit = true,
-        Type consoleDriverType = null,
-        bool useFakeClipboard = true,
-        bool fakeClipboardAlwaysThrowsNotSupportedException = false,
-        bool fakeClipboardIsSupportedAlwaysTrue = false,
+        string forceDriver = null,
         bool verifyShutdown = false
     )
     {
         AutoInit = autoInit;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
-        _driverType = consoleDriverType ?? typeof (FakeDriver);
-        FakeDriver.FakeBehaviors.UseFakeClipboard = useFakeClipboard;
-        FakeDriver.FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException =
-            fakeClipboardAlwaysThrowsNotSupportedException;
-        FakeDriver.FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse = fakeClipboardIsSupportedAlwaysTrue;
+        _forceDriver = forceDriver;
         _verifyShutdown = verifyShutdown;
     }
 
     private readonly bool _verifyShutdown;
-    private readonly Type _driverType;
+    private readonly string _forceDriver;
+    private IDisposable _v2Cleanup;
 
     public override void After (MethodInfo methodUnderTest)
     {
-        Debug.WriteLine ($"After: {methodUnderTest.Name}");
+        Debug.WriteLine ($"After: {methodUnderTest?.Name ?? "Unknown Test"}");
 
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;
+
+        _v2Cleanup?.Dispose ();
 
         if (AutoInit)
         {
@@ -104,12 +88,14 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
 
         // Force the ConfigurationManager to reset to its hardcoded defaults
-        CM.Disable(true);
+        CM.Disable (true);
     }
 
     public override void Before (MethodInfo methodUnderTest)
     {
-        Debug.WriteLine ($"Before: {methodUnderTest.Name}");
+        Debug.WriteLine ($"Before: {methodUnderTest?.Name ?? "Unknown Test"}");
+
+        Debug.Assert (!CM.IsEnabled, "A previous test left ConfigurationManager enabled!");
 
         // Disable & force the ConfigurationManager to reset to its hardcoded defaults
         CM.Disable (true);
@@ -131,9 +117,28 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
+            if (string.IsNullOrEmpty(_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
+            {
+                var fa = new FakeApplicationFactory ();
+                _v2Cleanup = fa.SetupFakeApplication ();
+
+            }
+            else
+            {
+                Assert.Fail ("Specifying driver name not yet supported");
+                //Application.Init ((IDriver)Activator.CreateInstance (_forceDriver));
+            }
         }
     }
 
     private bool AutoInit { get; }
+
+    /// <summary>
+    /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)
+    /// </summary>
+    public static void RunIteration ()
+    {
+        ApplicationImpl a = (ApplicationImpl)ApplicationImpl.Instance;
+        a.Coordinator?.RunIteration ();
+    }
 }

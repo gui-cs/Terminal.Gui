@@ -1,11 +1,10 @@
-![.NET Core](https://github.com/gui-cs/Terminal.Gui/workflows/.NET%20Core/badge.svg?branch=develop)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
-![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
+[![codecov](https://codecov.io/gh/gui-cs/Terminal.Gui/graph/badge.svg?token=1Ac9gyGtrj)](https://codecov.io/gh/gui-cs/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/gui-cs/gui.cs.svg)](LICENSE)
 ![Bugs](https://img.shields.io/github/issues/gui-cs/gui.cs/bug)
 
-# Terminal.Gui
+# Terminal.Gui v2
 
 The premier toolkit for building rich console apps for Windows, the Mac, and Linux/Unix.
 
@@ -50,9 +49,9 @@ The full developer documentation for Terminal.Gui is available at [gui-cs.github
 
 ## Getting Started
 
-- [Getting Started](https://gui-cs.github.io/Terminal.Gui/docs/getting-started.md) - Quick start guide to create your first Terminal.Gui application
-- [Migrating from v1 to v2](https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1.md) - Complete guide for upgrading existing applications
-- [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2.md) - Overview of new features and improvements
+- [Getting Started](https://gui-cs.github.io/Terminal.Gui/docs/getting-started) - Quick start guide to create your first Terminal.Gui application
+- [Migrating from v1 to v2](https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1) - Complete guide for upgrading existing applications
+- [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2) - Overview of new features and improvements
 
 ## API Reference
 
@@ -86,7 +85,7 @@ Or, you can use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.
 
 # Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete contribution guidelines.
 
 Debates on architecture and design can be found in Issues tagged with [design](https://github.com/gui-cs/Terminal.Gui/issues?q=is%3Aopen+is%3Aissue+label%3Av2+label%3Adesign).
 

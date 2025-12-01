@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewTests;
+namespace UnitTests.ViewTests;
 
 /// <summary>
 ///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties.
@@ -9,7 +9,7 @@ namespace Terminal.Gui.ViewTests;
 public class TextTests (ITestOutputHelper output)
 {
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Setting_With_Height_Horizontal ()
     {
         var top = new View { Width = 25, Height = 25 };
@@ -65,10 +65,10 @@ Y
 
         var top = new Toplevel ();
         top.Add (label, viewX, viewY);
-        RunState rs = Application.Begin (top);
+        SessionToken rs = Application.Begin (top);
 
         label.Text = "Hello";
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 1, 5), label.Frame);
 
@@ -85,7 +85,7 @@ Y
 
         label.Width = 2;
         label.Height = 10;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 2, 10), label.Frame);
 
@@ -120,12 +120,12 @@ Y
         var top = new Toplevel ();
         top.Add (win);
 
-        RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (15, 15);
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (15, 15);
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Margin.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Border.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Margin!.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Border!.Frame);
         Assert.Equal (new (1, 1, 13, 13), win.Padding.Frame);
 
         Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
@@ -158,7 +158,7 @@ Y
         view.Text = "Hello World";
         view.Width = 11;
         view.Height = 1;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 11, 1), view.Frame);
         Assert.Equal ("Absolute(0)", view.X.ToString ());
         Assert.Equal ("Absolute(0)", view.Y.ToString ());
@@ -188,7 +188,7 @@ Y
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
         view.Text = "Hello Worlds";
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         int len = "Hello Worlds".Length;
         Assert.Equal (12, len);
         Assert.Equal (new (0, 0, len, 1), view.Frame);
@@ -214,7 +214,7 @@ Y
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.TextDirection = TextDirection.TopBottom_LeftRight;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
@@ -241,13 +241,13 @@ Y
         // Setting to false causes Width and Height to be set to the current ContentSize
         view.Width = 1;
         view.Height = 12;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
         view.Width = 12;
         view.Height = 1;
         view.TextFormatter.ConstrainToSize = new (12, 1);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (12, 1), view.TextFormatter.ConstrainToSize);
         Assert.Equal (new (0, 0, 12, 1), view.Frame);
 
@@ -257,7 +257,7 @@ Y
         expected = @" HelloWorlds";
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         // TextDirection.TopBottom_LeftRight - Height of 1 and Width of 12 means 
         // that the text will be spread "vertically" across 1 line.
@@ -283,7 +283,7 @@ Y
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.PreserveTrailingSpaces = true;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 12, 1), view.Frame);
 
@@ -312,7 +312,7 @@ Y
         view.Width = f.Height;
         view.Height = f.Width;
         view.TextDirection = TextDirection.TopBottom_LeftRight;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
@@ -339,7 +339,7 @@ Y
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
 
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 1, 12), view.Frame);
 
@@ -385,8 +385,8 @@ Y
         win.Add (view);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (4, 10);
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (4, 10);
 
         Assert.Equal (5, text.Length);
 
@@ -416,7 +416,7 @@ Y
         Assert.Equal (10, text.Length);
 
         //view.Height = Dim.Fill () - text.Length;
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 1, 5), view.Frame);
         Assert.Equal (new (1, 5), view.TextFormatter.ConstrainToSize);
@@ -442,7 +442,7 @@ Y
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void DimAuto_Vertical_TextDirection_Wide_Rune ()
     {
         var text = "界View";
@@ -510,8 +510,8 @@ w ";
         win.Add (horizontalView, verticalView);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 20);
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (20, 20);
 
         Assert.Equal (new (0, 0, 11, 2), horizontalView.Frame);
         Assert.Equal (new (0, 3, 2, 11), verticalView.Frame);
@@ -542,7 +542,7 @@ w ";
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         verticalView.Text = $"最初の行{Environment.NewLine}二行目";
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (0, 3, 4, 4), verticalView.Frame);
 
         expected = @"
@@ -598,8 +598,8 @@ w ";
         win.Add (horizontalView, verticalView);
         var top = new Toplevel ();
         top.Add (win);
-        RunState rs = Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (22, 22);
+        SessionToken rs = Application.Begin (top);
+        Application.Driver!.SetScreenSize (22, 22);
 
         Assert.Equal (new (text.GetColumns (), 1), horizontalView.TextFormatter.ConstrainToSize);
         Assert.Equal (new (2, 8), verticalView.TextFormatter.ConstrainToSize);
@@ -635,7 +635,7 @@ w ";
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         verticalView.Text = "最初の行二行目";
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         // height was initialized with 8 and can only grow or keep initial value
         Assert.Equal (new (0, 3, 2, 7), verticalView.Frame);
@@ -677,8 +677,8 @@ w ";
         var lbl = new Label { Text = "123" };
         var top = new Toplevel ();
         top.Add (lbl);
-        RunState rs = Application.Begin (top);
-        Application.RunIteration (ref rs);
+        SessionToken rs = Application.Begin (top);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal (new (0, 0, 3, 1), lbl.Frame);
 
@@ -691,7 +691,7 @@ w ";
         Assert.Equal (new (0, 0, 2, 1), lbl.NeedsDrawRect);
         Assert.Equal (new (0, 0, 80, 25), lbl.SuperView.NeedsDrawRect);
         Assert.True (lbl.SuperView.NeedsLayout);
-        Application.RunIteration (ref rs);
+        AutoInitShutdownAttribute.RunIteration ();
 
         Assert.Equal ("12  ", GetContents ());
 
@@ -783,7 +783,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
+        Application.Driver!.SetScreenSize (width + 2, 6);
 
         // frame.Width is width + border wide (20 + 2) and 6 high
 
@@ -913,7 +913,7 @@ w ";
         var top = new Toplevel ();
         top.Add (frame);
         Application.Begin (top);
-        ((FakeDriver)Application.Driver!).SetBufferSize (9, height + 2);
+        Application.Driver!.SetScreenSize (9, height + 2);
 
         if (autoSize)
         {
@@ -995,10 +995,10 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void Narrow_Wide_Runes ()
     {
-        ((FakeDriver)Application.Driver!).SetBufferSize (32, 32);
+        Application.Driver!.SetScreenSize (32, 32);
         var top = new View { Width = 32, Height = 32 };
 
         var text = $"First line{Environment.NewLine}Second line";
@@ -1118,7 +1118,7 @@ w ";
     }
 
     [Fact]
-    [SetupFakeDriver]
+    [SetupFakeApplication]
     public void SetText_RendersCorrectly ()
     {
         View view;

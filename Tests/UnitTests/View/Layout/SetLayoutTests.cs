@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.LayoutTests;
+namespace UnitTests.LayoutTests;
 
 public class SetLayoutTests (ITestOutputHelper output)
 {
@@ -25,17 +25,18 @@ public class SetLayoutTests (ITestOutputHelper output)
         Application.Top.Add (view);
 
         var rs = Application.Begin (Application.Top);
+        Application.Driver!.SetScreenSize (80, 25);
 
         Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, Application.Screen.Width, Application.Screen.Height));
         Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Top.Frame);
         Assert.Equal (new (0, 0, 80, 25), Application.Top.Frame);
 
-        ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
+        Application.Driver!.SetScreenSize (20, 10);
         Assert.Equal (new (0, 0, Application.Screen.Width, Application.Screen.Height), Application.Top.Frame);
 
         Assert.Equal (new (0, 0, 20, 10), Application.Top.Frame);
 
         Application.End (rs);
-
+        Application.Top.Dispose ();
     }
 }

@@ -35,7 +35,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         int screenX4 = dimension == Dimension.Width ? Application.Screen.Width * 4 : Application.Screen.Height * 4;
         int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screenX4;
 
-        Debug.WriteLineIf (autoMin > autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");
+        //Debug.WriteLineIf (autoMin > autoMax, "MinimumContentDim must be less than or equal to MaximumContentDim.");
 
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
@@ -48,7 +48,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                     us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new (int.Min (autoMax, screenX4), screenX4));
                 }
 
-                textSize = us.TextFormatter.ConstrainToWidth!.Value;
+                textSize = us.TextFormatter.ConstrainToWidth ?? 0;
             }
             else
             {
@@ -81,7 +81,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             {
                 // TOOD: All the below is a naive implementation. It may be possible to optimize this.
 
-                List<View> includedSubViews = us.InternalSubViews.ToList ();
+                List<View> includedSubViews = us.SubViews.Snapshot ().ToList ();
 
                 // If [x] it can cause `us.ContentSize` to change.
                 // If [ ] it doesn't need special processing for us to determine `us.ContentSize`.

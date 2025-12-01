@@ -98,9 +98,9 @@ internal class ShadowView : View
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
-                if (c < Driver?.Contents!.GetLength (1) && r < Driver?.Contents?.GetLength (0))
+                if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
                 {
-                    Driver.AddRune (Driver.Contents [r, c].Rune);
+                    AddRune (ScreenContents [r, c].Rune);
                 }
             }
         }
@@ -132,9 +132,9 @@ internal class ShadowView : View
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
-                if (Driver?.Contents is { } && screen.X < Driver.Contents.GetLength (1) && r < Driver.Contents.GetLength (0))
+                if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
                 {
-                    Driver.AddRune (Driver.Contents [r, c].Rune);
+                    AddRune (ScreenContents [r, c].Rune);
                 }
             }
         }
@@ -151,7 +151,14 @@ internal class ShadowView : View
             return Attribute.Default;
         }
 
-        Attribute attr = Driver!.Contents! [location.Y, location.X].Attribute!.Value;
+        if (ScreenContents == null ||
+            location.Y < 0 || location.Y >= ScreenContents.GetLength (0) ||
+            location.X < 0 || location.X >= ScreenContents.GetLength (1))
+        {
+            return Attribute.Default;
+        }
+
+        Attribute attr = ScreenContents [location.Y, location.X].Attribute!.Value;
 
         var newAttribute =
             new Attribute (

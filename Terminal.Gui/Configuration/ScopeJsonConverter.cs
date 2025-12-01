@@ -107,13 +107,12 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             {
                 // It is not a config property. Maybe it's just a property on the Scope with [JsonInclude]
                 // like ScopeSettings.$schema.
-                // If so, don't add it to the dictionary but apply it to the underlying property on 
-                // the scopeT. 
-                // BUGBUG: This is a really bad design. The only time it's used is for $schema though.
+                // If so, don't add it to the dictionary but apply it to the underlying property on
+                // the scopeT.
+                // BUGBUG: This is terrible design. The only time it's used is for $schema though.
                 PropertyInfo? property = scope!.GetType ()
                                                .GetProperties ()
-                                               .Where (
-                                                       p =>
+                                               .Where (p =>
                                                        {
                                                            if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
                                                            {
@@ -143,6 +142,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 {
                     // Set the value of propertyName on the scopeT.
                     PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
+
                     prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
                 }
                 else
@@ -168,8 +168,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
 
         IEnumerable<PropertyInfo> properties = scope!.GetType ()
                                                      .GetProperties ()
-                                                     .Where (
-                                                             p => p.GetCustomAttribute (typeof (JsonIncludeAttribute))
+                                                     .Where (p => p.GetCustomAttribute (typeof (JsonIncludeAttribute))
                                                                   != null
                                                             );
 
@@ -181,8 +180,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
-                                                               .Where (
-                                                                       cp =>
+                                                               .Where (cp =>
                                                                            cp.Value.PropertyInfo?.GetCustomAttribute (
                                                                                     typeof (
                                                                                         ConfigurationPropertyAttribute)
@@ -223,6 +221,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
             else
             {
                 object? prop = p.Value.PropertyValue;
+
                 if (prop == null)
                 {
                     writer.WriteNullValue ();

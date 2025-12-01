@@ -46,6 +46,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
 		<ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
+		<ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="xunit.runner.json">
@@ -57,26 +58,4 @@
 		<Using Include="Terminal.Gui" />
 		<Using Include="Xunit" />
 	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Input\Mouse\" />
-	</ItemGroup>
-	<PropertyGroup Label="FineCodeCoverage">
-		<Enabled>
-			False
-		</Enabled>
-		<Exclude>
-			[UICatalog]*
-		</Exclude>
-		<Include></Include>
-		<ExcludeByFile>
-			<!--**/Migrations/*
-      **/Hacks/*.cs-->
-		</ExcludeByFile>
-		<ExcludeByAttribute>
-			<!--MyCustomExcludeFromCodeCoverage-->
-		</ExcludeByAttribute>
-		<IncludeTestAssembly>
-			False
-		</IncludeTestAssembly>
-	</PropertyGroup>
 </Project>

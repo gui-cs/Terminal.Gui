@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.LayoutTests;
+﻿namespace UnitTests_Parallelizable.LayoutTests;
 
 public class FrameTests
 {
@@ -61,10 +61,10 @@ public class FrameTests
         Assert.Equal (view.Height, frame.Height);
 
         // Set back to original state
-        view.X = Pos.Func (() => 10);
-        view.Y = Pos.Func (() => 20);
-        view.Width = Dim.Func (() => 30);
-        view.Height = Dim.Func (() => 40);
+        view.X = Pos.Func (_ => 10);
+        view.Y = Pos.Func (_ => 20);
+        view.Width = Dim.Func (_ => 30);
+        view.Height = Dim.Func (_ => 40);
         Assert.True (view.NeedsLayout);
 
         view.Layout ();
@@ -243,6 +243,25 @@ public class FrameTests
         Assert.Equal (view.Height, frame.Height);
     }
 
+
+    [Fact]
+    public void Frame_Set_Sets_Viewport_Without_Layout ()
+    {
+        Rectangle frame = new (1, 2, 3, 4);
+
+        View v = new () { Frame = frame };
+        Assert.Equal (frame, v.Frame);
+
+        Assert.Equal (
+                      new (0, 0, frame.Width, frame.Height),
+                      v.Viewport
+                     ); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (Pos.Absolute (1), v.X);
+        Assert.Equal (Pos.Absolute (2), v.Y);
+        Assert.Equal (Dim.Absolute (3), v.Width);
+        Assert.Equal (Dim.Absolute (4), v.Height);
+    }
+
     [Fact]
     public void FrameChanged_Event_Raised_When_Frame_Changes ()
     {
@@ -281,10 +300,10 @@ public class FrameTests
     {
         public FrameTestView ()
         {
-            X = Pos.Func (() => 10);
-            Y = Pos.Func (() => 20);
-            Width = Dim.Func (() => 30);
-            Height = Dim.Func (() => 40);
+            X = Pos.Func (_ => 10);
+            Y = Pos.Func (_ => 20);
+            Width = Dim.Func (_ => 30);
+            Height = Dim.Func (_ => 40);
         }
     }
 
