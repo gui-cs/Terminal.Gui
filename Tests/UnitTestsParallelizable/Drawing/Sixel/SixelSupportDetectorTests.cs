@@ -91,4 +91,36 @@ public class SixelSupportDetectorTests
 
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.AtLeast (1));
     }
+
+    [Fact]
+    public void Detect_SetsSupported_WhenIsVirtualTerminalIsTrue ()
+    {
+        // Arrange
+        var abandoned = false;
+        var driverMock = new Mock<IDriver> (MockBehavior.Strict);
+        driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
+                  .Callback<AnsiEscapeSequenceRequest> (req =>
+                                                        {
+                                                            // Abandon all requests
+                                                            req.Abandoned?.Invoke ();
+                                                            abandoned = true;
+                                                        })
+                  .Verifiable ();
+        var detector = new SixelSupportDetector (driverMock.Object);
+        // Mock IsVirtualTerminal to return true
+        var isVirtualTerminalMethod = typeof (SixelSupportDetector).GetMethod ("IsVirtualTerminal", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.NotNull (isVirtualTerminalMethod);
+        isVirtualTerminalMethod!.Invoke (detector, null);
+        SixelSupportResult? final = null;
+
+        // Act
+        detector.Detect (r => final = r);
+
+        // Assert
+        Assert.NotNull (final);
+        // Not a real VT, so should be supported
+        Assert.False (final.IsSupported);
+        Assert.True (abandoned);
+        driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.AtLeast (1));
+    }
 }
