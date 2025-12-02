@@ -13,7 +13,7 @@ public class TimeoutTests (ITestOutputHelper output)
     [Fact]
     public void AddTimeout_Fires ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init ("fake");
 
         uint timeoutTime = 100;
@@ -43,9 +43,24 @@ public class TimeoutTests (ITestOutputHelper output)
 
         // The timeout should have fired
         Assert.True (timeoutFired);
-
-        app.Dispose ();
     }
 
+    [Fact]
+    public void AddTimeout_TimeSpan_Zero_Fires ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init ("fake");
+        var timeoutFired = false;
 
+        app.AddTimeout (TimeSpan.Zero, () =>
+                                       {
+                                           timeoutFired = true;
+                                           return false;
+                                       });
+
+        app.StopAfterFirstIteration = true;
+        app.Run<Runnable> ();
+
+        Assert.True (timeoutFired);
+    }
 }
