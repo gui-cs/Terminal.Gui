@@ -405,7 +405,7 @@ internal class DriverImpl : IDriver
     public void EnqueueKeyEvent (Key key) { InputProcessor.EnqueueKeyDownEvent (key); }
 
     /// <inheritdoc/>
-    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (this, request); }
+    public virtual void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (this, request); }
 
     /// <inheritdoc/>
     public AnsiRequestScheduler GetRequestScheduler () => _ansiRequestScheduler;

@@ -33,7 +33,7 @@ public class SixelSupportDetector ()
     public void Detect (Action<SixelSupportResult> resultCallback)
     {
         var result = new SixelSupportResult ();
-        result.SupportsTransparency = result.IsSupported = IsVirtualTerminal () || IsXtermWithTransparency ();
+        result.SupportsTransparency = IsVirtualTerminal () && IsXtermWithTransparency ();
         IsSixelSupportedByDar (result, resultCallback);
     }
 

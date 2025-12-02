@@ -162,16 +162,42 @@ public class SixelToRenderTests
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.AtLeastOnce ());
     }
 
-    [Fact]
-    public void Detect_WhenXtermEnvironmentIndicatesTransparency_SupportsTransparencyEvenIfDAReturnsNo4 ()
+    [Theory]
+    [InlineData ("", false, false, false, false)]
+    [InlineData ("", false, true, false, false)]
+    [InlineData ("?1;0;7c", true, false, false, false)]
+    [InlineData ("?1;0;7c", true, true, false, true)]
+    [InlineData ("?1;4;0;7c", true, false, true, false)]
+    [InlineData ("?1;4;0;7c", true, true, true, true)]
+    public void Detect_WhenXtermEnvironmentIndicatesTransparency_SupportsTransparencyEvenIfDAReturnsNo4 (
+        string darResponse,
+        bool isVirtualTerminal,
+        bool isXtermWithTransparency,
+        bool expectedIsSupported,
+        bool expectedSupportsTransparency
+    )
     {
         // Arrange - set XTERM_VERSION env var to indicate real xterm with transparency
         string? prev = Environment.GetEnvironmentVariable ("XTERM_VERSION");
-        Environment.SetEnvironmentVariable ("XTERM_VERSION", "370");
+
+        if (isXtermWithTransparency)
+        {
+            Environment.SetEnvironmentVariable ("XTERM_VERSION", "370");
+        }
 
         try
         {
-            var driverMock = new Mock<IDriver> (MockBehavior.Strict);
+            var output = new FakeOutput ();
+            output.IsVirtualTerminal = isVirtualTerminal;
+
+            var driverMock = new Mock<DriverImpl> (
+                                                   MockBehavior.Strict,
+                                                   new FakeInputProcessor (null!),
+                                                   new OutputBufferImpl (),
+                                                   output,
+                                                   new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                                   new SizeMonitorImpl (output)
+                                                   );
 
             driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                       .Callback<AnsiEscapeSequenceRequest> (req =>
@@ -179,7 +205,7 @@ public class SixelToRenderTests
                                                               if (req.Request == EscSeqUtils.CSI_SendDeviceAttributes.Request)
                                                               {
                                                                   // Response does NOT contain "4" (so DAR indicates no sixel)
-                                                                  req.ResponseReceived.Invoke ("?1;0;7c");
+                                                                  req.ResponseReceived.Invoke (darResponse);
                                                               }
                                                               else
                                                               {
@@ -197,12 +223,13 @@ public class SixelToRenderTests
 
             // Assert
             Assert.NotNull (final);
+            Assert.Equal (isVirtualTerminal, driverMock.Object.IsVirtualTerminal);
 
             // DAR did not indicate sixel support
-            Assert.False (final.IsSupported);
+            Assert.Equal (expectedIsSupported, final.IsSupported);
 
             // But because XTERM_VERSION >= 370 we expect SupportsTransparency to have been initially true and remain true
-            Assert.True (final.SupportsTransparency);
+            Assert.Equal (expectedSupportsTransparency, final.SupportsTransparency);
 
             driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.AtLeastOnce ());
         }

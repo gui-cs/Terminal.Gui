@@ -92,35 +92,228 @@ public class SixelSupportDetectorTests
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.AtLeast (1));
     }
 
-    [Fact]
-    public void Detect_SetsSupported_WhenIsVirtualTerminalIsTrue ()
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Detect_SetsSupported_WhenIsVirtualTerminalIsTrueAndResponseContain4OrFalse (bool isVirtualTerminal)
     {
         // Arrange
-        var abandoned = false;
-        var driverMock = new Mock<IDriver> (MockBehavior.Strict);
+        var responseReceived = false;
+        var output = new FakeOutput ();
+        output.IsVirtualTerminal = isVirtualTerminal;
+
+        Mock<DriverImpl> driverMock = new (
+                                           MockBehavior.Strict,
+                                           new FakeInputProcessor (null!),
+                                           new OutputBufferImpl (),
+                                           output,
+                                           new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                           new SizeMonitorImpl (output)
+                                          );
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                   .Callback<AnsiEscapeSequenceRequest> (req =>
                                                         {
-                                                            // Abandon all requests
-                                                            req.Abandoned?.Invoke ();
-                                                            abandoned = true;
+                                                            if (req.Request == EscSeqUtils.CSI_SendDeviceAttributes.Request)
+                                                            {
+                                                                responseReceived = true;
+
+                                                                if (isVirtualTerminal)
+                                                                {
+                                                                    // Response does contain "4" (so DAR indicates has sixel)
+                                                                    req.ResponseReceived.Invoke ("?1;4;0;7c");
+                                                                }
+                                                                else
+                                                                {
+                                                                    // Response does NOT contain "4" (so DAR indicates no sixel)
+                                                                    req.ResponseReceived.Invoke ("");
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                // Abandon all requests
+                                                                req.Abandoned?.Invoke ();
+                                                            }
                                                         })
                   .Verifiable ();
+
         var detector = new SixelSupportDetector (driverMock.Object);
-        // Mock IsVirtualTerminal to return true
-        var isVirtualTerminalMethod = typeof (SixelSupportDetector).GetMethod ("IsVirtualTerminal", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        Assert.NotNull (isVirtualTerminalMethod);
-        isVirtualTerminalMethod!.Invoke (detector, null);
         SixelSupportResult? final = null;
 
         // Act
         detector.Detect (r => final = r);
 
         // Assert
+        Assert.Equal (isVirtualTerminal, driverMock.Object.IsVirtualTerminal);
         Assert.NotNull (final);
-        // Not a real VT, so should be supported
-        Assert.False (final.IsSupported);
-        Assert.True (abandoned);
+
+        if (isVirtualTerminal)
+        {
+            Assert.True (final.IsSupported);
+        }
+        else
+        {
+            // Not a real VT, so should be supported
+            Assert.False (final.IsSupported);
+        }
+        Assert.True (responseReceived);
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.AtLeast (1));
+    }
+
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Detect_SetsSupported_WhenIsVirtualTerminalIsTrueAndResponseContain4OrFalse_WithoutMock (bool isVirtualTerminal)
+    {
+        // Arrange
+        var responseReceived = false;
+        var output = new FakeOutput ();
+        output.IsVirtualTerminal = isVirtualTerminal;
+
+        DriverImplProxy driver = new (
+                                      new FakeInputProcessor (null!),
+                                      new OutputBufferImpl (),
+                                      output,
+                                      new (new AnsiResponseParser ()),
+                                      new SizeMonitorImpl (output)
+                                     );
+
+        driver.Callback += req =>
+                           {
+                               if (req.Request == EscSeqUtils.CSI_SendDeviceAttributes.Request)
+                               {
+                                   responseReceived = true;
+
+                                   if (isVirtualTerminal)
+                                   {
+                                       // Response does contain "4" (so DAR indicates has sixel)
+                                       req.ResponseReceived.Invoke ("?1;4;0;7c");
+                                   }
+                                   else
+                                   {
+                                       // Response does NOT contain "4" (so DAR indicates no sixel)
+                                       req.ResponseReceived.Invoke ("");
+                                   }
+
+                                   return true;
+                               }
+
+                               // Abandon all requests
+                               req.Abandoned?.Invoke ();
+
+                               return false;
+                           };
+
+        var detector = new SixelSupportDetector (driver);
+        SixelSupportResult? final = null;
+
+        // Act
+        detector.Detect (r => final = r);
+
+        // Assert
+        Assert.Equal (isVirtualTerminal, driver.IsVirtualTerminal);
+        Assert.NotNull (final);
+
+        if (isVirtualTerminal)
+        {
+            Assert.True (final.IsSupported);
+            Assert.False (final.SupportsTransparency);
+        }
+        else
+        {
+            // Not a real VT, so shouldn't be supported
+            Assert.False (final.IsSupported);
+            Assert.False (final.SupportsTransparency);
+        }
+        Assert.True (responseReceived);
+    }
+
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Detect_SetsSupported_WhenIsVirtualTerminalIsTrueOrFalse_With_Response (bool isVirtualTerminal)
+    {
+        // Arrange
+        var responseReceived = false;
+        var output = new FakeOutput ();
+        output.IsVirtualTerminal = isVirtualTerminal;
+
+        DriverImplProxy driver = new (
+                                      new FakeInputProcessor (null!),
+                                      new OutputBufferImpl (),
+                                      output,
+                                      new (new AnsiResponseParser ()),
+                                      new SizeMonitorImpl (output)
+                                     );
+
+        driver.Callback += req =>
+                           {
+                               if (req.Request == EscSeqUtils.CSI_SendDeviceAttributes.Request)
+                               {
+                                   responseReceived = true;
+
+                                   // Respond to the SendDeviceAttributes request with a value that indicates support (contains "4")
+                                   // Respond to the SendDeviceAttributes request with an empty value that indicates non-support
+                                   req.ResponseReceived.Invoke (driver.IsVirtualTerminal ? "1;4;7c" : "");
+                               }
+
+                               // Abandon all requests
+                               req.Abandoned?.Invoke ();
+
+                               return true;
+                           };
+
+        var detector = new SixelSupportDetector (driver);
+        SixelSupportResult? final = null;
+
+        // Act
+        detector.Detect (r => final = r);
+
+        // Assert
+        Assert.Equal (isVirtualTerminal, driver.IsVirtualTerminal);
+        Assert.NotNull (final);
+
+        if (isVirtualTerminal)
+        {
+            Assert.True (final.IsSupported);
+            Assert.False (final.SupportsTransparency);
+        }
+        else
+        {
+            // Not a real VT, so shouldn't be supported
+            Assert.False (final.IsSupported);
+            Assert.False (final.SupportsTransparency);
+        }
+
+        Assert.True (responseReceived);
+    }
+}
+
+/// <inheritdoc />
+internal class DriverImplProxy : DriverImpl
+{
+    /// <inheritdoc />
+    public DriverImplProxy (IInputProcessor inputProcessor,
+                            IOutputBuffer outputBuffer,
+                            IOutput output,
+                            AnsiRequestScheduler ansiRequestScheduler,
+                            ISizeMonitor sizeMonitor) : base (inputProcessor, outputBuffer, output, ansiRequestScheduler, sizeMonitor)
+    { }
+
+    public Func<AnsiEscapeSequenceRequest, bool>? Callback { get; set; }
+
+    /// <inheritdoc />
+    public override void QueueAnsiRequest (AnsiEscapeSequenceRequest request)
+    {
+        if (Callback is null)
+        {
+            throw new NullReferenceException ($"{nameof (Callback)} cannot be null.");
+        }
+
+        if (!Callback (request))
+        {
+            base.QueueAnsiRequest (request);
+        }
+
+        Callback = null;
     }
 }
