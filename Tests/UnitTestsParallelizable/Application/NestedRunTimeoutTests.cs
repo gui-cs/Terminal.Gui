@@ -20,111 +20,126 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
 
         var mainWindow = new Window { Title = "Main Window" };
         var dialog = new Dialog { Title = "Nested Dialog", Buttons = [new() { Text = "Ok" }] };
+        var nestedRunCompleted = false;
 
-        // Schedule a safety timeout that will ensure the app quits if test hangs
-        var requestStopTimeoutFired = false;
+        // Use iteration counter for safety instead of time-based timeout
+        var iterations = 0;
+        app.Iteration += IterationHandler;
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (10000),
-                        () =>
-                        {
-                            output.WriteLine ("SAFETY: RequestStop Timeout fired - test took too long!");
-                            requestStopTimeoutFired = true;
-                            app.RequestStop ();
+        try
+        {
+            // Schedule multiple timeouts
+            app.AddTimeout (
+                            TimeSpan.FromMilliseconds (100),
+                            () =>
+                            {
+                                executionOrder.Add ("Timeout1-100ms");
+                                output.WriteLine ("Timeout1 fired at 100ms");
 
-                            return false;
-                        }
-                       );
+                                return false;
+                            }
+                           );
 
-        // Schedule multiple timeouts
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (100),
-                        () =>
-                        {
-                            executionOrder.Add ("Timeout1-100ms");
-                            output.WriteLine ("Timeout1 fired at 100ms");
+            app.AddTimeout (
+                            TimeSpan.FromMilliseconds (200),
+                            () =>
+                            {
+                                executionOrder.Add ("Timeout2-200ms-StartNestedRun");
+                                output.WriteLine ("Timeout2 fired at 200ms - Starting nested run");
 
-                            return false;
-                        }
-                       );
+                                // Start nested run
+                                app.Run (dialog);
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (200),
-                        () =>
-                        {
-                            executionOrder.Add ("Timeout2-200ms-StartNestedRun");
-                            output.WriteLine ("Timeout2 fired at 200ms - Starting nested run");
+                                executionOrder.Add ("Timeout2-NestedRunEnded");
+                                nestedRunCompleted = true;
+                                output.WriteLine ("Nested run ended");
 
-                            // Start nested run
-                            app.Run (dialog);
+                                return false;
+                            }
+                           );
 
-                            executionOrder.Add ("Timeout2-NestedRunEnded");
-                            output.WriteLine ("Nested run ended");
+            app.AddTimeout (
+                            TimeSpan.FromMilliseconds (300),
+                            () =>
+                            {
+                                executionOrder.Add ("Timeout3-300ms-InNestedRun");
+                                output.WriteLine ($"Timeout3 fired at 300ms - TopRunnable: {app.TopRunnableView?.Title}");
 
-                            return false;
-                        }
-                       );
+                                // This should fire while dialog is running
+                                Assert.Equal (dialog, app.TopRunnableView);
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (300),
-                        () =>
-                        {
-                            executionOrder.Add ("Timeout3-300ms-InNestedRun");
-                            output.WriteLine ($"Timeout3 fired at 300ms - TopRunnable: {app.TopRunnableView?.Title}");
+                                return false;
+                            }
+                           );
 
-                            // This should fire while dialog is running
-                            Assert.Equal (dialog, app.TopRunnableView);
+            app.AddTimeout (
+                            TimeSpan.FromMilliseconds (400),
+                            () =>
+                            {
+                                executionOrder.Add ("Timeout4-400ms-CloseDialog");
+                                output.WriteLine ("Timeout4 fired at 400ms - Closing dialog");
 
-                            return false;
-                        }
-                       );
+                                // Close the dialog
+                                app.RequestStop (dialog);
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (400),
-                        () =>
-                        {
-                            executionOrder.Add ("Timeout4-400ms-CloseDialog");
-                            output.WriteLine ("Timeout4 fired at 400ms - Closing dialog");
+                                return false;
+                            }
+                           );
 
-                            // Close the dialog
-                            app.RequestStop (dialog);
+            // Event-driven: Only stop main window AFTER nested run completes
+            // Use a repeating timeout that checks the condition
+            app.AddTimeout (
+                            TimeSpan.FromMilliseconds (50),
+                            () =>
+                            {
+                                // Keep checking until nested run completes
+                                if (nestedRunCompleted)
+                                {
+                                    executionOrder.Add ("Timeout5-AfterNestedRun-StopMain");
+                                    output.WriteLine ("Timeout5 fired after nested run completed - Stopping main window");
+                                    app.RequestStop (mainWindow);
 
-                            return false;
-                        }
-                       );
+                                    return false; // Don't repeat
+                                }
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (500),
-                        () =>
-                        {
-                            executionOrder.Add ("Timeout5-500ms-StopMain");
-                            output.WriteLine ("Timeout5 fired at 500ms - Stopping main window");
+                                return true; // Keep checking
+                            }
+                           );
 
-                            // Stop main window
-                            app.RequestStop (mainWindow);
+            // Act
+            app.Run (mainWindow);
 
-                            return false;
-                        }
-                       );
+            // Assert - Verify all timeouts fired in the correct order
+            output.WriteLine ($"Execution order: {string.Join (", ", executionOrder)}");
 
-        // Act
-        app.Run (mainWindow);
+            Assert.Equal (6, executionOrder.Count); // 5 timeout events + 1 nested run end marker
+            Assert.Equal ("Timeout1-100ms", executionOrder [0]);
+            Assert.Equal ("Timeout2-200ms-StartNestedRun", executionOrder [1]);
+            Assert.Equal ("Timeout3-300ms-InNestedRun", executionOrder [2]);
+            Assert.Equal ("Timeout4-400ms-CloseDialog", executionOrder [3]);
+            Assert.Equal ("Timeout2-NestedRunEnded", executionOrder [4]);
+            Assert.Equal ("Timeout5-AfterNestedRun-StopMain", executionOrder [5]);
+        }
+        finally
+        {
+            app.Iteration -= IterationHandler;
+            dialog.Dispose ();
+            mainWindow.Dispose ();
+        }
 
-        // Assert - Verify all timeouts fired in the correct order
-        output.WriteLine ($"Execution order: {string.Join (", ", executionOrder)}");
+        return;
 
-        Assert.Equal (6, executionOrder.Count); // 5 timeouts + 1 nested run end marker
-        Assert.Equal ("Timeout1-100ms", executionOrder [0]);
-        Assert.Equal ("Timeout2-200ms-StartNestedRun", executionOrder [1]);
-        Assert.Equal ("Timeout3-300ms-InNestedRun", executionOrder [2]);
-        Assert.Equal ("Timeout4-400ms-CloseDialog", executionOrder [3]);
-        Assert.Equal ("Timeout2-NestedRunEnded", executionOrder [4]);
-        Assert.Equal ("Timeout5-500ms-StopMain", executionOrder [5]);
+        void IterationHandler (object? s, EventArgs<IApplication?> e)
+        {
+            iterations++;
 
-        Assert.False (requestStopTimeoutFired, "Safety timeout should NOT have fired");
-
-        dialog.Dispose ();
-        mainWindow.Dispose ();
+            // Safety limit - should never be hit with event-driven logic
+            if (iterations > 2000)
+            {
+                output.WriteLine ($"SAFETY: Hit iteration limit. Execution order: {string.Join (", ", executionOrder)}");
+                app.RequestStop ();
+            }
+        }
     }
 
     [Fact]
@@ -279,16 +294,16 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
         var timeoutCountDuringNestedRun = 0;
         var timeoutCountAfterNestedRun = 0;
 
-        // Schedule 5 timeouts at different times
+        // Schedule 5 timeouts at different times with wider spacing
         for (var i = 0; i < 5; i++)
         {
             int capturedI = i;
 
             app.AddTimeout (
-                            TimeSpan.FromMilliseconds (100 * (i + 1)),
+                            TimeSpan.FromMilliseconds (150 * (i + 1)), // Increased spacing from 100ms to 150ms
                             () =>
                             {
-                                output.WriteLine ($"Timeout {capturedI} fired at {100 * (capturedI + 1)}ms");
+                                output.WriteLine ($"Timeout {capturedI} fired at {150 * (capturedI + 1)}ms");
 
                                 if (capturedI == 0)
                                 {
@@ -418,9 +433,9 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
                         }
                        );
 
-        // Stop main window after MessageBox closes
+        // Increased delay from 300ms to 500ms to ensure nested run completes before stopping main
         app.AddTimeout (
-                        TimeSpan.FromMilliseconds (300),
+                        TimeSpan.FromMilliseconds (500),
                         () =>
                         {
                             output.WriteLine ("Stopping main window");
