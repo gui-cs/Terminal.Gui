@@ -69,29 +69,47 @@ public static class ExampleRunner
             }
 
             ParameterInfo [] parameters = entryPoint.GetParameters ();
-            object? result = null;
 
-            if (parameters.Length == 0)
+            Task executionTask = Task.Run (() =>
             {
-                result = entryPoint.Invoke (null, null);
-            }
-            else if (parameters.Length == 1 && parameters [0].ParameterType == typeof (string []))
+                object? result = null;
+
+                if (parameters.Length == 0)
+                {
+                    result = entryPoint.Invoke (null, null);
+                }
+                else if (parameters.Length == 1 && parameters [0].ParameterType == typeof (string []))
+                {
+                    result = entryPoint.Invoke (null, [Array.Empty<string> ()]);
+                }
+                else
+                {
+                    throw new InvalidOperationException ("Entry point has unsupported signature");
+                }
+
+                // If entry point returns Task, wait for it
+                if (result is Task task)
+                {
+                    task.GetAwaiter ().GetResult ();
+                }
+            });
+
+            bool completed = executionTask.Wait (context.TimeoutMs);
+
+            if (!completed)
             {
-                result = entryPoint.Invoke (null, [Array.Empty<string> ()]);
-            }
-            else
-            {
+                // reset terminal
+                Console.Clear ();
                 return new ()
                 {
                     Success = false,
-                    ErrorMessage = "Entry point has unsupported signature"
+                    TimedOut = true
                 };
             }
 
-            // If entry point returns Task, wait for it
-            if (result is Task task)
+            if (executionTask.Exception is { })
             {
-                task.GetAwaiter ().GetResult ();
+                throw executionTask.Exception.GetBaseException ();
             }
 
             return new ()

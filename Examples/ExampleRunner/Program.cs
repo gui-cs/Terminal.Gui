@@ -65,10 +65,11 @@ foreach (ExampleInfo example in examples)
     // Create context for running the example
     ExampleContext context = new ()
     {
-        DriverName = "FakeDriver",
-        KeysToInject = ["Esc"], // Just press Esc to quit each example
+        KeysToInject = example.DemoKeyStrokes.OrderBy (ks => ks.Order)
+                          .SelectMany (ks => ks.KeyStrokes)
+                          .ToList (),
         TimeoutMs = 5000,
-        Mode = ExecutionMode.OutOfProcess
+        Mode = ExecutionMode.InProcess
     };
 
     try

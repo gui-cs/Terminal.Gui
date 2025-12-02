@@ -16,9 +16,6 @@ using Terminal.Gui.Views;
 [assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Enter", "Esc"], DelayMs = 100, Order = 4)]
 [assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Enter", "Esc"], DelayMs = 100, Order = 5)]
 
-// Setup automatic key injection for testing
-ExampleContextInjector.SetupAutomaticInjection ();
-
 // Check for test context to determine driver
 string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME);
 string? driverName = null;
@@ -30,6 +27,10 @@ if (!string.IsNullOrEmpty (contextJson))
 }
 
 IApplication app = Application.Create ();
+
+// Setup automatic key injection for testing
+ExampleContextInjector.SetupAutomaticInjection (app);
+
 app.Init (driverName);
 
 // Example 1: Use extension method with result extraction

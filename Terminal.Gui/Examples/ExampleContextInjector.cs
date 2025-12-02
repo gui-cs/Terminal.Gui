@@ -13,12 +13,13 @@ public static class ExampleContextInjector
     ///     Sets up automatic key injection if a test context is present in the environment.
     ///     Call this method before calling <see cref="Application.Init"/> or <see cref="IApplication.Init"/>.
     /// </summary>
+    /// <param name="app"></param>
     /// <remarks>
     ///     This method is safe to call multiple times - it will only set up injection once.
     ///     The actual key injection happens after the application is initialized, via the
     ///     <see cref="Application.InitializedChanged"/> event.
     /// </remarks>
-    public static void SetupAutomaticInjection ()
+    public static void SetupAutomaticInjection (IApplication? app)
     {
         if (_initialized)
         {
@@ -43,19 +44,15 @@ public static class ExampleContextInjector
         }
 
         // Subscribe to InitializedChanged to inject keys after initialization
-        Application.InitializedChanged += OnInitializedChanged;
+        app.SessionBegun += AppOnSessionBegun;
 
         return;
 
-        void OnInitializedChanged (object? sender, EventArgs<bool> e)
+        void AppOnSessionBegun (object? sender, SessionTokenEventArgs e) 
         {
-            if (!e.Value)
-            {
-                return;
-            }
 
             // Application has been initialized, inject the keys
-            if (Application.Driver is null)
+            if (app.Driver is null)
             {
                 return;
             }
@@ -64,12 +61,12 @@ public static class ExampleContextInjector
             {
                 if (Input.Key.TryParse (keyStr, out Input.Key? key) && key is { })
                 {
-                    Application.Driver.EnqueueKeyEvent (key);
+                    app.Keyboard.RaiseKeyDownEvent (key);
                 }
             }
 
             // Unsubscribe after injecting keys once
-            Application.InitializedChanged -= OnInitializedChanged;
+            app.SessionBegun -= AppOnSessionBegun;
         }
     }
 }
