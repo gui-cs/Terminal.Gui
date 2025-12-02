@@ -211,5 +211,12 @@ public class OutputBaseTests
             // Cursor was NOT moved to Sixel position
             Assert.NotEqual (s.ScreenPosition, output.GetCursorPosition ());
         }
+
+        IApplication app = Application.Create ();
+        app.Driver = driver;
+
+        Assert.Equal (driver.Sixel, app.Driver.Sixel);
+
+        app.Dispose ();
     }
 }
