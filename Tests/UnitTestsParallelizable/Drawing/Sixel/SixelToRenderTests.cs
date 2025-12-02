@@ -1,7 +1,7 @@
 #nullable enable
 using Moq;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class SixelToRenderTests
 {
@@ -180,11 +180,6 @@ public class SixelToRenderTests
         // Arrange - set XTERM_VERSION env var to indicate real xterm with transparency
         string? prev = Environment.GetEnvironmentVariable ("XTERM_VERSION");
 
-        if (isXtermWithTransparency)
-        {
-            Environment.SetEnvironmentVariable ("XTERM_VERSION", "370");
-        }
-
         try
         {
             var output = new FakeOutput ();
@@ -217,6 +212,11 @@ public class SixelToRenderTests
             var detector = new SixelSupportDetector (driverMock.Object);
 
             SixelSupportResult? final = null;
+
+            if (isXtermWithTransparency)
+            {
+                Environment.SetEnvironmentVariable ("XTERM_VERSION", "370");
+            }
 
             // Act
             detector.Detect (r => final = r);

@@ -1,7 +1,7 @@
 #nullable enable
 using Moq;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class SixelSupportDetectorTests
 {
