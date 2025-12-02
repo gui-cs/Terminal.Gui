@@ -452,6 +452,9 @@ internal partial class ApplicationImpl
         // Sort by Order and collect all keystrokes
         var sortedSequences = demoKeyAttributes.OrderBy<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute, int> (a => a.Order);
 
+        // Default delay between keys is 100ms
+        int currentDelay = 100;
+
         foreach (var attr in sortedSequences)
         {
             // Handle KeyStrokes array
@@ -459,8 +462,28 @@ internal partial class ApplicationImpl
             {
                 foreach (string keyStr in attr.KeyStrokes)
                 {
+                    // Check for SetDelay command
+                    if (keyStr.StartsWith ("SetDelay:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string delayValue = keyStr.Substring ("SetDelay:".Length);
+
+                        if (int.TryParse (delayValue, out int newDelay))
+                        {
+                            currentDelay = newDelay;
+                        }
+
+                        continue;
+                    }
+
+                    // Regular key
                     if (Input.Key.TryParse (keyStr, out Input.Key? key) && key is { })
                     {
+                        // Apply delay before sending key
+                        if (currentDelay > 0)
+                        {
+                            System.Threading.Thread.Sleep (currentDelay);
+                        }
+
                         Keyboard?.RaiseKeyDownEvent (key);
                     }
                 }
@@ -473,6 +496,12 @@ internal partial class ApplicationImpl
                 {
                     for (var i = 0; i < attr.RepeatCount; i++)
                     {
+                        // Apply delay before sending key
+                        if (currentDelay > 0)
+                        {
+                            System.Threading.Thread.Sleep (currentDelay);
+                        }
+
                         Keyboard?.RaiseKeyDownEvent (key);
                     }
                 }
