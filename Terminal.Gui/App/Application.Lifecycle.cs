@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -10,6 +11,11 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Lifecycle (Init/Shutdown)
 {
+    /// <summary>
+    ///     Gets the observable collection of all application instances.
+    ///     External observers can subscribe to this collection to monitor application lifecycle.
+    /// </summary>
+    public static ObservableCollection<IApplication> Apps { get; } = [];
     /// <summary>
     ///     Gets the singleton <see cref="IApplication"/> instance used by the legacy static Application model.
     /// </summary>
@@ -29,6 +35,10 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <summary>
     ///     Creates a new <see cref="IApplication"/> instance.
     /// </summary>
+    /// <param name="example">
+    ///     If <see langword="true"/>, the application will run in example mode where metadata is collected
+    ///     and demo keys are automatically sent when the first TopRunnable is modal.
+    /// </param>
     /// <remarks>
     ///     The recommended pattern is for developers to call <c>Application.Create()</c> and then use the returned
     ///     <see cref="IApplication"/> instance for all subsequent application operations.
@@ -37,12 +47,15 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <exception cref="InvalidOperationException">
     ///     Thrown if the legacy static Application model has already been used in this process.
     /// </exception>
-    public static IApplication Create ()
+    public static IApplication Create (bool example = false)
     {
         //Debug.Fail ("Application.Create() called");
         ApplicationImpl.MarkInstanceBasedModelUsed ();
 
-        return new ApplicationImpl ();
+        ApplicationImpl app = new () { IsExample = example };
+        Apps.Add (app);
+
+        return app;
     }
 
     /// <inheritdoc cref="IApplication.Init"/>

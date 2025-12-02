@@ -17,19 +17,18 @@ using Terminal.Gui.Views;
 // Check for test context to determine driver
 string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME);
 string? driverName = null;
+var isExample = false;
 
 if (!string.IsNullOrEmpty (contextJson))
 {
     ExampleContext? context = ExampleContext.FromJson (contextJson);
     driverName = context?.DriverName;
+    isExample = true;
 }
 
-IApplication? app = Application.Create ()
+IApplication? app = Application.Create (example: isExample)
                                .Init (driverName)
                                .Run<ColorPickerView> ();
-
-// Setup automatic key injection for testing
-ExampleContextInjector.SetupAutomaticInjection (app);
 
 // Run the application with fluent API - automatically creates, runs, and disposes the runnable
 Color? result = app.GetResult () as Color?;

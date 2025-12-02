@@ -12,6 +12,9 @@ internal partial class ApplicationImpl
     public bool Initialized { get; set; }
 
     /// <inheritdoc/>
+    public bool IsExample { get; set; }
+
+    /// <inheritdoc/>
     public event EventHandler<EventArgs<bool>>? InitializedChanged;
 
     /// <inheritdoc/>
@@ -92,6 +95,12 @@ internal partial class ApplicationImpl
 
         RaiseInitializedChanged (this, new (true));
         SubscribeDriverEvents ();
+
+        // Setup example mode if requested
+        if (IsExample)
+        {
+            SetupExampleMode ();
+        }
 
         SynchronizationContext.SetSynchronizationContext (new ());
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -381,4 +390,95 @@ internal partial class ApplicationImpl
         Application.Force16ColorsChanged -= OnForce16ColorsChanged;
         Application.ForceDriverChanged -= OnForceDriverChanged;
     }
+
+    #region Example Mode
+
+    private bool _exampleModeDemoKeysSent;
+
+    /// <summary>
+    ///     Sets up example mode functionality - collecting metadata and sending demo keys
+    ///     when the first TopRunnable is modal.
+    /// </summary>
+    private void SetupExampleMode ()
+    {
+        // Subscribe to SessionBegun to wait for the first modal runnable
+        SessionBegun += OnSessionBegunForExample;
+    }
+
+    private void OnSessionBegunForExample (object? sender, SessionTokenEventArgs e)
+    {
+        // Only send demo keys once, when the first modal runnable appears
+        if (_exampleModeDemoKeysSent)
+        {
+            return;
+        }
+
+        // Check if the TopRunnable is modal
+        if (TopRunnable?.IsModal != true)
+        {
+            return;
+        }
+
+        // Mark that we've sent the keys
+        _exampleModeDemoKeysSent = true;
+
+        // Unsubscribe - we only need to do this once
+        SessionBegun -= OnSessionBegunForExample;
+
+        // Send demo keys from assembly attributes
+        SendDemoKeys ();
+    }
+
+    private void SendDemoKeys ()
+    {
+        // Get the entry assembly to read example metadata
+        var assembly = System.Reflection.Assembly.GetEntryAssembly ();
+
+        if (assembly is null)
+        {
+            return;
+        }
+
+        // Look for ExampleDemoKeyStrokesAttribute
+        var demoKeyAttributes = assembly.GetCustomAttributes (typeof (Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute), false)
+                                        .OfType<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute> ()
+                                        .ToList ();
+
+        if (!demoKeyAttributes.Any ())
+        {
+            return;
+        }
+
+        // Sort by Order and collect all keystrokes
+        var sortedSequences = demoKeyAttributes.OrderBy<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute, int> (a => a.Order);
+
+        foreach (var attr in sortedSequences)
+        {
+            // Handle KeyStrokes array
+            if (attr.KeyStrokes is { Length: > 0 })
+            {
+                foreach (string keyStr in attr.KeyStrokes)
+                {
+                    if (Input.Key.TryParse (keyStr, out Input.Key? key) && key is { })
+                    {
+                        Keyboard?.RaiseKeyDownEvent (key);
+                    }
+                }
+            }
+
+            // Handle RepeatKey
+            if (!string.IsNullOrEmpty (attr.RepeatKey))
+            {
+                if (Input.Key.TryParse (attr.RepeatKey, out Input.Key? key) && key is { })
+                {
+                    for (var i = 0; i < attr.RepeatCount; i++)
+                    {
+                        Keyboard?.RaiseKeyDownEvent (key);
+                    }
+                }
+            }
+        }
+    }
+
+    #endregion Example Mode
 }
