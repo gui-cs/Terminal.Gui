@@ -9,11 +9,15 @@ namespace Terminal.Gui.Examples;
 ///         Multiple instances of this attribute can be applied to a single assembly to define a sequence
 ///         of keystroke injections. The <see cref="Order"/> property controls the execution sequence.
 ///     </para>
+///     <para>
+///         Keystrokes can include special "SetDelay:nnn" entries to change the delay between subsequent keys.
+///         The default delay is 100ms. For example: KeyStrokes = ["SetDelay:500", "Enter", "SetDelay:100", "Tab"]
+///     </para>
 /// </remarks>
 /// <example>
 ///     <code>
-///     [assembly: ExampleDemoKeyStrokes(RepeatKey = "CursorDown", RepeatCount = 5, Order = 1, DelayMs = 100)]
-///     [assembly: ExampleDemoKeyStrokes(KeyStrokes = new[] { "Enter" }, Order = 2, DelayMs = 200)]
+///     [assembly: ExampleDemoKeyStrokes(RepeatKey = "CursorDown", RepeatCount = 5, Order = 1)]
+///     [assembly: ExampleDemoKeyStrokes(KeyStrokes = ["SetDelay:500", "Enter", "SetDelay:100", "Esc"], Order = 2)]
 ///     </code>
 /// </example>
 [AttributeUsage (AttributeTargets.Assembly, AllowMultiple = true)]
@@ -21,7 +25,8 @@ public class ExampleDemoKeyStrokesAttribute : System.Attribute
 {
     /// <summary>
     ///     Gets or sets an array of keystroke names to inject.
-    ///     Each string should be a valid key name that can be parsed by <see cref="Input.Key.TryParse"/>.
+    ///     Each string should be a valid key name that can be parsed by <see cref="Input.Key.TryParse"/>,
+    ///     or a special "SetDelay:nnn" command to change the delay between subsequent keys.
     /// </summary>
     public string []? KeyStrokes { get; set; }
 
@@ -36,11 +41,6 @@ public class ExampleDemoKeyStrokesAttribute : System.Attribute
     ///     Only used when <see cref="RepeatKey"/> is specified.
     /// </summary>
     public int RepeatCount { get; set; } = 1;
-
-    /// <summary>
-    ///     Gets or sets the delay in milliseconds before injecting these keystrokes.
-    /// </summary>
-    public int DelayMs { get; set; } = 0;
 
     /// <summary>
     ///     Gets or sets the order in which this keystroke sequence should be executed

@@ -110,7 +110,6 @@ public static class ExampleDiscovery
                                new ()
                                {
                                    KeyStrokes = keys.ToArray (),
-                                   DelayMs = attr.DelayMs,
                                    Order = attr.Order
                                });
             }

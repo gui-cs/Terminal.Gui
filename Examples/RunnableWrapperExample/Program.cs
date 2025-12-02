@@ -3,35 +3,21 @@
 
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
-using Terminal.Gui.Examples;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
-[assembly: ExampleMetadata ("Runnable Wrapper Example", "Shows how to wrap any View to make it runnable without implementing IRunnable")]
-[assembly: ExampleCategory ("API Patterns")]
-[assembly: ExampleCategory ("Views")]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["t", "e", "s", "t", "Esc"], Order = 1)]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Enter", "Esc"], DelayMs = 100, Order = 2)]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Enter", "Esc"], DelayMs = 100, Order = 3)]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Enter", "Esc"], DelayMs = 100, Order = 4)]
-[assembly: ExampleDemoKeyStrokes (KeyStrokes = ["Enter", "Esc"], DelayMs = 100, Order = 5)]
+// Example metadata
+[assembly: Terminal.Gui.Examples.ExampleMetadata ("Runnable Wrapper Example", "Shows how to wrap any View to make it runnable without implementing IRunnable")]
+[assembly: Terminal.Gui.Examples.ExampleCategory ("API Patterns")]
+[assembly: Terminal.Gui.Examples.ExampleCategory ("Views")]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "t", "e", "s", "t", "Esc"], Order = 1)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 2)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 3)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 4)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 5)]
 
-// Check for test context to determine driver
-string? contextJson = Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME);
-string? driverName = null;
-
-if (!string.IsNullOrEmpty (contextJson))
-{
-    ExampleContext? context = ExampleContext.FromJson (contextJson);
-    driverName = context?.DriverName;
-}
-
-IApplication app = Application.Create ();
-
-// Setup automatic key injection for testing
-ExampleContextInjector.SetupAutomaticInjection (app);
-
-app.Init (driverName);
+IApplication app = Application.Create (example: true);
+app.Init ();
 
 // Example 1: Use extension method with result extraction
 var textField = new TextField { Width = 40, Text = "Default text" };

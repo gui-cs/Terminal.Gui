@@ -12,6 +12,9 @@ internal partial class ApplicationImpl
     public bool Initialized { get; set; }
 
     /// <inheritdoc/>
+    public bool IsExample { get; set; }
+
+    /// <inheritdoc/>
     public event EventHandler<EventArgs<bool>>? InitializedChanged;
 
     /// <inheritdoc/>
@@ -92,6 +95,12 @@ internal partial class ApplicationImpl
 
         RaiseInitializedChanged (this, new (true));
         SubscribeDriverEvents ();
+
+        // Setup example mode if requested
+        if (IsExample)
+        {
+            SetupExampleMode ();
+        }
 
         SynchronizationContext.SetSynchronizationContext (new ());
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -381,4 +390,151 @@ internal partial class ApplicationImpl
         Application.Force16ColorsChanged -= OnForce16ColorsChanged;
         Application.ForceDriverChanged -= OnForceDriverChanged;
     }
+
+    #region Example Mode
+
+    private bool _exampleModeDemoKeysSent;
+
+    /// <summary>
+    ///     Sets up example mode functionality - collecting metadata and sending demo keys
+    ///     when the first TopRunnable becomes modal.
+    /// </summary>
+    private void SetupExampleMode ()
+    {
+        // Subscribe to SessionBegun to monitor when runnables start
+        SessionBegun += OnSessionBegunForExample;
+    }
+
+    private void OnSessionBegunForExample (object? sender, SessionTokenEventArgs e)
+    {
+        // Only send demo keys once
+        if (_exampleModeDemoKeysSent)
+        {
+            return;
+        }
+
+        // Subscribe to IsModalChanged event on the TopRunnable
+        if (TopRunnable is { })
+        {
+            TopRunnable.IsModalChanged += OnIsModalChangedForExample;
+            
+            // Check if already modal - if so, send keys immediately
+            if (TopRunnable.IsModal)
+            {
+                _exampleModeDemoKeysSent = true;
+                TopRunnable.IsModalChanged -= OnIsModalChangedForExample;
+                SendDemoKeys ();
+            }
+        }
+
+        // Unsubscribe from SessionBegun - we only need to set up the modal listener once
+        SessionBegun -= OnSessionBegunForExample;
+    }
+
+    private void OnIsModalChangedForExample (object? sender, EventArgs<bool> e)
+    {
+        // Only send demo keys once, when a runnable becomes modal (not when it stops being modal)
+        if (_exampleModeDemoKeysSent || !e.Value)
+        {
+            return;
+        }
+
+        // Mark that we've sent the keys
+        _exampleModeDemoKeysSent = true;
+
+        // Unsubscribe - we only need to do this once
+        if (TopRunnable is { })
+        {
+            TopRunnable.IsModalChanged -= OnIsModalChangedForExample;
+        }
+
+        // Send demo keys from assembly attributes
+        SendDemoKeys ();
+    }
+
+    private void SendDemoKeys ()
+    {
+        // Get the entry assembly to read example metadata
+        var assembly = System.Reflection.Assembly.GetEntryAssembly ();
+
+        if (assembly is null)
+        {
+            return;
+        }
+
+        // Look for ExampleDemoKeyStrokesAttribute
+        var demoKeyAttributes = assembly.GetCustomAttributes (typeof (Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute), false)
+                                        .OfType<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute> ()
+                                        .ToList ();
+
+        if (!demoKeyAttributes.Any ())
+        {
+            return;
+        }
+
+        // Sort by Order and collect all keystrokes
+        var sortedSequences = demoKeyAttributes.OrderBy<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute, int> (a => a.Order);
+
+        // Send keys asynchronously to avoid blocking the UI thread
+        Task.Run (async () =>
+        {
+            // Default delay between keys is 100ms
+            int currentDelay = 100;
+
+            foreach (var attr in sortedSequences)
+            {
+                // Handle KeyStrokes array
+                if (attr.KeyStrokes is { Length: > 0 })
+                {
+                    foreach (string keyStr in attr.KeyStrokes)
+                    {
+                        // Check for SetDelay command
+                        if (keyStr.StartsWith ("SetDelay:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string delayValue = keyStr.Substring ("SetDelay:".Length);
+
+                            if (int.TryParse (delayValue, out int newDelay))
+                            {
+                                currentDelay = newDelay;
+                            }
+
+                            continue;
+                        }
+
+                        // Regular key
+                        if (Input.Key.TryParse (keyStr, out Input.Key? key) && key is { })
+                        {
+                            // Apply delay before sending key
+                            if (currentDelay > 0)
+                            {
+                                await Task.Delay (currentDelay);
+                            }
+
+                            Keyboard?.RaiseKeyDownEvent (key);
+                        }
+                    }
+                }
+
+                // Handle RepeatKey
+                if (!string.IsNullOrEmpty (attr.RepeatKey))
+                {
+                    if (Input.Key.TryParse (attr.RepeatKey, out Input.Key? key) && key is { })
+                    {
+                        for (var i = 0; i < attr.RepeatCount; i++)
+                        {
+                            // Apply delay before sending key
+                            if (currentDelay > 0)
+                            {
+                                await Task.Delay (currentDelay);
+                            }
+
+                            Keyboard?.RaiseKeyDownEvent (key);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    #endregion Example Mode
 }

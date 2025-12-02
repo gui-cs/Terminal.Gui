@@ -87,6 +87,12 @@ public interface IApplication : IDisposable
     bool Initialized { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether this application is running in example mode.
+    ///     When <see langword="true"/>, metadata is collected and demo keys are automatically sent.
+    /// </summary>
+    bool IsExample { get; set; }
+
+    /// <summary>
     ///     INTERNAL: Resets the state of this instance. Called by Dispose.
     /// </summary>
     /// <param name="ignoreDisposed">If true, ignores disposed state checks during reset.</param>

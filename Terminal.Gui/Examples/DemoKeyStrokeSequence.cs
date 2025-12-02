@@ -7,13 +7,9 @@ public class DemoKeyStrokeSequence
 {
     /// <summary>
     ///     Gets or sets the array of keystroke names to inject.
+    ///     Can include special "SetDelay:nnn" commands to change the delay between keys.
     /// </summary>
     public string [] KeyStrokes { get; set; } = [];
-
-    /// <summary>
-    ///     Gets or sets the delay in milliseconds before injecting these keystrokes.
-    /// </summary>
-    public int DelayMs { get; set; } = 0;
 
     /// <summary>
     ///     Gets or sets the order in which this sequence should be executed.
