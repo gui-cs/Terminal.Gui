@@ -10,7 +10,7 @@ public class MenuBarTests ()
     public void DefaultKey_Activates_And_Opens ()
     {
         // Arrange
-        var top = new Toplevel ()
+        var top = new Runnable ()
         {
             App = ApplicationImpl.Instance
         };
@@ -58,7 +58,7 @@ public class MenuBarTests ()
     public void DefaultKey_Deactivates ()
     {
         // Arrange
-        var top = new Toplevel () { App = ApplicationImpl.Instance };
+        var top = new Runnable () { App = ApplicationImpl.Instance };
         MenuBar menuBar = new MenuBar () { App = ApplicationImpl.Instance };
         menuBar.EnableForDesign (ref top);
 
@@ -95,7 +95,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
 
@@ -133,7 +133,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -165,7 +165,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -204,7 +204,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -237,7 +237,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -274,7 +274,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -319,7 +319,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         menuBar.Add (menuBarItem2);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -356,7 +356,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -382,7 +382,7 @@ public class MenuBarTests ()
     public void Mouse_Click_Activates_And_Opens ()
     {
         // Arrange
-        var top = new Toplevel () { App = ApplicationImpl.Instance };
+        var top = new Runnable () { App = ApplicationImpl.Instance };
         MenuBar menuBar = new MenuBar () { App = ApplicationImpl.Instance };
         menuBar.EnableForDesign (ref top);
 
@@ -424,7 +424,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -471,7 +471,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
 
@@ -513,7 +513,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -544,7 +544,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -576,7 +576,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -614,7 +614,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -663,7 +663,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -704,7 +704,7 @@ public class MenuBarTests ()
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);

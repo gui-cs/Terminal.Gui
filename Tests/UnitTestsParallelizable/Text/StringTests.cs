@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.TextTests;
+﻿namespace TextTests;
 
 #nullable enable
 

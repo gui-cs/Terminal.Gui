@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class DrawTests (ITestOutputHelper output)
@@ -28,11 +28,12 @@ public class DrawTests (ITestOutputHelper output)
         var view = new View { Text = r.ToString (), Height = Dim.Fill (), Width = Dim.Fill () };
         var tf = new TextField { Text = s, Y = 1, Width = 3 };
         win.Add (view, tf);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
+        Application.LayoutAndDraw ();
 
         const string expectedOutput = """
 
@@ -71,7 +72,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 6,
             VerticalTextAlignment = Alignment.End,
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (viewRight, viewBottom);
 
         var rs = Application.Begin (top);
@@ -304,7 +305,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 5
         };
         container.Add (content);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (container);
         var rs = Application.Begin (top);
 
@@ -421,7 +422,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 5
         };
         container.Add (content);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (container);
 
         // BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
@@ -512,7 +513,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 5
         };
         container.Add (content);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (container);
         Application.Begin (top);
 
@@ -636,12 +637,12 @@ public class DrawTests (ITestOutputHelper output)
         var view = new Label { Text = r.ToString () };
         var tf = new TextField { Text = us, Y = 1, Width = 3 };
         win.Add (view, tf);
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
-
+        Application.LayoutAndDraw ();
 
         var expected = """
 
@@ -662,7 +663,7 @@ public class DrawTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View { X = -2, Text = "view" };
         top.Add (view);
@@ -713,7 +714,7 @@ public class DrawTests (ITestOutputHelper output)
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
         SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -761,7 +762,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
         SessionToken sessionToken = Application.Begin (top);
 
@@ -814,7 +815,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
         SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -860,7 +861,7 @@ At 0,0
             Height = 2,
             Text = "A text with some long width\n and also with two lines."
         };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label, view);
         SessionToken sessionToken = Application.Begin (top);
 

@@ -29,6 +29,6 @@ public class FakeApplicationFactory
         // Initialize with a fake driver
         impl.Init ("fake");
 
-        return new FakeApplicationLifecycle (hardStopTokenSource);
+        return new FakeApplicationLifecycle (impl, hardStopTokenSource);
     }
 }

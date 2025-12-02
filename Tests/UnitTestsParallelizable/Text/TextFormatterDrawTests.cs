@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests_Parallelizable.TextTests;
+namespace TextTests;
 
 public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -427,7 +427,7 @@ Nice       Work")]
 
         TextFormatter tf = new ()
         {
-            Text = UICatalogTop.GetAboutBoxMessage (),
+            Text = UICatalogRunnable.GetAboutBoxMessage (),
             Alignment = Alignment.Center,
             VerticalAlignment = Alignment.Start,
             WordWrap = false,

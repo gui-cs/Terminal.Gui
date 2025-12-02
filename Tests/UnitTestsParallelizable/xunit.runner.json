@@ -3,5 +3,5 @@
   "parallelizeTestCollections": true,
   "parallelizeAssembly": true,
   "stopOnFail": false,
-  "maxParallelThreads": "2x"
+  "maxParallelThreads": "default"
 }

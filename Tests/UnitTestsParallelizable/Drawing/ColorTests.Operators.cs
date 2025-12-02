@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Reflection;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public partial class ColorTests
 {
@@ -195,7 +195,7 @@ public static partial class ColorTestsTheoryDataGenerators
 
     public static TheoryData<FieldInfo, int> Fields_At_Expected_Offsets ()
     {
-        TheoryData<FieldInfo, int> data = []
+        TheoryData<FieldInfo?, int> data = []
             ;
 
         data.Add (
@@ -246,6 +246,6 @@ public static partial class ColorTestsTheoryDataGenerators
                   3
                  );
 
-        return data;
+        return data!;
     }
 }

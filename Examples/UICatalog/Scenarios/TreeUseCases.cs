@@ -71,10 +71,13 @@ public class TreeUseCases : Scenario
 
         appWindow.Add (menu, statusBar);
 
-        appWindow.Ready += (sender, args) =>
+        appWindow.IsModalChanged += (sender, args) =>
         {
-            // Start with the most basic use case
-            LoadSimpleNodes ();
+            if (args.Value)
+            {
+                // Start with the most basic use case
+                LoadSimpleNodes ();
+            }
         };
 
         Application.Run (appWindow);
@@ -92,9 +95,9 @@ public class TreeUseCases : Scenario
 
         if (_currentTree is { })
         {
-            if (Application.TopRunnable is { })
+            if (Application.TopRunnableView is { })
             {
-                Application.TopRunnable.Remove (_currentTree);
+                Application.TopRunnableView.Remove (_currentTree);
             }
 
             _currentTree.Dispose ();
@@ -116,9 +119,9 @@ public class TreeUseCases : Scenario
             tree.TreeBuilder = new GameObjectTreeBuilder ();
         }
 
-        if (Application.TopRunnable is { })
+        if (Application.TopRunnableView is { })
         {
-            Application.TopRunnable.Add (tree);
+            Application.TopRunnableView.Add (tree);
         }
 
         tree.AddObject (army1);
@@ -141,9 +144,9 @@ public class TreeUseCases : Scenario
 
         if (_currentTree is { })
         {
-            if (Application.TopRunnable is { })
+            if (Application.TopRunnableView is { })
             {
-                Application.TopRunnable.Remove (_currentTree);
+                Application.TopRunnableView.Remove (_currentTree);
             }
 
             _currentTree.Dispose ();
@@ -151,9 +154,9 @@ public class TreeUseCases : Scenario
 
         TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        if (Application.TopRunnable is { })
+        if (Application.TopRunnableView is { })
         {
-            Application.TopRunnable.Add (tree);
+            Application.TopRunnableView.Add (tree);
         }
 
         tree.AddObject (myHouse);
@@ -165,9 +168,9 @@ public class TreeUseCases : Scenario
     {
         if (_currentTree is { })
         {
-            if (Application.TopRunnable is { })
+            if (Application.TopRunnableView is { })
             {
-                Application.TopRunnable.Remove (_currentTree);
+                Application.TopRunnableView.Remove (_currentTree);
             }
 
             _currentTree.Dispose ();
@@ -175,9 +178,9 @@ public class TreeUseCases : Scenario
 
         TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        if (Application.TopRunnable is { })
+        if (Application.TopRunnableView is { })
         {
-            Application.TopRunnable.Add (tree);
+            Application.TopRunnableView.Add (tree);
         }
 
         TreeNode root1 = new ("Root1");

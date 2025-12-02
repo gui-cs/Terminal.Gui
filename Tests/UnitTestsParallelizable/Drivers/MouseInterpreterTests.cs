@@ -1,4 +1,5 @@
-﻿namespace UnitTests_Parallelizable.DriverTests;
+﻿#nullable disable
+namespace DriverTests;
 
 public class MouseInterpreterTests
 {

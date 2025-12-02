@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class DriverTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -55,11 +55,11 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("windows")]
     [InlineData ("dotnet")]
     [InlineData ("unix")]
-    public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName)
+    public void All_Drivers_Init_Dispose_Cross_Platform (string driverName)
     {
         IApplication? app = Application.Create ();
         app.Init (driverName);
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Theory]
@@ -72,8 +72,8 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
-        app.Run ().Dispose ();
-        app.Shutdown ();
+        app.Run<Runnable<bool>> ();
+        app.Dispose ();
     }
 
     [Theory]
@@ -86,11 +86,11 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
-        app.Run<TestTop> ().Dispose ();
+        app.Run<TestTop> ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (driverName!, output, app.Driver);
 
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     }
 }
 
-public class TestTop : Toplevel
+public class TestTop : Runnable
 {
     /// <inheritdoc/>
     public override void BeginInit ()

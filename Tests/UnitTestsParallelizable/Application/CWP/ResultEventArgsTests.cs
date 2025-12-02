@@ -2,7 +2,7 @@
 using System;
 using Terminal.Gui.App;
 using Xunit;
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 public class ResultEventArgsTests
 {

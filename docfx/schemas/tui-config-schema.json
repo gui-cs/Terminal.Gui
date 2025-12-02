@@ -606,7 +606,7 @@
         },
         "Schemes": {
           "type": "array",
-          "description": "A list of scheme definitions for this theme. Each item in the array is an object containing one or more named schemes (e.g., 'TopLevel', 'Base', 'Menu').",
+          "description": "A list of scheme definitions for this theme. Each item in the array is an object containing one or more named schemes (e.g., 'Runnable', 'Base', 'Menu').",
           "items": {
             "type": "object",
             "description": "An object where each key is a scheme name (e.g., 'Base', 'Error') and its value is the scheme definition.",

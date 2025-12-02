@@ -1,4 +1,5 @@
-namespace UnitTests_Parallelizable.ViewsTests;
+#nullable disable
+namespace ViewsTests;
 
 public class OptionSelectorTests
 {

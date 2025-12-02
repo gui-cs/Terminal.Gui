@@ -1,7 +1,7 @@
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
@@ -126,9 +126,8 @@ public partial class ApplicationImpl
     }
 
     /// <summary>
-    ///     INTERNAL: Called when the application's size has changed. Sets the size of all <see cref="Toplevel"/>s and fires
-    ///     the
-    ///     <see cref="ScreenChanged"/> event.
+    ///     INTERNAL: Called when the application's screen has changed.
+    ///     Raises the <see cref="ScreenChanged"/> event.
     /// </summary>
     /// <param name="screen">The new screen size and position.</param>
     private void RaiseScreenChangedEvent (Rectangle screen)
@@ -137,13 +136,13 @@ public partial class ApplicationImpl
 
         ScreenChanged?.Invoke (this, new (screen));
 
-        foreach (Toplevel t in SessionStack)
+        foreach (SessionToken t in SessionStack!)
         {
-            t.OnSizeChanging (new (screen.Size));
-            t.SetNeedsLayout ();
+            if (t.Runnable is View runnableView)
+            {
+                runnableView.SetNeedsLayout ();
+            }
         }
-
-        LayoutAndDraw (true);
     }
 
     private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { RaiseScreenChangedEvent (new (new (0, 0), e.Size!.Value)); }
@@ -151,7 +150,7 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View> tops = [.. SessionStack];
+        List<View?> tops = [.. SessionStack!.Select(r => r.Runnable! as View)!];
 
         if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
@@ -160,7 +159,7 @@ public partial class ApplicationImpl
             tops.Insert (0, visiblePopover);
         }
 
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse ()!, Screen.Size);
 
         if (ClearScreenNextIteration)
         {
@@ -176,7 +175,8 @@ public partial class ApplicationImpl
         if (Driver is { })
         {
             Driver.Clip = new (Screen);
-            View.Draw (tops, neededLayout || forceRedraw);
+
+            View.Draw (views: tops!, neededLayout || forceRedraw);
             Driver.Clip = new (Screen);
             Driver?.Refresh ();
         }

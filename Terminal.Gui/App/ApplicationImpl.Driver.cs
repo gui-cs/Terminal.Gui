@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
     public IDriver? Driver { get; set; }

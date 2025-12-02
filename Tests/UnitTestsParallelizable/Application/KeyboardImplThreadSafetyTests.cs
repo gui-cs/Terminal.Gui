@@ -1,7 +1,7 @@
 // ReSharper disable AccessToDisposedClosure
 
 #nullable enable
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Tests to verify that KeyboardImpl is thread-safe for concurrent access scenarios.
@@ -102,7 +102,7 @@ public class KeyboardImplThreadSafetyTests
 
         // Assert
         Assert.Empty (exceptions);
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class KeyboardImplThreadSafetyTests
         // Assert
         Assert.Empty (exceptions);
         keyboard.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public class KeyboardImplThreadSafetyTests
         // Assert
         Assert.Empty (exceptions);
         keyboard.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -471,7 +471,7 @@ public class KeyboardImplThreadSafetyTests
         // Assert
         Assert.Empty (exceptions);
         keyboard.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -515,6 +515,6 @@ public class KeyboardImplThreadSafetyTests
         // Assert
         Assert.Empty (exceptions);
         keyboard.Dispose ();
-        app.Shutdown ();
+        app.Dispose ();
     }
 }

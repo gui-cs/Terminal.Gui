@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using UnitTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TextValidateField_NET_Provider_Tests : FakeDriverBase
 {
@@ -57,7 +57,7 @@ public class TextValidateField_NET_Provider_Tests : FakeDriverBase
         Assert.True (field.IsValid);
 
         var provider = field.Provider as NetMaskedTextProvider;
-        provider.Mask = "--------(00000000)--------";
+        provider!.Mask = "--------(00000000)--------";
         Assert.Equal ("--------(1234____)--------", field.Provider.DisplayText);
         Assert.False (field.IsValid);
     }

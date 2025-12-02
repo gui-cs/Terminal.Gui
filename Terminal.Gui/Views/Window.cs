@@ -14,7 +14,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 /// </remarks>
 /// <seealso cref="FrameView"/>
-public class Window : Toplevel
+public class Window : Runnable
 {
     private static ShadowStyle _defaultShadow = ShadowStyle.None; // Resources/config.json overrides
     private static LineStyle _defaultBorderStyle = LineStyle.Single; // Resources/config.json overrides

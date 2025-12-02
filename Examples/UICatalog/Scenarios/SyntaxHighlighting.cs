@@ -120,7 +120,7 @@ public class SyntaxHighlighting : Scenario
         Application.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        Toplevel appWindow = new ();
+        Runnable appWindow = new ();
 
         var menu = new MenuBar ();
 

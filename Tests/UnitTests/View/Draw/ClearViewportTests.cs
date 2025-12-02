@@ -3,7 +3,7 @@ using Moq;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class ClearViewportTests (ITestOutputHelper output)
@@ -214,10 +214,11 @@ public class ClearViewportTests (ITestOutputHelper output)
                                    view.SetClip (savedClip);
                                    e.Cancel = true;
                                };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 10);
+        Application.LayoutAndDraw ();
 
         var expected = @"
 ┌──────────────────┐
@@ -279,10 +280,11 @@ public class ClearViewportTests (ITestOutputHelper output)
                                    view.SetClip (savedClip);
                                    e.Cancel = true;
                                };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (20, 10);
+        Application.LayoutAndDraw ();
 
         var expected = @"
 ┌──────────────────┐
@@ -319,104 +321,5 @@ public class ClearViewportTests (ITestOutputHelper output)
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         top.Dispose ();
-    }
-
-    [Theory (Skip = "This test is too fragile; depends on Library Resoruces/Themes which can easily change.")]
-    [AutoInitShutdown]
-    [InlineData (true)]
-    [InlineData (false)]
-    public void Clear_Does_Not_Spillover_Its_Parent (bool label)
-    {
-        ConfigurationManager.Enable (ConfigLocations.LibraryResources);
-
-        View root = new () { Width = 20, Height = 10 };
-
-        string text = new ('c', 100);
-
-        View v = label
-
-                     // Label has Width/Height == AutoSize, so Frame.Size will be (100, 1)
-                     ? new Label { Text = text }
-
-                     // TextView has Width/Height == (Dim.Fill, 1), so Frame.Size will be 20 (width of root), 1
-                     : new TextView { Width = Dim.Fill (), Height = 1, Text = text };
-
-        root.Add (v);
-
-        Toplevel top = new ();
-        top.Add (root);
-        SessionToken sessionToken = Application.Begin (top);
-        AutoInitShutdownAttribute.RunIteration ();
-
-        if (label)
-        {
-            Assert.False (v.CanFocus);
-            Assert.Equal (new (0, 0, text.Length, 1), v.Frame);
-        }
-        else
-        {
-            Assert.True (v.CanFocus);
-            Assert.Equal (new (0, 0, 20, 1), v.Frame);
-        }
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
-cccccccccccccccccccc",
-                                                       output
-                                                      );
-
-        Attribute [] attributes =
-        {
-            SchemeManager.GetSchemes () ["TopLevel"]!.Normal,
-            SchemeManager.GetSchemes () ["Base"]!.Normal,
-            SchemeManager.GetSchemes () ["Base"]!.Focus
-        };
-
-        if (label)
-        {
-            DriverAssert.AssertDriverAttributesAre (
-                                                    @"
-111111111111111111110
-111111111111111111110",
-                                                    output,
-                                                    Application.Driver,
-                                                    attributes
-                                                   );
-        }
-        else
-        {
-            DriverAssert.AssertDriverAttributesAre (
-                                                    @"
-222222222222222222220
-111111111111111111110",
-                                                    output,
-                                                    Application.Driver,
-                                                    attributes
-                                                   );
-        }
-
-        if (label)
-        {
-            root.CanFocus = true;
-            v.CanFocus = true;
-            Assert.True (v.HasFocus);
-            v.SetFocus ();
-            Assert.True (v.HasFocus);
-            Application.LayoutAndDraw ();
-
-            DriverAssert.AssertDriverAttributesAre (
-                                                    @"
-222222222222222222220
-111111111111111111110",
-                                                    output,
-                                                    Application.Driver,
-                                                    attributes
-                                                   );
-        }
-
-        Application.End (sessionToken);
-        top.Dispose ();
-
-        CM.Disable (resetToHardCodedDefaults: true);
     }
 }

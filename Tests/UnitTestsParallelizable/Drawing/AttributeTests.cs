@@ -2,7 +2,7 @@
 
 using UnitTests;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class AttributeTests : FakeDriverBase
 {

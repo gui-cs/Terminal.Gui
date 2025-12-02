@@ -18,7 +18,7 @@ namespace Terminal.Gui.Views;
 ///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
 ///         This enables proper modal dialog management and respects the application's lifecycle. Pass your
 ///         application instance (from <see cref="Application.Create()"/>) or use the legacy
-///         <see cref="ApplicationImpl.Instance"/> if using the static Application pattern.
+///         <see cref="Application.Instance"/> if using the static Application pattern.
 ///     </para>
 ///     <para>
 ///         Example using instance-based pattern:
@@ -114,7 +114,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an error <see cref="MessageBox"/> with fixed dimensions.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
@@ -153,7 +153,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an auto-sized error <see cref="MessageBox"/>.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
     /// <param name="buttons">Array of button labels.</param>
@@ -182,7 +182,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an error <see cref="MessageBox"/> with fixed dimensions and a default button.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
@@ -223,7 +223,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an auto-sized error <see cref="MessageBox"/> with a default button.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
     /// <param name="defaultButton">Index of the default button (0-based).</param>
@@ -253,7 +253,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an error <see cref="MessageBox"/> with fixed dimensions, a default button, and word-wrap control.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
@@ -299,7 +299,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an auto-sized error <see cref="MessageBox"/> with a default button and word-wrap control.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines.</param>
     /// <param name="defaultButton">Index of the default button (0-based).</param>
@@ -340,7 +340,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays a <see cref="MessageBox"/> with fixed dimensions.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
@@ -372,7 +372,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an auto-sized <see cref="MessageBox"/>.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
     /// <param name="buttons">Array of button labels.</param>
@@ -401,7 +401,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays a <see cref="MessageBox"/> with fixed dimensions and a default button.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
@@ -442,7 +442,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an auto-sized <see cref="MessageBox"/> with a default button.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
     /// <param name="defaultButton">Index of the default button (0-based).</param>
@@ -472,7 +472,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays a <see cref="MessageBox"/> with fixed dimensions, a default button, and word-wrap control.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="width">Width for the MessageBox.</param>
     /// <param name="height">Height for the MessageBox.</param>
     /// <param name="title">Title for the MessageBox.</param>
@@ -518,7 +518,7 @@ public static class MessageBox
     /// <summary>
     ///     Displays an auto-sized <see cref="MessageBox"/> with a default button and word-wrap control.
     /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnable"/>.</param>
+    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines.</param>
     /// <param name="defaultButton">Index of the default button (0-based).</param>

@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class TransparentTests (ITestOutputHelper output)

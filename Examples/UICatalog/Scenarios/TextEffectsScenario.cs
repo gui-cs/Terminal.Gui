@@ -23,14 +23,11 @@ public class TextEffectsScenario : Scenario
             Title = "Text Effects Scenario"
         };
 
-        w.Loaded += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
+        w.IsModalChanged += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
 
-        w.SizeChanging += (s, e) =>
+        w.ViewportChanged += (s, e) =>
                           {
-                              if (e.Size.HasValue)
-                              {
-                                  SetupGradientLineCanvas (w, e.Size.Value);
-                              }
+                              SetupGradientLineCanvas (w, e.NewViewport.Size);
                           };
 
         w.SetScheme (new ()

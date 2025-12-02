@@ -56,7 +56,7 @@ public class StatusBarTests
     //                                           )
     //                                   }
     //                                  );
-    //    Toplevel top = new ();
+    //    Runnable top = new ();
     //    top.Add (statusBar);
 
     //    bool CanExecuteNew () { return win == null; }
@@ -100,7 +100,7 @@ public class StatusBarTests
         var iteration = 0;
 
         Application.Iteration += OnApplicationOnIteration;
-        Application.Run ().Dispose ();
+        Application.Run<Runnable> ();
         Application.Iteration -= OnApplicationOnIteration;
 
         return;

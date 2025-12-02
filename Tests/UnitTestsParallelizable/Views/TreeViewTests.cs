@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 [TestSubject (typeof (TreeView))]
 public class TreeViewTests

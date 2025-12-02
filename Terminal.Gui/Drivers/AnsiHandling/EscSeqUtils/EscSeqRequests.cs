@@ -16,7 +16,7 @@ public static class EscSeqRequests
     /// </summary>
     /// <param name="terminator">The terminator.</param>
     /// <param name="numRequests">The number of requests.</param>
-    public static void Add (string terminator, int numRequests = 1)
+    public static void Add (string? terminator, int numRequests = 1)
     {
         ArgumentException.ThrowIfNullOrEmpty (terminator);
 

@@ -97,7 +97,7 @@ The driver architecture employs a **multi-threaded design** for optimal responsi
 
 ```
 ┌─────────────────────────────────────────────┐
-│         ApplicationImpl.Init()              │
+│         IApplication.Init()              │
 │  Creates MainLoopCoordinator<T> with        │
 │  ComponentFactory<T>                        │
 └────────────────┬────────────────────────────┘
@@ -128,7 +128,7 @@ This separation ensures that input is never lost and the UI remains responsive d
 
 When you call `Application.Init()`:
 
-1. **ApplicationImpl.Init()** is invoked
+1. **IApplication.Init()** is invoked
 2. Creates a `MainLoopCoordinator<T>` with the appropriate `ComponentFactory<T>`
 3. **MainLoopCoordinator.StartAsync()** begins:
    - Starts the input thread which creates `IInput<T>`
@@ -220,6 +220,5 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 ## See Also
 
 - @Terminal.Gui.Drivers - API Reference
-- @Terminal.Gui.App.Application - Application class
-- @Terminal.Gui.App.ApplicationImpl - Application implementation
+- @Terminal.Gui.App.IApplication - Application interface
 - @Terminal.Gui.App.MainLoopCoordinator`1 - Main loop coordination

@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using Terminal.Gui.App;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 /// <summary>
 ///     Parallelizable tests for keyboard handling.

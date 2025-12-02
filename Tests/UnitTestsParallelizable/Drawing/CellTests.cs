@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class CellTests
 {
@@ -24,10 +24,10 @@ public class CellTests
     [InlineData ("a︠", new uint [] { 0x0061, 0xFE20 })]
     [InlineData ("e︡", new uint [] { 0x0065, 0xFE21 })]
     [InlineData ("🇵🇹", new uint [] { 0x1F1F5, 0x1F1F9 })]
-    public void Runes_From_Grapheme (string grapheme, uint [] expected)
+    public void Runes_From_Grapheme (string? grapheme, uint [] expected)
     {
         // Arrange
-        var c = new Cell { Grapheme = grapheme };
+        var c = new Cell { Grapheme = grapheme! };
 
         // Act
         Rune [] runes = expected.Select (u => new Rune (u)).ToArray ();
@@ -73,7 +73,7 @@ public class CellTests
         Assert.Equal (expected, result);
     }
 
-    public static IEnumerable<object []> ToStringTestData ()
+    public static IEnumerable<object? []> ToStringTestData ()
     {
         yield return ["", null, "[\"\":]"];
         yield return ["a", null, "[\"a\":]"];

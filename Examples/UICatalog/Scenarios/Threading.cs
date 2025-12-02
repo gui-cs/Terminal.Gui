@@ -75,7 +75,7 @@ public class Threading : Scenario
             Y = Pos.Y (_btnActionCancel) + 6,
             Width = 10,
             Height = 10,
-            SchemeName = "TopLevel"
+            SchemeName = "Runnable"
         };
 
         win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
@@ -86,7 +86,7 @@ public class Threading : Scenario
             Y = Pos.Y (_itemsList),
             Width = 50,
             Height = Dim.Fill (),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (_log)
         };
 
@@ -162,10 +162,10 @@ public class Threading : Scenario
         void Win_Loaded (object sender, EventArgs args)
         {
             _btnActionCancel.SetFocus ();
-            win.Loaded -= Win_Loaded;
+            win.IsModalChanged -= Win_Loaded;
         }
 
-        win.Loaded += Win_Loaded;
+        win.IsModalChanged += Win_Loaded;
 
         Application.Run (win);
         win.Dispose ();

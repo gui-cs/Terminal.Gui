@@ -2,7 +2,7 @@ using System;
 using Terminal.Gui;
 using Terminal.Gui.App;
 using Xunit;
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 public class PopoverBaseImplTests
 {
@@ -23,10 +23,10 @@ public class PopoverBaseImplTests
     }
 
     [Fact]
-    public void Toplevel_Property_CanBeSetAndGet ()
+    public void Runnable_Property_CanBeSetAndGet ()
     {
         var popover = new TestPopover ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         popover.Current = top;
         Assert.Same (top, popover.Current);
     }

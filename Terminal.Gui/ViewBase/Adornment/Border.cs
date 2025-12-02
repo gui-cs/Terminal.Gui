@@ -141,7 +141,7 @@ public partial class Border : Adornment
             };
             CloseButton.Accept += (s, e) =>
             {
-                e.Handled = Parent.InvokeCommand (Command.QuitToplevel) == true;
+                e.Handled = Parent.InvokeCommand (Command.Quit) == true;
             };
             Add (CloseButton);
 
