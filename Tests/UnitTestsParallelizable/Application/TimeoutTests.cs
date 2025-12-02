@@ -5,9 +5,9 @@ using Xunit.Abstractions;
 namespace ApplicationTests.Timeout;
 
 /// <summary>
-///     Tests for timeout behavior with nested Application.Run() calls.
-///     These tests verify that timeouts scheduled in a parent run loop continue to fire
-///     correctly when a nested modal dialog is shown via Application.Run().
+///     Tests for timeout behavior and functionality.
+///     These tests verify that timeouts fire correctly, can be added/removed,
+///     handle exceptions properly, and work with Application.Run() calls.
 /// </summary>
 public class TimeoutTests (ITestOutputHelper output)
 {
