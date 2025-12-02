@@ -16,6 +16,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     ///     External observers can subscribe to this collection to monitor application lifecycle.
     /// </summary>
     public static ObservableCollection<IApplication> Apps { get; } = [];
+
     /// <summary>
     ///     Gets the singleton <see cref="IApplication"/> instance used by the legacy static Application model.
     /// </summary>
@@ -52,7 +53,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         //Debug.Fail ("Application.Create() called");
         ApplicationImpl.MarkInstanceBasedModelUsed ();
 
-        ApplicationImpl app = new () { IsExample = example };
+        ApplicationImpl app = new ();
         Apps.Add (app);
 
         return app;

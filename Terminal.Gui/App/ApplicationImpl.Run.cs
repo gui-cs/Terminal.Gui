@@ -174,6 +174,7 @@ internal partial class ApplicationImpl
         runnable.RaiseIsRunningChangedEvent (true);
         runnable.RaiseIsModalChangedEvent (true);
 
+        //RaiseIteration ();
         LayoutAndDraw ();
 
         return token;

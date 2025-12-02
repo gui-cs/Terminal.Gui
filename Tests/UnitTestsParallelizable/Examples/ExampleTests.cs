@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Terminal.Gui.Examples;
 using Xunit.Abstractions;
 
-namespace UnitTests.Parallelizable.Examples;
+namespace ApplicationTests.Examples;
 
 /// <summary>
 ///     Tests for the example discovery and execution infrastructure.

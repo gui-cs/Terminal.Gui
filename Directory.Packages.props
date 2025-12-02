@@ -20,7 +20,7 @@
     <PackageVersion Include="System.IO.Abstractions" Version="[22.0.16,23)" />
     <PackageVersion Include="Wcwidth" Version="[4.0.0,)" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="[1.21.2,2)" />
-    <PackageVersion Include="Serilog" Version="4.2.0" />
+    <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />

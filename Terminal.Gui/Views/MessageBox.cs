@@ -610,7 +610,7 @@ public static class MessageBox
                                            e.Handled = true;
                                        }
 
-                                       (s as View)?.App?.RequestStop ();
+                                       ((s as View)?.SuperView as Dialog)?.RequestStop ();
                                    };
                 }
 
@@ -657,7 +657,6 @@ public static class MessageBox
         d.TextFormatter.WordWrap = wrapMessage;
         d.TextFormatter.MultiLine = !wrapMessage;
 
-        // Run the modal; do not shut down the mainloop driver when done
         app.Run (d);
         d.Dispose ();
 

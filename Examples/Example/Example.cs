@@ -12,9 +12,7 @@ using Terminal.Gui.Views;
 // Example metadata
 [assembly: Terminal.Gui.Examples.ExampleMetadata ("Simple Example", "A basic login form demonstrating Terminal.Gui fundamentals")]
 [assembly: Terminal.Gui.Examples.ExampleCategory ("Getting Started")]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:500", "a", "d", "m", "i", "n", "Tab", "p", "a", "s", "s", "w", "o", "r", "d", "Enter"], Order = 1)]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:500", "Enter"], Order = 2)]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:100", "Esc"], Order = 3)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["a", "d", "m", "i", "n", "Tab", "p", "a", "s", "s", "w", "o", "r", "d", "Enter", "Esc"], Order = 1)]
 
 // Override the default configuration for the application to use the Light theme
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
@@ -23,19 +21,18 @@ ConfigurationManager.Enable (ConfigLocations.All);
 IApplication app = Application.Create (example: true);
 app.Init ();
 app.Run<ExampleWindow> ();
+string? result = app.GetResult<string> ();
 
 // Dispose the app to clean up and enable Console.WriteLine below
 app.Dispose ();
 
 // To see this output on the screen it must be done after shutdown,
 // which restores the previous screen.
-Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
+Console.WriteLine ($@"Username: {result}");
 
 // Defines a top-level window with border and title
 public sealed class ExampleWindow : Window
 {
-    public static string UserName { get; set; }
-
     public ExampleWindow ()
     {
         Title = $"Example App ({Application.QuitKey} to quit)";
@@ -84,8 +81,8 @@ public sealed class ExampleWindow : Window
                                   if (userNameText.Text == "admin" && passwordText.Text == "password")
                                   {
                                       MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
-                                      UserName = userNameText.Text;
-                                      Application.RequestStop ();
+                                      Result = userNameText.Text;
+                                      App?.RequestStop ();
                                   }
                                   else
                                   {
@@ -98,14 +95,5 @@ public sealed class ExampleWindow : Window
 
         // Add the views to the Window
         Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
-
-        var lv = new ListView
-        {
-            Y = Pos.AnchorEnd (),
-            Height = Dim.Auto (),
-            Width = Dim.Auto ()
-        };
-        lv.SetSource (["One", "Two", "Three", "Four"]);
-        Add (lv);
     }
 }

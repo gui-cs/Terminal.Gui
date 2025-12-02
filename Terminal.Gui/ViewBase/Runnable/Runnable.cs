@@ -170,12 +170,6 @@ public class Runnable : View, IRunnable
     /// <inheritdoc/>
     public void RaiseIsModalChangedEvent (bool newIsModal)
     {
-        // CWP Phase 3: Post-notification (work already done by Application)
-        OnIsModalChanged (newIsModal);
-
-        EventArgs<bool> args = new (newIsModal);
-        IsModalChanged?.Invoke (this, args);
-
         // Layout may need to change when modal state changes
         SetNeedsLayout ();
         SetNeedsDraw ();
@@ -194,6 +188,13 @@ public class Runnable : View, IRunnable
                 App?.Driver?.UpdateCursor ();
             }
         }
+
+        // CWP Phase 3: Post-notification (work already done by Application)
+        OnIsModalChanged (newIsModal);
+
+        EventArgs<bool> args = new (newIsModal);
+        IsModalChanged?.Invoke (this, args);
+
     }
 
     /// <inheritdoc/>

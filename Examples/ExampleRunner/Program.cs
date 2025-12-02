@@ -1,16 +1,34 @@
 #nullable enable
 // Example Runner - Demonstrates discovering and running all examples using the example infrastructure
 
-using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Examples;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-[assembly: ExampleMetadata ("Example Runner", "Discovers and runs all examples sequentially")]
-[assembly: ExampleCategory ("Infrastructure")]
+// Configure Serilog to write to Debug output and Console
+Log.Logger = new LoggerConfiguration ()
+    .MinimumLevel.Is (LogEventLevel.Verbose)
+                                  .WriteTo.Debug ()
+                                  .CreateLogger ();
+
+ILogger logger = LoggerFactory.Create (builder =>
+                                       {
+                                           builder
+                                               .AddSerilog (dispose: true) // Integrate Serilog with ILogger
+                                               .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
+                                       }).CreateLogger ("ExampleRunner Logging");
+Logging.Logger = logger;
+
+Logging.Debug ("Logging enabled - writing to Debug output\n");
 
 // Parse command line arguments
 bool useFakeDriver = args.Contains ("--fake-driver") || args.Contains ("-f");
-int timeout = 5000; // Default timeout in milliseconds
+int timeout = 30000; // Default timeout in milliseconds
 
 for (var i = 0; i < args.Length; i++)
 {
@@ -130,5 +148,8 @@ if (useFakeDriver)
 {
     Console.WriteLine ("\nNote: Tests run with FakeDriver. Some examples may timeout if they don't respond to Esc key.");
 }
+
+// Flush logs before exiting
+Log.CloseAndFlush ();
 
 return failCount == 0 ? 0 : 1;

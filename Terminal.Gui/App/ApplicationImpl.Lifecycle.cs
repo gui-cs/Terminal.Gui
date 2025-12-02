@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using Terminal.Gui.Examples;
 
 namespace Terminal.Gui.App;
 
@@ -10,9 +12,6 @@ internal partial class ApplicationImpl
 
     /// <inheritdoc/>
     public bool Initialized { get; set; }
-
-    /// <inheritdoc/>
-    public bool IsExample { get; set; }
 
     /// <inheritdoc/>
     public event EventHandler<EventArgs<bool>>? InitializedChanged;
@@ -97,7 +96,7 @@ internal partial class ApplicationImpl
         SubscribeDriverEvents ();
 
         // Setup example mode if requested
-        if (IsExample)
+        if (Application.Apps.Contains (this))
         {
             SetupExampleMode ();
         }
@@ -401,6 +400,10 @@ internal partial class ApplicationImpl
     /// </summary>
     private void SetupExampleMode ()
     {
+        if (Environment.GetEnvironmentVariable (ExampleContext.ENVIRONMENT_VARIABLE_NAME) is null)
+        {
+            return;
+        }
         // Subscribe to SessionBegun to monitor when runnables start
         SessionBegun += OnSessionBegunForExample;
     }
@@ -414,17 +417,17 @@ internal partial class ApplicationImpl
         }
 
         // Subscribe to IsModalChanged event on the TopRunnable
-        if (TopRunnable is { })
+        if (e.State.Runnable is Runnable { } runnable)
         {
-            TopRunnable.IsModalChanged += OnIsModalChangedForExample;
-            
-            // Check if already modal - if so, send keys immediately
-            if (TopRunnable.IsModal)
-            {
-                _exampleModeDemoKeysSent = true;
-                TopRunnable.IsModalChanged -= OnIsModalChangedForExample;
-                SendDemoKeys ();
-            }
+            e.State.Runnable.IsModalChanged += OnIsModalChangedForExample;
+
+            //// Check if already modal - if so, send keys immediately
+            //if (e.State.Runnable.IsModal)
+            //{
+            //    _exampleModeDemoKeysSent = true;
+            //    e.State.Runnable.IsModalChanged -= OnIsModalChangedForExample;
+            //    SendDemoKeys ();
+            //}
         }
 
         // Unsubscribe from SessionBegun - we only need to set up the modal listener once
@@ -454,8 +457,10 @@ internal partial class ApplicationImpl
 
     private void SendDemoKeys ()
     {
-        // Get the entry assembly to read example metadata
-        var assembly = System.Reflection.Assembly.GetEntryAssembly ();
+        // Get the assembly of the currently running example
+        // Use TopRunnable's type assembly instead of entry assembly
+        // This works correctly when examples are loaded dynamically by ExampleRunner
+        Assembly? assembly = TopRunnable?.GetType ().Assembly;
 
         if (assembly is null)
         {
@@ -463,9 +468,9 @@ internal partial class ApplicationImpl
         }
 
         // Look for ExampleDemoKeyStrokesAttribute
-        var demoKeyAttributes = assembly.GetCustomAttributes (typeof (Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute), false)
-                                        .OfType<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute> ()
-                                        .ToList ();
+        List<ExampleDemoKeyStrokesAttribute> demoKeyAttributes = assembly.GetCustomAttributes (typeof (ExampleDemoKeyStrokesAttribute), false)
+                                                                         .OfType<ExampleDemoKeyStrokesAttribute> ()
+                                                                         .ToList ();
 
         if (!demoKeyAttributes.Any ())
         {
@@ -473,67 +478,74 @@ internal partial class ApplicationImpl
         }
 
         // Sort by Order and collect all keystrokes
-        var sortedSequences = demoKeyAttributes.OrderBy<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute, int> (a => a.Order);
+        IOrderedEnumerable<ExampleDemoKeyStrokesAttribute> sortedSequences = demoKeyAttributes.OrderBy (a => a.Order);
 
-        // Send keys asynchronously to avoid blocking the UI thread
-        Task.Run (async () =>
+        // Default delay between keys is 100ms
+        int currentDelay = 100;
+
+        // Track cumulative timeout for scheduling
+        int cumulativeTimeout = 0;
+
+        foreach (ExampleDemoKeyStrokesAttribute attr in sortedSequences)
         {
-            // Default delay between keys is 100ms
-            int currentDelay = 100;
-
-            foreach (var attr in sortedSequences)
+            // Handle KeyStrokes array
+            if (attr.KeyStrokes is not { Length: > 0 })
             {
-                // Handle KeyStrokes array
-                if (attr.KeyStrokes is { Length: > 0 })
+                continue;
+            }
+
+            foreach (string keyStr in attr.KeyStrokes)
+            {
+                // Check for SetDelay command
+                if (keyStr.StartsWith ("SetDelay:", StringComparison.OrdinalIgnoreCase))
                 {
-                    foreach (string keyStr in attr.KeyStrokes)
+                    string delayValue = keyStr.Substring ("SetDelay:".Length);
+
+                    if (int.TryParse (delayValue, out int newDelay))
                     {
-                        // Check for SetDelay command
-                        if (keyStr.StartsWith ("SetDelay:", StringComparison.OrdinalIgnoreCase))
-                        {
-                            string delayValue = keyStr.Substring ("SetDelay:".Length);
-
-                            if (int.TryParse (delayValue, out int newDelay))
-                            {
-                                currentDelay = newDelay;
-                            }
-
-                            continue;
-                        }
-
-                        // Regular key
-                        if (Input.Key.TryParse (keyStr, out Input.Key? key) && key is { })
-                        {
-                            // Apply delay before sending key
-                            if (currentDelay > 0)
-                            {
-                                await Task.Delay (currentDelay);
-                            }
-
-                            Keyboard?.RaiseKeyDownEvent (key);
-                        }
+                        currentDelay = newDelay;
                     }
+
+                    continue;
                 }
 
-                // Handle RepeatKey
-                if (!string.IsNullOrEmpty (attr.RepeatKey))
+                // Regular key
+                if (Key.TryParse (keyStr, out Key? key))
                 {
-                    if (Input.Key.TryParse (attr.RepeatKey, out Input.Key? key) && key is { })
-                    {
-                        for (var i = 0; i < attr.RepeatCount; i++)
-                        {
-                            // Apply delay before sending key
-                            if (currentDelay > 0)
-                            {
-                                await Task.Delay (currentDelay);
-                            }
+                    cumulativeTimeout += currentDelay;
 
-                            Keyboard?.RaiseKeyDownEvent (key);
-                        }
+                    // Capture key by value to avoid closure issues
+                    Key keyToSend = key;
+
+                    AddTimeout (TimeSpan.FromMilliseconds (cumulativeTimeout), () =>
+                                                                               {
+                                                                                   Keyboard.RaiseKeyDownEvent (keyToSend);
+                                                                                   return false;
+                                                                               });
+                }
+            }
+
+            // Handle RepeatKey
+            if (!string.IsNullOrEmpty (attr.RepeatKey))
+            {
+                if (Key.TryParse (attr.RepeatKey, out Key? key))
+                {
+                    for (var i = 0; i < attr.RepeatCount; i++)
+                    {
+                        cumulativeTimeout += currentDelay;
+
+                        // Capture key by value to avoid closure issues
+                        Key keyToSend = key;
+
+                        AddTimeout (TimeSpan.FromMilliseconds (cumulativeTimeout), () =>
+                                                                                   {
+                                                                                       Keyboard.RaiseKeyDownEvent (keyToSend);
+                                                                                       return false;
+                                                                                   });
                     }
                 }
             }
-        });
+        }
     }
 
     #endregion Example Mode
