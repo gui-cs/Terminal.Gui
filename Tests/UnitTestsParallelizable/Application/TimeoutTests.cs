@@ -158,7 +158,7 @@ public class TimeoutTests (ITestOutputHelper output)
         app.Init ("fake");
 
         var timeoutFired = false;
-        var taskCompleted = new ManualResetEventSlim (false);
+        using var taskCompleted = new ManualResetEventSlim (false);
 
         Task.Run (() =>
                   {
@@ -265,7 +265,7 @@ public class TimeoutTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void AddTimeout_Long_Running_Callback_Does_Not_Block_Other_Timeouts ()
+    public void Long_Running_Callback_Delays_Subsequent_Timeouts ()
     {
         using IApplication app = Application.Create ();
         app.Init ("fake");
@@ -829,7 +829,7 @@ public class TimeoutTests (ITestOutputHelper output)
 
             // Verify no exceptions occurred
             Assert.True (timeoutCount >= 0, "Should be able to access Timeouts property without exception");
-            
+
             // Verify all tasks completed and all timeouts fired
             Assert.True (tasksCompleted.IsSet, "All background tasks should have completed");
             Assert.Equal (THREAD_COUNT, addedCount);
