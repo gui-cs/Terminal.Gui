@@ -2,10 +2,34 @@
 // Example Runner - Demonstrates discovering and running all examples using the example infrastructure
 
 using System.Diagnostics.CodeAnalysis;
+using Terminal.Gui.Configuration;
 using Terminal.Gui.Examples;
 
 [assembly: ExampleMetadata ("Example Runner", "Discovers and runs all examples sequentially")]
 [assembly: ExampleCategory ("Infrastructure")]
+
+// Parse command line arguments
+bool useFakeDriver = args.Contains ("--fake-driver") || args.Contains ("-f");
+int timeout = 5000; // Default timeout in milliseconds
+
+for (var i = 0; i < args.Length; i++)
+{
+    if ((args [i] == "--timeout" || args [i] == "-t") && i + 1 < args.Length)
+    {
+        if (int.TryParse (args [i + 1], out int parsedTimeout))
+        {
+            timeout = parsedTimeout;
+        }
+    }
+}
+
+// Configure ForceDriver via ConfigurationManager if requested
+if (useFakeDriver)
+{
+    Console.WriteLine ("Using FakeDriver (forced via ConfigurationManager)\n");
+    ConfigurationManager.RuntimeConfig = """{ "ForceDriver": "FakeDriver" }""";
+    ConfigurationManager.Enable (ConfigLocations.All);
+}
 
 // Discover examples from the Examples directory
 string? assemblyDir = Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().Location);
@@ -63,12 +87,13 @@ foreach (ExampleInfo example in examples)
     Console.Write ($"Running: {example.Name,-40} ");
 
     // Create context for running the example
+    // Note: When running with example mode, the demo keys from attributes will be used
+    // We don't need to inject additional keys via the context
     ExampleContext context = new ()
     {
-        KeysToInject = example.DemoKeyStrokes.OrderBy (ks => ks.Order)
-                          .SelectMany (ks => ks.KeyStrokes)
-                          .ToList (),
-        TimeoutMs = 5000,
+        DriverName = useFakeDriver ? "FakeDriver" : null,
+        KeysToInject = [], // Empty - let example mode handle keys from attributes
+        TimeoutMs = timeout,
         Mode = ExecutionMode.InProcess
     };
 
@@ -100,5 +125,10 @@ foreach (ExampleInfo example in examples)
 }
 
 Console.WriteLine ($"\n=== Summary: {successCount} passed, {failCount} failed ===");
+
+if (useFakeDriver)
+{
+    Console.WriteLine ("\nNote: Tests run with FakeDriver. Some examples may timeout if they don't respond to Esc key.");
+}
 
 return failCount == 0 ? 0 : 1;

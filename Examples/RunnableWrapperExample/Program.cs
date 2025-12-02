@@ -10,11 +10,11 @@ using Terminal.Gui.Views;
 [assembly: Terminal.Gui.Examples.ExampleMetadata ("Runnable Wrapper Example", "Shows how to wrap any View to make it runnable without implementing IRunnable")]
 [assembly: Terminal.Gui.Examples.ExampleCategory ("API Patterns")]
 [assembly: Terminal.Gui.Examples.ExampleCategory ("Views")]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["t", "e", "s", "t", "Esc"], Order = 1)]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:100", "Enter", "Esc"], Order = 2)]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:100", "Enter", "Esc"], Order = 3)]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:100", "Enter", "Esc"], Order = 4)]
-[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:100", "Enter", "Esc"], Order = 5)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "t", "e", "s", "t", "Esc"], Order = 1)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 2)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 3)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 4)]
+[assembly: Terminal.Gui.Examples.ExampleDemoKeyStrokes (KeyStrokes = ["SetDelay:200", "Enter", "Esc"], Order = 5)]
 
 IApplication app = Application.Create (example: true);
 app.Init ();
