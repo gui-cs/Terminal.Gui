@@ -397,24 +397,44 @@ internal partial class ApplicationImpl
 
     /// <summary>
     ///     Sets up example mode functionality - collecting metadata and sending demo keys
-    ///     when the first TopRunnable is modal.
+    ///     when the first TopRunnable becomes modal.
     /// </summary>
     private void SetupExampleMode ()
     {
-        // Subscribe to SessionBegun to wait for the first modal runnable
+        // Subscribe to SessionBegun to monitor when runnables start
         SessionBegun += OnSessionBegunForExample;
     }
 
     private void OnSessionBegunForExample (object? sender, SessionTokenEventArgs e)
     {
-        // Only send demo keys once, when the first modal runnable appears
+        // Only send demo keys once
         if (_exampleModeDemoKeysSent)
         {
             return;
         }
 
-        // Check if the TopRunnable is modal
-        if (TopRunnable?.IsModal != true)
+        // Subscribe to IsModalChanged event on the TopRunnable
+        if (TopRunnable is { })
+        {
+            TopRunnable.IsModalChanged += OnIsModalChangedForExample;
+            
+            // Check if already modal - if so, send keys immediately
+            if (TopRunnable.IsModal)
+            {
+                _exampleModeDemoKeysSent = true;
+                TopRunnable.IsModalChanged -= OnIsModalChangedForExample;
+                SendDemoKeys ();
+            }
+        }
+
+        // Unsubscribe from SessionBegun - we only need to set up the modal listener once
+        SessionBegun -= OnSessionBegunForExample;
+    }
+
+    private void OnIsModalChangedForExample (object? sender, EventArgs<bool> e)
+    {
+        // Only send demo keys once, when a runnable becomes modal (not when it stops being modal)
+        if (_exampleModeDemoKeysSent || !e.Value)
         {
             return;
         }
@@ -423,7 +443,10 @@ internal partial class ApplicationImpl
         _exampleModeDemoKeysSent = true;
 
         // Unsubscribe - we only need to do this once
-        SessionBegun -= OnSessionBegunForExample;
+        if (TopRunnable is { })
+        {
+            TopRunnable.IsModalChanged -= OnIsModalChangedForExample;
+        }
 
         // Send demo keys from assembly attributes
         SendDemoKeys ();
@@ -452,61 +475,65 @@ internal partial class ApplicationImpl
         // Sort by Order and collect all keystrokes
         var sortedSequences = demoKeyAttributes.OrderBy<Terminal.Gui.Examples.ExampleDemoKeyStrokesAttribute, int> (a => a.Order);
 
-        // Default delay between keys is 100ms
-        int currentDelay = 100;
-
-        foreach (var attr in sortedSequences)
+        // Send keys asynchronously to avoid blocking the UI thread
+        Task.Run (async () =>
         {
-            // Handle KeyStrokes array
-            if (attr.KeyStrokes is { Length: > 0 })
+            // Default delay between keys is 100ms
+            int currentDelay = 100;
+
+            foreach (var attr in sortedSequences)
             {
-                foreach (string keyStr in attr.KeyStrokes)
+                // Handle KeyStrokes array
+                if (attr.KeyStrokes is { Length: > 0 })
                 {
-                    // Check for SetDelay command
-                    if (keyStr.StartsWith ("SetDelay:", StringComparison.OrdinalIgnoreCase))
+                    foreach (string keyStr in attr.KeyStrokes)
                     {
-                        string delayValue = keyStr.Substring ("SetDelay:".Length);
-
-                        if (int.TryParse (delayValue, out int newDelay))
+                        // Check for SetDelay command
+                        if (keyStr.StartsWith ("SetDelay:", StringComparison.OrdinalIgnoreCase))
                         {
-                            currentDelay = newDelay;
+                            string delayValue = keyStr.Substring ("SetDelay:".Length);
+
+                            if (int.TryParse (delayValue, out int newDelay))
+                            {
+                                currentDelay = newDelay;
+                            }
+
+                            continue;
                         }
 
-                        continue;
+                        // Regular key
+                        if (Input.Key.TryParse (keyStr, out Input.Key? key) && key is { })
+                        {
+                            // Apply delay before sending key
+                            if (currentDelay > 0)
+                            {
+                                await Task.Delay (currentDelay);
+                            }
+
+                            Keyboard?.RaiseKeyDownEvent (key);
+                        }
                     }
+                }
 
-                    // Regular key
-                    if (Input.Key.TryParse (keyStr, out Input.Key? key) && key is { })
+                // Handle RepeatKey
+                if (!string.IsNullOrEmpty (attr.RepeatKey))
+                {
+                    if (Input.Key.TryParse (attr.RepeatKey, out Input.Key? key) && key is { })
                     {
-                        // Apply delay before sending key
-                        if (currentDelay > 0)
+                        for (var i = 0; i < attr.RepeatCount; i++)
                         {
-                            System.Threading.Thread.Sleep (currentDelay);
-                        }
+                            // Apply delay before sending key
+                            if (currentDelay > 0)
+                            {
+                                await Task.Delay (currentDelay);
+                            }
 
-                        Keyboard?.RaiseKeyDownEvent (key);
+                            Keyboard?.RaiseKeyDownEvent (key);
+                        }
                     }
                 }
             }
-
-            // Handle RepeatKey
-            if (!string.IsNullOrEmpty (attr.RepeatKey))
-            {
-                if (Input.Key.TryParse (attr.RepeatKey, out Input.Key? key) && key is { })
-                {
-                    for (var i = 0; i < attr.RepeatCount; i++)
-                    {
-                        // Apply delay before sending key
-                        if (currentDelay > 0)
-                        {
-                            System.Threading.Thread.Sleep (currentDelay);
-                        }
-
-                        Keyboard?.RaiseKeyDownEvent (key);
-                    }
-                }
-            }
-        }
+        });
     }
 
     #endregion Example Mode
