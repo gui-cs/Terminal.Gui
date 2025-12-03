@@ -1,6 +1,3 @@
-
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>

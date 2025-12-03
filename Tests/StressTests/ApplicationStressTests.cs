@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace StressTests;
 
-public class ApplicationStressTests (ITestOutputHelper output)
+public class ApplicationStressTests
 {
     private const int NUM_INCREMENTS = 500;
 

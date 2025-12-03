@@ -1248,5 +1248,64 @@ public enum StandardColor
     ///         A bright yellowish-green color.
     ///     </para>
     /// </summary>
-    YellowGreen = 0x9ACD32
+    YellowGreen = 0x9ACD32,
+
+    // Legacy 16-color names for backwards compatibility
+    // These match the RGB values used in ColorName16 mapping
+
+    /// <summary>
+    ///     Bright Black RGB(118, 118, 118).
+    ///     <para>
+    ///         A bright black (dark gray) color from the legacy 16-color palette. This is the ColorName16.DarkGray color.
+    ///     </para>
+    /// </summary>
+    BrightBlack = 0x767676,
+
+    /// <summary>
+    ///     Bright Blue RGB(59, 120, 255).
+    ///     <para>
+    ///         A bright blue color from the legacy 16-color palette.
+    ///     </para>
+    /// </summary>
+    BrightBlue = 0x3B78FF,
+
+    /// <summary>
+    ///     Bright Cyan RGB(97, 214, 214).
+    ///     <para>
+    ///         A bright cyan color from the legacy 16-color palette.
+    ///     </para>
+    /// </summary>
+    BrightCyan = 0x61D6D6,
+
+    /// <summary>
+    ///     Bright Green RGB(22, 198, 12).
+    ///     <para>
+    ///         A bright green color from the legacy 16-color palette.
+    ///     </para>
+    /// </summary>
+    BrightGreen = 0x16C60C,
+
+    /// <summary>
+    ///     Bright Magenta RGB(180, 0, 158).
+    ///     <para>
+    ///         A bright magenta color from the legacy 16-color palette.
+    ///     </para>
+    /// </summary>
+    BrightMagenta = 0xB4009E,
+
+    /// <summary>
+    ///     Bright Red RGB(231, 72, 86).
+    ///     <para>
+    ///         A bright red color from the legacy 16-color palette.
+    ///     </para>
+    /// </summary>
+    BrightRed = 0xE74856,
+
+    /// <summary>
+    ///     Bright Yellow RGB(249, 241, 165).
+    ///     <para>
+    ///         A bright yellow color from the legacy 16-color palette.
+    ///     </para>
+    /// </summary>
+    BrightYellow = 0xF9F1A5
 }
