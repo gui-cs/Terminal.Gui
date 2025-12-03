@@ -69,24 +69,8 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         Application.PrevTabKeyChanged -= OnPrevTabKeyChanged;
     }
 
-    private IApplication? _app;
-
     /// <inheritdoc/>
-    public IApplication? App
-    {
-        get => _app;
-        set
-        {
-            _app = value;
-
-            _quitKey = _app?.Keyboard.QuitKey ?? Key.Esc;
-            _arrangeKey = _app?.Keyboard.ArrangeKey ?? Key.F5.WithCtrl;
-            _nextTabGroupKey = _app?.Keyboard.NextTabGroupKey ?? Key.F6;
-            _nextTabKey = _app?.Keyboard.NextTabKey ?? Key.Tab;
-            _prevTabGroupKey = _app?.Keyboard.PrevTabGroupKey ?? Key.F6.WithShift;
-            _prevTabKey = _app?.Keyboard.PrevTabKey ?? Key.Tab.WithShift;
-        }
-    }
+    public IApplication? App { get; set; }
 
     /// <inheritdoc/>
     public KeyBindings KeyBindings { get; internal set; } = new (null);
