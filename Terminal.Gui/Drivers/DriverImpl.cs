@@ -226,16 +226,17 @@ internal class DriverImpl : IDriver
 
     public bool SupportsTrueColor => _isVirtualTerminal;
 
-    /// <inheritdoc/>
+    private bool _force16Colors;
 
+    /// <inheritdoc/>
     public bool Force16Colors
     {
-        get => Application.Force16Colors;
+        get => _force16Colors;
         set
         {
-            if (!_isVirtualTerminal && !Application.Force16Colors)
+            if (!_isVirtualTerminal && !value)
             {
-                Application.Force16Colors = true;
+                _force16Colors = Application.Force16Colors = true;
 
                 return;
             }
@@ -245,7 +246,7 @@ internal class DriverImpl : IDriver
                 return;
             }
 
-            Application.Force16Colors = value;
+            _force16Colors = Application.Force16Colors = value;
         }
     }
 
