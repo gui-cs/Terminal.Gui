@@ -52,7 +52,7 @@ public class ColorJsonConverterTests
     [InlineData (ColorName16.Red, "Red")]
     [InlineData (ColorName16.Magenta, "Fuchsia")]   // W3C+ Standard overrides
     [InlineData (ColorName16.Yellow, "Yellow")]
-    [InlineData (ColorName16.DarkGray, "DarkGray")]
+    [InlineData (ColorName16.DarkGray, "BrightBlack")] // Legacy ColorName16.DarkGray now serializes as BrightBlack (first alphabetical match)
     [InlineData (ColorName16.BrightBlue, "BrightBlue")]
     [InlineData (ColorName16.BrightGreen, "BrightGreen")]
     [InlineData (ColorName16.BrightCyan, "BrightCyan")]
@@ -98,7 +98,7 @@ public class ColorJsonConverterTests
     [InlineData ("BrightYellow", Color.BrightYellow)]
     [InlineData ("Yellow", Color.Yellow)]
     [InlineData ("Cyan", Color.Cyan)]
-    [InlineData ("DarkGray", Color.DarkGray)]
+    [InlineData ("BrightBlack", Color.DarkGray)] // Legacy ColorName16.DarkGray is now accessible as BrightBlack
     [InlineData ("Gray", Color.Gray)]
     [InlineData ("Green", Color.Green)]
     [InlineData ("Magenta", Color.Magenta)]
