@@ -11,8 +11,28 @@ namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a 24-bit color encoded in ARGB32 format.
-///     <para/>
+///     <para>
+///         The RGB components define the color identity (what color it is), while the alpha channel defines
+///         rendering intent (how transparent it should be when drawn).
+///     </para>
 /// </summary>
+/// <remarks>
+///     <para>
+///         When matching colors to standard color names (e.g., via <see cref="ColorStrings.GetColorName"/>),
+///         the alpha channel is ignored. This means colors with the same RGB values but different alpha values
+///         will resolve to the same color name. This design supports transparency features while maintaining
+///         semantic color identity.
+///     </para>
+///     <para>
+///         While Terminal.Gui does not currently support alpha blending during rendering, the alpha channel
+///         is used to indicate rendering intent:
+///         <list type="bullet">
+///             <item><description>Alpha = 0: Fully transparent (don't render)</description></item>
+///             <item><description>Alpha = 255: Fully opaque (normal rendering)</description></item>
+///             <item><description>Other values: Reserved for future alpha blending support</description></item>
+///         </list>
+///     </para>
+/// </remarks>
 /// <seealso cref="Attribute"/>
 /// <seealso cref="ColorExtensions"/>
 /// <seealso cref="ColorName16"/>
@@ -23,8 +43,16 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 {
     /// <summary>The value of the alpha channel component</summary>
     /// <remarks>
-    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
-    ///     rendering.
+    ///     <para>
+    ///         The alpha channel represents rendering intent (transparency) rather than color identity.
+    ///         Terminal.Gui does not currently perform alpha blending, but uses this value to determine
+    ///         whether to render the color at all (alpha = 0 means don't render).
+    ///     </para>
+    ///     <para>
+    ///         When matching colors to standard color names, the alpha channel is ignored. For example,
+    ///         <c>new Color(255, 0, 0, 255)</c> and <c>new Color(255, 0, 0, 128)</c> will both be
+    ///         identified as "Red".
+    ///     </para>
     /// </remarks>
     [JsonIgnore]
     [field: FieldOffset (3)]
@@ -32,8 +60,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
     /// <summary>The value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.</summary>
     /// <remarks>
-    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
-    ///     rendering.
+    ///     The alpha channel in the ARGB value represents rendering intent (transparency), not color identity.
+    ///     When matching to standard color names, only the RGB components are considered.
     /// </remarks>
     [JsonIgnore]
     [field: FieldOffset (0)]

@@ -18,7 +18,7 @@ internal static class StandardColors
     {
         string [] standardNames = Enum.GetNames<StandardColor> ().Order ().ToArray ();
 
-        return ImmutableArray.Create (standardNames);
+        return [.. standardNames];
     }
 
     private static readonly Lazy<FrozenDictionary<uint, string>> _argbNameMap = new (
@@ -82,7 +82,10 @@ internal static class StandardColors
     /// <returns>True if conversion succeeded; otherwise false.</returns>
     public static bool TryNameColor (Color color, [NotNullWhen (true)] out string? name)
     {
-        if (_argbNameMap.Value.TryGetValue (color.Argb, out name))
+        // Ignore alpha channel when matching - alpha represents transparency, not color identity
+        uint opaqueArgb = color.Argb | 0xFF000000;
+
+        if (_argbNameMap.Value.TryGetValue (opaqueArgb, out name))
         {
             return true;
         }
