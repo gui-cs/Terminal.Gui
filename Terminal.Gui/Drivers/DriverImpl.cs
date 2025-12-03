@@ -234,7 +234,7 @@ internal class DriverImpl : IDriver
         get => _force16Colors;
         set
         {
-            if (!_isVirtualTerminal && !value)
+            if (!_isVirtualTerminal && !_force16Colors && !value)
             {
                 _force16Colors = Application.Force16Colors = true;
 
