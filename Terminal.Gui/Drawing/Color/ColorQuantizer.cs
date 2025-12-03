@@ -39,7 +39,7 @@ public class ColorQuantizer
     /// <param name="pixels"></param>
     public void BuildPalette (Color [,] pixels)
     {
-        List<Color> allColors = new ();
+        List<Color> allColors = [];
         int width = pixels.GetLength (0);
         int height = pixels.GetLength (1);
 
@@ -56,8 +56,8 @@ public class ColorQuantizer
     }
 
     /// <summary>
-    /// Returns the closest color in <see cref="Palette"/> that matches <paramref name="toTranslate"/>
-    /// based on the color comparison algorithm defined by <see cref="DistanceAlgorithm"/>
+    ///     Returns the closest color in <see cref="Palette"/> that matches <paramref name="toTranslate"/>
+    ///     based on the color comparison algorithm defined by <see cref="DistanceAlgorithm"/>
     /// </summary>
     /// <param name="toTranslate"></param>
     /// <returns></returns>

@@ -1,6 +1,6 @@
-namespace DrawingTests;
+namespace DrawingTests.ColorTests;
 
-public partial class ColorTests
+public partial class ColorClassTests
 {
     [Fact]
     public void Constructor_Empty_ReturnsColorWithZeroValue ()

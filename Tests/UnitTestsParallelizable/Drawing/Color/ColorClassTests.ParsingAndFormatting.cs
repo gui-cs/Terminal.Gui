@@ -2,9 +2,9 @@
 using System.Buffers.Binary;
 using System.Globalization;
 
-namespace DrawingTests;
+namespace DrawingTests.ColorTests;
 
-public partial class ColorTests
+public partial class ColorClassTests
 {
     [Fact]
     public void Color_ToString_WithNamedColor ()

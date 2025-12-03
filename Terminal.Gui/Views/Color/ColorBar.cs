@@ -1,5 +1,3 @@
-
-
 using ColorHelper;
 
 namespace Terminal.Gui.Views;
@@ -15,7 +13,7 @@ internal abstract class ColorBar : View, IColorBar
     /// </summary>
     protected ColorBar ()
     {
-        Height = Dim.Auto(minimumContentDim: 1);
+        Height = Dim.Auto (minimumContentDim: 1);
         Width = Dim.Fill ();
         CanFocus = true;
 
@@ -135,7 +133,6 @@ internal abstract class ColorBar : View, IColorBar
 
             mouseEvent.Handled = true;
             SetFocus ();
-
         }
 
         return mouseEvent.Handled;
