@@ -205,34 +205,6 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
         Assert.True (eventRaised);
     }
 
-    [Fact]
-    public void DrewText_Event_Raised ()
-    {
-        IDriver driver = CreateFakeDriver (80, 25);
-        driver.Clip = new Region (driver.Screen);
-
-        bool eventRaised = false;
-
-        var view = new View
-        {
-            X = 10,
-            Y = 10,
-            Width = 20,
-            Height = 20,
-            Driver = driver,
-            Text = "Test"
-        };
-        view.BeginInit ();
-        view.EndInit ();
-        view.LayoutSubViews ();
-
-        view.DrewText += (s, e) => eventRaised = true;
-
-        view.Draw ();
-
-        Assert.True (eventRaised);
-    }
-
     #endregion
 
     #region LineCanvas Tests

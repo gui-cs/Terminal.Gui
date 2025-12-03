@@ -253,7 +253,7 @@ public partial class View // Drawing APIs
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-           //Margin?.Draw ();
+            //Margin?.Draw ();
         }
     }
 
@@ -288,7 +288,7 @@ public partial class View // Drawing APIs
 
     internal void DoClearViewport (DrawContext? context = null)
     {
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) || OnClearingViewport ())
+        if (!NeedsDraw || ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) || OnClearingViewport ())
         {
             return;
         }
@@ -407,8 +407,8 @@ public partial class View // Drawing APIs
 
         DrawText (context);
 
-        OnDrewText();
-        DrewText?.Invoke(this, EventArgs.Empty);
+        OnDrewText ();
+        DrewText?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -472,7 +472,7 @@ public partial class View // Drawing APIs
 
     private void DoDrawContent (DrawContext? context = null)
     {
-        if (OnDrawingContent (context))
+        if (!NeedsDraw || OnDrawingContent (context))
         {
             return;
         }
@@ -523,7 +523,7 @@ public partial class View // Drawing APIs
 
     private void DoDrawSubViews (DrawContext? context = null)
     {
-        if (OnDrawingSubViews (context))
+        if (!NeedsDraw || OnDrawingSubViews (context))
         {
             return;
         }
@@ -607,7 +607,7 @@ public partial class View // Drawing APIs
 
     private void DoRenderLineCanvas ()
     {
-        if (OnRenderingLineCanvas ())
+        if (!NeedsDraw || OnRenderingLineCanvas ())
         {
             return;
         }

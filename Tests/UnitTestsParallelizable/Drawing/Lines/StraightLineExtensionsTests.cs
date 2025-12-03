@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.Parallelizable.Drawing.Lines;
+namespace DrawingTests.Lines;
 
 public class StraightLineExtensionsTests (ITestOutputHelper output)
 {
