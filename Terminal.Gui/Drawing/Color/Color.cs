@@ -134,8 +134,6 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <summary>Initializes a new instance of the <see cref="Color"/> with all channels set to 0.</summary>
     public Color () { Argb = 0u; }
 
-    // TODO: ColorName and AnsiColorCode are only needed when a driver is in Force16Color mode and we
-    // TODO: should be able to remove these from any non-Driver-specific usages.
     /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static Dictionary<ColorName16, string> Colors16
@@ -203,31 +201,6 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public bool IsClosestToNamedColor16 (in ColorName16 namedColor) { return GetClosestNamedColor16 () == namedColor; }
 
-    /// <summary>
-    ///     Determines if the closest named <see cref="Color"/> to <paramref name="color"/>/> is the provided
-    ///     <paramref name="namedColor"/>.
-    /// </summary>
-    /// <param name="color">
-    ///     The color to test against the <see cref="GetClosestNamedColor16(Color)"/> value in
-    ///     <paramref name="namedColor"/>.
-    /// </param>
-    /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor16(Color)"/> to check if this <see cref="Color"/> is closer
-    ///     to than any other configured named color.
-    /// </param>
-    /// <returns>
-    ///     <see langword="true"/> if the closest named color to <paramref name="color"/> is the provided value. <br/>
-    ///     <see langword="false"/> if any other named color is closer to <paramref name="color"/> than
-    ///     <paramref name="namedColor"/>.
-    /// </returns>
-    /// <remarks>
-    ///     If <paramref name="color"/> is equidistant from two named colors, the result of this method is not guaranteed
-    ///     to be determinate.
-    /// </remarks>
-    [Pure]
-    [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public static bool IsColorClosestToNamedColor16 (in Color color, in ColorName16 namedColor) { return color.IsClosestToNamedColor16 (in namedColor); }
-
     /// <summary>Gets the "closest" named color to this <see cref="Color"/> value.</summary>
     /// <param name="inputColor"></param>
     /// <remarks>
@@ -238,15 +211,6 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     internal static ColorName16 GetClosestNamedColor16 (Color inputColor)
     {
         return ColorExtensions.ColorToName16Map!.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
-    }
-
-    /// <summary>Converts the given color value to exact named color represented by <see cref="ColorName16"/>.</summary>
-    /// <param name="inputColor"></param>
-    /// <param name="colorName16">Successfully converted named color.</param>
-    /// <returns>True if conversion succeeded; otherwise false.</returns>
-    internal static bool TryGetExactNamedColor16 (Color inputColor, out ColorName16 colorName16)
-    {
-        return ColorExtensions.ColorToName16Map!.TryGetValue (inputColor, out colorName16);
     }
 
     [SkipLocalsInit]
@@ -297,16 +261,8 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         HSL? hsl = ColorConverter.RgbToHsl (new (R, G, B));
 
         double lNorm = hsl.L / 255.0;
-        double newL;
 
-        if (lNorm < 0.5)
-        {
-            newL = Math.Min (1.0, lNorm + brightenAmount);
-        }
-        else
-        {
-            newL = Math.Max (0.0, lNorm - brightenAmount);
-        }
+        double newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + brightenAmount) : Math.Max (0.0, lNorm - brightenAmount);
 
         if (Math.Abs (newL - lNorm) < 0.1)
         {

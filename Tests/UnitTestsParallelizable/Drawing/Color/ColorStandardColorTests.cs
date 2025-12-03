@@ -1,6 +1,6 @@
-using Xunit;
+using Terminal.Gui.Drawing;
 
-namespace DrawingTests;
+namespace DrawingTests.ColorTests;
 
 public class ColorStandardColorTests
 {
@@ -9,7 +9,7 @@ public class ColorStandardColorTests
     {
         // Without the fix, this uses Color(in StandardColor) -> this((int)colorName),
         // which sets A=0x00 and prevents name resolution (expects A=0xFF).
-        var c = new Terminal.Gui.Drawing.Color(Terminal.Gui.Drawing.StandardColor.CadetBlue);
+        var c = new Terminal.Gui.Drawing.Color(StandardColor.CadetBlue);
 
         // Expected: named color
         Assert.Equal("CadetBlue", c.ToString());
@@ -19,7 +19,7 @@ public class ColorStandardColorTests
     public void ToString_G_Prints_Opaque_ARGB_For_StandardColor_CadetBlue()
     {
         // Without the fix, A=0x00, so "G" prints "#005F9EA0" instead of "#FF5F9EA0".
-        var c = new Terminal.Gui.Drawing.Color(Terminal.Gui.Drawing.StandardColor.CadetBlue);
+        var c = new Terminal.Gui.Drawing.Color(StandardColor.CadetBlue);
 
         // Expected: #AARRGGBB with A=FF (opaque)
         Assert.Equal("#FF5F9EA0", c.ToString("G", null));

@@ -113,7 +113,7 @@ public class ColorJsonConverterTests
         var actualColor = JsonSerializer.Deserialize<Color> (json, JsonOptions);
 
         // Assert
-        Assert.Equal (new Color (expectedColor), actualColor);
+        Assert.Equal (new (expectedColor), actualColor);
     }
 
     [Fact]

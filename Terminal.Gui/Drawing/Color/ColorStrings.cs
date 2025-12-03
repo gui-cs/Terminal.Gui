@@ -10,20 +10,6 @@ public static class ColorStrings
     private static readonly StandardColorsNameResolver _standard = new();
 
     /// <summary>
-    ///     Gets the W3C+  standard string for <paramref name="color"/>.
-    /// </summary>
-    /// <param name="color">The color.</param>
-    /// <returns><see langword="null"/> if there is no standard color name for the specified color.</returns>
-    public static string? GetStandardColorName (Color color)
-    {
-        if (_standard.TryNameColor (color, out string? name))
-        {
-            return name;
-        }
-        return null;
-    }
-
-    /// <summary>
     ///     Gets the color name for <paramref name="color"/>.
     /// </summary>
     /// <param name="color">The color.</param>
