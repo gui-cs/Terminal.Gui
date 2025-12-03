@@ -245,8 +245,6 @@ public class ApplicationTests (ITestOutputHelper output)
 
         void Application_Iteration (object? sender, EventArgs<IApplication?> e)
         {
-            //Assert.Equal (0, iteration);
-
             iteration++;
             app.RequestStop ();
         }
