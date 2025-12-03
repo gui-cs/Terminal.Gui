@@ -174,6 +174,8 @@ internal partial class ApplicationImpl
 
         if (Driver is { })
         {
+            Logging.Redraws.Add (1);
+
             Driver.Clip = new (Screen);
 
             View.Draw (views: tops!, neededLayout || forceRedraw);

@@ -139,20 +139,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
         if (App?.TopRunnableView != null)
         {
-            bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (App?.TopRunnableView)
-                                     || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
-
             SizeMonitor.Poll ();
 
-            if (needsDrawOrLayout)
-            {
-                Logging.Redraws.Add (1);
-
-                App?.LayoutAndDraw (forceRedraw: false);
-
-                Output.Write (OutputBuffer);
-            }
+            App?.LayoutAndDraw (forceRedraw: false);
 
             SetCursor ();
         }
@@ -187,31 +176,6 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         {
             Output.SetCursorVisibility (CursorVisibility.Invisible);
         }
-    }
-
-    private bool AnySubViewsNeedDrawn (View? v)
-    {
-        if (v is null)
-        {
-            return false;
-        }
-
-        if (v.NeedsDraw || v.NeedsLayout)
-        {
-            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
-
-            return true;
-        }
-
-        foreach (View subview in v.SubViews)
-        {
-            if (AnySubViewsNeedDrawn (subview))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /// <inheritdoc/>
