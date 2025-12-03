@@ -901,10 +901,9 @@ public partial class View // Drawing APIs
             subview.ClearNeedsDraw ();
         }
 
-        if (SuperView is { })
-        {
-            SuperView.SubViewNeedsDraw = false;
-        }
+        // DO NOT clear SuperView.SubViewNeedsDraw here!
+        // The SuperView will clear its own SubViewNeedsDraw after it has drawn all its subviews.
+        // If we clear it here, and this view has siblings that still need drawing, we'll break the draw system.
 
         // This ensures LineCanvas' get redrawn
         if (!SuperViewRendersLineCanvas)

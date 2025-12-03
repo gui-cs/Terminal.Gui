@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.App;
 
 internal partial class ApplicationImpl
@@ -150,17 +149,6 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View?> tops = [.. SessionStack!.Select(r => r.Runnable! as View)!];
-
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            visiblePopover.SetNeedsDraw ();
-            visiblePopover.SetNeedsLayout ();
-            tops.Insert (0, visiblePopover);
-        }
-
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse ()!, Screen.Size);
-
         if (ClearScreenNextIteration)
         {
             forceRedraw = true;
@@ -172,13 +160,28 @@ internal partial class ApplicationImpl
             Driver?.ClearContents ();
         }
 
-        if (Driver is { })
+        List<View?> views = [.. SessionStack!.Select (r => r.Runnable! as View)!];
+
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            views.Insert (0, visiblePopover);
+        }
+
+        bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+
+        bool needsDraw = forceRedraw || views.Any (v => v is { NeedsDraw: true } or { SubViewNeedsDraw: true });
+
+        if (Driver is { } && (neededLayout || needsDraw))
         {
             Logging.Redraws.Add (1);
+            Logging.Trace ("LayoutAndDraw");
 
             Driver.Clip = new (Screen);
 
-            View.Draw (views: tops!, neededLayout || forceRedraw);
+            View.Draw (views: views.ToArray ().Cast<View> ()!, neededLayout || forceRedraw);
+
             Driver.Clip = new (Screen);
             Driver?.Refresh ();
         }

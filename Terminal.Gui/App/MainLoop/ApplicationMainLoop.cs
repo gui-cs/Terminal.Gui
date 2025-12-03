@@ -137,7 +137,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        if (App?.TopRunnableView != null)
+        //if (App?.TopRunnableView != null)
         {
             SizeMonitor.Poll ();
 
@@ -155,10 +155,11 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     private void SetCursor ()
     {
-        View? mostFocused = App?.TopRunnableView!.MostFocused;
+        View? mostFocused = App?.TopRunnableView?.MostFocused;
 
         if (mostFocused == null)
         {
+            Output.SetCursorVisibility (CursorVisibility.Invisible);
             return;
         }
 
@@ -167,9 +168,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         if (to.HasValue)
         {
             // Translate to screen coordinates
-            to = mostFocused.ViewportToScreen (to.Value);
+            Point screenPos = mostFocused.ViewportToScreen (to.Value);
 
-            Output.SetCursorPosition (to.Value.X, to.Value.Y);
+            Output.SetCursorPosition (screenPos.X, screenPos.Y);
             Output.SetCursorVisibility (mostFocused.CursorVisibility);
         }
         else

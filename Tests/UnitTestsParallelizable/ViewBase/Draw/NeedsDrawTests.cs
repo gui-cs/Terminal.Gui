@@ -311,4 +311,174 @@ public class NeedsDrawTests : FakeDriverBase
         Assert.Equal (new (1, 1, 5, 5), view.Viewport);
         Assert.Equal (new (1, 1, 5, 5), view.NeedsDrawRect);
     }
+
+    [Fact]
+    public void ClearNeedsDraw_WithSiblings_DoesNotClearSuperViewSubViewNeedsDraw ()
+    {
+        // This test verifies the fix for the bug where a subview clearing its NeedsDraw
+        // would incorrectly clear the superview's SubViewNeedsDraw flag, even if other siblings
+        // still needed drawing.
+
+        IDriver driver = CreateFakeDriver (80, 25);
+        driver.Clip = new Region (driver.Screen);
+
+        var superView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 50,
+            Height = 50,
+            Driver = driver
+        };
+
+        var subView1 = new View { X = 0, Y = 0, Width = 10, Height = 10, Id = "SubView1" };
+        var subView2 = new View { X = 0, Y = 10, Width = 10, Height = 10, Id = "SubView2" };
+        var subView3 = new View { X = 0, Y = 20, Width = 10, Height = 10, Id = "SubView3" };
+
+        superView.Add (subView1, subView2, subView3);
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.LayoutSubViews ();
+
+        // All subviews should need drawing initially
+        Assert.True (subView1.NeedsDraw);
+        Assert.True (subView2.NeedsDraw);
+        Assert.True (subView3.NeedsDraw);
+        Assert.True (superView.SubViewNeedsDraw);
+
+        // Draw subView1 - this will call ClearNeedsDraw() on subView1
+        subView1.Draw ();
+
+        // SubView1 should no longer need drawing
+        Assert.False (subView1.NeedsDraw);
+
+        // But subView2 and subView3 still need drawing
+        Assert.True (subView2.NeedsDraw);
+        Assert.True (subView3.NeedsDraw);
+
+        // THE BUG: Before the fix, subView1.ClearNeedsDraw() would set superView.SubViewNeedsDraw = false
+        // even though subView2 and subView3 still need drawing.
+        // After the fix, superView.SubViewNeedsDraw should still be true because subView2 and subView3 need drawing.
+        Assert.True (superView.SubViewNeedsDraw, "SuperView's SubViewNeedsDraw should still be true because subView2 and subView3 still need drawing");
+
+        // Now draw subView2
+        subView2.Draw ();
+        Assert.False (subView2.NeedsDraw);
+        Assert.True (subView3.NeedsDraw);
+
+        // SuperView should still have SubViewNeedsDraw = true because subView3 needs drawing
+        Assert.True (superView.SubViewNeedsDraw, "SuperView's SubViewNeedsDraw should still be true because subView3 still needs drawing");
+
+        // Now draw subView3
+        subView3.Draw ();
+        Assert.False (subView3.NeedsDraw);
+
+        // SuperView should STILL have SubViewNeedsDraw = true because it hasn't been cleared by the superview itself
+        // Only the superview's own ClearNeedsDraw() should clear this flag
+        Assert.True (superView.SubViewNeedsDraw, "SuperView's SubViewNeedsDraw should only be cleared by superView.ClearNeedsDraw(), not by subviews");
+
+        // Finally, draw the superview - this will clear SubViewNeedsDraw
+        superView.Draw ();
+        Assert.False (superView.SubViewNeedsDraw, "SuperView's SubViewNeedsDraw should now be false after superView.Draw()");
+        Assert.False (subView1.NeedsDraw);
+        Assert.False (subView2.NeedsDraw);
+        Assert.False (subView3.NeedsDraw);
+    }
+
+    [Fact]
+    public void ClearNeedsDraw_ClearsOwnFlags ()
+    {
+        // Verify that ClearNeedsDraw properly clears the view's own flags
+        IDriver driver = CreateFakeDriver (80, 25);
+        driver.Clip = new Region (driver.Screen);
+
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 20,
+            Height = 20,
+            Driver = driver
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        Assert.True (view.NeedsDraw);
+        Assert.Equal (view.Viewport, view.NeedsDrawRect);
+
+        view.Draw ();
+
+        Assert.False (view.NeedsDraw);
+        Assert.Equal (Rectangle.Empty, view.NeedsDrawRect);
+        Assert.False (view.SubViewNeedsDraw);
+    }
+
+    [Fact]
+    public void ClearNeedsDraw_ClearsAdornments ()
+    {
+        // Verify that ClearNeedsDraw clears adornment flags
+        IDriver driver = CreateFakeDriver (80, 25);
+        driver.Clip = new Region (driver.Screen);
+
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 20,
+            Height = 20,
+            Driver = driver
+        };
+        view.Border!.Thickness = new Thickness (1);
+        view.Padding!.Thickness = new Thickness (1);
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        Assert.True (view.Border!.NeedsDraw);
+        Assert.True (view.Padding!.NeedsDraw);
+
+        view.Draw ();
+
+        Assert.False (view.Border!.NeedsDraw);
+        Assert.False (view.Padding!.NeedsDraw);
+    }
+
+    [Fact]
+    public void ClearNeedsDraw_PropagatesDownToAllSubViews ()
+    {
+        // Verify that ClearNeedsDraw clears flags on all descendants
+        IDriver driver = CreateFakeDriver (80, 25);
+        driver.Clip = new Region (driver.Screen);
+
+        var topView = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 100,
+            Height = 100,
+            Driver = driver
+        };
+
+        var middleView = new View { X = 10, Y = 10, Width = 50, Height = 50 };
+        var bottomView = new View { X = 5, Y = 5, Width = 20, Height = 20 };
+
+        topView.Add (middleView);
+        middleView.Add (bottomView);
+        topView.BeginInit ();
+        topView.EndInit ();
+        topView.LayoutSubViews ();
+
+        Assert.True (topView.NeedsDraw);
+        Assert.True (middleView.NeedsDraw);
+        Assert.True (bottomView.NeedsDraw);
+
+        topView.Draw ();
+
+        Assert.False (topView.NeedsDraw);
+        Assert.False (topView.SubViewNeedsDraw);
+        Assert.False (middleView.NeedsDraw);
+        Assert.False (middleView.SubViewNeedsDraw);
+        Assert.False (bottomView.NeedsDraw);
+    }
 }
