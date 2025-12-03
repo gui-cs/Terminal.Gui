@@ -3,7 +3,7 @@ using System.Reflection;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {

@@ -43,7 +43,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     public void With_New_A_Runs (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
-        Assert.True (context.App!.TopRunnable!.Running);
+        Assert.True (context.App!.TopRunnable!.IsRunning);
         Assert.NotEqual (Rectangle.Empty, context.App!.Screen);
     }
 
@@ -54,9 +54,9 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (10, 3, d, _out)
                                            .Then ((app) =>
                                                   {
-                                                      app.TopRunnable!.BorderStyle = LineStyle.None;
-                                                      app.TopRunnable!.Border!.Thickness = Thickness.Empty;
-                                                      app.TopRunnable.Text = "hello";
+                                                      app.TopRunnableView!.BorderStyle = LineStyle.None;
+                                                      app.TopRunnableView!.Border!.Thickness = Thickness.Empty;
+                                                      app.TopRunnableView.Text = "hello";
                                                   })
                                            .ScreenShot ("ScreenShot", _out)
                                            .AnsiScreenShot ("AnsiScreenShot", _out)

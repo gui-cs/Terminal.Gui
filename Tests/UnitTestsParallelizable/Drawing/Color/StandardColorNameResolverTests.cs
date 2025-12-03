@@ -2,7 +2,7 @@
 
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class StandardColorNameResolverTests (ITestOutputHelper output)
 {

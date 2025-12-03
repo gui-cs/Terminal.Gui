@@ -38,7 +38,7 @@ public class ApplicationStressTests
         Application.Init (driverName: "fake");
         Random r = new ();
         TextField tf = new ();
-        var top = new Toplevel ();
+        var top = new Window ();
         top.Add (tf);
 
         _tbCounter = 0;
@@ -72,7 +72,7 @@ public class ApplicationStressTests
                     int tbNow = _tbCounter;
 
                     // Wait for Application.TopRunnable to be running to ensure timed events can be processed
-                    while (Application.TopRunnable is null || Application.TopRunnable is { Running: false })
+                    while (Application.TopRunnableView is null || Application.TopRunnableView is IRunnable { IsRunning: false })
                     {
                         Thread.Sleep (1);
                     }

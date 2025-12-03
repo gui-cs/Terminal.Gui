@@ -2,7 +2,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 /// <summary>
 ///     Tests for the ToAnsi functionality that generates ANSI escape sequences from buffer contents.

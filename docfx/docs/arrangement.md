@@ -376,14 +376,14 @@ See the [Multitasking Deep Dive](multitasking.md) for complete details on modal 
 ### What Makes a View Modal
 
 A view is modal when:
-- Run via [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Toplevel_System_Func_System_Exception_System_Boolean__)
-- [Toplevel.Modal](~/api/Terminal.Gui.Views.Toplevel.yml#Terminal_Gui_Views_Toplevel_Modal) = `true`
+- Run via [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Runnable_System_Func_System_Exception_System_Boolean__)
+- [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.yml#Terminal_Gui_Views_Runnable_Modal) = `true`
 
 ### Modal Characteristics
 
 - **Exclusive Input** - All keyboard and mouse input goes to the modal view
 - **Constrained Z-Order** - Modal view has Z-order of 1, everything else at 0
-- **Blocks Execution** - `Application.Run` blocks until [Application.RequestStop](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_RequestStop_Terminal_Gui_Views_Toplevel_) is called
+- **Blocks Execution** - `Application.Run` blocks until [Application.RequestStop](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_RequestStop_Terminal_Gui_Views_Runnable_) is called
 - **Own RunState** - Each modal view has its own [RunState](~/api/Terminal.Gui.App.RunState.yml)
 
 ### Modal View Types
@@ -431,13 +431,13 @@ See the [Multitasking Deep Dive](multitasking.md) for complete details.
 ### Non-Modal Runnable Views
 
 ```csharp
-var toplevel = new Toplevel
+var runnable = new Runnable
 {
     Modal = false // Non-modal
 };
 
 // Runs as independent application
-Application.Run(toplevel);
+Application.Run(runnable);
 ```
 
 **Characteristics:**
@@ -572,7 +572,7 @@ Application.Shutdown();
 ```csharp
 Application.Init();
 
-var top = new Toplevel();
+var top = new Runnable();
 
 var leftPane = new FrameView
 {
@@ -606,7 +606,7 @@ Application.Shutdown();
 ```csharp
 Application.Init();
 
-var desktop = new Toplevel 
+var desktop = new Runnable 
 { 
     Arrangement = ViewArrangement.Overlapped 
 };
@@ -724,7 +724,7 @@ view.LayoutComplete += (s, e) =>
 - [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)
 - [Border](~/api/Terminal.Gui.ViewBase.Border.yml)
 - [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)
-- [Toplevel.Modal](~/api/Terminal.Gui.Views.Toplevel.yml#Terminal_Gui_Views_Toplevel_Modal)
+- [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.yml#Terminal_Gui_Views_Runnable_Modal)
 
 ### UICatalog Examples
 

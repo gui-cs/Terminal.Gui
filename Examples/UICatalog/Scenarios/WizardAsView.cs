@@ -21,7 +21,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "_Restart Configuration...",
                                            Action = () => MessageBox.Query (
-                                                                            ApplicationImpl.Instance,
+                                                                            Application.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to reset the Wizard and start over?",
                                                                             "Ok",
@@ -32,7 +32,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "Re_boot Server...",
                                            Action = () => MessageBox.Query (
-                                                                            ApplicationImpl.Instance,
+                                                                            Application.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to reboot the server start over?",
                                                                             "Ok",
@@ -43,7 +43,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "_Shutdown Server...",
                                            Action = () => MessageBox.Query (
-                                                                            ApplicationImpl.Instance,
+                                                                            Application.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to cancel setup and shutdown?",
                                                                             "Ok",
@@ -66,7 +66,7 @@ public class WizardAsView : Scenario
 
         // Set Modal to false to cause the Wizard class to render without a frame and
         // behave like an non-modal View (vs. a modal/pop-up Window).
-        wizard.Modal = false;
+       // wizard.Modal = false;
 
         wizard.MovingBack += (s, args) =>
                              {
@@ -148,11 +148,11 @@ public class WizardAsView : Scenario
         lastStep.HelpText =
             "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing Esc will cancel.";
 
-        Window topLevel = new ();
-        topLevel.Add (menu, wizard);
+        Window window = new ();
+        window.Add (menu, wizard);
 
-        Application.Run (topLevel);
-        topLevel.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
     }
 }

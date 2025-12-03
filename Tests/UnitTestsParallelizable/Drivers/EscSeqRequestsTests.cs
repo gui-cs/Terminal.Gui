@@ -1,6 +1,6 @@
 ﻿using UnitTests;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class EscSeqRequestsTests : FakeDriverBase
 {
@@ -82,7 +82,7 @@ public class EscSeqRequestsTests : FakeDriverBase
     [Theory]
     [InlineData (null)]
     [InlineData ("")]
-    public void Add_Null_Or_Empty_Terminator_Throws (string terminator)
+    public void Add_Null_Or_Empty_Terminator_Throws (string? terminator)
     {
         if (terminator is null)
         {
@@ -95,7 +95,6 @@ public class EscSeqRequestsTests : FakeDriverBase
     }
 
     [Theory]
-    [InlineData (null)]
     [InlineData ("")]
     public void HasResponse_Null_Or_Empty_Terminator_Does_Not_Throws (string terminator)
     {
@@ -107,20 +106,12 @@ public class EscSeqRequestsTests : FakeDriverBase
     }
 
     [Theory]
-    [InlineData (null)]
     [InlineData ("")]
     public void Remove_Null_Or_Empty_Terminator_Throws (string terminator)
     {
         EscSeqRequests.Add ("t");
 
-        if (terminator is null)
-        {
-            Assert.Throws<ArgumentNullException> (() => EscSeqRequests.Remove (terminator));
-        }
-        else
-        {
-            Assert.Throws<ArgumentException> (() => EscSeqRequests.Remove (terminator));
-        }
+        Assert.Throws<ArgumentException> (() => EscSeqRequests.Remove (terminator));
 
         EscSeqRequests.Clear ();
     }

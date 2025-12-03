@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class NumericUpDownTests
 {

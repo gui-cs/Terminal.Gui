@@ -1,14 +1,72 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace UnitTests.ApplicationTests;
 
 public class ApplicationScreenTests
 {
-    public ApplicationScreenTests (ITestOutputHelper output)
-    {
-    }
+    public ApplicationScreenTests (ITestOutputHelper output) { }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void ClearContents_Called_When_Top_Frame_Changes ()
+    {
+        var top = new Runnable ();
+        SessionToken rs = Application.Begin (top);
+
+        // Arrange
+        var clearedContentsRaised = 0;
+
+        Application.Driver!.ClearedContents += OnClearedContents;
+
+        // Act
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (0, clearedContentsRaised);
+
+        // Act
+        Application.TopRunnableView!.SetNeedsLayout ();
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (0, clearedContentsRaised);
+
+        // Act
+        Application.TopRunnableView.X = 1;
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (1, clearedContentsRaised);
+
+        // Act
+        Application.TopRunnableView.Width = 10;
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (2, clearedContentsRaised);
+
+        // Act
+        Application.TopRunnableView.Y = 1;
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (3, clearedContentsRaised);
+
+        // Act
+        Application.TopRunnableView.Height = 10;
+        Application.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (4, clearedContentsRaised);
+
+        Application.Driver!.ClearedContents -= OnClearedContents;
+
+        Application.End (rs);
+
+        return;
+
+        void OnClearedContents (object e, EventArgs a) { clearedContentsRaised++; }
+    }
 
     [Fact]
     public void ClearScreenNextIteration_Resets_To_False_After_LayoutAndDraw ()
@@ -26,67 +84,6 @@ public class ApplicationScreenTests
 
         // Cleanup
         Application.ResetState (true);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void ClearContents_Called_When_Top_Frame_Changes ()
-    {
-        Toplevel top = new Toplevel ();
-        SessionToken rs = Application.Begin (top);
-        // Arrange
-        var clearedContentsRaised = 0;
-
-        Application.Driver!.ClearedContents += OnClearedContents;
-
-        // Act
-        Application.LayoutAndDraw ();
-
-        // Assert
-        Assert.Equal (0, clearedContentsRaised);
-
-        // Act
-        Application.TopRunnable!.SetNeedsLayout ();
-        Application.LayoutAndDraw ();
-
-        // Assert
-        Assert.Equal (0, clearedContentsRaised);
-
-        // Act
-        Application.TopRunnable.X = 1;
-        Application.LayoutAndDraw ();
-
-        // Assert
-        Assert.Equal (1, clearedContentsRaised);
-
-        // Act
-        Application.TopRunnable.Width = 10;
-        Application.LayoutAndDraw ();
-
-        // Assert
-        Assert.Equal (2, clearedContentsRaised);
-
-        // Act
-        Application.TopRunnable.Y = 1;
-        Application.LayoutAndDraw ();
-
-        // Assert
-        Assert.Equal (3, clearedContentsRaised);
-
-        // Act
-        Application.TopRunnable.Height = 10;
-        Application.LayoutAndDraw ();
-
-        // Assert
-        Assert.Equal (4, clearedContentsRaised);
-
-        Application.Driver!.ClearedContents -= OnClearedContents;
-
-        Application.End (rs);
-
-        return;
-
-        void OnClearedContents (object e, EventArgs a) { clearedContentsRaised++; }
     }
 
     [Fact]

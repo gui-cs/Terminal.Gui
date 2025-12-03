@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.InputTests;
+namespace InputTests;
 
 public class KeyBindingTests ()
 {

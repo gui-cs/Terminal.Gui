@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using Moq;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.TextTests;
+namespace TextTests;
 
 public class CollectionNavigatorTests
 {

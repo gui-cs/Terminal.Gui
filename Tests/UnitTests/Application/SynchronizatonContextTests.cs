@@ -39,7 +39,7 @@ public class SyncrhonizationContextTests
 
             Task.Run (() =>
                       {
-                          while (Application.TopRunnable is null || Application.TopRunnable is { Running: false })
+                          while (Application.TopRunnable is { IsRunning: false })
                           {
                               Thread.Sleep (500);
                           }
@@ -56,7 +56,7 @@ public class SyncrhonizationContextTests
                                         null
                                        );
 
-                          if (Application.TopRunnable is { Running: true })
+                          if (Application.TopRunnable is { IsRunning: true })
                           {
                               Assert.False (success);
                           }
@@ -64,7 +64,7 @@ public class SyncrhonizationContextTests
                      );
 
             // blocks here until the RequestStop is processed at the end of the test
-            Application.Run ().Dispose ();
+            Application.Run<Runnable> ();
             Assert.True (success);
 
             Application.Shutdown ();
@@ -100,7 +100,7 @@ public class SyncrhonizationContextTests
                  );
 
         // blocks here until the RequestStop is processed at the end of the test
-        Application.Run ().Dispose ();
+        Application.Run<Runnable> ();
         Assert.True (success);
         Application.Shutdown ();
     }

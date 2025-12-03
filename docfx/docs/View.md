@@ -271,7 +271,7 @@ View view = new ()
 
 ### 2. Initialization
 
-When a View is added to a SuperView or when [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Toplevel_System_Func_System_Exception_System_Boolean__) is called:
+When a View is added to a SuperView or when [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Runnable_System_Func_System_Exception_System_Boolean__) is called:
 
 1. [BeginInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_BeginInit) is called
 2. [EndInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_EndInit) is called
@@ -566,7 +566,7 @@ Views can implement [IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) to run as 
 
 The **IRunnable** pattern provides:
 
-- **Interface-Based**: Implement `IRunnable<TResult>` instead of inheriting from `Toplevel`
+- **Interface-Based**: Implement `IRunnable<TResult>` instead of inheriting from `Runnable`
 - **Type-Safe Results**: Generic `TResult` parameter for compile-time type safety
 - **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for concise code
 - **Automatic Disposal**: Framework manages lifecycle of created runnables
@@ -674,14 +674,13 @@ protected override bool OnIsRunningChanging(bool oldIsRunning, bool newIsRunning
 
 - **`IsRunningChanging`** - Cancellable event before added/removed from stack
 - **`IsRunningChanged`** - Non-cancellable event after stack change
-- **`IsModalChanging`** - Cancellable event before becoming/leaving top of stack
 - **`IsModalChanged`** - Non-cancellable event after modal state change
 
 ---
 
 ## Modal Views (Legacy)
 
-Views can run modally (exclusively capturing all input until closed). See [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) for the legacy pattern.
+Views can run modally (exclusively capturing all input until closed). See [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) for the legacy pattern.
 
 **Note:** New code should use `IRunnable<TResult>` pattern (see above) for better type safety and lifecycle management.
 
@@ -708,7 +707,7 @@ dialog.Dispose();
 
 ### Modal View Types (Legacy)
 
-- **[Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml)** - Base class for modal views, can fill entire screen
+- **[Runnable](~/api/Terminal.Gui.Views.Runnable.yml)** - Base class for modal views, can fill entire screen
 - **[Window](~/api/Terminal.Gui.Views.Window.yml)** - Overlapped container with border and title
 - **[Dialog](~/api/Terminal.Gui.Views.Dialog.yml)** - Modal Window, centered with button support
 - **[Wizard](~/api/Terminal.Gui.Views.Wizard.yml)** - Multi-step modal dialog

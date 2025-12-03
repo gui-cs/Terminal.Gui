@@ -14,7 +14,7 @@ public class PosViewTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Subtract_Operator ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
         var field = new TextField { X = 0, Y = 0, Width = 20 };

@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class AlignerTests (ITestOutputHelper output)
 {

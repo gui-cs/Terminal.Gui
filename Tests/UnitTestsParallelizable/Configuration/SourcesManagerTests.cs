@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
-namespace UnitTests_Parallelizable.ConfigurationTests;
+namespace ConfigurationTests;
 
 public class SourcesManagerTests
 {
@@ -262,7 +262,7 @@ public class SourcesManagerTests
         var location = ConfigLocations.AppResources;
 
         // Act
-        bool result = sourcesManager.Load (settingsScope, assembly, null, location);
+        bool result = sourcesManager.Load (settingsScope, assembly, string.Empty, location);
 
         // Assert
         Assert.False (result);

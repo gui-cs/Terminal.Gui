@@ -536,7 +536,7 @@ public class ScrollBarTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Mouse_Click_DecrementButton_Decrements ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)
     {
-        var top = new Toplevel ()
+        var top = new Runnable ()
         {
             Id = "top",
             Width = 10,
@@ -585,7 +585,7 @@ public class ScrollBarTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Mouse_Click_IncrementButton_Increments ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)
     {
-        var top = new Toplevel ()
+        var top = new Runnable ()
         {
             Id = "top",
             Width = 10,

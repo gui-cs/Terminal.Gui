@@ -19,7 +19,7 @@ public class AutocompleteTests (ITestOutputHelper output)
                                 .Select (s => s.Value)
                                 .Distinct ()
                                 .ToList ();
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tv);
         SessionToken rs = Application.Begin (top);
 
@@ -165,7 +165,7 @@ This an long line and against TextView.",
     public void KeyBindings_Command ()
     {
         var tv = new TextView { Width = 10, Height = 2, Text = " Fortunately super feature." };
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tv);
         Application.Begin (top);
 

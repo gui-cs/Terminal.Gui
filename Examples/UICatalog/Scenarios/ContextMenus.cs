@@ -26,7 +26,7 @@ public class ContextMenus : Scenario
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
-            SchemeName = "Toplevel"
+            SchemeName = "Runnable"
         };
 
         _appWindow.Initialized += AppWindowOnInitialized;
@@ -49,7 +49,7 @@ public class ContextMenus : Scenario
             var text = "Context Menu";
             var width = 20;
 
-            CreateWinContextMenu (ApplicationImpl.Instance);
+            CreateWinContextMenu (Application.Instance);
 
             var label = new Label
             {
@@ -84,7 +84,11 @@ public class ContextMenus : Scenario
             _appWindow.MouseClick += OnAppWindowOnMouseClick;
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
-            _appWindow.Closed += (s, e) => { Thread.CurrentThread.CurrentUICulture = originalCulture; };
+            _appWindow.IsRunningChanged += (s, e) => {
+                                               if (!e.Value)
+                                               {
+                                                   Thread.CurrentThread.CurrentUICulture = originalCulture;
+                                               } };
         }
 
         void OnAppWindowOnMouseClick (object? s, MouseEventArgs e)

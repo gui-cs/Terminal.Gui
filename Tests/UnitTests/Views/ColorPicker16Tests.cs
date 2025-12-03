@@ -49,7 +49,7 @@ public class ColorPicker16Tests
     {
         var colorPicker = new ColorPicker16 { X = 0, Y = 0, Height = 4, Width = 32 };
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (colorPicker);
         Application.Begin (top);
 

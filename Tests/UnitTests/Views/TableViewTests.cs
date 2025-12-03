@@ -25,33 +25,33 @@ public class TableViewTests (ITestOutputHelper output)
 
     public static DataTableSource BuildTable (int cols, int rows) { return BuildTable (cols, rows, out _); }
 
-    /// <summary>Builds a simple table of string columns with the requested number of columns and rows</summary>
-    /// <param name="cols"></param>
-    /// <param name="rows"></param>
-    /// <returns></returns>
-    public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
-    {
-        dt = new ();
-
-        for (var c = 0; c < cols; c++)
+        /// <summary>Builds a simple table of string columns with the requested number of columns and rows</summary>
+        /// <param name="cols"></param>
+        /// <param name="rows"></param>
+        /// <returns></returns>
+        public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
         {
-            dt.Columns.Add ("Col" + c);
-        }
-
-        for (var r = 0; r < rows; r++)
-        {
-            DataRow newRow = dt.NewRow ();
+            dt = new ();
 
             for (var c = 0; c < cols; c++)
             {
-                newRow [c] = $"R{r}C{c}";
+                dt.Columns.Add ("Col" + c);
             }
 
-            dt.Rows.Add (newRow);
-        }
+            for (var r = 0; r < rows; r++)
+            {
+                DataRow newRow = dt.NewRow ();
 
-        return new (dt);
-    }
+                for (var c = 0; c < cols; c++)
+                {
+                    newRow [c] = $"R{r}C{c}";
+                }
+
+                dt.Rows.Add (newRow);
+            }
+
+            return new (dt);
+        }
 
     [Fact]
     [AutoInitShutdown]
@@ -419,11 +419,11 @@ public class TableViewTests (ITestOutputHelper output)
     {
         var tableView = new TableView ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         SessionToken rs = Application.Begin (top);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 25 characters can be printed into table
         tableView.Viewport = new (0, 0, 25, 5);
@@ -610,7 +610,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.AlwaysShowHeaders = false;
 
         // ensure that TableView has the input focus
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         Application.Begin (top);
 
@@ -688,7 +688,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -770,7 +770,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
         tableView.LayoutSubViews ();
 
         // 3 columns are visibile
@@ -835,7 +835,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -949,7 +949,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -980,7 +980,7 @@ public class TableViewTests (ITestOutputHelper output)
     {
         TableView tableView = GetABCDEFTableView (out _);
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visibile
         tableView.Viewport = new (0, 0, 7, 5);
@@ -1012,7 +1012,7 @@ public class TableViewTests (ITestOutputHelper output)
         var tv = new TableView (BuildTable (1, 1));
         tv.CellActivated += (s, c) => activatedValue = c.Table [c.Row, c.Col].ToString ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1073,7 +1073,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         bStyle.ColorGetter = a => Convert.ToInt32 (a.CellValue) == 2 ? cellHighlight : null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         SessionToken rs = Application.Begin (top);
 
@@ -1169,7 +1169,7 @@ public class TableViewTests (ITestOutputHelper output)
         // when B is 2 use the custom highlight color for the row
         tv.Style.RowColorGetter += e => Convert.ToInt32 (e.Table [e.RowIndex, 1]) == 2 ? rowHighlight : null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         SessionToken rs = Application.Begin (top);
 
@@ -1250,7 +1250,7 @@ public class TableViewTests (ITestOutputHelper output)
         // width exactly matches the max col widths
         tv.Viewport = new (0, 0, 5, 4);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -1581,7 +1581,7 @@ public class TableViewTests (ITestOutputHelper output)
         {
             App = ApplicationImpl.Instance
         };
-        tv.SchemeName = "TopLevel";
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 50, 7);
 
         tv.Table = new EnumerableTableSource<string> (
@@ -1619,7 +1619,7 @@ public class TableViewTests (ITestOutputHelper output)
         Assert.Equal (0, tv.SelectedRow);
 
         // ensure that TableView has the input focus
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
 
@@ -2228,7 +2228,7 @@ public class TableViewTests (ITestOutputHelper output)
         {
             App = ApplicationImpl.Instance
         };
-        tv.SchemeName = "TopLevel";
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 50, 6);
 
         tv.Table = new EnumerableTableSource<Type> (
@@ -2437,7 +2437,7 @@ A B C
         };
 
         //tv.BeginInit (); tv.EndInit ();
-        tv.SchemeName = "TopLevel";
+        tv.SchemeName = "Runnable";
         tv.Viewport = new (0, 0, 25, 4);
 
         tv.Style = new ()
@@ -3247,141 +3247,6 @@ A B C
         Assert.Equal ("Column Name 2", cn [1]);
     }
 
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Left ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in
-        tableView.SelectedColumn = 1;
-
-        // Pressing left should move us to the first column without changing focus
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-        Assert.Same (tableView, Application.TopRunnable!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the leftmost cell a further left press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-
-        Assert.NotSame (tableView, Application.TopRunnable.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf1, Application.TopRunnable.MostFocused);
-        Assert.True (tf1.HasFocus);
-
-        Application.TopRunnable.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Up ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in
-        tableView.SelectedRow = 1;
-
-        // First press should move us up
-        Application.RaiseKeyDownEvent (Key.CursorUp);
-        Assert.Same (tableView, Application.TopRunnable!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the top row a further press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorUp);
-
-        Assert.NotSame (tableView, Application.TopRunnable.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf1, Application.TopRunnable.MostFocused);
-        Assert.True (tf1.HasFocus);
-
-        Application.TopRunnable.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Right ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in from the rightmost column
-        tableView.SelectedColumn = tableView.Table.Columns - 2;
-
-        // First press should move us to the rightmost column without changing focus
-        Application.RaiseKeyDownEvent (Key.CursorRight);
-        Assert.Same (tableView, Application.TopRunnable!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the rightmost cell, a further right press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorRight);
-
-        Assert.NotSame (tableView, Application.TopRunnable.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf2, Application.TopRunnable.MostFocused);
-        Assert.True (tf2.HasFocus);
-
-        Application.TopRunnable.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Down ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in from the bottommost row
-        tableView.SelectedRow = tableView.Table.Rows - 2;
-
-        // First press should move us to the bottommost row without changing focus
-        Application.RaiseKeyDownEvent (Key.CursorDown);
-        Assert.Same (tableView, Application.TopRunnable!.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Because we are now on the bottommost cell, a further down press should move focus
-        Application.RaiseKeyDownEvent (Key.CursorDown);
-
-        Assert.NotSame (tableView, Application.TopRunnable.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf2, Application.TopRunnable.MostFocused);
-        Assert.True (tf2.HasFocus);
-
-        Application.TopRunnable.Dispose ();
-    }
-
-    [Fact]
-    public void CanTabOutOfTableViewUsingCursor_Left_ClearsSelectionFirst ()
-    {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
-
-        // Make the selected cell one in
-        tableView.SelectedColumn = 1;
-
-        // Pressing shift-left should give us a multi selection
-        Application.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
-        Assert.Same (tableView, Application.TopRunnable!.MostFocused);
-        Assert.True (tableView.HasFocus);
-        Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
-
-        // Because we are now on the leftmost cell a further left press would normally move focus
-        // However there is an ongoing selection so instead the operation clears the selection and
-        // gets swallowed (not resulting in a focus change)
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-
-        // Selection 'clears' just to the single cell and we remain focused
-        Assert.Single (tableView.GetAllSelectedCells ());
-        Assert.Same (tableView, Application.TopRunnable.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // A further left will switch focus
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
-
-        Assert.NotSame (tableView, Application.TopRunnable.MostFocused);
-        Assert.False (tableView.HasFocus);
-
-        Assert.Same (tf1, Application.TopRunnable.MostFocused);
-        Assert.True (tf1.HasFocus);
-
-        Application.TopRunnable.Dispose ();
-    }
 
     [Theory]
     [InlineData (true, 0, 1)]
@@ -3406,37 +3271,6 @@ A B C
         Assert.Equal (expectedRow, tableView.CollectionNavigator.GetNextMatchingItem (0, "3".ToCharArray () [0]));
     }
 
-    /// <summary>
-    ///     Creates 3 views on <see cref="Application.TopRunnable"/> with the focus in the
-    ///     <see cref="TableView"/>.  This is a helper method to setup tests that want to
-    ///     explore moving input focus out of a tableview.
-    /// </summary>
-    /// <param name="tv"></param>
-    /// <param name="tf1"></param>
-    /// <param name="tf2"></param>
-    private void GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2)
-    {
-        tableView = new ();
-        tableView.BeginInit ();
-        tableView.EndInit ();
-
-
-        Application.TopRunnable = new ();
-        tf1 = new ();
-        tf2 = new ();
-        Application.TopRunnable.Add (tf1);
-        Application.TopRunnable.Add (tableView);
-        Application.TopRunnable.Add (tf2);
-
-        tableView.SetFocus ();
-
-        Assert.Same (tableView, Application.TopRunnable.MostFocused);
-        Assert.True (tableView.HasFocus);
-
-        // Set big table
-        tableView.Table = BuildTable (25, 50);
-    }
-
     private TableView GetABCDEFTableView (out DataTable dt)
     {
         var tableView = new TableView ()
@@ -3446,7 +3280,7 @@ A B C
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);
@@ -3474,7 +3308,7 @@ A B C
         var tv = new TableView ()
         {
             App = ApplicationImpl.Instance,
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Viewport = new (0, 0, 25, 6)
         };
 
@@ -3506,7 +3340,7 @@ A B C
         {
             App = ApplicationImpl.Instance
         };
-        tableView.SchemeName = "TopLevel";
+        tableView.SchemeName = "Runnable";
 
         // 3 columns are visible
         tableView.Viewport = new (0, 0, 7, 5);

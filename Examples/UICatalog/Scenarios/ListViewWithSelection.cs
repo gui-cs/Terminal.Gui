@@ -98,7 +98,7 @@ public class ListViewWithSelection : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList)
         };
-        _eventListView.SchemeName = "TopLevel";
+        _eventListView.SchemeName = "Runnable";
         _appWindow.Add (_eventListView);
 
         _listView.SelectedItemChanged += (s, a) => LogEvent (s as View, a, "SelectedItemChanged");
