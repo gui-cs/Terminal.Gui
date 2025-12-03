@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
 using System.Reflection;
 
-namespace DrawingTests;
+namespace DrawingTests.ColorTests;
 
-public partial class ColorTests
+public partial class ColorClassTests
 {
     [Theory]
     [Trait ("Category", "Operators")]

@@ -1,4 +1,4 @@
-﻿namespace DrawingTests;
+﻿namespace DrawingTests.RegionTests;
 
 using Xunit;
 
