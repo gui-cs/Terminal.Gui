@@ -26,7 +26,6 @@ public class ColorPickers : Scenario
     /// <summary>Foreground ColorPicker.</summary>
     private ColorPicker16 _foregroundColorPicker16;
 
-
     /// <summary>Set up the scenario.</summary>
     public override void Main ()
     {
@@ -42,7 +41,7 @@ public class ColorPickers : Scenario
         ///////////////////////////////////////
 
         // Foreground ColorPicker.
-        _foregroundColorPicker = new()
+        _foregroundColorPicker = new ()
         {
             Title = "_Foreground Color",
             BorderStyle = LineStyle.Single,
@@ -51,14 +50,14 @@ public class ColorPickers : Scenario
         _foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
         app.Add (_foregroundColorPicker);
 
-        _foregroundColorLabel = new()
+        _foregroundColorLabel = new ()
         {
             X = Pos.Left (_foregroundColorPicker), Y = Pos.Bottom (_foregroundColorPicker) + 1
         };
         app.Add (_foregroundColorLabel);
 
         // Background ColorPicker.
-        _backgroundColorPicker = new()
+        _backgroundColorPicker = new ()
         {
             Title = "_Background Color",
             X = Pos.AnchorEnd (),
@@ -69,7 +68,7 @@ public class ColorPickers : Scenario
         _backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
         app.Add (_backgroundColorPicker);
 
-        _backgroundColorLabel = new()
+        _backgroundColorLabel = new ()
         {
             X = Pos.AnchorEnd (),
             Y = Pos.Bottom (_backgroundColorPicker) + 1
@@ -82,7 +81,7 @@ public class ColorPickers : Scenario
         ///////////////////////////////////////
 
         // Foreground ColorPicker 16.
-        _foregroundColorPicker16 = new()
+        _foregroundColorPicker16 = new ()
         {
             Title = "_Foreground Color",
             BorderStyle = LineStyle.Single,
@@ -93,7 +92,7 @@ public class ColorPickers : Scenario
         app.Add (_foregroundColorPicker16);
 
         // Background ColorPicker 16.
-        _backgroundColorPicker16 = new()
+        _backgroundColorPicker16 = new ()
         {
             Title = "_Background Color",
             X = Pos.AnchorEnd (),
@@ -106,7 +105,7 @@ public class ColorPickers : Scenario
         app.Add (_backgroundColorPicker16);
 
         // Demo Label.
-        _demoView = new()
+        _demoView = new ()
         {
             Title = "Color Sample",
             Text = "Lorem Ipsum",
@@ -284,7 +283,7 @@ public class ColorPickers : Scenario
     private void UpdateDemoLabel ()
     {
         _demoView.SetScheme (
-                             new()
+                             new ()
                              {
                                  Normal = new (
                                                _foregroundColorPicker.Visible ? _foregroundColorPicker.SelectedColor : _foregroundColorPicker16.SelectedColor,
@@ -292,7 +291,6 @@ public class ColorPickers : Scenario
                                               )
                              });
     }
-
 
     public override List<Key> GetDemoKeyStrokes ()
     {
