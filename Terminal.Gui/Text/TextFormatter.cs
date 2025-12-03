@@ -123,11 +123,31 @@ public class TextFormatter
             }
 
             string strings = linesFormatted [line];
-            string[] graphemes = GraphemeHelper.GetGraphemes (strings).ToArray ();
+            
+            // Use ArrayPool to avoid per-draw allocations
+            int estimatedCount = strings.Length + 10; // Add buffer for grapheme clusters
+            string [] graphemes = ArrayPool<string>.Shared.Rent (estimatedCount);
+            var graphemeCount = 0;
 
-            // When text is justified, we lost left or right, so we use the direction to align.
+            try
+            {
+                foreach (string grapheme in GraphemeHelper.GetGraphemes (strings))
+                {
+                    if (graphemeCount >= graphemes.Length)
+                    {
+                        // Need larger array (rare case for complex text)
+                        string [] larger = ArrayPool<string>.Shared.Rent (graphemes.Length * 2);
+                        Array.Copy (graphemes, larger, graphemeCount);
+                        ArrayPool<string>.Shared.Return (graphemes, clearArray: true);
+                        graphemes = larger;
+                    }
 
-            int x = 0, y = 0;
+                    graphemes [graphemeCount++] = grapheme;
+                }
+
+                // When text is justified, we lost left or right, so we use the direction to align.
+
+                int x = 0, y = 0;
 
             // Horizontal Alignment
             if (Alignment is Alignment.End)
@@ -214,7 +234,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    y = screen.Bottom - graphemes.Length;
+                    y = screen.Bottom - graphemeCount;
                 }
                 else
                 {
@@ -250,7 +270,7 @@ public class TextFormatter
             {
                 if (isVertical)
                 {
-                    int s = (screen.Height - graphemes.Length) / 2;
+                    int s = (screen.Height - graphemeCount) / 2;
                     y = screen.Top + s;
                 }
                 else
@@ -292,17 +312,17 @@ public class TextFormatter
                         continue;
                     }
 
-                    if (!FillRemaining && idx > graphemes.Length - 1)
+                    if (!FillRemaining && idx > graphemeCount - 1)
                     {
                         break;
                     }
 
                     if ((!isVertical
                          && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
-                             || (idx < graphemes.Length && graphemes [idx].GetColumns () > screen.Width)))
+                             || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width)))
                         || (isVertical
                             && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
-                                || (idx < graphemes.Length && graphemes [idx].GetColumns () > screen.Width))))
+                                || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width))))
                     {
                         break;
                     }
@@ -317,7 +337,7 @@ public class TextFormatter
 
                 if (isVertical)
                 {
-                    if (idx >= 0 && idx < graphemes.Length)
+                    if (idx >= 0 && idx < graphemeCount)
                     {
                         text = graphemes [idx];
                     }
@@ -368,7 +388,7 @@ public class TextFormatter
                 {
                     driver?.Move (current, y);
 
-                    if (idx >= 0 && idx < graphemes.Length)
+                    if (idx >= 0 && idx < graphemeCount)
                     {
                         text = graphemes [idx];
                     }
@@ -428,14 +448,19 @@ public class TextFormatter
                     current += runeWidth;
                 }
 
-                int nextRuneWidth = idx + 1 > -1 && idx + 1 < graphemes.Length
+                int nextRuneWidth = idx + 1 > -1 && idx + 1 < graphemeCount
                                         ? graphemes [idx + 1].GetColumns ()
                                         : 0;
 
-                if (!isVertical && idx + 1 < graphemes.Length && current + nextRuneWidth > start + size)
+                if (!isVertical && idx + 1 < graphemeCount && current + nextRuneWidth > start + size)
                 {
                     break;
                 }
+            }
+            }
+            finally
+            {
+                ArrayPool<string>.Shared.Return (graphemes, clearArray: true);
             }
         }
     }
