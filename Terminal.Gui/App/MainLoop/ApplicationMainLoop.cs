@@ -143,13 +143,13 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
                                      || AnySubViewsNeedDrawn (App?.TopRunnableView)
                                      || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
 
-            bool sizeChanged = SizeMonitor.Poll ();
+            SizeMonitor.Poll ();
 
-            if (needsDrawOrLayout || sizeChanged)
+            if (needsDrawOrLayout)
             {
                 Logging.Redraws.Add (1);
 
-                App?.LayoutAndDraw (true);
+                App?.LayoutAndDraw (forceRedraw: false);
 
                 Output.Write (OutputBuffer);
             }
