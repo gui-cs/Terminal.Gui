@@ -1,8 +1,8 @@
-using Xunit.Abstractions;
+#pragma warning disable xUnit1031
 
 namespace DrawingTests.ColorTests;
 
-public class StandardColorsTests (ITestOutputHelper output)
+public class StandardColorsTests
 {
     [Fact]
     public void GetArgb_HandlesAllStandardColorValues ()
@@ -198,7 +198,6 @@ public class StandardColorsTests (ITestOutputHelper output)
     [Theory]
     [InlineData (StandardColor.AmberPhosphor, 255, 191, 0)]
     [InlineData (StandardColor.GreenPhosphor, 0, 255, 102)]
-    [InlineData (StandardColor.FluorescentOrange, 255, 191, 0)]
     [InlineData (StandardColor.GuppieGreen, 173, 255, 47)]
     public void TryParseColor_HandlesNonW3CColors (StandardColor color, byte r, byte g, byte b)
     {

@@ -66,7 +66,7 @@ public static class ColorStrings
             return true;
         }
 
-        color = default;
+        color = default (Color);
         return false;
     }
 
@@ -83,7 +83,7 @@ public static class ColorStrings
             }
         }
 
-        color = default;
+        color = default (Color);
         return false;
     }
 }
