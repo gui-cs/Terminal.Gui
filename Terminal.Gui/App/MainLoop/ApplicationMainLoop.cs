@@ -152,8 +152,6 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
                 App?.LayoutAndDraw (true);
 
                 Output.Write (OutputBuffer);
-
-                Output.SetCursorVisibility (CursorVisibility.Default);
             }
 
             SetCursor ();
