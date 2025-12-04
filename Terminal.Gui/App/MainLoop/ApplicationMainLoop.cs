@@ -137,17 +137,18 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        //if (App?.TopRunnableView != null)
-        {
-            SizeMonitor.Poll ();
+        // Check for any size changes; this will cause SizeChanged events
+        SizeMonitor.Poll ();
 
-            App?.LayoutAndDraw (forceRedraw: false);
+        // Layout and draw any views that need it
+        App?.LayoutAndDraw (forceRedraw: false);
 
-            SetCursor ();
-        }
+        // Update the cursor
+        SetCursor ();
 
-        var swCallbacks = Stopwatch.StartNew ();
+        Stopwatch swCallbacks = Stopwatch.StartNew ();
 
+        // Run any timeout callbacks that are due
         TimedEvents.RunTimers ();
 
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
