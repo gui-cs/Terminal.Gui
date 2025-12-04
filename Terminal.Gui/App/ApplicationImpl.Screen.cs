@@ -30,6 +30,8 @@ internal partial class ApplicationImpl
                 throw new NotImplementedException ("Screen locations other than 0, 0 are not yet supported");
             }
 
+            // TODO: Enable this to actually change the Driver.
+
             lock (_lockScreen)
             {
                 _screen = value;
@@ -114,7 +116,7 @@ internal partial class ApplicationImpl
     }
 
     /// <summary>
-    ///     INTERNAL: Resets the Screen field to null so it will be recalculated on next access.
+    ///     INTERNAL: Resets the Screen rectangle to null so it will be recalculated on next access.
     /// </summary>
     private void ResetScreen ()
     {
@@ -169,20 +171,25 @@ internal partial class ApplicationImpl
             views.Insert (0, visiblePopover);
         }
 
+        // Layout
         bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
 
+        // Draw
         bool needsDraw = forceRedraw || views.Any (v => v is { NeedsDraw: true } or { SubViewNeedsDraw: true });
 
         if (Driver is { } && (neededLayout || needsDraw))
         {
             Logging.Redraws.Add (1);
-            Logging.Trace ("LayoutAndDraw");
 
             Driver.Clip = new (Screen);
 
+            // Only force a complete redraw if needed (needsLayout or forceRedraw).
+            // Otherwise, just redraw views that need it.
             View.Draw (views: views.ToArray ().Cast<View> ()!, neededLayout || forceRedraw);
 
             Driver.Clip = new (Screen);
+
+            // Cause the driver to flush any pending updates to the terminal
             Driver?.Refresh ();
         }
     }
