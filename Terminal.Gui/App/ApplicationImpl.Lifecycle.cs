@@ -87,7 +87,7 @@ internal partial class ApplicationImpl
         _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
 
         CreateDriver (_driverName);
-        //Screen = Driver!.Screen;
+
         Initialized = true;
 
         RaiseInitializedChanged (this, new (true));
