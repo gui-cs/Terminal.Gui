@@ -95,9 +95,9 @@ public class StaticDrawTests : FakeDriverBase
         //                at the very end, cleaning up any SubViewNeedsDraw flags set
         //                by Margin.DrawMargins()
         Assert.False (superview.SubViewNeedsDraw,
-            "SuperView's SubViewNeedsDraw should be false after all subviews are drawn and cleared");
+                      "superview's SubViewNeedsDraw should be false after static Draw(). All subviews were drawn in the call to View.Draw");
         Assert.False (subview1.SubViewNeedsDraw,
-            "SubView1's SubViewNeedsDraw should be false after its subviews are drawn and cleared");
+                      "SubView1's SubViewNeedsDraw should be false after its subviews are drawn and cleared");
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class StaticDrawTests : FakeDriverBase
 
         // All SubViewNeedsDraw flags should be cleared after the static Draw
         Assert.False (topView.SubViewNeedsDraw,
-            "TopView's SubViewNeedsDraw should be false after static Draw()");
+            "TopView's SubViewNeedsDraw should be false after static Draw(). All subviews were drawn in the call to View.Draw");
         Assert.False (middleView1.SubViewNeedsDraw,
             "MiddleView1's SubViewNeedsDraw should be false after its subviews are drawn");
         Assert.False (middleView2.SubViewNeedsDraw,

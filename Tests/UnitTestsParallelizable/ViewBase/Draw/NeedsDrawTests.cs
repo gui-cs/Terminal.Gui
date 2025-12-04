@@ -311,7 +311,7 @@ public class NeedsDrawTests : FakeDriverBase
         Assert.Equal (new (1, 1, 5, 5), view.Viewport);
         Assert.Equal (new (1, 1, 5, 5), view.NeedsDrawRect);
     }
-    
+
     [Fact]
     public void ClearNeedsDraw_ClearsOwnFlags ()
     {
@@ -557,7 +557,7 @@ public class NeedsDrawTests : FakeDriverBase
     }
 
 
-    [Fact (Skip = "This is a real bug discovered in PR #4431 that needs to be fixed")]
+    [Fact]
     public void IndividualViewDraw_DoesNotClearSuperViewSubViewNeedsDraw ()
     {
         // This test validates that individual view Draw() calls should NOT clear the superview's

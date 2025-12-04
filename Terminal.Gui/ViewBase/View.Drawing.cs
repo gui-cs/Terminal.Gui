@@ -35,6 +35,11 @@ public partial class View // Drawing APIs
         foreach (View view in viewsArray)
         {
             view.ClearNeedsDraw ();
+            // ClearNeedsDraw does not clear view.SuperView.SubViewsNeedDraw, so we have to do it here
+            if (view.SuperView is { })
+            {
+                view.SuperView.SubViewNeedsDraw = false;
+            }
         }
     }
 

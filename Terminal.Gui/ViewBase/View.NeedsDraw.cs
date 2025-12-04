@@ -39,6 +39,12 @@ public partial class View
         }
     }
 
+    // TODO: This property is decoupled from the actual state of the subviews (and adornments)
+    // TODO: It is a 'cache' that is set when any subview or adornment requests a redraw
+    // TODO: As a result the code is fragile and can get out of sync. 
+    // TODO: Consider making this a computed property that checks all subviews and adornments for their NeedsDraw state
+    // TODO: But that may have performance implications.
+
     /// <summary>Gets whether any SubViews need to be redrawn.</summary>
     public bool SubViewNeedsDraw { get; private set; }
 
@@ -161,10 +167,20 @@ public partial class View
 
         SubViewNeedsDraw = false;
 
-        if (SuperView is { })
-        {
-            SuperView.SubViewNeedsDraw = false;
-        }
+        // DO NOT clear SuperView.SubViewNeedsDraw here!
+        // The SuperView is responsible for clearing its own SubViewNeedsDraw flag.
+        // Previously this code cleared it:
+        //if (SuperView is { })
+        //{
+        //    SuperView.SubViewNeedsDraw = false;
+        //}
+        // This caused a bug where drawing one subview would incorrectly clear the SuperView's
+        // SubViewNeedsDraw flag even when sibling subviews still needed drawing.
+        //
+        // The SuperView will clear its own SubViewNeedsDraw after all its subviews are drawn,
+        // either via:
+        // 1. The superview's own Draw() method calling ClearNeedsDraw()
+        // 2. The static View.Draw(peers) method calling ClearNeedsDraw() on all peers
 
         // This ensures LineCanvas' get redrawn
         if (!SuperViewRendersLineCanvas)
