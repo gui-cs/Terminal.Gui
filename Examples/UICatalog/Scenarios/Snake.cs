@@ -322,7 +322,7 @@ public class Snake : Scenario
 
         private SnakeState State { get; }
 
-        protected override bool OnDrawingContent (DrawContext? context)
+        protected override bool OnDrawingContent (DrawContext context)
         {
             SetAttribute (white);
             ClearViewport ();

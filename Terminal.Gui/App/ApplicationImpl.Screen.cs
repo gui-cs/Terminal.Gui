@@ -16,7 +16,7 @@ internal partial class ApplicationImpl
                 throw new NotImplementedException ("Screen locations other than 0, 0 are not yet supported");
             }
 
-            Driver?.SetScreenSize (value.Size.Width, value.Size.Height);
+            Driver?.SetScreenSize (value.Width, value.Height);
         }
     }
 
