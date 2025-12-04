@@ -520,14 +520,66 @@ public partial class View // Drawing APIs
     /// </summary>
     /// <param name="context">The draw context to report drawn areas to.</param>
     /// <returns><see langword="true"/> to stop further drawing content.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Override this method to draw custom content for your View.
+    ///     </para>
+    ///     <para>
+    ///         <b>Transparency Support:</b> If your View has <see cref="ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/>
+    ///         set, you should report the exact regions you draw to via the <paramref name="context"/> parameter. This allows
+    ///         the transparency system to exclude only the drawn areas from the clip region, letting views beneath show through
+    ///         in the areas you didn't draw.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="DrawContext.AddDrawnRectangle"/> for simple rectangular areas, or <see cref="DrawContext.AddDrawnRegion"/>
+    ///         for complex, non-rectangular shapes. All coordinates passed to these methods must be in <b>screen-relative coordinates</b>.
+    ///         Use <see cref="View.ViewportToScreen(in Rectangle)"/> or <see cref="View.ContentToScreen(in Point)"/> to convert from
+    ///         viewport-relative or content-relative coordinates.
+    ///     </para>
+    ///     <para>
+    ///         Example of drawing custom content with transparency support:
+    ///     </para>
+    ///     <code>
+    ///         protected override bool OnDrawingContent (DrawContext? context)
+    ///         {
+    ///             base.OnDrawingContent (context);
+    ///             
+    ///             // Draw content in viewport-relative coordinates
+    ///             Rectangle rect1 = new Rectangle (5, 5, 10, 3);
+    ///             Rectangle rect2 = new Rectangle (8, 8, 4, 7);
+    ///             FillRect (rect1, Glyphs.BlackCircle);
+    ///             FillRect (rect2, Glyphs.BlackCircle);
+    ///             
+    ///             // Report drawn region in screen-relative coordinates for transparency
+    ///             if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+    ///             {
+    ///                 Region drawnRegion = new Region (ViewportToScreen (rect1));
+    ///                 drawnRegion.Union (ViewportToScreen (rect2));
+    ///                 context?.AddDrawnRegion (drawnRegion);
+    ///             }
+    ///             
+    ///             return true;
+    ///         }
+    ///     </code>
+    /// </remarks>
     protected virtual bool OnDrawingContent (DrawContext? context) { return false; }
 
     /// <summary>Raised when the View's content is to be drawn.</summary>
     /// <remarks>
-    ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
     ///     <para>
-    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
-    ///         <see cref="View"/> .
+    ///         Subscribe to this event to draw custom content for the View. Use the drawing methods available on <see cref="View"/>
+    ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune?)"/>.
+    ///     </para>
+    ///     <para>
+    ///         The event is invoked after <see cref="ClearingViewport"/> and after any <see cref="SubViews"/> and <see cref="Text"/> have been drawn.
+    ///     </para>
+    ///     <para>
+    ///         <b>Transparency Support:</b> If the View has <see cref="ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/>
+    ///         set, use the <see cref="DrawEventArgs.DrawContext"/> to report which areas were actually drawn. This enables proper transparency
+    ///         by excluding only the drawn areas from the clip region. See <see cref="DrawContext"/> for details on reporting drawn regions.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="DrawEventArgs.NewViewport"/> property provides the view-relative rectangle describing the currently visible viewport into the View.
     ///     </para>
     /// </remarks>
     public event EventHandler<DrawEventArgs>? DrawingContent;
