@@ -2405,5 +2405,23 @@ public class TextViewTests
         Assert.Equal (expectedText, tv.SelectedText);
     }
 
+    [Fact]
+    public void ReadOnly_True_Move_Right_Moves_Until_The_End_Of_Text_More_One_Column ()
+    {
+        TextView tv = CreateTextView ();
+        tv.Text = "Hi";
+        tv.ReadOnly = true;
+
+        Assert.Equal (0, tv.CurrentColumn);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithShift));
+        Assert.Equal (1, tv.CurrentColumn);
+        Assert.Equal ("H", tv.SelectedText);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithShift));
+        Assert.Equal (2, tv.CurrentColumn);
+        Assert.Equal ("Hi", tv.SelectedText);
+    }
+
     private TextView CreateTextView () { return new () { Width = 30, Height = 10 }; }
 }

@@ -3654,7 +3654,7 @@ public class TextView : View, IDesignable
     {
         List<Cell> currentLine = GetCurrentLine ();
 
-        if ((ReadOnly ? CurrentColumn + 1 : CurrentColumn) < currentLine.Count)
+        if (CurrentColumn < currentLine.Count)
         {
             CurrentColumn++;
         }
