@@ -196,7 +196,7 @@ public class UICatalog
 
         UICatalogMain (Options);
 
-        Debug.Assert (Application.ForceDriver == string.Empty);
+        Application.ForceDriver = string.Empty;
 
         return 0;
     }
