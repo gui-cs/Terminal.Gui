@@ -273,7 +273,7 @@ public class DrawingArea : View
     public ITool CurrentTool { get; set; } = new DrawLineTool ();
     public DrawingArea () { AddLayer (); }
 
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         foreach (LineCanvas canvas in Layers)
         {
@@ -380,7 +380,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Color fg = Value.Foreground;
         Color bg = Value.Background;

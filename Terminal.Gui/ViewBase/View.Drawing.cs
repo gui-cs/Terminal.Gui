@@ -504,12 +504,6 @@ public partial class View // Drawing APIs
             return;
         }
 
-        // TODO: Upgrade all overrides of OnDrawingContent to use DrawContext and remove this override
-        if (OnDrawingContent ())
-        {
-            return;
-        }
-
         var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
         DrawingContent?.Invoke (this, dev);
 
@@ -527,12 +521,6 @@ public partial class View // Drawing APIs
     /// <param name="context">The draw context to report drawn areas to.</param>
     /// <returns><see langword="true"/> to stop further drawing content.</returns>
     protected virtual bool OnDrawingContent (DrawContext? context) { return false; }
-
-    /// <summary>
-    ///     Called when the View's content is to be drawn. The default implementation does nothing.
-    /// </summary>
-    /// <returns><see langword="true"/> to stop further drawing content.</returns>
-    protected virtual bool OnDrawingContent () { return false; }
 
     /// <summary>Raised when the View's content is to be drawn.</summary>
     /// <remarks>

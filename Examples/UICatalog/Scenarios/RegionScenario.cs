@@ -268,7 +268,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Color fg = Value?.Foreground ?? Color.Black;
         Color bg = Value?.Background ?? Color.Black;

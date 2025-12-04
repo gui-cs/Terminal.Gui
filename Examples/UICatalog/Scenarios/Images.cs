@@ -631,7 +631,7 @@ public class Images : Scenario
         public Image<Rgba32> FullResImage;
         private Image<Rgba32> _matchSize;
 
-        protected override bool OnDrawingContent ()
+        protected override bool OnDrawingContent (DrawContext? context)
         {
             if (FullResImage == null)
             {
@@ -708,7 +708,7 @@ public class Images : Scenario
             return (columns, rows);
         }
 
-        protected override bool OnDrawingContent ()
+        protected override bool OnDrawingContent (DrawContext? context)
         {
             if (_palette == null || _palette.Count == 0)
             {
