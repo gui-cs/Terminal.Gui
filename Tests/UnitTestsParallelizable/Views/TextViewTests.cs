@@ -2423,5 +2423,26 @@ public class TextViewTests
         Assert.Equal ("Hi", tv.SelectedText);
     }
 
+    [Fact]
+    public void LeftColumn_Treat_Negative_Width_As_One_Column ()
+    {
+        TextView tv = new () { Width = 2, Height = 1, Text = "\u001B[" };
+
+        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (new (0, 0), tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tv.LeftColumn);
+        Assert.Equal (new (2, 0), tv.CursorPosition);
+
+        Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tv.LeftColumn);
+        Assert.Equal (new (2, 0), tv.CursorPosition);
+    }
+
     private TextView CreateTextView () { return new () { Width = 30, Height = 10 }; }
 }
