@@ -211,15 +211,23 @@ public class LineCanvas : IDisposable
     {
         Dictionary<Point, Rune> map = new ();
 
+        List<IntersectionDefinition> intersectionsBufferList = [];
+
         // walk through each pixel of the bitmap
         for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++)
         {
             for (int x = inArea.X; x < inArea.X + inArea.Width; x++)
             {
-                IntersectionDefinition [] intersects = _lines
-                    .Select (l => l.Intersects (x, y))
-                    .OfType<IntersectionDefinition> () // automatically filters nulls and casts
-                    .ToArray ();
+                intersectionsBufferList.Clear ();
+                foreach (var line in _lines)
+                {
+                    if (line.Intersects (x, y) is { } intersect)
+                    {
+                        intersectionsBufferList.Add (intersect);
+                    }
+                }
+                // Safe as long as the list is not modified while the span is in use.
+                ReadOnlySpan<IntersectionDefinition> intersects = CollectionsMarshal.AsSpan(intersectionsBufferList);
 
                 Rune? rune = GetRuneForIntersects (intersects);
 
