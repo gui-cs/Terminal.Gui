@@ -28,17 +28,33 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
-        // Draw the margins (those with Shadows) last to ensure they are drawn on top of the content.
+        // Draw the margins last to ensure they are drawn on top of the content.
         Margin.DrawMargins (viewsArray);
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
         {
             view.ClearNeedsDraw ();
-            // ClearNeedsDraw does not clear view.SuperView.SubViewsNeedDraw, so we have to do it here
-            if (view.SuperView is { })
+        }
+
+        // After all peer views have been drawn and cleared, we can now clear the SuperView's SubViewNeedsDraw flag.
+        // ClearNeedsDraw() does not clear SuperView.SubViewNeedsDraw (by design, to avoid premature clearing
+        // when siblings still need drawing), so we must do it here after ALL peers are processed.
+        // We only clear the flag if ALL the SuperView's subviews no longer need drawing.
+        View? lastSuperView = null;
+        foreach (View view in viewsArray)
+        {
+            if (view is not Adornment && view.SuperView is { } && view.SuperView != lastSuperView)
             {
-                view.SuperView.SubViewNeedsDraw = false;
+                // Check if ANY subview of this SuperView still needs drawing
+                bool anySubViewNeedsDrawing = view.SuperView.InternalSubViews.Any (v => v.NeedsDraw || v.SubViewNeedsDraw);
+
+                if (!anySubViewNeedsDrawing)
+                {
+                    view.SuperView.SubViewNeedsDraw = false;
+                }
+
+                lastSuperView = view.SuperView;
             }
         }
     }
@@ -216,7 +232,7 @@ public partial class View // Drawing APIs
         {
             Margin.NeedsLayout = false;
             Margin?.Thickness.Draw (Driver, FrameToScreen ());
-            Margin?.Parent?.SetSubViewNeedsDraw ();
+            Margin?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
         if (SubViewNeedsDraw)
@@ -466,7 +482,7 @@ public partial class View // Drawing APIs
         }
 
         // We assume that the text has been drawn over the entire area; ensure that the subviews are redrawn.
-        SetSubViewNeedsDraw ();
+        SetSubViewNeedsDrawDownHierarchy ();
     }
 
     /// <summary>
@@ -478,6 +494,7 @@ public partial class View // Drawing APIs
     public event EventHandler? DrewText;
 
     #endregion DrawText
+
     #region DrawContent
 
     private void DoDrawContent (DrawContext? context = null)
@@ -599,7 +616,7 @@ public partial class View // Drawing APIs
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
             {
-               //view.SetNeedsDraw ();
+                //view.SetNeedsDraw ();
             }
             view.Draw (context);
 

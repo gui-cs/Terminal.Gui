@@ -69,7 +69,7 @@ public class NeedsDrawTests : FakeDriverBase
         view.BeginInit ();
         Assert.True (view.NeedsDraw);
 
-        view.NeedsDraw = false;
+        view.ClearNeedsDraw ();
 
         view.BeginInit ();
         Assert.False (view.NeedsDraw); // Because layout is still needed
@@ -94,7 +94,7 @@ public class NeedsDrawTests : FakeDriverBase
 
         view = new () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         view.BeginInit ();
-        view.NeedsDraw = false;
+        view.ClearNeedsDraw ();
         view.EndInit ();
         Assert.True (view.NeedsDraw);
     }
@@ -145,7 +145,7 @@ public class NeedsDrawTests : FakeDriverBase
         Assert.True (view.NeedsDraw);
         Assert.False (view.NeedsLayout);
 
-        view.NeedsDraw = false;
+        view.ClearNeedsDraw ();
 
         // SRL won't change anything since the view frame wasn't changed. However, Layout has not been called
         view.SetRelativeLayout (new (10, 10));
@@ -199,7 +199,7 @@ public class NeedsDrawTests : FakeDriverBase
         superView.Layout ();
         Assert.True (superView.NeedsDraw);
 
-        superView.NeedsDraw = false;
+        superView.ClearNeedsDraw ();
         superView.SetRelativeLayout (new (10, 10));
         Assert.True (superView.NeedsDraw);
     }
@@ -647,7 +647,7 @@ public class NeedsDrawTests : FakeDriverBase
         grandparent.EndInit ();
         grandparent.LayoutSubViews ();
 
-        child.SetSubViewNeedsDraw ();
+        child.SetSubViewNeedsDrawDownHierarchy ();
 
         Assert.True (child.SubViewNeedsDraw);
         Assert.True (parent.SubViewNeedsDraw);

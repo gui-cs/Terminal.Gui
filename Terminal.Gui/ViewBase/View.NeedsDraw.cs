@@ -2,18 +2,18 @@
 
 public partial class View
 {
-    // TODO: Change NeedsDraw to use a Region instead of Rectangle
-    // TODO: Make _needsDrawRect nullable instead of relying on Empty
-    //      TODO: If null, it means ?
-    //      TODO: If Empty, it means no need to redraw
-    //      TODO: If not Empty, it means the region that needs to be redrawn
-
+    // NOTE: NeedsDrawRect is not currently used to clip drawing to only the invalidated region.
+    //       It is only used within SetNeedsDraw to propagate redraw requests to subviews.
+    // NOTE: Consider changing NeedsDrawRect from Rectangle to Region for more precise invalidation
+    //       NeedsDraw is already efficiently cached via NeedsDrawRect. It checks:
+    //       1. NeedsDrawRect (cached by SetNeedsDraw/ClearNeedsDraw)
+    //       2. Adornment NeedsDraw flags (each cached separately)
     /// <summary>
-    ///     The viewport-relative region that needs to be redrawn. Marked internal for unit tests.
+    ///     INTERNAL: Gets the viewport-relative region that needs to be redrawn.
     /// </summary>
-    internal Rectangle NeedsDrawRect { get; set; } = Rectangle.Empty;
+    internal Rectangle NeedsDrawRect { get; private set; } = Rectangle.Empty;
 
-    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
+    /// <summary>Gets whether the view needs to be redrawn.</summary>
     /// <remarks>
     ///     <para>
     ///         Will be <see langword="true"/> if the <see cref="NeedsLayout"/> property is <see langword="true"/> or if
@@ -23,34 +23,11 @@ public partial class View
     ///         Setting has no effect on <see cref="NeedsLayout"/>.
     ///     </para>
     /// </remarks>
-    public bool NeedsDraw
-    {
-        get => Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
-        set
-        {
-            if (value)
-            {
-                SetNeedsDraw ();
-            }
-            else
-            {
-                ClearNeedsDraw ();
-            }
-        }
-    }
+    public bool NeedsDraw => Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
 
-    // TODO: This property is decoupled from the actual state of the subviews (and adornments)
-    // TODO: It is a 'cache' that is set when any subview or adornment requests a redraw
-    // TODO: As a result the code is fragile and can get out of sync. 
-    // TODO: Consider making this a computed property that checks all subviews and adornments for their NeedsDraw state
-    // TODO: But that may have performance implications.
-
-    /// <summary>Gets whether any SubViews need to be redrawn.</summary>
-    public bool SubViewNeedsDraw { get; private set; }
-
-    /// <summary>Sets that the <see cref="Viewport"/> of this View needs to be redrawn.</summary>
+    /// <summary>Sets <see cref="NeedsDraw"/> to <see langword="true"/> indicating the <see cref="Viewport"/> of this View needs to be redrawn.</summary>
     /// <remarks>
-    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
+    ///     If the view is not visible (<see cref="Visible"/> is <see langword="false"/>), this method
     ///     does nothing.
     /// </remarks>
     public void SetNeedsDraw ()
@@ -109,14 +86,13 @@ public partial class View
             Padding?.SetNeedsDraw ();
         }
 
-        SuperView?.SetSubViewNeedsDraw ();
+        SuperView?.SetSubViewNeedsDrawDownHierarchy ();
 
         if (this is Adornment adornment)
         {
-            adornment.Parent?.SetSubViewNeedsDraw ();
+            adornment.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
-        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
         foreach (View subview in InternalSubViews.Snapshot ())
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
@@ -129,8 +105,51 @@ public partial class View
         }
     }
 
-    /// <summary>Sets <see cref="SubViewNeedsDraw"/> to <see langword="true"/> for this View and all Superviews.</summary>
-    public void SetSubViewNeedsDraw ()
+    /// <summary>INTERNAL: Clears <see cref="NeedsDraw"/> and <see cref="SubViewNeedsDraw"/> for this view and all SubViews.</summary>
+    /// <remarks>
+    ///     See <see cref="SubViewNeedsDraw"/> is a cached value that is set when any subview or adornment requests a redraw.
+    ///     It may not always be in sync with the actual state of the subviews.
+    /// </remarks>
+    internal void ClearNeedsDraw ()
+    {
+        NeedsDrawRect = Rectangle.Empty;
+
+        Margin?.ClearNeedsDraw ();
+        Border?.ClearNeedsDraw ();
+        Padding?.ClearNeedsDraw ();
+
+        foreach (View subview in InternalSubViews.Snapshot ())
+        {
+            subview.ClearNeedsDraw ();
+        }
+
+        SubViewNeedsDraw = false;
+
+        // This ensures LineCanvas' get redrawn
+        if (!SuperViewRendersLineCanvas)
+        {
+            LineCanvas.Clear ();
+        }
+    }
+
+    // NOTE: SubViewNeedsDraw is decoupled from the actual state of the subviews (and adornments).
+    //       It is a performance optimization to avoid having to traverse all subviews and adornments to check if any need redraw.
+    //       As a result the code is fragile and can get out of sync; care must be taken to ensure it is set and cleared correctly.
+    /// <summary>
+    ///     INTERNAL: Gets whether any SubViews need to be redrawn.
+    /// </summary>
+    /// <remarks>
+    ///     See <see cref="SubViewNeedsDraw"/> is a cached value that is set when any subview or adornment requests a redraw.
+    ///     It may not always be in sync with the actual state of the subviews.
+    /// </remarks>
+    internal bool SubViewNeedsDraw { get; private set; }
+
+    /// <summary>INTERNAL: Sets <see cref="SubViewNeedsDraw"/> to <see langword="true"/> for this View and all Superviews.</summary>
+    /// <remarks>
+    ///     See <see cref="SubViewNeedsDraw"/> is a cached value that is set when any subview or adornment requests a redraw.
+    ///     It may not always be in sync with the actual state of the subviews.
+    /// </remarks>
+    internal void SetSubViewNeedsDrawDownHierarchy ()
     {
         if (!Visible)
         {
@@ -141,51 +160,12 @@ public partial class View
 
         if (this is Adornment adornment)
         {
-            adornment.Parent?.SetSubViewNeedsDraw ();
+            adornment.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
         if (SuperView is { SubViewNeedsDraw: false })
         {
-            SuperView.SetSubViewNeedsDraw ();
-        }
-    }
-
-    /// <summary>Clears <see cref="NeedsDraw"/> and <see cref="SubViewNeedsDraw"/>.</summary>
-    protected void ClearNeedsDraw ()
-    {
-        NeedsDrawRect = Rectangle.Empty;
-
-        Margin?.ClearNeedsDraw ();
-        Border?.ClearNeedsDraw ();
-        Padding?.ClearNeedsDraw ();
-
-        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
-        foreach (View subview in InternalSubViews.Snapshot ())
-        {
-            subview.ClearNeedsDraw ();
-        }
-
-        SubViewNeedsDraw = false;
-
-        // DO NOT clear SuperView.SubViewNeedsDraw here!
-        // The SuperView is responsible for clearing its own SubViewNeedsDraw flag.
-        // Previously this code cleared it:
-        //if (SuperView is { })
-        //{
-        //    SuperView.SubViewNeedsDraw = false;
-        //}
-        // This caused a bug where drawing one subview would incorrectly clear the SuperView's
-        // SubViewNeedsDraw flag even when sibling subviews still needed drawing.
-        //
-        // The SuperView will clear its own SubViewNeedsDraw after all its subviews are drawn,
-        // either via:
-        // 1. The superview's own Draw() method calling ClearNeedsDraw()
-        // 2. The static View.Draw(peers) method calling ClearNeedsDraw() on all peers
-
-        // This ensures LineCanvas' get redrawn
-        if (!SuperViewRendersLineCanvas)
-        {
-            LineCanvas.Clear ();
+            SuperView.SetSubViewNeedsDrawDownHierarchy ();
         }
     }
 }

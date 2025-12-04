@@ -79,7 +79,7 @@ public class Margin : Adornment
 
             if (view.Margin is { } margin && margin.Thickness != Thickness.Empty && margin.GetCachedClip () != null)
             {
-                margin.NeedsDraw = true;
+                margin.SetNeedsDraw ();
                 Region? saved = view.GetClip ();
                 view.SetClip (margin.GetCachedClip ());
                 margin.Draw ();
@@ -88,7 +88,7 @@ public class Margin : Adornment
             }
 
             Debug.Assert (view.NeedsDraw == false);
-            view.NeedsDraw = false;
+            view.ClearNeedsDraw ();
 
             foreach (var subview in view.SubViews)
             {
