@@ -154,7 +154,7 @@ public partial class View // Drawing APIs
     {
         // NOTE: We do not support subviews of Margin?
 
-        if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
+        if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
         {
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
             foreach (View subview in Border.SubViews.Where (v => v.Visible || v.Id == "DrawIndicator"))
@@ -172,7 +172,7 @@ public partial class View // Drawing APIs
             SetClip (saved);
         }
 
-        if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty)
+        if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty && Padding.NeedsDraw)
         {
             foreach (View subview in Padding.SubViews)
             {
@@ -589,7 +589,7 @@ public partial class View // Drawing APIs
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
             {
-                view.SetNeedsDraw ();
+               //view.SetNeedsDraw ();
             }
             view.Draw (context);
 
@@ -901,9 +901,10 @@ public partial class View // Drawing APIs
             subview.ClearNeedsDraw ();
         }
 
-        // DO NOT clear SuperView.SubViewNeedsDraw here!
-        // The SuperView will clear its own SubViewNeedsDraw after it has drawn all its subviews.
-        // If we clear it here, and this view has siblings that still need drawing, we'll break the draw system.
+        if (SuperView is { })
+        {
+            SuperView.SubViewNeedsDraw = false;
+        }
 
         // This ensures LineCanvas' get redrawn
         if (!SuperViewRendersLineCanvas)
