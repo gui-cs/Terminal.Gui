@@ -632,4 +632,22 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
             return sb.ToString ();
         }
     }
+
+    [Fact]
+    public void PositionCursor_Treat_Zero_Width_As_One_Column ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        TextField tf = new () { Width = 10, Text = "\u001B[" };
+        tf.Driver = driver;
+        tf.SetRelativeLayout (new (10, 1));
+
+        Assert.Equal (0, tf.CursorPosition);
+
+        tf.CursorPosition = 1;
+        Assert.Equal (new Point (1, 0), tf.PositionCursor ());
+
+        tf.CursorPosition = 2;
+        Assert.Equal (new Point (2, 0), tf.PositionCursor ());
+    }
 }
