@@ -5,24 +5,10 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
 
-    private readonly object _lockScreen = new ();
-    private Rectangle? _screen;
-
     /// <inheritdoc/>
     public Rectangle Screen
     {
-        get
-        {
-            lock (_lockScreen)
-            {
-                if (_screen == null)
-                {
-                    _screen = Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
-                }
-
-                return _screen.Value;
-            }
-        }
+        get => Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
         set
         {
             if (value is { } && (value.X != 0 || value.Y != 0))
@@ -30,12 +16,7 @@ internal partial class ApplicationImpl
                 throw new NotImplementedException ("Screen locations other than 0, 0 are not yet supported");
             }
 
-            // TODO: Enable this to actually change the Driver.
-
-            lock (_lockScreen)
-            {
-                _screen = value;
-            }
+            Driver?.SetScreenSize (value.Size.Width, value.Size.Height);
         }
     }
 
@@ -115,16 +96,6 @@ internal partial class ApplicationImpl
         return false;
     }
 
-    /// <summary>
-    ///     INTERNAL: Resets the Screen rectangle to null so it will be recalculated on next access.
-    /// </summary>
-    private void ResetScreen ()
-    {
-        lock (_lockScreen)
-        {
-            _screen = null;
-        }
-    }
 
     /// <summary>
     ///     INTERNAL: Called when the application's screen has changed.
@@ -133,7 +104,7 @@ internal partial class ApplicationImpl
     /// <param name="screen">The new screen size and position.</param>
     private void RaiseScreenChangedEvent (Rectangle screen)
     {
-        Screen = new (Point.Empty, screen.Size);
+        //Screen = new (Point.Empty, screen.Size);
 
         ScreenChanged?.Invoke (this, new (screen));
 
@@ -185,7 +156,7 @@ internal partial class ApplicationImpl
 
             // Only force a complete redraw if needed (needsLayout or forceRedraw).
             // Otherwise, just redraw views that need it.
-            View.Draw (views: views.ToArray ().Cast<View> ()!, neededLayout || forceRedraw);
+            View.Draw (views: views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
 
             Driver.Clip = new (Screen);
 
