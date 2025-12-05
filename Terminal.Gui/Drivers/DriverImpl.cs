@@ -26,7 +26,7 @@ namespace Terminal.Gui.Drivers;
 ///         Applications interact with drivers through the <see cref="Application"/> class.
 ///     </para>
 /// </remarks>
-internal class DriverImpl : IDriver
+internal class DriverImpl : IDriver, IDisposable
 {
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
@@ -63,18 +63,16 @@ internal class DriverImpl : IDriver
                                      };
 
         SizeMonitor = sizeMonitor;
-
-        sizeMonitor.SizeChanged += (_, e) =>
-                                   {
-                                       SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
-
-                                       //SizeChanged?.Invoke (this, e);
-                                   };
+        SizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
 
         CreateClipboard ();
+
+        Driver.Force16ColorsChanged += OnDriverOnForce16ColorsChanged;
+
     }
 
     private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
+
 
     /// <inheritdoc/>
     public bool Force16Colors
@@ -127,14 +125,7 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
 
-    public Rectangle Screen =>
-
-        //if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetOutput)
-        //{
-        //    // In unit tests, we don't have a real output, so we return an empty rectangle.
-        //    return Rectangle.Empty;
-        //}
-        new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
+    public Rectangle Screen => new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
 
     /// <inheritdoc/>
     public virtual void SetScreenSize (int width, int height)
@@ -142,6 +133,11 @@ internal class DriverImpl : IDriver
         OutputBuffer.SetSize (width, height);
         _output.SetSize (width, height);
         SizeChanged?.Invoke (this, new (new (width, height)));
+    }
+
+    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
+    {
+        SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
     }
 
     /// <inheritdoc/>
@@ -409,5 +405,13 @@ internal class DriverImpl : IDriver
     public string ToAnsi ()
     {
         return _output.ToAnsi (OutputBuffer);
+    }
+
+    /// <inheritdoc />
+    public void Dispose ()
+    {
+        SizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
+        Driver.Force16ColorsChanged -= OnDriverOnForce16ColorsChanged;
+        _output.Dispose ();
     }
 }
