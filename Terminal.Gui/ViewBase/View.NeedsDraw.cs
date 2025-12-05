@@ -19,9 +19,6 @@ public partial class View
     ///         Will be <see langword="true"/> if the <see cref="NeedsLayout"/> property is <see langword="true"/> or if
     ///         any part of the view's <see cref="Viewport"/> needs to be redrawn.
     ///     </para>
-    ///     <para>
-    ///         Setting has no effect on <see cref="NeedsLayout"/>.
-    ///     </para>
     /// </remarks>
     public bool NeedsDraw => Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
 
