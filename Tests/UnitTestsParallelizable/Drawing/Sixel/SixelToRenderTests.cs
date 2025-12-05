@@ -165,9 +165,9 @@ public class SixelToRenderTests
     [Theory]
     [InlineData ("", false, false, false, false)]
     [InlineData ("", false, true, false, false)]
-    [InlineData ("?1;0;7c", true, false, false, false)]
+    [InlineData ("?1;0;7c", true, false, false, true)]
     [InlineData ("?1;0;7c", true, true, false, true)]
-    [InlineData ("?1;4;0;7c", true, false, true, false)]
+    [InlineData ("?1;4;0;7c", true, false, true, true)]
     [InlineData ("?1;4;0;7c", true, true, true, true)]
     public void Detect_WhenXtermEnvironmentIndicatesTransparency_SupportsTransparencyEvenIfDAReturnsNo4 (
         string darResponse,

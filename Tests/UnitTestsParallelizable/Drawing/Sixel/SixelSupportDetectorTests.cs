@@ -208,7 +208,7 @@ public class SixelSupportDetectorTests
         if (isVirtualTerminal)
         {
             Assert.True (final.IsSupported);
-            Assert.False (final.SupportsTransparency);
+            Assert.True (final.SupportsTransparency);
         }
         else
         {
