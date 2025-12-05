@@ -90,7 +90,7 @@ public sealed class Transparent : Scenario
 
             var transparentSubView = new View ()
             {
-                Text = "Sizable/Movable SunView with border and shadow.",
+                Text = "Sizable/Movable SubView with border and shadow.",
                 Id = "transparentSubView",
                 X = Pos.Center (),
                 Y = Pos.Center (),
