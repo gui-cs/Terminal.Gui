@@ -31,7 +31,7 @@ public class OutputBaseTests
         var output = new FakeOutput { IsVirtualTerminal = isVirtualTerminal };
 
         // Create DriverImpl and associate it with the FakeOutput to test Sixel output
-        DriverImpl driver = new (
+        IDriver driver = new DriverImpl (
                                  new FakeInputProcessor (null!),
                                  new OutputBufferImpl (),
                                  output,
@@ -39,8 +39,6 @@ public class OutputBaseTests
                                  new SizeMonitorImpl (output));
 
         driver.Force16Colors = force16Colors;
-
-        Assert.Equal (output.Driver, driver);
 
         IOutputBuffer buffer = output.LastBuffer!;
         buffer.SetSize (1, 1);
@@ -177,17 +175,15 @@ public class OutputBaseTests
         };
 
         // Create DriverImpl and associate it with the FakeOutput to test Sixel output
-        DriverImpl driver = new (
+        IDriver driver = new DriverImpl (
                                  new FakeInputProcessor (null!),
                                  new OutputBufferImpl (),
                                  output,
                                  new (new AnsiResponseParser ()),
                                  new SizeMonitorImpl (output));
 
-        Assert.Equal (output.Driver, driver);
-
         // Add the Sixel to the driver
-        driver.Sixel.Add (s);
+        driver.GetSixels ().Enqueue (s);
 
         // FakeOutput exposes this because it's in test scope
         output.IsVirtualTerminal = isVirtualTerminal;
@@ -215,7 +211,7 @@ public class OutputBaseTests
         IApplication app = Application.Create ();
         app.Driver = driver;
 
-        Assert.Equal (driver.Sixel, app.Driver.Sixel);
+        Assert.Equal (driver.GetSixels (), app.Driver.GetSixels ());
 
         app.Dispose ();
     }

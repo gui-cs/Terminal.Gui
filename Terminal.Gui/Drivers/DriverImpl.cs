@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
@@ -68,11 +69,7 @@ internal class DriverImpl : IDriver, IDisposable
         CreateClipboard ();
 
         Driver.Force16ColorsChanged += OnDriverOnForce16ColorsChanged;
-
     }
-
-    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
 
     /// <inheritdoc/>
     public bool Force16Colors
@@ -83,13 +80,7 @@ internal class DriverImpl : IDriver, IDisposable
 
     private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
 
-    /// <inheritdoc/>
-    public bool Force16Colors
-    {
-        get => _output.Force16Colors;
-        set => _output.Force16Colors = value;
-    }
-
+    // TODO: This should be on IDriver
     /// <summary>
     ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
     /// </summary>
@@ -224,9 +215,8 @@ internal class DriverImpl : IDriver, IDisposable
 
     public bool SupportsTrueColor => _output.IsVirtualTerminal;
 
-
     /// <inheritdoc/>
-    public List<SixelToRender> Sixel { get; } = [];
+    public ConcurrentQueue<SixelToRender>? GetSixels () => _output.GetSixels ();
 
     /// <inheritdoc/>
 

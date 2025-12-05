@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
@@ -96,10 +98,10 @@ public interface IDriver
     bool Force16Colors { get; set; }
 
     /// <summary>
-    ///     Collection of sixel images to write out to screen when updating.
-    ///     Only add to this collection if you are sure terminal supports sixel format.
+    ///     Gets the queue of sixel images to write out to screen when updating.
+    ///     If the terminal does not support Sixel, adding to this queue has no effect.
     /// </summary>
-    List<SixelToRender> Sixel { get; }
+    ConcurrentQueue<SixelToRender> GetSixels ();
 
     /// <summary>
     ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>

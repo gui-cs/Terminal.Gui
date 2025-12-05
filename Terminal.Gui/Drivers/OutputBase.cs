@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -39,8 +41,10 @@ public abstract class OutputBase
         }
     }
 
-    /// <inheritdoc cref="IOutput.Sixel"/>>
-    public List<SixelToRender>? Sixel { get; internal set; }
+    private readonly ConcurrentQueue<SixelToRender> _sixels = [];
+
+    /// <inheritdoc cref="IOutput.GetSixels"/>>
+    public ConcurrentQueue<SixelToRender> GetSixels () => _sixels;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -131,9 +135,9 @@ public abstract class OutputBase
             }
         }
 
-        if (IsVirtualTerminal && Sixel is {})
+        if (IsVirtualTerminal)
         {
-            foreach (SixelToRender s in Sixel)
+            foreach (SixelToRender s in GetSixels ())
             {
                 if (string.IsNullOrWhiteSpace (s.SixelData))
                 {

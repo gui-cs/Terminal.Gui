@@ -219,18 +219,21 @@ public class Images : Scenario
         Color [,] bmp = _fire.GetFirePixels ();
 
         // TODO: Static way of doing this, suboptimal
-        if (_fireSixel != null)
+        // ConcurrentQueue doesn't support Remove, so we update the existing object
+        if (_fireSixel == null)
         {
-            Application.Sixel.Remove (_fireSixel);
+            _fireSixel = new ()
+            {
+                SixelData = _fireEncoder.EncodeSixel (bmp),
+                ScreenPosition = new (0, 0)
+            };
+            Application.Sixel.Enqueue (_fireSixel);
         }
-
-        _fireSixel = new ()
+        else
         {
-            SixelData = _fireEncoder.EncodeSixel (bmp),
-            ScreenPosition = new (0, 0)
-        };
-
-        Application.Sixel.Add (_fireSixel);
+            _fireSixel.SixelData = _fireEncoder.EncodeSixel (bmp);
+            _fireSixel.ScreenPosition = new (0, 0);
+        }
 
         _win.SetNeedsDraw ();
 
@@ -245,8 +248,6 @@ public class Images : Scenario
         _sixelNotSupported.Dispose ();
         _sixelSupported.Dispose ();
         _isDisposed = true;
-
-        Application.Driver?.Sixel.Clear ();
     }
 
     private void OpenImage (object sender, CommandEventArgs e)
@@ -513,7 +514,7 @@ public class Images : Scenario
                 ScreenPosition = _screenLocationForSixel
             };
 
-            Application.Sixel.Add (_sixelImage);
+            Application.Sixel.Enqueue (_sixelImage);
         }
         else
         {

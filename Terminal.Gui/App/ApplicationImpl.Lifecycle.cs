@@ -300,16 +300,11 @@ internal partial class ApplicationImpl
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
 
-        //Navigation = null;
-
         // === 8. Reset initialization state ===
         Initialized = false;
         MainThreadId = null;
 
-        // === 9. Clear graphics ===
-        Sixel.Clear ();
-
-        // === 10. Reset synchronization context ===
+        // === 9. Reset synchronization context ===
         // IMPORTANT: Always reset sync context, even if not initialized
         // This ensures cleanup works correctly even if Shutdown is called without Init
         // Reset synchronization context to allow the user to run async/await,

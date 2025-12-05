@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿using System.Collections.Concurrent;
+
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     The low-level interface drivers implement to provide output capabilities; encapsulates platform-specific
@@ -14,11 +16,8 @@ public interface IOutput : IDisposable
     /// </summary>
     bool IsVirtualTerminal { get; set; }
 
-    /// <summary>
-    ///     Collection of sixel images to write out to screen when updating.
-    ///     Only add to this collection if you are sure terminal supports sixel format.
-    /// </summary>
-    List<SixelToRender>? Sixel { get; }
+    /// <seealso cref="IDriver.GetSixels"/>
+    ConcurrentQueue<SixelToRender> GetSixels ();
 
     /// <summary>
     ///     Gets the current position of the console cursor.

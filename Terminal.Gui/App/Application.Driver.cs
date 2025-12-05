@@ -1,4 +1,6 @@
 
+
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
@@ -37,7 +39,7 @@ public static partial class Application // Driver abstractions
 
     /// <inheritdoc cref="IDriver.Sixel"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static List<SixelToRender> Sixel => ApplicationImpl.Instance.Driver?.Sixel!;
+    public static ConcurrentQueue<SixelToRender> Sixel => ApplicationImpl.Instance.Driver?.GetSixels ()!;
 
     /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
