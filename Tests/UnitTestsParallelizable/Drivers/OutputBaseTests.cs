@@ -25,10 +25,10 @@ public class OutputBaseTests
     [InlineData (true, true)]
     [InlineData (false, false)]
     [InlineData (false, true)]
-    public void ToAnsi_WithAttribute_AppendsCorrectColorSequence_BasedOnVirtualTerminal_And_Force16Colors (bool isVirtualTerminal, bool force16Colors)
+    public void ToAnsi_WithAttribute_AppendsCorrectColorSequence_BasedOnIsLegacyConsole_And_Force16Colors (bool isLegacyConsole, bool force16Colors)
     {
         // Arrange
-        var output = new FakeOutput { IsVirtualTerminal = isVirtualTerminal };
+        var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
 
         // Create DriverImpl and associate it with the FakeOutput to test Sixel output
         IDriver driver = new DriverImpl (
@@ -53,11 +53,11 @@ public class OutputBaseTests
         string ansi = output.ToAnsi (buffer);
 
         // Assert: when true color expected, we should see the RGB CSI; otherwise we should see the 16-color CSI
-        if (isVirtualTerminal && !force16Colors)
+        if (!isLegacyConsole && !force16Colors)
         {
             Assert.Contains ("\u001b[38;2;1;2;3m", ansi);
         }
-        else if (isVirtualTerminal && force16Colors)
+        else if (!isLegacyConsole && force16Colors)
         {
             var expected16 = EscSeqUtils.CSI_SetForegroundColor (fg.GetAnsiColorCode ());
             Assert.Contains (expected16, ansi);
@@ -100,11 +100,11 @@ public class OutputBaseTests
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void Write_Virtual_Or_NonVirtual_Uses_WriteToConsole_And_Clears_Dirty_Flags (bool isVirtualTerminal)
+    public void Write_Virtual_Or_NonVirtual_Uses_WriteToConsole_And_Clears_Dirty_Flags (bool isLegacyConsole)
     {
         // Arrange
         // FakeOutput exposes this because it's in test scope
-        var output = new FakeOutput { IsVirtualTerminal = isVirtualTerminal };
+        var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.LastBuffer!;
         buffer.SetSize (3, 1);
 
@@ -157,7 +157,7 @@ public class OutputBaseTests
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void Write_EmitsSixelDataAndPositionsCursor (bool isVirtualTerminal)
+    public void Write_EmitsSixelDataAndPositionsCursor (bool isLegacyConsole)
     {
         // Arrange
         var output = new FakeOutput ();
@@ -186,12 +186,12 @@ public class OutputBaseTests
         driver.GetSixels ().Enqueue (s);
 
         // FakeOutput exposes this because it's in test scope
-        output.IsVirtualTerminal = isVirtualTerminal;
+        output.IsLegacyConsole = isLegacyConsole;
 
         // Act
         output.Write (buffer);
 
-        if (isVirtualTerminal)
+        if (!isLegacyConsole)
         {
             // Assert: Sixel data was emitted (use Contains to avoid equality/side-effects)
             Assert.Contains ("SIXEL-DATA", output.Output);

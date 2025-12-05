@@ -8,10 +8,11 @@ public class SixelToRenderTests
     [Fact]
     public void SixelToRender_Properties_AreGettableAndSettable ()
     {
-        var s = new SixelToRender ();
-
-        s.SixelData = "SIXEL-DATA";
-        s.ScreenPosition = new Point (3, 5);
+        SixelToRender s = new SixelToRender
+        {
+            SixelData = "SIXEL-DATA",
+            ScreenPosition = new (3, 5)
+        };
 
         Assert.Equal ("SIXEL-DATA", s.SixelData);
         Assert.Equal (3, s.ScreenPosition.X);
@@ -34,7 +35,10 @@ public class SixelToRenderTests
     public void Detect_WhenDeviceAttributesIndicateSupport_GetsResolutionDirectly ()
     {
         // Arrange
-        var driverMock = new Mock<IDriver> (MockBehavior.Strict);
+        Mock<IDriver> driverMock = new (MockBehavior.Strict);
+
+        // Setup IsLegacyConsole - false means modern terminal with ANSI support
+        driverMock.Setup (d => d.IsLegacyConsole).Returns (false);
 
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                   .Callback<AnsiEscapeSequenceRequest> (req =>
@@ -76,7 +80,10 @@ public class SixelToRenderTests
     public void Detect_WhenDirectResolutionFails_ComputesResolutionFromWindowSizes ()
     {
         // Arrange
-        var driverMock = new Mock<IDriver> (MockBehavior.Strict);
+        Mock<IDriver> driverMock = new (MockBehavior.Strict);
+
+        // Setup IsLegacyConsole - false means modern terminal with ANSI support
+        driverMock.Setup (d => d.IsLegacyConsole).Returns (false);
 
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                   .Callback<AnsiEscapeSequenceRequest> (req =>
@@ -131,7 +138,10 @@ public class SixelToRenderTests
     public void Detect_WhenDeviceAttributesDoNotIndicateSupport_ReturnsNotSupported ()
     {
         // Arrange
-        var driverMock = new Mock<IDriver> (MockBehavior.Strict);
+        Mock<IDriver> driverMock = new (MockBehavior.Strict);
+
+        // Setup IsLegacyConsole - false means modern terminal with ANSI support
+        driverMock.Setup (d => d.IsLegacyConsole).Returns (false);
 
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                   .Callback<AnsiEscapeSequenceRequest> (req =>
@@ -163,15 +173,15 @@ public class SixelToRenderTests
     }
 
     [Theory]
-    [InlineData ("", false, false, false, false)]
-    [InlineData ("", false, true, false, false)]
-    [InlineData ("?1;0;7c", true, false, false, true)]
-    [InlineData ("?1;0;7c", true, true, false, true)]
-    [InlineData ("?1;4;0;7c", true, false, true, true)]
-    [InlineData ("?1;4;0;7c", true, true, true, true)]
+    [InlineData ("", true, false, false, false)]
+    [InlineData ("", true, true, false, false)]
+    [InlineData ("?1;0;7c", false, false, false, true)]
+    [InlineData ("?1;0;7c", false, true, false, true)]
+    [InlineData ("?1;4;0;7c", false, false, true, true)]
+    [InlineData ("?1;4;0;7c", false, true, true, true)]
     public void Detect_WhenXtermEnvironmentIndicatesTransparency_SupportsTransparencyEvenIfDAReturnsNo4 (
         string darResponse,
-        bool isVirtualTerminal,
+        bool isLegacyConsole,
         bool isXtermWithTransparency,
         bool expectedIsSupported,
         bool expectedSupportsTransparency
@@ -183,16 +193,16 @@ public class SixelToRenderTests
         try
         {
             var output = new FakeOutput ();
-            output.IsVirtualTerminal = isVirtualTerminal;
+            output.IsLegacyConsole = isLegacyConsole;
 
-            var driverMock = new Mock<DriverImpl> (
-                                                   MockBehavior.Strict,
-                                                   new FakeInputProcessor (null!),
-                                                   new OutputBufferImpl (),
-                                                   output,
-                                                   new AnsiRequestScheduler (new AnsiResponseParser ()),
-                                                   new SizeMonitorImpl (output)
-                                                   );
+            Mock<DriverImpl> driverMock = new (
+                                               MockBehavior.Strict,
+                                               new FakeInputProcessor (null!),
+                                               new OutputBufferImpl (),
+                                               output,
+                                               new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                               new SizeMonitorImpl (output)
+                                              );
 
             driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                       .Callback<AnsiEscapeSequenceRequest> (req =>
@@ -223,7 +233,7 @@ public class SixelToRenderTests
 
             // Assert
             Assert.NotNull (final);
-            Assert.Equal (isVirtualTerminal, driverMock.Object.IsVirtualTerminal);
+            Assert.Equal (isLegacyConsole, driverMock.Object.IsLegacyConsole);
 
             // DAR did not indicate sixel support
             Assert.Equal (expectedIsSupported, final.IsSupported);

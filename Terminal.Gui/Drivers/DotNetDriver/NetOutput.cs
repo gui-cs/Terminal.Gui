@@ -30,8 +30,6 @@ public class NetOutput : OutputBase, IOutput
         {
             _isWinPlatform = true;
         }
-
-        IsVirtualTerminal = true;
     }
 
     /// <inheritdoc/>

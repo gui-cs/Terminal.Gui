@@ -11,10 +11,8 @@ public interface IOutput : IDisposable
     /// <seealso cref="IDriver.Force16Colors"/>
     bool Force16Colors { get; set; }
 
-    /// <summary>
-    ///     Gets or sets whether <see cref="IOutput"/> support for virtualized terminal sequences.
-    /// </summary>
-    bool IsVirtualTerminal { get; set; }
+    /// <seealso cref="IDriver.IsLegacyConsole"/>
+    bool IsLegacyConsole { get; set; }
 
     /// <seealso cref="IDriver.GetSixels"/>
     ConcurrentQueue<SixelToRender> GetSixels ();

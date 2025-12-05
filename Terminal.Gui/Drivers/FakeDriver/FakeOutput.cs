@@ -19,7 +19,6 @@ public class FakeOutput : OutputBase, IOutput
     {
         LastBuffer = new OutputBufferImpl ();
         LastBuffer.SetSize (80, 25);
-        IsVirtualTerminal = true;
     }
 
     /// <summary>
@@ -89,7 +88,7 @@ public class FakeOutput : OutputBase, IOutput
     {
         if (Force16Colors)
         {
-            if (IsVirtualTerminal)
+            if (!IsLegacyConsole)
             {
                 output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
                 output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));

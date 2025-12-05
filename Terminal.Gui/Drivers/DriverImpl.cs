@@ -123,6 +123,13 @@ internal class DriverImpl : IDriver
     }
 
     /// <inheritdoc/>
+    public bool IsLegacyConsole
+    {
+        get => _output.IsLegacyConsole;
+        set => _output.IsLegacyConsole = value;
+    }
+
+    /// <inheritdoc/>
     public void Dispose ()
     {
         SizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
@@ -231,7 +238,7 @@ internal class DriverImpl : IDriver
     #region Color Support
 
     /// <inheritdoc/>
-    public bool SupportsTrueColor => _output.IsVirtualTerminal;
+    public bool SupportsTrueColor => !IsLegacyConsole;
 
     /// <inheritdoc/>
     public bool Force16Colors
@@ -241,16 +248,6 @@ internal class DriverImpl : IDriver
     }
 
     private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
-    // TODO: This should be on IDriver
-    /// <summary>
-    ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
-    /// </summary>
-    internal bool IsVirtualTerminal
-    {
-        get => _output.IsVirtualTerminal;
-        set => _output.IsVirtualTerminal = value;
-    }
 
     #endregion Color Support
 

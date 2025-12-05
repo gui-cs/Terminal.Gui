@@ -32,6 +32,26 @@ public interface IDriver : IDisposable
     /// <remarks>This is only implemented in UnixDriver.</remarks>
     void Suspend ();
 
+    /// <summary>
+    ///     Gets whether the driver has detected the console requires legacy console API (Windows Console API without ANSI/VT
+    ///     support).
+    ///     Returns <see langword="true"/> for legacy consoles that don't support modern ANSI escape sequences (e.g. Windows
+    ///     conhost);
+    ///     <see langword="false"/> for modern terminals with ANSI/VT support.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property indicates whether the terminal supports modern ANSI escape sequences for input/output.
+    ///         On Windows, this maps to whether Virtual Terminal processing is enabled.
+    ///         On Unix-like systems, this is typically <see langword="false"/> as they support ANSI by default.
+    ///     </para>
+    ///     <para>
+    ///         When <see langword="true"/>, the driver must use legacy Windows Console API functions
+    ///         (e.g., WriteConsoleW, SetConsoleTextAttribute) instead of ANSI escape sequences.
+    ///     </para>
+    /// </remarks>
+    bool IsLegacyConsole { get; internal set; }
+
     #endregion Driver Lifecycle
 
     #region Driver Components
@@ -42,17 +62,6 @@ public interface IDriver : IDisposable
     ///     and detecting and processing ansi escape sequences.
     /// </summary>
     IInputProcessor InputProcessor { get; }
-
-    /// <summary>
-    ///     Describes the desired screen state. Data source for <see cref="IOutput"/>.
-    /// </summary>
-    IOutputBuffer OutputBuffer { get; }
-
-    /// <summary>
-    ///     Interface for classes responsible for reporting the current
-    ///     size of the terminal window.
-    /// </summary>
-    ISizeMonitor SizeMonitor { get; }
 
     /// <summary>Get the operating system clipboard.</summary>
     IClipboard? Clipboard { get; }
@@ -151,7 +160,8 @@ public interface IDriver : IDisposable
     int Row { get; }
 
     /// <summary>
-    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
+    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or
+    ///     <see cref="AddStr"/>
     ///     call.
     /// </summary>
     Attribute CurrentAttribute { get; set; }

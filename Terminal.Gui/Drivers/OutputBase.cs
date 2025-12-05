@@ -15,7 +15,7 @@ public abstract class OutputBase
         get => _force16Colors;
         set
         {
-            if (!IsVirtualTerminal && !value)
+            if (IsLegacyConsole && !value)
             {
                 return;
             }
@@ -24,17 +24,17 @@ public abstract class OutputBase
         }
     }
 
-    private bool _isVirtualTerminal;
+    private bool _isLegacyConsole;
 
-    /// <inheritdoc cref="IOutput.IsVirtualTerminal"/>>
-    public bool IsVirtualTerminal
+    /// <inheritdoc cref="IOutput.IsLegacyConsole"/>
+    public bool IsLegacyConsole
     {
-        get => _isVirtualTerminal;
+        get => _isLegacyConsole;
         set
         {
-            _isVirtualTerminal = value;
+            _isLegacyConsole = value;
 
-            if (!_isVirtualTerminal)
+            if (value) // If legacy console (true), force 16 colors
             {
                 Force16Colors = true;
             }
@@ -120,7 +120,11 @@ public abstract class OutputBase
 
             if (output.Length > 0)
             {
-                if (IsVirtualTerminal)
+                if (IsLegacyConsole)
+                {
+                    Write (output);
+                }
+                else
                 {
                     SetCursorPositionImpl (lastCol, row);
 
@@ -128,25 +132,23 @@ public abstract class OutputBase
                     StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
                     Write (processed);
                 }
-                else
-                {
-                    Write (output);
-                }
             }
         }
 
-        if (IsVirtualTerminal)
+        if (IsLegacyConsole)
         {
-            foreach (SixelToRender s in GetSixels ())
-            {
-                if (string.IsNullOrWhiteSpace (s.SixelData))
-                {
-                    continue;
-                }
+            return;
+        }
 
-                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                Write ((StringBuilder)new (s.SixelData));
+        foreach (SixelToRender s in GetSixels ())
+        {
+            if (string.IsNullOrWhiteSpace (s.SixelData))
+            {
+                continue;
             }
+
+            SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+            Write ((StringBuilder)new (s.SixelData));
         }
 
 
@@ -280,15 +282,15 @@ public abstract class OutputBase
     {
         SetCursorPositionImpl (lastCol, row);
 
-        if (IsVirtualTerminal)
+        if (IsLegacyConsole)
+        {
+            Write (output);
+        }
+        else
         {
             // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
             StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
             Write (processed);
-        }
-        else
-        {
-            Write (output);
         }
 
         output.Clear ();

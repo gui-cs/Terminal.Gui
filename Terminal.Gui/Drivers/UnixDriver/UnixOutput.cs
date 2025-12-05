@@ -36,11 +36,6 @@ internal class UnixOutput : OutputBase, IOutput
     [DllImport ("libc", SetLastError = true)]
     private static extern int dup (int fd);
 
-    public UnixOutput ()
-    {
-        IsVirtualTerminal = true;
-    }
-
     /// <inheritdoc />
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
