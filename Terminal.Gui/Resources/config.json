@@ -20,7 +20,7 @@
   "Key.Separator": "+",
 
   "Application.ArrangeKey": "Ctrl+F5",
-  "Application.Force16Colors": false,
+  "Driver.Force16Colors": false,
   //"Application.ForceDriver": "", // TODO: ForceDriver should be nullable
   "Application.IsMouseDisabled": false,
   "Application.NextTabGroupKey": "F6",
