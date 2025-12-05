@@ -269,7 +269,7 @@ internal partial class ApplicationImpl
         if (Driver is { })
         {
             UnsubscribeDriverEvents ();
-            Driver?.Dispose ();
+            Driver.Dispose ();
             Driver = null;
         }
 

@@ -122,11 +122,11 @@ public class Images : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
-            CheckedState = !Driver.Force16Colors? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Use true color"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => Driver.Force16Colors= evt.Result == CheckState.UnChecked;
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => Driver.Force16Colors = evt.Result == CheckState.UnChecked;
         _win.Add (cbUseTrueColor);
 
         var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
