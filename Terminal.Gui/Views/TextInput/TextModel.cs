@@ -616,13 +616,18 @@ internal class TextModel
         for (; i < tCount; i++)
         {
             string text = t [i];
-            size += text.GetColumns (false);
+            int colWidth = text.GetColumns (false);
+            size += colWidth;
             len += text.Length;
 
             if (text == "\t")
             {
                 size += tabWidth + 1;
                 len += tabWidth - 1;
+            }
+            else if (colWidth == -1)
+            {
+                size += 2; // -1+2=1
             }
 
             if (checkNextRune && i == tCount - 1 && t.Count > tCount && IsWideText (t [i + 1], tabWidth, out int s, out int l))

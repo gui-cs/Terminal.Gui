@@ -12,7 +12,7 @@ public class SourcesManagerTests
         // Arrange
         var sourcesManager = new SourcesManager ();
         var stream = new MemoryStream ();
-        var source = "test.json";
+        var source = "Load_WithNullSettingsScope_ReturnsFalse";
         var location = ConfigLocations.AppCurrent;
 
         // Act
@@ -37,7 +37,7 @@ public class SourcesManagerTests
                    }
                    """;
         var location = ConfigLocations.HardCoded;
-        var source = "stream";
+        var source = "Load_WithValidStream_UpdatesSettingsScope";
 
         var stream = new MemoryStream ();
         var writer = new StreamWriter (stream);
@@ -69,7 +69,7 @@ public class SourcesManagerTests
         writer.Flush ();
         stream.Position = 0;
 
-        var source = "test.json";
+        var source = "Load_WithInvalidJson_AddsJsonError";
         var location = ConfigLocations.AppCurrent;
 
         // Act
@@ -180,7 +180,7 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
 
         var settingsScope = new SettingsScope ();
-        var source = "test.json";
+        var source = "Load_WithNullOrEmptyJson_ReturnsFalse";
         var location = ConfigLocations.AppCurrent;
 
         // Act
@@ -206,7 +206,7 @@ public class SourcesManagerTests
                         "Application.QuitKey": "Ctrl+Z"
                    }
                    """;
-        var source = "test.json";
+        var source = "Load_WithValidJson_UpdatesSettingsScope";
         var location = ConfigLocations.HardCoded;
 
         // Act
@@ -233,7 +233,7 @@ public class SourcesManagerTests
     //                    "Button.DefaultShadowStyle": "None"
     //               }
     //               """;
-    //    var source = "test.json";
+    //    var source = "Update_WithValidJson_UpdatesThemeScope";
     //    var location = ConfigLocations.HardCoded;
 
     //    // Act

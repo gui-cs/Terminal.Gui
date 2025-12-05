@@ -137,30 +137,18 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
-        if (App?.TopRunnableView != null)
-        {
-            bool needsDrawOrLayout = AnySubViewsNeedDrawn (App?.Popover?.GetActivePopover () as View)
-                                     || AnySubViewsNeedDrawn (App?.TopRunnableView)
-                                     || (App?.Mouse.MouseGrabView != null && AnySubViewsNeedDrawn (App?.Mouse.MouseGrabView));
+        // Check for any size changes; this will cause SizeChanged events
+        SizeMonitor.Poll ();
 
-            bool sizeChanged = SizeMonitor.Poll ();
+        // Layout and draw any views that need it
+        App?.LayoutAndDraw (forceRedraw: false);
 
-            if (needsDrawOrLayout || sizeChanged)
-            {
-                Logging.Redraws.Add (1);
+        // Update the cursor
+        SetCursor ();
 
-                App?.LayoutAndDraw (true);
+        Stopwatch swCallbacks = Stopwatch.StartNew ();
 
-                Output.Write (OutputBuffer);
-
-                Output.SetCursorVisibility (CursorVisibility.Default);
-            }
-
-            SetCursor ();
-        }
-
-        var swCallbacks = Stopwatch.StartNew ();
-
+        // Run any timeout callbacks that are due
         TimedEvents.RunTimers ();
 
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
@@ -168,10 +156,11 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     private void SetCursor ()
     {
-        View? mostFocused = App?.TopRunnableView!.MostFocused;
+        View? mostFocused = App?.TopRunnableView?.MostFocused;
 
         if (mostFocused == null)
         {
+            Output.SetCursorVisibility (CursorVisibility.Invisible);
             return;
         }
 
@@ -180,40 +169,15 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         if (to.HasValue)
         {
             // Translate to screen coordinates
-            to = mostFocused.ViewportToScreen (to.Value);
+            Point screenPos = mostFocused.ViewportToScreen (to.Value);
 
-            Output.SetCursorPosition (to.Value.X, to.Value.Y);
+            Output.SetCursorPosition (screenPos.X, screenPos.Y);
             Output.SetCursorVisibility (mostFocused.CursorVisibility);
         }
         else
         {
             Output.SetCursorVisibility (CursorVisibility.Invisible);
         }
-    }
-
-    private bool AnySubViewsNeedDrawn (View? v)
-    {
-        if (v is null)
-        {
-            return false;
-        }
-
-        if (v.NeedsDraw || v.NeedsLayout)
-        {
-            // Logging.Trace ($"{v.GetType ().Name} triggered redraw (NeedsDraw={v.NeedsDraw} NeedsLayout={v.NeedsLayout}) ");
-
-            return true;
-        }
-
-        foreach (View subview in v.SubViews)
-        {
-            if (AnySubViewsNeedDrawn (subview))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /// <inheritdoc/>

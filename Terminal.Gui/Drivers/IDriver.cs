@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
@@ -31,19 +30,16 @@ public interface IDriver
     ISizeMonitor SizeMonitor { get; }
 
     /// <summary>Get the operating system clipboard.</summary>
-    /// 
     IClipboard? Clipboard { get; }
 
     /// <summary>Gets the location and size of the terminal screen.</summary>
     Rectangle Screen { get; }
 
     /// <summary>
-    /// Sets the screen size for testing purposes. Only supported by FakeDriver.
-    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    ///     Sets the screen size. <see cref="Screen"/> is the source of truth for screen dimensions.
     /// </summary>
     /// <param name="width">The new width in columns.</param>
     /// <param name="height">The new height in rows.</param>
-    /// <exception cref="NotSupportedException">Thrown when called on non-FakeDriver instances.</exception>
     void SetScreenSize (int width, int height);
 
     /// <summary>
@@ -52,7 +48,6 @@ public interface IDriver
     /// </summary>
     /// <value>The rectangle describing the of <see cref="Clip"/> region.</value>
     Region? Clip { get; set; }
-
 
     /// <summary>
     ///     Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
@@ -101,7 +96,8 @@ public interface IDriver
     bool Force16Colors { get; set; }
 
     /// <summary>
-    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
+    ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or
+    ///     <see cref="AddStr"/>
     ///     call.
     /// </summary>
     Attribute CurrentAttribute { get; set; }
@@ -218,13 +214,15 @@ public interface IDriver
     /// <param name="c"></param>
     void FillRect (Rectangle rect, char c);
 
-
     /// <summary>Gets the terminal cursor visibility.</summary>
     /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
     /// <returns><see langword="true"/> upon success</returns>
     bool GetCursorVisibility (out CursorVisibility visibility);
 
-    /// <summary>Updates the screen to reflect all the changes that have been done to the display buffer</summary>
+    /// <summary>
+    ///     INTERNAL: Updates the terminal with the current output buffer. Should not be used by applications. Drawing occurs
+    ///     once each Application main loop iteration.
+    /// </summary>
     void Refresh ();
 
     /// <summary>Sets the terminal cursor visibility.</summary>
@@ -233,8 +231,8 @@ public interface IDriver
     bool SetCursorVisibility (CursorVisibility visibility);
 
     /// <summary>
-    /// The event fired when the screen changes (size, position, etc.).
-    /// <see cref="Screen"/> is the source of truth for screen dimensions.
+    ///     The event fired when the screen changes (size, position, etc.).
+    ///     <see cref="Screen"/> is the source of truth for screen dimensions.
     /// </summary>
     event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
@@ -294,7 +292,6 @@ public interface IDriver
     /// </summary>
     /// <returns></returns>
     public AnsiRequestScheduler GetRequestScheduler ();
-
 
     /// <summary>
     ///     Gets a string representation of <see cref="Contents"/>.

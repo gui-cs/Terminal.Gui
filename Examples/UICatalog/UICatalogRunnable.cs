@@ -295,18 +295,25 @@ public class UICatalogRunnable : Runnable
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
             _diagnosticFlagsSelector.AssignHotKeys = true;
             _diagnosticFlagsSelector.Value = Diagnostics;
-            _diagnosticFlagsSelector.ValueChanged += (sender, args) =>
-                                                     {
-                                                         _diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
-                                                         Diagnostics = _diagnosticFlags;
-                                                     };
+            _diagnosticFlagsSelector.Selecting += (sender, args) =>
+                                                  {
+                                                      _diagnosticFlags = (ViewDiagnosticFlags)((int)args.Context!.Source!.Data!);// (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                                     Diagnostics = _diagnosticFlags;
+                                                 };
 
-            menuItems.Add (
-                           new MenuItem
-                           {
-                               CommandView = _diagnosticFlagsSelector,
-                               HelpText = "View Diagnostics"
-                           });
+            MenuItem diagFlagMenuItem = new MenuItem ()
+            {
+                CommandView = _diagnosticFlagsSelector,
+                HelpText = "View Diagnostics"
+            };
+            diagFlagMenuItem.Accepting += (sender, args) =>
+                                         {
+                                             //_diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
+                                             //Diagnostics = _diagnosticFlags;
+                                             //args.Handled = true;
+                                         };
+
+            menuItems.Add (diagFlagMenuItem);
 
             menuItems.Add (new Line ());
 

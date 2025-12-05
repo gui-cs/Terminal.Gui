@@ -198,7 +198,7 @@ public class GraphView : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (CellSize.X == 0 || CellSize.Y == 0)
         {

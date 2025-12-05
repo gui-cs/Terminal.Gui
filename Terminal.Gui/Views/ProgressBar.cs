@@ -132,7 +132,7 @@ public class ProgressBar : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         SetAttribute (GetAttributeForRole (VisualRole.Active));
 
