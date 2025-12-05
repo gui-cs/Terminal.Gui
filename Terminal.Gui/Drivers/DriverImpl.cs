@@ -216,7 +216,7 @@ internal class DriverImpl : IDriver, IDisposable
     public bool SupportsTrueColor => _output.IsVirtualTerminal;
 
     /// <inheritdoc/>
-    public ConcurrentQueue<SixelToRender>? GetSixels () => _output.GetSixels ();
+    public ConcurrentQueue<SixelToRender> GetSixels () => _output.GetSixels ();
 
     /// <inheritdoc/>
 

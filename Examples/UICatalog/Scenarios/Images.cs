@@ -227,7 +227,7 @@ public class Images : Scenario
                 SixelData = _fireEncoder.EncodeSixel (bmp),
                 ScreenPosition = new (0, 0)
             };
-            Application.Sixel.Enqueue (_fireSixel);
+            Application.GetSixels ().Enqueue (_fireSixel);
         }
         else
         {
@@ -514,7 +514,7 @@ public class Images : Scenario
                 ScreenPosition = _screenLocationForSixel
             };
 
-            Application.Sixel.Enqueue (_sixelImage);
+            Application.GetSixels ().Enqueue (_sixelImage);
         }
         else
         {
