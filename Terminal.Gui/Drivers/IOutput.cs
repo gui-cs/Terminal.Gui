@@ -65,7 +65,6 @@ public interface IOutput : IDisposable
     ///     This is the same output that would be written to the terminal to recreate the current screen contents.
     /// </summary>
     /// <param name="buffer">The output buffer to convert to ANSI.</param>
-    /// <param name="force16Colors"></param>
     /// <returns>A string containing ANSI escape sequences representing the buffer contents.</returns>
-    string ToAnsi (IOutputBuffer buffer, bool force16Colors);
+    string ToAnsi (IOutputBuffer buffer);
 }

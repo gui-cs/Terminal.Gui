@@ -74,6 +74,15 @@ internal class DriverImpl : IDriver
         CreateClipboard ();
     }
 
+    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
+
+    /// <inheritdoc/>
+    public bool Force16Colors
+    {
+        get => _output.Force16Colors;
+        set => _output.Force16Colors = value;
+    }
+
     /// <inheritdoc/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
@@ -201,13 +210,6 @@ internal class DriverImpl : IDriver
 
     public bool SupportsTrueColor => true;
 
-    /// <inheritdoc/>
-
-    public bool Force16Colors
-    {
-        get => Application.Force16Colors || !SupportsTrueColor;
-        set => Application.Force16Colors = value || !SupportsTrueColor;
-    }
 
     /// <inheritdoc/>
 

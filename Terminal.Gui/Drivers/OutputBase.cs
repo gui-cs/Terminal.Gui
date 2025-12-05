@@ -5,6 +5,10 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
+    /// <inheritdoc cref="IOutput.Force16Colors"/>
+    public bool Force16Colors { get; set; }
+
+
     private CursorVisibility? _cachedCursorVisibility;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
