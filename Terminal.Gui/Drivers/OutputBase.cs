@@ -5,6 +5,9 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
+    /// <inheritdoc cref="IOutput.Force16Colors"/>
+    public bool Force16Colors { get; set; }
+
     private CursorVisibility? _cachedCursorVisibility;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
@@ -117,7 +120,7 @@ public abstract class OutputBase
     /// <param name="output"></param>
     /// <param name="attr"></param>
     /// <param name="redrawTextStyle"></param>
-    protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
+    protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyles);
 
     /// <summary>
     ///     When overriden in derived class, positions the terminal output cursor to the specified point on the screen.
@@ -153,8 +156,8 @@ public abstract class OutputBase
         int endCol,
         StringBuilder output,
         ref Attribute? lastAttr,
-        Func<int, int, bool>? includeCellPredicate = null,
-        bool addNewlines = true
+        Func<int, int, bool>? includeCellPredicate,
+        bool addNewlines
     )
     {
         TextStyle redrawTextStyle = TextStyle.None;
@@ -168,7 +171,7 @@ public abstract class OutputBase
                     continue;
                 }
 
-                Cell cell = buffer.Contents![row, col];
+                Cell cell = buffer.Contents! [row, col];
                 AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col);
             }
 
@@ -217,13 +220,14 @@ public abstract class OutputBase
     ///     This is the same output that would be written to the terminal to recreate the current screen contents.
     /// </summary>
     /// <param name="buffer">The output buffer to convert to ANSI.</param>
+    /// <param name="force16Colors"></param>
     /// <returns>A string containing ANSI escape sequences representing the buffer contents.</returns>
-    public string ToAnsi (IOutputBuffer buffer)
+    public string ToAnsi (IOutputBuffer buffer, bool force16Colors)
     {
         var output = new StringBuilder ();
         Attribute? lastAttr = null;
 
-        BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, output, ref lastAttr);
+        BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, output, ref lastAttr, null, true);
 
         return output.ToString ();
     }

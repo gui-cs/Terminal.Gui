@@ -364,9 +364,6 @@ internal partial class ApplicationImpl
     }
 #endif
 
-    // Event handlers for Application static property changes
-    private void OnForce16ColorsChanged (object? sender, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
     private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
 
     /// <summary>
@@ -374,7 +371,6 @@ internal partial class ApplicationImpl
     /// </summary>
     private void UnsubscribeApplicationEvents ()
     {
-        Application.Force16ColorsChanged -= OnForce16ColorsChanged;
         Application.ForceDriverChanged -= OnForceDriverChanged;
     }
 }

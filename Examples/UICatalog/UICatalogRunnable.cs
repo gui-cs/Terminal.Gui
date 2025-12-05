@@ -176,7 +176,7 @@ public class UICatalogRunnable : Runnable
             _force16ColorsMenuItemCb = new ()
             {
                 Title = "Force _16 Colors",
-                CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                CheckedState = Driver.Force16Colors? CheckState.Checked : CheckState.UnChecked,
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
                 HighlightStates = MouseState.None
@@ -184,7 +184,7 @@ public class UICatalogRunnable : Runnable
 
             _force16ColorsMenuItemCb.CheckedStateChanging += (sender, args) =>
                                                              {
-                                                                 if (Application.Force16Colors
+                                                                 if (Driver.Force16Colors
                                                                      && args.Result == CheckState.UnChecked
                                                                      && !Application.Driver!.SupportsTrueColor)
                                                                  {
@@ -194,7 +194,7 @@ public class UICatalogRunnable : Runnable
 
             _force16ColorsMenuItemCb.CheckedStateChanged += (sender, args) =>
                                                             {
-                                                                Application.Force16Colors = args.Value == CheckState.Checked;
+                                                                Driver.Force16Colors= args.Value == CheckState.Checked;
 
                                                                 _force16ColorsShortcutCb!.CheckedState = args.Value;
                                                                 Application.LayoutAndDraw ();
@@ -646,13 +646,13 @@ public class UICatalogRunnable : Runnable
         _force16ColorsShortcutCb = new ()
         {
             Title = "16 color mode",
-            CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = Driver.Force16Colors? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false
         };
 
         _force16ColorsShortcutCb.CheckedStateChanging += (sender, args) =>
                                                          {
-                                                             if (Application.Force16Colors
+                                                             if (Driver.Force16Colors
                                                                  && args.Result == CheckState.UnChecked
                                                                  && !Application.Driver!.SupportsTrueColor)
                                                              {
@@ -663,7 +663,7 @@ public class UICatalogRunnable : Runnable
 
         _force16ColorsShortcutCb.CheckedStateChanged += (sender, args) =>
                                                          {
-                                                             Application.Force16Colors = args.Value == CheckState.Checked;
+                                                             Driver.Force16Colors= args.Value == CheckState.Checked;
                                                              _force16ColorsMenuItemCb!.CheckedState = args.Value;
                                                              Application.LayoutAndDraw ();
                                                          };
@@ -714,7 +714,7 @@ public class UICatalogRunnable : Runnable
         }
 
         _disableMouseCb!.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
-        _force16ColorsShortcutCb!.CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+        _force16ColorsShortcutCb!.CheckedState = Driver.Force16Colors? CheckState.Checked : CheckState.UnChecked;
 
         Application.TopRunnableView?.SetNeedsDraw ();
     }

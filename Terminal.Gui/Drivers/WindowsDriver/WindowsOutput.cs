@@ -145,12 +145,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
             {
                 throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
             }
-
-            // Force 16 colors if not in virtual terminal mode.
-            // BUGBUG: This is bad. It does not work if the app was crated without
-            // BUGBUG: Apis.
-            //ApplicationImpl.Instance.Force16Colors = true;
-
         }
 
         GetSize ();
@@ -355,12 +349,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        // BUGBUG: This is bad. It does not work if the app was crated without
-        // BUGBUG: Apis.
-        // bool force16Colors = ApplicationImpl.Instance.Force16Colors;
-        bool force16Colors = false;
-
-        if (force16Colors)
+        if (Force16Colors)
         {
             if (_isVirtualTerminal)
             {

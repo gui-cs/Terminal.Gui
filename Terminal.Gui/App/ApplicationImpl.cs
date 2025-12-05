@@ -14,8 +14,6 @@ internal partial class ApplicationImpl : IApplication
     /// </summary>
     internal ApplicationImpl ()
     {
-        // Subscribe to Application static property change events
-        Application.Force16ColorsChanged += OnForce16ColorsChanged;
         Application.ForceDriverChanged += OnForceDriverChanged;
     }
 
@@ -142,18 +140,6 @@ internal partial class ApplicationImpl : IApplication
     {
         // If an instance exists, reset it
         _instance?.ResetState (ignoreDisposed);
-
-        // Reset Application static properties to their defaults
-        // This ensures tests start with clean state
-        Application.ForceDriver = string.Empty;
-        Application.Force16Colors = false;
-        Application.IsMouseDisabled = false;
-        Application.QuitKey = Key.Esc;
-        Application.ArrangeKey = Key.F5.WithCtrl;
-        Application.NextTabGroupKey = Key.F6;
-        Application.NextTabKey = Key.Tab;
-        Application.PrevTabGroupKey = Key.F6.WithShift;
-        Application.PrevTabKey = Key.Tab.WithShift;
 
         // Always reset the model tracking to allow tests to use either model after reset
         ResetModelUsageTracking ();

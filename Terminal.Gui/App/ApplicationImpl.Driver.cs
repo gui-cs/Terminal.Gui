@@ -85,6 +85,8 @@ internal partial class ApplicationImpl
         {
             throw new ("Driver was null even after booting MainLoopCoordinator");
         }
+
+        Driver.Force16Colors = Terminal.Gui.Drivers.Driver.Force16Colors;
     }
 
     private readonly IComponentFactory? _componentFactory;
