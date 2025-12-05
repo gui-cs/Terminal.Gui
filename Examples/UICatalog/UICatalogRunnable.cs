@@ -289,7 +289,7 @@ public class UICatalogRunnable : Runnable
             _diagnosticFlagsSelector = new ()
             {
                 Styles = SelectorStyles.ShowNoneFlag,
-                CanFocus =true
+                CanFocus = true
 
             };
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
