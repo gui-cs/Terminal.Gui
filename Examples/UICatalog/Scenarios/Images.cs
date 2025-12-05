@@ -122,7 +122,7 @@ public class Images : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
-            CheckedState = !Driver.Force16Colors? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Use true color"
         };
