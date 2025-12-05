@@ -101,7 +101,7 @@ internal abstract class ColorBar : View, IColorBar
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (!string.IsNullOrWhiteSpace (Text))
         {

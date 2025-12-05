@@ -931,7 +931,7 @@ public class TableView : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Move (0, 0);
 

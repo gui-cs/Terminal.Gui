@@ -172,7 +172,7 @@ public class SpinnerView : View, IDesignable
     protected override bool OnClearingViewport () { return true; }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Render ();
 

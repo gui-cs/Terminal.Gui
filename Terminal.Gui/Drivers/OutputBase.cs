@@ -101,8 +101,10 @@ public abstract class OutputBase
         //    }
         //}
 
-        SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
-        _cachedCursorVisibility = savedVisibility;
+
+        // DO NOT restore cursor visibility here - let ApplicationMainLoop.SetCursor() handle it
+        // The old code was saving/restoring visibility which caused flickering because
+        // it would restore to the old value even if the application wanted it hidden
     }
 
     /// <summary>

@@ -906,7 +906,7 @@ At 0,0
         public bool IsKeyUp { get; set; }
         public override string Text { get; set; } = null!;
 
-        protected override bool OnDrawingContent ()
+        protected override bool OnDrawingContent (DrawContext? context)
         {
             var idx = 0;
 
