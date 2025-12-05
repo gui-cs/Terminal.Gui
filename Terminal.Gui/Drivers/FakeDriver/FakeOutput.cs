@@ -31,7 +31,7 @@ public class FakeOutput : OutputBase, IOutput
     ///     Gets the captured output as a string.
     /// </summary>
     public string Output => _output.ToString ();
-
+    
     /// <inheritdoc />
     public Point GetCursorPosition ()
     {
@@ -87,7 +87,7 @@ public class FakeOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        if (Driver?.Force16Colors == true)
+        if (Force16Colors)
         {
             if (IsVirtualTerminal)
             {

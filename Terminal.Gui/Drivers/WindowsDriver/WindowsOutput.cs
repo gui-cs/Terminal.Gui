@@ -257,13 +257,12 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public override void Write (IOutputBuffer outputBuffer)
     {
-        _force16Colors = Driver?.Force16Colors ?? false;
         _everythingStringBuilder.Clear ();
 
         // for 16 color mode we will write to a backing buffer, then flip it to the active one at the end to avoid jitter.
         _consoleBuffer = 0;
 
-        if (_force16Colors)
+        if (Force16Colors)
         {
             if (IsVirtualTerminal)
             {
@@ -329,7 +328,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
         var str = output.ToString ();
 
-        if (_force16Colors && !IsVirtualTerminal)
+        if (Force16Colors && !IsVirtualTerminal)
         {
             char [] a = str.ToCharArray ();
             WriteConsole (_screenBuffer, a, (uint)a.Length, out _, nint.Zero);
@@ -343,7 +342,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        if (_force16Colors)
+        if (Force16Colors)
         {
             if (IsVirtualTerminal)
             {
@@ -466,7 +465,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
-        if (_force16Colors && !IsVirtualTerminal)
+        if (Force16Colors && !IsVirtualTerminal)
         {
             SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
         }
@@ -543,7 +542,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
     }
 
     private bool _isDisposed;
-    private bool _force16Colors;
     private nint _consoleBuffer;
     private readonly StringBuilder _everythingStringBuilder = new ();
 

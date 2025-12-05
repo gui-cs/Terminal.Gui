@@ -268,7 +268,7 @@ public interface IApplication : IDisposable
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new ();
+        where TRunnable : IRunnable, new();
 
     #region Iteration & Invoke
 
@@ -489,12 +489,6 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     bool ClearScreenNextIteration { get; set; }
-
-    /// <summary>
-    ///     Collection of sixel images to write out to screen when updating.
-    ///     Only add to this collection if you are sure terminal supports sixel format.
-    /// </summary>
-    List<SixelToRender> Sixel { get; }
 
     #endregion Screen and Driver
 

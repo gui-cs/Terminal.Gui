@@ -5,31 +5,42 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
-    /// <summary>
-    /// Get or sets the <see cref="IDriver"/> instance associated with this output.
-    /// </summary>
-    internal IDriver? Driver { get; set; }
+    private bool _force16Colors;
+
+    /// <inheritdoc cref="IOutput.Force16Colors"/>
+    public bool Force16Colors
+    {
+        get => _force16Colors;
+        set
+        {
+            if (!IsVirtualTerminal && !value)
+            {
+                return;
+            }
+
+            _force16Colors = value;
+        }
+    }
 
     private bool _isVirtualTerminal;
 
-    /// <summary>
-    ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
-    /// </summary>
-    internal bool IsVirtualTerminal
+    /// <inheritdoc cref="IOutput.IsVirtualTerminal"/>>
+    public bool IsVirtualTerminal
     {
         get => _isVirtualTerminal;
         set
         {
             _isVirtualTerminal = value;
 
-            if (Driver is DriverImpl driverImpl)
+            if (!_isVirtualTerminal)
             {
-                driverImpl.IsVirtualTerminal = _isVirtualTerminal;
+                Force16Colors = true;
             }
         }
     }
 
-    private CursorVisibility? _cachedCursorVisibility;
+    /// <inheritdoc cref="IOutput.Sixel"/>>
+    public List<SixelToRender>? Sixel { get; internal set; }
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -52,7 +63,6 @@ public abstract class OutputBase
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
@@ -121,15 +131,17 @@ public abstract class OutputBase
             }
         }
 
-        if (Driver is { } && IsVirtualTerminal)
+        if (IsVirtualTerminal && Sixel is {})
         {
-            foreach (SixelToRender s in Driver?.Sixel!)
+            foreach (SixelToRender s in Sixel)
             {
-                if (!string.IsNullOrWhiteSpace (s.SixelData))
+                if (string.IsNullOrWhiteSpace (s.SixelData))
                 {
-                    SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-                    Write ((StringBuilder)new (s.SixelData));
+                    continue;
                 }
+
+                SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+                Write ((StringBuilder)new (s.SixelData));
             }
         }
 

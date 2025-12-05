@@ -306,14 +306,7 @@ internal partial class ApplicationImpl
         Initialized = false;
         MainThreadId = null;
 
-        // === 9. Reset ForceDriver ===
-        // Note: ForceDriver and Force16Colors are reset
-        // If they need to persist across Init/Shutdown cycles
-        // then the user of the library should manage that state
-        Force16Colors = false;
-        ForceDriver = string.Empty;
-
-        // === 10. Reset synchronization context ===
+        // === 9. Reset synchronization context ===
         // IMPORTANT: Always reset sync context, even if not initialized
         // This ensures cleanup works correctly even if Shutdown is called without Init
         // Reset synchronization context to allow the user to run async/await,
@@ -322,7 +315,7 @@ internal partial class ApplicationImpl
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
 
-        // === 11. Unsubscribe from Application static property change events ===
+        // === 10. Unsubscribe from Application static property change events ===
         UnsubscribeApplicationEvents ();
     }
 
@@ -361,9 +354,6 @@ internal partial class ApplicationImpl
     }
 #endif
 
-    // Event handlers for Application static property changes
-    private void OnForce16ColorsChanged (object? sender, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
     private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
 
     /// <summary>
@@ -371,7 +361,6 @@ internal partial class ApplicationImpl
     /// </summary>
     private void UnsubscribeApplicationEvents ()
     {
-        Application.Force16ColorsChanged -= OnForce16ColorsChanged;
         Application.ForceDriverChanged -= OnForceDriverChanged;
     }
 }

@@ -13,6 +13,17 @@ public interface IOutput : IDisposable
     bool Force16Colors { get; set; }
 
     /// <summary>
+    ///     Gets or sets whether <see cref="IOutput"/> support for virtualized terminal sequences.
+    /// </summary>
+    bool IsVirtualTerminal { get; set; }
+
+    /// <summary>
+    ///     Collection of sixel images to write out to screen when updating.
+    ///     Only add to this collection if you are sure terminal supports sixel format.
+    /// </summary>
+    List<SixelToRender>? Sixel { get; }
+
+    /// <summary>
     ///     Gets the current position of the console cursor.
     /// </summary>
     /// <returns></returns>

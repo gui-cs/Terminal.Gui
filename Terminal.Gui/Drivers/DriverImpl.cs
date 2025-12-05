@@ -72,31 +72,24 @@ internal class DriverImpl : IDriver
                                    };
 
         CreateClipboard ();
-
-        if (_output is OutputBase outputBase)
-        {
-            IsVirtualTerminal = outputBase.IsVirtualTerminal;
-            outputBase.Driver = this;
-        }
     }
 
-    private bool _isVirtualTerminal = true;
+    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
+
+    /// <inheritdoc/>
+    public bool Force16Colors
+    {
+        get => _output.Force16Colors;
+        set => _output.Force16Colors = value;
+    }
 
     /// <summary>
     ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
     /// </summary>
     internal bool IsVirtualTerminal
     {
-        get => _isVirtualTerminal;
-        set
-        {
-            _isVirtualTerminal = value;
-
-            if (!_isVirtualTerminal)
-            {
-                Force16Colors = true;
-            }
-        }
+        get => _output.IsVirtualTerminal;
+        set => _output.IsVirtualTerminal = value;
     }
 
     /// <inheritdoc/>
@@ -224,31 +217,8 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
 
-    public bool SupportsTrueColor => _isVirtualTerminal;
+    public bool SupportsTrueColor => _output.IsVirtualTerminal;
 
-    private bool _force16Colors;
-
-    /// <inheritdoc/>
-    public bool Force16Colors
-    {
-        get => _force16Colors;
-        set
-        {
-            if (!_isVirtualTerminal && !_force16Colors && !value)
-            {
-                _force16Colors = Application.Force16Colors = true;
-
-                return;
-            }
-
-            if (!_isVirtualTerminal && !value)
-            {
-                return;
-            }
-
-            _force16Colors = Application.Force16Colors = value;
-        }
-    }
 
     /// <inheritdoc/>
     public List<SixelToRender> Sixel { get; } = [];
