@@ -93,8 +93,12 @@ public interface IDriver
     ///         Will be forced to <see langword="true"/> if <see cref="IDriver.SupportsTrueColor"/> is
     ///         <see langword="false"/>, indicating that the <see cref="IDriver"/> cannot support TrueColor.
     ///     </para>
+    ///     <para>
+    ///         This property is read-only. To change the Force16Colors setting, set
+    ///         <c>Terminal.Gui.Drivers.Driver.Force16Colors</c> before creating the driver instance.
+    ///     </para>
     /// </remarks>
-    bool Force16Colors { get; set; }
+    bool Force16Colors { get; }
 
     /// <summary>
     ///     Gets whether the <see cref="IDriver"/> is using 16 colors instead of TrueColors.

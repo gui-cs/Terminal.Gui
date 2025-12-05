@@ -206,11 +206,7 @@ internal class DriverImpl : IDriver
     public bool SupportsTrueColor => true;
 
     /// <inheritdoc/>
-    bool IDriver.Force16Colors
-    {
-        get => _instanceForce16Colors || !SupportsTrueColor;
-        set => throw new InvalidOperationException ("Force16Colors is read-only per driver instance. Set Terminal.Gui.Drivers.Driver.Force16Colors static property before driver creation.");
-    }
+    public bool Force16Colors => _instanceForce16Colors || !SupportsTrueColor;
 
     /// <inheritdoc/>
     public bool GetForce16Colors () => _instanceForce16Colors || !SupportsTrueColor;
