@@ -51,7 +51,7 @@ public static partial class Application // Driver abstractions
         // Only inspect the IDriver assembly
         var asm = typeof (IDriver).Assembly;
 
-        foreach (Type? type in asm.GetTypes ())
+        foreach (Type type in asm.GetTypes ())
         {
             if (typeof (IDriver).IsAssignableFrom (type) && type is { IsAbstract: false, IsClass: true })
             {

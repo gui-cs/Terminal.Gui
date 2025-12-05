@@ -27,12 +27,8 @@ namespace Terminal.Gui.Drivers;
 ///         Applications interact with drivers through the <see cref="Application"/> class.
 ///     </para>
 /// </remarks>
-internal class DriverImpl : IDriver, IDisposable
+internal class DriverImpl : IDriver
 {
-    private readonly IOutput _output;
-    private readonly AnsiRequestScheduler _ansiRequestScheduler;
-    private CursorVisibility _lastCursor = CursorVisibility.Default;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
@@ -71,185 +67,16 @@ internal class DriverImpl : IDriver, IDisposable
         Driver.Force16ColorsChanged += OnDriverOnForce16ColorsChanged;
     }
 
-    /// <inheritdoc/>
-    public bool Force16Colors
-    {
-        get => _output.Force16Colors;
-        set => _output.Force16Colors = value;
-    }
-
-    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
-    // TODO: This should be on IDriver
-    /// <summary>
-    ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
-    /// </summary>
-    internal bool IsVirtualTerminal
-    {
-        get => _output.IsVirtualTerminal;
-        set => _output.IsVirtualTerminal = value;
-    }
+    #region Driver Lifecycle
 
     /// <inheritdoc/>
-    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
+    public void Init () { throw new NotSupportedException (); }
 
     /// <inheritdoc/>
-    public IInputProcessor InputProcessor { get; }
+    public void Refresh () { _output.Write (OutputBuffer); }
 
     /// <inheritdoc/>
-    public IOutputBuffer OutputBuffer { get; }
-
-    /// <inheritdoc/>
-    public ISizeMonitor SizeMonitor { get; }
-
-    private void CreateClipboard ()
-    {
-        if (InputProcessor.DriverName is { } && InputProcessor.DriverName.Contains ("fake"))
-        {
-            if (Clipboard is null)
-            {
-                Clipboard = new FakeClipboard ();
-            }
-
-            return;
-        }
-
-        PlatformID p = Environment.OSVersion.Platform;
-
-        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
-        {
-            Clipboard = new WindowsClipboard ();
-        }
-        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
-        {
-            Clipboard = new MacOSXClipboard ();
-        }
-        else if (PlatformDetection.IsWSLPlatform ())
-        {
-            Clipboard = new WSLClipboard ();
-        }
-
-        // Clipboard is set to FakeClipboard at initialization
-    }
-
-    /// <inheritdoc/>
-
-    public Rectangle Screen => new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
-
-    /// <inheritdoc/>
-    public virtual void SetScreenSize (int width, int height)
-    {
-        OutputBuffer.SetSize (width, height);
-        _output.SetSize (width, height);
-        SizeChanged?.Invoke (this, new (new (width, height)));
-    }
-
-    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
-    {
-        SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
-    }
-
-    /// <inheritdoc/>
-
-    public Region? Clip
-    {
-        get => OutputBuffer.Clip;
-        set => OutputBuffer.Clip = value;
-    }
-
-    /// <inheritdoc/>
-
-    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
-
-    /// <inheritdoc/>
-
-    public int Col => OutputBuffer.Col;
-
-    /// <inheritdoc/>
-
-    public int Cols
-    {
-        get => OutputBuffer.Cols;
-        set => OutputBuffer.Cols = value;
-    }
-
-    /// <inheritdoc/>
-
-    public Cell [,]? Contents
-    {
-        get => OutputBuffer.Contents;
-        set => OutputBuffer.Contents = value;
-    }
-
-    /// <inheritdoc/>
-
-    public int Left
-    {
-        get => OutputBuffer.Left;
-        set => OutputBuffer.Left = value;
-    }
-
-    /// <inheritdoc/>
-
-    public int Row => OutputBuffer.Row;
-
-    /// <inheritdoc/>
-
-    public int Rows
-    {
-        get => OutputBuffer.Rows;
-        set => OutputBuffer.Rows = value;
-    }
-
-    /// <inheritdoc/>
-
-    public int Top
-    {
-        get => OutputBuffer.Top;
-        set => OutputBuffer.Top = value;
-    }
-
-    // TODO: Probably not everyone right?
-
-    /// <inheritdoc/>
-
-    public bool SupportsTrueColor => _output.IsVirtualTerminal;
-
-    /// <inheritdoc/>
-    public ConcurrentQueue<SixelToRender> GetSixels () => _output.GetSixels ();
-
-    /// <inheritdoc/>
-
-    public Attribute CurrentAttribute
-    {
-        get => OutputBuffer.CurrentAttribute;
-        set => OutputBuffer.CurrentAttribute = value;
-    }
-
-    /// <inheritdoc/>
-    public void AddRune (Rune rune) { OutputBuffer.AddRune (rune); }
-
-    /// <inheritdoc/>
-    public void AddRune (char c) { OutputBuffer.AddRune (c); }
-
-    /// <inheritdoc/>
-    public void AddStr (string str) { OutputBuffer.AddStr (str); }
-
-    /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
-    public void ClearContents ()
-    {
-        OutputBuffer.ClearContents ();
-        ClearedContents?.Invoke (this, new MouseEventArgs ());
-    }
-
-    /// <inheritdoc/>
-    public event EventHandler<EventArgs>? ClearedContents;
-
-    /// <inheritdoc/>
-    public void FillRect (Rectangle rect, Rune rune = default) { OutputBuffer.FillRect (rect, rune); }
-
-    /// <inheritdoc/>
-    public void FillRect (Rectangle rect, char c) { OutputBuffer.FillRect (rect, c); }
+    public string? GetName () => InputProcessor.DriverName?.ToLowerInvariant ();
 
     /// <inheritdoc/>
     public virtual string GetVersionInfo ()
@@ -257,42 +84,6 @@ internal class DriverImpl : IDriver, IDisposable
         string type = InputProcessor.DriverName ?? throw new ArgumentNullException (nameof (InputProcessor.DriverName));
 
         return type;
-    }
-
-    /// <inheritdoc/>
-    public bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
-
-    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
-    /// <param name="text">Used to determine if one or two columns are required.</param>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
-    ///     <see cref="IDriver.Clip"/>.
-    ///     <see langword="true"/> otherwise.
-    /// </returns>
-    public bool IsValidLocation (string text, int col, int row) { return OutputBuffer.IsValidLocation (text, col, row); }
-
-    /// <inheritdoc/>
-    public void Move (int col, int row) { OutputBuffer.Move (col, row); }
-
-    // TODO: Probably part of output
-
-    /// <inheritdoc/>
-    public bool SetCursorVisibility (CursorVisibility visibility)
-    {
-        _lastCursor = visibility;
-        _output.SetCursorVisibility (visibility);
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    public bool GetCursorVisibility (out CursorVisibility current)
-    {
-        current = _lastCursor;
-
-        return true;
     }
 
     /// <inheritdoc/>
@@ -332,16 +123,211 @@ internal class DriverImpl : IDriver, IDisposable
     }
 
     /// <inheritdoc/>
-    public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
-
-    /// <inheritdoc/>
-    public void Init () { throw new NotSupportedException (); }
-
-    /// <inheritdoc/>
-    public void End ()
+    public void Dispose ()
     {
-        // TODO: Nope
+        SizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
+        Driver.Force16ColorsChanged -= OnDriverOnForce16ColorsChanged;
+        _output.Dispose ();
     }
+
+    #endregion Driver Lifecycle
+
+    #region Driver Components
+
+    private readonly IOutput _output;
+
+    /// <inheritdoc/>
+    public IInputProcessor InputProcessor { get; }
+
+    /// <inheritdoc/>
+    public IOutputBuffer OutputBuffer { get; }
+
+    /// <inheritdoc/>
+    public ISizeMonitor SizeMonitor { get; }
+
+    /// <inheritdoc/>
+    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
+
+    private void CreateClipboard ()
+    {
+        if (InputProcessor.DriverName is { } && InputProcessor.DriverName.Contains ("fake"))
+        {
+            if (Clipboard is null)
+            {
+                Clipboard = new FakeClipboard ();
+            }
+
+            return;
+        }
+
+        PlatformID p = Environment.OSVersion.Platform;
+
+        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
+        {
+            Clipboard = new WindowsClipboard ();
+        }
+        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
+        {
+            Clipboard = new MacOSXClipboard ();
+        }
+        else if (PlatformDetection.IsWSLPlatform ())
+        {
+            Clipboard = new WSLClipboard ();
+        }
+
+        // Clipboard is set to FakeClipboard at initialization
+    }
+
+    #endregion Driver Components
+
+    #region Screen and Display
+
+    /// <inheritdoc/>
+    public Rectangle Screen => new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
+
+    /// <inheritdoc/>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        OutputBuffer.SetSize (width, height);
+        _output.SetSize (width, height);
+        SizeChanged?.Invoke (this, new (new (width, height)));
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
+
+    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e) { SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height); }
+
+    /// <inheritdoc/>
+    public int Cols
+    {
+        get => OutputBuffer.Cols;
+        set => OutputBuffer.Cols = value;
+    }
+
+    /// <inheritdoc/>
+    public int Rows
+    {
+        get => OutputBuffer.Rows;
+        set => OutputBuffer.Rows = value;
+    }
+
+    /// <inheritdoc/>
+    public int Left
+    {
+        get => OutputBuffer.Left;
+        set => OutputBuffer.Left = value;
+    }
+
+    /// <inheritdoc/>
+    public int Top
+    {
+        get => OutputBuffer.Top;
+        set => OutputBuffer.Top = value;
+    }
+
+    #endregion Screen and Display
+
+    #region Color Support
+
+    /// <inheritdoc/>
+    public bool SupportsTrueColor => _output.IsVirtualTerminal;
+
+    /// <inheritdoc/>
+    public bool Force16Colors
+    {
+        get => _output.Force16Colors;
+        set => _output.Force16Colors = value;
+    }
+
+    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
+
+    // TODO: This should be on IDriver
+    /// <summary>
+    ///     Gets or sets whether <see cref="IDriver"/> support for virtualized terminal sequences.
+    /// </summary>
+    internal bool IsVirtualTerminal
+    {
+        get => _output.IsVirtualTerminal;
+        set => _output.IsVirtualTerminal = value;
+    }
+
+    #endregion Color Support
+
+    #region Content Buffer
+
+    /// <inheritdoc/>
+    public Cell [,]? Contents
+    {
+        get => OutputBuffer.Contents;
+        set => OutputBuffer.Contents = value;
+    }
+
+    /// <inheritdoc/>
+    public Region? Clip
+    {
+        get => OutputBuffer.Clip;
+        set => OutputBuffer.Clip = value;
+    }
+
+    /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
+    public void ClearContents ()
+    {
+        OutputBuffer.ClearContents ();
+        ClearedContents?.Invoke (this, new MouseEventArgs ());
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<EventArgs>? ClearedContents;
+
+    #endregion Content Buffer
+
+    #region Drawing and Rendering
+
+    /// <inheritdoc/>
+    public int Col => OutputBuffer.Col;
+
+    /// <inheritdoc/>
+    public int Row => OutputBuffer.Row;
+
+    /// <inheritdoc/>
+    public Attribute CurrentAttribute
+    {
+        get => OutputBuffer.CurrentAttribute;
+        set => OutputBuffer.CurrentAttribute = value;
+    }
+
+    /// <inheritdoc/>
+    public void Move (int col, int row) { OutputBuffer.Move (col, row); }
+
+    /// <inheritdoc/>
+    public bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
+
+    /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
+    /// <param name="text">Used to determine if one or two columns are required.</param>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <returns>
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
+    ///     <see cref="IDriver.Clip"/>.
+    ///     <see langword="true"/> otherwise.
+    /// </returns>
+    public bool IsValidLocation (string text, int col, int row) => OutputBuffer.IsValidLocation (text, col, row);
+
+    /// <inheritdoc/>
+    public void AddRune (Rune rune) { OutputBuffer.AddRune (rune); }
+
+    /// <inheritdoc/>
+    public void AddRune (char c) { OutputBuffer.AddRune (c); }
+
+    /// <inheritdoc/>
+    public void AddStr (string str) { OutputBuffer.AddStr (str); }
+
+    /// <inheritdoc/>
+    public void FillRect (Rectangle rect, Rune rune = default) { OutputBuffer.FillRect (rect, rune); }
+
+    /// <inheritdoc/>
+    public void FillRect (Rectangle rect, char c) { OutputBuffer.FillRect (rect, c); }
 
     /// <inheritdoc/>
     public Attribute SetAttribute (Attribute newAttribute)
@@ -355,35 +341,11 @@ internal class DriverImpl : IDriver, IDisposable
     /// <inheritdoc/>
     public Attribute GetAttribute () => OutputBuffer.CurrentAttribute;
 
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
-    public event EventHandler<Key>? KeyDown;
-
-    /// <inheritdoc/>
-    public event EventHandler<Key>? KeyUp;
-
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<MouseEventArgs>? MouseEvent;
-
     /// <inheritdoc/>
     public void WriteRaw (string ansi) { _output.Write (ansi); }
 
     /// <inheritdoc/>
-    public void EnqueueKeyEvent (Key key) { InputProcessor.EnqueueKeyDownEvent (key); }
-
-    /// <inheritdoc/>
-    public virtual void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (this, request); }
-
-    /// <inheritdoc/>
-    public AnsiRequestScheduler GetRequestScheduler () => _ansiRequestScheduler;
-
-    /// <inheritdoc/>
-    public void Refresh ()
-    {
-        _output.Write (OutputBuffer);
-    }
-
-    /// <inheritdoc/>
-    public string? GetName () => InputProcessor.DriverName?.ToLowerInvariant ();
+    public ConcurrentQueue<SixelToRender> GetSixels () => _output.GetSixels ();
 
     /// <inheritdoc/>
     public new string ToString ()
@@ -412,17 +374,59 @@ internal class DriverImpl : IDriver, IDisposable
         return sb.ToString ();
     }
 
-    /// <inheritdoc />
-    public string ToAnsi ()
+    /// <inheritdoc/>
+    public string ToAnsi () => _output.ToAnsi (OutputBuffer);
+
+    #endregion Drawing and Rendering
+
+    #region Cursor
+
+    private CursorVisibility _lastCursor = CursorVisibility.Default;
+
+    /// <inheritdoc/>
+    public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
+
+    /// <inheritdoc/>
+    public bool GetCursorVisibility (out CursorVisibility current)
     {
-        return _output.ToAnsi (OutputBuffer);
+        current = _lastCursor;
+
+        return true;
     }
 
-    /// <inheritdoc />
-    public void Dispose ()
+    /// <inheritdoc/>
+    public bool SetCursorVisibility (CursorVisibility visibility)
     {
-        SizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
-        Driver.Force16ColorsChanged -= OnDriverOnForce16ColorsChanged;
-        _output.Dispose ();
+        _lastCursor = visibility;
+        _output.SetCursorVisibility (visibility);
+
+        return true;
     }
+
+    #endregion Cursor
+
+    #region Input Events
+
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    public event EventHandler<MouseEventArgs>? MouseEvent;
+
+    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
+    public event EventHandler<Key>? KeyDown;
+
+    /// <inheritdoc/>
+    public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc/>
+    public void EnqueueKeyEvent (Key key) { InputProcessor.EnqueueKeyDownEvent (key); }
+
+    #endregion Input Events
+
+    #region ANSI Escape Sequences
+
+    private readonly AnsiRequestScheduler _ansiRequestScheduler;
+
+    /// <inheritdoc/>
+    public virtual void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (this, request); }
+
+    #endregion ANSI Escape Sequences
 }

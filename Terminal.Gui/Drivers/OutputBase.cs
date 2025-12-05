@@ -216,7 +216,7 @@ public abstract class OutputBase
                     continue;
                 }
 
-                Cell cell = buffer.Contents![row, col];
+                Cell cell = buffer.Contents! [row, col];
                 AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col);
             }
 

@@ -31,7 +31,7 @@ public class FakeOutput : OutputBase, IOutput
     ///     Gets the captured output as a string.
     /// </summary>
     public string Output => _output.ToString ();
-    
+
     /// <inheritdoc />
     public Point GetCursorPosition ()
     {
