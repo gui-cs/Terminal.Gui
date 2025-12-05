@@ -9,6 +9,9 @@ public sealed class Driver
 {
     private static bool _force16Colors = false; // Resources/config.json overrides
 
+    // NOTE: Force16Colors is a configuration property (Driver.Force16Colors).
+    // NOTE: IDriver also has a Force16Colors property, which is an instance property
+    // NOTE: set whenever this static property is set.
     /// <summary>
     ///     Determines if driver instances should use 16 colors instead of the default TrueColors.
     /// </summary>

@@ -13,11 +13,13 @@ public static partial class Application // Driver abstractions
         internal set => ApplicationImpl.Instance.Driver = value;
     }
 
+    // NOTE: ForceDriver is a configuration property (Application.ForceDriver).
+    // NOTE: IApplication also has a ForceDriver property, which is an instance property
+    // NOTE: set whenever this static property is set.
     private static string _forceDriver = string.Empty; // Resources/config.json overrides
 
     /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    [Obsolete ("The legacy static Application object is going away.")]
     public static string ForceDriver
     {
         get => _forceDriver;
