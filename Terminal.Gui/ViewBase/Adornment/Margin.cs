@@ -1,5 +1,6 @@
 
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ViewBase;
@@ -62,7 +63,6 @@ public class Margin : Adornment
         }
     }
 
-    // PERFORMANCE: Margins are ALWAYS drawn. This may be an issue for apps that have a large number of views with shadows.
     /// <summary>
     ///     INTERNAL API - Draws the margins for the specified views. This is called by the <see cref="Application"/> on each
     ///     iteration of the main loop after all Views have been drawn.
@@ -77,17 +77,18 @@ public class Margin : Adornment
         {
             var view = stack.Pop ();
 
-            if (view.Margin?.GetCachedClip () != null)
+            if (view.Margin is { } margin && margin.Thickness != Thickness.Empty && margin.GetCachedClip () != null)
             {
-                view.Margin!.NeedsDraw = true;
+                margin.SetNeedsDraw ();
                 Region? saved = view.GetClip ();
-                view.SetClip (view.Margin!.GetCachedClip ());
-                view.Margin!.Draw (); 
+                view.SetClip (margin.GetCachedClip ());
+                margin.Draw ();
                 view.SetClip (saved);
-                view.Margin!.ClearCachedClip ();
+                margin.ClearCachedClip ();
             }
 
-            view.NeedsDraw = false;
+            Debug.Assert (view.NeedsDraw == false);
+            view.ClearNeedsDraw ();
 
             foreach (var subview in view.SubViews)
             {
@@ -225,7 +226,7 @@ public class Margin : Adornment
             return;
         }
 
-        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag(MouseState.Pressed);
+        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag (MouseState.Pressed);
         bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.HighlightStates.HasFlag (MouseState.PressedOutside); ;
 
         if (pressedOutside)

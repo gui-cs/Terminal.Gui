@@ -87,7 +87,7 @@ internal partial class ApplicationImpl
         _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
 
         CreateDriver (_driverName);
-        Screen = Driver!.Screen;
+
         Initialized = true;
 
         RaiseInitializedChanged (this, new (true));
@@ -272,10 +272,6 @@ internal partial class ApplicationImpl
             Driver?.End ();
             Driver = null;
         }
-
-        // Reset screen
-        ResetScreen ();
-        _screen = null;
 
         // === 5. Clear run state ===
         Iteration = null;

@@ -22,6 +22,7 @@ See end for list of issues this design addresses.
 - Cursor Visibility - Whether the cursor is visible to the user or not. NOTE: Some ConsoleDrivers overload Cursor Style and Cursor Visibility, making "invisible" a style. Terminal.Gui HIDES this from developers and changing the visibility of the cursor does NOT change the style.
 - Caret - Visual indicator that  where text entry will occur. 
 - Selection - A visual indicator to the user that something is selected. It is common for the Selection and Cursor to be the same. It is also common for the Selection and Cursor to be distinct. In a `ListView` the Cursor and Selection (`SelectedItem`) are the same, but the `Cursor` is not visible. In a `TextView` with text selected, the `Cursor` is at either the start or end of the `Selection`. A `TableView' supports mutliple things being selected at once.
+- **Draw Cursor** - The internal position tracked by `OutputBuffer.Col` and `OutputBuffer.Row` that indicates where the next `AddRune()` or `AddStr()` call will write. This is NOT the same as the visible terminal cursor and should never be used for cursor positioning.
 
 ## Requirements
 
@@ -137,24 +138,83 @@ It doesn't make sense the every View instance has it's own notion of `MostFocuse
 
 # Issues with Current Design
 
-## `Driver.Row/Pos`, which are changed via `Move` serves two purposes that confuse each other:
+## `Driver.Row/Col`, which are changed via `Move` serves two purposes that confuse each other:
 
-a) Where the next `AddRune` will put the next rune
-b) The current "Cursor Location"
+a) Where the next `AddRune` will put the next rune (**the "Draw Cursor"**)
+b) The current "Cursor Location" (the visible terminal cursor)
 
-If most TUI apps acted like a command line where the visible cursor was always visible, this might make sense. But the fact that only a very few View subclasses we've seen actually care to show the cursor illustrates a problem:
+**These are completely separate concepts that were conflated in the original design.**
 
-Any drawing causes the "Cursor Position" to be changed/lost. This means we have a ton of code that is constantly repositioning the cursor every MainLoop iteration.
+The **Draw Cursor** (`OutputBuffer.Col`/`OutputBuffer.Row`) tracks where drawing operations will write characters. Every call to `Move()` during view drawing updates these values. By the end of drawing, they point to wherever the last `AddRune()` or `AddStr()` call left them - typically the bottom-right of the last drawn element.
+
+The **Terminal Cursor** is the visible cursor indicator in the terminal that shows the user where their input will go. This should ONLY be positioned based on `View.PositionCursor()` for the focused view.
+
+### The Core Problem
+
+The conflation of these two concepts caused the cursor to be positioned at arbitrary "Draw Cursor" locations (wherever drawing happened to finish) instead of where the application actually wanted it. Any code that tried to use `Driver.Col`/`Driver.Row` for cursor positioning was fundamentally broken.
+
+### The Fix (Applied 2025-01-13)
+
+**In `OutputBase.Write(IOutputBuffer)`**: Removed the cursor visibility save/restore pattern that was causing flickering.
+
+**Previous (Broken) Code:**
+```csharp
+CursorVisibility? savedVisibility = _cachedCursorVisibility;
+SetCursorVisibility (CursorVisibility.Invisible);  // Hide while drawing
+
+// ... draw everything ...
+
+SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);  // PROBLEM: Restores stale visibility!
+_cachedCursorVisibility = savedVisibility;
+```
+
+The problem: After drawing, cursor visibility was restored to `savedVisibility`, which was whatever was set previously. This was often wrong:
+- If views didn't want the cursor visible (returned `null` from `PositionCursor()`), it would get shown anyway
+- The cursor would flicker on/off every frame during scrolling or other drawing operations
+- The "saved" visibility was stale and didn't reflect the application's current intent
+
+**Fixed Code:**
+```csharp
+// Hide cursor while writing to prevent flickering
+// Note: ApplicationMainLoop.SetCursor() is responsible for positioning and 
+// showing the cursor after drawing is complete
+SetCursorVisibility (CursorVisibility.Invisible);
+
+// ... draw everything ...
+
+// DO NOT restore cursor visibility here - let ApplicationMainLoop.SetCursor() handle it
+```
+
+Now `OutputBase.Write()` only hides the cursor during drawing. The responsibility for showing the cursor at the correct location with the correct visibility is left entirely to `ApplicationMainLoop.SetCursor()`, which:
+1. Calls `View.PositionCursor()` on the focused view
+2. Converts the viewport-relative position to screen coordinates  
+3. Sets the cursor position and visibility appropriately
+
+This separation of concerns eliminates the flickering and ensures the cursor is only shown when and where the application actually wants it.
+
+### Implications for Future Design
+
+Any future cursor system design MUST maintain this separation:
+- **Drawing operations** (`Move()`, `AddRune()`, `AddStr()`) should NEVER affect the visible terminal cursor
+- **Cursor positioning** should be a separate, explicit operation based on application/view intent
+- `OutputBuffer.Col` and `OutputBuffer.Row` are internal state for drawing and should not be exposed for cursor positioning
 
 ## The actual cursor position RARELY changes (relative to `Mainloop.Iteration`).
 
-Derived from abo`ve, the current design means we need to call `View.PositionCursor` every iteration. For some views this is a low-cost operation. For others it involves a lot of math. 
+Derived from above, the current design means we need to call `View.PositionCursor` every iteration. For some views this is a low-cost operation. For others it involves a lot of math. 
 
-This is just stupid. 
+This is just stupid.
+
+**Potential optimization**: Cache the last cursor position and only call `PositionCursor()` when:
+- Focus changes
+- The focused view signals its cursor position changed (e.g. via `SetNeedsDraw()`)
+- Layout changes
 
 ## Flicker
 
 Related to the above, we need constantly Show/Hide the cursor every iteration. This causes ridiculous cursor flicker. 
+
+**FIXED 2025-01-13**: The root cause was `OutputBase.Write()` restoring stale cursor visibility after drawing. See fix details above.
 
 ## `View.PositionCursor` is poorly spec'd and confusing to implement correctly
 
@@ -165,3 +225,7 @@ Should a view call `base.PositionCursor`? If so, before or after doing stuff?
 First, leaving it up to views to do this is fragile.
 
 Second, when a View gets focus is but one of many places where cursor visibilty should be updated. 
+
+# Related Issues
+
+- [#3444](https://github.com/gui-cs/Terminal.Gui/issues/3444) - Cursor flickers in bottom right during TableView scrolling (FIXED 2025-01-13)

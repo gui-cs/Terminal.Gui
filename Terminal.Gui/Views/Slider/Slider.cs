@@ -779,7 +779,7 @@ public class Slider<T> : View, IOrientation
     #region Drawing
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         // TODO: make this more surgical to reduce repaint
 
