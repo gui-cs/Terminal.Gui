@@ -190,7 +190,7 @@ public class ColorPickers : Scenario
             Enabled = canTrueColor,
             Text = "Force16Colors"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Driver!.Force16Colors= evt.Result == CheckState.Checked; };
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Driver!.Force16Colors = evt.Result == CheckState.Checked; };
         app.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
 
         // Set default colors.
