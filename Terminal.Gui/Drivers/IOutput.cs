@@ -7,6 +7,12 @@
 public interface IOutput : IDisposable
 {
     /// <summary>
+    ///     Gets or sets whether the <see cref="IOutput"/> should use 16 colors instead of the default TrueColors.
+    /// </summary>
+    /// <seealso cref="IDriver.Force16Colors"/>
+    bool Force16Colors { get; set; }
+
+    /// <summary>
     ///     Gets the current position of the console cursor.
     /// </summary>
     /// <returns></returns>
@@ -17,7 +23,7 @@ public interface IOutput : IDisposable
     ///     of characters not pixels).
     /// </summary>
     /// <returns></returns>
-    public Size GetSize ();
+    Size GetSize ();
 
     /// <summary>
     ///     Moves the console cursor to the given location.
