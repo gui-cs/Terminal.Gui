@@ -8,9 +8,6 @@ public abstract class OutputBase
     /// <inheritdoc cref="IOutput.Force16Colors"/>
     public bool Force16Colors { get; set; }
 
-
-    private CursorVisibility? _cachedCursorVisibility;
-
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
@@ -32,7 +29,6 @@ public abstract class OutputBase
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
