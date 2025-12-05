@@ -197,7 +197,7 @@ public class LineDrawing : Scenario
 
         Application.Run (d);
         d.Dispose ();
-        newColor = Driver.Force16Colors? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
+        newColor = Driver.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }
