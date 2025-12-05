@@ -204,15 +204,49 @@ When `IApplication.Shutdown()` is called:
 
 ### IDriver
 
-The main driver interface that the framework uses internally. Provides:
+The main driver interface that the framework uses internally. `IDriver` is organized into logical regions:
 
-- **Screen Management**: `Screen`, `Cols`, `Rows`, `Contents`
-- **Drawing Operations**: `AddRune()`, `AddStr()`, `Move()`, `FillRect()`
-- **Cursor Management**: `SetCursorVisibility()`, `UpdateCursor()`
-- **Attribute Management**: `CurrentAttribute`, `SetAttribute()`, `MakeColor()`
-- **Clipping**: `Clip` property
-- **Events**: `KeyDown`, `KeyUp`, `MouseEvent`, `SizeChanged`
-- **Platform Features**: `SupportsTrueColor`, `Force16Colors`, `Clipboard`
+#### Driver Lifecycle
+- `Init()`, `Refresh()`, `End()` - Core lifecycle methods
+- `GetName()`, `GetVersionInfo()` - Driver identification
+- `Suspend()` - Platform-specific suspend support
+
+#### Driver Components
+- `InputProcessor` - Processes input into Terminal.Gui events
+- `OutputBuffer` - Manages screen buffer state
+- `SizeMonitor` - Detects terminal size changes
+- `Clipboard` - OS clipboard integration
+
+#### Screen and Display
+- `Screen`, `Cols`, `Rows`, `Left`, `Top` - Screen dimensions
+- `SetScreenSize()`, `SizeChanged` - Size management
+
+#### Color Support
+- `SupportsTrueColor` - 24-bit color capability
+- `Force16Colors` - Force 16-color mode
+
+#### Content Buffer
+- `Contents` - Screen buffer array
+- `Clip` - Clipping region
+- `ClearContents()`, `ClearedContents` - Buffer management
+
+#### Drawing and Rendering
+- `Col`, `Row`, `CurrentAttribute` - Drawing state
+- `Move()`, `AddRune()`, `AddStr()`, `FillRect()` - Drawing operations
+- `SetAttribute()`, `GetAttribute()` - Attribute management
+- `WriteRaw()`, `GetSixels()` - Raw output and graphics
+- `Refresh()`, `ToString()`, `ToAnsi()` - Output rendering
+
+#### Cursor
+- `UpdateCursor()` - Position cursor
+- `GetCursorVisibility()`, `SetCursorVisibility()` - Visibility management
+
+#### Input Events
+- `KeyDown`, `KeyUp`, `MouseEvent` - Input events
+- `EnqueueKeyEvent()` - Test support
+
+#### ANSI Escape Sequences
+- `QueueAnsiRequest()` - ANSI request handling
 
 **Note:** The driver is internal to Terminal.Gui. View classes should not access `Driver` directly. Instead:
 - Use @Terminal.Gui.App.Application.Screen to get screen dimensions

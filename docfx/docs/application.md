@@ -752,16 +752,18 @@ foreach (string? name in names)
 
 ## View.Driver Property
 
-Similar to `View.App`, views now have a `Driver` property.
+Similar to `View.App`, views now have a `Driver` property for accessing driver functionality.
 
 ```csharp
 public override void OnDrawContent (Rectangle viewport)
 {
-    // Use view's driver instead of Application.Driver
+    // Use view's driver instead of obsolete Application.Driver
     Driver?.Move (0, 0);
     Driver?.AddStr ("Hello");
 }
 ```
+
+**Note**: See [Drivers Deep Dive](drivers.md) for complete driver architecture details, including the organized interface structure with lifecycle, components, display, rendering, cursor, and input regions.
 
 ## Testing with the New Architecture
 
