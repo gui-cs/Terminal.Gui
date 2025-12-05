@@ -1,5 +1,7 @@
 #nullable disable
 ﻿
+using DriverConfig = Terminal.Gui.Drivers.Driver;
+
 namespace Terminal.Gui.Views;
 
 public partial class ColorPicker
@@ -21,14 +23,14 @@ public partial class ColorPicker
         var d = new Dialog
         {
             Title = title,
-            Width = Application.Force16Colors ? 37 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Width = DriverConfig.Force16Colors ? 37 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
             Height = 20
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = Application.Force16Colors ? 6 : 4,
+            Y = DriverConfig.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefault = true
@@ -63,7 +65,7 @@ public partial class ColorPicker
 
         View cpForeground;
 
-        if (Application.Force16Colors)
+        if (DriverConfig.Force16Colors)
         {
             cpForeground = new ColorPicker16
             {
@@ -88,7 +90,7 @@ public partial class ColorPicker
 
         View cpBackground;
 
-        if (Application.Force16Colors)
+        if (DriverConfig.Force16Colors)
         {
             cpBackground = new ColorPicker16
             {
@@ -117,8 +119,8 @@ public partial class ColorPicker
 
         app.Run (d);
         d.Dispose ();
-        Color newForeColor = Application.Force16Colors ? ((ColorPicker16)cpForeground).SelectedColor : ((ColorPicker)cpForeground).SelectedColor;
-        Color newBackColor = Application.Force16Colors ? ((ColorPicker16)cpBackground).SelectedColor : ((ColorPicker)cpBackground).SelectedColor;
+        Color newForeColor = DriverConfig.Force16Colors ? ((ColorPicker16)cpForeground).SelectedColor : ((ColorPicker)cpForeground).SelectedColor;
+        Color newBackColor = DriverConfig.Force16Colors ? ((ColorPicker16)cpBackground).SelectedColor : ((ColorPicker)cpBackground).SelectedColor;
         newAttribute = new (newForeColor, newBackColor);
         app.Dispose ();
         return accept;

@@ -44,8 +44,8 @@ public class GlobalTestSetup : IDisposable
 
         //// Don't check Application.ForceDriver
         //Assert.Empty (Application.ForceDriver);
-        //// Don't check Application.Force16Colors
-        ////Assert.False (Application.Force16Colors);
+        //// Don't check Terminal.Gui.Drivers.Driver.Force16Colors
+        ////Assert.False (Terminal.Gui.Drivers.Driver.Force16Colors);
         //Assert.Null (Application.Driver);
         //Assert.False (Application.StopAfterFirstIteration);
         Assert.Equal (Key.Tab.WithShift, Application.PrevTabKey);

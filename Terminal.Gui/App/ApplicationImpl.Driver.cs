@@ -8,10 +8,7 @@ internal partial class ApplicationImpl
     public IDriver? Driver { get; set; }
 
     /// <inheritdoc/>
-    public bool Force16Colors { get; set; }
-
-    /// <inheritdoc/>
-    public string ForceDriver { get; set; } = string.Empty;
+    public string ForceDriver { get; internal set; } = string.Empty;
 
     /// <inheritdoc/>
     public List<SixelToRender> Sixel { get; } = new ();

@@ -450,17 +450,10 @@ public interface IApplication : IDisposable
     IClipboard? Clipboard { get; }
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in
-    ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be
-    ///     output as long as the selected <see cref="IDriver"/> supports TrueColor.
+    ///     Gets the name of the driver to force. One of "fake", "dotnet", "windows", or "unix".
+    ///     If not specified, the driver is selected based on the platform.
     /// </summary>
-    bool Force16Colors { get; set; }
-
-    /// <summary>
-    ///     Forces the use of the specified driver (one of "fake", "dotnet", "windows", or "unix"). If not
-    ///     specified, the driver is selected based on the platform.
-    /// </summary>
-    string ForceDriver { get; set; }
+    string ForceDriver { get; }
 
     /// <summary>
     ///     Gets or location and size of the application in the terminal. By default, the location is (0, 0) and the size

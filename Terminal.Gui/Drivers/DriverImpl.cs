@@ -31,6 +31,7 @@ internal class DriverImpl : IDriver
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
     private CursorVisibility _lastCursor = CursorVisibility.Default;
+    private readonly bool _instanceForce16Colors;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
@@ -52,6 +53,9 @@ internal class DriverImpl : IDriver
         _output = output;
         OutputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
+
+        // Read the static Force16Colors value at construction time and store in instance field
+        _instanceForce16Colors = Terminal.Gui.Drivers.Driver.Force16Colors;
 
         InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
@@ -202,12 +206,14 @@ internal class DriverImpl : IDriver
     public bool SupportsTrueColor => true;
 
     /// <inheritdoc/>
-
-    public bool Force16Colors
+    bool IDriver.Force16Colors
     {
-        get => Application.Force16Colors || !SupportsTrueColor;
-        set => Application.Force16Colors = value || !SupportsTrueColor;
+        get => _instanceForce16Colors || !SupportsTrueColor;
+        set => throw new InvalidOperationException ("Force16Colors is read-only per driver instance. Set Terminal.Gui.Drivers.Driver.Force16Colors static property before driver creation.");
     }
+
+    /// <inheritdoc/>
+    public bool GetForce16Colors () => _instanceForce16Colors || !SupportsTrueColor;
 
     /// <inheritdoc/>
 

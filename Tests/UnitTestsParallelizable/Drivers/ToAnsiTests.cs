@@ -73,7 +73,7 @@ public class ToAnsiTests : FakeDriverBase
     public void ToAnsi_With_Background_Colors (bool force16Colors, string expected)
     {
         IDriver driver = CreateFakeDriver (10, 2);
-        Application.Force16Colors = force16Colors;
+        Terminal.Gui.Drivers.Driver.Force16Colors = force16Colors;
 
         // Set background color
         driver.CurrentAttribute = new (Color.White, Color.Red);
@@ -210,7 +210,7 @@ public class ToAnsiTests : FakeDriverBase
         IDriver driver = CreateFakeDriver (10, 1);
 
         // Use RGB colors (when not forcing 16 colors)
-        Application.Force16Colors = false;
+        Terminal.Gui.Drivers.Driver.Force16Colors = false;
         try
         {
             driver.CurrentAttribute = new Attribute (new Color (255, 0, 0), new Color (0, 255, 0));
@@ -224,7 +224,7 @@ public class ToAnsiTests : FakeDriverBase
         }
         finally
         {
-            Application.Force16Colors = true; // Reset
+            Terminal.Gui.Drivers.Driver.Force16Colors = true; // Reset
         }
     }
 
@@ -234,7 +234,7 @@ public class ToAnsiTests : FakeDriverBase
         IDriver driver = CreateFakeDriver (10, 1);
 
         // Force 16 colors
-        Application.Force16Colors = true;
+        Terminal.Gui.Drivers.Driver.Force16Colors = true;
         driver.CurrentAttribute = new Attribute (Color.Red, Color.Blue);
         driver.AddStr ("16Color");
 

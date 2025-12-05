@@ -313,7 +313,7 @@ internal partial class ApplicationImpl
         // Note: ForceDriver and Force16Colors are reset
         // If they need to persist across Init/Shutdown cycles
         // then the user of the library should manage that state
-        Force16Colors = false;
+        Terminal.Gui.Drivers.Driver.Force16Colors = false;
         ForceDriver = string.Empty;
 
         // === 11. Reset synchronization context ===
@@ -365,8 +365,6 @@ internal partial class ApplicationImpl
 #endif
 
     // Event handlers for Application static property changes
-    private void OnForce16ColorsChanged (object? sender, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
     private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
 
     /// <summary>
@@ -374,7 +372,6 @@ internal partial class ApplicationImpl
     /// </summary>
     private void UnsubscribeApplicationEvents ()
     {
-        Application.Force16ColorsChanged -= OnForce16ColorsChanged;
         Application.ForceDriverChanged -= OnForceDriverChanged;
     }
 }

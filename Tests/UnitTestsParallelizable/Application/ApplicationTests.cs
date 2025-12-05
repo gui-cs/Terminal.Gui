@@ -132,7 +132,7 @@ public class ApplicationTests (ITestOutputHelper output)
     {
         using IApplication app = Application.Create ();
 
-        app.ForceDriver = "fake";
+        Application.ForceDriver = "fake";
         // Note: Init() without params picks up driver configuration
         app.Init ();
 

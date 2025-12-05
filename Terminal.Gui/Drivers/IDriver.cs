@@ -84,8 +84,9 @@ public interface IDriver
     bool SupportsTrueColor { get; }
 
     /// <summary>
-    ///     Gets or sets whether the <see cref="IDriver"/> should use 16 colors instead of the default TrueColors.
-    ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
+    ///     Gets whether the <see cref="IDriver"/> should use 16 colors instead of the default TrueColors.
+    ///     This value is set at driver construction time from the static <c>Terminal.Gui.Drivers.Driver.Force16Colors</c> property.
+    ///     Use <see cref="GetForce16Colors"/> to retrieve this value.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -94,6 +95,14 @@ public interface IDriver
     ///     </para>
     /// </remarks>
     bool Force16Colors { get; set; }
+
+    /// <summary>
+    ///     Gets whether the <see cref="IDriver"/> is using 16 colors instead of TrueColors.
+    /// </summary>
+    /// <returns>
+    ///     <see langword="true"/> if the driver is using 16 colors; otherwise, <see langword="false"/>.
+    /// </returns>
+    bool GetForce16Colors ();
 
     /// <summary>
     ///     The <see cref="System.Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or

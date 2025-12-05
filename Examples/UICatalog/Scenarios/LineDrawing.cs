@@ -133,14 +133,14 @@ public class LineDrawing : Scenario
         var d = new Dialog
         {
             Title = title,
-            Width = Application.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Width = Terminal.Gui.Drivers.Driver.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
             Height = 10
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = Application.Force16Colors ? 6 : 4,
+            Y = Terminal.Gui.Drivers.Driver.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefault = true
@@ -174,7 +174,7 @@ public class LineDrawing : Scenario
         d.AddButton (btnCancel);
 
         View cp;
-        if (Application.Force16Colors)
+        if (Terminal.Gui.Drivers.Driver.Force16Colors)
         {
             cp = new ColorPicker16
             {
@@ -197,7 +197,7 @@ public class LineDrawing : Scenario
 
         Application.Run (d);
         d.Dispose ();
-        newColor = Application.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
+        newColor = Terminal.Gui.Drivers.Driver.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }

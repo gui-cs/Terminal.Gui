@@ -15,7 +15,6 @@ internal partial class ApplicationImpl : IApplication
     internal ApplicationImpl ()
     {
         // Subscribe to Application static property change events
-        Application.Force16ColorsChanged += OnForce16ColorsChanged;
         Application.ForceDriverChanged += OnForceDriverChanged;
     }
 
@@ -146,7 +145,7 @@ internal partial class ApplicationImpl : IApplication
         // Reset Application static properties to their defaults
         // This ensures tests start with clean state
         Application.ForceDriver = string.Empty;
-        Application.Force16Colors = false;
+        Drivers.Driver.Force16Colors = false;
         Application.IsMouseDisabled = false;
         Application.QuitKey = Key.Esc;
         Application.ArrangeKey = Key.F5.WithCtrl;
