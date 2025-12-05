@@ -383,7 +383,7 @@ public class IApplicationScreenChangedTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Screen_Property_Setting_Does_Not_Fire_ScreenChanged_Event ()
+    public void Screen_Property_Setting_Raises_ScreenChanged_Event ()
     {
         // Arrange
         using IApplication app = Application.Create ();
@@ -397,11 +397,10 @@ public class IApplicationScreenChangedTests (ITestOutputHelper output)
 
         try
         {
-            // Act - Manually set Screen property (not via driver resize)
+            // Act - Manually set Screen property 
             app.Screen = new (0, 0, 100, 50);
 
-            // Assert - Event should not fire for manual property setting
-            Assert.False (eventFired);
+            Assert.True (eventFired);
             Assert.Equal (new (0, 0, 100, 50), app.Screen);
         }
         finally

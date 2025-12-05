@@ -1,15 +1,19 @@
-﻿#nullable enable
-using Moq;
+﻿using Moq;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewBaseTests;
+namespace ViewBaseTests.Viewport;
 
 [Trait ("Category", "Output")]
 public class ClearViewportTests (ITestOutputHelper output)
 {
     public class TestableView : View
     {
+        public TestableView ()
+        {
+            Frame = new Rectangle (0, 0, 10, 10);
+        }
+
         public bool TestOnClearingViewport () { return OnClearingViewport (); }
 
         public int OnClearingViewportCalled { get; set; }
@@ -76,6 +80,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         Mock<TestableView> view = new () { CallBase = true };
 
         // Act
+        view.Object.SetNeedsDraw ();
         view.Object.DoClearViewport ();
 
         // Assert
@@ -91,6 +96,7 @@ public class ClearViewportTests (ITestOutputHelper output)
         view.Object.ClearingViewport += (sender, e) => eventRaised = true;
 
         // Act
+        view.Object.SetNeedsDraw ();
         view.Object.DoClearViewport ();
 
         // Assert
@@ -98,12 +104,13 @@ public class ClearViewportTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [SetupFakeApplication]
     public void Clear_ClearsEntireViewport ()
     {
-        var superView = new View
+        using IApplication? app = Application.Create ();
+        app.Init ("Fake");
+
+        var superView = new Runnable
         {
-            App = ApplicationImpl.Instance,
             Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
@@ -115,8 +122,7 @@ public class ClearViewportTests (ITestOutputHelper output)
             BorderStyle = LineStyle.Single
         };
         superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
+        app.Begin (superView);
         superView.LayoutSubViews ();
         superView.Draw ();
 
@@ -125,7 +131,8 @@ public class ClearViewportTests (ITestOutputHelper output)
  ┌─┐
  │X│
  └─┘",
-                                                       output);
+                                                       output,
+                                                       app.Driver);
 
         // On Draw exit the view is excluded from the clip, so this will do nothing.
         view.ClearViewport ();
@@ -135,9 +142,11 @@ public class ClearViewportTests (ITestOutputHelper output)
  ┌─┐
  │X│
  └─┘",
-                                                       output);
+                                                       output,
+                                                       app.Driver);
 
-       view.SetClipToScreen ();
+
+        view.SetClipToScreen ();
 
         view.ClearViewport ();
 
@@ -146,16 +155,18 @@ public class ClearViewportTests (ITestOutputHelper output)
  ┌─┐
  │ │
  └─┘",
-                                                       output);
+                                                       output,
+                                                       app.Driver);
     }
 
     [Fact]
-    [SetupFakeApplication]
     public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
-        var superView = new View
+        using IApplication? app = Application.Create ();
+        app.Init ("Fake");
+
+        var superView = new Runnable
         {
-            App = ApplicationImpl.Instance,
             Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
@@ -168,8 +179,7 @@ public class ClearViewportTests (ITestOutputHelper output)
             ViewportSettings = ViewportSettingsFlags.ClearContentOnly
         };
         superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
+        app.Begin (superView);
         superView.LayoutSubViews ();
 
         superView.Draw ();
@@ -179,8 +189,9 @@ public class ClearViewportTests (ITestOutputHelper output)
  ┌─┐
  │X│
  └─┘",
-                                                       output);
-       view.SetClipToScreen ();
+                                                       output,
+                                                       app.Driver);
+        view.SetClipToScreen ();
         view.ClearViewport ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -188,14 +199,16 @@ public class ClearViewportTests (ITestOutputHelper output)
  ┌─┐
  │ │
  └─┘",
-                                                       output);
+                                                       output,
+                                                       app.Driver);
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Clear_Viewport_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
-        var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
+        using IApplication? app = Application.Create ();
+        app.Init ("Fake");
+        var view = new FrameView {  Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         view.DrawingContent += (s, e) =>
                                {
@@ -203,11 +216,11 @@ public class ClearViewportTests (ITestOutputHelper output)
 
                                    for (var row = 0; row < view.Viewport.Height; row++)
                                    {
-                                       Application.Driver?.Move (1, row + 1);
+                                       app.Driver?.Move (1, row + 1);
 
                                        for (var col = 0; col < view.Viewport.Width; col++)
                                        {
-                                           Application.Driver?.AddStr ($"{col}");
+                                           app.Driver?.AddStr ($"{col}");
                                        }
                                    }
 
@@ -216,9 +229,9 @@ public class ClearViewportTests (ITestOutputHelper output)
                                };
         var top = new Runnable ();
         top.Add (view);
-        Application.Begin (top);
-        Application.Driver!.SetScreenSize (20, 10);
-        Application.LayoutAndDraw ();
+        app.Begin (top);
+        app.Driver!.SetScreenSize (20, 10);
+        app.LayoutAndDraw ();
 
         var expected = @"
 ┌──────────────────┐
@@ -234,7 +247,7 @@ public class ClearViewportTests (ITestOutputHelper output)
 "
             ;
 
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
         Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
@@ -253,14 +266,15 @@ public class ClearViewportTests (ITestOutputHelper output)
 "
             ;
 
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
         top.Dispose ();
     }
 
     [Fact]
-    [AutoInitShutdown]
     public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
+        using IApplication? app = Application.Create ();
+        app.Init ("Fake");
         var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         view.DrawingContent += (s, e) =>
@@ -269,11 +283,11 @@ public class ClearViewportTests (ITestOutputHelper output)
 
                                    for (var row = 0; row < view.Viewport.Height; row++)
                                    {
-                                       Application.Driver?.Move (1, row + 1);
+                                       app.Driver?.Move (1, row + 1);
 
                                        for (var col = 0; col < view.Viewport.Width; col++)
                                        {
-                                           Application.Driver?.AddStr ($"{col}");
+                                           app.Driver?.AddStr ($"{col}");
                                        }
                                    }
 
@@ -282,9 +296,9 @@ public class ClearViewportTests (ITestOutputHelper output)
                                };
         var top = new Runnable ();
         top.Add (view);
-        Application.Begin (top);
-        Application.Driver!.SetScreenSize (20, 10);
-        Application.LayoutAndDraw ();
+        app.Begin (top);
+        app.Driver!.SetScreenSize (20, 10);
+        app.LayoutAndDraw ();
 
         var expected = @"
 ┌──────────────────┐
@@ -300,7 +314,7 @@ public class ClearViewportTests (ITestOutputHelper output)
 "
             ;
 
-        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
         Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
@@ -318,7 +332,7 @@ public class ClearViewportTests (ITestOutputHelper output)
 └──────────────────┘
 ";
 
-        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
 
         top.Dispose ();
     }

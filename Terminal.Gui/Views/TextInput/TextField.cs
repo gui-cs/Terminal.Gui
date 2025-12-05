@@ -922,7 +922,7 @@ public class TextField : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         _isDrawing = true;
 

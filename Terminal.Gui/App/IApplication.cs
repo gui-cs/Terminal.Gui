@@ -463,8 +463,9 @@ public interface IApplication : IDisposable
     string ForceDriver { get; set; }
 
     /// <summary>
-    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the
-    ///     <see cref="IDriver"/>.
+    ///     Gets or location and size of the application in the terminal. By default, the location is (0, 0) and the size
+    ///     is the size of the terminal as reported by the <see cref="IDriver"/>.
+    ///     Setting the location to anything but (0, 0) is not supported and will throw <see cref="NotSupportedException"/>.
     /// </summary>
     /// <remarks>
     ///     <para>

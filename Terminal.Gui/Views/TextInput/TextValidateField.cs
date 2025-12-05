@@ -172,7 +172,7 @@ public class TextValidateField : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (_provider is null)
         {

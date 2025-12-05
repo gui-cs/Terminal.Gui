@@ -253,7 +253,13 @@ public class Menus : Scenario
 
             // The source of truth is our status CB; any time it changes, update the menu item
             var enableOverwriteMenuItemCb = menuBar.GetMenuItemsWithTitle ("Overwrite").FirstOrDefault ()?.CommandView as CheckBox;
-            enableOverwriteStatusCb.CheckedStateChanged += (_, _) => enableOverwriteMenuItemCb!.CheckedState = enableOverwriteStatusCb.CheckedState;
+            enableOverwriteStatusCb.CheckedStateChanged += (_, _) =>
+                                                           {
+                                                               if (enableOverwriteMenuItemCb is { })
+                                                               {
+                                                                   enableOverwriteMenuItemCb.CheckedState = enableOverwriteStatusCb.CheckedState;
+                                                               }
+                                                           };
 
             menuBar.Accepted += (o, args) =>
                                 {
@@ -298,7 +304,13 @@ public class Menus : Scenario
 
             // The source of truth is our status CB; any time it changes, update the menu item
             var editModeMenuItemCb = menuBar.GetMenuItemsWithTitle ("EditMode").FirstOrDefault ()?.CommandView as CheckBox;
-            editModeStatusCb.CheckedStateChanged += (_, _) => editModeMenuItemCb!.CheckedState = editModeStatusCb.CheckedState;
+            editModeStatusCb.CheckedStateChanged += (_, _) =>
+                                                       {
+                                                           if (editModeMenuItemCb is { })
+                                                           {
+                                                               editModeMenuItemCb.CheckedState = editModeStatusCb.CheckedState;
+                                                           }
+                                                       };
 
             menuBar.Accepted += (o, args) =>
                                 {

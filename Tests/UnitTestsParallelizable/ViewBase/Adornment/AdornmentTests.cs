@@ -10,7 +10,7 @@ public class AdornmentTests
     //    public bool PaddingDrawn { get; set; }
 
     //    /// <inheritdoc />
-    //    protected override bool OnDrawingContent () 
+    //    protected override bool OnDrawingContent (DrawContext? context) 
     //    {
     //        if (Border is { } && Border.Thickness != Thickness.Empty)
     //        {

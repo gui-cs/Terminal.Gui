@@ -414,7 +414,7 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public void Refresh ()
     {
-        // No need we will always draw when dirty
+        _output.Write (OutputBuffer);
     }
 
     /// <inheritdoc/>
