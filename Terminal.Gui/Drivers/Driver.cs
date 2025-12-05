@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Holds global driver settings.
@@ -30,5 +28,4 @@ public sealed class Driver
 
     /// <summary>Raised when <see cref="Force16Colors"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<bool>>? Force16ColorsChanged;
-
 }
