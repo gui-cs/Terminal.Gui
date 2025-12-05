@@ -6,9 +6,6 @@
 /// </summary>
 public interface IOutput : IDisposable
 {
-    /// <summary>
-    ///     Gets or sets whether the <see cref="IOutput"/> should use 16 colors instead of the default TrueColors.
-    /// </summary>
     /// <seealso cref="IDriver.Force16Colors"/>
     bool Force16Colors { get; set; }
 

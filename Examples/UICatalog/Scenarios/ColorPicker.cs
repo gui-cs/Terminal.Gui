@@ -186,11 +186,11 @@ public class ColorPickers : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 1,
             Y = Pos.Top (lblDriverName),
-            CheckedState = Application.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = Application.Driver.Force16Colors? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Force16Colors"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Force16Colors = evt.Result == CheckState.Checked; };
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Driver!.Force16Colors= evt.Result == CheckState.Checked; };
         app.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
 
         // Set default colors.

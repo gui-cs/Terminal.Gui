@@ -85,7 +85,6 @@ public interface IDriver
 
     /// <summary>
     ///     Gets or sets whether the <see cref="IDriver"/> should use 16 colors instead of the default TrueColors.
-    ///     See <see cref="Application.Force16Colors"/> to change this setting via <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -93,6 +92,7 @@ public interface IDriver
     ///         <see langword="false"/>, indicating that the <see cref="IDriver"/> cannot support TrueColor.
     ///     </para>
     /// </remarks>
+    /// <seealso cref="Driver.Force16Colors"/>
     bool Force16Colors { get; set; }
 
     /// <summary>
