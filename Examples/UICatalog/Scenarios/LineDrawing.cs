@@ -133,14 +133,14 @@ public class LineDrawing : Scenario
         var d = new Dialog
         {
             Title = title,
-            Width = Driver.Force16Colors? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Width = Driver.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
             Height = 10
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = Driver.Force16Colors? 6 : 4,
+            Y = Driver.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefault = true

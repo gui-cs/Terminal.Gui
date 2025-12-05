@@ -26,7 +26,7 @@ The appropriate driver is automatically selected based on the platform when you 
 
 You can explicitly specify a driver in several ways:
 
-Method 1: Set ForceDriver using Configuraiton Manager
+Method 1: Set ForceDriver using Configuration Manager
 
 ```json
 {
