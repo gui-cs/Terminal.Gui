@@ -45,8 +45,9 @@ public class ToAnsiTests : FakeDriverBase
     [InlineData (false, "\u001b[38;2;255;0;0m", "\u001b[38;2;0;0;255")]
     public void ToAnsi_With_Colors (bool force16Colors, string expectedRed, string expectedBue)
     {
+        // Set the static property before creating the driver
+        Terminal.Gui.Drivers.Driver.Force16Colors = force16Colors;
         IDriver driver = CreateFakeDriver (10, 2);
-        driver.Force16Colors = force16Colors;
 
         // Set red foreground
         driver.CurrentAttribute = new Attribute (Color.Red, Color.Black);
@@ -65,6 +66,9 @@ public class ToAnsiTests : FakeDriverBase
         Assert.Contains (expectedBue, ansi); // Blue foreground
         Assert.Contains ("Red", ansi);
         Assert.Contains ("Blue", ansi);
+        
+        // Reset for other tests
+        Terminal.Gui.Drivers.Driver.Force16Colors = false;
     }
 
     [Theory (Skip = "Uses Application.")]
@@ -82,13 +86,13 @@ public class ToAnsiTests : FakeDriverBase
         string ansi = driver.ToAnsi ();
 
         /*
-         The ANSI escape sequence for red background (8-color) is ESC[41m — where ESC is \x1b (or \u001b).
+         The ANSI escape sequence for red background (8-color) is ESC[41m ï¿½ where ESC is \x1b (or \u001b).
            Examples:
-           •	C# string: "\u001b[41m" or "\x1b[41m"
-           •	Reset (clear attributes): "\u001b[0m"
+           ï¿½	C# string: "\u001b[41m" or "\x1b[41m"
+           ï¿½	Reset (clear attributes): "\u001b[0m"
            Notes:
-           •	Bright/red background (16-color bright variant) uses ESC[101m ("\u001b[101m").
-           •	For 24-bit RGB background use ESC[48;2;<r>;<g>;<b>m, e.g. "\u001b[48;2;255;0;0m" for pure red.
+           ï¿½	Bright/red background (16-color bright variant) uses ESC[101m ("\u001b[101m").
+           ï¿½	For 24-bit RGB background use ESC[48;2;<r>;<g>;<b>m, e.g. "\u001b[48;2;255;0;0m" for pure red.
          */
 
         Assert.True (driver.Force16Colors == force16Colors);
@@ -162,8 +166,9 @@ public class ToAnsiTests : FakeDriverBase
     [InlineData (false, "\u001b[38;2;", "\u001b[48;2;")]
     public void ToAnsi_Attribute_Changes_Within_Line (bool force16Colors, string expectedRed, string expectedBlue)
     {
+        // Set the static property before creating the driver
+        Terminal.Gui.Drivers.Driver.Force16Colors = force16Colors;
         IDriver driver = CreateFakeDriver (20, 1);
-        driver.Force16Colors = force16Colors;
 
         driver.AddStr ("Normal");
         driver.CurrentAttribute = new Attribute (Color.Red, Color.Black);
@@ -178,6 +183,9 @@ public class ToAnsiTests : FakeDriverBase
         Assert.Contains ("Normal", ansi);
         Assert.Contains (expectedRed, ansi); // Red
         Assert.Contains (expectedBlue, ansi); // Blue
+        
+        // Reset for other tests
+        Terminal.Gui.Drivers.Driver.Force16Colors = false;
     }
 
     [Fact]
@@ -259,8 +267,9 @@ public class ToAnsiTests : FakeDriverBase
         string expectedCyan
     )
     {
+        // Set the static property before creating the driver
+        Terminal.Gui.Drivers.Driver.Force16Colors = force16Colors;
         IDriver driver = CreateFakeDriver (50, 1);
-        driver.Force16Colors = force16Colors;
 
         // Create a line with many attribute changes
         string [] colors = { "Red", "Green", "Blue", "Yellow", "Magenta", "Cyan" };
@@ -292,6 +301,9 @@ public class ToAnsiTests : FakeDriverBase
         Assert.Contains (expectedYellow, ansi); // Yellow
         Assert.Contains (expectedMagenta, ansi); // Magenta
         Assert.Contains (expectedCyan, ansi); // Cyan
+        
+        // Reset for other tests
+        Terminal.Gui.Drivers.Driver.Force16Colors = false;
     }
 
     [Fact]
