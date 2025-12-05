@@ -571,7 +571,7 @@ public partial class View // Drawing APIs
     ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune?)"/>.
     ///     </para>
     ///     <para>
-    ///         The event is invoked after <see cref="ClearingViewport"/> and after any <see cref="SubViews"/> and <see cref="Text"/> have been drawn.
+    ///         The event is invoked after <see cref="ClearingViewport"/> and <see cref="Text"/> have been drawn, but before any <see cref="SubViews"/> are drawn.
     ///     </para>
     ///     <para>
     ///         <b>Transparency Support:</b> If the View has <see cref="ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/>
