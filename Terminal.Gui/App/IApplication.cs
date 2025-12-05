@@ -268,7 +268,7 @@ public interface IApplication : IDisposable
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new();
+        where TRunnable : IRunnable, new ();
 
     #region Iteration & Invoke
 
