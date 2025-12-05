@@ -26,7 +26,7 @@ namespace Terminal.Gui.Drivers;
 ///         Applications interact with drivers through the <see cref="Application"/> class.
 ///     </para>
 /// </remarks>
-internal class DriverImpl : IDriver, IDisposable
+internal class DriverImpl : IDriver
 {
     private readonly IOutput _output;
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
@@ -63,52 +63,25 @@ internal class DriverImpl : IDriver, IDisposable
                                      };
 
         SizeMonitor = sizeMonitor;
-        SizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
+
+        sizeMonitor.SizeChanged += (_, e) =>
+                                   {
+                                       SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
+
+                                       //SizeChanged?.Invoke (this, e);
+                                   };
 
         CreateClipboard ();
-
-        Driver.Force16ColorsChanged += OnDriverOnForce16ColorsChanged;
     }
+
+    /// <inheritdoc/>
+    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
     /// <inheritdoc/>
     public IInputProcessor InputProcessor { get; }
 
     /// <inheritdoc/>
     public IOutputBuffer OutputBuffer { get; }
-
-
-    /// <inheritdoc/>
-    public bool SupportsTrueColor => true;
-
-    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
-    /// <inheritdoc/>
-    public bool Force16Colors
-    {
-        get => _output.Force16Colors;
-        set => _output.Force16Colors = value;
-    }
-
-    /// <inheritdoc/>
-    public Rectangle Screen => new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
-
-    /// <inheritdoc/>
-    public virtual void SetScreenSize (int width, int height)
-    {
-        OutputBuffer.SetSize (width, height);
-        _output.SetSize (width, height);
-        SizeChanged?.Invoke (this, new (new (width, height)));
-    }
-
-    /// <inheritdoc/>
-    public event EventHandler<SizeChangedEventArgs>? SizeChanged;
-
-    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
-    {
-        SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
-
-        //SizeChanged?.Invoke (this, e);
-    }
 
     /// <inheritdoc/>
     public ISizeMonitor SizeMonitor { get; }
@@ -144,10 +117,26 @@ internal class DriverImpl : IDriver, IDisposable
     }
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
 
+    public Rectangle Screen =>
+
+        //if (Application.RunningUnitTests && _output is WindowsConsoleOutput or NetOutput)
+        //{
+        //    // In unit tests, we don't have a real output, so we return an empty rectangle.
+        //    return Rectangle.Empty;
+        //}
+        new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
 
     /// <inheritdoc/>
+    public virtual void SetScreenSize (int width, int height)
+    {
+        OutputBuffer.SetSize (width, height);
+        _output.SetSize (width, height);
+        SizeChanged?.Invoke (this, new (new (width, height)));
+    }
+
+    /// <inheritdoc/>
+
     public Region? Clip
     {
         get => OutputBuffer.Clip;
@@ -155,9 +144,15 @@ internal class DriverImpl : IDriver, IDisposable
     }
 
     /// <inheritdoc/>
+
+    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
+
+    /// <inheritdoc/>
+
     public int Col => OutputBuffer.Col;
 
     /// <inheritdoc/>
+
     public int Cols
     {
         get => OutputBuffer.Cols;
@@ -165,6 +160,7 @@ internal class DriverImpl : IDriver, IDisposable
     }
 
     /// <inheritdoc/>
+
     public Cell [,]? Contents
     {
         get => OutputBuffer.Contents;
@@ -172,6 +168,7 @@ internal class DriverImpl : IDriver, IDisposable
     }
 
     /// <inheritdoc/>
+
     public int Left
     {
         get => OutputBuffer.Left;
@@ -179,9 +176,11 @@ internal class DriverImpl : IDriver, IDisposable
     }
 
     /// <inheritdoc/>
+
     public int Row => OutputBuffer.Row;
 
     /// <inheritdoc/>
+
     public int Rows
     {
         get => OutputBuffer.Rows;
@@ -194,6 +193,20 @@ internal class DriverImpl : IDriver, IDisposable
     {
         get => OutputBuffer.Top;
         set => OutputBuffer.Top = value;
+    }
+
+    // TODO: Probably not everyone right?
+
+    /// <inheritdoc/>
+
+    public bool SupportsTrueColor => true;
+
+    /// <inheritdoc/>
+
+    public bool Force16Colors
+    {
+        get => Application.Force16Colors || !SupportsTrueColor;
+        set => Application.Force16Colors = value || !SupportsTrueColor;
     }
 
     /// <inheritdoc/>
@@ -357,7 +370,7 @@ internal class DriverImpl : IDriver, IDisposable
     /// <inheritdoc/>
     public void Refresh ()
     {
-        // No need we will always draw when dirty
+        _output.Write (OutputBuffer);
     }
 
     /// <inheritdoc/>
@@ -393,15 +406,6 @@ internal class DriverImpl : IDriver, IDisposable
     /// <inheritdoc />
     public string ToAnsi ()
     {
-        return _output.ToAnsi (OutputBuffer, Force16Colors);
-    }
-
-    /// <inheritdoc />
-    public void Dispose ()
-    {
-        SizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
-        Driver.Force16ColorsChanged -= OnDriverOnForce16ColorsChanged;
-
-        _output.Dispose ();
+        return _output.ToAnsi (OutputBuffer);
     }
 }
