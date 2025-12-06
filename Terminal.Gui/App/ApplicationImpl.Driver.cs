@@ -145,7 +145,11 @@ internal partial class ApplicationImpl
 
     internal void SubscribeDriverEvents ()
     {
-        ArgumentNullException.ThrowIfNull (Driver);
+        if (Driver is null)
+        {
+            Logging.Error($"Driver is null");
+            return;
+        }
 
         Driver.SizeChanged += Driver_SizeChanged;
         Driver.KeyDown += Driver_KeyDown;
@@ -155,7 +159,11 @@ internal partial class ApplicationImpl
 
     internal void UnsubscribeDriverEvents ()
     {
-        ArgumentNullException.ThrowIfNull (Driver);
+        if (Driver is null)
+        {
+            Logging.Error ($"Driver is null");
+            return;
+        }
 
         Driver.SizeChanged -= Driver_SizeChanged;
         Driver.KeyDown -= Driver_KeyDown;
