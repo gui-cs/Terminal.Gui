@@ -363,6 +363,7 @@ public partial class View // Mouse APIs
     /// </remarks>
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
+
     /// <summary>
     ///     INTERNAL: Raises a new mouse event for the deepest view under the specified mouse position. Useful for unit tests
     ///     where using Application.RaiseMouseEvent is not possible.
@@ -376,14 +377,6 @@ public partial class View // Mouse APIs
 
         return deepestView?.NewMouseEvent (mouseEvent);
     }
-        if (mouseEvent.IsReleased)
-        {
-            if (App?.Mouse.MouseGrabView == this)
-            {
-                //Logging.Debug ($"{Id} - {MouseState}");
-                MouseState &= ~MouseState.Pressed;
-                MouseState &= ~MouseState.PressedOutside;
-            }
 
     #endregion Low Level Mouse Events
 
@@ -407,12 +400,10 @@ public partial class View // Mouse APIs
         Debug.Assert (!mouseEvent.Handled);
         mouseEvent.Handled = false;
 
-        if (mouseEvent.IsPressed)
+        // The first time we get pressed event, grab the mouse and set focus
+        if (App?.Mouse.MouseGrabView != this)
         {
-            // The first time we get pressed event, grab the mouse and set focus
-            if (App?.Mouse.MouseGrabView != this)
-            {
-                App?.Mouse.GrabMouse (this);
+            App?.Mouse.GrabMouse (this);
 
             if (!HasFocus && CanFocus)
             {

@@ -218,7 +218,7 @@ Events in Terminal.Gui often propagate through the view hierarchy. For example, 
 ```csharp
 private bool? HandleHotKeyCommand (ICommandContext commandContext)
 {
-    bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
+    bool cachedIsDefault = IsDefaultAcceptView; // Supports "Swap Default" in Buttons scenario where IsDefaultAcceptView changes
 
     if (RaiseActivating (commandContext) is true)
     {

@@ -21,7 +21,7 @@ namespace Terminal.Gui.Views;
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
 /// </remarks>
-public class Button : View, IDesignable, IDefaultAcceptView
+public class Button : View, IDesignable, View.IDefaultAcceptView
 {
     private static ShadowStyle _defaultShadow = ShadowStyle.Opaque; // Resources/config.json overrides
     private static MouseState _defaultHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides

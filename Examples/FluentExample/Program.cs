@@ -64,7 +64,7 @@ public class ColorPickerView : Runnable<Color?>
             Title = "_OK",
             X = Pos.Align (Alignment.Center),
             Y = Pos.AnchorEnd (),
-            IsDefault = true
+            IsDefaultAcceptView = true
         };
 
         okButton.Accepting += (s, e) =>

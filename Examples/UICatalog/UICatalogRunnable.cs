@@ -298,7 +298,7 @@ public class UICatalogRunnable : Runnable
             _diagnosticFlagsSelector.UsedHotKeys.Add (Key.D);
             _diagnosticFlagsSelector.AssignHotKeys = true;
             _diagnosticFlagsSelector.Value = Diagnostics;
-            _diagnosticFlagsSelector.Selecting += (sender, args) =>
+            _diagnosticFlagsSelector.Activating += (sender, args) =>
                                                   {
                                                       _diagnosticFlags = (ViewDiagnosticFlags)((int)args.Context!.Source!.Data!);// (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
                                                       Diagnostics = _diagnosticFlags;
@@ -330,7 +330,7 @@ public class UICatalogRunnable : Runnable
             };
 
             //_disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
-            _disableMouseCb.Selecting += (sender, args) =>
+            _disableMouseCb.Activating += (sender, args) =>
                                          {
                                              Application.IsMouseDisabled = !Application.IsMouseDisabled;
                                              _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.None;

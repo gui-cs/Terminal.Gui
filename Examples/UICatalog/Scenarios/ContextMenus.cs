@@ -35,7 +35,7 @@ public class ContextMenus : Scenario
         Application.Run (_appWindow);
         _appWindow.Dispose ();
         _appWindow.KeyDown -= OnAppWindowOnKeyDown;
-        _appWindow.MouseClick -= OnAppWindowOnMouseClick;
+        _appWindow.MouseEvent -= OnAppWindowOnMouseEvent;
         _winContextMenu?.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
@@ -81,7 +81,7 @@ public class ContextMenus : Scenario
             _appWindow.Add (_tfBottomRight);
 
             _appWindow.KeyDown += OnAppWindowOnKeyDown;
-            _appWindow.MouseClick += OnAppWindowOnMouseClick;
+            _appWindow.MouseEvent += OnAppWindowOnMouseEvent;
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
             _appWindow.IsRunningChanged += (s, e) => {
@@ -91,7 +91,7 @@ public class ContextMenus : Scenario
                                                } };
         }
 
-        void OnAppWindowOnMouseClick (object? s, MouseEventArgs e)
+        void OnAppWindowOnMouseEvent (object? s, MouseEventArgs e)
         {
             if (e.Flags == MouseFlags.Button3Clicked)
             {

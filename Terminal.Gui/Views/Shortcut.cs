@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 
 namespace Terminal.Gui.Views;
 
@@ -727,6 +728,7 @@ public class Shortcut : View, IDesignable
 
             Region textRegion = KeyView.TextFormatter.GetDrawRegion (drawRect);
             KeyView.TextFormatter?.Draw (
+                                         Driver,
                                          drawRect,
                                          HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
                                          HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),

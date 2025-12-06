@@ -353,7 +353,7 @@ public class CsvEditor : Scenario
     {
         var okPressed = false;
 
-        Button ok = new () { Text = "Ok", IsDefault = true };
+        Button ok = new () { Text = "Ok", IsDefaultAcceptView = true };
 
         ok.Accepting += (s, e) =>
                         {

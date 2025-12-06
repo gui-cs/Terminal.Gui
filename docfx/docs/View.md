@@ -228,8 +228,8 @@ Events:
 - `HasFocusChanged` - After focus changes
 - `Accepting` - When Command.Accept is invoked (typically Enter key)
 - `Accepted` - After Command.Accept completes
-- `Selecting` - When Command.Select is invoked (typically Space or mouse click)
-- `Selected` - After Command.Select completes
+- `Selecting` - When Command.Activate is invoked (typically Space or mouse click)
+- `Selected` - After Command.Activate completes
 
 ### Scrolling
 
@@ -340,7 +340,7 @@ view.AddCommand (Command.Accept, () =>
 view.KeyBindings.Add (Key.Enter, Command.Accept);
 
 // Bind a mouse action to the command
-view.MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
+view.MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
 ```
 
 ### Input
@@ -587,7 +587,7 @@ public class ColorPickerDialog : Runnable<Color?>
         
         _colorPicker = new ColorPicker16 { X = Pos.Center(), Y = 2 };
         
-        var okButton = new Button { Text = "OK", IsDefault = true };
+        var okButton = new Button { Text = "OK", IsDefaultAcceptView = true };
         okButton.Accepting += (s, e) => {
             Result = _colorPicker.SelectedColor;
             Application.RequestStop();

@@ -180,7 +180,7 @@ public class FileDialog : Runnable<string?>
         _pathField = new () { Width = Dim.Fill () };
         Add (_pathField);
         
-        Button okButton = new () { Text = "OK", IsDefault = true };
+        Button okButton = new () { Text = "OK", IsDefaultAcceptView = true };
         okButton.Accepting += (s, e) =>
         {
             Result = _pathField.Text;

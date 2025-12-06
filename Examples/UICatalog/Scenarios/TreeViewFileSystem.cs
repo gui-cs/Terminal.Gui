@@ -60,7 +60,7 @@ public class TreeViewFileSystem : Scenario
         };
 
         win.Add (_detailsFrame);
-        _treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
+        _treeViewFiles.MouseEvent += TreeViewFiles_MouseEvent;
         _treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
         _treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
@@ -556,7 +556,7 @@ public class TreeViewFileSystem : Scenario
         }
     }
 
-    private void TreeViewFiles_MouseEvent (object sender, MouseEventArgs obj)
+    private void TreeViewFiles_MouseEvent (object? sender, MouseEventArgs obj)
     {
         // if user right clicks
         if (!obj.Flags.HasFlag (MouseFlags.Button3Clicked))
@@ -564,23 +564,17 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        IFileSystemInfo rightClicked = _treeViewFiles.GetObjectOnRow (obj.Position.Y);
-            IFileSystemInfo? rightClicked = _treeViewFiles.GetObjectOnRow (obj.Position.Y);
+        IFileSystemInfo? rightClicked = _treeViewFiles?.GetObjectOnRow (obj.Position.Y);
 
         // nothing was clicked
-        if (rightClicked == null)
+        if (rightClicked is null)
         {
             return;
         }
-            // nothing was clicked
-            if (rightClicked is null)
-            {
-                return;
-            }
 
         ShowContextMenu (
                          new (
-                              obj.Position.X + _treeViewFiles.Frame.X,
+                              obj.Position.X + _treeViewFiles!.Frame.X,
                               obj.Position.Y + _treeViewFiles.Frame.Y + 2
                              ),
                          rightClicked

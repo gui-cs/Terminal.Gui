@@ -125,7 +125,7 @@ View CreateCustomForm ()
         Title = "OK",
         X = Pos.Center (),
         Y = 7,
-        IsDefault = true
+        IsDefaultAcceptView = true
     };
 
     okButton.Accepting += (s, e) =>

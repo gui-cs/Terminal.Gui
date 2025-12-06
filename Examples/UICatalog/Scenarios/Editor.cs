@@ -954,7 +954,7 @@ public class Editor : Scenario
             X = Pos.Align (Alignment.Center),
             Y = Pos.AnchorEnd (),
             Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            IsDefault = true,
+            IsDefaultAcceptView = true,
             Text = "Find _Next"
         };
         btnFindNext.Accepting += (s, e) => { FindNext (); };

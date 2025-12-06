@@ -178,7 +178,7 @@ public class ViewCommandTests
 
         return;
 
-        void ViewOnActivate (object sender, CommandEventArgs e)
+        void ViewOnActivate (object? sender, CommandEventArgs e)
         {
             activatingInvoked = true;
             e.Handled = true;
@@ -198,7 +198,7 @@ public class ViewCommandTests
 
         return;
 
-        void ViewOnActivating (object sender, CommandEventArgs e) { activating = true; }
+        void ViewOnActivating (object? sender, CommandEventArgs e) { activating = true; }
     }
 
     [Fact]

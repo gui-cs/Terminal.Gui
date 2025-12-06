@@ -500,13 +500,13 @@ public class ShortcutTests
                                   e.Handled = true;
                               };
 
-        var selected = 0;
-        shortcut.Selecting += (s, e) => selected++;
+        var activatingCount = 0;
+        shortcut.Activating += (s, e) => activatingCount++;
 
         app.Keyboard.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAccept, accepted);
-        Assert.Equal (expectedSelect, selected);
+        Assert.Equal (expectedSelect, activatingCount);
     }
 
 }

@@ -604,7 +604,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         try
         {
             app.Iteration += OnApplicationOnIteration;
-            int? res = MessageBox.Query (app, "hey", "IsDefault", "Yes", "No");
+            int? res = MessageBox.Query (app, "hey", "IsDefaultAcceptView", "Yes", "No");
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (0, res);

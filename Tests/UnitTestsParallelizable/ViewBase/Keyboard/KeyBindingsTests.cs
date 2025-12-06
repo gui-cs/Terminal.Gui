@@ -147,7 +147,7 @@ public class KeyBindingsTests
         app.Begin (new Runnable<bool> ());
         var hotKeyRaised = false;
         var acceptRaised = false;
-        var selectRaised = false;
+        var activatingRaised = false;
 
         var view = new View
         {
@@ -178,7 +178,7 @@ public class KeyBindingsTests
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.E.WithAlt));
         Assert.True (hotKeyRaised);
         Assert.False (acceptRaised);
-        Assert.False (selectRaised);
+        Assert.False (activatingRaised);
     }
 
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)

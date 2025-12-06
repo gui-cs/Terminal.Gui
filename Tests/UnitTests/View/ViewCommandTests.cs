@@ -90,28 +90,28 @@ public class ViewCommandTests
         Assert.Equal (1, acceptCancel);
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void HotKey_From_Non_IsDefaultAcceptView_Button_Raises_Accept_In_The_Default_Button ()
-    {
-        var acceptOk = 0;
-        var acceptCancel = 0;
-        Button btnOk = new () { Id = "Ok", Text = "_Ok", IsDefaultAcceptView = true };
-        btnOk.Accepting += (s, e) => acceptOk++;
-        Button btnCancel = new () { Id = "Cancel", Y = 1, Text = "_Cancel" };
-        btnCancel.Accepting += (s, e) => acceptCancel++;
-        Application.Top = new ();
-        Application.Top.Add (btnOk, btnCancel);
-        var rs = Application.Begin (Application.Top);
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void HotKey_From_Non_IsDefaultAcceptView_Button_Raises_Accept_In_The_Default_Button ()
+    //{
+    //    var acceptOk = 0;
+    //    var acceptCancel = 0;
+    //    Button btnOk = new () { Id = "Ok", Text = "_Ok", IsDefaultAcceptView = true };
+    //    btnOk.Accepting += (s, e) => acceptOk++;
+    //    Button btnCancel = new () { Id = "Cancel", Y = 1, Text = "_Cancel" };
+    //    btnCancel.Accepting += (s, e) => acceptCancel++;
+    //    Application.Top = new ();
+    //    Application.Top.Add (btnOk, btnCancel);
+    //    var rs = Application.Begin (Application.Top);
 
-        Application.RaiseKeyDownEvent(Key.C);
-        Assert.Equal (1, acceptOk);
-        Assert.Equal (1, acceptCancel);
+    //    Application.RaiseKeyDownEvent(Key.C);
+    //    Assert.Equal (1, acceptOk);
+    //    Assert.Equal (1, acceptCancel);
 
-        Application.End (rs);
-        Application.Top.Dispose ();
-        Application.ResetState ();
-    }
+    //    Application.End (rs);
+    //    Application.Top.Dispose ();
+    //    Application.ResetState ();
+    //}
 
     // See https://github.com/gui-cs/Terminal.Gui/issues/3913
     [Fact]

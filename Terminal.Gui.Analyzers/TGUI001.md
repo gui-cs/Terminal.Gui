@@ -10,7 +10,7 @@ When registering an event handler for `Accepting`, you should set Handled to tru
 
 ## Reason for rule
 
-If you do not do this then you may see unpredictable behaviour such as clicking a Button resulting in another `IsDefault` button in the View also firing.
+If you do not do this then you may see unpredictable behaviour such as clicking a Button resulting in another `IsDefaultAcceptView` button in the View also firing.
 
 See:
 

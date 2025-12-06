@@ -72,7 +72,7 @@ public class MouseTests : TestsAllViews
 
         var clickedCount = 0;
 
-        view.MouseClick += (s, e) => clickedCount++;
+        view.MouseEvent += (s, e) => clickedCount++;
 
         me.Flags = pressed;
         view.NewMouseEvent (me);
@@ -117,7 +117,7 @@ public class MouseTests : TestsAllViews
 
         var clickedCount = 0;
 
-        view.MouseClick += (s, e) => clickedCount++;
+        view.MouseEvent += (s, e) => clickedCount++;
 
         me.Flags = clicked;
         view.NewMouseEvent (me);
@@ -145,13 +145,13 @@ public class MouseTests : TestsAllViews
             WantContinuousButtonPressed = true
         };
 
-        var selectingCount = 0;
+        var activatingCount = 0;
 
-        view.Selecting += (s, e) => selectingCount++;
+        view.Activating += (s, e) => activatingCount++;
 
         me.Flags = clicked;
         view.NewMouseEvent (me);
-        Assert.Equal (1, selectingCount);
+        Assert.Equal (1, activatingCount);
 
         view.Dispose ();
 

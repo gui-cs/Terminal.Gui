@@ -241,7 +241,7 @@ public class TableView : View, IDesignable
                    );
 
         // BUGBUG: OnCellActivated is misnamed, it should be OnCellAccepted? Or is it OnCellSelected?
-        // BUGBUG: Does this mean we still need Command.Select?
+        // BUGBUG: Does this mean we still need Command.Activate?
         AddCommand (Command.Accept, () => OnCellActivated (new (Table, SelectedColumn, SelectedRow)));
 
         AddCommand (

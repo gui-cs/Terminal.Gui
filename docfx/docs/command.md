@@ -10,11 +10,11 @@
 
 The `Command` system in Terminal.Gui provides a standardized framework for defining and executing actions that views can perform, such as selecting items, accepting input, or navigating content. Implemented primarily through the `View.Command` APIs, this system integrates tightly with input handling (e.g., keyboard and mouse events) and leverages the *Cancellable Work Pattern* to ensure extensibility, cancellation, and decoupling. Central to this system are the `Selecting` and `Accepting` events, which encapsulate common user interactions: `Selecting` for changing a view’s state or preparing it for interaction (e.g., toggling a checkbox, focusing a menu item), and `Accepting` for confirming an action or state (e.g., executing a menu command, submitting a dialog).
 
-This deep dive explores the `Command` and `View.Command` APIs, focusing on the `Selecting` and `Accepting` concepts, their implementation, and their propagation behavior. It critically evaluates the need for additional events (`Selected`/`Accepted`) and the propagation of `Selecting` events, drawing on insights from `Menu`, `MenuItemv2`, `MenuBar`, `CheckBox`, and `FlagSelector`. These implementations highlight the system’s application in hierarchical (menus) and stateful (checkboxes, flag selectors) contexts. The document reflects the current implementation, including the `Cancel` property in `CommandEventArgs` and local handling of `Command.Select`. An appendix briefly summarizes proposed changes from a filed issue to rename `Command.Select` to `Command.Activate`, replace `Cancel` with `Handled`, and introduce a propagation mechanism, addressing limitations in the current system.
+This deep dive explores the `Command` and `View.Command` APIs, focusing on the `Selecting` and `Accepting` concepts, their implementation, and their propagation behavior. It critically evaluates the need for additional events (`Selected`/`Accepted`) and the propagation of `Selecting` events, drawing on insights from `Menu`, `MenuItemv2`, `MenuBar`, `CheckBox`, and `FlagSelector`. These implementations highlight the system’s application in hierarchical (menus) and stateful (checkboxes, flag selectors) contexts. The document reflects the current implementation, including the `Cancel` property in `CommandEventArgs` and local handling of `Command.Activate`. An appendix briefly summarizes proposed changes from a filed issue to rename `Command.Activate` to `Command.Activate`, replace `Cancel` with `Handled`, and introduce a propagation mechanism, addressing limitations in the current system.
 
 ## Overview of the Command System
 
-The `Command` system in Terminal.Gui defines a set of standard actions via the `Command` enum (e.g., `Command.Select`, `Command.Accept`, `Command.HotKey`, `Command.StartOfPage`). These actions are triggered by user inputs (e.g., key presses, mouse clicks) or programmatically, enabling consistent view interactions.
+The `Command` system in Terminal.Gui defines a set of standard actions via the `Command` enum (e.g., `Command.Activate`, `Command.Accept`, `Command.HotKey`, `Command.StartOfPage`). These actions are triggered by user inputs (e.g., key presses, mouse clicks) or programmatically, enabling consistent view interactions.
 
 ### Key Components
 - **Command Enum**: Defines actions like `Select` (state change or interaction preparation), `Accept` (action confirmation), `HotKey` (hotkey activation), and others (e.g., `StartOfPage` for navigation).
@@ -43,9 +43,9 @@ Views register commands using `View.AddCommand`, associating a `Command` with a 
 private void SetupCommands()
 {
     AddCommand(Command.Accept, RaiseAccepting);
-    AddCommand(Command.Select, ctx =>
+    AddCommand(Command.Activate, ctx =>
     {
-        if (RaiseSelecting(ctx) is true)
+        if (RaiseActivating(ctx) is true)
         {
             return true;
         }
@@ -88,9 +88,9 @@ public bool? InvokeCommand(Command command, ICommandContext? ctx)
 ```
 
 ### Command Routing
-Most commands route directly to the target view. `Command.Select` and `Command.Accept` have special routing:
-- `Command.Select`: Handled locally, with no propagation to superviews, relying on view-specific events (e.g., `SelectedMenuItemChanged` in `Menu`) for hierarchical coordination.
-- `Command.Accept`: Propagates to a default button (if `IsDefault = true`), superview, or `SuperMenuItem` (in menus).
+Most commands route directly to the target view. `Command.Activate` and `Command.Accept` have special routing:
+- `Command.Activate`: Handled locally, with no propagation to superviews, relying on view-specific events (e.g., `SelectedMenuItemChanged` in `Menu`) for hierarchical coordination.
+- `Command.Accept`: Propagates to a default button (if `IsDefaultAcceptView = true`), superview, or `SuperMenuItem` (in menus).
 
 **Example**: `Command.Accept` in `RaiseAccepting`:
 ```csharp
@@ -104,8 +104,8 @@ protected bool? RaiseAccepting(ICommandContext? ctx)
     }
     if (!args.Cancel)
     {
-        var isDefaultView = SuperView?.InternalSubViews.FirstOrDefault(v => v is Button { IsDefault: true });
-        if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+        var isDefaultView = SuperView?.InternalSubViews.FirstOrDefault(v => v is Button { IsDefaultAcceptView: true });
+        if (isDefaultView != this && isDefaultView is Button { IsDefaultAcceptView: true } button)
         {
             bool? handled = isDefaultView.InvokeCommand(Command.Accept, ctx);
             if (handled == true)
@@ -124,19 +124,19 @@ protected bool? RaiseAccepting(ICommandContext? ctx)
 
 ## The Selecting and Accepting Concepts
 
-The `Selecting` and `Accepting` events, along with their corresponding commands (`Command.Select`, `Command.Accept`), are designed to handle the most common user interactions with views:
+The `Selecting` and `Accepting` events, along with their corresponding commands (`Command.Activate`, `Command.Accept`), are designed to handle the most common user interactions with views:
 - **Selecting**: Changing a view’s state or preparing it for further interaction, such as highlighting an item in a list, toggling a checkbox, or focusing a menu item.
 - **Accepting**: Confirming an action or state, such as submitting a form, activating a button, or finalizing a selection.
 
 These concepts are opinionated, reflecting Terminal.Gui’s view that most UI interactions can be modeled as either state changes/preparation (selecting) or action confirmations (accepting). Below, we explore each concept, their implementation, use cases, and propagation behavior, using `Cancel` to reflect the current implementation.
 
 ### Selecting
-- **Definition**: `Selecting` represents a user action that changes a view’s state or prepares it for further interaction, such as selecting an item in a `ListView`, toggling a `CheckBox`, or focusing a `MenuItemv2`. It is associated with `Command.Select`, typically triggered by a spacebar press, single mouse click, navigation keys (e.g., arrow keys), or mouse enter (e.g., in menus).
-- **Event**: The `Selecting` event is raised by `RaiseSelecting`, allowing external code to modify or cancel the state change.
+- **Definition**: `Selecting` represents a user action that changes a view’s state or prepares it for further interaction, such as selecting an item in a `ListView`, toggling a `CheckBox`, or focusing a `MenuItemv2`. It is associated with `Command.Activate`, typically triggered by a spacebar press, single mouse click, navigation keys (e.g., arrow keys), or mouse enter (e.g., in menus).
+- **Event**: The `Selecting` event is raised by `RaiseActivating`, allowing external code to modify or cancel the state change.
 - **Virtual Method**: `OnSelecting` enables subclasses to preprocess or cancel the action.
 - **Implementation**:
   ```csharp
-  protected bool? RaiseSelecting(ICommandContext? ctx)
+  protected bool? RaiseActivating(ICommandContext? ctx)
   {
       CommandEventArgs args = new() { Context = ctx };
       if (OnSelecting(args) || args.Cancel)
@@ -162,7 +162,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
         {
             return true;
         }
-        if (RaiseSelecting(commandContext) is true)
+        if (RaiseActivating(commandContext) is true)
         {
             return true;
         }
@@ -183,7 +183,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
     ```csharp
     checkbox.Selecting += (sender, args) =>
     {
-        if (RaiseSelecting(args.Context) is true)
+        if (RaiseActivating(args.Context) is true)
         {
             args.Cancel = true;
             return;
@@ -196,14 +196,14 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
     ```
   - **Views without State**: For views like `Button`, `Selecting` typically sets focus but does not change state, making it less relevant.
 
-- **Propagation**: `Command.Select` is handled locally by the target view. If the command is unhandled (`null` or `false`), processing stops without propagating to the superview or other views. This is evident in `Menu`, where `SelectedMenuItemChanged` is used for hierarchical coordination, and in `CheckBox` and `FlagSelector`, where state changes are internal.
+- **Propagation**: `Command.Activate` is handled locally by the target view. If the command is unhandled (`null` or `false`), processing stops without propagating to the superview or other views. This is evident in `Menu`, where `SelectedMenuItemChanged` is used for hierarchical coordination, and in `CheckBox` and `FlagSelector`, where state changes are internal.
 
 ### Accepting
 - **Definition**: `Accepting` represents a user action that confirms or finalizes a view’s state or triggers an action, such as submitting a dialog, activating a button, or confirming a selection in a list. It is associated with `Command.Accept`, typically triggered by the Enter key or double-click.
 - **Event**: The `Accepting` event is raised by `RaiseAccepting`, allowing external code to modify or cancel the action.
 - **Virtual Method**: `OnAccepting` enables subclasses to preprocess or cancel the action.
 - **Implementation**: As shown above in `RaiseAccepting`.
-  - **Default Behavior**: Raises `Accepting` and propagates to a default button (if present in the superview with `IsDefault = true`) or the superview if not canceled.
+  - **Default Behavior**: Raises `Accepting` and propagates to a default button (if present in the superview with `IsDefaultAcceptView = true`) or the superview if not canceled.
   - **Cancellation**: `args.Cancel` or `OnAccepting` returning `true` halts the command.
   - **Context**: `ICommandContext` provides invocation details.
 
@@ -228,7 +228,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
   - **Dialog**: `Accepting` on a default button closes the dialog or triggers an action.
 
 - **Propagation**: `Command.Accept` propagates to:
-  - A default button (if present in the superview with `IsDefault = true`).
+  - A default button (if present in the superview with `IsDefaultAcceptView = true`).
   - The superview, enabling hierarchical handling (e.g., a dialog processes `Accept` if no button handles it).
   - In `Menu`, propagation extends to the `SuperMenuItem` for submenus in popovers, as seen in `OnAccepting`:
     ```csharp
@@ -289,12 +289,12 @@ The distinction between `Selecting` and `Accepting` is clear in theory:
 However, practical challenges arise:
 - **Overlapping Triggers**: In `ListView`, pressing Enter might both select an item (`Selecting`) and confirm it (`Accepting`), depending on the interaction model, potentially confusing developers. Similarly, in `Menu`, navigation (e.g., arrow keys) triggers `Selecting`, while Enter triggers `Accepting`, but the overlap in user intent can blur the lines.
 - **Stateless Views**: For views like `Button` or `MenuItemv2`, `Selecting` is limited to setting focus, which dilutes its purpose as a state-changing action and may confuse developers expecting a more substantial state change.
-- **Propagation Limitations**: The local handling of `Command.Select` restricts hierarchical coordination. For example, `MenuBar` relies on `SelectedMenuItemChanged` to manage `PopoverMenu` visibility, which is view-specific and not generalizable. This highlights a need for a propagation mechanism that maintains subview-superview decoupling.
+- **Propagation Limitations**: The local handling of `Command.Activate` restricts hierarchical coordination. For example, `MenuBar` relies on `SelectedMenuItemChanged` to manage `PopoverMenu` visibility, which is view-specific and not generalizable. This highlights a need for a propagation mechanism that maintains subview-superview decoupling.
 - **FlagSelector Design Flaw**: In `FlagSelector`, the `CheckBox.Selecting` handler incorrectly triggers both `Selecting` and `Accepting`, conflating state changes (toggling flags) with action confirmation (submitting the flag set). This violates the intended separation and requires a design fix to ensure `Selecting` is limited to subview state changes and `Accepting` is reserved for parent-level confirmation.
 
 **Recommendation**: Enhance documentation to clarify the `Selecting`/`Accepting` model:
 - Define `Selecting` as state changes or interaction preparation (e.g., item selection, toggling, focusing) and `Accepting` as action confirmations (e.g., submission, activation).
-- Explicitly note that `Command.Select` may set focus in stateless views (e.g., `Button`, `MenuItemv2`) but is primarily for state changes.
+- Explicitly note that `Command.Activate` may set focus in stateless views (e.g., `Button`, `MenuItemv2`) but is primarily for state changes.
 - Address `FlagSelector`’s conflation by refactoring its `Selecting` handler to separate state changes from confirmation.
 
 ## Evaluating Selected/Accepted Events
@@ -436,10 +436,10 @@ The need for `Selected` and `Accepted` events is under consideration, with `Acce
 
 ## Propagation of Selecting
 
-The current implementation of `Command.Select` is local, but `MenuBar` requires propagation to manage `PopoverMenu` visibility, highlighting a limitation in the system’s ability to support hierarchical coordination without view-specific mechanisms.
+The current implementation of `Command.Activate` is local, but `MenuBar` requires propagation to manage `PopoverMenu` visibility, highlighting a limitation in the system’s ability to support hierarchical coordination without view-specific mechanisms.
 
 ### Current Behavior
-- **Selecting**: `Command.Select` is handled locally by the target view, with no propagation to the superview or other views. If the command is unhandled (returns `null` or `false`), processing stops without further routing.
+- **Selecting**: `Command.Activate` is handled locally by the target view, with no propagation to the superview or other views. If the command is unhandled (returns `null` or `false`), processing stops without further routing.
   - **Rationale**: `Selecting` is typically view-specific, as state changes (e.g., highlighting a `ListView` item, toggling a `CheckBox`) or preparatory actions (e.g., focusing a `MenuItemv2`) are internal to the view. This is evident in `CheckBox`, where state toggling is self-contained:
     ```csharp
     private bool? AdvanceAndSelect(ICommandContext? commandContext)
@@ -449,7 +449,7 @@ The current implementation of `Command.Select` is local, but `MenuBar` requires 
         {
             return true;
         }
-        if (RaiseSelecting(commandContext) is true)
+        if (RaiseActivating(commandContext) is true)
         {
             return true;
         }
@@ -498,11 +498,11 @@ The current implementation of `Command.Select` is local, but `MenuBar` requires 
     ```
 
 ### Should Selecting Propagate?
-The local handling of `Command.Select` is sufficient for many views, but `MenuBar`’s need to manage `PopoverMenu` visibility highlights a gap in the current design, where hierarchical coordination relies on view-specific events like `SelectedMenuItemChanged`.
+The local handling of `Command.Activate` is sufficient for many views, but `MenuBar`’s need to manage `PopoverMenu` visibility highlights a gap in the current design, where hierarchical coordination relies on view-specific events like `SelectedMenuItemChanged`.
 
 - **Arguments For Propagation**:
   - **Hierarchical Coordination**: In `MenuBar`, propagation would allow the menu bar to react to `MenuItemv2` selections (e.g., focusing a menu item via arrow keys or mouse enter) to show or hide popovers, streamlining the interaction model. Without propagation, `MenuBar` depends on `SelectedMenuItemChanged`, which is specific to `Menu` and not reusable for other hierarchical components.
-  - **Consistency with Accepting**: `Command.Accept`’s propagation model supports hierarchical actions (e.g., dialog submission, menu command execution), suggesting that `Command.Select` could benefit from a similar approach to enable broader UI coordination, particularly in complex views like menus or dialogs.
+  - **Consistency with Accepting**: `Command.Accept`’s propagation model supports hierarchical actions (e.g., dialog submission, menu command execution), suggesting that `Command.Activate` could benefit from a similar approach to enable broader UI coordination, particularly in complex views like menus or dialogs.
   - **Future-Proofing**: Propagation could support other hierarchical components, such as `TabView` (coordinating tab selection) or nested dialogs (tracking subview state changes), enhancing the `Command` system’s flexibility for future use cases.
 
 - **Arguments Against Propagation**:
@@ -545,9 +545,9 @@ The local handling of `Command.Select` is sufficient for many views, but `MenuBa
 
 - **Context Insight**: The `MenuBar` implementation demonstrates a clear need for propagation to manage `PopoverMenu` visibility, as it must react to `MenuItemv2` selections (e.g., focus changes) across its submenu hierarchy. The reliance on `SelectedMenuItemChanged` works but is specific to `Menu`, limiting its applicability to other hierarchical components. In contrast, `CheckBox` and `FlagSelector` show that local handling is adequate for most stateful views, where state changes are self-contained or communicated via view-specific events. `ListView` similarly operates locally, with `SelectedItemChanged` or similar events handling external notifications. `Button`’s focus-based `Selecting` is inherently local, requiring no propagation. This dichotomy suggests that while propagation is critical for certain hierarchical scenarios (e.g., menus), it’s unnecessary for many views, and any propagation mechanism must avoid coupling subviews to superviews to maintain encapsulation.
 
-- **Verdict**: The local handling of `Command.Select` is sufficient for most views, including `CheckBox`, `FlagSelector`, `ListView`, and `Button`, where state changes or preparatory actions are internal or communicated via view-specific events. However, `MenuBar`’s requirement for hierarchical coordination to manage `PopoverMenu` visibility highlights a gap in the current design, where view-specific events like `SelectedMenuItemChanged` are used as a workaround. A generic propagation model would enhance flexibility for hierarchical components, but it must ensure that subviews (e.g., `MenuItemv2`) remain decoupled from superviews (e.g., `MenuBar`) to avoid implementation-specific dependencies. The current lack of propagation is a limitation, particularly for menus, but adding it requires careful design to avoid overcomplicating the API or impacting performance for views that don’t need it.
+- **Verdict**: The local handling of `Command.Activate` is sufficient for most views, including `CheckBox`, `FlagSelector`, `ListView`, and `Button`, where state changes or preparatory actions are internal or communicated via view-specific events. However, `MenuBar`’s requirement for hierarchical coordination to manage `PopoverMenu` visibility highlights a gap in the current design, where view-specific events like `SelectedMenuItemChanged` are used as a workaround. A generic propagation model would enhance flexibility for hierarchical components, but it must ensure that subviews (e.g., `MenuItemv2`) remain decoupled from superviews (e.g., `MenuBar`) to avoid implementation-specific dependencies. The current lack of propagation is a limitation, particularly for menus, but adding it requires careful design to avoid overcomplicating the API or impacting performance for views that don’t need it.
 
-**Recommendation**: Maintain the local handling of `Command.Select` for now, as it meets the needs of most views like `CheckBox`, `FlagSelector`, and `ListView`. For `MenuBar`, continue using `SelectedMenuItemChanged` as a temporary solution, but prioritize developing a generic propagation mechanism that supports hierarchical coordination without coupling subviews to superviews. This mechanism should allow superviews to opt-in to receiving `Selecting` events from subviews, ensuring encapsulation (see appendix for a proposed solution).
+**Recommendation**: Maintain the local handling of `Command.Activate` for now, as it meets the needs of most views like `CheckBox`, `FlagSelector`, and `ListView`. For `MenuBar`, continue using `SelectedMenuItemChanged` as a temporary solution, but prioritize developing a generic propagation mechanism that supports hierarchical coordination without coupling subviews to superviews. This mechanism should allow superviews to opt-in to receiving `Selecting` events from subviews, ensuring encapsulation (see appendix for a proposed solution).
 
 ## Recommendations for Refining the Design
 
@@ -555,7 +555,7 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
 
 1. **Clarify Selecting/Accepting in Documentation**:
    - Explicitly define `Selecting` as state changes or interaction preparation (e.g., toggling a `CheckBox`, focusing a `MenuItemv2`, selecting a `ListView` item) and `Accepting` as action confirmations (e.g., executing a menu command, submitting a dialog).
-   - Emphasize that `Command.Select` may set focus in stateless views (e.g., `Button`, `MenuItemv2`) but is primarily intended for state changes, to reduce confusion for developers.
+   - Emphasize that `Command.Activate` may set focus in stateless views (e.g., `Button`, `MenuItemv2`) but is primarily intended for state changes, to reduce confusion for developers.
    - Provide examples for each view type (e.g., `Menu`, `CheckBox`, `FlagSelector`, `ListView`, `Button`) to illustrate their distinct roles. For instance:
      - `Menu`: “`Selecting` focuses a `MenuItemv2` via arrow keys, while `Accepting` executes the selected command.”
      - `CheckBox`: “`Selecting` toggles the `CheckedState`, while `Accepting` confirms the current state.”
@@ -568,13 +568,13 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
      ```csharp
      checkbox.Selecting += (sender, args) =>
      {
-         if (RaiseSelecting(args.Context) is true)
+         if (RaiseActivating(args.Context) is true)
          {
              args.Cancel = true;
          }
      };
      ```
-   - This ensures `Selecting` only propagates state changes to the parent `FlagSelector` via `RaiseSelecting`, and `Accepting` is triggered separately (e.g., via Enter on the `FlagSelector` itself) to confirm the `Value`.
+   - This ensures `Selecting` only propagates state changes to the parent `FlagSelector` via `RaiseActivating`, and `Accepting` is triggered separately (e.g., via Enter on the `FlagSelector` itself) to confirm the `Value`.
 
 3. **Enhance ICommandContext with View-Specific State**:
    - Enrich `ICommandContext` with a `State` property to include view-specific data (e.g., the selected `MenuItemv2` in `Menu`, the new `CheckedState` in `CheckBox`, the updated `Value` in `FlagSelector`). This enables more informed event handlers without requiring view-specific subscriptions.
@@ -590,7 +590,7 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
      ```
    - Example: In `Menu`, include the `SelectedMenuItem` in `ICommandContext.State` for `Selecting` handlers:
      ```csharp
-     protected bool? RaiseSelecting(ICommandContext? ctx)
+     protected bool? RaiseActivating(ICommandContext? ctx)
      {
          ctx.State = SelectedMenuItem; // Provide selected MenuItemv2
          CommandEventArgs args = new() { Context = ctx };
@@ -613,7 +613,7 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
      - `TabView`: Consider potential needs for tab selection coordination if implemented in the future.
 
 5. **Improve Propagation for Hierarchical Views**:
-   - Recognize the limitation in `Command.Select`’s local handling for hierarchical components like `MenuBar`, where superviews need to react to subview selections (e.g., focusing a `MenuItemv2` to manage popovers). The current reliance on `SelectedMenuItemChanged` is effective but view-specific, limiting reusability.
+   - Recognize the limitation in `Command.Activate`’s local handling for hierarchical components like `MenuBar`, where superviews need to react to subview selections (e.g., focusing a `MenuItemv2` to manage popovers). The current reliance on `SelectedMenuItemChanged` is effective but view-specific, limiting reusability.
    - Develop a propagation mechanism that allows superviews to opt-in to receiving `Selecting` events from subviews without requiring subviews to know superview details, ensuring encapsulation. This could involve a new event or property in `View` to enable propagation while maintaining decoupling (see appendix for a proposed solution).
    - Example: For `MenuBar`, a propagation mechanism could allow it to handle `Selecting` events from `MenuItemv2` subviews to show or hide popovers, replacing the need for `SelectedMenuItemChanged`:
      ```csharp
@@ -661,8 +661,8 @@ By clarifying terminology, fixing implementation flaws (e.g., `FlagSelector`), e
 A filed issue proposes enhancements to the `Command` system to address limitations in terminology, cancellation semantics, and propagation, informed by `Menu`, `MenuBar`, `CheckBox`, and `FlagSelector`. These changes are not yet implemented but aim to improve clarity, consistency, and flexibility.
 
 ### Proposed Changes
-1. **Rename `Command.Select` to `Command.Activate`**:
-   - Replace `Command.Select`, `Selecting` event, `OnSelecting`, and `RaiseSelecting` with `Command.Activate`, `Activating`, `OnActivating`, and `RaiseActivating`.
+1. **Rename `Command.Activate` to `Command.Activate`**:
+   - Replace `Command.Activate`, `Selecting` event, `OnSelecting`, and `RaiseActivating` with `Command.Activate`, `Activating`, `OnActivating`, and `RaiseActivating`.
    - Rationale: “Select” is ambiguous for stateless views (e.g., `Button` focus) and imprecise for non-list state changes (e.g., `CheckBox` toggling). “Activate” better captures state changes and preparation.
    - Impact: Breaking change requiring codebase updates and migration guidance.
 
