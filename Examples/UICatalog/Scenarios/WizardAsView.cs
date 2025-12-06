@@ -21,7 +21,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "_Restart Configuration...",
                                            Action = () => MessageBox.Query (
-                                                                            ApplicationImpl.Instance,
+                                                                            Application.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to reset the Wizard and start over?",
                                                                             "Ok",
@@ -32,7 +32,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "Re_boot Server...",
                                            Action = () => MessageBox.Query (
-                                                                            ApplicationImpl.Instance,
+                                                                            Application.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to reboot the server start over?",
                                                                             "Ok",
@@ -43,7 +43,7 @@ public class WizardAsView : Scenario
                                        {
                                            Title = "_Shutdown Server...",
                                            Action = () => MessageBox.Query (
-                                                                            ApplicationImpl.Instance,
+                                                                            Application.Instance,
                                                                             "Wizard",
                                                                             "Are you sure you want to cancel setup and shutdown?",
                                                                             "Ok",

@@ -721,11 +721,11 @@ public class ListView : View, IDesignable
     protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) { CollectionChanged?.Invoke (this, e); }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Source is null)
         {
-            return base.OnDrawingContent ();
+            return base.OnDrawingContent (context);
         }
 
         var current = Attribute.Default;

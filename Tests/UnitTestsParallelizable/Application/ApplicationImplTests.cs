@@ -380,11 +380,10 @@ public class ApplicationImplTests
         if (app.TopRunnableView != null)
         {
             app.RequestStop ();
-
-            return true;
         }
 
-        return true;
+        // Return false so the timer does not repeat
+        return false;
     }
 
     [Fact]

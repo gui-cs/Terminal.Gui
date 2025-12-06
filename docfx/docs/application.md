@@ -18,7 +18,7 @@ Terminal.Gui v2 uses an instance-based application architecture with the **IRunn
 graph TB
     subgraph ViewTree["View Hierarchy (SuperView/SubView)"]
         direction TB
-        Top[app.Current<br/>Window]
+        Top[app.TopRunnable<br/>Window]
         Menu[MenuBar]
         Status[StatusBar]
         Content[Content View]
@@ -59,19 +59,19 @@ sequenceDiagram
     
     App->>Main: Run(mainWindow)
     activate Main
-    Note over App: SessionStack: [Main]<br/>Current: Main
+    Note over App: SessionStack: [Main]<br/>TopRunnable: Main
     
     Main->>Dialog: Run(dialog)
     activate Dialog
-    Note over App: SessionStack: [Dialog, Main]<br/>Current: Dialog
+    Note over App: SessionStack: [Dialog, Main]<br/>TopRunnable: Dialog
     
     Dialog->>App: RequestStop()
     deactivate Dialog
-    Note over App: SessionStack: [Main]<br/>Current: Main
+    Note over App: SessionStack: [Main]<br/>TopRunnable: Main
     
     Main->>App: RequestStop()
     deactivate Main
-    Note over App: SessionStack: []<br/>Current: null
+    Note over App: SessionStack: []<br/>TopRunnable: null
 ```
 
 ## Key Concepts
@@ -81,38 +81,38 @@ sequenceDiagram
 **Terminal.Gui v2** supports both static and instance-based patterns. The static `Application` class is marked obsolete but still functional for backward compatibility. The recommended pattern is to use `Application.Create()` to get an `IApplication` instance:
 
 ```csharp
-// OLD (v1 / early v2 - still works but obsolete):
-Application.Init();
-var top = new Window();
-top.Add(myView);
-Application.Run(top);
-top.Dispose();
-Application.Shutdown(); // Obsolete - use Dispose() instead
-
 // RECOMMENDED (v2 - instance-based with using statement):
-using (var app = Application.Create().Init())
+using (IApplication app = Application.Create ().Init ())
 {
-    var top = new Window();
-    top.Add(myView);
-    app.Run(top);
-    top.Dispose();
+    Window top = new ();
+    top.Add (myView);
+    app.Run (top);
+    top.Dispose ();
 } // app.Dispose() called automatically
 
 // WITH IRunnable (fluent API with automatic disposal):
-using (var app = Application.Create().Init())
+using (IApplication app = Application.Create ().Init ())
 {
-    app.Run<ColorPickerDialog>();
-    Color? result = app.GetResult<Color>();
+    app.Run<ColorPickerDialog> ();
+    Color? result = app.GetResult<Color> ();
 }
 
-// SIMPLEST (manual disposal):
-var app = Application.Create().Init();
-app.Run<ColorPickerDialog>();
-Color? result = app.GetResult<Color>();
-app.Dispose();
+// ALTERNATIVE (manual disposal):
+IApplication app = Application.Create ().Init ();
+app.Run<ColorPickerDialog> ();
+Color? result = app.GetResult<Color> ();
+app.Dispose ();
+
+// OLD (v1 / early v2 - obsolete, avoid in new code):
+Application.Init ();
+Window top = new ();
+top.Add (myView);
+Application.Run (top);
+top.Dispose ();
+Application.Shutdown (); // Obsolete - use Dispose() instead
 ```
 
-**Note:** The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton). `Application.Create()` creates a **new** `ApplicationImpl` instance, enabling multiple application contexts and better testability.
+**Note:** The static `Application` class delegates to a singleton instance accessible via `Application.Instance`. `Application.Create()` creates a **new** application instance, enabling multiple application contexts and better testability.
 
 ### View.App Property
 
@@ -130,7 +130,7 @@ public class View
     /// Gets the application context, checking parent hierarchy if needed.
     /// Override to customize application resolution.
     /// </summary>
-    public virtual IApplication? GetApp() => App ?? SuperView?.GetApp();
+    public virtual IApplication? GetApp () => App ?? SuperView?.GetApp ();
 }
 ```
 
@@ -147,13 +147,14 @@ public class View
 ```csharp
 public class MyView : View
 {
-    public override void OnEnter(View view)
+    public override void OnEnter (View view)
     {
-        // Use View.App instead of static Application
-        App?.Current?.SetNeedsDraw();
+        // Use View.App instead of obsolete static Application
+        IApplication? app = App;
+        app?.TopRunnable?.SetNeedsDraw ();
         
         // Access SessionStack
-        if (App?.SessionStack.Count > 0)
+        if (app?.SessionStack?.Count > 0)
         {
             // Work with sessions
         }
@@ -168,15 +169,15 @@ public class MyView : View
 {
     private readonly IApplication _app;
     
-    public MyView(IApplication app)
+    public MyView (IApplication app)
     {
         _app = app;
-        // Now completely decoupled from static Application
+        // Completely decoupled from obsolete static Application
     }
     
-    public void DoWork()
+    public void DoWork ()
     {
-        _app.Current?.SetNeedsDraw();
+        _app.TopRunnable?.SetNeedsDraw ();
     }
 }
 ```
@@ -199,26 +200,26 @@ The fluent API enables elegant method chaining with automatic resource managemen
 
 ```csharp
 // Recommended: using statement with GetResult
-using (var app = Application.Create().Init())
+using (IApplication app = Application.Create ().Init ())
 {
-    app.Run<ColorPickerDialog>();
-    Color? result = app.GetResult<Color>();
+    app.Run<ColorPickerDialog> ();
+    Color? result = app.GetResult<Color> ();
     
     if (result is { })
     {
-        ApplyColor(result);
+        ApplyColor (result);
     }
 }
 
 // Alternative: Manual disposal
-var app = Application.Create().Init();
-app.Run<ColorPickerDialog>();
-Color? result = app.GetResult<Color>();
-app.Dispose();
+IApplication app = Application.Create ().Init ();
+app.Run<ColorPickerDialog> ();
+Color? result = app.GetResult<Color> ();
+app.Dispose ();
 
 if (result is { })
 {
-    ApplyColor(result);
+    ApplyColor (result);
 }
 ```
 
@@ -240,19 +241,19 @@ if (result is { })
 
 ```csharp
 // Framework ownership - automatic disposal
-using (var app = Application.Create().Init())
+using (IApplication app = Application.Create ().Init ())
 {
-    app.Run<MyDialog>(); // Dialog disposed automatically when Run returns
-    var result = app.GetResult<MyResultType>();
+    app.Run<MyDialog> (); // Dialog disposed automatically when Run returns
+    MyResultType? result = app.GetResult<MyResultType> ();
 }
 
 // Caller ownership - manual disposal
-using (var app = Application.Create().Init())
+using (IApplication app = Application.Create ().Init ())
 {
-    var dialog = new MyDialog();
-    app.Run(dialog);
-    var result = dialog.Result;
-    dialog.Dispose();  // Caller must dispose
+    MyDialog dialog = new ();
+    app.Run (dialog);
+    MyResultType? result = dialog.Result;
+    dialog.Dispose ();  // Caller must dispose
 }
 ```
 
@@ -265,35 +266,36 @@ public class FileDialog : Runnable<string?>
 {
     private TextField _pathField;
     
-    public FileDialog()
+    public FileDialog ()
     {
         Title = "Select File";
         
-        _pathField = new TextField { X = 1, Y = 1, Width = Dim.Fill(1) };
+        _pathField = new () { X = 1, Y = 1, Width = Dim.Fill (1) };
         
-        var okButton = new Button { Text = "OK", IsDefault = true };
-        okButton.Accepting += (s, e) => {
+        Button okButton = new () { Text = "OK", IsDefault = true };
+        okButton.Accepting += (s, e) =>
+        {
             Result = _pathField.Text;
-            Application.RequestStop();
+            App?.RequestStop ();
         };
         
-        Add(_pathField, okButton);
+        Add (_pathField, okButton);
     }
     
-    protected override bool OnIsRunningChanging(bool oldValue, bool newValue)
+    protected override bool OnIsRunningChanging (bool oldValue, bool newValue)
     {
         if (!newValue)  // Stopping - extract result before disposal
         {
             Result = _pathField?.Text;
         }
-        return base.OnIsRunningChanging(oldValue, newValue);
+        return base.OnIsRunningChanging (oldValue, newValue);
     }
 }
 ```
 
 ### Lifecycle Properties
 
-- **`IsRunning`** - True when runnable is on `RunnableSessionStack`
+- **`IsRunning`** - True when runnable is on `SessionStack`
 - **`IsModal`** - True when runnable is at top of stack (capturing all input)
 - **`Result`** - Typed result value set before stopping
 
@@ -310,7 +312,7 @@ All events follow Terminal.Gui's Cancellable Work Pattern:
 **Example - Result Extraction:**
 
 ```csharp
-protected override bool OnIsRunningChanging(bool oldValue, bool newValue)
+protected override bool OnIsRunningChanging (bool oldValue, bool newValue)
 {
     if (!newValue)  // Stopping
     {
@@ -318,33 +320,41 @@ protected override bool OnIsRunningChanging(bool oldValue, bool newValue)
         Result = _colorPicker.SelectedColor;
         
         // Optionally cancel stop (e.g., unsaved changes)
-        if (HasUnsavedChanges())
+        if (HasUnsavedChanges ())
         {
-            int response = MessageBox.Query("Save?", "Save changes?", "Yes", "No", "Cancel");
-            if (response == 2) return true;  // Cancel stop
-            if (response == 0) Save();
+            int response = MessageBox.Query ("Save?", "Save changes?", "Yes", "No", "Cancel");
+            
+            if (response == 2)
+            {
+                return true;  // Cancel stop
+            }
+            
+            if (response == 0)
+            {
+                Save ();
+            }
         }
     }
     
-    return base.OnIsRunningChanging(oldValue, newValue);
+    return base.OnIsRunningChanging (oldValue, newValue);
 }
 ```
 
-### RunnableSessionStack
+### SessionStack
 
-The `RunnableSessionStack` manages all running `IRunnable` sessions:
+The `SessionStack` manages all running `IRunnable` sessions:
 
 ```csharp
 public interface IApplication
 {
     /// <summary>
     /// Stack of running IRunnable sessions.
-    /// Each entry is a RunnableSessionToken wrapping an IRunnable.
+    /// Each entry is a SessionToken wrapping an IRunnable.
     /// </summary>
-    ConcurrentStack<RunnableSessionToken>? RunnableSessionStack { get; }
+    ConcurrentStack<SessionToken>? SessionStack { get; }
     
     /// <summary>
-    /// The IRunnable at the top of RunnableSessionStack (currently modal).
+    /// The IRunnable at the top of SessionStack (currently modal).
     /// </summary>
     IRunnable? TopRunnable { get; }
 }
@@ -353,9 +363,9 @@ public interface IApplication
 **Stack Behavior:**
 
 - Push: `Begin(IRunnable)` adds to top of stack
-- Pop: `End(RunnableSessionToken)` removes from stack
+- Pop: `End(SessionToken)` removes from stack
 - Peek: `TopRunnable` returns current modal runnable
-- All: `RunnableSessionStack` enumerates all running sessions
+- All: `SessionStack` enumerates all running sessions
 
 ## IApplication Interface
 
@@ -374,19 +384,19 @@ public interface IApplication
     IMainLoopCoordinator? Coordinator { get; }
     
     // Fluent API methods  
-    IApplication Init(string? driverName = null);
-    void Dispose(); // IDisposable
+    IApplication Init (string? driverName = null);
+    void Dispose (); // IDisposable
     
     // Runnable methods
-    SessionToken? Begin(IRunnable runnable);
-    object? Run(IRunnable runnable, Func<Exception, bool>? errorHandler = null);
-    IApplication Run<TRunnable>(Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new();
-    void RequestStop(IRunnable? runnable);
-    void End(SessionToken sessionToken);
+    SessionToken? Begin (IRunnable runnable);
+    object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null);
+    IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null) where TRunnable : IRunnable, new();
+    void RequestStop (IRunnable? runnable);
+    void End (SessionToken sessionToken);
     
     // Result extraction
-    object? GetResult();
-    T? GetResult<T>() where T : class;
+    object? GetResult ();
+    T? GetResult<T> () where T : class;
     
     // ... other members
 }
@@ -423,13 +433,13 @@ The `SessionStack` property is the stack of running sessions:
 
 ```csharp
 // Access all running sessions
-foreach (var runnable in app.SessionStack)
+foreach (SessionToken runnable in app.SessionStack)
 {
     // Process each session
 }
 
 // From within a view
-int sessionCount = App?.SessionStack.Count ?? 0;
+var sessionCount = App?.SessionStack.Count ?? 0;
 ```
 
 **Why "SessionStack" instead of "Runnables"?**
@@ -439,25 +449,25 @@ int sessionCount = App?.SessionStack.Count ?? 0;
 
 ## Migration from Static Application
 
-The static `Application` class delegates to `ApplicationImpl.Instance` (a singleton) and is marked obsolete. All static methods and properties are marked with `[Obsolete]` but remain functional for backward compatibility:
+The static `Application` class delegates to a singleton instance and is marked obsolete. All static methods and properties are marked with `[Obsolete]` but remain functional for backward compatibility:
 
 ```csharp
 public static partial class Application
 {
-    [Obsolete("The legacy static Application object is going away.")]
-    public static View? TopRunnableView => ApplicationImpl.Instance.TopRunnableView;
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static View? TopRunnableView => Instance.TopRunnableView;
     
-    [Obsolete("The legacy static Application object is going away.")]
-    public static IRunnable? TopRunnable => ApplicationImpl.Instance.TopRunnable;
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static IRunnable? TopRunnable => Instance.TopRunnable;
     
-    [Obsolete("The legacy static Application object is going away.")]
-    public static ConcurrentStack<SessionToken>? SessionStack => ApplicationImpl.Instance.SessionStack;
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static ConcurrentStack<SessionToken>? SessionStack => Instance.SessionStack;
     
     // ... other obsolete static members
 }
 ```
 
-**Important:** The static `Application` class uses a singleton (`ApplicationImpl.Instance`), while `Application.Create()` creates new instances. For new code, prefer the instance-based pattern using `Application.Create()`.
+**Important:** The static `Application` class uses a singleton (`Application.Instance`), while `Application.Create()` creates new instances. For new code, prefer the instance-based pattern using `Application.Create()`.
 
 ### Migration Strategies
 
@@ -465,15 +475,15 @@ public static partial class Application
 
 ```csharp
 // OLD:
-void MyMethod()
+void MyMethod ()
 {
-    Application.TopRunnable?.SetNeedsDraw();
+    Application.TopRunnable?.SetNeedsDraw ();
 }
 
 // NEW:
-void MyMethod(View view)
+void MyMethod (View view)
 {
-    view.App?.TopRunnableView?.SetNeedsDraw();
+    view.App?.TopRunnableView?.SetNeedsDraw ();
 }
 ```
 
@@ -481,18 +491,18 @@ void MyMethod(View view)
 
 ```csharp
 // OLD:
-void ProcessSessions()
+void ProcessSessions ()
 {
-    foreach (var runnable in Application.SessionStack)
+    foreach (SessionToken runnable in Application.SessionStack)
     {
         // Process
     }
 }
 
 // NEW:
-void ProcessSessions(IApplication app)
+void ProcessSessions (IApplication app)
 {
-    foreach (var runnable in app.SessionStack)
+    foreach (SessionToken runnable in app.SessionStack)
     {
         // Process
     }
@@ -506,14 +516,14 @@ public class MyService
 {
     private readonly IApplication _app;
     
-    public MyService(IApplication app)
+    public MyService (IApplication app)
     {
         _app = app;
     }
     
-    public void DoWork()
+    public void DoWork ()
     {
-        _app.Current?.Title = "Processing...";
+        _app.TopRunnable?.Title = "Processing...";
     }
 }
 ```
@@ -530,9 +540,9 @@ Terminal.Gui v2 implements the `IDisposable` pattern for proper resource cleanup
 
 ```csharp
 // Automatic disposal with using statement
-using (var app = Application.Create().Init())
+using (IApplication app = Application.Create ().Init ())
 {
-    app.Run<MyDialog>();
+    app.Run<MyDialog> ();
     // app.Dispose() automatically called when scope exits
 }
 ```
@@ -541,15 +551,15 @@ using (var app = Application.Create().Init())
 
 ```csharp
 // Manual disposal
-var app = Application.Create();
+IApplication app = Application.Create ();
 try
 {
-    app.Init();
-    app.Run<MyDialog>();
+    app.Init ();
+    app.Run<MyDialog> ();
 }
 finally
 {
-    app.Dispose(); // Ensure cleanup even if exception occurs
+    app.Dispose (); // Ensure cleanup even if exception occurs
 }
 ```
 
@@ -561,44 +571,44 @@ finally
 
 ```csharp
 // RECOMMENDED (using statement):
-using (var app = Application.Create().Init())
+using (IApplication app = Application.Create ().Init ())
 {
-    app.Run<MyDialog>();
-    var result = app.GetResult<MyResult>();
+    app.Run<MyDialog> ();
+    MyResult? result = app.GetResult<MyResult> ();
     // app.Dispose() called automatically here
 }
 
 // ALTERNATIVE (manual disposal):
-var app = Application.Create().Init();
-app.Run<MyDialog>();
-var result = app.GetResult<MyResult>();
-app.Dispose(); // Must call explicitly
+IApplication app = Application.Create ().Init ();
+app.Run<MyDialog> ();
+MyResult? result = app.GetResult<MyResult> ();
+app.Dispose (); // Must call explicitly
 
 // OLD (obsolete - do not use):
-var result = app.Run<MyDialog>().Shutdown() as MyResult;
+object? result = app.Run<MyDialog> ().Shutdown ();
 ```
 
 ### Input Thread Lifecycle
 
-When you call `Init()`, Terminal.Gui starts a dedicated input thread that continuously polls for console input. This thread must be stopped properly:
+When calling `Init()`, Terminal.Gui starts a dedicated input thread that continuously polls for console input. This thread must be stopped properly:
 
 ```csharp
-var app = Application.Create();
-app.Init("fake"); // Input thread starts here
+IApplication app = Application.Create ();
+app.Init ("fake"); // Input thread starts here
 
 // Input thread runs in background at ~50 polls/second (20ms throttle)
 
-app.Dispose(); // Cancels input thread and waits for it to exit
+app.Dispose (); // Cancels input thread and waits for it to exit
 ```
 
 **Important for Tests**: Always dispose applications in tests to prevent thread leaks:
 
 ```csharp
 [Fact]
-public void My_Test()
+public void My_Test ()
 {
-    using var app = Application.Create();
-    app.Init("fake");
+    using IApplication app = Application.Create ();
+    app.Init ("fake");
     
     // Test code here
     
@@ -612,22 +622,22 @@ The legacy static `Application` singleton can be re-initialized after disposal (
 
 ```csharp
 // Test 1
-Application.Init();
-Application.Shutdown(); // Obsolete but still works for legacy singleton
+Application.Init ();
+Application.Shutdown (); // Obsolete but still works for legacy singleton
 
 // Test 2 - singleton resets and can be re-initialized
-Application.Init(); // ✅ Works!
-Application.Shutdown(); // Obsolete but still works for legacy singleton
+Application.Init (); // ✅ Works!
+Application.Shutdown (); // Obsolete but still works for legacy singleton
 ```
 
 However, instance-based applications follow standard `IDisposable` semantics and cannot be reused after disposal:
 
 ```csharp
-var app = Application.Create();
-app.Init();
-app.Dispose();
+IApplication app = Application.Create ();
+app.Init ();
+app.Dispose ();
 
-app.Init(); // ❌ Throws ObjectDisposedException
+app.Init (); // ❌ Throws ObjectDisposedException
 ```
 
 ## Session Management
@@ -637,21 +647,21 @@ app.Init(); // ❌ Throws ObjectDisposedException
 Applications manage sessions through `Begin()` and `End()`:
 
 ```csharp
-using var app = Application.Create ();
-app.Init();
+using IApplication app = Application.Create ();
+app.Init ();
 
-var window = new Window();
+Window window = new ();
 
 // Begin a new session - pushes to SessionStack
-SessionToken? token = app.Begin(window);
+SessionToken? token = app.Begin (window);
 
 // TopRunnable now points to this window
-Debug.Assert(app.TopRunnable == window);
+Debug.Assert (app.TopRunnable == window);
 
 // End the session - pops from SessionStack
 if (token != null)
 {
-    app.End(token);
+    app.End (token);
 }
 
 // TopRunnable restored to previous runnable (if any)
@@ -662,58 +672,98 @@ if (token != null)
 Multiple sessions can run nested:
 
 ```csharp
-using var app = Application.Create ();
-app.Init();
+using IApplication app = Application.Create ();
+app.Init ();
 
 // Session 1
-var main = new Window { Title = "Main" };
-var token1 = app.Begin(main);
+Window main = new () { Title = "Main" };
+SessionToken? token1 = app.Begin (main);
 // app.TopRunnable == main, SessionStack.Count == 1
 
 // Session 2 (nested)
-var dialog = new Dialog { Title = "Dialog" };
-var token2 = app.Begin(dialog);
+Dialog dialog = new () { Title = "Dialog" };
+SessionToken? token2 = app.Begin (dialog);
 // app.TopRunnable == dialog, SessionStack.Count == 2
 
 // End dialog
-app.End(token2);
+app.End (token2);
 // app.TopRunnable == main, SessionStack.Count == 1
 
 // End main
-app.End(token1);
+app.End (token1);
 // app.TopRunnable == null, SessionStack.Count == 0
 ```
 
+## Driver Management
+
+### ForceDriver Configuration Property
+
+The `ForceDriver` property is a configuration property that allows you to specify which driver to use. It can be set via code or through the configuration system (e.g., `config.json`):
+
+```csharp
+// RECOMMENDED: Set on instance
+using (IApplication app = Application.Create ())
+{
+    app.ForceDriver = "fake";
+    app.Init ();
+}
+
+// ALTERNATIVE: Set on legacy static Application (obsolete)
+Application.ForceDriver = "dotnet";
+Application.Init ();
+```
+
+**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
+
+### ForceDriverChanged Event
+
+The static `Application.ForceDriverChanged` event is raised when the `ForceDriver` property changes:
+
+```csharp
+// ForceDriverChanged event (on legacy static Application)
+Application.ForceDriverChanged += (sender, e) =>
+{
+    Debug.WriteLine ($"Driver changed from '{e.OldValue}' to '{e.NewValue}'");
+};
+
+Application.ForceDriver = "fake";
+```
+
+### Getting Available Drivers
+
+You can query which driver types are available using `GetDriverTypes()`:
+
+```csharp
+// Get available driver types and names
+(List<Type?> types, List<string?> names) = Application.GetDriverTypes();
+
+foreach (string? name in names)
+{
+    Debug.WriteLine($"Available driver: {name}");
+}
+// Output:
+// Available driver: dotnet
+// Available driver: windows
+// Available driver: unix
+// Available driver: fake
+```
+
+**Note**: This method uses reflection and is marked with `[RequiresUnreferencedCode]` for AOT compatibility considerations.
+
 ## View.Driver Property
 
-Similar to `View.App`, views now have a `Driver` property:
+Similar to `View.App`, views now have a `Driver` property for accessing driver functionality.
 
 ```csharp
-public class View
+public override void OnDrawContent (Rectangle viewport)
 {
-    /// <summary>
-    /// Gets the driver for this view.
-    /// </summary>
-    public IDriver? Driver => GetDriver();
-    
-    /// <summary>
-    /// Gets the driver, checking application context if needed.
-    /// Override to customize driver resolution.
-    /// </summary>
-    public virtual IDriver? GetDriver() => App?.Driver;
+    // Use view's driver instead of obsolete Application.Driver
+    Driver?.Move (0, 0);
+    Driver?.AddStr ("Hello");
 }
 ```
 
-**Usage:**
-
-```csharp
-public override void OnDrawContent(Rectangle viewport)
-{
-    // Use view's driver instead of Application.Driver
-    Driver?.Move(0, 0);
-    Driver?.AddStr("Hello");
-}
-```
+**Note**: See [Drivers Deep Dive](drivers.md) for complete driver architecture details, including the organized interface structure with lifecycle, components, display, rendering, cursor, and input regions.
 
 ## Testing with the New Architecture
 
@@ -723,44 +773,52 @@ The instance-based architecture dramatically improves testability:
 
 ```csharp
 [Fact]
-public void MyView_DisplaysCorrectly()
+public void MyView_DisplaysCorrectly ()
 {
     // Create mock application
-    var mockApp = new Mock<IApplication>();
-    mockApp.Setup(a => a.Current).Returns(new Runnable());
+    Mock<IApplication> mockApp = new ();
+    Runnable runnable = new ();
+    mockApp.Setup (a => a.TopRunnable).Returns (runnable);
     
     // Create view with mock app
-    var view = new MyView { App = mockApp.Object };
+    MyView view = new () { App = mockApp.Object };
     
     // Test without Application.Init()!
-    view.SetNeedsDraw();
-    Assert.True(view.NeedsDraw);
+    view.SetNeedsDraw ();
+    Assert.True (view.NeedsDraw);
     
-    // No Application.Shutdown() needed!
+    // No disposal needed for mock!
 }
 ```
 
-### Testing with Real ApplicationImpl
+### Testing with Real Application
 
 ```csharp
 [Fact]
-public void MyView_WorksWithRealApplication()
+public void MyView_WorksWithRealApplication ()
 {
-    using var app = Application.Create ();
-    app.Init("fake");
-    
-    var view = new MyView();
-    var top = new Window();
-    top.Add(view);
-    
-    app.Begin(top);
-    
-    // View.App automatically set
-    Assert.NotNull(view.App);
-    Assert.Same(app, view.App);
-    
-    // Test view behavior
-    view.DoSomething();
+    using (IApplication app = Application.Create ())
+    {
+        app.Init ("fake");
+        
+        MyView view = new ();
+        Window top = new ();
+        top.Add (view);
+        
+        SessionToken? token = app.Begin (top);
+        
+        // View.App automatically set
+        Assert.NotNull (view.App);
+        Assert.Same (app, view.App);
+        
+        // Test view behavior
+        view.DoSomething ();
+        
+        if (token is { })
+        {
+            app.End (token);
+        }
+    }
 }
 ```
 
@@ -769,60 +827,65 @@ public void MyView_WorksWithRealApplication()
 ### DO: Use View.App
 
 ```csharp
-✅ GOOD:
-public void Refresh()
+// ✅ GOOD - Use View.App (modern instance-based pattern):
+public void Refresh ()
 {
-    App?.TopRunnableView?.SetNeedsDraw();
+    App?.TopRunnableView?.SetNeedsDraw ();
 }
 ```
 
 ### DON'T: Use Static Application
 
 ```csharp
-❌ AVOID:
-public void Refresh()
+// ❌ AVOID - Obsolete static Application:
+public void Refresh ()
 {
-    Application.TopRunnableView?.SetNeedsDraw(); // Obsolete!
+    Application.TopRunnableView?.SetNeedsDraw (); // Obsolete!
 }
 ```
 
 ### DO: Pass IApplication as Dependency
 
 ```csharp
-✅ GOOD:
+// ✅ GOOD - Dependency injection:
 public class Service
 {
-    public Service(IApplication app) { }
+    private readonly IApplication _app;
+    
+    public Service (IApplication app)
+    {
+        _app = app;
+    }
 }
 ```
 
 ### DON'T: Use Static Application in New Code
 
 ```csharp
-❌ AVOID (obsolete pattern):
-public void Refresh()
+// ❌ AVOID - Obsolete static Application in new code:
+public void Refresh ()
 {
-    Application.TopRunnableView?.SetNeedsDraw(); // Obsolete static access
+    Application.TopRunnableView?.SetNeedsDraw (); // Obsolete!
 }
 
-✅ PREFERRED:
-public void Refresh()
+// ✅ PREFERRED - Use View.App property:
+public void Refresh ()
 {
-    App?.TopRunnableView?.SetNeedsDraw(); // Use View.App property
+    App?.TopRunnableView?.SetNeedsDraw ();
 }
 ```
 
 ### DO: Override GetApp() for Custom Resolution
 
 ```csharp
-✅ GOOD:
+// ✅ GOOD - Custom application resolution:
 public class SpecialView : View
 {
     private IApplication? _customApp;
     
-    public override IApplication? GetApp()
+    public override IApplication? GetApp ()
     {
-        return _customApp ?? base.GetApp();
+        return _customApp ?? base.GetApp ();
     }
 }
 ```
@@ -835,39 +898,23 @@ The instance-based architecture enables multiple applications:
 
 ```csharp
 // Application 1
-using var app1 = Application.Create ();
-app1.Init("windows");
-var top1 = new Window { Title = "App 1" };
-// ... configure top1
+using (IApplication app1 = Application.Create ())
+{
+    app1.Init ("fake");
+    Window top1 = new () { Title = "App 1" };
+    // ... configure and run top1
+}
 
 // Application 2 (different driver!)
-using var app2 = Application.Create ();
-app2.Init("unix");
-var top2 = new Window { Title = "App 2" };
-// ... configure top2
+using (IApplication app2 = Application.Create ())
+{
+    app2.Init ("fake");
+    Window top2 = new () { Title = "App 2" };
+    // ... configure and run top2
+}
 
 // Views in top1 use app1
 // Views in top2 use app2
-```
-
-### Application-Agnostic Views
-
-Create views that work with any application:
-
-```csharp
-public class UniversalView : View
-{
-    public void ShowMessage(string message)
-    {
-        // Works regardless of which application context
-        var app = GetApp();
-        if (app != null)
-        {
-            var msg = new MessageBox(message);
-            app.Begin(msg);
-        }
-    }
-}
 ```
 
 ## See Also

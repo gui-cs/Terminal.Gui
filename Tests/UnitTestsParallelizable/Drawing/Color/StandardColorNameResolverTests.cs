@@ -1,8 +1,6 @@
-﻿#nullable enable
+﻿using Xunit.Abstractions;
 
-using Xunit.Abstractions;
-
-namespace DrawingTests;
+namespace DrawingTests.ColorTests;
 
 public class StandardColorNameResolverTests (ITestOutputHelper output)
 {

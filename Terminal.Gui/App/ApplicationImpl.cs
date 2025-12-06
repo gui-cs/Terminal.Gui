@@ -6,7 +6,7 @@ namespace Terminal.Gui.App;
 ///     Implementation of core <see cref="Application"/> methods using the modern
 ///     main loop architecture with component factories for different platforms.
 /// </summary>
-public partial class ApplicationImpl : IApplication
+internal partial class ApplicationImpl : IApplication
 {
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
@@ -15,7 +15,6 @@ public partial class ApplicationImpl : IApplication
     internal ApplicationImpl ()
     {
         // Subscribe to Application static property change events
-        Application.Force16ColorsChanged += OnForce16ColorsChanged;
         Application.ForceDriverChanged += OnForceDriverChanged;
     }
 
@@ -75,7 +74,7 @@ public partial class ApplicationImpl : IApplication
     /// <summary>
     ///     Gets the currently configured backend implementation of <see cref="Application"/> gateway methods.
     /// </summary>
-    public static IApplication Instance
+    internal static IApplication Instance
     {
         get
         {
@@ -142,18 +141,6 @@ public partial class ApplicationImpl : IApplication
     {
         // If an instance exists, reset it
         _instance?.ResetState (ignoreDisposed);
-
-        // Reset Application static properties to their defaults
-        // This ensures tests start with clean state
-        Application.ForceDriver = string.Empty;
-        Application.Force16Colors = false;
-        Application.IsMouseDisabled = false;
-        Application.QuitKey = Key.Esc;
-        Application.ArrangeKey = Key.F5.WithCtrl;
-        Application.NextTabGroupKey = Key.F6;
-        Application.NextTabKey = Key.Tab;
-        Application.PrevTabGroupKey = Key.F6.WithShift;
-        Application.PrevTabKey = Key.Tab.WithShift;
 
         // Always reset the model tracking to allow tests to use either model after reset
         ResetModelUsageTracking ();

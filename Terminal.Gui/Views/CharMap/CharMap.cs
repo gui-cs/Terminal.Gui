@@ -580,7 +580,7 @@ public class CharMap : View, IDesignable
     private static int RowLabelWidth => $"U+{MAX_CODE_POINT:x5}".Length + 1;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Viewport.Height == 0 || Viewport.Width == 0)
         {
