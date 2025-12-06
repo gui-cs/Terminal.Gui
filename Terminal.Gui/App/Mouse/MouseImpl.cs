@@ -20,14 +20,8 @@ internal class MouseImpl : IMouse, IDisposable
         Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
     }
 
-    private IApplication? _app;
-
     /// <inheritdoc/>
-    public IApplication? App
-    {
-        get => _app;
-        set => _app = value;
-    }
+    public IApplication? App { get; set; }
 
     /// <inheritdoc/>
     public Point? LastMousePosition { get; set; }
@@ -248,7 +242,7 @@ internal class MouseImpl : IMouse, IDisposable
                 continue;
             }
 
-            CancelEventArgs eventArgs = new System.ComponentModel.CancelEventArgs ();
+            CancelEventArgs eventArgs = new CancelEventArgs ();
             bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
             if (cancelled is true || eventArgs.Cancel)

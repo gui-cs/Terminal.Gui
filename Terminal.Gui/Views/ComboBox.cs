@@ -287,7 +287,7 @@ public class ComboBox : View, IDesignable
     public virtual void OnCollapsed () { Collapsed?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
 
         if (!_autoHide)
@@ -881,7 +881,7 @@ public class ComboBox : View, IDesignable
             return res;
         }
 
-        protected override bool OnDrawingContent ()
+        protected override bool OnDrawingContent (DrawContext context)
         {
             Attribute current = GetAttributeForRole (VisualRole.Focus);
             SetAttribute (current);

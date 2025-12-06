@@ -632,4 +632,46 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
             return sb.ToString ();
         }
     }
+
+    [Fact]
+    public void PositionCursor_Treat_Zero_Width_As_One_Column ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        TextField tf = new () { Width = 10, Text = "\u001B[" };
+        tf.Driver = driver;
+        tf.SetRelativeLayout (new (10, 1));
+
+        Assert.Equal (0, tf.CursorPosition);
+
+        tf.CursorPosition = 1;
+        Assert.Equal (new Point (1, 0), tf.PositionCursor ());
+
+        tf.CursorPosition = 2;
+        Assert.Equal (new Point (2, 0), tf.PositionCursor ());
+    }
+
+    [Fact]
+    public void ScrollOffset_Treat_Negative_Width_As_One_Column ()
+    {
+        View view = new () { Width = 10, Height = 1};
+        TextField tf = new () { Width = 2, Text = "\u001B[" };
+        view.Add (tf);
+        tf.SetRelativeLayout (new (10, 1));
+
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal (0, tf.CursorPosition);
+
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal (1, tf.CursorPosition);
+
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tf.ScrollOffset);
+        Assert.Equal (2, tf.CursorPosition);
+
+        Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tf.ScrollOffset);
+        Assert.Equal (2, tf.CursorPosition);
+    }
 }

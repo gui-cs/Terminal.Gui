@@ -1,29 +1,14 @@
-
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
 
-    private readonly object _lockScreen = new ();
-    private Rectangle? _screen;
-
     /// <inheritdoc/>
     public Rectangle Screen
     {
-        get
-        {
-            lock (_lockScreen)
-            {
-                if (_screen == null)
-                {
-                    _screen = Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
-                }
-
-                return _screen.Value;
-            }
-        }
+        get => Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
         set
         {
             if (value is { } && (value.X != 0 || value.Y != 0))
@@ -31,10 +16,7 @@ public partial class ApplicationImpl
                 throw new NotImplementedException ("Screen locations other than 0, 0 are not yet supported");
             }
 
-            lock (_lockScreen)
-            {
-                _screen = value;
-            }
+            Driver?.SetScreenSize (value.Width, value.Height);
         }
     }
 
@@ -114,16 +96,6 @@ public partial class ApplicationImpl
         return false;
     }
 
-    /// <summary>
-    ///     INTERNAL: Resets the Screen field to null so it will be recalculated on next access.
-    /// </summary>
-    private void ResetScreen ()
-    {
-        lock (_lockScreen)
-        {
-            _screen = null;
-        }
-    }
 
     /// <summary>
     ///     INTERNAL: Called when the application's screen has changed.
@@ -132,7 +104,7 @@ public partial class ApplicationImpl
     /// <param name="screen">The new screen size and position.</param>
     private void RaiseScreenChangedEvent (Rectangle screen)
     {
-        Screen = new (Point.Empty, screen.Size);
+        //Screen = new (Point.Empty, screen.Size);
 
         ScreenChanged?.Invoke (this, new (screen));
 
@@ -150,17 +122,6 @@ public partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        List<View?> tops = [.. SessionStack!.Select(r => r.Runnable! as View)!];
-
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
-        {
-            visiblePopover.SetNeedsDraw ();
-            visiblePopover.SetNeedsLayout ();
-            tops.Insert (0, visiblePopover);
-        }
-
-        bool neededLayout = View.Layout (tops.ToArray ().Reverse ()!, Screen.Size);
-
         if (ClearScreenNextIteration)
         {
             forceRedraw = true;
@@ -172,12 +133,34 @@ public partial class ApplicationImpl
             Driver?.ClearContents ();
         }
 
-        if (Driver is { })
+        List<View?> views = [.. SessionStack!.Select (r => r.Runnable! as View)!];
+
+        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
         {
+            visiblePopover.SetNeedsDraw ();
+            visiblePopover.SetNeedsLayout ();
+            views.Insert (0, visiblePopover);
+        }
+
+        // Layout
+        bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+
+        // Draw
+        bool needsDraw = forceRedraw || views.Any (v => v is { NeedsDraw: true } or { SubViewNeedsDraw: true });
+
+        if (Driver is { } && (neededLayout || needsDraw))
+        {
+            Logging.Redraws.Add (1);
+
             Driver.Clip = new (Screen);
 
-            View.Draw (views: tops!, neededLayout || forceRedraw);
+            // Only force a complete redraw if needed (needsLayout or forceRedraw).
+            // Otherwise, just redraw views that need it.
+            View.Draw (views: views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
+
             Driver.Clip = new (Screen);
+
+            // Cause the driver to flush any pending updates to the terminal
             Driver?.Refresh ();
         }
     }

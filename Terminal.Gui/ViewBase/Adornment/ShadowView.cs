@@ -20,7 +20,7 @@ internal class ShadowView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         switch (ShadowStyle)
         {

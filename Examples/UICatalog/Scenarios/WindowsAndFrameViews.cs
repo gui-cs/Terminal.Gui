@@ -18,7 +18,7 @@ public class WindowsAndFrameViews : Scenario
 
         static int? About ()
         {
-            return MessageBox.Query (ApplicationImpl.Instance,
+            return MessageBox.Query (Application.Instance,
                                      "About UI Catalog",
                                      "UI Catalog is a comprehensive sample library for Terminal.Gui",
                                      "Ok"

@@ -201,7 +201,7 @@ public class PosCenterTests (ITestOutputHelper output) : FakeDriverBase
 
         _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
         win.Dispose ();
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Theory]
@@ -372,6 +372,6 @@ public class PosCenterTests (ITestOutputHelper output) : FakeDriverBase
 
         _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output, driver);
         win.Dispose ();
-        driver.End ();
+        driver.Dispose ();
     }
 }

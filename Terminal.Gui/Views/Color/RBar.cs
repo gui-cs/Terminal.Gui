@@ -1,5 +1,3 @@
-
-
 using ColorHelper;
 
 namespace Terminal.Gui.Views;

@@ -922,7 +922,7 @@ public class TextField : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         _isDrawing = true;
 
@@ -1118,7 +1118,8 @@ public class TextField : View, IDesignable
                 break;
             }
 
-            int cols = _text [idx].GetColumns ();
+            int cols = Math.Max (_text [idx].GetColumns (), 1);
+
             TextModel.SetCol (ref col, Viewport.Width - 1, cols);
         }
 

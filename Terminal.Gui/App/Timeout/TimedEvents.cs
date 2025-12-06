@@ -201,32 +201,47 @@ public class TimedEvents : ITimedEvents
     private void RunTimersImpl ()
     {
         long now = GetTimestampTicks ();
-        SortedList<long, Timeout> copy;
 
-        // lock prevents new timeouts being added
-        // after we have taken the copy but before
-        // we have allocated a new list (which would
-        // result in lost timeouts or errors during enumeration)
-        lock (_timeoutsLockToken)
+        // Process due timeouts one at a time, without blocking the entire queue
+        while (true)
         {
-            copy = _timeouts;
-            _timeouts = new ();
-        }
+            Timeout? timeoutToExecute = null;
+            long scheduledTime = 0;
 
-        foreach ((long k, Timeout timeout) in copy)
-        {
-            if (k < now)
+            // Find the next due timeout
+            lock (_timeoutsLockToken)
             {
-                if (timeout.Callback! ())
+                if (_timeouts.Count == 0)
                 {
-                    AddTimeout (timeout.Span, timeout);
+                    break; // No more timeouts
                 }
-            }
-            else
-            {
-                lock (_timeoutsLockToken)
+
+                // Re-evaluate current time for each iteration
+                now = GetTimestampTicks ();
+                
+                // Check if the earliest timeout is due
+                scheduledTime = _timeouts.Keys [0];
+                
+                if (scheduledTime >= now)
                 {
-                    _timeouts.Add (NudgeToUniqueKey (k), timeout);
+                    // Earliest timeout is not yet due, we're done
+                    break;
+                }
+
+                // This timeout is due - remove it from the queue
+                timeoutToExecute = _timeouts.Values [0];
+                _timeouts.RemoveAt (0);
+            }
+
+            // Execute the callback outside the lock
+            // This allows nested Run() calls to access the timeout queue
+            if (timeoutToExecute != null)
+            {
+                bool repeat = timeoutToExecute.Callback! ();
+                
+                if (repeat)
+                {
+                    AddTimeout (timeoutToExecute.Span, timeoutToExecute);
                 }
             }
         }

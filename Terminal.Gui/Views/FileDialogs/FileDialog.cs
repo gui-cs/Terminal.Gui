@@ -409,7 +409,7 @@ public class FileDialog : Dialog, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (!string.IsNullOrWhiteSpace (_feedback))
         {

@@ -217,7 +217,7 @@ public class Line : View, IOrientation
     ///     This method adds the line to the LineCanvas for rendering.
     ///     The actual rendering is performed by the parent view through <see cref="View.RenderLineCanvas"/>.
     /// </remarks>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;

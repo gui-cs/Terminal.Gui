@@ -133,7 +133,7 @@ public class FileDialogExamples : Scenario
                              }
                              catch (Exception ex)
                              {
-                                 MessageBox.ErrorQuery (ApplicationImpl.Instance, "Error", ex.ToString (), "_Ok");
+                                 MessageBox.ErrorQuery (Application.Instance, "Error", ex.ToString (), "_Ok");
                              }
                              finally
                              {
@@ -153,7 +153,7 @@ public class FileDialogExamples : Scenario
         {
             if (File.Exists (e.Dialog.Path))
             {
-                int? result = MessageBox.Query (ApplicationImpl.Instance, "Overwrite?", "File already exists", "_Yes", "_No");
+                int? result = MessageBox.Query (Application.Instance, "Overwrite?", "File already exists", "_Yes", "_No");
                 e.Cancel = result == 1;
             }
         }
@@ -248,7 +248,7 @@ public class FileDialogExamples : Scenario
 
             if (canceled)
             {
-                MessageBox.Query (ApplicationImpl.Instance,
+                MessageBox.Query (Application.Instance,
                                   "Canceled",
                                   "You canceled navigation and did not pick anything",
                                   "Ok"
@@ -256,7 +256,7 @@ public class FileDialogExamples : Scenario
             }
             else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
             {
-                MessageBox.Query (ApplicationImpl.Instance,
+                MessageBox.Query (Application.Instance,
                                   "Chosen!",
                                   "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)),
                                   "Ok"
@@ -264,7 +264,7 @@ public class FileDialogExamples : Scenario
             }
             else
             {
-                MessageBox.Query (ApplicationImpl.Instance,
+                MessageBox.Query (Application.Instance,
                                   "Chosen!",
                                   "You chose:" + Environment.NewLine + path,
                                   "Ok"
