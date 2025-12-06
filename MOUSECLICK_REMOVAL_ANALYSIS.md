@@ -145,7 +145,8 @@ NewMouseEvent()
 
 ### 7. TabRow.cs - **SIMPLE** ✅
 **Current Usage:**
-- Lines with `_leftScrollIndicator.MouseClick` and `_rightScrollIndicator.MouseClick`
+- Line 27: `_rightScrollIndicator.MouseClick += _host.Tab_MouseClick!;`
+- Line 37: `_leftScrollIndicator.MouseClick += _host.Tab_MouseClick!;`
 - Forwards to `_host.Tab_MouseClick`
 
 **Complexity:** SIMPLE
@@ -160,8 +161,9 @@ NewMouseEvent()
 
 ### 8. TreeTableSource.cs - **SIMPLE** ✅
 **Current Usage:**
-- Line ~: `_tableView.MouseClick += Table_MouseClick;`
-- Handler expands/collapses tree nodes
+- Line 45: `_tableView.MouseClick += Table_MouseClick;`
+- Line 59: `_tableView.MouseClick -= Table_MouseClick;`
+- Lines 171+: Handler expands/collapses tree nodes
 
 **Complexity:** SIMPLE
 - Just needs to handle expansion on click
@@ -176,8 +178,8 @@ NewMouseEvent()
 
 ### 9. CheckBoxTableSourceWrapper.cs - **SIMPLE** ✅
 **Current Usage:**
-- Line ~: `tableView.MouseClick += TableView_MouseClick;`
-- Handler toggles checkboxes
+- Line 33: `tableView.MouseClick += TableView_MouseClick;`
+- Line 155: Handler toggles checkboxes
 
 **Complexity:** SIMPLE
 - Toggles checkbox state on click
@@ -192,8 +194,8 @@ NewMouseEvent()
 
 ### 10. FileDialog.cs - **SIMPLE** ✅
 **Current Usage:**
-- Line ~: `_tableView.MouseClick += OnTableViewMouseClick;`
-- Handler for file selection
+- Line 198: `_tableView.MouseClick += OnTableViewMouseClick;`
+- Line 1049: Handler for file selection
 
 **Complexity:** SIMPLE
 - Handles file selection in dialog
