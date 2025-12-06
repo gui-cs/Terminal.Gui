@@ -275,8 +275,8 @@ Test files using MouseClick:
 
 ## Next Steps (Post Phase 1)
 1. ✅ Phase 1: Create this analysis document
-2. ⬜ Phase 2: Port Scenarios (Examples/UICatalog)
-3. ⬜ Phase 3: Port Simple Views
-4. ⬜ Phase 4: Port Moderate Views  
+2. ✅ Phase 2: Port Scenarios (Examples/UICatalog)
+3. ✅ Phase 3: Port Simple Views
+4. ⬜ Phase 4: Port Moderate Views (ScrollBar - TabView already done in Phase 3)
 5. ⬜ Phase 5: Update Tests
 6. ⬜ Phase 6: Remove API from View.Mouse.cs
