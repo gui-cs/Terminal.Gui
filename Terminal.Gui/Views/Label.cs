@@ -26,16 +26,25 @@ public class Label : View, IDesignable
         // On HoKey, pass it to the next view
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
 
-        TitleChanged += Label_TitleChanged;
-        MouseClick += Label_MouseClick;
-    }
+        // When clicked and can't focus, invoke HotKey command on next peer
+        AddCommand (
+                    Command.Select,
+                    ctx =>
+                    {
+                        if (RaiseSelecting (ctx) is true)
+                        {
+                            return true;
+                        }
 
-    private void Label_MouseClick (object? sender, MouseEventArgs e)
-    {
-        if (!CanFocus)
-        {
-            e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, this)) == true;
-        }
+                        if (!CanFocus)
+                        {
+                            return InvokeCommand (Command.HotKey, ctx);
+                        }
+
+                        return false;
+                    });
+
+        TitleChanged += Label_TitleChanged;
     }
 
     private void Label_TitleChanged (object? sender, EventArgs<string> e)

@@ -75,8 +75,11 @@ public class Button : View, IDesignable
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
+        // Replace default Select binding with HotKey for mouse clicks
+        MouseBindings.Clear ();
+        MouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+
         TitleChanged += Button_TitleChanged;
-        MouseClick += Button_MouseClick;
 
         base.ShadowStyle = DefaultShadow;
         HighlightStates = DefaultHighlightStates;
@@ -114,16 +117,6 @@ public class Button : View, IDesignable
         }
 
         return false;
-    }
-    private void Button_MouseClick (object sender, MouseEventArgs e)
-    {
-        if (e.Handled)
-        {
-            return;
-        }
-
-        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
-        e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new KeyBinding ([Command.HotKey], this, data: null)) == true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)
