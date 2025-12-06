@@ -24,22 +24,75 @@ The appropriate driver is automatically selected based on the platform when you 
 
 ### Explicit Driver Selection
 
-You can explicitly specify a driver in three ways:
+You can explicitly specify a driver in several ways:
 
-```csharp
-// Method 1: Set ForceDriver property before Init
-Application.ForceDriver = "dotnet";
-Application.Init();
+Method 1: Set ForceDriver using Configuration Manager
 
-// Method 2: Pass driver name to Init
-Application.Init(driverName: "unix");
-
-// Method 3: Pass a custom IDriver instance
-var customDriver = new MyCustomDriver();
-Application.Init(driver: customDriver);
+```json
+{
+  "ForceDriver": "fake"
+}
 ```
 
-Valid driver names: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
+Method 2: Pass driver name to Init
+
+```csharp
+Application.Init(driverName: "unix");
+```
+
+Method 3: Set ForceDriver on instance
+
+```csharp
+using (IApplication app = Application.Create())
+{
+    app.ForceDriver = "fake";
+    app.Init();
+}
+```
+
+**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
+
+### ForceDriver as Configuration Property
+
+The `ForceDriver` property is a configuration property marked with `[ConfigurationProperty]`, which means:
+
+- It can be set through the configuration system (e.g., `config.json`)
+- Changes raise the `ForceDriverChanged` event
+- It persists across application instances when using the static `Application` class
+
+```csharp
+// Subscribe to driver changes
+Application.ForceDriverChanged += (sender, e) =>
+{
+    Console.WriteLine($"Driver changed: {e.OldValue} → {e.NewValue}");
+};
+
+// Change driver
+Application.ForceDriver = "fake";
+```
+
+### Discovering Available Drivers
+
+Use `GetDriverTypes()` to discover which drivers are available at runtime:
+
+```csharp
+(List<Type?> driverTypes, List<string?> driverNames) = Application.GetDriverTypes();
+
+Console.WriteLine("Available drivers:");
+foreach (string? name in driverNames)
+{
+    Console.WriteLine($"  - {name}");
+}
+
+// Output:
+// Available drivers:
+//   - dotnet
+//   - windows
+//   - unix
+//   - fake
+```
+
+**Note**: `GetDriverTypes()` uses reflection to discover driver implementations and is marked with `[RequiresUnreferencedCode("AOT")]` and `[Obsolete]` as part of the legacy static API.
 
 ## Architecture
 
@@ -151,21 +204,69 @@ When `IApplication.Shutdown()` is called:
 
 ### IDriver
 
-The main driver interface that the framework uses internally. Provides:
+The main driver interface that the framework uses internally. `IDriver` is organized into logical regions:
 
-- **Screen Management**: `Screen`, `Cols`, `Rows`, `Contents`
-- **Drawing Operations**: `AddRune()`, `AddStr()`, `Move()`, `FillRect()`
-- **Cursor Management**: `SetCursorVisibility()`, `UpdateCursor()`
-- **Attribute Management**: `CurrentAttribute`, `SetAttribute()`, `MakeColor()`
-- **Clipping**: `Clip` property
-- **Events**: `KeyDown`, `KeyUp`, `MouseEvent`, `SizeChanged`
-- **Platform Features**: `SupportsTrueColor`, `Force16Colors`, `Clipboard`
+#### Driver Lifecycle
+- `Init()`, `Refresh()`, `End()` - Core lifecycle methods
+- `GetName()`, `GetVersionInfo()` - Driver identification
+- `Suspend()` - Platform-specific suspend support
+
+#### Driver Components
+- `InputProcessor` - Processes input into Terminal.Gui events
+- `OutputBuffer` - Manages screen buffer state
+- `SizeMonitor` - Detects terminal size changes
+- `Clipboard` - OS clipboard integration
+
+#### Screen and Display
+- `Screen`, `Cols`, `Rows`, `Left`, `Top` - Screen dimensions
+- `SetScreenSize()`, `SizeChanged` - Size management
+
+#### Color Support
+- `SupportsTrueColor` - 24-bit color capability
+- `Force16Colors` - Force 16-color mode
+
+#### Content Buffer
+- `Contents` - Screen buffer array
+- `Clip` - Clipping region
+- `ClearContents()`, `ClearedContents` - Buffer management
+
+#### Drawing and Rendering
+- `Col`, `Row`, `CurrentAttribute` - Drawing state
+- `Move()`, `AddRune()`, `AddStr()`, `FillRect()` - Drawing operations
+- `SetAttribute()`, `GetAttribute()` - Attribute management
+- `WriteRaw()`, `GetSixels()` - Raw output and graphics
+- `Refresh()`, `ToString()`, `ToAnsi()` - Output rendering
+
+#### Cursor
+- `UpdateCursor()` - Position cursor
+- `GetCursorVisibility()`, `SetCursorVisibility()` - Visibility management
+
+#### Input Events
+- `KeyDown`, `KeyUp`, `MouseEvent` - Input events
+- `EnqueueKeyEvent()` - Test support
+
+#### ANSI Escape Sequences
+- `QueueAnsiRequest()` - ANSI request handling
 
 **Note:** The driver is internal to Terminal.Gui. View classes should not access `Driver` directly. Instead:
 - Use @Terminal.Gui.App.Application.Screen to get screen dimensions
 - Use @Terminal.Gui.ViewBase.View.Move for positioning (with viewport-relative coordinates)
 - Use @Terminal.Gui.ViewBase.View.AddRune and @Terminal.Gui.ViewBase.View.AddStr for drawing
 - ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can access Driver when needed for framework implementation
+
+### Driver Creation and Selection
+
+The driver selection logic in `ApplicationImpl.Driver.cs` prioritizes component factory type over the driver name parameter:
+
+1. **Component Factory Type**: If an `IComponentFactory` is already set, it determines the driver
+2. **Driver Name Parameter**: The `driverName` parameter to `Init()` is checked next
+3. **ForceDriver Property**: The `ForceDriver` configuration property is evaluated
+4. **Platform Detection**: If none of the above specify a driver, the platform is detected:
+   - Windows (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
+   - Unix/Linux/macOS → `UnixDriver`
+   - Other platforms → `DotNetDriver` (fallback)
+
+This prioritization ensures flexibility while maintaining deterministic behavior.
 
 ## Platform-Specific Details
 
