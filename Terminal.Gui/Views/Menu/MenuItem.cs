@@ -143,13 +143,8 @@ public class MenuItem : Shortcut
         {
             // Logging.Debug ($"{Title} - calling base.DispatchCommand...");
             // Base will Raise Selected, then Accepting, then invoke the Action, if any
+            // Note: base.DispatchCommand will call RaiseAccepted via RaiseAccepting when handled
             ret = base.DispatchCommand (commandContext);
-        }
-
-        if (ret is true)
-        {
-            // Logging.Debug ($"{Title} - Calling RaiseAccepted");
-            RaiseAccepted (commandContext);
         }
 
         return ret;

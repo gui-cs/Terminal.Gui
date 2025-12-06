@@ -141,6 +141,13 @@ public partial class View // Command APIs
             Accepting?.Invoke (this, args);
         }
 
+        // If Accepting was handled, raise Accepted (non-cancelable event)
+        if (args.Handled)
+        {
+            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling RaiseAccepted");
+            RaiseAccepted (ctx);
+        }
+
         // Accept is a special case where if the event is not canceled, the event is
         //  - Invoked on any peer-View with IsDefault == true
         //  - bubbled up the SuperView hierarchy.
