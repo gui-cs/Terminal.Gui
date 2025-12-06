@@ -91,6 +91,9 @@ jobs:
         shell: bash
         run: |
           # Run tests 3 times with different parallelization settings to expose concurrency issues
+          # Run 1: Default parallelization (2x) - standard test execution
+          # Run 2: Maximum parallelization (unlimited) - stress test with high concurrency
+          # Run 3: Single-threaded execution (1) - deterministic execution to expose ordering issues
           for RUN in {1..3}; do
             echo "============================================"
             echo "Starting test run $RUN of 3"
