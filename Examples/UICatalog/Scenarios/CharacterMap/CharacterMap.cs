@@ -134,27 +134,33 @@ public class CharacterMap : Scenario
         _categoryList.Table = CreateCategoryTable (0, isDescending);
 
         // if user clicks the mouse in TableView
-        _categoryList.MouseClick += (s, e) =>
-                                    {
-                                        _categoryList.ScreenToCell (e.Position, out int? clickedCol);
+        _categoryList.Selecting += (s, e) =>
+                                   {
+                                       // Only handle mouse clicks
+                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                       {
+                                           return;
+                                       }
 
-                                        if (clickedCol != null && e.Flags.HasFlag (MouseFlags.Button1Clicked))
-                                        {
-                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
-                                            isDescending = !isDescending;
+                                       _categoryList.ScreenToCell (mouseArgs.Position, out int? clickedCol);
 
-                                            _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+                                       if (clickedCol != null && mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                       {
+                                           EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                           string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                                           isDescending = !isDescending;
 
-                                            table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                           _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
-                                            _categoryList.SelectedRow = table.Data
-                                                                             .Select ((item, index) => new { item, index })
-                                                                             .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                                             ?.index
-                                                                        ?? -1;
-                                        }
-                                    };
+                                           table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+
+                                           _categoryList.SelectedRow = table.Data
+                                                                            .Select ((item, index) => new { item, index })
+                                                                            .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                                            ?.index
+                                                                       ?? -1;
+                                       }
+                                   };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 

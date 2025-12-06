@@ -447,19 +447,6 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        editText.MouseClick += (s, m) =>
-                               {
-                                   foreach (View v in singleLineLabels)
-                                   {
-                                       v.Text = editText.Text;
-                                   }
-
-                                   foreach (View v in multiLineLabels)
-                                   {
-                                       v.Text = editText.Text;
-                                   }
-                               };
-
         app.KeyUp += (s, m) =>
                      {
                          foreach (View v in singleLineLabels)

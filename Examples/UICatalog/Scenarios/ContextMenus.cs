@@ -35,7 +35,7 @@ public class ContextMenus : Scenario
         Application.Run (_appWindow);
         _appWindow.Dispose ();
         _appWindow.KeyDown -= OnAppWindowOnKeyDown;
-        _appWindow.MouseClick -= OnAppWindowOnMouseClick;
+        _appWindow.Selecting -= OnAppWindowOnSelecting;
         _winContextMenu?.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
@@ -81,7 +81,7 @@ public class ContextMenus : Scenario
             _appWindow.Add (_tfBottomRight);
 
             _appWindow.KeyDown += OnAppWindowOnKeyDown;
-            _appWindow.MouseClick += OnAppWindowOnMouseClick;
+            _appWindow.Selecting += OnAppWindowOnSelecting;
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
             _appWindow.IsRunningChanged += (s, e) => {
@@ -91,13 +91,16 @@ public class ContextMenus : Scenario
                                                } };
         }
 
-        void OnAppWindowOnMouseClick (object? s, MouseEventArgs e)
+        void OnAppWindowOnSelecting (object? s, CommandEventArgs e)
         {
-            if (e.Flags == MouseFlags.Button3Clicked)
+            if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
-                // ReSharper disable once AccessToDisposedClosure
-                _winContextMenu?.MakeVisible (e.ScreenPosition);
-                e.Handled = true;
+                if (mouseArgs.Flags == MouseFlags.Button3Clicked)
+                {
+                    // ReSharper disable once AccessToDisposedClosure
+                    _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
+                    e.Handled = true;
+                }
             }
         }
 

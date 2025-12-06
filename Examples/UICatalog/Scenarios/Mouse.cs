@@ -302,12 +302,6 @@ public class Mouse : Scenario
                               }
                           };
 
-        win.MouseClick += (sender, a) =>
-                          {
-                              winLogList.Add ($"MouseClick: ({a.Position}) - {a.Flags} {count++}");
-                              winLog.MoveDown ();
-                          };
-
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();

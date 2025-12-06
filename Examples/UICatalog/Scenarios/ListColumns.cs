@@ -112,9 +112,6 @@ public class ListColumns : Scenario
             Normal = new (Color.White, Color.BrightBlue)
         };
 
-        // if user clicks the mouse in TableView
-        _listColView.MouseClick += (s, e) => { _listColView.ScreenToCell (e.Position, out int? clickedCol); };
-
         _listColView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         // Setup menu checkboxes
