@@ -175,7 +175,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void MouseClick_OnSubView_RaisesMouseClickEvent ()
+    public void MouseClick_OnSubView_RaisesSelectingEvent ()
     {
         // Arrange
         View superView = new ()
@@ -194,8 +194,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         superView.Add (subView);
 
-        var clickCount = 0;
-        subView.MouseClick += (sender, args) => clickCount++;
+        var selectingCount = 0;
+        subView.Selecting += (sender, args) => selectingCount++;
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -207,7 +207,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         subView.NewMouseEvent (mouseEvent);
 
         // Assert
-        Assert.Equal (1, clickCount);
+        Assert.Equal (1, selectingCount);
 
         subView.Dispose ();
         superView.Dispose ();
@@ -392,7 +392,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void View_Disabled_DoesNotRaiseMouseClickEvent ()
+    public void View_Disabled_DoesNotRaiseSelectingEvent ()
     {
         // Arrange
         View view = new ()
@@ -402,8 +402,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Enabled = false
         };
 
-        var clickCalled = false;
-        view.MouseClick += (sender, args) => { clickCalled = true; };
+        var selectingCalled = false;
+        view.Selecting += (sender, args) => { selectingCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -415,7 +415,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         view.NewMouseEvent (mouseEvent);
 
         // Assert
-        Assert.False (clickCalled);
+        Assert.False (selectingCalled);
 
         view.Dispose ();
     }

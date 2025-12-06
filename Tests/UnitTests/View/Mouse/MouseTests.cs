@@ -104,36 +104,6 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button2Clicked)]
     [InlineData (MouseFlags.Button3Clicked)]
     [InlineData (MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_MouseClick (MouseFlags clicked)
-    {
-        var me = new MouseEventArgs ();
-
-        var view = new View
-        {
-            Width = 1,
-            Height = 1,
-            WantContinuousButtonPressed = true
-        };
-
-        var clickedCount = 0;
-
-        view.MouseClick += (s, e) => clickedCount++;
-
-        me.Flags = clicked;
-        view.NewMouseEvent (me);
-        Assert.Equal (1, clickedCount);
-
-        view.Dispose ();
-
-        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
-        Application.ResetState (true);
-    }
-
-    [Theory]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Selecting (MouseFlags clicked)
     {
         var me = new MouseEventArgs ();
