@@ -32,8 +32,9 @@ public class SixelSupportDetector ()
     /// </returns>
     public void Detect (Action<SixelSupportResult> resultCallback)
     {
-        var result = new SixelSupportResult ();
-        result.SupportsTransparency = IsVirtualTerminal () || IsXtermWithTransparency ();
+        SixelSupportResult result = new SixelSupportResult ();
+        bool isLegacyConsole = IsLegacyConsole ();
+        result.SupportsTransparency = !isLegacyConsole || (!isLegacyConsole && IsXtermWithTransparency ());
         IsSixelSupportedByDar (result, resultCallback);
     }
 
@@ -155,9 +156,9 @@ public class SixelSupportDetector ()
 
     private static bool ResponseIndicatesSupport (string response) { return response.Split (';').Contains ("4"); }
 
-    private static bool IsVirtualTerminal ()
+    private bool IsLegacyConsole ()
     {
-        return !string.IsNullOrWhiteSpace (Environment.GetEnvironmentVariable ("WT_SESSION"));
+        return _driver is { IsLegacyConsole: true };
     }
 
     private static bool IsXtermWithTransparency ()

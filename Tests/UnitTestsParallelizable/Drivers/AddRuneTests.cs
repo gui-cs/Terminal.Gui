@@ -21,7 +21,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         driver.AddRune (new Rune ('a'));
         Assert.Equal ("a", driver.Contents? [0, 0].Grapheme);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         //		Application.Refresh ();
         //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
         //ắ", output);
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
             }
         }
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
             }
         }
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -177,6 +177,6 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         //	}
         //}
 
-        driver.End ();
+        driver.Dispose ();
     }
 }

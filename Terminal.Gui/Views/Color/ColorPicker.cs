@@ -99,7 +99,7 @@ public partial class ColorPicker : View, IDesignable
     public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
         SetAttribute (new (SelectedColor, normal.Background, Enabled ? TextStyle.None : TextStyle.Faint));

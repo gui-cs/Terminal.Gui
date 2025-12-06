@@ -1,8 +1,7 @@
-﻿#nullable enable
+﻿
+namespace DrawingTests.ColorTests;
 
-namespace DrawingTests;
-
-public partial class ColorTests
+public partial class ColorClassTests
 {
     [Theory]
     [CombinatorialData]

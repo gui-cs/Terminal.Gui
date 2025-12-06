@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace DrawingTests;
+namespace DrawingTests.ColorTests;
 
-public partial class ColorTests
+public partial class ColorClassTests
 {
     [Fact]
     [Trait ("Category", "Type Checks")]

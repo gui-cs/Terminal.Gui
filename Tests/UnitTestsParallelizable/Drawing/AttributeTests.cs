@@ -141,7 +141,7 @@ public class AttributeTests : FakeDriverBase
         Assert.Equal (bg, attr.Foreground);
         Assert.Equal (bg, attr.Background);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public class AttributeTests : FakeDriverBase
         Assert.Equal (fg, attr.Foreground);
         Assert.Equal (bg, attr.Background);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]

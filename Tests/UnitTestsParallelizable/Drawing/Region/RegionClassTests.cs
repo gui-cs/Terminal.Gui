@@ -1,6 +1,6 @@
-﻿namespace DrawingTests;
+﻿namespace DrawingTests.RegionTests;
 
-public class RegionTests
+public class RegionClassTests
 {
     [Fact]
     public void Clone_CreatesExactCopy ()

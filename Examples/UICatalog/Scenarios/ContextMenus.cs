@@ -49,7 +49,7 @@ public class ContextMenus : Scenario
             var text = "Context Menu";
             var width = 20;
 
-            CreateWinContextMenu (ApplicationImpl.Instance);
+            CreateWinContextMenu (Application.Instance);
 
             var label = new Label
             {

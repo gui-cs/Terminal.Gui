@@ -241,7 +241,7 @@ public partial class Border : Adornment
 
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Thickness == Thickness.Empty)
         {
@@ -539,8 +539,6 @@ public partial class Border : Adornment
         }
 
         return true;
-
-        ;
     }
 
     /// <summary>

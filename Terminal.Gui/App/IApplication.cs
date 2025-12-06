@@ -450,13 +450,6 @@ public interface IApplication : IDisposable
     IClipboard? Clipboard { get; }
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Driver"/> will be forced to output only the 16 colors defined in
-    ///     <see cref="ColorName16"/>. The default is <see langword="false"/>, meaning 24-bit (TrueColor) colors will be
-    ///     output as long as the selected <see cref="IDriver"/> supports TrueColor.
-    /// </summary>
-    bool Force16Colors { get; set; }
-
-    /// <summary>
     ///     Forces the use of the specified driver (one of "fake", "dotnet", "windows", or "unix"). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
@@ -496,12 +489,6 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     bool ClearScreenNextIteration { get; set; }
-
-    /// <summary>
-    ///     Collection of sixel images to write out to screen when updating.
-    ///     Only add to this collection if you are sure terminal supports sixel format.
-    /// </summary>
-    List<SixelToRender> Sixel { get; }
 
     #endregion Screen and Driver
 

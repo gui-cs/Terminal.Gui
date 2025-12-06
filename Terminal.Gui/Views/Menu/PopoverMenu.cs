@@ -560,40 +560,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         return false;
     }
 
-    /// <summary>
-    ///     Raises the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating a menu (or submenu)
-    ///     was accepted and the Menus in the PopoverMenu were hidden. Use this to determine when to hide the PopoverMenu.
-    /// </summary>
-    /// <param name="ctx"></param>
-    /// <returns></returns>
-    protected void RaiseAccepted (ICommandContext? ctx)
-    {
-        // Logging.Debug ($"{Title} - RaiseAccepted: {ctx}");
-        CommandEventArgs args = new () { Context = ctx };
 
-        OnAccepted (args);
-        Accepted?.Invoke (this, args);
-    }
-
-    /// <summary>
-    ///     Called when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
-    ///     menu.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    /// <param name="args"></param>
-    protected virtual void OnAccepted (CommandEventArgs args) { }
-
-    /// <summary>
-    ///     Raised when the user has accepted an item in this menu (or submenu. This is used to determine when to hide the
-    ///     menu.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         See <see cref="RaiseAccepted"/> for more information.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<CommandEventArgs>? Accepted;
 
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e)
     {

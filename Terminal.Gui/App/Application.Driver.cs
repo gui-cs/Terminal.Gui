@@ -1,4 +1,6 @@
 
+
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.App;
@@ -13,30 +15,13 @@ public static partial class Application // Driver abstractions
         internal set => ApplicationImpl.Instance.Driver = value;
     }
 
-    private static bool _force16Colors = false; // Resources/config.json overrides
-
-    /// <inheritdoc cref="IApplication.Force16Colors"/>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    [Obsolete ("The legacy static Application object is going away.")]
-    public static bool Force16Colors
-    {
-        get => _force16Colors;
-        set
-        {
-            bool oldValue = _force16Colors;
-            _force16Colors = value;
-            Force16ColorsChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, _force16Colors));
-        }
-    }
-
-    /// <summary>Raised when <see cref="Force16Colors"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<bool>>? Force16ColorsChanged;
-
+    // NOTE: ForceDriver is a configuration property (Application.ForceDriver).
+    // NOTE: IApplication also has a ForceDriver property, which is an instance property
+    // NOTE: set whenever this static property is set.
     private static string _forceDriver = string.Empty; // Resources/config.json overrides
 
     /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    [Obsolete ("The legacy static Application object is going away.")]
     public static string ForceDriver
     {
         get => _forceDriver;
@@ -44,16 +29,15 @@ public static partial class Application // Driver abstractions
         {
             string oldValue = _forceDriver;
             _forceDriver = value;
-            ForceDriverChanged?.Invoke (null, new ValueChangedEventArgs<string> (oldValue, _forceDriver));
+            ForceDriverChanged?.Invoke (null, new (oldValue, _forceDriver));
         }
     }
 
     /// <summary>Raised when <see cref="ForceDriver"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<string>>? ForceDriverChanged;
 
-    /// <inheritdoc cref="IApplication.Sixel"/>
-    [Obsolete ("The legacy static Application object is going away.")] 
-    public static List<SixelToRender> Sixel => ApplicationImpl.Instance.Sixel;
+    /// <inheritdoc cref="IDriver.GetSixels"/>
+    public static ConcurrentQueue<SixelToRender> GetSixels () => ApplicationImpl.Instance.Driver?.GetSixels ()!;
 
     /// <summary>Gets a list of <see cref="IDriver"/> types and type names that are available.</summary>
     /// <returns></returns>
@@ -67,7 +51,7 @@ public static partial class Application // Driver abstractions
         // Only inspect the IDriver assembly
         var asm = typeof (IDriver).Assembly;
 
-        foreach (Type? type in asm.GetTypes ())
+        foreach (Type type in asm.GetTypes ())
         {
             if (typeof (IDriver).IsAssignableFrom (type) && type is { IsAbstract: false, IsClass: true })
             {
