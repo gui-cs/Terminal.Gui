@@ -196,7 +196,7 @@ public class UICatalog
 
         UICatalogMain (Options);
 
-        Debug.Assert (Application.ForceDriver == string.Empty);
+        Application.ForceDriver = string.Empty;
 
         return 0;
     }
@@ -433,8 +433,10 @@ public class UICatalog
 
             // This call to Application.Shutdown brackets the Application.Init call
             // made by Scenario.Init() above
-            // TODO: Throw if shutdown was not called already
-            Application.Shutdown ();
+            if (Application.Driver is { })
+            {
+                Application.Shutdown ();
+            }
 
             VerifyObjectsWereDisposed ();
 
@@ -482,8 +484,10 @@ public class UICatalog
 
         scenario.Dispose ();
 
-        // TODO: Throw if shutdown was not called already
-        Application.Shutdown ();
+        if (Application.Driver is { })
+        {
+            Application.Shutdown ();
+        }
 
         return results;
     }

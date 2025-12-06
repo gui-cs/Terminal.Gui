@@ -47,7 +47,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         Assert.False (driver.IsValidLocation (text, driver.Cols, driver.Rows - 1));
         Assert.False (driver.IsValidLocation (text, driver.Cols, driver.Rows));
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Theory]

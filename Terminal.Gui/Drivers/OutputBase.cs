@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -5,7 +7,44 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
-    private CursorVisibility? _cachedCursorVisibility;
+    private bool _force16Colors;
+
+    /// <inheritdoc cref="IOutput.Force16Colors"/>
+    public bool Force16Colors
+    {
+        get => _force16Colors;
+        set
+        {
+            if (IsLegacyConsole && !value)
+            {
+                return;
+            }
+
+            _force16Colors = value;
+        }
+    }
+
+    private bool _isLegacyConsole;
+
+    /// <inheritdoc cref="IOutput.IsLegacyConsole"/>
+    public bool IsLegacyConsole
+    {
+        get => _isLegacyConsole;
+        set
+        {
+            _isLegacyConsole = value;
+
+            if (value) // If legacy console (true), force 16 colors
+            {
+                Force16Colors = true;
+            }
+        }
+    }
+
+    private readonly ConcurrentQueue<SixelToRender> _sixels = [];
+
+    /// <inheritdoc cref="IOutput.GetSixels"/>>
+    public ConcurrentQueue<SixelToRender> GetSixels () => _sixels;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -28,7 +67,22 @@ public abstract class OutputBase
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibility = _cachedCursorVisibility;
+        if (IsLegacyConsole)
+        {
+            // BUGBUG: This is a workaround for some regression in legacy console mode where
+            // BUGBUG: dirty cells are not handled correctly. Mark all cells dirty as a workaround.
+            lock (buffer.Contents!)
+            {
+                for (var row = 0; row < buffer.Rows; row++)
+                {
+                    for (var c = 0; c < buffer.Cols; c++)
+                    {
+                        buffer.Contents [row, c].IsDirty = true;
+                    }
+                }
+            }
+        }
+
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
@@ -82,24 +136,36 @@ public abstract class OutputBase
 
             if (output.Length > 0)
             {
-                SetCursorPositionImpl (lastCol, row);
+                if (IsLegacyConsole)
+                {
+                    Write (output);
+                }
+                else
+                {
+                    SetCursorPositionImpl (lastCol, row);
 
-                // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-                Write (processed);
+                    // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+                    StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+                    Write (processed);
+                }
             }
         }
 
-        // BUGBUG: The Sixel impl depends on the legacy static Application object
-        // BUGBUG: Disabled for now
-        //foreach (SixelToRender s in  Application.Sixel)
-        //{
-        //    if (!string.IsNullOrWhiteSpace (s.SixelData))
-        //    {
-        //        SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-        //        Console.Out.Write (s.SixelData);
-        //    }
-        //}
+        if (IsLegacyConsole)
+        {
+            return;
+        }
+
+        foreach (SixelToRender s in GetSixels ())
+        {
+            if (string.IsNullOrWhiteSpace (s.SixelData))
+            {
+                continue;
+            }
+
+            SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+            Write ((StringBuilder)new (s.SixelData));
+        }
 
 
         // DO NOT restore cursor visibility here - let ApplicationMainLoop.SetCursor() handle it
@@ -168,7 +234,7 @@ public abstract class OutputBase
                     continue;
                 }
 
-                Cell cell = buffer.Contents![row, col];
+                Cell cell = buffer.Contents! [row, col];
                 AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col);
             }
 
@@ -232,9 +298,16 @@ public abstract class OutputBase
     {
         SetCursorPositionImpl (lastCol, row);
 
-        // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-        StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-        Write (processed);
+        if (IsLegacyConsole)
+        {
+            Write (output);
+        }
+        else
+        {
+            // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+            Write (processed);
+        }
 
         output.Clear ();
         lastCol += outputWidth;

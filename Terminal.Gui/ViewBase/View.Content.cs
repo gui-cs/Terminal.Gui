@@ -335,7 +335,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Altering the Viewport Size will eventually (when the view is next laid out) cause the
-    ///         <see cref="Layout()"/> and <see cref="OnDrawingContent()"/> methods to be called.
+    ///         <see cref="Layout()"/> and <see cref="OnDrawingContent(DrawContext)"/> methods to be called.
     ///     </para>
     /// </remarks>
     public virtual Rectangle Viewport
