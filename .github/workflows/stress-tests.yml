@@ -49,3 +49,100 @@ jobs:
             logs/
             TestResults/StressTests
 
+  parallel_unittests_stress:
+    name: Parallel Unit Tests Stress (3 iterations)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+          dotnet-quality: 'ga'
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build UnitTestsParallelizable
+        run: dotnet build Tests/UnitTestsParallelizable --configuration Debug --no-restore
+
+      - name: Disable Windows Defender (Windows only)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Add-MpPreference -ExclusionPath "${{ github.workspace }}"
+          Add-MpPreference -ExclusionProcess "dotnet.exe"
+          Add-MpPreference -ExclusionProcess "testhost.exe"
+          Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
+
+      - name: Set VSTEST_DUMP_PATH
+        shell: bash
+        run: echo "VSTEST_DUMP_PATH=logs/UnitTestsParallelizable/${{ runner.os }}/" >> $GITHUB_ENV
+
+      - name: Run UnitTestsParallelizable (3 iterations with varying parallelization)
+        shell: bash
+        run: |
+          # Run tests 3 times with different parallelization settings to expose concurrency issues
+          for RUN in {1..3}; do
+            echo "============================================"
+            echo "Starting test run $RUN of 3"
+            echo "============================================"
+            
+            # Use a combination of run number and timestamp to create different execution patterns
+            SEED=$((1000 + $RUN + $(date +%s) % 1000))
+            echo "Using randomization seed: $SEED"
+            
+            # Vary the xUnit parallelization based on run number to expose race conditions
+            if [ $RUN -eq 1 ]; then
+              XUNIT_MAX_PARALLEL_THREADS="2x"
+              echo "Run $RUN: Using default parallelization (2x)"
+            elif [ $RUN -eq 2 ]; then
+              XUNIT_MAX_PARALLEL_THREADS="unlimited"
+              echo "Run $RUN: Using maximum parallelization (unlimited)"
+            else
+              XUNIT_MAX_PARALLEL_THREADS="1"
+              echo "Run $RUN: Using single-threaded execution"
+            fi
+            
+            dotnet test Tests/UnitTestsParallelizable \
+              --no-build \
+              --verbosity normal \
+              --settings Tests/UnitTestsParallelizable/runsettings.xml \
+              --diag:logs/UnitTestsParallelizable/${{ runner.os }}/run${RUN}-logs.txt \
+              --blame \
+              --blame-crash \
+              --blame-hang \
+              --blame-hang-timeout 60s \
+              --blame-crash-collect-always \
+              -- xUnit.MaxParallelThreads=${XUNIT_MAX_PARALLEL_THREADS}
+            
+            if [ $? -ne 0 ]; then
+              echo "ERROR: Test run $RUN failed!"
+              exit 1
+            fi
+            
+            echo "Test run $RUN completed successfully"
+            echo ""
+          done
+          
+          echo "============================================"
+          echo "All 3 test runs completed successfully!"
+          echo "============================================"
+
+      - name: Upload UnitTestsParallelizable Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parallel_unittests_stress-logs-${{ runner.os }}
+          path: |
+            logs/UnitTestsParallelizable/
+            TestResults/
+

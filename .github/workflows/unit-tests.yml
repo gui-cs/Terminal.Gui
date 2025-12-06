@@ -154,39 +154,18 @@ jobs:
       shell: bash
       run: echo "VSTEST_DUMP_PATH=logs/UnitTestsParallelizable/${{ runner.os }}/" >> $GITHUB_ENV
 
-    - name: Run UnitTestsParallelizable (10 iterations with varying parallelization)
+    - name: Run UnitTestsParallelizable (1 iteration)
       shell: bash
       run: |
-        # Run tests 3 times with different parallelization settings to expose concurrency issues
-        for RUN in {1..3}; do
+        # Run tests once for regular workflow runs (stress tests will run multiple iterations)
+        for RUN in {1..1}; do
           echo "============================================"
-          echo "Starting test run $RUN of 3"
+          echo "Starting test run $RUN of 1"
           echo "============================================"
           
-          # Use a combination of run number and timestamp to create different execution patterns
-          SEED=$((1000 + $RUN + $(date +%s) % 1000))
-          echo "Using randomization seed: $SEED"
-          
-          # Vary the xUnit parallelization based on run number to expose race conditions
-          # Runs 1-3: Default parallelization (2x CPU cores)
-          # Runs 4-6: Max parallelization (unlimited)
-          # Runs 7-9: Single threaded (1)
-          # Run 10: Random (1-4 threads)
-          if [ $RUN -le 3 ]; then
-            XUNIT_MAX_PARALLEL_THREADS="2x"
-            echo "Run $RUN: Using default parallelization (2x)"
-          elif [ $RUN -le 6 ]; then
-            XUNIT_MAX_PARALLEL_THREADS="unlimited"
-            echo "Run $RUN: Using maximum parallelization (unlimited)"
-          elif [ $RUN -le 9 ]; then
-            XUNIT_MAX_PARALLEL_THREADS="1"
-            echo "Run $RUN: Using single-threaded execution"
-          else
-            # Random parallelization based on seed
-            PROC_COUNT=$(( ($SEED % 4) + 1 ))
-            XUNIT_MAX_PARALLEL_THREADS="$PROC_COUNT"
-            echo "Run $RUN: Using random parallelization with $PROC_COUNT threads"
-          fi
+          # Use default parallelization (2x CPU cores)
+          XUNIT_MAX_PARALLEL_THREADS="2x"
+          echo "Using default parallelization (2x)"
           
           # Run tests with or without coverage based on OS and run number
           if [ "${{ runner.os }}" == "Linux" ] && [ $RUN -eq 1 ]; then
@@ -227,7 +206,7 @@ jobs:
         done
         
         echo "============================================"
-        echo "All 10 test runs completed successfully!"
+        echo "Test run completed successfully!"
         echo "============================================"
 
     - name: Upload UnitTestsParallelizable Logs
