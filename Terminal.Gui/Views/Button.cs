@@ -78,6 +78,10 @@ public class Button : View, IDesignable
         // Replace default Select binding with HotKey for mouse clicks
         MouseBindings.Clear ();
         MouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button3Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
 

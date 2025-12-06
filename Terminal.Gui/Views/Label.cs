@@ -26,24 +26,6 @@ public class Label : View, IDesignable
         // On HoKey, pass it to the next view
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
 
-        // When clicked and can't focus, invoke HotKey command on next peer
-        AddCommand (
-                    Command.Select,
-                    ctx =>
-                    {
-                        if (RaiseSelecting (ctx) is true)
-                        {
-                            return true;
-                        }
-
-                        if (!CanFocus)
-                        {
-                            return InvokeCommand (Command.HotKey, ctx);
-                        }
-
-                        return false;
-                    });
-
         TitleChanged += Label_TitleChanged;
     }
 
@@ -96,6 +78,18 @@ public class Label : View, IDesignable
         }
 
         return false;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnSelecting (CommandEventArgs args)
+    {
+        // If Label can't focus and is clicked, invoke HotKey on next peer
+        if (!CanFocus)
+        {
+            return InvokeCommand (Command.HotKey, args.Context) == true;
+        }
+
+        return base.OnSelecting (args);
     }
 
     /// <inheritdoc/>
