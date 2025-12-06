@@ -72,7 +72,7 @@ public class MouseTests : TestsAllViews
 
         var clickedCount = 0;
 
-        view.MouseClick += (s, e) => clickedCount++;
+        view.MouseEvent += (s, e) => clickedCount += e.IsSingleDoubleOrTripleClicked ? 1 : 0;
 
         me.Flags = pressed;
         view.NewMouseEvent (me);

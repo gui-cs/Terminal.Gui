@@ -66,7 +66,7 @@ Here are some common mouse binding patterns used throughout Terminal.Gui:
 
 At the core of *Terminal.Gui*'s mouse API is the @Terminal.Gui.Input.MouseEventArgs class. The @Terminal.Gui.Input.MouseEventArgs class provides a platform-independent abstraction for common mouse events. Every mouse event can be fully described in a @Terminal.Gui.Input.MouseEventArgs instance, and most of the mouse-related APIs are simply helper functions for decoding a @Terminal.Gui.Input.MouseEventArgs.
 
-When the user does something with the mouse, the driver maps the platform-specific mouse event into a `MouseEventArgs` and calls `IApplication.Mouse.RaiseMouseEvent`. Then, `IApplication.Mouse.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `IApplication` will then call the appropriate high-level helper APIs. For example, if the user double-clicks the mouse, `View.OnMouseClick` will be called/`View.MouseClick` will be raised with the event arguments indicating which mouse button was double-clicked. 
+When the user does something with the mouse, the driver maps the platform-specific mouse event into a `MouseEventArgs` and calls `IApplication.Mouse.RaiseMouseEvent`. Then, `IApplication.Mouse.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `IApplication` will then call the appropriate high-level helper APIs.
 
 ### Mouse Event Processing Flow
 

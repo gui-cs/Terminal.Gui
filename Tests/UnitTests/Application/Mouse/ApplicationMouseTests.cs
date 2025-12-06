@@ -119,7 +119,7 @@ public class ApplicationMouseTests
 
         var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
-        view.MouseClick += (s, e) =>
+        view.MouseEvent += (s, e) =>
                            {
                                Assert.Equal (expectedX, e.Position.X);
                                Assert.Equal (expectedY, e.Position.Y);

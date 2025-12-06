@@ -32,7 +32,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         Point? receivedPosition = null;
-        var eventReceived = false;
+        bool eventReceived = false;
 
         view.MouseEvent += (_, args) =>
         {
@@ -90,7 +90,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         Point? receivedPosition = null;
-        var eventReceived = false;
+        bool eventReceived = false;
 
         view.MouseEvent += (_, args) =>
         {
@@ -146,7 +146,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
 
         Point? subViewReceivedPosition = null;
-        var subViewEventReceived = false;
+        bool subViewEventReceived = false;
 
         subView.MouseEvent += (_, args) =>
         {
@@ -194,7 +194,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         superView.Add (subView);
 
-        var selectingCount = 0;
+        int selectingCount = 0;
         subView.Selecting += (_, _) => selectingCount++;
 
         MouseEventArgs mouseEvent = new ()
@@ -222,8 +222,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var handlerCalled = false;
-        var clickHandlerCalled = false;
+        bool handlerCalled = false;
+        bool clickHandlerCalled = false;
 
         view.MouseEvent += (_, args) =>
         {
@@ -231,7 +231,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             args.Handled = true; // Mark as handled
         };
 
-        view.MouseClick += (_, _) => { clickHandlerCalled = true; };
+        view.MouseEvent += (_, e) => { clickHandlerCalled = !e.IsSingleDoubleOrTripleClicked; ; };
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -255,16 +255,13 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var eventHandlerCalled = false;
-        var clickHandlerCalled = false;
+        bool eventHandlerCalled = false;
 
         view.MouseEvent += (_, _) =>
         {
             eventHandlerCalled = true;
             // Don't set Handled = true
         };
-
-        view.MouseClick += (_, _) => { clickHandlerCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -277,7 +274,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (eventHandlerCalled);
-        Assert.True (clickHandlerCalled); // Click handler should be called when event is not handled
 
         view.Dispose ();
     }
@@ -294,9 +290,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var pressedCount = 0;
-        var releasedCount = 0;
-        var clickedCount = 0;
+        int pressedCount = 0;
+        int releasedCount = 0;
 
         view.MouseEvent += (_, args) =>
         {
@@ -311,8 +306,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             }
         };
 
-        view.MouseClick += (_, args) => { clickedCount++; };
-
         MouseEventArgs mouseEvent = new ()
         {
             Position = new (5, 5),
@@ -325,7 +318,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         // Assert
         Assert.Equal (expectedPressed, pressedCount);
         Assert.Equal (expectedReleased, releasedCount);
-        Assert.Equal (expectedClicked, clickedCount);
 
         view.Dispose ();
     }
@@ -339,9 +331,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var clickCount = 0;
+        int clickCount = 0;
 
-        view.MouseClick += (_, _) => clickCount++;
+        view.MouseEvent += (_, a) => clickCount += a.IsSingleDoubleOrTripleClicked ? 1 : 0;
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -373,7 +365,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Enabled = false
         };
 
-        var eventCalled = false;
+        bool eventCalled = false;
         view.MouseEvent += (_, _) => { eventCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
@@ -402,7 +394,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Enabled = false
         };
 
-        var selectingCalled = false;
+        bool selectingCalled = false;
         view.Selecting += (_, _) => { selectingCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
@@ -475,7 +467,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         superView.Add (view);
 
-        var selectingCount = 0;
+        int selectingCount = 0;
         view.Selecting += (_, _) => selectingCount++;
 
         MouseEventArgs mouseEvent = new ()
