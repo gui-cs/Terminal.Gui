@@ -42,7 +42,7 @@ NewMouseEvent()
 **Porting Strategy:**
 1. Remove `MouseClick += Button_MouseClick;`
 2. Remove `Button_MouseClick` method
-3. Add: `MouseBindings.Replace(MouseFlags.Button1Clicked, Command.HotKey);`
+3. Add: `MouseBindings.Add(MouseFlags.Button1Clicked, Command.HotKey);` (or use Clear() first if needed)
 4. Tests already exist that validate button clicks work
 
 **Related Tests:**
@@ -105,13 +105,13 @@ NewMouseEvent()
 
 ---
 
-### 5. TextView.cs - **COMPLEX** 🔴
+### 5. TextView.cs - **NO CHANGE NEEDED** ✅
 **Current Usage:**
 - Lines 1559, 1599, 1650, 1663, 1698, 1726: Calls `ProcessMouseClick()`
 - Line 4046: Private method that calculates row/column from mouse position
 - Called from `OnMouseEvent()` for various mouse flags
 
-**Complexity:** COMPLEX
+**Complexity:** NO CHANGE NEEDED
 - ProcessMouseClick is called from multiple places in OnMouseEvent
 - Used for Button1Clicked, Button1DoubleClicked, Button1TripleClicked, and dragging
 - The logic is tightly integrated with the mouse event handling
@@ -253,15 +253,15 @@ Test files using MouseClick:
 - **Already Done:** 1 (HexView)
 - **Simple (1-2 steps):** 6 (Button, Label, TabRow, TreeTableSource, CheckBoxTableSourceWrapper, FileDialog)
 - **Moderate (3-5 steps):** 2 (ScrollBar, TabView)
-- **Complex/No Change:** 1 (TextView - private method, not the API)
+- **No Change Needed:** 1 (TextView - private method, not the API)
 - **Scenarios:** 10 (All simple)
 
 ### Recommended Porting Order:
-1. **Phase 1:** Port Scenarios (all simple, good for learning)
-2. **Phase 2:** Port Simple Views (Button, Label, etc.)
-3. **Phase 3:** Port Moderate Views (ScrollBar, TabView)
-4. **Phase 4:** Update/Remove Tests
-5. **Phase 5:** Remove the API from View.Mouse.cs
+1. **Phase 2:** Port Scenarios (all simple, good for learning)
+2. **Phase 3:** Port Simple Views (Button, Label, etc.)
+3. **Phase 4:** Port Moderate Views (ScrollBar, TabView)
+4. **Phase 5:** Update/Remove Tests
+5. **Phase 6:** Remove the API from View.Mouse.cs
 
 ### Key Insights:
 1. Most Views just forward MouseClick to a Command - very simple ports
@@ -271,10 +271,10 @@ Test files using MouseClick:
 
 ---
 
-## Next Steps
-1. ✅ Create this analysis document
-2. ⬜ Port Scenarios (Examples/UICatalog)
-3. ⬜ Port Simple Views
-4. ⬜ Port Moderate Views  
-5. ⬜ Update Tests
-6. ⬜ Remove API from View.Mouse.cs
+## Next Steps (Post Phase 1)
+1. ✅ Phase 1: Create this analysis document
+2. ⬜ Phase 2: Port Scenarios (Examples/UICatalog)
+3. ⬜ Phase 3: Port Simple Views
+4. ⬜ Phase 4: Port Moderate Views  
+5. ⬜ Phase 5: Update Tests
+6. ⬜ Phase 6: Remove API from View.Mouse.cs
