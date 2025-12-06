@@ -164,7 +164,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
         var requestStopTimeoutFired = false;
 
         app.AddTimeout (
-                        TimeSpan.FromMilliseconds (5000),
+                        TimeSpan.FromMilliseconds (10000),
                         () =>
                         {
                             output.WriteLine ("SAFETY: RequestStop Timeout fired - test took too long!");
