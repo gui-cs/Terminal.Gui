@@ -151,7 +151,7 @@ public class OutputBaseTests
         Assert.False (buffer.Contents! [0, 2].IsDirty);
 
         // Verify SetCursorPositionImpl was invoked by WriteToConsole (cursor set to a written column)
-        Assert.Equal (new Point (0, 0), output.GetCursorPosition ());
+        Assert.Equal (new Point (2, 0), output.GetCursorPosition ());
     }
 
     [Theory]
