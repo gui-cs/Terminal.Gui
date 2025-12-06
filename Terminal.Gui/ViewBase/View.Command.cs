@@ -202,6 +202,48 @@ public partial class View // Command APIs
     public event EventHandler<CommandEventArgs>? Accepting;
 
     /// <summary>
+    ///     Raises the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating the View has been accepted.
+    ///     This is called after <see cref="Accepting"/> has been raised and not cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="Accepting"/>, this event cannot be cancelled. It is raised after the View has been accepted.
+    ///     </para>
+    /// </remarks>
+    /// <param name="ctx">The command context.</param>
+    protected void RaiseAccepted (ICommandContext? ctx)
+    {
+        CommandEventArgs args = new () { Context = ctx };
+
+        OnAccepted (args);
+        Accepted?.Invoke (this, args);
+    }
+
+    /// <summary>
+    ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="OnAccepting"/>, this method is called after the View has been accepted and cannot cancel the operation.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args">The event arguments.</param>
+    protected virtual void OnAccepted (CommandEventArgs args) { }
+
+    /// <summary>
+    ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="Accepting"/>, this event cannot be cancelled. It is raised after the View has been accepted.
+    ///     </para>
+    ///     <para>
+    ///         See <see cref="RaiseAccepted"/> for more information.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<CommandEventArgs>? Accepted;
+
+    /// <summary>
     ///     Called when the user has performed an action (e.g. <see cref="Command.Select"/>) causing the View to change state.
     ///     Calls <see cref="OnSelecting"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
     ///     event. The default <see cref="Command.Select"/> handler calls this method.

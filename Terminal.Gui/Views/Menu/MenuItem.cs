@@ -205,42 +205,7 @@ public class MenuItem : Shortcut
         return base.OnMouseEnter (eventArgs);
     }
 
-    // TODO: Consider moving Accepted to Shortcut?
 
-    /// <summary>
-    ///     Raises the <see cref="OnAccepted"/>/<see cref="Accepted"/> event indicating this item (or submenu)
-    ///     was accepted. This is used to determine when to hide the menu.
-    /// </summary>
-    /// <param name="ctx"></param>
-    /// <returns></returns>
-    protected void RaiseAccepted (ICommandContext? ctx)
-    {
-        //Logging.Trace ($"RaiseAccepted: {ctx}");
-        CommandEventArgs args = new () { Context = ctx };
-
-        OnAccepted (args);
-        Accepted?.Invoke (this, args);
-    }
-
-    /// <summary>
-    ///     Called when the user has accepted an item in this menu (or submenu). This is used to determine when to hide the
-    ///     menu.
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    /// <param name="args"></param>
-    protected virtual void OnAccepted (CommandEventArgs args) { }
-
-    /// <summary>
-    ///     Raised when the user has accepted an item in this menu (or submenu). This is used to determine when to hide the
-    ///     menu.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         See <see cref="RaiseAccepted"/> for more information.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<CommandEventArgs>? Accepted;
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
