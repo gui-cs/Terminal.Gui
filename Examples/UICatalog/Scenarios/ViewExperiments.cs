@@ -86,18 +86,19 @@ public class ViewExperiments : Scenario
             //App?.Popover!.Visible = true;
         }
 
-        testFrame.MouseClick += TestFrameOnMouseClick;
-
-        void TestFrameOnMouseClick (object sender, MouseEventArgs e)
+        testFrame.Selecting += (sender, e) =>
         {
-            if (e.Flags == MouseFlags.Button3Clicked)
+            if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
-                popoverView.X = e.ScreenPosition.X;
-                popoverView.Y = e.ScreenPosition.Y;
-                //App?.Popover = popoverView;
-                //App?.Popover!.Visible = true;
+                if (mouseArgs.Flags == MouseFlags.Button3Clicked)
+                {
+                    popoverView.X = mouseArgs.ScreenPosition.X;
+                    popoverView.Y = mouseArgs.ScreenPosition.Y;
+                    //App?.Popover = popoverView;
+                    //App?.Popover!.Visible = true;
+                }
             }
-        }
+        };
 
         testFrame.Add (button);
 

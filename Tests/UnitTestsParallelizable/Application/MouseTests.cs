@@ -128,46 +128,46 @@ public class MouseTests
     [Theory]
 
     // click on border
-    [InlineData (0, 0, 0, 0, 0, false)]
-    [InlineData (0, 1, 0, 0, 0, false)]
-    [InlineData (0, 0, 1, 0, 0, false)]
-    [InlineData (0, 9, 0, 0, 0, false)]
-    [InlineData (0, 0, 9, 0, 0, false)]
+    [InlineData (0, 0, 0, 0, 0, 0)]
+    [InlineData (0, 1, 0, 0, 0, 0)]
+    [InlineData (0, 0, 1, 0, 0, 0)]
+    [InlineData (0, 9, 0, 0, 0, 0)]
+    [InlineData (0, 0, 9, 0, 0, 0)]
 
     // outside border
-    [InlineData (0, 10, 0, 0, 0, false)]
-    [InlineData (0, 0, 10, 0, 0, false)]
+    [InlineData (0, 10, 0, 0, 0, 0)]
+    [InlineData (0, 0, 10, 0, 0, 0)]
 
     // view is offset from origin ; click is on border
-    [InlineData (1, 1, 1, 0, 0, false)]
-    [InlineData (1, 2, 1, 0, 0, false)]
-    [InlineData (1, 1, 2, 0, 0, false)]
-    [InlineData (1, 10, 1, 0, 0, false)]
-    [InlineData (1, 1, 10, 0, 0, false)]
+    [InlineData (1, 1, 1, 0, 0, 0)]
+    [InlineData (1, 2, 1, 0, 0, 0)]
+    [InlineData (1, 1, 2, 0, 0, 0)]
+    [InlineData (1, 10, 1, 0, 0, 0)]
+    [InlineData (1, 1, 10, 0, 0, 0)]
 
     // outside border
-    [InlineData (1, -1, 0, 0, 0, false)]
-    [InlineData (1, 0, -1, 0, 0, false)]
-    [InlineData (1, 10, 10, 0, 0, false)]
-    [InlineData (1, 11, 11, 0, 0, false)]
+    [InlineData (1, -1, 0, 0, 0, 0)]
+    [InlineData (1, 0, -1, 0, 0, 0)]
+    [InlineData (1, 10, 10, 0, 0, 0)]
+    [InlineData (1, 11, 11, 0, 0, 0)]
 
     // view is at origin, click is inside border
-    [InlineData (0, 1, 1, 0, 0, true)]
-    [InlineData (0, 2, 1, 1, 0, true)]
-    [InlineData (0, 1, 2, 0, 1, true)]
-    [InlineData (0, 8, 1, 7, 0, true)]
-    [InlineData (0, 1, 8, 0, 7, true)]
-    [InlineData (0, 8, 8, 7, 7, true)]
+    [InlineData (0, 1, 1, 0, 0, 1)]
+    [InlineData (0, 2, 1, 1, 0, 1)]
+    [InlineData (0, 1, 2, 0, 1, 1)]
+    [InlineData (0, 8, 1, 7, 0, 1)]
+    [InlineData (0, 1, 8, 0, 7, 1)]
+    [InlineData (0, 8, 8, 7, 7, 1)]
 
     // view is offset from origin ; click inside border
     // our view is 10x10, but has a border, so it's bounds is 8x8
-    [InlineData (1, 2, 2, 0, 0, true)]
-    [InlineData (1, 3, 2, 1, 0, true)]
-    [InlineData (1, 2, 3, 0, 1, true)]
-    [InlineData (1, 9, 2, 7, 0, true)]
-    [InlineData (1, 2, 9, 0, 7, true)]
-    [InlineData (1, 9, 9, 7, 7, true)]
-    [InlineData (1, 10, 10, 7, 7, false)]
+    [InlineData (1, 2, 2, 0, 0, 1)]
+    [InlineData (1, 3, 2, 1, 0, 1)]
+    [InlineData (1, 2, 3, 0, 1, 1)]
+    [InlineData (1, 9, 2, 7, 0, 1)]
+    [InlineData (1, 2, 9, 0, 7, 1)]
+    [InlineData (1, 9, 9, 7, 7, 1)]
+    [InlineData (1, 10, 10, 7, 7, 0)]
 
     //01234567890123456789
     // |12345678|
@@ -178,13 +178,13 @@ public class MouseTests
         int clickY,
         int expectedX,
         int expectedY,
-        bool expectedClicked
+        int expectedClickedCount
     )
     {
         Size size = new (10, 10);
         Point pos = new (offset, offset);
 
-        var clicked = false;
+        int clickedCount = 0;
 
         using IApplication? application = Application.Create ();
 
@@ -208,14 +208,14 @@ public class MouseTests
 
         var mouseEvent = new MouseEventArgs { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
-        view.MouseClick += (s, e) =>
+        view.MouseEvent += (_s, e) =>
         {
             Assert.Equal (expectedX, e.Position.X);
             Assert.Equal (expectedY, e.Position.Y);
-            clicked = true;
+            clickedCount += e.IsSingleDoubleOrTripleClicked ? 1 : 0;
         };
 
         application.Mouse.RaiseMouseEvent (mouseEvent);
-        Assert.Equal (expectedClicked, clicked);
+        Assert.Equal (expectedClickedCount, clickedCount);
     }
 }
