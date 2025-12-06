@@ -131,7 +131,7 @@ public class ViewCommandTests
     [Fact]
     public void Accepted_Event_Is_Raised_After_Accepting_When_Handled ()
     {
-        var view = new View ();
+        View view = new ();
         var acceptingInvoked = false;
         var acceptedInvoked = false;
 
@@ -156,7 +156,7 @@ public class ViewCommandTests
     [Fact]
     public void Accepted_Event_Not_Raised_When_Accepting_Not_Handled ()
     {
-        var view = new View ();
+        View view = new ();
         var acceptingInvoked = false;
         var acceptedInvoked = false;
 
@@ -181,7 +181,7 @@ public class ViewCommandTests
     [Fact]
     public void Accepted_Event_Cannot_Be_Cancelled ()
     {
-        var view = new View ();
+        View view = new ();
         var acceptedInvoked = false;
 
         view.Accepting += (sender, e) =>
@@ -204,7 +204,7 @@ public class ViewCommandTests
     [Fact]
     public void OnAccepted_Called_When_Accepting_Handled ()
     {
-        var view = new OnAcceptedTestView ();
+        OnAcceptedTestView view = new ();
 
         view.Accepting += (sender, e) =>
                           {
@@ -218,7 +218,7 @@ public class ViewCommandTests
     [Fact]
     public void OnAccepted_Not_Called_When_Accepting_Not_Handled ()
     {
-        var view = new OnAcceptedTestView ();
+        OnAcceptedTestView view = new ();
 
         view.Accepting += (sender, e) =>
                           {
