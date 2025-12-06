@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui.App;
@@ -45,7 +44,6 @@ internal static class ClipboardProcessRunner
             CreateNoWindow = true
         };
 
-        TaskCompletionSource<bool> eventHandled = new ();
         process.Start ();
 
         if (!string.IsNullOrEmpty (input))

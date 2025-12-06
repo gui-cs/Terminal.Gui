@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.Views;
 
@@ -132,7 +132,7 @@ public class ProgressBar : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         SetAttribute (GetAttributeForRole (VisualRole.Active));
 
@@ -185,12 +185,12 @@ public class ProgressBar : View, IDesignable
                             GetAttributeForRole (VisualRole.Active).Style);
             }
 
-            tf.Draw (   
-                     ViewportToScreen (Viewport),
-                     attr,
-                     GetAttributeForRole (VisualRole.Normal),
-                     SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle)
-                    );
+            tf.Draw (
+                     driver: Driver,
+                     screen: ViewportToScreen (Viewport),
+                     normalColor: attr,
+                     hotColor: GetAttributeForRole (VisualRole.Normal),
+                     maximum: SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle));
         }
 
         return true;

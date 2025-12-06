@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 
 namespace UICatalog.Scenarios;
 
@@ -8,99 +10,173 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public class RuneWidthGreaterThanOne : Scenario
 {
-    private Button _button;
-    private Label _label;
-    private Label _labelR;
-    private Label _labelV;
-    private string _lastRunesUsed;
-    private TextField _text;
-    private Window _win;
+    private Button? _button;
+    private Label? _label;
+    private Label? _labelR;
+    private Label? _labelV;
+    private string? _lastRunesUsed;
+    private TextField? _text;
+    private Window? _win;
 
     public override void Main ()
     {
         Application.Init ();
 
-        Toplevel topLevel = new ();
-
-        var menu = new MenuBar
+        // Window (top-level)
+        Window win = new ()
         {
-            Menus =
-            [
-                new MenuBarItem (
-                                 "Padding",
-                                 new MenuItem []
-                                 {
-                                     new (
-                                          "With Padding",
-                                          "",
-                                          () => _win.Padding.Thickness =
-                                                    new Thickness (1)
-                                         ),
-                                     new (
-                                          "Without Padding",
-                                          "",
-                                          () => _win.Padding.Thickness =
-                                                    new Thickness (0)
-                                         )
-                                 }
-                                ),
-                new MenuBarItem (
-                                 "BorderStyle",
-                                 new MenuItem []
-                                 {
-                                     new (
-                                          "Single",
-                                          "",
-                                          () => _win.BorderStyle = LineStyle.Single
-                                         ),
-                                     new (
-                                          "None",
-                                          "",
-                                          () => _win.BorderStyle = LineStyle.None
-                                         )
-                                 }
-                                ),
-                new MenuBarItem (
-                                 "Runes length",
-                                 new MenuItem []
-                                 {
-                                     new ("Wide", "", WideRunes),
-                                     new ("Narrow", "", NarrowRunes),
-                                     new ("Mixed", "", MixedRunes)
-                                 }
-                                )
-            ]
+            X = 5,
+            Y = 5,
+            Width = Dim.Fill (22),
+            Height = Dim.Fill (5),
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable
+        };
+        _win = win;
+
+        // MenuBar
+        MenuBar menu = new ();
+
+        // Controls
+        _label = new ()
+        {
+            X = Pos.Center (),
+            Y = 1
         };
 
-        _label = new Label
+        _text = new ()
         {
-            X = Pos.Center (), Y = 1,
+            X = Pos.Center (),
+            Y = 3,
+            Width = 20
         };
-        _text = new TextField { X = Pos.Center (), Y = 3, Width = 20 };
-        _button = new Button { X = Pos.Center (), Y = 5 };
-        _labelR = new Label { X = Pos.AnchorEnd (30), Y = 18 };
 
-        _labelV = new Label
+        _button = new ()
         {
-            TextDirection = TextDirection.TopBottom_LeftRight, X = Pos.AnchorEnd (30), Y = Pos.Bottom (_labelR)
+            X = Pos.Center (),
+            Y = 5
         };
-        _win = new Window { X = 5, Y = 5, Width = Dim.Fill (22), Height = Dim.Fill (5) };
-        _win.Add (_label, _text, _button, _labelR, _labelV);
-        topLevel.Add (menu, _win);
+
+        _labelR = new ()
+        {
+            X = Pos.AnchorEnd (30),
+            Y = 18
+        };
+
+        _labelV = new ()
+        {
+            TextDirection = TextDirection.TopBottom_LeftRight,
+            X = Pos.AnchorEnd (30),
+            Y = Pos.Bottom (_labelR)
+        };
+
+        menu.Add (
+            new MenuBarItem (
+                "Padding",
+                [
+                    new MenuItem
+                    {
+                        Title = "With Padding",
+                        Action = () =>
+                        {
+                            if (_win is { })
+                            {
+                                _win.Padding!.Thickness = new (1);
+                            }
+                        }
+                    },
+                    new MenuItem
+                    {
+                        Title = "Without Padding",
+                        Action = () =>
+                        {
+                            if (_win is { })
+                            {
+                                _win.Padding!.Thickness = new (0);
+                            }
+                        }
+                    }
+                ]
+            )
+        );
+
+        menu.Add (
+            new MenuBarItem (
+                "BorderStyle",
+                [
+                    new MenuItem
+                    {
+                        Title = "Single",
+                        Action = () =>
+                        {
+                            if (_win is { })
+                            {
+                                _win.BorderStyle = LineStyle.Single;
+                            }
+                        }
+                    },
+                    new MenuItem
+                    {
+                        Title = "None",
+                        Action = () =>
+                        {
+                            if (_win is { })
+                            {
+                                _win.BorderStyle = LineStyle.None;
+                            }
+                        }
+                    }
+                ]
+            )
+        );
+
+        menu.Add (
+            new MenuBarItem (
+                "Runes length",
+                [
+                    new MenuItem
+                    {
+                        Title = "Wide",
+                        Action = WideRunes
+                    },
+                    new MenuItem
+                    {
+                        Title = "Narrow",
+                        Action = NarrowRunes
+                    },
+                    new MenuItem
+                    {
+                        Title = "Mixed",
+                        Action = MixedRunes
+                    }
+                ]
+            )
+        );
+
+        // Add views in order of visual appearance
+        win.Add (menu, _label, _text, _button, _labelR, _labelV);
 
         WideRunes ();
 
-        //NarrowRunes ();
-        //MixedRunes ();
-        Application.Run (topLevel);
-        topLevel.Dispose ();
+        Application.Run (win);
+        win.Dispose ();
         Application.Shutdown ();
     }
 
-    private void MixedMessage (object sender, EventArgs e) { MessageBox.Query ("Say Hello 你", $"Hello {_text.Text}", "Ok"); }
+    private void MixedMessage (object? sender, EventArgs e)
+    {
+        if (_text is { })
+        {
+            MessageBox.Query (Application.Instance, "Say Hello 你", $"Hello {_text.Text}", "Ok");
+        }
+    }
 
     private void MixedRunes ()
     {
+        if (_label is null || _text is null || _button is null || _labelR is null || _labelV is null || _win is null)
+        {
+            return;
+        }
+
         UnsetClickedEvent ();
         _label.Text = "Enter your name 你:";
         _text.Text = "gui.cs 你:";
@@ -117,10 +193,21 @@ public class RuneWidthGreaterThanOne : Scenario
         Application.LayoutAndDraw ();
     }
 
-    private void NarrowMessage (object sender, EventArgs e) { MessageBox.Query ("Say Hello", $"Hello {_text.Text}", "Ok"); }
+    private void NarrowMessage (object? sender, EventArgs e)
+    {
+        if (_text is { })
+        {
+            MessageBox.Query (Application.Instance, "Say Hello", $"Hello {_text.Text}", "Ok");
+        }
+    }
 
     private void NarrowRunes ()
     {
+        if (_label is null || _text is null || _button is null || _labelR is null || _labelV is null || _win is null)
+        {
+            return;
+        }
+
         UnsetClickedEvent ();
         _label.Text = "Enter your name:";
         _text.Text = "gui.cs";
@@ -139,6 +226,11 @@ public class RuneWidthGreaterThanOne : Scenario
 
     private void UnsetClickedEvent ()
     {
+        if (_button is null)
+        {
+            return;
+        }
+
         switch (_lastRunesUsed)
         {
             case "Narrow":
@@ -156,10 +248,21 @@ public class RuneWidthGreaterThanOne : Scenario
         }
     }
 
-    private void WideMessage (object sender, EventArgs e) { MessageBox.Query ("こんにちはと言う", $"こんにちは {_text.Text}", "Ok"); }
+    private void WideMessage (object? sender, EventArgs e)
+    {
+        if (_text is { })
+        {
+            MessageBox.Query (Application.Instance, "こんにちはと言う", $"こんにちは {_text.Text}", "Ok");
+        }
+    }
 
     private void WideRunes ()
     {
+        if (_label is null || _text is null || _button is null || _labelR is null || _labelV is null || _win is null)
+        {
+            return;
+        }
+
         UnsetClickedEvent ();
         _label.Text = "あなたの名前を入力してください：";
         _text.Text = "ティラミス";

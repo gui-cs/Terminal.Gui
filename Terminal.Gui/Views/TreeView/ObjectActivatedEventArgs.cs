@@ -1,3 +1,4 @@
+#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>Event args for the <see cref="TreeView{T}.ObjectActivated"/> event</summary>

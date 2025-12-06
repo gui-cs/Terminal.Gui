@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 using ColorHelper;
 
 namespace Terminal.Gui.Views;
@@ -15,7 +13,7 @@ internal abstract class ColorBar : View, IColorBar
     /// </summary>
     protected ColorBar ()
     {
-        Height = 1;
+        Height = Dim.Auto (minimumContentDim: 1);
         Width = Dim.Fill ();
         CanFocus = true;
 
@@ -83,17 +81,14 @@ internal abstract class ColorBar : View, IColorBar
         SetNeedsDraw ();
     }
 
-    /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
+        base.OnSubViewsLaidOut (args);
         var xOffset = 0;
 
         if (!string.IsNullOrWhiteSpace (Text))
         {
-            Move (0, 0);
-            SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal));
-            AddStr (Text);
-
             // TODO: is there a better method than this? this is what it is in TableView
             xOffset = Text.EnumerateRunes ().Sum (c => c.GetColumns ());
         }
@@ -101,7 +96,21 @@ internal abstract class ColorBar : View, IColorBar
         _barWidth = Viewport.Width - xOffset;
         _barStartsAt = xOffset;
 
-        DrawBar (xOffset, 0, _barWidth);
+        // Each 1 unit of X in the bar corresponds to this much of Value
+        _cellValue = (double)MaxValue / (_barWidth - 1);
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnDrawingContent (DrawContext? context)
+    {
+        if (!string.IsNullOrWhiteSpace (Text))
+        {
+            Move (0, 0);
+            SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal));
+            AddStr (Text);
+        }
+
+        DrawBar (_barStartsAt, 0, _barWidth);
 
         return true;
     }
@@ -124,7 +133,6 @@ internal abstract class ColorBar : View, IColorBar
 
             mouseEvent.Handled = true;
             SetFocus ();
-
         }
 
         return mouseEvent.Handled;
@@ -168,9 +176,6 @@ internal abstract class ColorBar : View, IColorBar
 
     private void DrawBar (int xOffset, int yOffset, int width)
     {
-        // Each 1 unit of X in the bar corresponds to this much of Value
-        _cellValue = (double)MaxValue / (width - 1);
-
         for (var x = 0; x < width; x++)
         {
             double fraction = (double)x / (width - 1);

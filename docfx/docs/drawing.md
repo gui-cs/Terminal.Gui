@@ -8,7 +8,28 @@ Terminal.Gui provides a set of APIs for formatting text, line drawing, and chara
 
 # View Drawing API
 
-Terminal.Gui apps draw using the @Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32) and @Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune) APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the @Terminal.Gui.Drawing.Attribute that was most recently set via @Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute). The @Terminal.Gui.Drivers.ConsoleDriver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
+Terminal.Gui apps draw using the @Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32) and @Terminal.Gui.ViewBase.View.AddRune(System.Text.Rune) APIs. Move selects the column and row of the cell and AddRune places the specified glyph in that cell using the @Terminal.Gui.Drawing.Attribute that was most recently set via @Terminal.Gui.ViewBase.View.SetAttribute(Terminal.Gui.Drawing.Attribute). The driver caches all changed Cells and efficiently outputs them to the terminal each iteration of the Application. In other words, Terminal.Gui uses deferred rendering. 
+
+## Drawing Lifecycle
+
+**Drawing occurs during Application MainLoop iterations**, not immediately when draw-related methods are called. This deferred rendering approach provides better performance and ensures visual consistency.
+
+### MainLoop Iteration Process
+
+Each iteration of the @Terminal.Gui.App.Application MainLoop (throttled to a maximum rate) performs these steps in order:
+
+1. **Layout** - Views that need layout are measured and positioned (@Terminal.Gui.ViewBase.View.LayoutSubviews is called)
+2. **Draw** - Views that need drawing update the driver's back buffer (@Terminal.Gui.ViewBase.View.Draw is called)
+3. **Write** - The driver writes changed portions of the back buffer to the actual terminal
+4. **Cursor** - The driver ensures the cursor is positioned correctly with appropriate visibility
+
+### When Drawing Actually Occurs
+
+- **Normal Operation**: Drawing happens automatically during MainLoop iterations when @Terminal.Gui.ViewBase.View.NeedsDraw or @Terminal.Gui.ViewBase.View.SubViewNeedsDraw is set
+- **Forced Update**: @Terminal.Gui.App.Application.LayoutAndDraw can be called to immediately trigger layout and drawing outside of the normal iteration cycle
+- **Testing**: Tests can call @Terminal.Gui.ViewBase.View.Draw directly to update the back buffer, then call @Terminal.Gui.Drivers.IDriver.Refresh to output to the terminal
+
+**Important**: Calling `View.Draw()` does not immediately update the terminal screen. It only updates the driver's back buffer. The actual terminal output occurs when the driver's `Refresh()` method is called, which happens automatically during MainLoop iterations.
 
 ## Coordinate System for Drawing
 
@@ -26,7 +47,7 @@ See [Layout](layout.md) for more details of the Terminal.Gui coordinate system.
 
 1) Adding the text to a @Terminal.Gui.Text.TextFormatter object.
 2) Setting formatting options, such as @Terminal.Gui.Text.TextFormatter.Alignment.
-3) Calling @Terminal.Gui.Text.TextFormatter.Draw(System.Drawing.Rectangle,Terminal.Gui.Drawing.Attribute,Terminal.Gui.Drawing.Attribute,System.Drawing.Rectangle,Terminal.Gui.Drivers.IConsoleDriver).
+3) Calling @Terminal.Gui.Text.TextFormatter.Draw(Terminal.Gui.Drivers.IDriver, System.Drawing.Rectangle,Terminal.Gui.Drawing.Attribute,Terminal.Gui.Drawing.Attribute,System.Drawing.Rectangle).
 
 ## Line drawing
 
@@ -60,20 +81,20 @@ Then, after the above steps have completed, the Mainloop will iterate through al
 
 If a View need to redraw because something changed within it's Content Area it can call @Terminal.Gui.ViewBase.View.SetNeedsDraw. If a View needs to be redrawn because something has changed the size of the Viewport, it can call @Terminal.Gui.ViewBase.View.SetNeedsLayout.
 
+**Note**: Calling `SetNeedsDraw()` does not immediately cause drawing to occur. It marks the view as needing to be redrawn, which will happen in the next MainLoop iteration. To force immediate drawing (typically only needed in tests), call @Terminal.Gui.App.Application.LayoutAndDraw.
+
 ## Clipping
 
-Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the @Terminal.Gui.Drivers.ConsoleDriver. Terminal.Gui supports non-rectangular clip regions with @Terminal.Gui.Drawing.Region. @Terminal.Gui.Drivers.ConsoleDriver.Clip is the application managed clip region and is managed by @Terminal.Gui.App.Application. Developers cannot change this directly, but can use @Terminal.Gui.ViewBase.View.SetClipToScreen, @Terminal.Gui.ViewBase.View.SetClip(Terminal.Gui.Drawing.Region), @Terminal.Gui.ViewBase.View.SetClipToFrame, etc...
+Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with @Terminal.Gui.Drawing.Region. The driver.Clip is the application managed clip region and is managed by @Terminal.Gui.App.Application. Developers cannot change this directly, but can use @Terminal.Gui.ViewBase.View.SetClipToScreen, @Terminal.Gui.ViewBase.View.SetClip(Terminal.Gui.Drawing.Region), @Terminal.Gui.ViewBase.View.SetClipToFrame, etc...
 
 
 ## Cell
 
 The @Terminal.Gui.Drawing.Cell class represents a single cell on the screen. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type @Terminal.Gui.Drawing.Attribute.
 
-`Cell` is not exposed directly to the developer. Instead, the @Terminal.Gui.Drivers.ConsoleDriver classes manage the `Cell` array that represents the screen.
+`Cell` is not exposed directly to the developer. Instead, the driver classes manage the `Cell` array that represents the screen.
 
 To draw a `Cell` to the screen, use @Terminal.Gui.ViewBase.View.Move(System.Int32,System.Int32) to specify the row and column coordinates and then use the @Terminal.Gui.ViewBase.View.AddRune(System.Int32,System.Int32,System.Text.Rune) method to draw a single glyph.  
-
-// ... existing code ...
 
 ## Attribute 
 
@@ -100,7 +121,53 @@ SetAttributeForRole (VisualRole.Focus);
 AddStr ("Red on Black Underlined.");
 ```
 
-// ... existing code ...
+## Color
+
+Terminal.Gui supports 24-bit true color (16.7 million colors) via the @Terminal.Gui.Drawing.Color struct. The @Terminal.Gui.Drawing.Color struct represents colors in ARGB32 format, with separate bytes for Alpha (transparency), Red, Green, and Blue components.
+
+### Standard Colors (W3C+)
+
+Terminal.Gui provides comprehensive support for W3C standard color names plus additional common terminal colors via the @Terminal.Gui.Drawing.StandardColor enum. This includes all standard W3C colors (like `AliceBlue`, `Red`, `Tomato`, etc.) as well as classic terminal colors (like `AmberPhosphor`, `GreenPhosphor`).
+
+Colors can be created from standard color names:
+
+```cs
+var color1 = new Color(StandardColor.CornflowerBlue);
+var color2 = new Color(StandardColor.Tomato);
+var color3 = new Color("Red");  // Case-insensitive color name parsing
+```
+
+Standard colors can also be parsed from strings:
+
+```cs
+if (Color.TryParse("CornflowerBlue", out Color color))
+{
+    // Use the color
+}
+```
+
+### Alpha Channel and Transparency
+
+While @Terminal.Gui.Drawing.Color supports an alpha channel for transparency (values 0-255), **terminal rendering does not currently support alpha blending**. The alpha channel is primarily used to:
+
+- Indicate whether a color should be rendered at all (alpha = 0 means fully transparent/don't render)
+- Support future transparency features
+- Enable terminal background pass-through (see [#2381](https://github.com/gui-cs/Terminal.Gui/issues/2381) and [#4229](https://github.com/gui-cs/Terminal.Gui/issues/4229))
+
+**Important**: When matching colors to standard color names, the alpha channel is **ignored**. This means `Color(255, 0, 0, 255)` (opaque red) and `Color(255, 0, 0, 128)` (semi-transparent red) will both be recognized as "Red". This design decision supports the vision of enabling transparent backgrounds while still being able to identify colors semantically.
+
+```cs
+var opaqueRed = new Color(255, 0, 0, 255);
+var transparentRed = new Color(255, 0, 0, 0);
+
+// Both will resolve to "Red"
+ColorStrings.GetColorName(opaqueRed);      // Returns "Red"
+ColorStrings.GetColorName(transparentRed); // Returns "Red"
+```
+
+### Legacy 16-Color Support
+
+For backwards compatibility and terminals with limited color support, Terminal.Gui maintains the legacy 16-color system via @Terminal.Gui.Drawing.ColorName16. When true color is not available or when `Application.Force16Colors` is set, Terminal.Gui will map true colors to the nearest 16-color equivalent.
 
 ## VisualRole
 
@@ -141,4 +208,30 @@ See [View Deep Dive](View.md) for details.
 
 ## Diagnostics
 
-The @Terminal.Gui.ViewBase.ViewDiagnosticFlags.DrawIndicator flag can be set on @Terminal.Gui.ViewBase.View.Diagnostics to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either @Terminal.Gui.ViewBase.View.NeedsDraw or @Terminal.Gui.ViewBase.View.SubViewNeedsDraw is set. 
+The @Terminal.Gui.ViewBase.ViewDiagnosticFlags.DrawIndicator flag can be set on @Terminal.Gui.ViewBase.View.Diagnostics to cause an animated glyph to appear in the `Border` of each View. The glyph will animate each time that View's `Draw` method is called where either @Terminal.Gui.ViewBase.View.NeedsDraw or @Terminal.Gui.ViewBase.View.SubViewNeedsDraw is set.
+
+## Accessing Application Drawing Context
+
+Views can access application-level drawing functionality through `View.App`:
+
+```csharp
+public class CustomView : View
+{
+    protected override bool OnDrawingContent()
+    {
+        // Access driver capabilities through View.App
+        if (App?.Driver?.SupportsTrueColor == true)
+        {
+            // Use true color features
+            SetAttribute(new Attribute(Color.FromRgb(255, 0, 0), Color.FromRgb(0, 0, 255)));
+        }
+        else
+        {
+            // Fallback to 16-color mode
+            SetAttributeForRole(VisualRole.Normal);
+        }
+        
+        AddStr("Custom drawing with application context");
+        return true;
+    }
+}

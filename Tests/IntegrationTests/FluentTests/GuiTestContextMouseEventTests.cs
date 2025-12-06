@@ -152,7 +152,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view1)
                                            .Add (view2)
-                                           .Then (() => view1.SetFocus ())
+                                           .Then ((_) => view1.SetFocus ())
                                            .AssertTrue (view1.HasFocus)
                                            .LeftClick (25, 7) // Click on view2
                                            .AssertFalse (view1.HasFocus)

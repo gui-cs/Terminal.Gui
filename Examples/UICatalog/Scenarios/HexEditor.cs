@@ -14,7 +14,7 @@ public class HexEditor : Scenario
 {
     private string? _fileName;
     private HexView? _hexView;
-    private MenuItemv2? _miReadOnly;
+    private MenuItem? _miReadOnly;
     private bool _saved = true;
     private Shortcut? _scAddress;
     private Shortcut? _scInfo;
@@ -49,13 +49,13 @@ public class HexEditor : Scenario
 
         app.Add (_hexView);
 
-        var menu = new MenuBarv2
+        var menu = new MenuBar
         {
             Menus =
             [
                 new (
                      "_File",
-                     new MenuItemv2 []
+                     new MenuItem []
                      {
                          new ("_New", "", New),
                          new ("_Open", "", Open),
@@ -66,7 +66,7 @@ public class HexEditor : Scenario
                     ),
                 new (
                      "_Edit",
-                     new MenuItemv2 []
+                     new MenuItem []
                      {
                          new ("_Copy", "", Copy),
                          new ("C_ut", "", Cut),
@@ -75,7 +75,7 @@ public class HexEditor : Scenario
                     ),
                 new (
                      "_Options",
-                     new MenuItemv2 []
+                     new MenuItem []
                      {
                          _miReadOnly = new (
                                               "_Read Only",
@@ -181,7 +181,7 @@ public class HexEditor : Scenario
         }
     }
 
-    private void Copy () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok"); }
+    private void Copy () { MessageBox.ErrorQuery (Application.Instance, "Not Implemented", "Functionality not yet implemented.", "Ok"); }
 
     private void CreateDemoFile (string fileName)
     {
@@ -208,7 +208,7 @@ public class HexEditor : Scenario
         ms.Close ();
     }
 
-    private void Cut () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "Ok"); }
+    private void Cut () { MessageBox.ErrorQuery (Application.Instance, "Not Implemented", "Functionality not yet implemented.", "Ok"); }
 
     private Stream LoadFile ()
     {
@@ -216,7 +216,7 @@ public class HexEditor : Scenario
 
         if (!_saved && _hexView!.Edits.Count > 0 && _hexView.Source is {})
         {
-            if (MessageBox.ErrorQuery (
+            if (MessageBox.ErrorQuery (Application.Instance,
                                        "Save",
                                        "The changes were not saved. Want to open without saving?",
                                        "_Yes",
@@ -267,7 +267,7 @@ public class HexEditor : Scenario
         d.Dispose ();
     }
 
-    private void Paste () { MessageBox.ErrorQuery ("Not Implemented", "Functionality not yet implemented.", "_Ok"); }
+    private void Paste () { MessageBox.ErrorQuery (Application.Instance, "Not Implemented", "Functionality not yet implemented.", "_Ok"); }
     private void Quit () { Application.RequestStop (); }
 
     private void Save ()

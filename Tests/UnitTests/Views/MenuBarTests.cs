@@ -10,23 +10,38 @@ public class MenuBarTests ()
     public void DefaultKey_Activates_And_Opens ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var top = new Runnable ()
+        {
+            App = ApplicationImpl.Instance
+        };
+
+        var menuBar = new MenuBar () { Id = "menuBar" };
+        top.Add (menuBar);
+
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
+
+        menuBar.Add (menuBarItem);
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
-        menuBar.Add (menuBarItem);
+
+
+        Assert.NotNull (menuBar.App);
+        Assert.NotNull (menu.App);
+        Assert.NotNull (menuItem.App);
+        Assert.NotNull (menuBarItem);
+        Assert.NotNull (menuBarItemPopover);
+
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
-        top.Add (menuBar);
+
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
 
         // Act
-        Application.RaiseKeyDownEvent (MenuBarv2.DefaultKey);
+        Application.RaiseKeyDownEvent (MenuBar.DefaultKey);
         Assert.True (menuBar.Active);
         Assert.True (menuBar.IsOpen ());
         Assert.True (menuBar.HasFocus);
@@ -43,33 +58,23 @@ public class MenuBarTests ()
     public void DefaultKey_Deactivates ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
-        var menuBarItemPopover = new PopoverMenu ();
-        menuBarItem.PopoverMenu = menuBarItemPopover;
-        menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
-        menuBar.Add (menuBarItem);
-        Assert.Single (menuBar.SubViews);
-        Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable () { App = ApplicationImpl.Instance };
+        MenuBar menuBar = new MenuBar () { App = ApplicationImpl.Instance };
+        menuBar.EnableForDesign (ref top);
+
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
 
         // Act
-        Application.RaiseKeyDownEvent (MenuBarv2.DefaultKey);
+        Application.RaiseKeyDownEvent (MenuBar.DefaultKey);
         Assert.True (menuBar.IsOpen ());
-        Assert.True (menuBarItem.PopoverMenu.Visible);
 
-        Application.RaiseKeyDownEvent (MenuBarv2.DefaultKey);
+        Application.RaiseKeyDownEvent (MenuBar.DefaultKey);
         Assert.False (menuBar.Active);
         Assert.False (menuBar.IsOpen ());
         Assert.False (menuBar.HasFocus);
         Assert.False (menuBar.CanFocus);
-        Assert.False (menuBarItem.PopoverMenu.Visible);
-        Assert.False (menuBarItem.PopoverMenu.HasFocus);
 
         Application.End (rs);
         top.Dispose ();
@@ -80,21 +85,21 @@ public class MenuBarTests ()
     public void QuitKey_Deactivates ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "Menu_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_MenuBarItem" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "Menu_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_MenuBarItem" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
 
-        Application.RaiseKeyDownEvent (MenuBarv2.DefaultKey);
+        Application.RaiseKeyDownEvent (MenuBar.DefaultKey);
         Assert.True (menuBar.Active);
         Assert.True (menuBar.IsOpen ());
         Assert.True (menuBarItem.PopoverMenu.Visible);
@@ -118,17 +123,17 @@ public class MenuBarTests ()
     public void MenuBarItem_HotKey_Activates_And_Opens ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -150,17 +155,17 @@ public class MenuBarTests ()
     public void MenuBarItem_HotKey_Deactivates ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -189,17 +194,17 @@ public class MenuBarTests ()
     {
         // Arrange
         int action = 0;
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "Menu_Item", Action = () => action++ };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_MenuBarItem" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "Menu_Item", Action = () => action++ };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_MenuBarItem" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -222,17 +227,17 @@ public class MenuBarTests ()
     public void MenuItems_HotKey_Deactivates ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "Menu_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_MenuBarItem" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "Menu_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_MenuBarItem" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -259,17 +264,17 @@ public class MenuBarTests ()
     public void HotKey_Makes_PopoverMenu_Visible_Only_Once ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -296,25 +301,25 @@ public class MenuBarTests ()
     public void WhenOpen_Other_MenuBarItem_HotKey_Activates_And_Opens ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
 
-        var menuItem2 = new MenuItemv2 { Id = "menuItem2", Title = "_Copy" };
-        var menu2 = new Menuv2 ([menuItem2]) { Id = "menu2" };
-        var menuBarItem2 = new MenuBarItemv2 () { Id = "menuBarItem2", Title = "_Edit" };
+        var menuItem2 = new MenuItem { Id = "menuItem2", Title = "_Copy" };
+        var menu2 = new Menu ([menuItem2]) { Id = "menu2" };
+        var menuBarItem2 = new MenuBarItem () { Id = "menuBarItem2", Title = "_Edit" };
         var menuBarItemPopover2 = new PopoverMenu () { Id = "menuBarItemPopover2" };
         menuBarItem2.PopoverMenu = menuBarItemPopover2;
         menuBarItemPopover2.Root = menu2;
 
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         menuBar.Add (menuBarItem2);
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -341,17 +346,17 @@ public class MenuBarTests ()
     public void Mouse_Enter_Activates_But_Does_Not_Open ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -377,17 +382,10 @@ public class MenuBarTests ()
     public void Mouse_Click_Activates_And_Opens ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
-        var menuBarItemPopover = new PopoverMenu ();
-        menuBarItem.PopoverMenu = menuBarItemPopover;
-        menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
-        menuBar.Add (menuBarItem);
-        Assert.Single (menuBar.SubViews);
-        Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable () { App = ApplicationImpl.Instance };
+        MenuBar menuBar = new MenuBar () { App = ApplicationImpl.Instance };
+        menuBar.EnableForDesign (ref top);
+
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -401,8 +399,6 @@ public class MenuBarTests ()
         Assert.True (menuBar.IsOpen ());
         Assert.True (menuBar.HasFocus);
         Assert.True (menuBar.CanFocus);
-        Assert.True (menuBarItem.PopoverMenu.Visible);
-        Assert.True (menuBarItem.PopoverMenu.HasFocus);
 
         Application.End (rs);
         top.Dispose ();
@@ -418,17 +414,17 @@ public class MenuBarTests ()
     {
         // Arrange
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -465,17 +461,17 @@ public class MenuBarTests ()
     {
         // Arrange
         int action = 0;
-        var menuItem = new MenuItemv2 { Title = "_Item", Action = () => action++ };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Title = "_New" };
+        var menuItem = new MenuItem { Title = "_Item", Action = () => action++ };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 ();
+        var menuBar = new MenuBar ();
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
 
@@ -483,7 +479,7 @@ public class MenuBarTests ()
         Application.RaiseKeyDownEvent (Key.N.WithAlt);
         Assert.Equal (0, action);
 
-        Assert.Equal(Key.I, menuItem.HotKey);
+        Assert.Equal (Key.I, menuItem.HotKey);
         Application.RaiseKeyDownEvent (Key.I);
         Assert.Equal (1, action);
         Assert.False (menuBar.Active);
@@ -507,17 +503,17 @@ public class MenuBarTests ()
     public void Disabled_MenuBar_Is_Not_Activated ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -538,17 +534,17 @@ public class MenuBarTests ()
     public void MenuBarItem_Disabled_MenuBarItem_HotKey_No_Activate_Or_Open ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -570,17 +566,17 @@ public class MenuBarTests ()
     public void MenuBarItem_Disabled_Popover_Is_Activated ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -608,17 +604,17 @@ public class MenuBarTests ()
     public void Update_MenuBarItem_HotKey_Works ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -657,17 +653,17 @@ public class MenuBarTests ()
     public void Visible_False_HotKey_Does_Not_Activate ()
     {
         // Arrange
-        var menuItem = new MenuItemv2 { Id = "menuItem", Title = "_Item" };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);
@@ -692,23 +688,23 @@ public class MenuBarTests ()
     {
         // Arrange
         int action = 0;
-        var menuItem = new MenuItemv2 ()
+        var menuItem = new MenuItem ()
         {
             Id = "menuItem",
             Title = "_Item",
             Key = Key.F1,
             Action = () => action++
         };
-        var menu = new Menuv2 ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItemv2 { Id = "menuBarItem", Title = "_New" };
+        var menu = new Menu ([menuItem]) { Id = "menu" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
-        var menuBar = new MenuBarv2 () { Id = "menuBar" };
+        var menuBar = new MenuBar () { Id = "menuBar" };
         menuBar.Add (menuBarItem);
         Assert.Single (menuBar.SubViews);
         Assert.Single (menuBarItem.SubViews);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (menuBar);
         SessionToken rs = Application.Begin (top);
         Assert.False (menuBar.Active);

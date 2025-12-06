@@ -28,7 +28,7 @@ public class AllViewsTester : Scenario
 
     public override void Main ()
     {
-        // Don't create a sub-win (Scenario.Win); just use Application.Top
+        // Don't create a sub-win (Scenario.Win); just use Application.TopRunnable
         Application.Init ();
 
         var app = new Window
@@ -65,7 +65,7 @@ public class AllViewsTester : Scenario
                                                   // Dispose existing current View, if any
                                                   DisposeCurrentView ();
 
-                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
+                                                  CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem.Value]);
 
                                                   // Force ViewToEdit to be the view and not a subview
                                                   if (_adornmentsEditor is { })
@@ -219,6 +219,13 @@ public class AllViewsTester : Scenario
     private void CreateCurrentView (Type type)
     {
         Debug.Assert (_curView is null);
+
+        // Skip RunnableWrapper types as they have generic constraints that cannot be satisfied
+        if (type.IsGenericType && type.GetGenericTypeDefinition().Name.StartsWith("RunnableWrapper"))
+        {
+            Logging.Warning ($"Cannot create an instance of {type.Name} because it is a RunnableWrapper with unsatisfiable generic constraints.");
+            return;
+        }
 
         // If we are to create a generic Type
         if (type.IsGenericType)

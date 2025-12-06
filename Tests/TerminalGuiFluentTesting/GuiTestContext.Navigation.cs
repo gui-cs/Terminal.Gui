@@ -40,13 +40,13 @@ public partial class GuiTestContext
     public GuiTestContext Focus<T> (Func<T, bool>? evaluator = null) where T : View
     {
         evaluator ??= _ => true;
-        Toplevel? t = Application.Top;
+        View? t = App?.TopRunnableView;
 
         HashSet<View> seen = new ();
 
         if (t == null)
         {
-            Fail ("Application.Top was null when trying to set focus");
+            Fail ("Application.TopRunnable was null when trying to set focus");
 
             return this;
         }
@@ -62,7 +62,7 @@ public partial class GuiTestContext
             }
 
             // No, try tab to the next (or first)
-            EnqueueKeyEvent (Application.NextTabKey);
+            EnqueueKeyEvent (Terminal.Gui.App.Application.NextTabKey);
             WaitIteration ();
 
             next = t.MostFocused;

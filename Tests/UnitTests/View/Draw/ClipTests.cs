@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class ClipTests (ITestOutputHelper _output)
@@ -14,6 +14,7 @@ public class ClipTests (ITestOutputHelper _output)
     {
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
             Width = 3, Height = 3
@@ -36,6 +37,7 @@ public class ClipTests (ITestOutputHelper _output)
     {
         var view = new View
         {
+            App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
             Width = 3, Height = 3
@@ -47,17 +49,17 @@ public class ClipTests (ITestOutputHelper _output)
         view.Draw ();
 
         // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
+        Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
         // When we exit Draw, the view is excluded from the clip. So drawing at 0,0, is not valid and is clipped.
         view.AddRune (0, 0, Rune.ReplacementChar);
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
+        Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
         view.AddRune (-1, -1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'P', Application.Driver?.Contents! [1, 1].Rune);
+        Assert.Equal ("P", Application.Driver?.Contents! [1, 1].Grapheme);
 
         view.AddRune (1, 1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'P', Application.Driver?.Contents! [3, 3].Rune);
+        Assert.Equal ("P", Application.Driver?.Contents! [3, 3].Grapheme);
     }
 
     [Theory]
@@ -67,7 +69,11 @@ public class ClipTests (ITestOutputHelper _output)
     [SetupFakeApplication]
     public void FillRect_Fills_HonorsClip (int x, int y, int width, int height)
     {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+        var superView = new View
+        {
+            App = ApplicationImpl.Instance,
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         var view = new View
         {
@@ -91,7 +97,7 @@ public class ClipTests (ITestOutputHelper _output)
                                                        _output);
 
         Rectangle toFill = new (x, y, width, height);
-        View.SetClipToScreen ();
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -133,7 +139,7 @@ public class ClipTests (ITestOutputHelper _output)
                                                        _output);
         toFill = new (-1, -1, width + 1, height + 1);
 
-        View.SetClipToScreen ();
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -154,7 +160,7 @@ public class ClipTests (ITestOutputHelper _output)
  └─┘",
                                                        _output);
         toFill = new (0, 0, width * 2, height * 2);
-        View.SetClipToScreen ();
+        superView.SetClipToScreen ();
         view.FillRect (toFill);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -175,6 +181,7 @@ public class ClipTests (ITestOutputHelper _output)
 
         var top = new View
         {
+            App = ApplicationImpl.Instance,
             Id = "top",
             Width = Dim.Fill (),
             Height = Dim.Fill ()
@@ -193,7 +200,7 @@ public class ClipTests (ITestOutputHelper _output)
         frameView.Border!.Thickness = new (1, 0, 0, 0);
 
         top.Add (frameView);
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Layout ();
         top.Draw ();
 
@@ -217,7 +224,7 @@ public class ClipTests (ITestOutputHelper _output)
 
         top.Add (view);
         top.Layout ();
-        View.SetClipToScreen ();
+        top.SetClipToScreen ();
         top.Draw ();
 
         //                            012345678901234567890123456789012345678
@@ -226,7 +233,7 @@ public class ClipTests (ITestOutputHelper _output)
         //                            01 2345678901234 56 78 90 12 34 56 
         //                            │� |0123456989│� ン  ラ イ ン で  す 。
         expectedOutput = """
-                         │�│0123456789│�ンラインです。
+                         │�│0123456789│ ンラインです。
                          """;
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, _output);
@@ -252,19 +259,20 @@ public class ClipTests (ITestOutputHelper _output)
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ViewportSettings = ViewportSettingsFlags.ClipContentOnly
+            ViewportSettings = ViewportSettingsFlags.ClipContentOnly,
+            App = ApplicationImpl.Instance
         };
         view.SetContentSize (new Size (10, 10));
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
+        Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
 
         // Act
         view.AddViewportToClip ();
 
         // Assert
-        Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());
+        Assert.Equal (expectedClip, view.GetClip ()!.GetBounds ());
         view.Dispose ();
     }
 
@@ -286,20 +294,21 @@ public class ClipTests (ITestOutputHelper _output)
         var view = new View
         {
             Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
+            App = ApplicationImpl.Instance
         };
         view.SetContentSize (new Size (10, 10));
         view.Border!.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
+        Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
         view.Viewport = view.Viewport with { X = 1, Y = 1 };
 
         // Act
         view.AddViewportToClip ();
 
         // Assert
-        Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());
+        Assert.Equal (expectedClip, view.GetClip ()!.GetBounds ());
         view.Dispose ();
     }
 }

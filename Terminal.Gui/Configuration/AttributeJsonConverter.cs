@@ -9,7 +9,7 @@ namespace Terminal.Gui.Configuration;
 
 internal class AttributeJsonConverter : JsonConverter<Attribute>
 {
-    private static AttributeJsonConverter _instance;
+    private static AttributeJsonConverter? _instance;
 
     /// <summary></summary>
     public static AttributeJsonConverter Instance
@@ -63,7 +63,7 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
                 throw new JsonException ($"{propertyName}: Unexpected token when parsing Attribute: {reader.TokenType}.");
             }
 
-            propertyName = reader.GetString ();
+            propertyName = reader.GetString ()!;
             reader.Read ();
             var property = $"\"{reader.GetString ()}\"";
 

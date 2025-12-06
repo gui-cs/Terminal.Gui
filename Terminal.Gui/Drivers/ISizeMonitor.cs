@@ -1,5 +1,4 @@
-﻿#nullable enable
-
+﻿
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -15,6 +14,6 @@ public interface ISizeMonitor
     ///     Examines the current size of the terminal and raises <see cref="SizeChanged"/> if it is different
     ///     from last inspection.
     /// </summary>
-    /// <returns></returns>
+    /// <returns><see langword="true"/> if the size has changed; otherwise, <see langword="false"/>.</returns>
     bool Poll ();
 }

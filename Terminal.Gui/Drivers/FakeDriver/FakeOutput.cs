@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 
 namespace Terminal.Gui.Drivers;
@@ -87,8 +86,40 @@ public class FakeOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        // For testing, we can skip the actual color/style output
-        // or capture it if needed for verification
+        if (Force16Colors)
+        {
+            if (!IsLegacyConsole)
+            {
+                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+
+                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            }
+            else
+            {
+                Write (output);
+                Console.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor16 ();
+                Console.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor16 ();
+            }
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (
+                                                      output,
+                                                      attr.Foreground.R,
+                                                      attr.Foreground.G,
+                                                      attr.Foreground.B
+                                                     );
+
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (
+                                                      output,
+                                                      attr.Background.R,
+                                                      attr.Background.G,
+                                                      attr.Background.B
+                                                     );
+
+            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+        }
     }
 
     /// <inheritdoc/>

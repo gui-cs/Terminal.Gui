@@ -60,7 +60,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
-        button.Accepting += (sender, args) => MessageBox.Query ("hi", button.Title, "_Ok");
+        button.Accepting += (sender, args) => MessageBox.Query (Application.Instance, "hi", button.Title, "_Ok");
 
         testFrame.Add (button);
 
@@ -184,7 +184,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -214,7 +214,7 @@ public class Navigation : Scenario
 
         return;
 
-        void OnApplicationIteration (object sender, IterationEventArgs args)
+        void OnApplicationIteration (object sender, EventArgs<IApplication> args)
         {
             if (progressBar.Fraction == 1.0)
             {
@@ -223,7 +223,7 @@ public class Navigation : Scenario
 
             progressBar.Fraction += 0.01f;
 
-            Application.Invoke (() => { });
+            Application.Invoke ((_) => { });
         }
 
         void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
@@ -241,7 +241,7 @@ public class Navigation : Scenario
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyle.Transparent,
             BorderStyle = LineStyle.Double,

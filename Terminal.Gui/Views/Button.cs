@@ -1,6 +1,4 @@
-
-using static Terminal.Gui.ViewBase.View;
-
+#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -25,6 +23,9 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class Button : View, IDesignable, IDefaultAcceptView
 {
+    private static ShadowStyle _defaultShadow = ShadowStyle.Opaque; // Resources/config.json overrides
+    private static MouseState _defaultHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides
+
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
@@ -35,13 +36,21 @@ public class Button : View, IDesignable, IDefaultAcceptView
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Opaque;
+    public static ShadowStyle DefaultShadow
+    {
+        get => _defaultShadow;
+        set => _defaultShadow = value;
+    }
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStates { get; set; } = MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
+    public static MouseState DefaultHighlightStates
+    {
+        get => _defaultHighlightStates;
+        set => _defaultHighlightStates = value;
+    }
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()

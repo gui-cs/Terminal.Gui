@@ -1,3 +1,4 @@
+#nullable disable
 ﻿
 namespace Terminal.Gui.Views;
 
@@ -8,25 +9,26 @@ public partial class ColorPicker
     ///     <see cref="IDriver.Force16Colors"/> is false or true, respectively, for <see cref="Attribute.Foreground"/>
     ///     and <see cref="Attribute.Background"/> colors.
     /// </summary>
+    /// <param name="app">The <see cref="IApplication"/> instance ot use.</param>
     /// <param name="title">The title to show in the dialog.</param>
     /// <param name="currentAttribute">The current attribute used.</param>
     /// <param name="newAttribute">The new attribute.</param>
     /// <returns><see langword="true"/> if a new color was accepted, otherwise <see langword="false"/>.</returns>
-    public static bool Prompt (string title, Attribute? currentAttribute, out Attribute newAttribute)
+    public static bool Prompt (IApplication app, string title, Attribute? currentAttribute, out Attribute newAttribute)
     {
         var accept = false;
 
         var d = new Dialog
         {
             Title = title,
-            Width = Application.Force16Colors ? 37 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Width = app.Driver!.Force16Colors ? 37 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
             Height = 20
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = Application.Force16Colors ? 6 : 4,
+            Y = app.Driver!.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefaultAcceptView = true
@@ -36,7 +38,7 @@ public partial class ColorPicker
                         {
                             accept = true;
                             e.Handled = true;
-                            Application.RequestStop ();
+                            (s as View)?.App?.RequestStop ();
                         };
 
         var btnCancel = new Button
@@ -50,7 +52,7 @@ public partial class ColorPicker
         btnCancel.Accepting += (s, e) =>
                             {
                                 e.Handled = true;
-                                Application.RequestStop ();
+                                (s as View)?.App ?.RequestStop ();
                             };
 
         d.Add (btnOk);
@@ -61,7 +63,7 @@ public partial class ColorPicker
 
         View cpForeground;
 
-        if (Application.Force16Colors)
+        if (app.Driver!.Force16Colors)
         {
             cpForeground = new ColorPicker16
             {
@@ -86,7 +88,7 @@ public partial class ColorPicker
 
         View cpBackground;
 
-        if (Application.Force16Colors)
+        if (app.Driver!.Force16Colors)
         {
             cpBackground = new ColorPicker16
             {
@@ -113,12 +115,12 @@ public partial class ColorPicker
 
         d.Add (cpForeground, cpBackground);
 
-        Application.Run (d);
+        app.Run (d);
         d.Dispose ();
-        Color newForeColor = Application.Force16Colors ? ((ColorPicker16)cpForeground).SelectedColor : ((ColorPicker)cpForeground).SelectedColor;
-        Color newBackColor = Application.Force16Colors ? ((ColorPicker16)cpBackground).SelectedColor : ((ColorPicker)cpBackground).SelectedColor;
+        Color newForeColor = app.Driver!.Force16Colors ? ((ColorPicker16)cpForeground).SelectedColor : ((ColorPicker)cpForeground).SelectedColor;
+        Color newBackColor = app.Driver!.Force16Colors ? ((ColorPicker16)cpBackground).SelectedColor : ((ColorPicker)cpBackground).SelectedColor;
         newAttribute = new (newForeColor, newBackColor);
-
+        app.Dispose ();
         return accept;
     }
 }

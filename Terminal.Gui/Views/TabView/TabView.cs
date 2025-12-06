@@ -1,4 +1,3 @@
-#nullable enable
 
 namespace Terminal.Gui.Views;
 
@@ -112,7 +111,7 @@ public class TabView : View
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            // Let toplevel handle it
+                                            // Let runnable handle it
                                             return false;
                                         }
                                     }
@@ -146,7 +145,7 @@ public class TabView : View
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            // Let toplevel handle it
+                                            // Let runnable handle it
                                             return false;
                                         }
                                     }

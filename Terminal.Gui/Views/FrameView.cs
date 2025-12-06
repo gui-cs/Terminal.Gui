@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 namespace Terminal.Gui.Views;
 
 // TODO: FrameView is mis-named, really. It's far more about it being a TabGroup than a frame. 
@@ -19,6 +17,8 @@ namespace Terminal.Gui.Views;
 /// <seealso cref="Window"/>
 public class FrameView : View
 {
+    private static LineStyle _defaultBorderStyle = LineStyle.Rounded; // Resources/config.json overrides
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="FrameView"/> class.
     ///     layout.
@@ -31,13 +31,17 @@ public class FrameView : View
     }
 
     /// <summary>
-    ///     The default <see cref="LineStyle"/> for <see cref="FrameView"/>'s border. The default is
-    ///     <see cref="LineStyle.Single"/>.
+    ///     Defines the default border styling for <see cref="FrameView"/>. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <remarks>
     ///     This property can be set in a Theme to change the default <see cref="LineStyle"/> for all
     ///     <see cref="FrameView"/>s.
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
+    public static LineStyle DefaultBorderStyle
+    {
+        get => _defaultBorderStyle;
+        set => _defaultBorderStyle = value;
+    }
 }

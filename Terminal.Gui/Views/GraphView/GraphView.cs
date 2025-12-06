@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 namespace Terminal.Gui.Views;
 
@@ -198,7 +198,7 @@ public class GraphView : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (CellSize.X == 0 || CellSize.Y == 0)
         {
@@ -344,7 +344,7 @@ public class GraphView : View, IDesignable
     }
 
     /// <summary>
-    ///     Sets the color attribute of <see cref="Application.Driver"/> to the <see cref="GraphColor"/> (if defined) or
+    ///     Sets the color attribute of <see cref="IApplication.Driver"/> to the <see cref="GraphColor"/> (if defined) or
     ///     <see cref="Scheme"/> otherwise.
     /// </summary>
     public void SetDriverColorToGraphColor () { SetAttribute (GraphColor ?? GetAttributeForRole (VisualRole.Normal)); }

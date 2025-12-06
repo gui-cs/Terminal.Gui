@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -17,7 +17,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
         // a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
         var oGonek = new Rune (0x0328); // Combining ogonek (a small hook or comma shape)
         combined = "a" + oGonek + acuteAccent;
-        expected = ("a" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("a" + oGonek + acuteAccent).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -44,7 +44,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 
         // e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
         combined = "e" + oGonek + acuteAccent;
-        expected = ("e" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("e" + oGonek + acuteAccent).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -52,7 +52,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 
         // i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
         combined = "i" + oGonek + acuteAccent;
-        expected = ("i" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("i" + oGonek + acuteAccent).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -60,13 +60,13 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 
         // u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
         combined = "u" + oGonek + acuteAccent;
-        expected = ("u" + oGonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("u" + oGonek + acuteAccent).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
         driver.Move (500, 500);
         Assert.Equal (500, driver.Col);
         Assert.Equal (500, driver.Row);
-        driver.End ();
+        driver.Dispose ();
     }
 
     // TODO: Add these unit tests

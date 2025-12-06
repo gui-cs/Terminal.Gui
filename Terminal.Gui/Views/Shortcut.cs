@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
@@ -25,7 +24,8 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         By default, a Shortcut displays the command text on the left side, the help text in the middle, and the key
 ///         binding on the
-///         right side. Set <see cref="AlignmentModes"/> to <see cref="ViewBase.AlignmentModes.EndToStart"/> to reverse the order.
+///         right side. Set <see cref="AlignmentModes"/> to <see cref="ViewBase.AlignmentModes.EndToStart"/> to reverse the
+///         order.
 ///     </para>
 ///     <para>
 ///         The command text can be set by setting the <see cref="CommandView"/>'s Text property or by setting
@@ -44,7 +44,7 @@ public class Shortcut : View, IDesignable
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
     /// </summary>
-    public Shortcut () : this (Key.Empty, null, null, null) { }
+    public Shortcut () : this (Key.Empty, null, null) { }
 
     /// <summary>
     ///     Creates a new instance of <see cref="Shortcut"/>.
@@ -60,7 +60,7 @@ public class Shortcut : View, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        HighlightStates = ViewBase.MouseState.None;
+        HighlightStates = MouseState.None;
         CanFocus = true;
 
         if (Border is { })
@@ -84,10 +84,12 @@ public class Shortcut : View, IDesignable
         Title = commandText ?? string.Empty;
 
         HelpView.Id = "_helpView";
+
         //HelpView.CanFocus = false;
         HelpView.Text = helpText ?? string.Empty;
 
         KeyView.Id = "_keyView";
+
         //KeyView.CanFocus = false;
         key ??= Key.Empty;
         Key = key;
@@ -95,6 +97,15 @@ public class Shortcut : View, IDesignable
         Action = action;
 
         ShowHide ();
+    }
+
+    /// <inheritdoc/>
+    public override void EndInit ()
+    {
+        base.EndInit ();
+        App ??= SuperView?.App; // HACK: Remove once legacy static Application is gone
+        Debug.Assert (App is { });
+        UpdateKeyBindings (Key.Empty);
     }
 
     /// <inheritdoc />
@@ -109,8 +120,8 @@ public class Shortcut : View, IDesignable
     {
         return Dim.Auto (
                          DimAutoStyle.Content,
-                         minimumContentDim: Dim.Func (_ => _minimumNaturalWidth ?? 0),
-                         maximumContentDim: Dim.Func (_ => _minimumNaturalWidth ?? 0))!;
+                         Dim.Func (_ => _minimumNaturalWidth ?? 0),
+                         Dim.Func (_ => _minimumNaturalWidth ?? 0))!;
     }
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
@@ -171,24 +182,22 @@ public class Shortcut : View, IDesignable
     private void ForceCalculateNaturalWidth ()
     {
         // Get the natural size of each subview
-        CommandView.SetRelativeLayout (Application.Screen.Size);
-        HelpView.SetRelativeLayout (Application.Screen.Size);
-        KeyView.SetRelativeLayout (Application.Screen.Size);
+        Size screenSize = App?.Screen.Size ?? new (2048, 2048);
+        CommandView.SetRelativeLayout (screenSize);
+        HelpView.SetRelativeLayout (screenSize);
+        KeyView.SetRelativeLayout (screenSize);
 
         _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, SubViews, Dimension.Width);
 
         // Reset our relative layout
-        SetRelativeLayout (SuperView?.GetContentSize () ?? Application.Screen.Size);
+        SetRelativeLayout (SuperView?.GetContentSize () ?? screenSize);
     }
 
     // TODO: Enable setting of the margin thickness
-    private Thickness GetMarginThickness ()
-    {
-        return new (1, 0, 1, 0);
-    }
+    private Thickness GetMarginThickness () => new (1, 0, 1, 0);
 
     // When layout starts, we need to adjust the layout of the HelpView and KeyView
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewLayout (LayoutEventArgs e)
     {
         base.OnSubViewLayout (e);
@@ -239,6 +248,7 @@ public class Shortcut : View, IDesignable
     {
         // Accept (Enter key) -
         AddCommand (Command.Accept, DispatchCommand);
+
         // Hotkey -
         AddCommand (Command.HotKey, DispatchCommand);
         // Activate (Space key or click) -
@@ -265,7 +275,8 @@ public class Shortcut : View, IDesignable
     /// <param name="commandContext"></param>
     /// <returns>
     ///     <see langword="null"/> if no event was raised; input processing should continue.
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should
+    ///     continue.
     ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
@@ -365,7 +376,7 @@ public class Shortcut : View, IDesignable
     /// <example>
     ///     <para>
     ///         This example illustrates how to add a <see cref="Shortcut"/> to a <see cref="StatusBar"/> that toggles the
-    ///         <see cref="Application.Force16Colors"/> property.
+    ///         <see cref="IDriver.Force16Colors"/> property.
     ///     </para>
     ///     <code>
     ///     var force16ColorsShortcut = new Shortcut
@@ -380,8 +391,8 @@ public class Shortcut : View, IDesignable
     ///     cb.Toggled += (s, e) =>
     ///     {
     ///         var cb = s as CheckBox;
-    ///         Application.Force16Colors = cb!.Checked == true;
-    ///         Application.Refresh();
+    ///         App.Driver.Force16Colors = cb!.Checked == true;
+    ///         App.river.Refresh();
     ///     };
     ///     StatusBar.Add(force16ColorsShortcut);
     /// </code>
@@ -442,8 +453,8 @@ public class Shortcut : View, IDesignable
 
             void CommandViewOnActivating (object? sender, CommandEventArgs e)
             {
-                if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Data != this) ||
-                    e.Context is CommandContext<MouseBinding>)
+                if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Data != this)
+                    || e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
                     //InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
@@ -459,6 +470,7 @@ public class Shortcut : View, IDesignable
         if (CommandView.Margin is { })
         {
             CommandView.Margin!.Thickness = GetMarginThickness ();
+
             // strip off ViewportSettings.TransparentMouse
             CommandView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
@@ -468,6 +480,7 @@ public class Shortcut : View, IDesignable
         CommandView.VerticalTextAlignment = Alignment.Center;
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
+
         //CommandView.HighlightStates = HighlightStates.None;
         //if (CommandView.InvertFocusAttribute is null)
         //{
@@ -492,6 +505,7 @@ public class Shortcut : View, IDesignable
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.Focus);
                 }
+
                 break;
 
             case VisualRole.HotNormal:
@@ -500,6 +514,7 @@ public class Shortcut : View, IDesignable
                     e.Handled = true;
                     e.Result = GetAttributeForRole (VisualRole.HotFocus);
                 }
+
                 break;
 
             case VisualRole.Focus:
@@ -521,13 +536,13 @@ public class Shortcut : View, IDesignable
         }
     }
 
-
     private void Shortcut_TitleChanged (object? sender, EventArgs<string> e)
     {
         // If the Title changes, update the CommandView text.
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
         _commandView.Text = Title;
+
         //_commandView.Title = Title;
     }
 
@@ -536,7 +551,7 @@ public class Shortcut : View, IDesignable
     #region Help
 
     // The maximum width of the HelpView. Calculated in OnLayoutStarted and used in HelpView.Width (Dim.Auto/Func).
-    private int _maxHelpWidth = 0;
+    private int _maxHelpWidth;
 
     /// <summary>
     ///     The subview that displays the help text for the command. Internal for unit testing.
@@ -548,13 +563,14 @@ public class Shortcut : View, IDesignable
         if (HelpView.Margin is { })
         {
             HelpView.Margin!.Thickness = GetMarginThickness ();
+
             // strip off ViewportSettings.TransparentMouse
             HelpView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
         _maxHelpWidth = HelpView.Text.GetColumns ();
-        HelpView.Width = Dim.Auto (DimAutoStyle.Text, maximumContentDim: Dim.Func ((_ => _maxHelpWidth)));
+        HelpView.Width = Dim.Auto (DimAutoStyle.Text, maximumContentDim: Dim.Func (_ => _maxHelpWidth));
         HelpView.Height = Dim.Fill ();
 
         HelpView.Visible = true;
@@ -620,16 +636,20 @@ public class Shortcut : View, IDesignable
         }
     }
 
-    private bool _bindKeyToApplication = false;
+    private bool _bindKeyToApplication;
 
     /// <summary>
-    ///     Gets or sets whether <see cref="Key"/> is bound to <see cref="Command"/> via <see cref="View.HotKeyBindings"/> or <see cref="Application.KeyBindings"/>.
+    ///     Gets or sets whether <see cref="Key"/> is bound to <see cref="Command"/> via <see cref="View.HotKeyBindings"/> or
+    ///     <see cref="KeyBindings"/>.
     /// </summary>
     public bool BindKeyToApplication
     {
         get => _bindKeyToApplication;
         set
         {
+            App ??= SuperView?.App ?? Application.Instance; // HACK: Remove once legacy static Application is gone
+            Debug.Assert (App is { });
+
             if (value == _bindKeyToApplication)
             {
                 return;
@@ -637,7 +657,7 @@ public class Shortcut : View, IDesignable
 
             if (_bindKeyToApplication)
             {
-                Application.KeyBindings.Remove (Key);
+                App?.Keyboard.KeyBindings.Remove (Key);
             }
             else
             {
@@ -676,12 +696,12 @@ public class Shortcut : View, IDesignable
         }
     }
 
-
     private void SetKeyViewDefaultLayout ()
     {
         if (KeyView.Margin is { })
         {
             KeyView.Margin!.Thickness = GetMarginThickness ();
+
             // strip off ViewportSettings.TransparentMouse
             KeyView.Margin!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
         }
@@ -715,6 +735,21 @@ public class Shortcut : View, IDesignable
 
             args.Cancel = true;
         };
+        KeyView.GettingAttributeForRole += (sender, args) =>
+                                           {
+                                               if (args.Role == VisualRole.Normal)
+                                               {
+                                                   args.Result = SuperView?.GetAttributeForRole (HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal)
+                                                                 ?? Attribute.Default;
+                                                   args.Handled = true;
+                                               }
+                                           };
+
+        KeyView.ClearingViewport += (sender, args) =>
+                                    {
+                                        // Do not clear; otherwise spaces will be printed with underlines
+                                        args.Cancel = true;
+                                    };
     }
 
     private void UpdateKeyBindings (Key oldKey)
@@ -728,11 +763,11 @@ public class Shortcut : View, IDesignable
         {
             if (oldKey != Key.Empty)
             {
-                Application.KeyBindings.Remove (oldKey);
+                App?.Keyboard.KeyBindings.Remove (oldKey);
             }
 
-            Application.KeyBindings.Remove (Key);
-            Application.KeyBindings.Add (Key, this, Command.HotKey);
+            App?.Keyboard.KeyBindings.Remove (Key);
+            App?.Keyboard.KeyBindings.Add (Key, this, Command.HotKey);
         }
         else
         {
@@ -751,6 +786,22 @@ public class Shortcut : View, IDesignable
     #region Focus
 
     /// <inheritdoc />
+    private bool _forceFocusColors;
+
+    /// <summary>
+    ///     TODO: IS this needed?
+    /// </summary>
+    public bool ForceFocusColors
+    {
+        get => _forceFocusColors;
+        set
+        {
+            _forceFocusColors = value;
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
         //if (!HasFocus)
@@ -765,6 +816,7 @@ public class Shortcut : View, IDesignable
 
             return true;
         }
+
         if (role == VisualRole.HotNormal)
         {
             currentAttribute = GetAttributeForRole (VisualRole.HotFocus);

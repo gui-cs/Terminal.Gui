@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace UnitTests_Parallelizable.DrawingTests;
+namespace DrawingTests;
 
 public class SchemeGetAttributeForRoleAlgorithmTests
 {

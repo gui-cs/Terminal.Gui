@@ -95,14 +95,14 @@ view.MouseStateChanged += (sender, e) =>
 
 At the core of *Terminal.Gui*'s mouse API is the @Terminal.Gui.Input.MouseEventArgs class. The @Terminal.Gui.Input.MouseEventArgs class provides a platform-independent abstraction for common mouse events. Every mouse event can be fully described in a @Terminal.Gui.Input.MouseEventArgs instance, and most of the mouse-related APIs are simply helper functions for decoding a @Terminal.Gui.Input.MouseEventArgs.
 
-When the user does something with the mouse, the `ConsoleDriver` maps the platform-specific mouse event into a `MouseEventArgs` and calls `Application.RaiseMouseEvent`. Then, `Application.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `Application` will then call the appropriate high-level helper APIs. For example, if the user double-clicks the mouse, `View.OnMouseClick` will be called/`View.MouseClick` will be raised with the event arguments indicating which mouse button was double-clicked. 
+When the user does something with the mouse, the driver maps the platform-specific mouse event into a `MouseEventArgs` and calls `IApplication.Mouse.RaiseMouseEvent`. Then, `IApplication.Mouse.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `IApplication` will then call the appropriate high-level helper APIs. For example, if the user double-clicks the mouse, `View.OnMouseClick` will be called/`View.MouseClick` will be raised with the event arguments indicating which mouse button was double-clicked. 
 
 ### Mouse Event Processing Flow
 
 Mouse events are processed through the following workflow using the [Cancellable Work Pattern](cancellable-work-pattern.md):
 
-1. **Driver Level**: The ConsoleDriver captures platform-specific mouse events and converts them to `MouseEventArgs`
-2. **Application Level**: `Application.RaiseMouseEvent` determines the target view and routes the event
+1. **Driver Level**: The driver captures platform-specific mouse events and converts them to `MouseEventArgs`
+2. **Application Level**: `IApplication.Mouse.RaiseMouseEvent` determines the target view and routes the event
 3. **View Level**: The target view processes the event through:
    - `OnMouseEvent` (virtual method that can be overridden)
    - `MouseEvent` event (for event subscribers)
@@ -157,8 +157,8 @@ public class CustomView : View
 
 The @Terminal.Gui.App.Application.MouseEvent event can be used if an application wishes to receive all mouse events before they are processed by individual views:
 
-```cs
-Application.MouseEvent += (sender, e) => 
+```csharp
+App.Mouse.MouseEvent += (sender, e) => 
 {
     // Handle application-wide mouse events
     if (e.Flags.HasFlag(MouseFlags.Button3Clicked))
@@ -216,6 +216,7 @@ The `MouseEventArgs` provides both coordinate systems:
 * Some terminals may not support all mouse buttons or modifier keys
 * Mouse coordinates are limited to character cell boundaries - sub-character precision is not available
 * Performance can be impacted by excessive mouse move event handling - use mouse enter/leave events when appropriate rather than tracking all mouse moves
+
 
 
 

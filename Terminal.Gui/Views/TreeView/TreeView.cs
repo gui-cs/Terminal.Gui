@@ -2,6 +2,7 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
+#nullable disable
 using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;
@@ -1149,7 +1150,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public event EventHandler<ObjectActivatedEventArgs<T>> ObjectActivated;
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         if (roots is null)
         {

@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 
 namespace Terminal.Gui.Views;
@@ -34,9 +34,9 @@ public partial class ColorPicker : View, IDesignable
     private Color _selectedColor = Color.Black;
 
     // TODO: Add interface
-    private readonly IColorNameResolver _colorNameResolver = new MultiStandardColorNameResolver ();
+    private readonly IColorNameResolver _colorNameResolver = new StandardColorsNameResolver ();
 
-    private List<IColorBar> _bars = new ();
+    private List<IColorBar> _bars = [];
 
     /// <summary>
     ///     Rebuild the user interface to reflect the new state of <see cref="Style"/>.
@@ -47,21 +47,21 @@ public partial class ColorPicker : View, IDesignable
         DisposeOldViews ();
 
         var y = 0;
-        const int textFieldWidth = 4;
+        const int TEXT_FIELD_WIDTH = 4;
 
         foreach (ColorBar bar in _strategy.CreateBars (Style.ColorModel))
         {
             bar.Y = y;
-            bar.Width = Dim.Fill (Style.ShowTextFields ? textFieldWidth : 0);
+            bar.Width = Dim.Fill (Style.ShowTextFields ? TEXT_FIELD_WIDTH : 0);
 
             TextField? tfValue = null;
             if (Style.ShowTextFields)
             {
                 tfValue = new TextField
                 {
-                    X = Pos.AnchorEnd (textFieldWidth),
+                    X = Pos.AnchorEnd (TEXT_FIELD_WIDTH),
                     Y = y,
-                    Width = textFieldWidth
+                    Width = TEXT_FIELD_WIDTH
                 };
                 tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
                 tfValue.Accepting += (s, _) => UpdateSingleBarValueFromTextField (s);
@@ -99,7 +99,7 @@ public partial class ColorPicker : View, IDesignable
     public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
         SetAttribute (new (SelectedColor, normal.Background, Enabled ? TextStyle.None : TextStyle.Faint));
@@ -233,7 +233,10 @@ public partial class ColorPicker : View, IDesignable
         }
     }
 
-    private void RebuildColorFromBar (object? sender, EventArgs<int> e) { SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false); }
+    private void RebuildColorFromBar (object? sender, EventArgs<int> e)
+    {
+        SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false);
+    }
 
     private void SetSelectedColor (Color value, bool syncBars)
     {
@@ -242,9 +245,7 @@ public partial class ColorPicker : View, IDesignable
             Color old = _selectedColor;
             _selectedColor = value;
 
-            ColorChanged?.Invoke (
-                                  this,
-                                  new (value));
+            ColorChanged?.Invoke (this, new (value));
         }
 
         SyncSubViewValues (syncBars);
@@ -290,15 +291,16 @@ public partial class ColorPicker : View, IDesignable
     }
     private void UpdateSingleBarValueFromTextField (object? sender)
     {
-
         foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
         {
-            if (kvp.Value == sender)
+            if (kvp.Value != sender)
             {
-                if (int.TryParse (kvp.Value.Text, out int v))
-                {
-                    kvp.Key.Value = v;
-                }
+                continue;
+            }
+
+            if (int.TryParse (kvp.Value.Text, out int v))
+            {
+                kvp.Key.Value = v;
             }
         }
     }
@@ -314,6 +316,7 @@ public partial class ColorPicker : View, IDesignable
         // it is a leave event so update
         UpdateValueFromName ();
     }
+
     private void UpdateValueFromName ()
     {
         if (_tfName == null)

@@ -1,22 +1,27 @@
-#nullable enable
 using System.ComponentModel;
 
 namespace Terminal.Gui.App;
 
 public static partial class Application // Mouse handling
 {
-    /// <summary>
-    ///     Gets the most recent position of the mouse.
-    /// </summary>
-    public static Point? GetLastMousePosition () { return Mouse.GetLastMousePosition (); }
+    private static bool _isMouseDisabled = false; // Resources/config.json overrides
 
     /// <summary>Disable or enable the mouse. The mouse is enabled by default.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    [Obsolete ("The legacy static Application object is going away.")]
     public static bool IsMouseDisabled
     {
-        get => Mouse.IsMouseDisabled;
-        set => Mouse.IsMouseDisabled = value;
+        get => _isMouseDisabled;
+        set
+        {
+            bool oldValue = _isMouseDisabled;
+            _isMouseDisabled = value;
+            IsMouseDisabledChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, _isMouseDisabled));
+        }
     }
+
+    /// <summary>Raised when <see cref="IsMouseDisabled"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<bool>>? IsMouseDisabledChanged;
 
     /// <summary>
     ///     Gets the <see cref="IMouse"/> instance that manages mouse event handling and state.
@@ -26,12 +31,8 @@ public static partial class Application // Mouse handling
     ///         This property provides access to mouse-related functionality in a way that supports
     ///         parallel test execution by avoiding static state.
     ///     </para>
-    ///     <para>
-    ///         New code should use <c>Application.Mouse</c> instead of the static properties and methods
-    ///         for better testability. Legacy static properties like <see cref="IsMouseDisabled"/> and
-    ///         <see cref="GetLastMousePosition"/> are retained for backward compatibility.
-    ///     </para>
     /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static IMouse Mouse => ApplicationImpl.Instance.Mouse;
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
@@ -54,6 +55,7 @@ public static partial class Application // Mouse handling
     ///         Use this even to handle mouse events at the application level, before View-specific handling.
     ///     </para>
     /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
     public static event EventHandler<MouseEventArgs>? MouseEvent
     {
         add => Mouse.MouseEvent += value;
@@ -65,11 +67,13 @@ public static partial class Application // Mouse handling
     ///     INTERNAL: Holds the non-<see cref="ViewportSettingsFlags.TransparentMouse"/> views that are currently under the
     ///     mouse.
     /// </summary>
+    [Obsolete ("The legacy static Application object is going away.")]
     internal static List<View?> CachedViewsUnderMouse => Mouse.CachedViewsUnderMouse;
 
     /// <summary>
     ///     INTERNAL API: Holds the last mouse position.
     /// </summary>
+    [Obsolete ("The legacy static Application object is going away.")]
     internal static Point? LastMousePosition
     {
         get => Mouse.LastMousePosition;
@@ -81,6 +85,7 @@ public static partial class Application // Mouse handling
     /// </summary>
     /// <param name="screenPosition">The position of the mouse.</param>
     /// <param name="currentViewsUnderMouse">The most recent result from GetViewsUnderLocation().</param>
+    [Obsolete ("The legacy static Application object is going away.")]
     internal static void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
         Mouse.RaiseMouseEnterLeaveEvents (screenPosition, currentViewsUnderMouse);
@@ -92,6 +97,7 @@ public static partial class Application // Mouse handling
     /// </summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
+    [Obsolete ("The legacy static Application object is going away.")]
     internal static void RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
         Mouse.RaiseMouseEvent (mouseEvent);

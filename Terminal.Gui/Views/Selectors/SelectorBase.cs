@@ -1,4 +1,3 @@
-#nullable enable
 using System.Collections.Immutable;
 
 namespace Terminal.Gui.Views;
@@ -420,7 +419,7 @@ public abstract class SelectorBase : View, IOrientation
             maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ().Max (
                                                              v =>
                                                              {
-                                                                 v.SetRelativeLayout (Application.Screen.Size);
+                                                                 v.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
                                                                  v.Layout ();
                                                                  return v.Frame.Width;
                                                              });

@@ -5,7 +5,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Text Styles", "Shows Attribute.TextStyles including bold, italic, etc...")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Colors")]
-public sealed class TestStyles : Scenario
+public sealed class TextStyles : Scenario
 {
     private CheckBox? _drawDirectly;
 

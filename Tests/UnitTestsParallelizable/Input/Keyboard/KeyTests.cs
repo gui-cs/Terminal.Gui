@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.InputTests;
+namespace InputTests;
 
 public class KeyTests
 {

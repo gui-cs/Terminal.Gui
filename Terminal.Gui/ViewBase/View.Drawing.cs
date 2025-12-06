@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
@@ -29,8 +28,35 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
-        // Draw the margins (those with Shadows) last to ensure they are drawn on top of the content.
+        // Draw the margins last to ensure they are drawn on top of the content.
         Margin.DrawMargins (viewsArray);
+
+        // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
+        foreach (View view in viewsArray)
+        {
+            view.ClearNeedsDraw ();
+        }
+
+        // After all peer views have been drawn and cleared, we can now clear the SuperView's SubViewNeedsDraw flag.
+        // ClearNeedsDraw() does not clear SuperView.SubViewNeedsDraw (by design, to avoid premature clearing
+        // when siblings still need drawing), so we must do it here after ALL peers are processed.
+        // We only clear the flag if ALL the SuperView's subviews no longer need drawing.
+        View? lastSuperView = null;
+        foreach (View view in viewsArray)
+        {
+            if (view is not Adornment && view.SuperView is { } && view.SuperView != lastSuperView)
+            {
+                // Check if ANY subview of this SuperView still needs drawing
+                bool anySubViewNeedsDrawing = view.SuperView.InternalSubViews.Any (v => v.NeedsDraw || v.SubViewNeedsDraw);
+
+                if (!anySubViewNeedsDrawing)
+                {
+                    view.SuperView.SubViewNeedsDraw = false;
+                }
+
+                lastSuperView = view.SuperView;
+            }
+        }
     }
 
     /// <summary>
@@ -74,7 +100,7 @@ public partial class View // Drawing APIs
             originalClip = AddViewportToClip ();
 
             // If no context ...
-            context ??= new DrawContext ();
+            context ??= new ();
 
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoClearViewport (context);
@@ -137,7 +163,6 @@ public partial class View // Drawing APIs
 
         // ------------------------------------
         // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
-        // PERFORMANCE: If there is a Margin w/ Shadow, it will be redrawn each iteration of the main loop.
         Margin?.CacheClip ();
 
         // ------------------------------------
@@ -155,7 +180,7 @@ public partial class View // Drawing APIs
     {
         // NOTE: We do not support subviews of Margin?
 
-        if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty)
+        if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
         {
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
             foreach (View subview in Border.SubViews.Where (v => v.Visible || v.Id == "DrawIndicator"))
@@ -173,7 +198,7 @@ public partial class View // Drawing APIs
             SetClip (saved);
         }
 
-        if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty)
+        if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty && Padding.NeedsDraw)
         {
             foreach (View subview in Padding.SubViews)
             {
@@ -195,19 +220,19 @@ public partial class View // Drawing APIs
         else
         {
             // Set the clip to be just the thicknesses of the adornments
-            // TODO: Put this union logic in a method on View? 
+            // TODO: Put this union logic in a method on View?
             Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
-            clipAdornments?.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
-            clipAdornments?.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
-            clipAdornments?.Combine (originalClip, RegionOp.Intersect);
+            clipAdornments.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
+            clipAdornments.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
+            clipAdornments.Combine (originalClip, RegionOp.Intersect);
             SetClip (clipAdornments);
         }
 
         if (Margin?.NeedsLayout == true)
         {
             Margin.NeedsLayout = false;
-            Margin?.Thickness.Draw (FrameToScreen ());
-            Margin?.Parent?.SetSubViewNeedsDraw ();
+            Margin?.Thickness.Draw (Driver, FrameToScreen ());
+            Margin?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
         if (SubViewNeedsDraw)
@@ -240,7 +265,7 @@ public partial class View // Drawing APIs
     {
         // We do not attempt to draw Margin. It is drawn in a separate pass.
 
-        // Each of these renders lines to this View's LineCanvas 
+        // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
         if (Border is { } && Border.Thickness != Thickness.Empty)
         {
@@ -254,7 +279,7 @@ public partial class View // Drawing APIs
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-           //Margin?.Draw ();
+            //Margin?.Draw ();
         }
     }
 
@@ -289,7 +314,7 @@ public partial class View // Drawing APIs
 
     internal void DoClearViewport (DrawContext? context = null)
     {
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) || OnClearingViewport ())
+        if (!NeedsDraw || ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) || OnClearingViewport ())
         {
             return;
         }
@@ -408,8 +433,8 @@ public partial class View // Drawing APIs
 
         DrawText (context);
 
-        OnDrewText();
-        DrewText?.Invoke(this, EventArgs.Empty);
+        OnDrewText ();
+        DrewText?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -446,15 +471,18 @@ public partial class View // Drawing APIs
         // Report the drawn area to the context
         context?.AddDrawnRegion (textRegion);
 
-        TextFormatter?.Draw (
-                             drawRect,
-                             HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
-                             HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
-                             Rectangle.Empty
-                            );
+        if (Driver is { })
+        {
+            TextFormatter.Draw (
+                                 Driver,
+                                 drawRect,
+                                 HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
+                                 HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                                 Rectangle.Empty);
+        }
 
         // We assume that the text has been drawn over the entire area; ensure that the subviews are redrawn.
-        SetSubViewNeedsDraw ();
+        SetSubViewNeedsDrawDownHierarchy ();
     }
 
     /// <summary>
@@ -466,17 +494,12 @@ public partial class View // Drawing APIs
     public event EventHandler? DrewText;
 
     #endregion DrawText
+
     #region DrawContent
 
     private void DoDrawContent (DrawContext? context = null)
     {
-        if (OnDrawingContent (context))
-        {
-            return;
-        }
-
-        // TODO: Upgrade all overrides of OnDrawingContent to use DrawContext and remove this override
-        if (OnDrawingContent ())
+        if (!NeedsDraw || OnDrawingContent (context))
         {
             return;
         }
@@ -497,20 +520,66 @@ public partial class View // Drawing APIs
     /// </summary>
     /// <param name="context">The draw context to report drawn areas to.</param>
     /// <returns><see langword="true"/> to stop further drawing content.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Override this method to draw custom content for your View.
+    ///     </para>
+    ///     <para>
+    ///         <b>Transparency Support:</b> If your View has <see cref="ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/>
+    ///         set, you should report the exact regions you draw to via the <paramref name="context"/> parameter. This allows
+    ///         the transparency system to exclude only the drawn areas from the clip region, letting views beneath show through
+    ///         in the areas you didn't draw.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="DrawContext.AddDrawnRectangle"/> for simple rectangular areas, or <see cref="DrawContext.AddDrawnRegion"/>
+    ///         for complex, non-rectangular shapes. All coordinates passed to these methods must be in <b>screen-relative coordinates</b>.
+    ///         Use <see cref="View.ViewportToScreen(in Rectangle)"/> or <see cref="View.ContentToScreen(in Point)"/> to convert from
+    ///         viewport-relative or content-relative coordinates.
+    ///     </para>
+    ///     <para>
+    ///         Example of drawing custom content with transparency support:
+    ///     </para>
+    ///     <code>
+    ///         protected override bool OnDrawingContent (DrawContext? context)
+    ///         {
+    ///             base.OnDrawingContent (context);
+    ///             
+    ///             // Draw content in viewport-relative coordinates
+    ///             Rectangle rect1 = new Rectangle (5, 5, 10, 3);
+    ///             Rectangle rect2 = new Rectangle (8, 8, 4, 7);
+    ///             FillRect (rect1, Glyphs.BlackCircle);
+    ///             FillRect (rect2, Glyphs.BlackCircle);
+    ///             
+    ///             // Report drawn region in screen-relative coordinates for transparency
+    ///             if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+    ///             {
+    ///                 Region drawnRegion = new Region (ViewportToScreen (rect1));
+    ///                 drawnRegion.Union (ViewportToScreen (rect2));
+    ///                 context?.AddDrawnRegion (drawnRegion);
+    ///             }
+    ///             
+    ///             return true;
+    ///         }
+    ///     </code>
+    /// </remarks>
     protected virtual bool OnDrawingContent (DrawContext? context) { return false; }
-
-    /// <summary>
-    ///     Called when the View's content is to be drawn. The default implementation does nothing.
-    /// </summary>
-    /// <returns><see langword="true"/> to stop further drawing content.</returns>
-    protected virtual bool OnDrawingContent () { return false; }
 
     /// <summary>Raised when the View's content is to be drawn.</summary>
     /// <remarks>
-    ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
     ///     <para>
-    ///         Rect provides the view-relative rectangle describing the currently visible viewport into the
-    ///         <see cref="View"/> .
+    ///         Subscribe to this event to draw custom content for the View. Use the drawing methods available on <see cref="View"/>
+    ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune)"/>.
+    ///     </para>
+    ///     <para>
+    ///         The event is invoked after <see cref="ClearingViewport"/> and <see cref="Text"/> have been drawn, but before any <see cref="SubViews"/> are drawn.
+    ///     </para>
+    ///     <para>
+    ///         <b>Transparency Support:</b> If the View has <see cref="ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/>
+    ///         set, use the <see cref="DrawEventArgs.DrawContext"/> to report which areas were actually drawn. This enables proper transparency
+    ///         by excluding only the drawn areas from the clip region. See <see cref="DrawContext"/> for details on reporting drawn regions.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="DrawEventArgs.NewViewport"/> property provides the view-relative rectangle describing the currently visible viewport into the View.
     ///     </para>
     /// </remarks>
     public event EventHandler<DrawEventArgs>? DrawingContent;
@@ -521,7 +590,7 @@ public partial class View // Drawing APIs
 
     private void DoDrawSubViews (DrawContext? context = null)
     {
-        if (OnDrawingSubViews (context))
+        if (!NeedsDraw || OnDrawingSubViews (context))
         {
             return;
         }
@@ -587,7 +656,7 @@ public partial class View // Drawing APIs
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
             if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
             {
-                view.SetNeedsDraw ();
+                //view.SetNeedsDraw ();
             }
             view.Draw (context);
 
@@ -605,7 +674,7 @@ public partial class View // Drawing APIs
 
     private void DoRenderLineCanvas ()
     {
-        if (OnRenderingLineCanvas ())
+        if (!NeedsDraw || OnRenderingLineCanvas ())
         {
             return;
         }
@@ -658,7 +727,7 @@ public partial class View // Drawing APIs
                     Driver.Move (p.Key.X, p.Key.Y);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
-                    AddRune (p.Value.Value.Rune);
+                    AddStr (p.Value.Value.Grapheme);
                 }
             }
 
@@ -685,7 +754,7 @@ public partial class View // Drawing APIs
                 context!.ClipDrawnRegion (ViewportToScreen (Viewport));
 
                 // Exclude the drawn region from the clip
-                ExcludeFromClip (context!.GetDrawnRegion ());
+                ExcludeFromClip (context.GetDrawnRegion ());
 
                 // Exclude the Border and Padding from the clip
                 ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
@@ -731,185 +800,4 @@ public partial class View // Drawing APIs
 
     #endregion DrawComplete
 
-    #region NeedsDraw
-
-    // TODO: Change NeedsDraw to use a Region instead of Rectangle
-    // TODO: Make _needsDrawRect nullable instead of relying on Empty
-    //      TODO: If null, it means ?
-    //      TODO: If Empty, it means no need to redraw
-    //      TODO: If not Empty, it means the region that needs to be redrawn
-    // The viewport-relative region that needs to be redrawn. Marked internal for unit tests.
-    internal Rectangle NeedsDrawRect { get; set; } = Rectangle.Empty;
-
-    /// <summary>Gets or sets whether the view needs to be redrawn.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Will be <see langword="true"/> if the <see cref="NeedsLayout"/> property is <see langword="true"/> or if
-    ///         any part of the view's <see cref="Viewport"/> needs to be redrawn.
-    ///     </para>
-    ///     <para>
-    ///         Setting has no effect on <see cref="NeedsLayout"/>.
-    ///     </para>
-    /// </remarks>
-    public bool NeedsDraw
-    {
-        get => Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
-        set
-        {
-            if (value)
-            {
-                SetNeedsDraw ();
-            }
-            else
-            {
-                ClearNeedsDraw ();
-            }
-        }
-    }
-
-    /// <summary>Gets whether any SubViews need to be redrawn.</summary>
-    public bool SubViewNeedsDraw { get; private set; }
-
-    /// <summary>Sets that the <see cref="Viewport"/> of this View needs to be redrawn.</summary>
-    /// <remarks>
-    ///     If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), this method
-    ///     does nothing.
-    /// </remarks>
-    public void SetNeedsDraw ()
-    {
-        Rectangle viewport = Viewport;
-
-        if (!Visible || (NeedsDrawRect != Rectangle.Empty && viewport.IsEmpty))
-        {
-            // This handles the case where the view has not been initialized yet
-            return;
-        }
-
-        SetNeedsDraw (viewport);
-    }
-
-    /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="viewPortRelativeRegion"/>.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The location of <paramref name="viewPortRelativeRegion"/> is relative to the View's <see cref="Viewport"/>.
-    ///     </para>
-    ///     <para>
-    ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
-    ///         redrawn will be the <paramref name="viewPortRelativeRegion"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="viewPortRelativeRegion">The <see cref="Viewport"/>relative region that needs to be redrawn.</param>
-    public void SetNeedsDraw (Rectangle viewPortRelativeRegion)
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        if (NeedsDrawRect.IsEmpty)
-        {
-            NeedsDrawRect = viewPortRelativeRegion;
-        }
-        else
-        {
-            int x = Math.Min (Viewport.X, viewPortRelativeRegion.X);
-            int y = Math.Min (Viewport.Y, viewPortRelativeRegion.Y);
-            int w = Math.Max (Viewport.Width, viewPortRelativeRegion.Width);
-            int h = Math.Max (Viewport.Height, viewPortRelativeRegion.Height);
-            NeedsDrawRect = new (x, y, w, h);
-        }
-
-        // Do not set on Margin - it will be drawn in a separate pass.
-
-        if (Border is { } && Border.Thickness != Thickness.Empty)
-        {
-            Border?.SetNeedsDraw ();
-        }
-
-        if (Padding is { } && Padding.Thickness != Thickness.Empty)
-        {
-            Padding?.SetNeedsDraw ();
-        }
-
-        SuperView?.SetSubViewNeedsDraw ();
-
-        if (this is Adornment adornment)
-        {
-            adornment.Parent?.SetSubViewNeedsDraw ();
-        }
-
-        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
-        foreach (View subview in InternalSubViews.Snapshot ())
-        {
-            if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
-            {
-                Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, viewPortRelativeRegion);
-                subviewRegion.X -= subview.Frame.X;
-                subviewRegion.Y -= subview.Frame.Y;
-                subview.SetNeedsDraw (subviewRegion);
-            }
-        }
-    }
-
-    /// <summary>Sets <see cref="SubViewNeedsDraw"/> to <see langword="true"/> for this View and all Superviews.</summary>
-    public void SetSubViewNeedsDraw ()
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        SubViewNeedsDraw = true;
-
-        if (this is Adornment adornment)
-        {
-            adornment.Parent?.SetSubViewNeedsDraw ();
-        }
-
-        if (SuperView is { SubViewNeedsDraw: false })
-        {
-            SuperView.SetSubViewNeedsDraw ();
-        }
-    }
-
-    /// <summary>Clears <see cref="NeedsDraw"/> and <see cref="SubViewNeedsDraw"/>.</summary>
-    protected void ClearNeedsDraw ()
-    {
-        NeedsDrawRect = Rectangle.Empty;
-        SubViewNeedsDraw = false;
-
-        if (Margin is { } && (Margin.Thickness != Thickness.Empty || Margin.SubViewNeedsDraw || Margin.NeedsDraw))
-        {
-            Margin?.ClearNeedsDraw ();
-        }
-
-        if (Border is { } && (Border.Thickness != Thickness.Empty || Border.SubViewNeedsDraw || Border.NeedsDraw))
-        {
-            Border?.ClearNeedsDraw ();
-        }
-
-        if (Padding is { } && (Padding.Thickness != Thickness.Empty || Padding.SubViewNeedsDraw || Padding.NeedsDraw))
-        {
-            Padding?.ClearNeedsDraw ();
-        }
-
-        // There was multiple enumeration error here, so calling new snapshot collection - probably a stop gap
-        foreach (View subview in InternalSubViews.Snapshot ())
-        {
-            subview.ClearNeedsDraw ();
-        }
-
-        if (SuperView is { })
-        {
-            SuperView.SubViewNeedsDraw = false;
-        }
-
-        // This ensures LineCanvas' get redrawn
-        if (!SuperViewRendersLineCanvas)
-        {
-            LineCanvas.Clear ();
-        }
-    }
-
-    #endregion NeedsDraw
 }

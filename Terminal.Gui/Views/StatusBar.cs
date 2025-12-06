@@ -1,17 +1,16 @@
-#nullable enable
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of
-///     <see cref="Shortcut"/>s. The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu
+///     A status bar is a <see cref="View"/> that snaps to the bottom of the Viewport displaying set of
+///     <see cref="Shortcut"/>s. The <see cref="StatusBar"/> should be context-sensitive. This means, if the main menu
 ///     and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog
 ///     to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a
 ///     new instance of a status bar.
 /// </summary>
 public class StatusBar : Bar, IDesignable
 {
+    private static LineStyle _defaultSeparatorLineStyle = LineStyle.Single; // Resources/config.json overrides
+
     /// <inheritdoc/>
     public StatusBar () : this ([]) { }
 
@@ -58,7 +57,11 @@ public class StatusBar : Bar, IDesignable
     ///     Gets or sets the default Line Style for the separators between the shortcuts of the StatusBar.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultSeparatorLineStyle { get; set; } = LineStyle.Single;
+    public static LineStyle DefaultSeparatorLineStyle
+    {
+        get => _defaultSeparatorLineStyle;
+        set => _defaultSeparatorLineStyle = value;
+    }
 
     /// <inheritdoc />
     protected override void OnSubViewLayout (LayoutEventArgs args)
@@ -137,12 +140,14 @@ public class StatusBar : Bar, IDesignable
         button1.Accepting += OnButtonClicked;
         Add (button1);
 
-        shortcut.Accepting += (s, e) =>
-                           {
-                               button1.Visible = !button1.Visible;
-                               button1.Enabled = button1.Visible;
-                               e.Handled = false;
-                           };
+#pragma warning disable TGUI001
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  button1.Visible = !button1.Visible;
+                                  button1.Enabled = button1.Visible;
+                                  e.Handled = false;
+                              };
+#pragma warning restore TGUI001
 
         Add (new Label
         {
@@ -155,13 +160,13 @@ public class StatusBar : Bar, IDesignable
         {
             Text = "Or me!",
         };
-        button2.Accepting += (s, e) => Application.RequestStop ();
+        button2.Accepting += (s, e) => App?.RequestStop ();
 
         Add (button2);
 
         return true;
 
-        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query ("Hi", $"You clicked {sender}"); }
+        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App, "Hi", $"You clicked {sender}"); }
     }
 
     /// <inheritdoc />

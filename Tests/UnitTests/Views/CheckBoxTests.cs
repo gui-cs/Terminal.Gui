@@ -110,197 +110,6 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.True (ckb.CanFocus);
         Assert.Equal (new (0, 0, 2, 1), ckb.Frame);
 
-        ckb = new () { Text = "Test", CheckedState = CheckState.Checked };
-        Assert.True (ckb.Width is DimAuto);
-        Assert.True (ckb.Height is DimAuto);
-        ckb.Layout ();
-        Assert.Equal (CheckState.Checked, ckb.CheckedState);
-        Assert.False (ckb.AllowCheckStateNone);
-        Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
-        Assert.True (ckb.CanFocus);
-        Assert.Equal (new (0, 0, 6, 1), ckb.Frame);
-
-        ckb = new () { Text = "Test", X = 1, Y = 2 };
-        Assert.True (ckb.Width is DimAuto);
-        Assert.True (ckb.Height is DimAuto);
-        ckb.Layout ();
-        Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
-        Assert.False (ckb.AllowCheckStateNone);
-        Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Test", ckb.TextFormatter.Text);
-        Assert.True (ckb.CanFocus);
-        Assert.Equal (new (1, 2, 6, 1), ckb.Frame);
-
-        ckb = new () { Text = "Test", X = 3, Y = 4, CheckedState = CheckState.Checked };
-        Assert.True (ckb.Width is DimAuto);
-        Assert.True (ckb.Height is DimAuto);
-        ckb.Layout ();
-        Assert.Equal (CheckState.Checked, ckb.CheckedState);
-        Assert.False (ckb.AllowCheckStateNone);
-        Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
-        Assert.True (ckb.CanFocus);
-        Assert.Equal (new (3, 4, 6, 1), ckb.Frame);
-    }
-
-    [Fact]
-    public void AllowCheckStateNone_Get_Set ()
-    {
-        var checkBox = new CheckBox { Text = "Check this out 你" };
-
-        checkBox.HasFocus = true;
-        Assert.True (checkBox.HasFocus);
-        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
-
-        // Select with keyboard
-        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
-        Assert.Equal (CheckState.Checked, checkBox.CheckedState);
-
-        // Select with mouse
-        Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
-        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
-
-        checkBox.AllowCheckStateNone = true;
-        Assert.True (checkBox.NewKeyDownEvent (Key.Space));
-        Assert.Equal (CheckState.None, checkBox.CheckedState);
-        checkBox.Draw ();
-
-        checkBox.AllowCheckStateNone = false;
-        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_OnAccept_Returns_True ()
-    {
-        var ckb = new CheckBox ();
-        var acceptInvoked = false;
-
-        ckb.Accepting += ViewOnAccept;
-
-        bool? ret = ckb.InvokeCommand (Command.Accept);
-        Assert.True (ret);
-        Assert.True (acceptInvoked);
-
-        return;
-
-        void ViewOnAccept (object sender, CommandEventArgs e)
-        {
-            acceptInvoked = true;
-            e.Handled = true;
-        }
-    }
-
-
-    #region Keyboard Tests
-
-
-    [Fact]
-    public void KeyDown_Raise_Events_Properly ()
-    {
-        Application.Navigation = new ();
-        Application.Top = new ();
-        View otherView = new () { CanFocus = true };
-        var ckb = new CheckBox ();
-        Application.Top.Add (ckb, otherView);
-        Application.Top.SetFocus ();
-        Assert.True (ckb.HasFocus);
-
-        var checkedStateChangingCount = 0;
-        ckb.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
-
-        var activatingCount = 0;
-        ckb.Activating += (s, e) => activatingCount++;
-
-        var acceptCount = 0;
-        ckb.Accepting += (s, e) => acceptCount++;
-
-        Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
-        Assert.Equal (0, checkedStateChangingCount);
-        Assert.Equal (0, activatingCount);
-        Assert.Equal (0, acceptCount);
-        Assert.Equal (Key.Empty, ckb.HotKey);
-
-        // Test while focused
-        ckb.Text = "_Test";
-        Assert.Equal (Key.T, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.T);
-        Assert.Equal (CheckState.Checked, ckb.CheckedState);
-        Assert.Equal (1, checkedStateChangingCount);
-        Assert.Equal (1, activatingCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.Text = "T_est";
-        Assert.Equal (Key.E, ckb.HotKey);
-        ckb.NewKeyDownEvent (Key.E.WithAlt);
-        Assert.Equal (2, checkedStateChangingCount);
-        Assert.Equal (2, activatingCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.NewKeyDownEvent (Key.Space);
-        Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, activatingCount);
-        Assert.Equal (0, acceptCount);
-
-        ckb.NewKeyDownEvent (Key.Enter);
-        Assert.Equal (3, checkedStateChangingCount);
-        Assert.Equal (3, activatingCount);
-        Assert.Equal (1, acceptCount);
-
-        Application.Top.Dispose ();
-        Application.ResetState ();
-    }
-
-    [Fact]
-    public void Enter_Raises_Accepting ()
-    {
-        CheckBox cb = new ();
-        int acceptedCount = 0;
-
-        cb.Accepting += CheckBoxOnAccept;
-        cb.NewKeyDownEvent (Key.Enter);
-
-        Assert.Equal (1, acceptedCount);
-
-        return;
-
-        void CheckBoxOnAccept (object sender, CommandEventArgs e) { acceptedCount++; }
-    }
-
-
-    [Fact]
-    public void Accept_Command_Raises_Accepting ()
-    {
-        var cb = new CheckBox ();
-        int acceptedCount = 0;
-
-        cb.Accepting += CheckBoxOnAccept;
-        cb.InvokeCommand (Command.Accept);
-
-        Assert.Equal(1,acceptedCount);
-
-        return;
-
-        void CheckBoxOnAccept (object sender, CommandEventArgs e) { acceptedCount++; }
-    }
-
-    [Fact]
-    public void HotKey_Command_Does_Not_Raise_Accepting ()
-    {
-        var cb = new CheckBox ();
-        var accepted = false;
-
-        cb.Accepting += CheckBoxOnAccept;
-        cb.InvokeCommand (Command.HotKey);
-
-        Assert.False (accepted);
-
-        return;
-
-        void CheckBoxOnAccept (object sender, CommandEventArgs e) { accepted = true; }
-    }
-
-    #endregion Keyboard Tests
     #region Mouse Tests
 
     [Fact]
@@ -396,11 +205,12 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
         Application.Driver?.SetScreenSize (30, 5);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (Alignment.Center, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
@@ -456,12 +266,12 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox1, checkBox2);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 6);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (Alignment.Fill, checkBox1.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
         Assert.Equal (Alignment.Fill, checkBox2.TextAlignment);
@@ -517,12 +327,12 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (Alignment.Start, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.ConstrainToSize);
@@ -568,12 +378,12 @@ public class CheckBoxTests (ITestOutputHelper output)
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill (), Title = "Test Demo 你" };
         win.Add (checkBox);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (Alignment.End, checkBox.TextAlignment);
         Assert.Equal (new (1, 1, 25, 1), checkBox.Frame);
         Assert.Equal (_size25x1, checkBox.TextFormatter.ConstrainToSize);

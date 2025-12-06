@@ -1,7 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using Moq;
+using Terminal.Gui.App;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests;
 
 public class ApplicationPopoverTests
 {
@@ -42,6 +43,7 @@ public class ApplicationPopoverTests
         // Arrange
         var popover = new Mock<PopoverTestClass> ().Object;
         var popoverManager = new ApplicationPopover ();
+        popoverManager.Register (popover);
 
         // Act
         popoverManager.Show (popover);
@@ -56,6 +58,7 @@ public class ApplicationPopoverTests
         // Arrange
         var popover = new Mock<IPopover> ().Object;
         var popoverManager = new ApplicationPopover ();
+        popoverManager.Register (popover);
         popoverManager.Show (popover);
 
         // Act
@@ -72,6 +75,8 @@ public class ApplicationPopoverTests
         // Arrange
         var popover = new PopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
+        popoverManager.Register (popover);
+
         popoverManager.Show (popover);
 
         // Act
@@ -88,6 +93,7 @@ public class ApplicationPopoverTests
         // Arrange
         var popover = new PopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
+        popoverManager.Register (popover);
         popoverManager.Show (popover);
 
         // Act
@@ -106,6 +112,8 @@ public class ApplicationPopoverTests
         var activePopover = new PopoverTestClass () { Id = "activePopover" };
         var inactivePopover = new PopoverTestClass () { Id = "inactivePopover" }; ;
         var popoverManager = new ApplicationPopover ();
+
+        popoverManager.Register (activePopover);
         popoverManager.Show (activePopover);
         popoverManager.Register (inactivePopover);
 
@@ -126,6 +134,8 @@ public class ApplicationPopoverTests
         var activePopover = new PopoverTestClass ();
         var inactivePopover = new PopoverTestClass ();
         var popoverManager = new ApplicationPopover ();
+        popoverManager.Register (activePopover);
+
         popoverManager.Show (activePopover);
         popoverManager.Register (inactivePopover);
 
@@ -181,6 +191,6 @@ public class ApplicationPopoverTests
         }
 
         /// <inheritdoc />
-        public Toplevel? Toplevel { get; set; }
+        public IRunnable? Current { get; set; }
     }
 }

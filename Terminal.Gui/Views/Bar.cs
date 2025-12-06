@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -33,13 +31,14 @@ public class Bar : View, IOrientation, IDesignable
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
 
-
-        if (shortcuts is { })
+        if (shortcuts is null)
         {
-            foreach (View shortcut in shortcuts)
-            {
-                Add (shortcut);
-            }
+            return;
+        }
+
+        foreach (View shortcut in shortcuts)
+        {
+            base.Add (shortcut);
         }
     }
 
@@ -107,7 +106,7 @@ public class Bar : View, IOrientation, IDesignable
     public void OnOrientationChanged (Orientation newOrientation)
     {
         // BUGBUG: this should not be SuperView.GetContentSize
-        LayoutBarItems (SuperView?.GetContentSize () ?? Application.Screen.Size);
+        LayoutBarItems (SuperView?.GetContentSize () ?? App?.Screen.Size ?? Size.Empty);
     }
     #endregion
 
@@ -245,7 +244,7 @@ public class Bar : View, IOrientation, IDesignable
                             barItem.X = 0;
                             scBarItem.MinimumKeyTextSize = minKeyWidth;
                             scBarItem.Width = scBarItem.GetWidthDimAuto ();
-                            barItem.Layout (Application.Screen.Size);
+                            barItem.Layout (App?.Screen.Size ?? Size.Empty);
                             maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
                         }
 

@@ -182,13 +182,13 @@ public class CharacterMap : Scenario
 
         top.Add (_categoryList);
 
-        var menu = new MenuBarv2
+        var menu = new MenuBar
         {
             Menus =
             [
                 new (
                      "_File",
-                     new MenuItemv2 []
+                     new MenuItem []
                      {
                          new (
                               "_Quit",
@@ -343,14 +343,14 @@ public class CharacterMap : Scenario
                    );
     }
 
-    private MenuItemv2 CreateMenuShowWidth ()
+    private MenuItem CreateMenuShowWidth ()
     {
         CheckBox cb = new ()
         {
             Title = "_Show Glyph Width",
             CheckedState = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
         };
-        var item = new MenuItemv2 { CommandView = cb };
+        var item = new MenuItem { CommandView = cb };
 
         item.Action += () =>
                        {
@@ -363,7 +363,7 @@ public class CharacterMap : Scenario
         return item;
     }
 
-    private MenuItemv2 CreateMenuUnicodeCategorySelector ()
+    private MenuItem CreateMenuUnicodeCategorySelector ()
     {
         // First option is "All" (no filter), followed by all UnicodeCategory names
         string [] allCategoryNames = Enum.GetNames<UnicodeCategory> ();

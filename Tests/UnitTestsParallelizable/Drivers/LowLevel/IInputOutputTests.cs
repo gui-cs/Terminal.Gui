@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 /// <summary>
 ///     Low-level tests for IInput and IOutput implementations across all drivers.

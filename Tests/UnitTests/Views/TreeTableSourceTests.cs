@@ -55,7 +55,7 @@ public class TreeTableSourceTests : IDisposable
         // when pressing right we should expand the top route
         tv.NewKeyDownEvent (Key.CursorRight);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -73,7 +73,7 @@ public class TreeTableSourceTests : IDisposable
         // when pressing left we should collapse the top route again
         tv.NewKeyDownEvent (Key.CursorLeft);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -93,16 +93,11 @@ public class TreeTableSourceTests : IDisposable
     {
         Application.Driver!.SetScreenSize (100, 100);
 
-        Application.Top = new Toplevel ()
-        {
-            Frame = new (0, 0, 100, 100),
-        };
         TableView tv = GetTreeTable (out _);
-        Application.Top.Add (tv);
 
         tv.Style.GetOrCreateColumnStyle (1).MinAcceptableWidth = 1;
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -120,9 +115,9 @@ public class TreeTableSourceTests : IDisposable
         Assert.Equal (0, tv.SelectedRow);
         Assert.Equal (0, tv.SelectedColumn);
 
-        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (2, 2), Flags = MouseFlags.Button1Clicked });
+        Assert.True (tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked }));
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -138,16 +133,16 @@ public class TreeTableSourceTests : IDisposable
         DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Clicking to the right/left of the expand/collapse does nothing
-        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (3, 2), Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEventArgs { Position = new (3, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         DriverAssert.AssertDriverContentsAre (expected, _output);
-        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (1, 2), Flags = MouseFlags.Button1Clicked });
+        tv.NewMouseEvent (new MouseEventArgs { Position = new (1, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
         DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Clicking on the + again should collapse
-        Application.RaiseMouseEvent (new MouseEventArgs { ScreenPosition = new (2, 2), Flags = MouseFlags.Button1Clicked });
-        View.SetClipToScreen ();
+        tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -158,15 +153,13 @@ public class TreeTableSourceTests : IDisposable
 │└+Route 66    │Great race course      │";
 
         DriverAssert.AssertDriverContentsAre (expected, _output);
-
-        Application.ResetState (true);
     }
 
     [Fact]
     [AutoInitShutdown]
     public void TestTreeTableSource_CombinedWithCheckboxes ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
         TableView tv = GetTreeTable (out TreeView<IDescribedThing> treeSource);
 
         CheckBoxTableSourceWrapperByIndex checkSource;
@@ -202,7 +195,7 @@ public class TreeTableSourceTests : IDisposable
 
         Application.RaiseKeyDownEvent (Key.CursorRight);
 
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -220,7 +213,7 @@ public class TreeTableSourceTests : IDisposable
 
         tv.NewKeyDownEvent (Key.CursorDown);
         tv.NewKeyDownEvent (Key.Space);
-        View.SetClipToScreen ();
+        tv.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -246,8 +239,11 @@ public class TreeTableSourceTests : IDisposable
 
     private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
     {
-        var tableView = new TableView ();
-        tableView.SchemeName = "TopLevel";
+        var tableView = new TableView ()
+        {
+            Driver = ApplicationImpl.Instance.Driver,
+        };
+        tableView.SchemeName = "Runnable";
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
 
         tableView.Style.ShowHorizontalHeaderUnderline = true;
@@ -301,7 +297,7 @@ public class TreeTableSourceTests : IDisposable
         tableView.EndInit ();
         tableView.LayoutSubViews ();
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tableView);
         top.SetFocus ();
         Assert.Equal (tableView, top.MostFocused);

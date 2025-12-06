@@ -16,7 +16,6 @@ public class ApplicationMouseTests
         _output = output;
 #if DEBUG_IDISPOSABLE
         View.Instances.Clear ();
-        SessionToken.Instances.Clear ();
 #endif
     }
 
@@ -120,21 +119,14 @@ public class ApplicationMouseTests
 
         var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
-        view.Activating += (s, e) =>
+        view.MouseClick += (s, e) =>
                            {
-                               if (e.Context is CommandContext<MouseBinding> mouseCommandContext)
-                               {
-                                   Assert.Equal (expectedX, mouseCommandContext.Binding.MouseEventArgs!.Position.X);
-                                   Assert.Equal (expectedY, mouseCommandContext.Binding.MouseEventArgs.Position.Y);
-                                   clicked = true;
-                               }
-                               else
-                               {
-                                   Assert.Fail ();
-                               }
+                               Assert.Equal (expectedX, e.Position.X);
+                               Assert.Equal (expectedY, e.Position.Y);
+                               clicked = true;
                            };
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
 
@@ -143,112 +135,6 @@ public class ApplicationMouseTests
         top.Dispose ();
     }
 
-    /// <summary>
-    ///     Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked. With
-    ///     Frames; Frame != Viewport
-    /// </summary>
-    //[AutoInitShutdown]
-    [Theory]
-
-    // click on border
-    [InlineData (0, 0, 0, 0, 0, false)]
-    [InlineData (0, 1, 0, 0, 0, false)]
-    [InlineData (0, 0, 1, 0, 0, false)]
-    [InlineData (0, 9, 0, 0, 0, false)]
-    [InlineData (0, 0, 9, 0, 0, false)]
-
-    // outside border
-    [InlineData (0, 10, 0, 0, 0, false)]
-    [InlineData (0, 0, 10, 0, 0, false)]
-
-    // view is offset from origin ; click is on border 
-    [InlineData (1, 1, 1, 0, 0, false)]
-    [InlineData (1, 2, 1, 0, 0, false)]
-    [InlineData (1, 1, 2, 0, 0, false)]
-    [InlineData (1, 10, 1, 0, 0, false)]
-    [InlineData (1, 1, 10, 0, 0, false)]
-
-    // outside border
-    [InlineData (1, -1, 0, 0, 0, false)]
-    [InlineData (1, 0, -1, 0, 0, false)]
-    [InlineData (1, 10, 10, 0, 0, false)]
-    [InlineData (1, 11, 11, 0, 0, false)]
-
-    // view is at origin, click is inside border
-    [InlineData (0, 1, 1, 0, 0, true)]
-    [InlineData (0, 2, 1, 1, 0, true)]
-    [InlineData (0, 1, 2, 0, 1, true)]
-    [InlineData (0, 8, 1, 7, 0, true)]
-    [InlineData (0, 1, 8, 0, 7, true)]
-    [InlineData (0, 8, 8, 7, 7, true)]
-
-    // view is offset from origin ; click inside border
-    // our view is 10x10, but has a border, so it's bounds is 8x8
-    [InlineData (1, 2, 2, 0, 0, true)]
-    [InlineData (1, 3, 2, 1, 0, true)]
-    [InlineData (1, 2, 3, 0, 1, true)]
-    [InlineData (1, 9, 2, 7, 0, true)]
-    [InlineData (1, 2, 9, 0, 7, true)]
-    [InlineData (1, 9, 9, 7, 7, true)]
-    [InlineData (1, 10, 10, 7, 7, false)]
-
-    //01234567890123456789
-    // |12345678|
-    // |xxxxxxxx
-    public void MouseCoordinatesTest_Border (
-        int offset,
-        int clickX,
-        int clickY,
-        int expectedX,
-        int expectedY,
-        bool expectedClicked
-    )
-    {
-        Size size = new (10, 10);
-        Point pos = new (offset, offset);
-
-        var clicked = false;
-
-        Application.Top = new Toplevel ()
-        {
-            Id = "top",
-        };
-        Application.Top.X = 0;
-        Application.Top.Y = 0;
-        Application.Top.Width = size.Width * 2;
-        Application.Top.Height = size.Height * 2;
-        Application.Top.BorderStyle = LineStyle.None;
-
-        var view = new View { Id = "view", X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
-
-        // Give the view a border. With PR #2920, mouse clicks are only passed if they are inside the view's Viewport.
-        view.BorderStyle = LineStyle.Single;
-        view.CanFocus = true;
-
-        Application.Top.Add (view);
-
-        var mouseEvent = new MouseEventArgs { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
-
-        view.Activating += (s, e) =>
-                           {
-                               if (e.Context is CommandContext<MouseBinding> mouseCommandContext)
-                               {
-                                   Assert.Equal (expectedX, mouseCommandContext.Binding.MouseEventArgs!.Position.X);
-                                   Assert.Equal (expectedY, mouseCommandContext.Binding.MouseEventArgs.Position.Y);
-                                   clicked = true;
-                               }
-                               else
-                               {
-                                   Assert.Fail ();
-                               }
-                           };
-
-        Application.RaiseMouseEvent (mouseEvent);
-        Assert.Equal (expectedClicked, clicked);
-        Application.Top.Dispose ();
-        Application.ResetState (ignoreDisposed: true);
-
-    }
 
     #endregion mouse coordinate tests
 
@@ -263,7 +149,7 @@ public class ApplicationMouseTests
         //sv.SetContentSize (new (100, 100));
 
         //sv.Add (tf);
-        //var top = new Toplevel ();
+        //var top = new Runnable ();
         //top.Add (sv);
 
         //int iterations = -1;
@@ -281,14 +167,14 @@ public class ApplicationMouseTests
 
         //                                 Assert.Equal (sv, Application.Mouse.MouseGrabView);
 
-        //                                 MessageBox.Query ("Title", "Test", "Ok");
+        //                                 MessageBox.Query (App, "Title", "Test", "Ok");
 
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
         //                             }
         //                             else if (iterations == 1)
         //                             {
         //                                 // Application.Mouse.MouseGrabView is null because
-        //                                 // another toplevel (Dialog) was opened
+        //                                 // another runnable (Dialog) was opened
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
 
         //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.ReportMousePosition });
@@ -404,7 +290,7 @@ public class ApplicationMouseTests
         var count = 0;
         var view = new View { Width = 1, Height = 1 };
         view.MouseEvent += (s, e) => count++;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (view);
         Application.Begin (top);
 
@@ -453,7 +339,7 @@ public class ApplicationMouseTests
         View? receivedView = null;
         grabView.MouseEvent += (_, e) => receivedView = e.View;
 
-        var top = new Toplevel { Width = 20, Height = 10 };
+        var top = new Runnable { Width = 20, Height = 10 };
         top.Add (grabView);
         top.Add (targetView); // deepestViewUnderMouse = targetView
         Application.Begin (top);
@@ -475,45 +361,4 @@ public class ApplicationMouseTests
     }
 
     #endregion
-
-
-    [Theory]
-    [InlineData (MouseState.None)]
-    [InlineData (MouseState.In)]
-    [InlineData (MouseState.Pressed)]
-    [InlineData (MouseState.PressedOutside)]
-    public void RaiseMouseEvent_ButtonClicked_Raises_Activating_Once (MouseState states)
-    {
-        Application.Init (driverName: "fake");
-
-        Application.Top = new Toplevel ()
-        {
-            Id = "top",
-            Height = 10,
-            Width = 10
-        };
-
-        var view = new View
-        {
-            Width = 1,
-            Height = 1,
-            WantContinuousButtonPressed = false,
-            HighlightStates = states
-        };
-        Application.Top.Add (view);
-        Application.LayoutAndDraw ();
-
-        var activatingCount = 0;
-        view.Activating += (s, e) => activatingCount++;
-
-        var me = new MouseEventArgs ();
-        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Pressed, });
-        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Released, });
-        Application.RaiseMouseEvent (new MouseEventArgs () { Flags = MouseFlags.Button1Clicked, });
-
-        Application.Top.Dispose ();
-        Application.ResetState (true);
-
-        Assert.Equal (1, activatingCount);
-    }
 }

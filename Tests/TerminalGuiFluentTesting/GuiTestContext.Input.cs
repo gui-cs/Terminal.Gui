@@ -58,13 +58,13 @@ public partial class GuiTestContext
     private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
             // Enqueue the mouse event
-        WaitIteration (() =>
+        WaitIteration ((app) =>
         {
-            if (Application.Driver is { })
+            if (app.Driver is { })
             {
                 mouseEvent.Position = mouseEvent.ScreenPosition;
 
-                Application.Driver.InputProcessor.EnqueueMouseEvent (mouseEvent);
+                app.Driver.InputProcessor.EnqueueMouseEvent (app, mouseEvent);
             }
             else
             {
@@ -81,7 +81,7 @@ public partial class GuiTestContext
     {
         var screen = Point.Empty;
 
-        GuiTestContext ctx = WaitIteration (() =>
+        GuiTestContext ctx = WaitIteration ((_) =>
                                             {
                                                 TView v = Find (evaluator);
                                                 screen = v.ViewportToScreen (new Point (0, 0));
@@ -199,23 +199,18 @@ public partial class GuiTestContext
         // We do this by subscribing to the Driver.KeyDown event and waiting until it is raised.
         // This prevents the application from missing the key event if we enqueue it and immediately return.
         bool keyReceived = false;
-        if (_applicationImpl?.Driver is { })
+        if (App?.Driver is { })
         {
-            _applicationImpl.Driver.KeyDown += DriverOnKeyDown;
-            _applicationImpl.Driver.EnqueueKeyEvent (key);
+            App.Driver.KeyDown += DriverOnKeyDown;
+            App.Driver.EnqueueKeyEvent (key);
             WaitUntil (() => keyReceived);
         }
-        else
-        {
-            Fail ("Expected Application.Driver to be non-null.");
-        }
-
 
         return this;
 
         void DriverOnKeyDown (object? sender, Key e)
         {
-            _applicationImpl.Driver.KeyDown -= DriverOnKeyDown;
+            App.Driver.KeyDown -= DriverOnKeyDown;
             keyReceived = true;
         }
 

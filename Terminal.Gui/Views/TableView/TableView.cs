@@ -1,3 +1,4 @@
+#nullable disable
 using System.Data;
 using System.Globalization;
 
@@ -937,7 +938,7 @@ public class TableView : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         Move (0, 0);
 
@@ -1540,7 +1541,7 @@ public class TableView : View, IDesignable
     /// <param name="width"></param>
     private void ClearLine (int row, int width)
     {
-        if (Application.Screen.Height == 0)
+        if (App?.Screen.Height == 0)
         {
             return;
         }
@@ -1613,11 +1614,11 @@ public class TableView : View, IDesignable
             return false;
         }
 
-        int match = CollectionNavigator.GetNextMatchingItem (row, (char)key);
+        int? match = CollectionNavigator.GetNextMatchingItem (row, (char)key);
 
-        if (match != -1)
+        if (match != null)
         {
-            SelectedRow = match;
+            SelectedRow = match.Value;
             EnsureValidSelection ();
             EnsureSelectedCellIsVisible ();
             SetNeedsDraw ();
@@ -1816,7 +1817,7 @@ public class TableView : View, IDesignable
                 }
             }
 
-            if (Application.Screen.Height > 0)
+            if (App?.Screen.Height > 0)
             {
                 AddRuneAt (c, row, rune);
             }

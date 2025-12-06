@@ -1,4 +1,3 @@
-﻿#nullable enable
 using System.Diagnostics;
 
 namespace Terminal.Gui.App;
@@ -145,6 +144,22 @@ public class TimedEvents : ITimedEvents
         return false;
     }
 
+    /// <inheritdoc/>
+    public TimeSpan? GetTimeout (object token)
+    {
+        lock (_timeoutsLockToken)
+        {
+            int idx = _timeouts.IndexOfValue ((token as Timeout)!);
+
+            if (idx == -1)
+            {
+                return null;
+            }
+
+            return _timeouts.Values [idx].Span;
+        }
+    }
+
     private void AddTimeout (TimeSpan time, Timeout timeout)
     {
         lock (_timeoutsLockToken)
@@ -186,34 +201,58 @@ public class TimedEvents : ITimedEvents
     private void RunTimersImpl ()
     {
         long now = GetTimestampTicks ();
-        SortedList<long, Timeout> copy;
 
-        // lock prevents new timeouts being added
-        // after we have taken the copy but before
-        // we have allocated a new list (which would
-        // result in lost timeouts or errors during enumeration)
+        // Process due timeouts one at a time, without blocking the entire queue
+        while (true)
+        {
+            Timeout? timeoutToExecute = null;
+            long scheduledTime = 0;
+
+            // Find the next due timeout
+            lock (_timeoutsLockToken)
+            {
+                if (_timeouts.Count == 0)
+                {
+                    break; // No more timeouts
+                }
+
+                // Re-evaluate current time for each iteration
+                now = GetTimestampTicks ();
+                
+                // Check if the earliest timeout is due
+                scheduledTime = _timeouts.Keys [0];
+                
+                if (scheduledTime >= now)
+                {
+                    // Earliest timeout is not yet due, we're done
+                    break;
+                }
+
+                // This timeout is due - remove it from the queue
+                timeoutToExecute = _timeouts.Values [0];
+                _timeouts.RemoveAt (0);
+            }
+
+            // Execute the callback outside the lock
+            // This allows nested Run() calls to access the timeout queue
+            if (timeoutToExecute != null)
+            {
+                bool repeat = timeoutToExecute.Callback! ();
+                
+                if (repeat)
+                {
+                    AddTimeout (timeoutToExecute.Span, timeoutToExecute);
+                }
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public void StopAll ()
+    {
         lock (_timeoutsLockToken)
         {
-            copy = _timeouts;
-            _timeouts = new ();
-        }
-
-        foreach ((long k, Timeout timeout) in copy)
-        {
-            if (k < now)
-            {
-                if (timeout.Callback ())
-                {
-                    AddTimeout (timeout.Span, timeout);
-                }
-            }
-            else
-            {
-                lock (_timeoutsLockToken)
-                {
-                    _timeouts.Add (NudgeToUniqueKey (k), timeout);
-                }
-            }
+            _timeouts.Clear ();
         }
     }
 }

@@ -251,7 +251,7 @@ public class MessageBoxes : Scenario
                                                {
                                                    buttonPressedLabel.Text =
                                                        $"{MessageBox.Query (
-                                                                             width,
+                                                                            Application.Instance, width,
                                                                              height,
                                                                              titleEdit.Text,
                                                                              messageEdit.Text,
@@ -263,14 +263,14 @@ public class MessageBoxes : Scenario
                                                else
                                                {
                                                    buttonPressedLabel.Text =
-                                                       $"{MessageBox.ErrorQuery (
-                                                                                  width,
-                                                                                  height,
-                                                                                  titleEdit.Text,
-                                                                                  messageEdit.Text,
-                                                                                  defaultButton,
-                                                                                  ckbWrapMessage.CheckedState == CheckState.Checked,
-                                                                                  btns.ToArray ()
+                                                       $"{MessageBox.ErrorQuery (Application.Instance,
+                                                                                 width,
+                                                                                 height,
+                                                                                 titleEdit.Text,
+                                                                                 messageEdit.Text,
+                                                                                 defaultButton,
+                                                                                 ckbWrapMessage.CheckedState == CheckState.Checked,
+                                                                                 btns.ToArray ()
                                                                                  )}";
                                                }
                                            }

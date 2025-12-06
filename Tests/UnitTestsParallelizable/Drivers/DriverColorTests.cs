@@ -2,7 +2,7 @@
 
 using UnitTests;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class DriverColorTests : FakeDriverBase
 {
@@ -14,6 +14,6 @@ public class DriverColorTests : FakeDriverBase
         driver.Force16Colors = true;
         Assert.True (driver.Force16Colors);
 
-        driver.End ();
+        driver.Dispose ();
     }
 }

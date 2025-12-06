@@ -1,21 +1,14 @@
-#nullable enable
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
     public IDriver? Driver { get; set; }
 
     /// <inheritdoc/>
-    public bool Force16Colors { get; set; }
-
-    /// <inheritdoc/>
     public string ForceDriver { get; set; } = string.Empty;
-
-    /// <inheritdoc/>
-    public List<SixelToRender> Sixel { get; } = new ();
 
     /// <summary>
     ///     Creates the appropriate <see cref="IDriver"/> based on platform and driverName.
@@ -35,7 +28,7 @@ public partial class ApplicationImpl
         bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
 
         // Then check driverName
-        bool nameIsWindows = driverName?.Contains ("win", StringComparison.OrdinalIgnoreCase) ?? false;
+        bool nameIsWindows = driverName?.Contains ("windows", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsDotNet = driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
         bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
@@ -80,12 +73,14 @@ public partial class ApplicationImpl
 
         Logging.Trace ($"Created Subcomponents: {Coordinator}");
 
-        Coordinator.StartInputTaskAsync ().Wait ();
+        Coordinator.StartInputTaskAsync (this).Wait ();
 
         if (Driver == null)
         {
             throw new ("Driver was null even after booting MainLoopCoordinator");
         }
+
+        Driver.Force16Colors = Terminal.Gui.Drivers.Driver.Force16Colors;
     }
 
     private readonly IComponentFactory? _componentFactory;
@@ -150,7 +145,11 @@ public partial class ApplicationImpl
 
     internal void SubscribeDriverEvents ()
     {
-        ArgumentNullException.ThrowIfNull (Driver);
+        if (Driver is null)
+        {
+            Logging.Error($"Driver is null");
+            return;
+        }
 
         Driver.SizeChanged += Driver_SizeChanged;
         Driver.KeyDown += Driver_KeyDown;
@@ -160,7 +159,11 @@ public partial class ApplicationImpl
 
     internal void UnsubscribeDriverEvents ()
     {
-        ArgumentNullException.ThrowIfNull (Driver);
+        if (Driver is null)
+        {
+            Logging.Error ($"Driver is null");
+            return;
+        }
 
         Driver.SizeChanged -= Driver_SizeChanged;
         Driver.KeyDown -= Driver_KeyDown;

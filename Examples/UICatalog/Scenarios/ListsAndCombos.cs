@@ -35,7 +35,7 @@ public class ListsAndCombos : Scenario
         // ListView
         var lbListView = new Label
         {
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             X = 0,
 
             Width = Dim.Percent (40),
@@ -50,7 +50,7 @@ public class ListsAndCombos : Scenario
             Width = Dim.Percent (40),
             Source = new ListWrapper<string> (items)
         };
-        listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
+        listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem.Value];
         win.Add (lbListView, listview);
 
         //var scrollBar = new ScrollBarView (listview, true);
@@ -91,7 +91,7 @@ public class ListsAndCombos : Scenario
         // ComboBox
         var lbComboBox = new Label
         {
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             X = Pos.Right (lbListView) + 1,
 
             Width = Dim.Percent (40),

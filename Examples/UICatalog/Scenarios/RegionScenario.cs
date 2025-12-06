@@ -24,31 +24,31 @@ public class RegionScenario : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
         };
-        app.Padding!.Thickness = new (1);
+        appWindow.Padding!.Thickness = new (1);
 
         var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
-        tools.CurrentAttribute = app.GetAttributeForRole (VisualRole.HotNormal);
+        tools.CurrentAttribute = appWindow.GetAttributeForRole (VisualRole.HotNormal);
 
         tools.SetStyle += b =>
                           {
                               _drawStyle = b;
-                              app.SetNeedsDraw ();
+                              appWindow.SetNeedsDraw ();
                           };
 
         tools.RegionOpChanged += (s, e) => { _regionOp = e; };
 
         //tools.AddLayer += () => canvas.AddLayer ();
 
-        app.Add (tools);
+        appWindow.Add (tools);
 
         // Add drag handling to window
-        app.MouseEvent += (s, e) =>
+        appWindow.MouseEvent += (s, e) =>
                           {
                               if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
                               {
@@ -62,7 +62,7 @@ public class RegionScenario : Scenario
                                       // Drag
                                       if (_isDragging && _dragStart.HasValue)
                                       {
-                                          app.SetNeedsDraw ();
+                                          appWindow.SetNeedsDraw ();
                                       }
                                   }
                               }
@@ -77,31 +77,31 @@ public class RegionScenario : Scenario
                                       _dragStart = null;
                                   }
 
-                                  app.SetNeedsDraw ();
+                                  appWindow.SetNeedsDraw ();
                               }
                           };
 
         // Draw the regions
-        app.DrawingContent += (s, e) =>
+        appWindow.DrawingContent += (s, e) =>
                               {
                                   // Draw all regions with single line style
                                   //_region.FillRectangles (_attribute.Value, _fillRune);
                                   switch (_drawStyle)
                                   {
                                       case RegionDrawStyles.FillOnly:
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, _previewFillRune);
+                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, _previewFillRune);
 
                                           break;
 
                                       case RegionDrawStyles.InnerBoundaries:
-                                          _region.DrawBoundaries (app.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                          _region.DrawBoundaries (appWindow.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
+                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                           break;
 
                                       case RegionDrawStyles.OuterBoundary:
-                                          _region.DrawOuterBoundary (app.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
-                                          _region.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                          _region.DrawOuterBoundary (appWindow.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
+                                          _region.FillRectangles (appWindow.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                           break;
                                   }
@@ -109,14 +109,14 @@ public class RegionScenario : Scenario
                                   // If currently dragging, draw preview rectangle
                                   if (_isDragging && _dragStart.HasValue)
                                   {
-                                      Point currentMousePos = Application.GetLastMousePosition ()!.Value;
+                                      Point currentMousePos = appWindow.App!.Mouse.LastMousePosition!.Value;
                                       Rectangle previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
                                       var previewRegion = new Region (previewRect);
 
-                                      previewRegion.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
+                                      previewRegion.FillRectangles (appWindow.App.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                       previewRegion.DrawBoundaries (
-                                                                    app.LineCanvas,
+                                                                    appWindow.LineCanvas,
                                                                     LineStyle.Dashed,
                                                                     new (
                                                                          tools.CurrentAttribute!.Value.Foreground.GetBrighterColor (),
@@ -124,10 +124,10 @@ public class RegionScenario : Scenario
                                   }
                               };
 
-        Application.Run (app);
+        Application.Run (appWindow);
 
         // Clean up
-        app.Dispose ();
+        appWindow.Dispose ();
         Application.Shutdown ();
     }
 
@@ -268,7 +268,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Color fg = Value?.Foreground ?? Color.Black;
         Color bg = Value?.Background ?? Color.Black;

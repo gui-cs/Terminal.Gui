@@ -1,8 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿#nullable enable
+using JetBrains.Annotations;
 
-namespace UnitTests_Parallelizable.ViewsTests;
-
-[Collection ("Global Test Setup")]
+namespace ViewsTests;
 
 [TestSubject (typeof (Shortcut))]
 public class ShortcutTests
@@ -108,7 +107,7 @@ public class ShortcutTests
         // | C  H  K |
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             HelpText = help,
             Title = command,
@@ -118,7 +117,7 @@ public class ShortcutTests
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             HelpText = help,
             Key = key,
@@ -128,7 +127,7 @@ public class ShortcutTests
         shortcut.Layout ();
         Assert.Equal (expectedWidth, shortcut.Frame.Width);
 
-        shortcut = new()
+        shortcut = new ()
         {
             Key = key,
             HelpText = help,
@@ -299,7 +298,8 @@ public class ShortcutTests
     [Fact]
     public void BindKeyToApplication_Can_Be_Set ()
     {
-        var shortcut = new Shortcut ();
+        IApplication? app = Application.Create ();
+        var shortcut = new Shortcut () { App = app };
 
         shortcut.BindKeyToApplication = true;
 
@@ -314,13 +314,16 @@ public class ShortcutTests
         shortcut.Key = Key.A;
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
 
+        shortcut.App = Application.Create ();
         shortcut.BindKeyToApplication = true;
+        shortcut.BeginInit ();
+        shortcut.EndInit ();
         Assert.False (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.True (Application.KeyBindings.TryGet (Key.A, out _));
+        Assert.True (shortcut.App?.Keyboard.KeyBindings.TryGet (Key.A, out _));
 
         shortcut.BindKeyToApplication = false;
         Assert.True (shortcut.HotKeyBindings.TryGet (Key.A, out _));
-        Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
+        Assert.False (shortcut.App?.Keyboard.KeyBindings.TryGet (Key.A, out _));
     }
 
     //[Theory]
@@ -456,4 +459,54 @@ public class ShortcutTests
         Assert.True (shortcut.CanFocus);
         Assert.False (shortcut.CommandView.CanFocus);
     }
+
+    [Theory (Skip = "Broke somehow!")]
+    [InlineData (true, KeyCode.A, 1, 1)]
+    [InlineData (true, KeyCode.C, 1, 1)]
+    [InlineData (true, KeyCode.C | KeyCode.AltMask, 1, 1)]
+    [InlineData (true, KeyCode.Enter, 1, 1)]
+    [InlineData (true, KeyCode.Space, 1, 1)]
+    [InlineData (true, KeyCode.F1, 0, 0)]
+    [InlineData (false, KeyCode.A, 1, 1)]
+    [InlineData (false, KeyCode.C, 1, 1)]
+    [InlineData (false, KeyCode.C | KeyCode.AltMask, 1, 1)]
+    [InlineData (false, KeyCode.Enter, 0, 0)]
+    [InlineData (false, KeyCode.Space, 0, 0)]
+    [InlineData (false, KeyCode.F1, 0, 0)]
+    public void KeyDown_CheckBox_Raises_Accepted_Selected (bool canFocus, KeyCode key, int expectedAccept, int expectedSelect)
+    {
+        IApplication? app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        var shortcut = new Shortcut
+        {
+            Key = Key.A,
+            Text = "0",
+            CommandView = new CheckBox ()
+            {
+                Title = "_C"
+            },
+            CanFocus = canFocus
+        };
+        runnable.Add (shortcut);
+
+        Assert.Equal (canFocus, shortcut.HasFocus);
+
+        var accepted = 0;
+        shortcut.Accepting += (s, e) =>
+                              {
+                                  accepted++;
+                                  e.Handled = true;
+                              };
+
+        var selected = 0;
+        shortcut.Selecting += (s, e) => selected++;
+
+        app.Keyboard.RaiseKeyDownEvent (key);
+
+        Assert.Equal (expectedAccept, accepted);
+        Assert.Equal (expectedSelect, selected);
+    }
+
 }

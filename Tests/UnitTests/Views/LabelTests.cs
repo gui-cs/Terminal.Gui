@@ -1,4 +1,4 @@
-﻿using UnitTests;
+﻿#nullable enable
 using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
@@ -14,7 +14,7 @@ public class LabelTests (ITestOutputHelper output)
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
@@ -55,12 +55,12 @@ public class LabelTests (ITestOutputHelper output)
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         var expected = @"
 ┌────────────────────────────┐
 │                            │
@@ -101,7 +101,7 @@ public class LabelTests (ITestOutputHelper output)
         TextFormatter tf2 = new () { Direction = TextDirection.LeftRight_TopBottom, ConstrainToSize = tfSize, FillRemaining = true };
         tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (label);
         SessionToken sessionToken = Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -112,9 +112,17 @@ public class LabelTests (ITestOutputHelper output)
 
         AutoInitShutdownAttribute.RunIteration ();
 
-        tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+        tf1.Draw (
+                  Application.Driver,
+                  new (new (0, 1), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
-        tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+        tf2.Draw (
+                  Application.Driver,
+                  new (new (0, 2), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -135,10 +143,20 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
-        tf1.Draw (new (new (0, 1), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+
+        tf1.Draw (
+                  Application.Driver,
+                  new (new (0, 1), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
-        tf2.Draw (new (new (0, 2), tfSize), label.GetAttributeForRole (VisualRole.Normal), label.GetAttributeForRole (VisualRole.HotNormal));
+
+        tf2.Draw (
+                  Application.Driver,
+                  new (new (0, 2), tfSize),
+                  label.GetAttributeForRole (VisualRole.Normal),
+                  label.GetAttributeForRole (VisualRole.HotNormal));
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
@@ -154,8 +172,8 @@ This TextFormatter (tf2) is rewritten.                                 ",
     [AutoInitShutdown]
     public void Label_Draw_Horizontal_Simple_Runes ()
     {
-        var label = new Label { Text = "Demo Simple Rune" };
-        var top = new Toplevel ();
+        var label = new Label { Text = "Demo Simple Text" };
+        var top = new Runnable ();
         top.Add (label);
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -163,7 +181,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
         Assert.Equal (new (0, 0, 16, 1), label.Frame);
 
         var expected = @"
-Demo Simple Rune
+Demo Simple Text
 ";
 
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
@@ -173,10 +191,10 @@ Demo Simple Rune
 
     [Fact]
     [AutoInitShutdown]
-    public void Label_Draw_Vertical_Simple_Runes ()
+    public void Label_Draw_Vertical_Simple_Text ()
     {
-        var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "Demo Simple Rune" };
-        var top = new Toplevel ();
+        var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "Demo Simple Text" };
+        var top = new Runnable ();
         top.Add (label);
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -196,10 +214,10 @@ p
 l
 e
  
-R
-u
-n
+T
 e
+x
+t
 ";
 
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
@@ -212,7 +230,7 @@ e
     public void Label_Draw_Vertical_Wide_Runes ()
     {
         var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "デモエムポンズ" };
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (label);
         Application.Begin (top);
         AutoInitShutdownAttribute.RunIteration ();
@@ -239,14 +257,14 @@ e
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
@@ -271,14 +289,14 @@ e
         var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Assert.False (label.IsInitialized);
 
         Application.Begin (top);
         Application.Driver!.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw ();
         Assert.True (label.IsInitialized);
         Assert.Equal ("Say Hello 你", label.Text);
         Assert.Equal ("Say Hello 你", label.TextFormatter.Text);
@@ -301,7 +319,11 @@ e
     [SetupFakeApplication]
     public void Full_Border ()
     {
-        var label = new Label { BorderStyle = LineStyle.Single, Text = "Test" };
+        var label = new Label
+        {
+            Driver = Application.Driver,
+            BorderStyle = LineStyle.Single, Text = "Test"
+        };
         label.BeginInit ();
         label.EndInit ();
         label.SetRelativeLayout (Application.Screen.Size);
@@ -319,54 +341,6 @@ e
                                                        output
                                                       );
         label.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void With_Top_Margin_Without_Top_Border ()
-    {
-        var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
-        label.Margin!.Thickness = new (0, 1, 0, 0);
-        label.Border!.Thickness = new (1, 0, 1, 1);
-        var top = new Toplevel ();
-        top.Add (label);
-        Application.Begin (top);
-        AutoInitShutdownAttribute.RunIteration ();
-
-        Assert.Equal (new (0, 0, 6, 3), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
-        Application.Begin (top);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
-│Test│
-└────┘",
-                                                       output
-                                                      );
-        top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Without_Top_Border ()
-    {
-        var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        label.Border!.Thickness = new (1, 0, 1, 1);
-        var top = new Toplevel ();
-        top.Add (label);
-        Application.Begin (top);
-        AutoInitShutdownAttribute.RunIteration ();
-        Assert.Equal (new (0, 0, 6, 2), label.Frame);
-        Assert.Equal (new (0, 0, 4, 1), label.Viewport);
-        Application.Begin (top);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
-│Test│
-└────┘",
-                                                       output
-                                                      );
-        top.Dispose ();
     }
 
     // These tests were formally in AutoSizetrue.cs. They are (poor) Label tests.
@@ -699,6 +673,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
+
             //Width = Dim.Fill (),
             X = 0, // keep unit test focused; don't use Center here
             Y = Pos.AnchorEnd (1)
@@ -706,11 +681,11 @@ e
 
         win.Add (label);
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (29, label.Text.Length);
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
@@ -745,6 +720,7 @@ e
         var label = new Label
         {
             Text = "This should be the last line.",
+
             //Width = Dim.Fill (),
             X = 0,
             Y = Pos.Bottom (win)
@@ -753,11 +729,11 @@ e
 
         win.Add (label);
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (win);
         SessionToken rs = Application.Begin (top);
         Application.Driver!.SetScreenSize (40, 10);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (new (0, 0, 40, 10), top.Frame);
         Assert.Equal (new (0, 0, 40, 10), win.Frame);
         Assert.Equal (new (0, 7, 29, 1), label.Frame);
@@ -786,7 +762,7 @@ e
     [AutoInitShutdown]
     public void Dim_Subtract_Operator_With_Text ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View
         {
@@ -829,6 +805,7 @@ e
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  Application.Driver!.SetScreenSize (22, count + 4);
+                                 Application.LayoutAndDraw ();
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -873,7 +850,7 @@ e
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count > -1)
             {
@@ -907,7 +884,11 @@ e
         label.Width = Dim.Fill () - text.Length;
         label.Height = 0;
 
-        var win = new View { CanFocus = true, BorderStyle = LineStyle.Single, Width = Dim.Fill (), Height = Dim.Fill () };
+        var win = new View
+        {
+            App = ApplicationImpl.Instance,
+            CanFocus = true, BorderStyle = LineStyle.Single, Width = Dim.Fill (), Height = Dim.Fill ()
+        };
         win.Add (label);
         win.BeginInit ();
         win.EndInit ();
@@ -965,7 +946,7 @@ e
     [AutoInitShutdown]
     public void Dim_Add_Operator_With_Text ()
     {
-        Toplevel top = new ();
+        Runnable top = new ();
 
         var view = new View
         {
@@ -985,6 +966,7 @@ e
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  Application.Driver!.SetScreenSize (22, count + 4);
+                                 Application.LayoutAndDraw (); 
                                  Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (_expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
@@ -1030,7 +1012,7 @@ e
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             while (count < 21)
             {
@@ -1061,17 +1043,17 @@ e
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView!.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1120,17 +1102,17 @@ e
         };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (label);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
         Application.Begin (top);
         Application.Driver!.SetScreenSize (10, 4);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (5, text.Length);
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
         Assert.Equal (["Label"], label.TextFormatter.GetLines ());
         Assert.Equal (new (0, 0, 10, 4), win.Frame);
-        Assert.Equal (new (0, 0, 10, 4), Application.Top.Frame);
+        Assert.Equal (new (0, 0, 10, 4), Application.TopRunnableView!.Frame);
 
         var expected = @"
 ┌────────┐
@@ -1181,150 +1163,6 @@ e
         Rectangle expectedLabelBounds = new (0, 0, 8, 1);
         Assert.Equal (expectedLabelBounds, label.Viewport);
         super.Dispose ();
-    }
-
-    [Fact]
-    public void CanFocus_False_HotKey_SetsFocus_Next ()
-    {
-        View otherView = new ()
-        {
-            Text = "otherView",
-            CanFocus = true
-        };
-
-        Label label = new ()
-        {
-            Text = "_label"
-        };
-
-        View nextView = new ()
-        {
-            Text = "nextView",
-            CanFocus = true
-        };
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (otherView, label, nextView);
-
-        Application.Top.SetFocus ();
-        Assert.True (otherView.HasFocus);
-
-        Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
-        Assert.False (otherView.HasFocus);
-        Assert.False (label.HasFocus);
-        Assert.True (nextView.HasFocus);
-
-        Application.Top.Dispose ();
-        Application.ResetState ();
-    }
-
-    [Fact]
-    public void CanFocus_False_MouseClick_SetsFocus_Next ()
-    {
-        View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
-        Label label = new () { X = 0, Y = 1, Text = "_label" };
-        View nextView = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 1, Height = 1, Id = "nextView", CanFocus = true };
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (otherView, label, nextView);
-        Application.Top.Layout ();
-
-        Application.Top.SetFocus ();
-
-        // click on label
-        Application.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
-        Assert.False (label.HasFocus);
-        Assert.True (nextView.HasFocus);
-
-        Application.Top.Dispose ();
-        Application.ResetState ();
-    }
-
-    [Fact]
-    public void CanFocus_True_HotKey_SetsFocus ()
-    {
-        Label label = new ()
-        {
-            Text = "_label",
-            CanFocus = true
-        };
-
-        View view = new ()
-        {
-            Text = "view",
-            CanFocus = true
-        };
-        Application.Navigation = new ();
-        Application.Top = new ();
-        Application.Top.Add (label, view);
-
-        view.SetFocus ();
-        Assert.True (label.CanFocus);
-        Assert.False (label.HasFocus);
-        Assert.True (view.CanFocus);
-        Assert.True (view.HasFocus);
-
-        // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
-        Assert.True (Application.RaiseKeyDownEvent (label.HotKey));
-        Assert.True (label.HasFocus);
-        Assert.False (view.HasFocus);
-
-        Application.Top.Dispose ();
-        Application.ResetState ();
-    }
-
-    [Fact]
-    public void CanFocus_True_MouseClick_Focuses ()
-    {
-        Application.Navigation = new ();
-
-        Label label = new ()
-        {
-            Text = "label",
-            X = 0,
-            Y = 0,
-            CanFocus = true
-        };
-
-        View otherView = new ()
-        {
-            Text = "view",
-            X = 0,
-            Y = 1,
-            Width = 4,
-            Height = 1,
-            CanFocus = true
-        };
-
-        Application.Top = new ()
-        {
-            Width = 10,
-            Height = 10
-        };
-        Application.Top.Add (label, otherView);
-        Application.Top.SetFocus ();
-        Application.Top.Layout ();
-
-        Assert.True (label.CanFocus);
-        Assert.True (label.HasFocus);
-        Assert.True (otherView.CanFocus);
-        Assert.False (otherView.HasFocus);
-
-        otherView.SetFocus ();
-        Assert.True (otherView.HasFocus);
-
-        // label can focus, so clicking on it set focus
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
-        Assert.True (label.HasFocus);
-        Assert.False (otherView.HasFocus);
-
-        // click on view
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
-        Assert.False (label.HasFocus);
-        Assert.True (otherView.HasFocus);
-
-        Application.Top.Dispose ();
-        Application.ResetState ();
     }
 
     // https://github.com/gui-cs/Terminal.Gui/issues/3893

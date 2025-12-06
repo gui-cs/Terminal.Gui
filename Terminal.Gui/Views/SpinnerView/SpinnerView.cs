@@ -1,4 +1,4 @@
-﻿#nullable enable
+
 
 //------------------------------------------------------------------------------
 // Windows Terminal supports Unicode and Emoji characters, but by default
@@ -114,7 +114,7 @@ public class SpinnerView : View, IDesignable
     ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are
     ///     ignored based on <see cref="SpinDelay"/>.
     /// </summary>
-    /// <remarks>Ensure this method is called on the main UI thread e.g. via <see cref="Application.Invoke"/></remarks>
+    /// <remarks>Ensure this method is called on the main UI thread e.g. via <see cref="IApplication.Invoke(Action)"/></remarks>
     public void AdvanceAnimation (bool setNeedsDraw = true)
     {
         if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelay))
@@ -172,7 +172,7 @@ public class SpinnerView : View, IDesignable
     protected override bool OnClearingViewport () { return true; }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Render ();
 
@@ -202,16 +202,16 @@ public class SpinnerView : View, IDesignable
     private void AddAutoSpinTimeout ()
     {
         // Only add timeout if we are initialized and not already spinning
-        if (_timeout is { } || !Application.Initialized)
+        if (App is { } && (_timeout is { } || !App.Initialized))
         {
             return;
         }
 
-        _timeout = Application.AddTimeout (
+        _timeout = App?.AddTimeout (
                                            TimeSpan.FromMilliseconds (SpinDelay),
                                            () =>
                                            {
-                                               Application.Invoke (() => AdvanceAnimation ());
+                                               App.Invoke ((_) => AdvanceAnimation ());
 
                                                return true;
                                            }
@@ -266,7 +266,7 @@ public class SpinnerView : View, IDesignable
     {
         if (_timeout is { })
         {
-            Application.RemoveTimeout (_timeout);
+            App?.RemoveTimeout (_timeout);
             _timeout = null;
         }
     }

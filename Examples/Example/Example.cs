@@ -3,30 +3,28 @@
 // This is a simple example application.  For the full range of functionality
 // see the UICatalog project
 
-using Terminal.Gui.Configuration;
 using Terminal.Gui.App;
-using Terminal.Gui.Drawing;
+using Terminal.Gui.Configuration;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
-using Attribute = Terminal.Gui.Drawing.Attribute;
 
-// Override the default configuration for the application to use the Light theme
-//ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
-ConfigurationManager.Enable(ConfigLocations.All);
+// Override the default configuration for the application to use the Amber Phosphor theme
+ConfigurationManager.RuntimeConfig = """{ "Theme": "Amber Phosphor" }""";
+ConfigurationManager.Enable (ConfigLocations.All);
 
+IApplication app = Application.Create ();
 
+app.Run<ExampleWindow> ();
 
-Application.Run<ExampleWindow> ().Dispose ();
-
-// Before the application exits, reset Terminal.Gui for clean shutdown
-Application.Shutdown ();
+// Dispose the app to clean up and enable Console.WriteLine below
+app.Dispose ();
 
 // To see this output on the screen it must be done after shutdown,
 // which restores the previous screen.
 Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
 
 // Defines a top-level window with border and title
-public class ExampleWindow : Window
+public sealed class ExampleWindow : Window
 {
     public static string UserName { get; set; }
 
@@ -74,39 +72,23 @@ public class ExampleWindow : Window
 
         // When login button is clicked display a message popup
         btnLogin.Accepting += (s, e) =>
-                           {
-                               if (userNameText.Text == "admin" && passwordText.Text == "password")
-                               {
-                                   MessageBox.Query ("Logging In", "Login Successful", "Ok");
-                                   UserName = userNameText.Text;
-                                   Application.RequestStop ();
-                               }
-                               else
-                               {
-                                   MessageBox.ErrorQuery ("Logging In", "Incorrect username or password", "Ok");
-                               }
-                               // When Accepting is handled, set e.Handled to true to prevent further processing.
-                               e.Handled = true;
-                           };
+                              {
+                                  if (userNameText.Text == "admin" && passwordText.Text == "password")
+                                  {
+                                      MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
+                                      UserName = userNameText.Text;
+                                      Application.RequestStop ();
+                                  }
+                                  else
+                                  {
+                                      MessageBox.ErrorQuery (App, "Logging In", "Incorrect username or password", "Ok");
+                                  }
+
+                                  // When Accepting is handled, set e.Handled to true to prevent further processing.
+                                  e.Handled = true;
+                              };
 
         // Add the views to the Window
         Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
-
-        ListView lv = new ListView ()
-        {
-            Y = Pos.AnchorEnd(),
-            Height= Dim.Auto(),
-            Width = Dim.Auto()
-        };
-        lv.SetSource (["One", "Two", "Three", "Four"]);
-        Add (lv);
-    }
-
-    public override void EndInit ()
-    {
-        base.EndInit ();
-        // Set the theme to "Anders" if it exists, otherwise use "Default"
-        ThemeManager.Theme = ThemeManager.GetThemeNames ().FirstOrDefault (x => x == "Anders") ?? "Default";
     }
 }
- 

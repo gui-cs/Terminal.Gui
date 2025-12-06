@@ -4,6 +4,7 @@ namespace UICatalog.Scenarios;
 public class AllViewsView : View
 {
     private const int MAX_VIEW_FRAME_HEIGHT = 25;
+
     public AllViewsView ()
     {
         CanFocus = true;
@@ -24,6 +25,7 @@ public class AllViewsView : View
         AddCommand (Command.Down, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => ScrollVertical (-SubViews.OfType<FrameView> ().First ().Frame.Height));
         AddCommand (Command.PageDown, () => ScrollVertical (SubViews.OfType<FrameView> ().First ().Frame.Height));
+
         AddCommand (
                     Command.Start,
                     () =>
@@ -32,6 +34,7 @@ public class AllViewsView : View
 
                         return true;
                     });
+
         AddCommand (
                     Command.End,
                     () =>
@@ -64,12 +67,12 @@ public class AllViewsView : View
         MouseBindings.Add (MouseFlags.WheeledRight, Command.ScrollRight);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();
 
-        var allClasses = GetAllViewClassesCollection ();
+        List<Type> allClasses = GetAllViewClassesCollection ();
 
         View? previousView = null;
 
@@ -94,19 +97,6 @@ public class AllViewsView : View
         }
     }
 
-    private static List<Type> GetAllViewClassesCollection ()
-    {
-        List<Type> types = typeof (View).Assembly.GetTypes ()
-                                        .Where (
-                                                myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
-                                                          && myType.IsSubclassOf (typeof (View)))
-                                        .ToList ();
-
-        types.Add (typeof (View));
-
-        return types;
-    }
-
     private View? CreateView (Type type)
     {
         // If we are to create a generic Type
@@ -124,12 +114,32 @@ public class AllViewsView : View
                 }
                 else
                 {
-                    typeArguments.Add (typeof (object));
+                    // Check if the generic parameter has constraints
+                    Type [] constraints = arg.GetGenericParameterConstraints ();
+
+                    if (constraints.Length > 0)
+                    {
+                        // Use the first constraint type to satisfy the constraint
+                        typeArguments.Add (constraints [0]);
+                    }
+                    else
+                    {
+                        typeArguments.Add (typeof (object));
+                    }
                 }
             }
 
             // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
-            type = type.MakeGenericType (typeArguments.ToArray ());
+            try
+            {
+                type = type.MakeGenericType (typeArguments.ToArray ());
+            }
+            catch (ArgumentException ex)
+            {
+                Logging.Warning ($"Cannot create generic type {type} with arguments [{string.Join (", ", typeArguments.Select (t => t.Name))}]: {ex.Message}");
+
+                return null;
+            }
         }
 
         // Ensure the type does not contain any generic parameters
@@ -161,6 +171,18 @@ public class AllViewsView : View
         view.Initialized += OnViewInitialized;
 
         return view;
+    }
+
+    private static List<Type> GetAllViewClassesCollection ()
+    {
+        List<Type> types = typeof (View).Assembly.GetTypes ()
+                                        .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
+                                                          && myType.IsSubclassOf (typeof (View)))
+                                        .ToList ();
+
+        types.Add (typeof (View));
+
+        return types;
     }
 
     private void OnViewInitialized (object? sender, EventArgs e)

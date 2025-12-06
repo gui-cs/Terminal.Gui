@@ -1,7 +1,3 @@
-﻿#nullable enable
-
-using System.Net.Mime;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
@@ -12,11 +8,17 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class CheckBox : View
 {
+    private static MouseState _defaultHighlightStates = MouseState.PressedOutside | MouseState.Pressed | MouseState.In; // Resources/config.json overrides
+
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStates { get; set; } = MouseState.PressedOutside | MouseState.Pressed | MouseState.In;
+    public static MouseState DefaultHighlightStates
+    {
+        get => _defaultHighlightStates;
+        set => _defaultHighlightStates = value;
+    }
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.

@@ -2,7 +2,7 @@
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -51,7 +51,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         tf.Activating += (sender, args) => Assert.Fail ("Activating should not be raised.");
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Space);
@@ -67,7 +67,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         var activatingCount = 0;
         tf.Activating += (sender, args) => activatingCount++;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Enter);
@@ -85,7 +85,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         var acceptedCount = 0;
         tf.Accepting += (sender, args) => acceptedCount++;
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         tf.SetFocus ();
         top.NewKeyDownEvent (Key.Enter);
@@ -118,7 +118,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void OnAccept (object sender, CommandEventArgs e) { accepted = true; }
+        void OnAccept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void Accept (object sender, CommandEventArgs e) { accepted = true; }
+        void Accept (object? sender, CommandEventArgs e) { accepted = true; }
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object? sender, CommandEventArgs e) { buttonAccept++; }
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void TextViewAccept (object sender, CommandEventArgs e)
+        void TextViewAccept (object? sender, CommandEventArgs e)
         {
             tfAcceptedInvoked = true;
             e.Handled = handle;
@@ -209,7 +209,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void OnEnter_Does_Not_Throw_If_Not_IsInitialized_SetCursorVisibility ()
     {
-        var top = new Toplevel ();
+        var top = new Runnable ();
         var tf = new TextField { Width = 10 };
         top.Add (tf);
 
@@ -291,7 +291,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         return;
 
-        void HandleJKey (object s, Key arg)
+        void HandleJKey (object? s, Key arg)
         {
             if (arg.AsRune == new Rune ('j'))
             {
@@ -622,14 +622,56 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         string GetContents ()
         {
-            var item = "";
+            var sb = new StringBuilder ();
 
             for (var i = 0; i < 16; i++)
             {
-                item += driver.Contents [0, i]!.Rune;
+                sb.Append (driver.Contents! [0, i]!.Grapheme);
             }
 
-            return item;
+            return sb.ToString ();
         }
+    }
+
+    [Fact]
+    public void PositionCursor_Treat_Zero_Width_As_One_Column ()
+    {
+        IDriver driver = CreateFakeDriver ();
+
+        TextField tf = new () { Width = 10, Text = "\u001B[" };
+        tf.Driver = driver;
+        tf.SetRelativeLayout (new (10, 1));
+
+        Assert.Equal (0, tf.CursorPosition);
+
+        tf.CursorPosition = 1;
+        Assert.Equal (new Point (1, 0), tf.PositionCursor ());
+
+        tf.CursorPosition = 2;
+        Assert.Equal (new Point (2, 0), tf.PositionCursor ());
+    }
+
+    [Fact]
+    public void ScrollOffset_Treat_Negative_Width_As_One_Column ()
+    {
+        View view = new () { Width = 10, Height = 1};
+        TextField tf = new () { Width = 2, Text = "\u001B[" };
+        view.Add (tf);
+        tf.SetRelativeLayout (new (10, 1));
+
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal (0, tf.CursorPosition);
+
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal (1, tf.CursorPosition);
+
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tf.ScrollOffset);
+        Assert.Equal (2, tf.CursorPosition);
+
+        Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tf.ScrollOffset);
+        Assert.Equal (2, tf.CursorPosition);
     }
 }

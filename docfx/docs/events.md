@@ -350,7 +350,7 @@ TG follows the *naming* advice provided in [.NET Naming Guidelines - Names of Ev
 
 ### Proposed Enhancement: Command Propagation
 
-The *Cancellable Work Pattern* in `View.Command` currently supports local `Command.Activate` and propagating `Command.Accept`. To address hierarchical coordination needs (e.g., `MenuBarv2` popovers, `Dialog` closing), a `PropagatedCommands` property is proposed (Issue #4050):
+The *Cancellable Work Pattern* in `View.Command` currently supports local `Command.Activate` and propagating `Command.Accept`. To address hierarchical coordination needs (e.g., `MenuBar` popovers, `Dialog` closing), a `PropagatedCommands` property is proposed (Issue #4050):
 
 - **Change**: Add `IReadOnlyList<Command> PropagatedCommands` to `View`, defaulting to `[Command.Accept]`. `Raise*` methods propagate if the command is in `SuperView?.PropagatedCommands` and `args.Handled` is `false`.
 - **Example**:
@@ -373,7 +373,7 @@ The *Cancellable Work Pattern* in `View.Command` currently supports local `Comma
   }
   ```
 
-- **Impact**: Enables `Command.Activate` propagation for `MenuBarv2` while preserving `Command.Accept` propagation, maintaining decoupling and avoiding noise from irrelevant commands.
+- **Impact**: Enables `Command.Activate` propagation for `MenuBar` while preserving `Command.Accept` propagation, maintaining decoupling and avoiding noise from irrelevant commands.
 
 ### **Conflation in FlagSelector**:
    - **Issue**: `CheckBox.Activating` triggers `Accepting`, conflating state change and confirmation.
@@ -389,7 +389,7 @@ The *Cancellable Work Pattern* in `View.Command` currently supports local `Comma
      ```
 
 ### **Propagation Limitations**:
-   - **Issue**: Local `Command.Activate` restricts `MenuBarv2` coordination; `Command.Accept` uses hacks (#3925).
+   - **Issue**: Local `Command.Activate` restricts `MenuBar` coordination; `Command.Accept` uses hacks (#3925).
    - **Recommendation**: Adopt `PropagatedCommands` to enable targeted propagation, as proposed.
 
 ### **Complexity in Multi-Phase Workflows**:

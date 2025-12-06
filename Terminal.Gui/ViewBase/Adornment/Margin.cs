@@ -1,5 +1,6 @@
-﻿#nullable enable
 
+
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ViewBase;
@@ -62,7 +63,6 @@ public class Margin : Adornment
         }
     }
 
-    // PERFORMANCE: Margins are ALWAYS drawn. This may be an issue for apps that have a large number of views with shadows.
     /// <summary>
     ///     INTERNAL API - Draws the margins for the specified views. This is called by the <see cref="Application"/> on each
     ///     iteration of the main loop after all Views have been drawn.
@@ -75,21 +75,21 @@ public class Margin : Adornment
 
         while (stack.Count > 0)
         {
-            var view = stack.Pop ();
+            View view = stack.Pop ();
 
-            if (view.Margin?.GetCachedClip () != null)
+            if (view.Margin is { } margin && margin.Thickness != Thickness.Empty && margin.GetCachedClip () != null)
             {
-                view.Margin!.NeedsDraw = true;
-                Region? saved = GetClip ();
-                View.SetClip (view.Margin!.GetCachedClip ());
-                view.Margin!.Draw ();
-                View.SetClip (saved);
-                view.Margin!.ClearCachedClip ();
+                margin.SetNeedsDraw ();
+                Region? saved = view.GetClip ();
+                view.SetClip (margin.GetCachedClip ());
+                margin.Draw ();
+                view.SetClip (saved);
+                margin.ClearCachedClip ();
             }
 
-            view.NeedsDraw = false;
+            view.ClearNeedsDraw ();
 
-            foreach (var subview in view.SubViews)
+            foreach (View subview in view.SubViews)
             {
                 stack.Push (subview);
             }
@@ -128,7 +128,7 @@ public class Margin : Adornment
             // This just draws/clears the thickness, not the insides.
             // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
             //SetAttribute (GetAttributeForRole (VisualRole.Normal));
-            Thickness.Draw (screen, Diagnostics, ToString ());
+            Thickness.Draw (Driver, screen, Diagnostics, ToString ());
         }
 
         if (ShadowStyle != ShadowStyle.None)
@@ -225,7 +225,7 @@ public class Margin : Adornment
             return;
         }
 
-        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag(MouseState.Pressed);
+        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag (MouseState.Pressed);
         bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.HighlightStates.HasFlag (MouseState.PressedOutside); ;
 
         if (pressedOutside)

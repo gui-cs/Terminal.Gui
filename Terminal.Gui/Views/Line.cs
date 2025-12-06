@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -163,10 +161,7 @@ public class Line : View, IOrientation
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 #pragma warning restore CS0067 // The event is never used
 
-    /// <summary>
-    ///     Called when <see cref="Orientation"/> has changed.
-    /// </summary>
-    /// <param name="newOrientation">The new orientation value.</param>
+    /// <inheritdoc/>
     public void OnOrientationChanged (Orientation newOrientation)
     {
         // Set dimensions based on new orientation:
@@ -222,7 +217,7 @@ public class Line : View, IOrientation
     ///     This method adds the line to the LineCanvas for rendering.
     ///     The actual rendering is performed by the parent view through <see cref="View.RenderLineCanvas"/>.
     /// </remarks>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;

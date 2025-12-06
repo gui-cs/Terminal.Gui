@@ -1,10 +1,9 @@
-﻿using UnitTests;
-
-namespace UnitTests.ViewTests;
+﻿#nullable enable
+namespace UnitTests.ViewBaseTests;
 
 public class EnabledTests
 {
-  
+
     [Fact]
     [AutoInitShutdown]
     public void _Enabled_Sets_Also_Sets_SubViews ()
@@ -15,7 +14,7 @@ public class EnabledTests
         button.Accepting += (s, e) => wasClicked = !wasClicked;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         var iterations = 0;
@@ -30,7 +29,7 @@ public class EnabledTests
 
         return;
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
         {
             iterations++;
 
