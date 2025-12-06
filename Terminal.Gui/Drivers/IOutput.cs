@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.Drivers;
+﻿using System.Collections.Concurrent;
+
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     The low-level interface drivers implement to provide output capabilities; encapsulates platform-specific
@@ -6,6 +8,15 @@
 /// </summary>
 public interface IOutput : IDisposable
 {
+    /// <seealso cref="IDriver.Force16Colors"/>
+    bool Force16Colors { get; set; }
+
+    /// <seealso cref="IDriver.IsLegacyConsole"/>
+    bool IsLegacyConsole { get; set; }
+
+    /// <seealso cref="IDriver.GetSixels"/>
+    ConcurrentQueue<SixelToRender> GetSixels ();
+
     /// <summary>
     ///     Gets the current position of the console cursor.
     /// </summary>
@@ -17,7 +28,7 @@ public interface IOutput : IDisposable
     ///     of characters not pixels).
     /// </summary>
     /// <returns></returns>
-    public Size GetSize ();
+    Size GetSize ();
 
     /// <summary>
     ///     Moves the console cursor to the given location.

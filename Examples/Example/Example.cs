@@ -8,8 +8,8 @@ using Terminal.Gui.Configuration;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
-// Override the default configuration for the application to use the Light theme
-ConfigurationManager.RuntimeConfig = """{ "Theme": "Light" }""";
+// Override the default configuration for the application to use the Amber Phosphor theme
+ConfigurationManager.RuntimeConfig = """{ "Theme": "Amber Phosphor" }""";
 ConfigurationManager.Enable (ConfigLocations.All);
 
 IApplication app = Application.Create ();
@@ -90,14 +90,5 @@ public sealed class ExampleWindow : Window
 
         // Add the views to the Window
         Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
-
-        var lv = new ListView
-        {
-            Y = Pos.AnchorEnd (),
-            Height = Dim.Auto (),
-            Width = Dim.Auto ()
-        };
-        lv.SetSource (["One", "Two", "Three", "Four"]);
-        Add (lv);
     }
 }

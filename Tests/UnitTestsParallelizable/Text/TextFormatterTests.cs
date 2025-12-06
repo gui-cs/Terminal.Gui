@@ -3121,7 +3121,7 @@ ssb
                  default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Theory]
@@ -3158,7 +3158,7 @@ ssb
                  default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Theory]
@@ -3196,7 +3196,7 @@ ssb
                  default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Theory]
@@ -3233,6 +3233,6 @@ ssb
                  default (Rectangle));
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 }

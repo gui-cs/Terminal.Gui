@@ -19,8 +19,8 @@
   // --------------- Application Settings ---------------
   "Key.Separator": "+",
 
+  "Driver.Force16Colors": false,
   "Application.ArrangeKey": "Ctrl+F5",
-  "Application.Force16Colors": false,
   //"Application.ForceDriver": "", // TODO: ForceDriver should be nullable
   "Application.IsMouseDisabled": false,
   "Application.NextTabGroupKey": "F6",
@@ -136,14 +136,14 @@
                 "Foreground": "White",
                 "Background": "DarkBlue"
               }
-            },
+            }
           },
           {
             "Dialog": {
               "Normal": {
                 "Foreground": "BrightBlue",
                 "Background": "LightGray"
-              },
+              }
             }
           },
           {
@@ -152,7 +152,7 @@
                 "Foreground": "White",
                 "Background": "Blue",
                 "Style": "Bold"
-              },
+              }
             }
           },
           {
@@ -161,7 +161,7 @@
                 "Foreground": "Red",
                 "Background": "WhiteSmoke",
                 "Style": "Italic"
-              },
+              }
             }
           }
         ],

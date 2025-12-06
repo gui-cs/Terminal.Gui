@@ -568,7 +568,7 @@ public partial class View // Drawing APIs
     /// <remarks>
     ///     <para>
     ///         Subscribe to this event to draw custom content for the View. Use the drawing methods available on <see cref="View"/>
-    ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune?)"/>.
+    ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune)"/>.
     ///     </para>
     ///     <para>
     ///         The event is invoked after <see cref="ClearingViewport"/> and <see cref="Text"/> have been drawn, but before any <see cref="SubViews"/> are drawn.

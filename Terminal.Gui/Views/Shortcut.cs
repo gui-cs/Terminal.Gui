@@ -391,7 +391,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <example>
     ///     <para>
     ///         This example illustrates how to add a <see cref="Shortcut"/> to a <see cref="StatusBar"/> that toggles the
-    ///         <see cref="IApplication.Force16Colors"/> property.
+    ///         <see cref="IDriver.Force16Colors"/> property.
     ///     </para>
     ///     <code>
     ///     var force16ColorsShortcut = new Shortcut
@@ -406,8 +406,8 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     cb.Toggled += (s, e) =>
     ///     {
     ///         var cb = s as CheckBox;
-    ///         Application.Force16Colors = cb!.Checked == true;
-    ///         Application.Refresh();
+    ///         App.Driver.Force16Colors = cb!.Checked == true;
+    ///         App.river.Refresh();
     ///     };
     ///     StatusBar.Add(force16ColorsShortcut);
     /// </code>
