@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace UICatalog.Scenarios;
 
@@ -9,12 +6,11 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextAlignmentAndDirection : Scenario
 {
-
     internal class AlignmentAndDirectionView : View
     {
         public AlignmentAndDirectionView ()
         {
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent;
+            ViewportSettings = ViewportSettingsFlags.Transparent;
             BorderStyle = LineStyle.Dotted;
         }
     }
@@ -30,15 +26,15 @@ public class TextAlignmentAndDirection : Scenario
 
         var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
 
-        SchemeManager.AddScheme ("TextAlignmentAndDirection1", new Scheme { Normal = new (Color.Black, Color.Gray) });
-        SchemeManager.AddScheme ("TextAlignmentAndDirection2", new Scheme { Normal = new (Color.Black, Color.DarkGray) });
+        SchemeManager.AddScheme ("TextAlignmentAndDirection1", new () { Normal = new (Color.Black, Color.Gray) });
+        SchemeManager.AddScheme ("TextAlignmentAndDirection2", new () { Normal = new (Color.Black, Color.DarkGray) });
 
-        List<View> singleLineLabels = new (); // single line
-        List<View> multiLineLabels = new (); // multi line
+        List<View> singleLineLabels = []; // single line
+        List<View> multiLineLabels = []; // multi line
 
-        // Horizontal Single-Line 
+        // Horizontal Single-Line
 
-        var labelHL = new Label
+        Label labelHL = new ()
         {
             X = 0,
             Y = 0,
@@ -46,10 +42,10 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             TextAlignment = Alignment.End,
             SchemeName = "Dialog",
-            Text = "Start",
+            Text = "Start"
         };
 
-        var labelHC = new Label
+        Label labelHC = new ()
         {
             X = 0,
             Y = 1,
@@ -60,7 +56,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Center"
         };
 
-        var labelHR = new Label
+        Label labelHR = new ()
         {
             X = 0,
             Y = 2,
@@ -71,7 +67,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = "End"
         };
 
-        var labelHJ = new Label
+        Label labelHJ = new ()
         {
             X = 0,
             Y = 3,
@@ -82,7 +78,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Fill"
         };
 
-        var txtLabelHL = new View
+        View txtLabelHL = new ()
         {
             X = Pos.Right (labelHL) + 1,
             Y = Pos.Y (labelHL),
@@ -91,10 +87,10 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection1",
             TextAlignment = Alignment.Start,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
 
-        var txtLabelHC = new View
+        View txtLabelHC = new ()
         {
             X = Pos.Right (labelHC) + 1,
             Y = Pos.Y (labelHC),
@@ -103,10 +99,10 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection2",
             TextAlignment = Alignment.Center,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
 
-        var txtLabelHR = new View
+        View txtLabelHR = new ()
         {
             X = Pos.Right (labelHR) + 1,
             Y = Pos.Y (labelHR),
@@ -115,10 +111,10 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection1",
             TextAlignment = Alignment.End,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
 
-        var txtLabelHJ = new View
+        View txtLabelHJ = new ()
         {
             X = Pos.Right (labelHJ) + 1,
             Y = Pos.Y (labelHJ),
@@ -127,7 +123,7 @@ public class TextAlignmentAndDirection : Scenario
             SchemeName = "TextAlignmentAndDirection2",
             TextAlignment = Alignment.Fill,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
 
         singleLineLabels.Add (txtLabelHL);
@@ -146,7 +142,7 @@ public class TextAlignmentAndDirection : Scenario
 
         // Vertical Single-Line
 
-        var labelVT = new Label
+        Label labelVT = new ()
         {
             X = Pos.AnchorEnd () - 6,
             Y = 0,
@@ -159,7 +155,7 @@ public class TextAlignmentAndDirection : Scenario
         };
         labelVT.TextFormatter.WordWrap = false;
 
-        var labelVM = new Label
+        Label labelVM = new ()
         {
             X = Pos.AnchorEnd () - 4,
             Y = 0,
@@ -172,7 +168,7 @@ public class TextAlignmentAndDirection : Scenario
         };
         labelVM.TextFormatter.WordWrap = false;
 
-        var labelVB = new Label
+        Label labelVB = new ()
         {
             X = Pos.AnchorEnd () - 2,
             Y = 0,
@@ -185,7 +181,7 @@ public class TextAlignmentAndDirection : Scenario
         };
         labelVB.TextFormatter.WordWrap = false;
 
-        var labelVJ = new Label
+        Label labelVJ = new ()
         {
             X = Pos.AnchorEnd (),
             Y = 0,
@@ -198,7 +194,7 @@ public class TextAlignmentAndDirection : Scenario
         };
         labelVJ.TextFormatter.WordWrap = false;
 
-        var txtLabelVT = new View
+        View txtLabelVT = new ()
         {
             X = Pos.X (labelVT),
             Y = Pos.Bottom (labelVT) + 1,
@@ -208,11 +204,11 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Start,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
         txtLabelVT.TextFormatter.WordWrap = false;
 
-        var txtLabelVM = new View
+        View txtLabelVM = new ()
         {
             X = Pos.X (labelVM),
             Y = Pos.Bottom (labelVM) + 1,
@@ -222,11 +218,11 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Center,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
         txtLabelVM.TextFormatter.WordWrap = false;
 
-        var txtLabelVB = new View
+        View txtLabelVB = new ()
         {
             X = Pos.X (labelVB),
             Y = Pos.Bottom (labelVB) + 1,
@@ -236,11 +232,11 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.End,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
         txtLabelVB.TextFormatter.WordWrap = false;
 
-        var txtLabelVJ = new View
+        View txtLabelVJ = new ()
         {
             X = Pos.X (labelVJ),
             Y = Pos.Bottom (labelVJ) + 1,
@@ -250,7 +246,7 @@ public class TextAlignmentAndDirection : Scenario
             TextDirection = TextDirection.TopBottom_LeftRight,
             VerticalTextAlignment = Alignment.Fill,
             Text = txt,
-            ViewportSettings = Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent
+            ViewportSettings = ViewportSettingsFlags.Transparent
         };
         txtLabelVJ.TextFormatter.WordWrap = false;
 
@@ -270,7 +266,7 @@ public class TextAlignmentAndDirection : Scenario
 
         // Multi-Line
 
-        var container = new View
+        View container = new ()
         {
             X = 0,
             Y = Pos.Bottom (txtLabelHJ),
@@ -280,7 +276,7 @@ public class TextAlignmentAndDirection : Scenario
             //SchemeName = "TextAlignmentAndDirection2"
         };
 
-        var txtLabelTL = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelTL = new ()
         {
             X = 0,
             Y = 1,
@@ -289,11 +285,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.Start,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelTL.TextFormatter.MultiLine = true;
 
-        var txtLabelTC = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelTC = new ()
         {
             X = Pos.Right (txtLabelTL),
             Y = 1,
@@ -302,11 +298,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.Start,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelTC.TextFormatter.MultiLine = true;
 
-        var txtLabelTR = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelTR = new ()
         {
             X = Pos.Right (txtLabelTC),
             Y = 1,
@@ -315,11 +311,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.Start,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelTR.TextFormatter.MultiLine = true;
 
-        var txtLabelML = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelML = new ()
         {
             X = Pos.X (txtLabelTL),
             Y = Pos.Bottom (txtLabelTL),
@@ -328,11 +324,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.Center,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelML.TextFormatter.MultiLine = true;
 
-        var txtLabelMC = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelMC = new ()
         {
             X = Pos.X (txtLabelTC),
             Y = Pos.Bottom (txtLabelTC),
@@ -341,11 +337,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.Center,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelMC.TextFormatter.MultiLine = true;
 
-        var txtLabelMR = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelMR = new ()
         {
             X = Pos.X (txtLabelTR),
             Y = Pos.Bottom (txtLabelTR),
@@ -354,11 +350,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.Center,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelMR.TextFormatter.MultiLine = true;
 
-        var txtLabelBL = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelBL = new ()
         {
             X = Pos.X (txtLabelML),
             Y = Pos.Bottom (txtLabelML),
@@ -367,11 +363,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.Start,
             VerticalTextAlignment = Alignment.End,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelBL.TextFormatter.MultiLine = true;
 
-        var txtLabelBC = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelBC = new ()
         {
             X = Pos.X (txtLabelMC),
             Y = Pos.Bottom (txtLabelMC),
@@ -380,11 +376,11 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.Center,
             VerticalTextAlignment = Alignment.End,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelBC.TextFormatter.MultiLine = true;
 
-        var txtLabelBR = new AlignmentAndDirectionView
+        AlignmentAndDirectionView txtLabelBR = new ()
         {
             X = Pos.X (txtLabelMR),
             Y = Pos.Bottom (txtLabelMR),
@@ -393,7 +389,7 @@ public class TextAlignmentAndDirection : Scenario
             TextAlignment = Alignment.End,
             VerticalTextAlignment = Alignment.End,
             SchemeName = "TextAlignmentAndDirection1",
-            Text = txt,
+            Text = txt
         };
         txtLabelBR.TextFormatter.MultiLine = true;
 
@@ -429,7 +425,7 @@ public class TextAlignmentAndDirection : Scenario
 
         // Edit Text
 
-        var label = new Label
+        Label label = new ()
         {
             X = 1,
             Y = Pos.Bottom (container) + 1,
@@ -438,7 +434,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Edit Text:"
         };
 
-        var editText = new TextView
+        TextView editText = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -466,7 +462,7 @@ public class TextAlignmentAndDirection : Scenario
 
         // JUSTIFY CHECKBOX
 
-        var justifyCheckbox = new CheckBox
+        CheckBox justifyCheckbox = new ()
         {
             X = Pos.Right (container) + 1,
             Y = Pos.Y (container) + 1,
@@ -479,7 +475,7 @@ public class TextAlignmentAndDirection : Scenario
 
         // JUSTIFY OPTIONS
 
-        var justifyOptions = new OptionSelector
+        OptionSelector justifyOptions = new ()
         {
             X = Pos.Left (justifyCheckbox) + 1,
             Y = Pos.Y (justifyCheckbox) + 1,
@@ -496,7 +492,7 @@ public class TextAlignmentAndDirection : Scenario
 
         // WRAP CHECKBOX
 
-        var wrapCheckbox = new CheckBox
+        CheckBox wrapCheckbox = new ()
         {
             X = Pos.Right (container) + 1,
             Y = Pos.Bottom (justifyOptions),
@@ -507,28 +503,28 @@ public class TextAlignmentAndDirection : Scenario
         wrapCheckbox.CheckedState = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
 
         wrapCheckbox.CheckedStateChanging += (s, e) =>
-                                {
-                                    if (e.Result == CheckState.Checked)
-                                    {
-                                        foreach (View t in multiLineLabels)
-                                        {
-                                            t.TextFormatter.WordWrap = false;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        foreach (View t in multiLineLabels)
-                                        {
-                                            t.TextFormatter.WordWrap = true;
-                                        }
-                                    }
-                                };
+                                             {
+                                                 if (e.Result == CheckState.Checked)
+                                                 {
+                                                     foreach (View t in multiLineLabels)
+                                                     {
+                                                         t.TextFormatter.WordWrap = false;
+                                                     }
+                                                 }
+                                                 else
+                                                 {
+                                                     foreach (View t in multiLineLabels)
+                                                     {
+                                                         t.TextFormatter.WordWrap = true;
+                                                     }
+                                                 }
+                                             };
 
         app.Add (wrapCheckbox);
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
 
-        var directionOptions = new OptionSelector
+        OptionSelector directionOptions = new ()
         {
             X = Pos.Right (container) + 1,
             Y = Pos.Bottom (wrapCheckbox) + 1,
@@ -539,24 +535,24 @@ public class TextAlignmentAndDirection : Scenario
         };
 
         directionOptions.ValueChanged += (s, ev) =>
-                                                {
-                                                    bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
+                                         {
+                                             bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
 
-                                                    if (justChecked)
-                                                    {
-                                                        ToggleJustify (true);
-                                                    }
+                                             if (justChecked)
+                                             {
+                                                 ToggleJustify (true);
+                                             }
 
-                                                    foreach (View v in multiLineLabels.Where (v => ev.Value is { }))
-                                                    {
-                                                        v.TextDirection = (TextDirection)ev.Value!.Value;
-                                                    }
+                                             foreach (View v in multiLineLabels.Where (v => ev.Value is { }))
+                                             {
+                                                 v.TextDirection = (TextDirection)ev.Value!.Value;
+                                             }
 
-                                                    if (justChecked)
-                                                    {
-                                                        ToggleJustify (false);
-                                                    }
-                                                };
+                                             if (justChecked)
+                                             {
+                                                 ToggleJustify (false);
+                                             }
+                                         };
 
         app.Add (directionOptions);
 
@@ -604,14 +600,17 @@ public class TextAlignmentAndDirection : Scenario
                             case 0:
                                 t.VerticalTextAlignment = Alignment.Fill;
                                 t.TextAlignment = data!.h;
+
                                 break;
                             case 1:
                                 t.VerticalTextAlignment = data!.v;
                                 t.TextAlignment = Alignment.Fill;
+
                                 break;
                             case 2:
                                 t.VerticalTextAlignment = Alignment.Fill;
                                 t.TextAlignment = Alignment.Fill;
+
                                 break;
                         }
                     }
@@ -622,14 +621,17 @@ public class TextAlignmentAndDirection : Scenario
                             case 0:
                                 t.TextAlignment = Alignment.Fill;
                                 t.VerticalTextAlignment = data!.v;
+
                                 break;
                             case 1:
                                 t.TextAlignment = data!.h;
                                 t.VerticalTextAlignment = Alignment.Fill;
+
                                 break;
                             case 2:
                                 t.TextAlignment = Alignment.Fill;
                                 t.VerticalTextAlignment = Alignment.Fill;
+
                                 break;
                         }
                     }

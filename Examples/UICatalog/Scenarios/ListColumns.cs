@@ -18,17 +18,17 @@ public class ListColumns : Scenario
     private TableView? _listColView;
     private CheckBox? _alternatingColorsCheckBox;
     private CheckBox? _alwaysUseNormalColorForVerticalCellLinesCheckBox;
-    private CheckBox? _bottomlineCheckBox;
+    private CheckBox? _bottomLineCheckBox;
     private CheckBox? _cellLinesCheckBox;
     private CheckBox? _cursorCheckBox;
     private CheckBox? _expandLastColumnCheckBox;
     private CheckBox? _orientVerticalCheckBox;
     private CheckBox? _scrollParallelCheckBox;
     private CheckBox? _smoothScrollingCheckBox;
-    private CheckBox? _toplineCheckBox;
+    private CheckBox? _topLineCheckBox;
 
     /// <summary>
-    ///     Builds a simple list in which values are the index.  This helps testing that scrolling etc is working
+    ///     Builds a simple list in which values are the index. This helps test that scrolling etc. is working
     ///     correctly and not skipping out values when paging
     /// </summary>
     /// <param name="items"></param>
@@ -115,19 +115,19 @@ public class ListColumns : Scenario
         _listColView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         // Setup menu checkboxes
-        _toplineCheckBox = new ()
+        _topLineCheckBox = new ()
         {
             Title = "_TopLine",
             CheckedState = _listColView.Style.ShowHorizontalHeaderOverline ? CheckState.Checked : CheckState.UnChecked
         };
-        _toplineCheckBox.CheckedStateChanged += (s, e) => ToggleTopline ();
+        _topLineCheckBox.CheckedStateChanged += (s, e) => ToggleTopline ();
 
-        _bottomlineCheckBox = new ()
+        _bottomLineCheckBox = new ()
         {
             Title = "_BottomLine",
             CheckedState = _listColView.Style.ShowHorizontalBottomline ? CheckState.Checked : CheckState.UnChecked
         };
-        _bottomlineCheckBox.CheckedStateChanged += (s, e) => ToggleBottomline ();
+        _bottomLineCheckBox.CheckedStateChanged += (s, e) => ToggleBottomline ();
 
         _cellLinesCheckBox = new ()
         {
@@ -218,11 +218,11 @@ public class ListColumns : Scenario
                                    [
                                        new MenuItem
                                        {
-                                           CommandView = _toplineCheckBox
+                                           CommandView = _topLineCheckBox
                                        },
                                        new MenuItem
                                        {
-                                           CommandView = _bottomlineCheckBox
+                                           CommandView = _bottomLineCheckBox
                                        },
                                        new MenuItem
                                        {
@@ -419,12 +419,12 @@ public class ListColumns : Scenario
 
     private void ToggleBottomline ()
     {
-        if (_listColView is null || _bottomlineCheckBox is null)
+        if (_listColView is null || _bottomLineCheckBox is null)
         {
             return;
         }
 
-        _listColView.Style.ShowHorizontalBottomline = _bottomlineCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.ShowHorizontalBottomline = _bottomLineCheckBox.CheckedState == CheckState.Checked;
         _listColView.Update ();
     }
 
@@ -487,12 +487,12 @@ public class ListColumns : Scenario
 
     private void ToggleTopline ()
     {
-        if (_listColView is null || _toplineCheckBox is null)
+        if (_listColView is null || _topLineCheckBox is null)
         {
             return;
         }
 
-        _listColView.Style.ShowHorizontalHeaderOverline = _toplineCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.ShowHorizontalHeaderOverline = _topLineCheckBox.CheckedState == CheckState.Checked;
         _listColView.Update ();
     }
 

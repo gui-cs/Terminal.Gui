@@ -25,7 +25,7 @@ public class MouseTests : TestsAllViews
     [AutoInitShutdown]
     public void ButtonPressed_In_Border_Starts_Drag (int marginThickness, int borderThickness, int paddingThickness, int xy, bool expectedMoved)
     {
-        var testView = new View
+        View testView = new ()
         {
             CanFocus = true,
             X = 4,
@@ -38,7 +38,7 @@ public class MouseTests : TestsAllViews
         testView.Border!.Thickness = new (borderThickness);
         testView.Padding!.Thickness = new (paddingThickness);
 
-        var top = new Runnable ();
+        Runnable top = new ();
         top.Add (testView);
 
         SessionToken rs = Application.Begin (top);
@@ -61,9 +61,9 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_False_Button_Press_Release_DoesNotClick (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        var me = new MouseEventArgs ();
+        MouseEventArgs me = new ();
 
-        var view = new View
+        View view = new ()
         {
             Width = 1,
             Height = 1,
@@ -106,9 +106,9 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Selecting (MouseFlags clicked)
     {
-        var me = new MouseEventArgs ();
+        MouseEventArgs me = new ();
 
-        var view = new View
+        View view = new ()
         {
             Width = 1,
             Height = 1,
@@ -136,9 +136,9 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
     {
-        var me = new MouseEventArgs ();
+        MouseEventArgs me = new ();
 
-        var view = new View
+        View view = new ()
         {
             Width = 1,
             Height = 1,
@@ -147,8 +147,8 @@ public class MouseTests : TestsAllViews
         };
 
         // Setup components for mouse held down
-        var timed = new TimedEvents ();
-        var grab = new MouseGrabHandler ();
+        TimedEvents timed = new ();
+        MouseGrabHandler grab = new ();
         view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
@@ -196,9 +196,9 @@ public class MouseTests : TestsAllViews
         MouseFlags clicked
     )
     {
-        var me = new MouseEventArgs ();
+        MouseEventArgs me = new ();
 
-        var view = new View
+        View view = new ()
         {
             Width = 1,
             Height = 1,
@@ -207,8 +207,8 @@ public class MouseTests : TestsAllViews
         };
 
         // Setup components for mouse held down
-        var timed = new TimedEvents ();
-        var grab = new MouseGrabHandler ();
+        TimedEvents timed = new ();
+        MouseGrabHandler grab = new ();
         view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
@@ -249,9 +249,9 @@ public class MouseTests : TestsAllViews
     [Fact]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
-        var me = new MouseEventArgs ();
+        MouseEventArgs me = new ();
 
-        var view = new View
+        View view = new ()
         {
             Width = 1,
             Height = 1,
@@ -260,8 +260,8 @@ public class MouseTests : TestsAllViews
         };
 
         // Setup components for mouse held down
-        var timed = new TimedEvents ();
-        var grab = new MouseGrabHandler ();
+        TimedEvents timed = new ();
+        MouseGrabHandler grab = new ();
         view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
@@ -322,7 +322,7 @@ public class MouseTests : TestsAllViews
     //[InlineData (true, MouseState.PressedOutside, 0, 0, 0, 1)]
     //public void MouseState_Button1_Pressed_Then_Released_Outside (bool inViewport, MouseState highlightFlags, int noneCount, int expectedInCount, int expectedPressedCount, int expectedPressedOutsideCount)
     //{
-    //    var testView = new MouseEventTestView
+    //    MouseEventTestView testView = new ()
     //    {
     //        HighlightStates = highlightFlags
     //    };
@@ -359,7 +359,7 @@ public class MouseTests : TestsAllViews
     [InlineData (10)]
     public void MouseState_None_Button1_Pressed_Move_No_Changes (int x)
     {
-        var testView = new MouseEventTestView
+        MouseEventTestView testView = new ()
         {
             HighlightStates = MouseState.None
         };
@@ -373,7 +373,7 @@ public class MouseTests : TestsAllViews
         Assert.Equal (0, testView.MouseStatePressedOutsideCount);
         Assert.Equal (0, testView.MouseStateNoneCount);
 
-        // Move to x,0 
+        // Move to x,0
         testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (x, 0) });
 
         if (inViewport)
@@ -391,7 +391,7 @@ public class MouseTests : TestsAllViews
             Assert.Equal (0, testView.MouseStateNoneCount);
         }
 
-        // Move backto 0,0 ; in viewport
+        // Move back to 0,0 ; in viewport
         testView.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
 
         if (inViewport)
@@ -421,7 +421,7 @@ public class MouseTests : TestsAllViews
     [InlineData (10)]
     public void MouseState_Pressed_Button1_Pressed_Move_Keeps_Pressed (int x)
     {
-        var testView = new MouseEventTestView
+        MouseEventTestView testView = new ()
         {
             HighlightStates = MouseState.Pressed
         };
@@ -483,7 +483,7 @@ public class MouseTests : TestsAllViews
     [InlineData (10)]
     public void MouseState_PressedOutside_Button1_Pressed_Move_Raises_PressedOutside (int x)
     {
-        var testView = new MouseEventTestView
+        MouseEventTestView testView = new ()
         {
             HighlightStates = MouseState.PressedOutside,
             WantContinuousButtonPressed = false
@@ -546,7 +546,7 @@ public class MouseTests : TestsAllViews
     [InlineData (10)]
     public void MouseState_PressedOutside_Button1_Pressed_Move_Raises_PressedOutside_WantContinuousButtonPressed (int x)
     {
-        var testView = new MouseEventTestView
+        MouseEventTestView testView = new ()
         {
             HighlightStates = MouseState.PressedOutside,
             WantContinuousButtonPressed = true

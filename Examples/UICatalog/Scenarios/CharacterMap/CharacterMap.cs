@@ -25,7 +25,7 @@ public class CharacterMap : Scenario
 
     public override List<Key> GetDemoKeyStrokes ()
     {
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         for (var i = 0; i < 200; i++)
         {
@@ -91,7 +91,7 @@ public class CharacterMap : Scenario
         };
         top.Add (jumpEdit);
 
-        _charMap.SelectedCodePointChanged += (sender, args) =>
+        _charMap.SelectedCodePointChanged += (_, args) =>
                                              {
                                                  if (Rune.IsValid (args.Value))
                                                  {
@@ -134,7 +134,7 @@ public class CharacterMap : Scenario
         _categoryList.Table = CreateCategoryTable (0, isDescending);
 
         // if user clicks the mouse in TableView
-        _categoryList.Selecting += (s, e) =>
+        _categoryList.Selecting += (_, e) =>
                                    {
                                        // Only handle mouse clicks
                                        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
@@ -173,7 +173,7 @@ public class CharacterMap : Scenario
 
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
-        _categoryList.SelectedCellChanged += (s, args) =>
+        _categoryList.SelectedCellChanged += (_, args) =>
                                              {
                                                  EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                                                  _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
@@ -225,7 +225,7 @@ public class CharacterMap : Scenario
 
             _errorLabel.Visible = true;
 
-            uint result = 0;
+            uint result;
 
             if (jumpEdit.Text.Length == 1)
             {
@@ -289,7 +289,7 @@ public class CharacterMap : Scenario
                                         ?? -1;
             _categoryList.EnsureSelectedCellIsVisible ();
 
-            // Ensure the typed glyph is selected 
+            // Ensure the typed glyph is selected
             _charMap.SelectedCodePoint = (int)result;
             _charMap.SetFocus ();
 

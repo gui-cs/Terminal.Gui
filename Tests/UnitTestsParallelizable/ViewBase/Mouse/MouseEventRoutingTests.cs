@@ -34,7 +34,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Point? receivedPosition = null;
         var eventReceived = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             eventReceived = true;
             receivedPosition = args.Position;
@@ -92,7 +92,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Point? receivedPosition = null;
         var eventReceived = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             eventReceived = true;
             receivedPosition = args.Position;
@@ -100,7 +100,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (viewRelativeX, viewRelativeY),
+            Position = new (viewRelativeX, viewRelativeY),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -148,7 +148,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Point? subViewReceivedPosition = null;
         var subViewEventReceived = false;
 
-        subView.MouseEvent += (sender, args) =>
+        subView.MouseEvent += (_, args) =>
         {
             subViewEventReceived = true;
             subViewReceivedPosition = args.Position;
@@ -195,7 +195,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
 
         var selectingCount = 0;
-        subView.Selecting += (sender, args) => selectingCount++;
+        subView.Selecting += (_, _) => selectingCount++;
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -225,17 +225,17 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         var handlerCalled = false;
         var clickHandlerCalled = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             handlerCalled = true;
             args.Handled = true; // Mark as handled
         };
 
-        view.MouseClick += (sender, args) => { clickHandlerCalled = true; };
+        view.MouseClick += (_, _) => { clickHandlerCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -258,17 +258,17 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         var eventHandlerCalled = false;
         var clickHandlerCalled = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, _) =>
         {
             eventHandlerCalled = true;
             // Don't set Handled = true
         };
 
-        view.MouseClick += (sender, args) => { clickHandlerCalled = true; };
+        view.MouseClick += (_, _) => { clickHandlerCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -298,7 +298,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         var releasedCount = 0;
         var clickedCount = 0;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             if (args.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
@@ -311,11 +311,11 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             }
         };
 
-        view.MouseClick += (sender, args) => { clickedCount++; };
+        view.MouseClick += (_, args) => { clickedCount++; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = flags
         };
 
@@ -341,11 +341,11 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         View view = new () { Width = 10, Height = 10 };
         var clickCount = 0;
 
-        view.MouseClick += (sender, args) => clickCount++;
+        view.MouseClick += (_, _) => clickCount++;
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = clickFlag
         };
 
@@ -374,11 +374,11 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         var eventCalled = false;
-        view.MouseEvent += (sender, args) => { eventCalled = true; };
+        view.MouseEvent += (_, _) => { eventCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -403,11 +403,11 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         var selectingCalled = false;
-        view.Selecting += (sender, args) => { selectingCalled = true; };
+        view.Selecting += (_, _) => { selectingCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -445,7 +445,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (2, 2),
+            Position = new (2, 2),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -476,11 +476,11 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (view);
 
         var selectingCount = 0;
-        view.Selecting += (sender, args) => selectingCount++;
+        view.Selecting += (_, _) => selectingCount++;
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
