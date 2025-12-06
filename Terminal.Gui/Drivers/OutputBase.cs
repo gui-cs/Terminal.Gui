@@ -79,7 +79,6 @@ public abstract class OutputBase
                     {
                         buffer.Contents [row, c].IsDirty = true;
                     }
-
                 }
             }
         }
