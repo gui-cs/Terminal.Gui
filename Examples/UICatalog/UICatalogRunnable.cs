@@ -329,8 +329,13 @@ public class UICatalogRunnable : Runnable
                 HighlightStates = MouseState.None
             };
 
-            _disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
+            //_disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
+            _disableMouseCb.Selecting += (sender, args) =>
+                                         {
+                                             Application.IsMouseDisabled = !Application.IsMouseDisabled;
+                                             _disableMouseCb.CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.None;
 
+                                         };
             menuItems.Add (
                            new MenuItem
                            {

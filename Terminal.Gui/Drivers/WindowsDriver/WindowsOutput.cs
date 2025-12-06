@@ -102,7 +102,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public WindowsOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
+        Logging.Information ($"Creating {nameof (WindowsOutput)}");
 
         if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
@@ -285,7 +285,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
                 if (err == 1)
                 {
-                    Logging.Logger.LogError ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
+                    Logging.Error ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
 
                     return;
                 }
@@ -302,7 +302,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
         }
         catch (Exception e)
         {
-            Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsOutput)}");
+            Logging.Error ($"Error: {e.Message} in {nameof (WindowsOutput)}");
 
             if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {

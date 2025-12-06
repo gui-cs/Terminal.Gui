@@ -67,6 +67,23 @@ public abstract class OutputBase
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
+        if (IsLegacyConsole)
+        {
+            // BUGBUG: This is a workaround for some regression in legacy console mode where
+            // BUGBUG: dirty cells are not handled correctly. Mark all cells dirty as a workaround.
+            lock (buffer.Contents!)
+            {
+                for (var row = 0; row < buffer.Rows; row++)
+                {
+                    for (var c = 0; c < buffer.Cols; c++)
+                    {
+                        buffer.Contents [row, c].IsDirty = true;
+                    }
+
+                }
+            }
+        }
+
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
