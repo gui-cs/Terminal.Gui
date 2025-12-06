@@ -268,7 +268,7 @@ Test files using MouseClick:
 ### Key Insights:
 1. Most Views just forward MouseClick to a Command - very simple ports
 2. HexView shows the ideal pattern - already done
-3. TextView's ProcessMouseClick is NOT part of the API being removed
+3. **TextView's ProcessMouseClick is NOT part of the API being removed** - it's a private helper method with an unfortunate name that will remain unchanged during the API removal
 4. The MouseClick->Command.Select->Selecting flow already exists, we're just removing the middle MouseClick layer
 
 ---
