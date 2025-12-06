@@ -101,10 +101,7 @@ public abstract class OutputBase
                             lastCol++;
                         }
 
-                        if (IsLegacyConsole)
-                        {
-                            SetCursorPositionImpl (lastCol, row);
-                        }
+                        SetCursorPositionImpl (lastCol, row);
 
                         continue;
                     }
@@ -291,8 +288,6 @@ public abstract class OutputBase
         }
         else
         {
-            SetCursorPositionImpl (lastCol, row);
-
             // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
             StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
             Write (processed);
