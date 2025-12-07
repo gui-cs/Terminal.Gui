@@ -158,7 +158,7 @@ internal partial class ApplicationImpl
             // Otherwise, just redraw views that need it.
             View.Draw (views: views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
 
-            //Driver.Clip = new (Screen);
+            Driver.Clip = new (Screen);
 
             // Cause the driver to flush any pending updates to the terminal
             Driver?.Refresh ();
