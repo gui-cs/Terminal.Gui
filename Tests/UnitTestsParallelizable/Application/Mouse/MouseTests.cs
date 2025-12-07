@@ -1,6 +1,4 @@
-using Xunit.Abstractions;
-
-namespace ApplicationTests;
+namespace ApplicationTests.Mouse;
 
 /// <summary>
 ///     Tests for the <see cref="IMouse"/> interface and <see cref="MouseImpl"/> implementation.

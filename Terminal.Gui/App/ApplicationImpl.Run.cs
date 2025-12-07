@@ -368,6 +368,8 @@ internal partial class ApplicationImpl
             previousRunnable.RaiseIsModalChangedEvent (true);
         }
 
+        Mouse?.UngrabMouse ();
+
         runnable.RaiseIsRunningChangedEvent (false);
 
         token.Result = runnable.Result;
