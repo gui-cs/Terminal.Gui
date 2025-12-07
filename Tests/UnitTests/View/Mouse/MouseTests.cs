@@ -49,8 +49,10 @@ public class MouseTests : TestsAllViews
 
         Application.RaiseMouseEvent (new () { ScreenPosition = new (xy + 1, xy + 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
         AutoInitShutdownAttribute.RunIteration ();
-
         Assert.Equal (expectedMoved, new Point (5, 5) == testView.Frame.Location);
+        // The above grabbed the mouse. Need to ungrab.
+        Application.Mouse.UngrabMouse ();
+
         top.Dispose ();
     }
 

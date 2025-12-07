@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Base implementation of <see cref="IRunnable{TResult}"/> for views that can be run as blocking sessions.

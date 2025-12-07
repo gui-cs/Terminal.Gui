@@ -1,4 +1,4 @@
-﻿namespace ApplicationTests;
+﻿namespace ApplicationTests.Timeout;
 
 public class LogarithmicTimeoutTests
 {

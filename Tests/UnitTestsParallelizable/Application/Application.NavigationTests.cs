@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace ApplicationTests;
+namespace ApplicationTests.Navigation;
 
 public class ApplicationNavigationTests (ITestOutputHelper output)
 {

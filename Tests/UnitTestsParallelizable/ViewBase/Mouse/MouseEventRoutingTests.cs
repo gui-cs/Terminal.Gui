@@ -1,7 +1,7 @@
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace ApplicationTests;
+namespace ApplicationTests.Mouse;
 
 /// <summary>
 ///     Parallelizable tests for mouse event routing and coordinate transformation.
@@ -283,10 +283,10 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     #region Mouse Button Events
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, 1, 0, 0)]
-    [InlineData (MouseFlags.Button1Released, 0, 1, 0)]
-    [InlineData (MouseFlags.Button1Clicked, 0, 0, 1)]
-    public void View_MouseButtonEvents_RaiseCorrectHandlers (MouseFlags flags, int expectedPressed, int expectedReleased, int expectedClicked)
+    [InlineData (MouseFlags.Button1Pressed, 1, 0)]
+    [InlineData (MouseFlags.Button1Released, 0, 1)]
+    [InlineData (MouseFlags.Button1Clicked, 0, 0)]
+    public void View_MouseButtonEvents_RaiseCorrectHandlers (MouseFlags flags, int expectedPressed, int expectedReleased)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
