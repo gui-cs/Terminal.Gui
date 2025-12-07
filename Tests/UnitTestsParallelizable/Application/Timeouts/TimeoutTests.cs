@@ -853,4 +853,23 @@ public class TimeoutTests
             }
         }
     }
+
+
+    [Fact]
+    public void Invoke_Adds_Idle ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+
+        Runnable top = new ();
+        SessionToken? rs = app.Begin (top);
+
+        var actionCalled = 0;
+        app.Invoke ((_) => { actionCalled++; });
+        app.TimedEvents!.RunTimers ();
+        Assert.Equal (1, actionCalled);
+        top.Dispose ();
+
+        app.Dispose ();
+    }
 }

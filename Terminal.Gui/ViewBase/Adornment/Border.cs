@@ -111,7 +111,6 @@ public partial class Border : Adornment
         if (App is { })
         {
             App.Mouse.GrabbingMouse += Application_GrabbingMouse;
-            App.Mouse.UnGrabbingMouse += Application_UnGrabbingMouse;
         }
 
         if (Parent is null)

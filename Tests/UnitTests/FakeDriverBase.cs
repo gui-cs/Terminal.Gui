@@ -4,7 +4,7 @@ namespace UnitTests;
 ///     Enables tests to create a FakeDriver for testing purposes.
 /// </summary>
 [Collection ("Global Test Setup")]
-public abstract class FakeDriverBase /*: IDisposable*/
+public abstract class FakeDriverBase/* : IDisposable*/
 {
     /// <summary>
     ///     Creates a new FakeDriver instance with the specified buffer size.

@@ -1,5 +1,4 @@
-﻿namespace ApplicationTests;
-
+﻿namespace ApplicationTests.Timeout;
 
 public class SmoothAcceleratingTimeoutTests
 {

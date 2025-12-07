@@ -148,7 +148,7 @@ See the [Mouse Deep Dive](mouse.md).
 - [View.WantContinuousButtonPresses](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_WantContinuousButtonPresses) - Enables continuous button press events
 - [View.Highlight](~/api/Terminal.Gui.ViewBase.View.yml) - Event for visual feedback on mouse hover/click
 - [View.HighlightStyle](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HighlightStyle) - Visual style when highlighted
-- Events: `MouseEnter`, `MouseLeave`, `MouseClick`, `MouseEvent`
+- Events: `MouseEnter`, `MouseLeave`, `MouseEvent`
 
 ### Layout and Arrangement
 
@@ -368,7 +368,6 @@ The mouse subsystem processes mouse events through:
 3. [View.MouseEnter](~/api/Terminal.Gui.ViewBase.View.yml) / [View.MouseLeave](~/api/Terminal.Gui.ViewBase.View.yml) events
 4. [View.MouseBindings](~/api/Terminal.Gui.ViewBase.View.yml) - Converts mouse actions to commands
 5. Command handlers
-6. [View.MouseClick](~/api/Terminal.Gui.ViewBase.View.yml) event (high-level)
 
 ### Layout
 

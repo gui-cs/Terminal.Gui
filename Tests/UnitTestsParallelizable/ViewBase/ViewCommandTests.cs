@@ -124,8 +124,123 @@ public class ViewCommandTests
         Assert.Equal (0, view.OnAcceptedCount);
     }
 
-
     #endregion OnAccept/Accept tests
+
+    #region Accepted tests
+
+    [Fact]
+    public void Accepted_Event_Is_Raised_After_Accepting_When_Handled ()
+    {
+        View view = new ();
+        var acceptingInvoked = false;
+        var acceptedInvoked = false;
+
+        view.Accepting += (sender, e) =>
+                          {
+                              acceptingInvoked = true;
+                              e.Handled = true;
+                          };
+
+        view.Accepted += (sender, e) =>
+                         {
+                             acceptedInvoked = true;
+                             Assert.True (acceptingInvoked); // Accepting should be raised first
+                         };
+
+        bool? ret = view.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptingInvoked);
+        Assert.True (acceptedInvoked);
+    }
+
+    [Fact]
+    public void Accepted_Event_Not_Raised_When_Accepting_Not_Handled ()
+    {
+        View view = new ();
+        var acceptingInvoked = false;
+        var acceptedInvoked = false;
+
+        view.Accepting += (sender, e) =>
+                          {
+                              acceptingInvoked = true;
+                              e.Handled = false;
+                          };
+
+        view.Accepted += (sender, e) =>
+                         {
+                             acceptedInvoked = true;
+                         };
+
+        // When not handled, Accept bubbles to SuperView, so returns false (no superview)
+        bool? ret = view.InvokeCommand (Command.Accept);
+        Assert.False (ret);
+        Assert.True (acceptingInvoked);
+        Assert.False (acceptedInvoked); // Should not be invoked when not handled
+    }
+
+    [Fact]
+    public void Accepted_Event_Cannot_Be_Cancelled ()
+    {
+        View view = new ();
+        var acceptedInvoked = false;
+
+        view.Accepting += (sender, e) =>
+                          {
+                              e.Handled = true;
+                          };
+
+        view.Accepted += (sender, e) =>
+                         {
+                             acceptedInvoked = true;
+                             // Accepted event has Handled property but it doesn't affect flow
+                             e.Handled = false;
+                         };
+
+        bool? ret = view.InvokeCommand (Command.Accept);
+        Assert.True (ret);
+        Assert.True (acceptedInvoked);
+    }
+
+    [Fact]
+    public void OnAccepted_Called_When_Accepting_Handled ()
+    {
+        OnAcceptedTestView view = new ();
+
+        view.Accepting += (sender, e) =>
+                          {
+                              e.Handled = true;
+                          };
+
+        view.InvokeCommand (Command.Accept);
+        Assert.Equal (1, view.OnAcceptedCallCount);
+    }
+
+    [Fact]
+    public void OnAccepted_Not_Called_When_Accepting_Not_Handled ()
+    {
+        OnAcceptedTestView view = new ();
+
+        view.Accepting += (sender, e) =>
+                          {
+                              e.Handled = false;
+                          };
+
+        view.InvokeCommand (Command.Accept);
+        Assert.Equal (0, view.OnAcceptedCallCount);
+    }
+
+    private class OnAcceptedTestView : View
+    {
+        public int OnAcceptedCallCount { get; private set; }
+
+        protected override void OnAccepted (CommandEventArgs args)
+        {
+            OnAcceptedCallCount++;
+            base.OnAccepted (args);
+        }
+    }
+
+    #endregion Accepted tests
 
     #region OnSelect/Select tests
 

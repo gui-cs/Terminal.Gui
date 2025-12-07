@@ -127,7 +127,7 @@ public partial class View // Drawing APIs
             // because they may draw outside the viewport.
             SetClip (originalClip);
             originalClip = AddFrameToClip ();
-            DoRenderLineCanvas ();
+            DoRenderLineCanvas (context);
 
             // ------------------------------------
             // Re-draw the border and padding subviews
@@ -568,7 +568,7 @@ public partial class View // Drawing APIs
     /// <remarks>
     ///     <para>
     ///         Subscribe to this event to draw custom content for the View. Use the drawing methods available on <see cref="View"/>
-    ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune?)"/>.
+    ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune)"/>.
     ///     </para>
     ///     <para>
     ///         The event is invoked after <see cref="ClearingViewport"/> and <see cref="Text"/> have been drawn, but before any <see cref="SubViews"/> are drawn.
@@ -672,8 +672,9 @@ public partial class View // Drawing APIs
 
     #region DrawLineCanvas
 
-    private void DoRenderLineCanvas ()
+    private void DoRenderLineCanvas (DrawContext? context)
     {
+        // TODO: Add context to OnRenderingLineCanvas
         if (!NeedsDraw || OnRenderingLineCanvas ())
         {
             return;
@@ -681,7 +682,7 @@ public partial class View // Drawing APIs
 
         // TODO: Add event
 
-        RenderLineCanvas ();
+        RenderLineCanvas (context);
     }
 
     /// <summary>
@@ -709,7 +710,8 @@ public partial class View // Drawing APIs
     ///     <see cref="LineCanvas"/> of this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
     ///     false (the default), this method will cause the <see cref="LineCanvas"/> to be rendered.
     /// </summary>
-    public void RenderLineCanvas ()
+    /// <param name="context"></param>
+    public void RenderLineCanvas (DrawContext? context)
     {
         if (Driver is null)
         {
@@ -728,6 +730,9 @@ public partial class View // Drawing APIs
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddStr (p.Value.Value.Grapheme);
+
+                    // Add each drawn cell to the context
+                    context?.AddDrawnRectangle (new Rectangle (p.Key, new (1, 1)) );
                 }
             }
 
@@ -759,9 +764,6 @@ public partial class View // Drawing APIs
                 // Exclude the Border and Padding from the clip
                 ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
                 ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
-
-                // QUESTION: This makes it so that no nesting of transparent views is possible, but is more correct?
-                context = new DrawContext ();
             }
             else
             {

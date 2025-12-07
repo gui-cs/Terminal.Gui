@@ -1,7 +1,3 @@
-#nullable enable
-using System;
-using Terminal.Gui.App;
-using Xunit;
 namespace ApplicationTests;
 
 public class ResultEventArgsTests
@@ -9,7 +5,7 @@ public class ResultEventArgsTests
     [Fact]
     public void DefaultConstructor_InitializesProperties ()
     {
-        var args = new ResultEventArgs<string> ();
+        ResultEventArgs<string> args = new ();
 
         Assert.Null (args.Result);
         Assert.False (args.Handled);
@@ -18,7 +14,7 @@ public class ResultEventArgsTests
     [Fact]
     public void Constructor_WithResult_SetsResult ()
     {
-        var args = new ResultEventArgs<int> (42);
+        ResultEventArgs<int> args = new (42);
 
         Assert.Equal (42, args.Result);
         Assert.False (args.Handled);
@@ -27,7 +23,7 @@ public class ResultEventArgsTests
     [Fact]
     public void Constructor_WithNullResult_AllowsNull ()
     {
-        var args = new ResultEventArgs<string?> (null);
+        ResultEventArgs<string?> args = new (null);
 
         Assert.Null (args.Result);
         Assert.False (args.Handled);
@@ -36,7 +32,7 @@ public class ResultEventArgsTests
     [Fact]
     public void Result_CanBeSetAndRetrieved ()
     {
-        var args = new ResultEventArgs<string> ();
+        ResultEventArgs<string> args = new ();
         args.Result = "foo";
 
         Assert.Equal ("foo", args.Result);
@@ -48,7 +44,7 @@ public class ResultEventArgsTests
     [Fact]
     public void Handled_CanBeSetAndRetrieved ()
     {
-        var args = new ResultEventArgs<object> ();
+        ResultEventArgs<object> args = new ();
         Assert.False (args.Handled);
 
         args.Handled = true;
@@ -61,7 +57,7 @@ public class ResultEventArgsTests
     [Fact]
     public void WorksWithValueTypes ()
     {
-        var args = new ResultEventArgs<int> ();
+        ResultEventArgs<int> args = new ();
         Assert.Equal (0, args.Result); // default(int) is 0
 
         args.Result = 123;
@@ -72,7 +68,7 @@ public class ResultEventArgsTests
     public void WorksWithReferenceTypes ()
     {
         var obj = new object ();
-        var args = new ResultEventArgs<object> (obj);
+        ResultEventArgs<object> args = new (obj);
 
         Assert.Same (obj, args.Result);
 
@@ -87,7 +83,8 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_AndCallerSeesChange ()
     {
         // Arrange
-        var args = new ResultEventArgs<string> ("initial");
+        ResultEventArgs<string> args = new ("initial");
+
         StringResultEvent += (sender, e) =>
                              {
                                  // Handler changes the result
@@ -101,17 +98,12 @@ public class ResultEventArgsTests
         Assert.Equal ("changed by handler", args.Result);
     }
 
-
-
     [Fact]
     public void EventHandler_CanSetResultToNull ()
     {
         // Arrange
-        var args = new ResultEventArgs<string> ("not null");
-        StringResultEvent += (sender, e) =>
-                             {
-                                 e.Result = null;
-                             };
+        ResultEventArgs<string> args = new ("not null");
+        StringResultEvent += (sender, e) => { e.Result = null; };
 
         // Act
         StringResultEvent?.Invoke (this, args);
@@ -124,7 +116,7 @@ public class ResultEventArgsTests
     public void MultipleHandlers_LastHandlerWins ()
     {
         // Arrange
-        var args = new ResultEventArgs<int> (1);
+        ResultEventArgs<int> args = new (1);
         EventHandler<ResultEventArgs<int>>? intEvent = null;
         intEvent += (s, e) => e.Result = 2;
         intEvent += (s, e) => e.Result = 3;
@@ -141,7 +133,7 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_Int ()
     {
         EventHandler<ResultEventArgs<int>> handler = (s, e) => e.Result = 99;
-        var args = new ResultEventArgs<int> (1);
+        ResultEventArgs<int> args = new (1);
         handler.Invoke (this, args);
         Assert.Equal (99, args.Result);
     }
@@ -151,7 +143,7 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_Double ()
     {
         EventHandler<ResultEventArgs<double>> handler = (s, e) => e.Result = 2.718;
-        var args = new ResultEventArgs<double> (3.14);
+        ResultEventArgs<double> args = new (3.14);
         handler.Invoke (this, args);
         Assert.Equal (2.718, args.Result);
     }
@@ -161,29 +153,39 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_Bool ()
     {
         EventHandler<ResultEventArgs<bool>> handler = (s, e) => e.Result = false;
-        var args = new ResultEventArgs<bool> (true);
+        ResultEventArgs<bool> args = new (true);
         handler.Invoke (this, args);
         Assert.False (args.Result);
     }
 
     // Enum
-    enum MyEnum { A, B, C }
+    private enum MyEnum
+    {
+        A,
+        B,
+        C
+    }
+
     [Fact]
     public void EventHandler_CanChangeResult_Enum ()
     {
         EventHandler<ResultEventArgs<MyEnum>> handler = (s, e) => e.Result = MyEnum.C;
-        var args = new ResultEventArgs<MyEnum> (MyEnum.A);
+        ResultEventArgs<MyEnum> args = new (MyEnum.A);
         handler.Invoke (this, args);
         Assert.Equal (MyEnum.C, args.Result);
     }
 
     // Struct
-    struct MyStruct { public int X; }
+    private struct MyStruct
+    {
+        public int X;
+    }
+
     [Fact]
     public void EventHandler_CanChangeResult_Struct ()
     {
-        EventHandler<ResultEventArgs<MyStruct>> handler = (s, e) => e.Result = new MyStruct { X = 42 };
-        var args = new ResultEventArgs<MyStruct> (new MyStruct { X = 1 });
+        EventHandler<ResultEventArgs<MyStruct>> handler = (s, e) => e.Result = new() { X = 42 };
+        ResultEventArgs<MyStruct> args = new (new() { X = 1 });
         handler.Invoke (this, args);
         Assert.Equal (42, args.Result.X);
     }
@@ -193,7 +195,7 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_String ()
     {
         EventHandler<ResultEventArgs<string>> handler = (s, e) => e.Result = "changed";
-        var args = new ResultEventArgs<string> ("original");
+        ResultEventArgs<string> args = new ("original");
         handler.Invoke (this, args);
         Assert.Equal ("changed", args.Result);
     }
@@ -204,7 +206,7 @@ public class ResultEventArgsTests
     {
         var newObj = new object ();
         EventHandler<ResultEventArgs<object>> handler = (s, e) => e.Result = newObj;
-        var args = new ResultEventArgs<object> (new object ());
+        ResultEventArgs<object> args = new (new ());
         handler.Invoke (this, args);
         Assert.Same (newObj, args.Result);
     }
@@ -214,7 +216,7 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_NullableInt ()
     {
         EventHandler<ResultEventArgs<int?>> handler = (s, e) => e.Result = null;
-        var args = new ResultEventArgs<int?> (42);
+        ResultEventArgs<int?> args = new (42);
         handler.Invoke (this, args);
         Assert.Null (args.Result);
     }
@@ -225,7 +227,7 @@ public class ResultEventArgsTests
     {
         var newArr = new [] { "x", "y" };
         EventHandler<ResultEventArgs<string []>> handler = (s, e) => e.Result = newArr;
-        var args = new ResultEventArgs<string []> (new [] { "a", "b" });
+        ResultEventArgs<string []> args = new (new [] { "a", "b" });
         handler.Invoke (this, args);
         Assert.Equal (newArr, args.Result);
     }
@@ -234,9 +236,9 @@ public class ResultEventArgsTests
     [Fact]
     public void EventHandler_CanChangeResult_List ()
     {
-        var newList = new List<int> { 1, 2, 3 };
+        List<int> newList = new() { 1, 2, 3 };
         EventHandler<ResultEventArgs<List<int>>> handler = (s, e) => e.Result = newList;
-        var args = new ResultEventArgs<List<int>> (new List<int> { 9 });
+        ResultEventArgs<List<int>> args = new (new() { 9 });
         handler.Invoke (this, args);
         Assert.Equal (newList, args.Result);
     }
@@ -245,21 +247,22 @@ public class ResultEventArgsTests
     [Fact]
     public void EventHandler_CanChangeResult_Dictionary ()
     {
-        var newDict = new Dictionary<string, int> { ["a"] = 1 };
+        Dictionary<string, int> newDict = new() { ["a"] = 1 };
         EventHandler<ResultEventArgs<Dictionary<string, int>>> handler = (s, e) => e.Result = newDict;
-        var args = new ResultEventArgs<Dictionary<string, int>> (new Dictionary<string, int> ());
+        ResultEventArgs<Dictionary<string, int>> args = new (new ());
         handler.Invoke (this, args);
         Assert.Equal (newDict, args.Result);
     }
 
     // Record
     public record MyRecord (int Id, string Name);
+
     [Fact]
     public void EventHandler_CanChangeResult_Record ()
     {
         var rec = new MyRecord (1, "foo");
         EventHandler<ResultEventArgs<MyRecord>> handler = (s, e) => e.Result = rec;
-        var args = new ResultEventArgs<MyRecord> (null);
+        ResultEventArgs<MyRecord> args = new (null);
         handler.Invoke (this, args);
         Assert.Equal (rec, args.Result);
     }
@@ -269,12 +272,12 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_NullableInt_ToValue_AndNull ()
     {
         EventHandler<ResultEventArgs<int?>> handler = (s, e) => e.Result = 123;
-        var args = new ResultEventArgs<int?> (null);
+        ResultEventArgs<int?> args = new (null);
         handler.Invoke (this, args);
         Assert.Equal (123, args.Result);
 
         handler = (s, e) => e.Result = null;
-        args = new ResultEventArgs<int?> (456);
+        args = new (456);
         handler.Invoke (this, args);
         Assert.Null (args.Result);
     }
@@ -284,12 +287,12 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_NullableDouble_ToValue_AndNull ()
     {
         EventHandler<ResultEventArgs<double?>> handler = (s, e) => e.Result = 3.14;
-        var args = new ResultEventArgs<double?> (null);
+        ResultEventArgs<double?> args = new (null);
         handler.Invoke (this, args);
         Assert.Equal (3.14, args.Result);
 
         handler = (s, e) => e.Result = null;
-        args = new ResultEventArgs<double?> (2.71);
+        args = new (2.71);
         handler.Invoke (this, args);
         Assert.Null (args.Result);
     }
@@ -299,12 +302,12 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_NullableStruct_ToValue_AndNull ()
     {
         EventHandler<ResultEventArgs<MyStruct?>> handler = (s, e) => e.Result = new MyStruct { X = 7 };
-        var args = new ResultEventArgs<MyStruct?> (null);
+        ResultEventArgs<MyStruct?> args = new (null);
         handler.Invoke (this, args);
         Assert.Equal (7, args.Result?.X);
 
         handler = (s, e) => e.Result = null;
-        args = new ResultEventArgs<MyStruct?> (new MyStruct { X = 8 });
+        args = new (new MyStruct { X = 8 });
         handler.Invoke (this, args);
         Assert.Null (args.Result);
     }
@@ -314,29 +317,33 @@ public class ResultEventArgsTests
     public void EventHandler_CanChangeResult_NullableString_ToValue_AndNull ()
     {
         EventHandler<ResultEventArgs<string?>> handler = (s, e) => e.Result = "hello";
-        var args = new ResultEventArgs<string?> (null);
+        ResultEventArgs<string?> args = new (null);
         handler.Invoke (this, args);
         Assert.Equal ("hello", args.Result);
 
         handler = (s, e) => e.Result = null;
-        args = new ResultEventArgs<string?> ("world");
+        args = new ("world");
         handler.Invoke (this, args);
         Assert.Null (args.Result);
     }
 
     // Nullable custom class
-    class MyClass { public int Y { get; set; } }
+    private class MyClass
+    {
+        public int Y { get; set; }
+    }
+
     [Fact]
     public void EventHandler_CanChangeResult_NullableClass_ToValue_AndNull ()
     {
-        EventHandler<ResultEventArgs<MyClass?>> handler = (s, e) => e.Result = new MyClass { Y = 42 };
-        var args = new ResultEventArgs<MyClass?> (null);
+        EventHandler<ResultEventArgs<MyClass?>> handler = (s, e) => e.Result = new() { Y = 42 };
+        ResultEventArgs<MyClass?> args = new (null);
         handler.Invoke (this, args);
         Assert.NotNull (args.Result);
         Assert.Equal (42, args.Result?.Y);
 
         handler = (s, e) => e.Result = null;
-        args = new ResultEventArgs<MyClass?> (new MyClass { Y = 99 });
+        args = new (new() { Y = 99 });
         handler.Invoke (this, args);
         Assert.Null (args.Result);
     }

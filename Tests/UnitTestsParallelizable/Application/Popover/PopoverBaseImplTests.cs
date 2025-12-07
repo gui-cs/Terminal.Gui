@@ -1,13 +1,10 @@
-using System;
-using Terminal.Gui;
-using Terminal.Gui.App;
-using Xunit;
-namespace ApplicationTests;
+namespace ApplicationTests.Popover;
 
 public class PopoverBaseImplTests
 {
     // Minimal concrete implementation for testing
-    private class TestPopover : PopoverBaseImpl { }
+    private class TestPopover : PopoverBaseImpl
+    { }
 
     [Fact]
     public void Constructor_SetsDefaults ()
@@ -40,11 +37,10 @@ public class PopoverBaseImplTests
         popover.ViewportSettings = ViewportSettingsFlags.None; // Remove required flags
 
         var popoverManager = new ApplicationPopover ();
+
         // Test missing Transparent flags
         Assert.ThrowsAny<Exception> (() => popoverManager.Show (popover));
-
     }
-
 
     [Fact]
     public void Show_ThrowsIfPopoverMissingQuitCommand ()

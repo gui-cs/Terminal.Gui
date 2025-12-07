@@ -75,7 +75,7 @@ public class Margin : Adornment
 
         while (stack.Count > 0)
         {
-            var view = stack.Pop ();
+            View view = stack.Pop ();
 
             if (view.Margin is { } margin && margin.Thickness != Thickness.Empty && margin.GetCachedClip () != null)
             {
@@ -87,10 +87,9 @@ public class Margin : Adornment
                 margin.ClearCachedClip ();
             }
 
-            Debug.Assert (view.NeedsDraw == false);
             view.ClearNeedsDraw ();
 
-            foreach (var subview in view.SubViews)
+            foreach (View subview in view.SubViews)
             {
                 stack.Push (subview);
             }
