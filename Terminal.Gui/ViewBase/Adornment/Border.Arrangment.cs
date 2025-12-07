@@ -766,7 +766,7 @@ public partial class Border
     }
 
     /// <summary>
-    ///     Cancels <see cref="IMouse.GrabbingMouse"/> events during an active drag to prevent other views from
+    ///     Cancels <see cref="IMouseGrabHandler.GrabbingMouse"/> events during an active drag to prevent other views from
     ///     stealing the mouse grab mid-operation.
     /// </summary>
     /// <remarks>
@@ -774,7 +774,7 @@ public partial class Border
     ///     must receive all mouse events until Button1Released. If another view (e.g., scrollbar, slider) were allowed
     ///     to grab the mouse, the drag would freeze, leaving Border in an inconsistent state with no cleanup.
     ///     Canceling follows the CWP pattern, ensuring Border maintains exclusive mouse control until it explicitly
-    ///     releases via <see cref="IMouse.UngrabMouse"/> in <see cref="OnMouseEvent"/>.
+    ///     releases via <see cref="IMouseGrabHandler.UngrabMouse"/> in <see cref="OnMouseEvent"/>.
     /// </remarks>
     private void Application_GrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
