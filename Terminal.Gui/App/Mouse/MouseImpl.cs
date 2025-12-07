@@ -274,6 +274,7 @@ internal class MouseImpl : IMouse, IDisposable
         if (view is null)
         {
             UngrabMouse();
+            return;
         }
 
         RaiseGrabbedMouseEvent (view);

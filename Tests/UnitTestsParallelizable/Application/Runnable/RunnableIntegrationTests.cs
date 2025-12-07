@@ -327,13 +327,14 @@ public class ApplicationRunnableIntegrationTests
 
         Assert.Null (app.Mouse.MouseGrabView);
 
+        runnable.Dispose ();
+        app.Dispose ();
     }
 
     [Fact]
     public void MultipleRunnables_IndependentResults ()
     {
         // Arrange
-        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable1 = new ();
         Runnable<string> runnable2 = new ();
 
