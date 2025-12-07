@@ -732,7 +732,7 @@ public partial class View // Drawing APIs
                     AddStr (p.Value.Value.Grapheme);
 
                     // Add each drawn cell to the context
-                    //context?.AddDrawnRectangle (new Rectangle (p.Key, new (1, 1)) );
+                    context?.AddDrawnRectangle (new Rectangle (p.Key, new (1, 1)) );
                 }
             }
 
@@ -764,9 +764,6 @@ public partial class View // Drawing APIs
                 // Exclude the Border and Padding from the clip
                 ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
                 ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
-
-                // QUESTION: This makes it so that no nesting of transparent views is possible, but is more correct?
-                context = new DrawContext ();
             }
             else
             {
