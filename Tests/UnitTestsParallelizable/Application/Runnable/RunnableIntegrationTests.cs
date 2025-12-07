@@ -332,7 +332,6 @@ public class ApplicationRunnableIntegrationTests
     public void MultipleRunnables_IndependentResults ()
     {
         // Arrange
-        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable1 = new ();
         Runnable<string> runnable2 = new ();
 
