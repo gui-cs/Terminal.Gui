@@ -326,6 +326,9 @@ public class ApplicationRunnableIntegrationTests
         app.End (token!);
 
         Assert.Null (app.Mouse.MouseGrabView);
+        
+        runnable.Dispose ();
+        app.Dispose ();
     }
 
     [Fact]
