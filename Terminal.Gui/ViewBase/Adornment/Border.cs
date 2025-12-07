@@ -214,6 +214,7 @@ public partial class Border : Adornment
             // TODO: all this.
             return Parent?.SuperView?.BorderStyle ?? LineStyle.None;
         }
+        // BUGBUG: Setting LineStyle should SetNeedsDraw
         set => _lineStyle = value;
     }
 

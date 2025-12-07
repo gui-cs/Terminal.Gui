@@ -34,8 +34,8 @@ public sealed class WideGlyphs : Scenario
             }
 
             // Only rebuild if size changed or array is null
-            if (_codepoints is null || 
-                _codepoints.GetLength (0) != view.Viewport.Height || 
+            if (_codepoints is null ||
+                _codepoints.GetLength (0) != view.Viewport.Height ||
                 _codepoints.GetLength (1) != view.Viewport.Width)
             {
                 _codepoints = new Rune [view.Viewport.Height, view.Viewport.Width];
@@ -51,6 +51,8 @@ public sealed class WideGlyphs : Scenario
         };
 
         // Fill the window with the pre-built codepoints array
+        // For detailed documentation on the draw code flow from Application.Run to this event,
+        // see WideGlyphs.DrawFlow.md in this directory
         appWindow.DrawingContent += (s, e) =>
         {
             View? view = s as View;
@@ -73,7 +75,7 @@ public sealed class WideGlyphs : Scenario
             }
         };
 
-        Line verticalLineAtEven = new Line ()
+        Line verticalLineAtEven = new ()
         {
             X = 10,
             Orientation = Orientation.Vertical,
@@ -81,7 +83,7 @@ public sealed class WideGlyphs : Scenario
         };
         appWindow.Add (verticalLineAtEven);
 
-        Line verticalLineAtOdd = new Line ()
+        Line verticalLineAtOdd = new ()
         {
             X = 25,
             Orientation = Orientation.Vertical,
@@ -112,6 +114,71 @@ public sealed class WideGlyphs : Scenario
             BorderStyle = LineStyle.Dashed,
         };
         appWindow.Add (arrangeableViewAtOdd);
+
+
+        var superView = new View
+        {
+            CanFocus = true,
+            X = 30, // on an even column to start
+            Y = Pos.Center (),
+            Width = Dim.Auto () + 4,
+            Height = Dim.Auto () + 1,
+            BorderStyle = LineStyle.Single,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
+        };
+
+        Rune codepoint = Glyphs.Apple;
+
+        superView.DrawingContent += (s, e) =>
+                                    {
+                                        var view = s as View;
+                                        for (var r = 0; r < view!.Viewport.Height; r++)
+                                        {
+                                            for (var c = 0; c < view.Viewport.Width; c += 2)
+                                            {
+                                                if (codepoint != default (Rune))
+                                                {
+                                                    view.AddRune (c, r, codepoint);
+                                                }
+                                            }
+                                        }
+                                        e.DrawContext?.AddDrawnRectangle (view.Viewport);
+                                        e.Cancel = true;
+                                    };
+        appWindow.Add (superView);
+
+        var viewWithBorderAtX0 = new View
+        {
+            Text = "viewWithBorderAtX0",
+            BorderStyle = LineStyle.Dashed,
+            X = 0,
+            Y = 1,
+            Width = Dim.Auto (),
+            Height = 3
+        };
+
+        var viewWithBorderAtX1 = new View
+        {
+            Text = "viewWithBorderAtX1",
+            BorderStyle = LineStyle.Dashed,
+            X = 1,
+            Y = Pos.Bottom (viewWithBorderAtX0) + 1,
+            Width = Dim.Auto (),
+            Height = 3
+        };
+
+        var viewWithBorderAtX2 = new View
+        {
+            Text = "viewWithBorderAtX2",
+            BorderStyle = LineStyle.Dashed,
+            X = 2,
+            Y = Pos.Bottom (viewWithBorderAtX1) + 1,
+            Width = Dim.Auto (),
+            Height = 3
+        };
+
+        superView.Add (viewWithBorderAtX0, viewWithBorderAtX1, viewWithBorderAtX2);
+
         // Run - Start the application.
         Application.Run (appWindow);
         appWindow.Dispose ();
