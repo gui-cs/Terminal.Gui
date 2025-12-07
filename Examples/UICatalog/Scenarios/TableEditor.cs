@@ -610,29 +610,35 @@ public class TableEditor : Scenario
         };
 
         // if user clicks the mouse in TableView
-        _tableView!.MouseClick += (s, e) =>
-                                  {
-                                      if (_currentTable == null)
-                                      {
-                                          return;
-                                      }
+        _tableView!.Selecting += (s, e) =>
+                                 {
+                                     if (_currentTable == null)
+                                     {
+                                         return;
+                                     }
 
-                                      _tableView!.ScreenToCell (e.Position, out int? clickedCol);
+                                     // Only handle mouse clicks
+                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                     {
+                                         return;
+                                     }
 
-                                      if (clickedCol != null)
-                                      {
-                                          if (e.Flags.HasFlag (MouseFlags.Button1Clicked))
-                                          {
-                                              // left click in a header
-                                              SortColumn (clickedCol.Value);
-                                          }
-                                          else if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
-                                          {
-                                              // right click in a header
-                                              ShowHeaderContextMenu (clickedCol.Value, e);
-                                          }
-                                      }
-                                  };
+                                     _tableView!.ScreenToCell (mouseArgs.Position, out int? clickedCol);
+
+                                     if (clickedCol != null)
+                                     {
+                                         if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                         {
+                                             // left click in a header
+                                             SortColumn (clickedCol.Value);
+                                         }
+                                         else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                         {
+                                             // right click in a header
+                                             ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
+                                         }
+                                     }
+                                 };
 
         _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 

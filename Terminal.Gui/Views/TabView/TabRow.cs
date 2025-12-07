@@ -24,7 +24,10 @@ internal class TabRow : View
             Visible = false,
             Text = Glyphs.RightArrow.ToString ()
         };
-        _rightScrollIndicator.MouseClick += _host.Tab_MouseClick!;
+        _rightScrollIndicator.Selecting += (s, e) =>
+        {
+            _host.Tab_Selecting (s, e);
+        };
 
         _leftScrollIndicator = new View
         {
@@ -34,7 +37,10 @@ internal class TabRow : View
             Visible = false,
             Text = Glyphs.LeftArrow.ToString ()
         };
-        _leftScrollIndicator.MouseClick += _host.Tab_MouseClick!;
+        _leftScrollIndicator.Selecting += (s, e) =>
+        {
+            _host.Tab_Selecting (s, e);
+        };
 
         Add (_rightScrollIndicator, _leftScrollIndicator);
     }

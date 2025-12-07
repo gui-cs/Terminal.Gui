@@ -55,9 +55,9 @@ public class ShortcutTests
     //  0123456789
     // " C  0  A "
     [InlineData (-1, 0, 0, 0, 0)]
-    [InlineData (0, 0, 1, 1, 1)] // mouseX = 0 is on the CommandView.Margin, so Shortcut will get MouseClick
-    [InlineData (1, 0, 1, 1, 1)] // mouseX = 1 is on the CommandView, so CommandView will get MouseClick
-    [InlineData (2, 0, 1, 1, 1)] // mouseX = 2 is on the CommandView.Margin, so Shortcut will get MouseClick
+    [InlineData (0, 0, 1, 1, 1)] // mouseX = 0 is on the CommandView.Margin, so Shortcut will get MouseEvent for click
+    [InlineData (1, 0, 1, 1, 1)] // mouseX = 1 is on the CommandView, so CommandView will get MouseEvent for click
+    [InlineData (2, 0, 1, 1, 1)] // mouseX = 2 is on the CommandView.Margin, so Shortcut will get MouseEvent for click
     [InlineData (3, 0, 1, 1, 1)]
     [InlineData (4, 0, 1, 1, 1)]
     [InlineData (5, 0, 1, 1, 1)]

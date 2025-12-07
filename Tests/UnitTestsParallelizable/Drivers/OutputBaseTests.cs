@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 namespace DriverTests;
 
@@ -152,6 +152,62 @@ public class OutputBaseTests
 
         // Verify SetCursorPositionImpl was invoked by WriteToConsole (cursor set to a written column)
         Assert.Equal (new Point (2, 0), output.GetCursorPosition ());
+    }
+
+    [Theory]
+    [InlineData (true)]
+    [InlineData (false)]
+    public void Write_Virtual_Or_NonVirtual_Uses_WriteToConsole_And_Clears_Dirty_Flags_Mixed_Graphemes (bool isLegacyConsole)
+    {
+        // Arrange
+        // FakeOutput exposes this because it's in test scope
+        var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
+        IOutputBuffer buffer = output.LastBuffer!;
+        buffer.SetSize (3, 1);
+
+        // Write '🦮' at col 0 and 'A' at col 3; leave col 1 untouched (not dirty)
+        buffer.Move (0, 0);
+        buffer.AddStr ("🦮A");
+
+        // Confirm some dirtiness before to write
+        Assert.True (buffer.Contents! [0, 0].IsDirty);
+        Assert.False (buffer.Contents! [0, 1].IsDirty);
+        Assert.True (buffer.Contents! [0, 2].IsDirty);
+
+        // Act
+        output.Write (buffer);
+
+        Assert.Contains ("🦮", output.Output);
+        Assert.Contains ("A", output.Output);
+
+        // Dirty flags cleared for the written cells
+        Assert.False (buffer.Contents! [0, 0].IsDirty);
+        Assert.False (buffer.Contents! [0, 1].IsDirty);
+        Assert.False (buffer.Contents! [0, 2].IsDirty);
+
+        Assert.Equal (new (0, 0), output.GetCursorPosition ());
+
+        // Now write 'X' at col 1 which replaces with the replacement character the col 0
+        buffer.Move (1, 0);
+        buffer.AddStr ("X");
+
+        // Confirm dirtiness state before to write
+        Assert.True (buffer.Contents! [0, 0].IsDirty);
+        Assert.True (buffer.Contents! [0, 1].IsDirty);
+        Assert.True (buffer.Contents! [0, 2].IsDirty);
+
+        output.Write (buffer);
+
+        Assert.Contains ("�", output.Output);
+        Assert.Contains ("X", output.Output);
+
+        // Dirty flags cleared for the written cells
+        Assert.False (buffer.Contents! [0, 0].IsDirty);
+        Assert.False (buffer.Contents! [0, 1].IsDirty);
+        Assert.False (buffer.Contents! [0, 2].IsDirty);
+
+        // Verify SetCursorPositionImpl was invoked by WriteToConsole (cursor set to a written column)
+        Assert.Equal (new (0, 0), output.GetCursorPosition ());
     }
 
     [Theory]

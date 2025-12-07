@@ -1,8 +1,6 @@
-#nullable enable
-using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace ApplicationTests;
+namespace ApplicationTests.Mouse;
 
 /// <summary>
 ///     Parallelizable tests for IMouse interface.
@@ -93,14 +91,14 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         MouseEventArgs? capturedArgs = null;
 
         mouse.MouseEvent += (sender, args) =>
-        {
-            eventFired = true;
-            capturedArgs = args;
-        };
+                            {
+                                eventFired = true;
+                                capturedArgs = args;
+                            };
 
         MouseEventArgs testEvent = new ()
         {
-            ScreenPosition = new Point (5, 10),
+            ScreenPosition = new (5, 10),
             Flags = MouseFlags.Button1Pressed
         };
 
@@ -121,13 +119,13 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         MouseImpl mouse = new ();
         var eventCount = 0;
 
-        void Handler (object? sender, MouseEventArgs args) => eventCount++;
+        void Handler (object? sender, MouseEventArgs args) { eventCount++; }
 
         mouse.MouseEvent += Handler;
 
         MouseEventArgs testEvent = new ()
         {
-            ScreenPosition = new Point (0, 0),
+            ScreenPosition = new (0, 0),
             Flags = MouseFlags.Button1Pressed
         };
 
@@ -157,7 +155,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         MouseEventArgs testEvent = new ()
         {
-            ScreenPosition = new Point (0, 0),
+            ScreenPosition = new (0, 0),
             Flags = MouseFlags.Button1Pressed
         };
 
@@ -185,7 +183,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         MouseEventArgs testEvent = new ()
         {
-            ScreenPosition = new Point (5, 5),
+            ScreenPosition = new (5, 5),
             Flags = flags
         };
 
@@ -231,7 +229,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         MouseEventArgs testEvent = new ()
         {
-            ScreenPosition = new Point (0, 0),
+            ScreenPosition = new (0, 0),
             Flags = MouseFlags.Button1Pressed
         };
 
@@ -300,7 +298,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         MouseEventArgs testEvent = new ()
         {
-            ScreenPosition = new Point (0, 0),
+            ScreenPosition = new (0, 0),
             Flags = MouseFlags.Button1Pressed
         };
 
@@ -380,10 +378,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         var eventFired = false;
 
         mouse.GrabbingMouse += (sender, args) =>
-        {
-            eventFired = true;
-            args.Cancel = true;
-        };
+                               {
+                                   eventFired = true;
+                                   args.Cancel = true;
+                               };
 
         // Act
         mouse.GrabMouse (testView);
@@ -403,10 +401,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         View? eventView = null;
 
         mouse.GrabbedMouse += (sender, args) =>
-        {
-            eventFired = true;
-            eventView = args.View;
-        };
+                              {
+                                  eventFired = true;
+                                  eventView = args.View;
+                              };
 
         // Act
         mouse.GrabMouse (testView);
@@ -428,10 +426,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         View? eventView = null;
 
         mouse.UnGrabbedMouse += (sender, args) =>
-        {
-            eventFired = true;
-            eventView = args.View;
-        };
+                                {
+                                    eventFired = true;
+                                    eventView = args.View;
+                                };
 
         // Act
         mouse.UngrabMouse ();
