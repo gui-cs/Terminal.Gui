@@ -555,7 +555,7 @@ void HandleMouse(object? sender, MouseEventArgs args) { }
 
 ```csharp
 // v2 - Viewport-relative coordinates
-view.MouseClick += (s, e) =>
+view.MouseEvent += (s, e) =>
 {
     // e.Position is relative to view's Viewport
     var x = e.Position.X; // 0 = left edge of viewport
@@ -563,16 +563,120 @@ view.MouseClick += (s, e) =>
 };
 ```
 
-### Highlight Event
+### Mouse Click Handling
 
-v2 adds a `Highlight` event for visual feedback:
+**v1:**
+```csharp
+// v1 - MouseClick event
+view.MouseClick += (mouseEvent) =>
+{
+    // Handle click
+    DoSomething();
+};
+```
+
+**v2:**
+```csharp
+// v2 - Use MouseBindings + Commands + Selecting event
+view.MouseBindings.Add(MouseFlags.Button1Clicked, Command.Select);
+view.Selecting += (s, e) =>
+{
+    // Handle selection (called when Button1Clicked)
+    DoSomething();
+};
+
+// Alternative: Use MouseEvent for low-level handling
+view.MouseEvent += (s, e) =>
+{
+    if (e.Flags.HasFlag(MouseFlags.Button1Clicked))
+    {
+        DoSomething();
+        e.Handled = true;
+    }
+};
+```
+
+**Key Changes:**
+- `View.MouseClick` event has been **removed**
+- Use `MouseBindings` to map mouse events to `Command`s
+- Default mouse bindings invoke `Command.Select` which raises the `Selecting` event
+- For custom behavior, override `OnSelecting` or subscribe to the `Selecting` event
+- For low-level mouse handling, use `MouseEvent` directly
+
+**Migration Pattern:**
+```csharp
+// ❌ v1 - OnMouseClick override
+protected override bool OnMouseClick(MouseEventArgs mouseEvent)
+{
+    if (mouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
+    {
+        PerformAction();
+        return true;
+    }
+    return base.OnMouseClick(mouseEvent);
+}
+
+// ✅ v2 - OnSelecting override
+protected override bool OnSelecting(CommandEventArgs args)
+{
+    if (args.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+    {
+        // Access mouse position and flags via context
+        if (mouseArgs.Flags.HasFlag(MouseFlags.Button1Clicked))
+        {
+            PerformAction();
+            return true;
+        }
+    }
+    return base.OnSelecting(args);
+}
+
+// ✅ v2 - Selecting event (simpler)
+view.Selecting += (s, e) =>
+{
+    PerformAction();
+    e.Handled = true;
+};
+```
+
+**Accessing Mouse Position in Selecting Event:**
+```csharp
+view.Selecting += (s, e) =>
+{
+    // Extract mouse event args from command context
+    if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+    {
+        Point position = mouseArgs.Position;
+        MouseFlags flags = mouseArgs.Flags;
+        
+        // Use position and flags for custom logic
+        HandleClick(position, flags);
+        e.Handled = true;
+    }
+};
+```
+
+### Mouse State and Highlighting
+
+v2 adds enhanced mouse state tracking:
 
 ```csharp
-view.Highlight += (s, e) =>
+// Configure which mouse states trigger highlighting
+view.HighlightStates = MouseState.In | MouseState.Pressed;
+
+// React to mouse state changes
+view.MouseStateChanged += (s, e) =>
 {
-    // Provide visual feedback on mouse hover
+    switch (e.Value)
+    {
+        case MouseState.In:
+            // Mouse entered view
+            break;
+        case MouseState.Pressed:
+            // Mouse button pressed in view
+            break;
+    }
 };
-view.HighlightStyle = HighlightStyle.Hover;
 ```
 
 See [Mouse Deep Dive](mouse.md) for complete details.

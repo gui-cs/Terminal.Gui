@@ -7,7 +7,7 @@ This document covers Terminal.Gui's navigation system, which determines:
 - What are the visual cues that help the user know what keystrokes will change the focus?
 - What are the visual cues that help the user know what keystrokes will cause action in elements of the application that don't currently have focus?
 - What is the order in which UI elements are traversed when using keyboard navigation?
-- What are the default actions for standard key/mouse input (e.g. Hotkey, `Space`, `Enter`, `MouseClick`)?
+- What are the default actions for standard key/mouse input (e.g. Hotkey, `Space`, `Enter`, or a mouse click)?
 
 ## See Also
 
