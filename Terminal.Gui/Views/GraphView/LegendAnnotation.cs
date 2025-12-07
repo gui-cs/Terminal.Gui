@@ -1,5 +1,5 @@
 #nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Used by <see cref="GraphView"/> to render smbol definitions in a graph, e.g. colors and their meanings
@@ -46,14 +46,16 @@ public class LegendAnnotation : View, IAnnotation
         if (!IsInitialized)
         {
             // BUGBUG: We should be getting a visual role here?
-            SetScheme (new() { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default });
+            SetScheme (new () { Normal = Application.Driver?.GetAttribute () ?? Attribute.Default });
             graph.Add (this);
         }
 
         if (BorderStyle != LineStyle.None)
         {
+            // BUGBUG: View code should never call Draw directly. This
+            // BUGBUG: needs to be refactored to decouple.
             DrawAdornments ();
-            RenderLineCanvas ();
+            RenderLineCanvas (null);
         }
 
         var linesDrawn = 0;
