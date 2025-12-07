@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace UICatalog.Scenarios;
 
@@ -136,14 +133,14 @@ public class LineDrawing : Scenario
         var d = new Dialog
         {
             Title = title,
-            Width = Application.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
+            Width = Driver.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
             Height = 10
         };
 
         var btnOk = new Button
         {
             X = Pos.Center () - 5,
-            Y = Application.Force16Colors ? 6 : 4,
+            Y = Driver.Force16Colors ? 6 : 4,
             Text = "Ok",
             Width = Dim.Auto (),
             IsDefault = true
@@ -177,7 +174,7 @@ public class LineDrawing : Scenario
         d.AddButton (btnCancel);
 
         View cp;
-        if (Application.Force16Colors)
+        if (Driver.Force16Colors)
         {
             cp = new ColorPicker16
             {
@@ -200,7 +197,7 @@ public class LineDrawing : Scenario
 
         Application.Run (d);
         d.Dispose ();
-        newColor = Application.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
+        newColor = Driver.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }
@@ -273,7 +270,7 @@ public class DrawingArea : View
     public ITool CurrentTool { get; set; } = new DrawLineTool ();
     public DrawingArea () { AddLayer (); }
 
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         foreach (LineCanvas canvas in Layers)
         {
@@ -380,7 +377,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         Color fg = Value.Foreground;
         Color bg = Value.Background;

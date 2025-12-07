@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -5,7 +7,44 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
-    private CursorVisibility? _cachedCursorVisibility;
+    private bool _force16Colors;
+
+    /// <inheritdoc cref="IOutput.Force16Colors"/>
+    public bool Force16Colors
+    {
+        get => _force16Colors;
+        set
+        {
+            if (IsLegacyConsole && !value)
+            {
+                return;
+            }
+
+            _force16Colors = value;
+        }
+    }
+
+    private bool _isLegacyConsole;
+
+    /// <inheritdoc cref="IOutput.IsLegacyConsole"/>
+    public bool IsLegacyConsole
+    {
+        get => _isLegacyConsole;
+        set
+        {
+            _isLegacyConsole = value;
+
+            if (value) // If legacy console (true), force 16 colors
+            {
+                Force16Colors = true;
+            }
+        }
+    }
+
+    private readonly ConcurrentQueue<SixelToRender> _sixels = [];
+
+    /// <inheritdoc cref="IOutput.GetSixels"/>>
+    public ConcurrentQueue<SixelToRender> GetSixels () => _sixels;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -28,7 +67,6 @@ public abstract class OutputBase
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibility = _cachedCursorVisibility;
         SetCursorVisibility (CursorVisibility.Invisible);
 
         for (int row = top; row < rows; row++)
@@ -51,7 +89,7 @@ public abstract class OutputBase
                     {
                         if (output.Length > 0)
                         {
-                            WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                            WriteToConsole (output, ref lastCol, ref outputWidth);
                         }
                         else if (lastCol == -1)
                         {
@@ -63,6 +101,8 @@ public abstract class OutputBase
                             lastCol++;
                         }
 
+                        SetCursorPositionImpl (lastCol, row);
+
                         continue;
                     }
 
@@ -72,37 +112,48 @@ public abstract class OutputBase
                     }
 
                     Cell cell = buffer.Contents [row, col];
-                    AppendCellAnsi (cell, output, ref redrawAttr, ref _redrawTextStyle, cols, ref col);
-
-                    outputWidth++;
-
                     buffer.Contents [row, col].IsDirty = false;
+                    AppendCellAnsi (cell, output, ref redrawAttr, ref _redrawTextStyle, cols, ref col, ref outputWidth);
                 }
             }
 
             if (output.Length > 0)
             {
-                SetCursorPositionImpl (lastCol, row);
+                if (IsLegacyConsole)
+                {
+                    Write (output);
+                }
+                else
+                {
+                    SetCursorPositionImpl (lastCol, row);
 
-                // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-                Write (processed);
+                    // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+                    StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+                    Write (processed);
+                }
             }
         }
 
-        // BUGBUG: The Sixel impl depends on the legacy static Application object
-        // BUGBUG: Disabled for now
-        //foreach (SixelToRender s in  Application.Sixel)
-        //{
-        //    if (!string.IsNullOrWhiteSpace (s.SixelData))
-        //    {
-        //        SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-        //        Console.Out.Write (s.SixelData);
-        //    }
-        //}
+        if (IsLegacyConsole)
+        {
+            return;
+        }
 
-        SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
-        _cachedCursorVisibility = savedVisibility;
+        foreach (SixelToRender s in GetSixels ())
+        {
+            if (string.IsNullOrWhiteSpace (s.SixelData))
+            {
+                continue;
+            }
+
+            SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+            Write ((StringBuilder)new (s.SixelData));
+        }
+
+
+        // DO NOT restore cursor visibility here - let ApplicationMainLoop.SetCursor() handle it
+        // The old code was saving/restoring visibility which caused flickering because
+        // it would restore to the old value even if the application wanted it hidden
     }
 
     /// <summary>
@@ -166,8 +217,9 @@ public abstract class OutputBase
                     continue;
                 }
 
-                Cell cell = buffer.Contents![row, col];
-                AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col);
+                Cell cell = buffer.Contents! [row, col];
+                int outputWidth = -1;
+                AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col, ref outputWidth);
             }
 
             // Add newline at end of row if requested
@@ -187,7 +239,8 @@ public abstract class OutputBase
     /// <param name="redrawTextStyle">The current text style for optimization.</param>
     /// <param name="maxCol">The maximum column, used for wide character handling.</param>
     /// <param name="currentCol">The current column, updated for wide characters.</param>
-    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol)
+    /// <param name="outputWidth">The current output width, updated for wide characters.</param>
+    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol, ref int outputWidth)
     {
         Attribute? attribute = cell.Attribute;
 
@@ -202,11 +255,13 @@ public abstract class OutputBase
         // Add the grapheme
         string grapheme = cell.Grapheme;
         output.Append (grapheme);
+        outputWidth++;
 
         // Handle wide grapheme
         if (grapheme.GetColumns () > 1 && currentCol + 1 < maxCol)
         {
             currentCol++; // Skip next cell for wide character
+            outputWidth++;
         }
     }
 
@@ -226,13 +281,18 @@ public abstract class OutputBase
         return output.ToString ();
     }
 
-    private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+    private void WriteToConsole (StringBuilder output, ref int lastCol, ref int outputWidth)
     {
-        SetCursorPositionImpl (lastCol, row);
-
-        // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-        StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-        Write (processed);
+        if (IsLegacyConsole)
+        {
+            Write (output);
+        }
+        else
+        {
+            // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
+            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+            Write (processed);
+        }
 
         output.Clear ();
         lastCol += outputWidth;

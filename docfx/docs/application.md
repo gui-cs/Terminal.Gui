@@ -81,14 +81,6 @@ sequenceDiagram
 **Terminal.Gui v2** supports both static and instance-based patterns. The static `Application` class is marked obsolete but still functional for backward compatibility. The recommended pattern is to use `Application.Create()` to get an `IApplication` instance:
 
 ```csharp
-// OLD (v1 / early v2 - still works but obsolete):
-Application.Init ();
-Window top = new ();
-top.Add (myView);
-Application.Run (top);
-top.Dispose ();
-Application.Shutdown (); // Obsolete - use Dispose() instead
-
 // RECOMMENDED (v2 - instance-based with using statement):
 using (IApplication app = Application.Create ().Init ())
 {
@@ -105,11 +97,19 @@ using (IApplication app = Application.Create ().Init ())
     Color? result = app.GetResult<Color> ();
 }
 
-// SIMPLEST (manual disposal):
+// ALTERNATIVE (manual disposal):
 IApplication app = Application.Create ().Init ();
 app.Run<ColorPickerDialog> ();
 Color? result = app.GetResult<Color> ();
 app.Dispose ();
+
+// OLD (v1 / early v2 - obsolete, avoid in new code):
+Application.Init ();
+Window top = new ();
+top.Add (myView);
+Application.Run (top);
+top.Dispose ();
+Application.Shutdown (); // Obsolete - use Dispose() instead
 ```
 
 **Note:** The static `Application` class delegates to a singleton instance accessible via `Application.Instance`. `Application.Create()` creates a **new** application instance, enabling multiple application contexts and better testability.
@@ -149,11 +149,12 @@ public class MyView : View
 {
     public override void OnEnter (View view)
     {
-        // Use View.App instead of static Application
-        App?.TopRunnable?.SetNeedsDraw ();
+        // Use View.App instead of obsolete static Application
+        IApplication? app = App;
+        app?.TopRunnable?.SetNeedsDraw ();
         
         // Access SessionStack
-        if (App?.SessionStack.Count > 0)
+        if (app?.SessionStack?.Count > 0)
         {
             // Work with sessions
         }
@@ -171,7 +172,7 @@ public class MyView : View
     public MyView (IApplication app)
     {
         _app = app;
-        // Now completely decoupled from static Application
+        // Completely decoupled from obsolete static Application
     }
     
     public void DoWork ()
@@ -275,7 +276,7 @@ public class FileDialog : Runnable<string?>
         okButton.Accepting += (s, e) =>
         {
             Result = _pathField.Text;
-            Application.RequestStop ();
+            App?.RequestStop ();
         };
         
         Add (_pathField, okButton);
@@ -321,11 +322,13 @@ protected override bool OnIsRunningChanging (bool oldValue, bool newValue)
         // Optionally cancel stop (e.g., unsaved changes)
         if (HasUnsavedChanges ())
         {
-            var response = MessageBox.Query ("Save?", "Save changes?", "Yes", "No", "Cancel");
+            int response = MessageBox.Query ("Save?", "Save changes?", "Yes", "No", "Cancel");
+            
             if (response == 2)
             {
                 return true;  // Cancel stop
             }
+            
             if (response == 0)
             {
                 Save ();
@@ -691,36 +694,76 @@ app.End (token1);
 // app.TopRunnable == null, SessionStack.Count == 0
 ```
 
-## View.Driver Property
+## Driver Management
 
-Similar to `View.App`, views now have a `Driver` property:
+### ForceDriver Configuration Property
+
+The `ForceDriver` property is a configuration property that allows you to specify which driver to use. It can be set via code or through the configuration system (e.g., `config.json`):
 
 ```csharp
-public class View
+// RECOMMENDED: Set on instance
+using (IApplication app = Application.Create ())
 {
-    /// <summary>
-    /// Gets the driver for this view.
-    /// </summary>
-    public IDriver? Driver => GetDriver ();
-    
-    /// <summary>
-    /// Gets the driver, checking application context if needed.
-    /// Override to customize driver resolution.
-    /// </summary>
-    public virtual IDriver? GetDriver () => App?.Driver;
+    app.ForceDriver = "fake";
+    app.Init ();
 }
+
+// ALTERNATIVE: Set on legacy static Application (obsolete)
+Application.ForceDriver = "dotnet";
+Application.Init ();
 ```
 
-**Usage:**
+**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
+
+### ForceDriverChanged Event
+
+The static `Application.ForceDriverChanged` event is raised when the `ForceDriver` property changes:
+
+```csharp
+// ForceDriverChanged event (on legacy static Application)
+Application.ForceDriverChanged += (sender, e) =>
+{
+    Debug.WriteLine ($"Driver changed from '{e.OldValue}' to '{e.NewValue}'");
+};
+
+Application.ForceDriver = "fake";
+```
+
+### Getting Available Drivers
+
+You can query which driver types are available using `GetDriverTypes()`:
+
+```csharp
+// Get available driver types and names
+(List<Type?> types, List<string?> names) = Application.GetDriverTypes();
+
+foreach (string? name in names)
+{
+    Debug.WriteLine($"Available driver: {name}");
+}
+// Output:
+// Available driver: dotnet
+// Available driver: windows
+// Available driver: unix
+// Available driver: fake
+```
+
+**Note**: This method uses reflection and is marked with `[RequiresUnreferencedCode]` for AOT compatibility considerations.
+
+## View.Driver Property
+
+Similar to `View.App`, views now have a `Driver` property for accessing driver functionality.
 
 ```csharp
 public override void OnDrawContent (Rectangle viewport)
 {
-    // Use view's driver instead of Application.Driver
+    // Use view's driver instead of obsolete Application.Driver
     Driver?.Move (0, 0);
     Driver?.AddStr ("Hello");
 }
 ```
+
+**Note**: See [Drivers Deep Dive](drivers.md) for complete driver architecture details, including the organized interface structure with lifecycle, components, display, rendering, cursor, and input regions.
 
 ## Testing with the New Architecture
 
@@ -734,7 +777,8 @@ public void MyView_DisplaysCorrectly ()
 {
     // Create mock application
     Mock<IApplication> mockApp = new ();
-    mockApp.Setup (a => a.TopRunnable).Returns (new Runnable ());
+    Runnable runnable = new ();
+    mockApp.Setup (a => a.TopRunnable).Returns (runnable);
     
     // Create view with mock app
     MyView view = new () { App = mockApp.Object };
@@ -743,7 +787,7 @@ public void MyView_DisplaysCorrectly ()
     view.SetNeedsDraw ();
     Assert.True (view.NeedsDraw);
     
-    // No Application.Shutdown() needed!
+    // No disposal needed for mock!
 }
 ```
 
@@ -753,21 +797,28 @@ public void MyView_DisplaysCorrectly ()
 [Fact]
 public void MyView_WorksWithRealApplication ()
 {
-    using IApplication app = Application.Create ();
-    app.Init ("fake");
-    
-    MyView view = new ();
-    Window top = new ();
-    top.Add (view);
-    
-    app.Begin (top);
-    
-    // View.App automatically set
-    Assert.NotNull (view.App);
-    Assert.Same (app, view.App);
-    
-    // Test view behavior
-    view.DoSomething ();
+    using (IApplication app = Application.Create ())
+    {
+        app.Init ("fake");
+        
+        MyView view = new ();
+        Window top = new ();
+        top.Add (view);
+        
+        SessionToken? token = app.Begin (top);
+        
+        // View.App automatically set
+        Assert.NotNull (view.App);
+        Assert.Same (app, view.App);
+        
+        // Test view behavior
+        view.DoSomething ();
+        
+        if (token is { })
+        {
+            app.End (token);
+        }
+    }
 }
 ```
 
@@ -776,7 +827,7 @@ public void MyView_WorksWithRealApplication ()
 ### DO: Use View.App
 
 ```csharp
-✅ GOOD:
+// ✅ GOOD - Use View.App (modern instance-based pattern):
 public void Refresh ()
 {
     App?.TopRunnableView?.SetNeedsDraw ();
@@ -786,7 +837,7 @@ public void Refresh ()
 ### DON'T: Use Static Application
 
 ```csharp
-❌ AVOID:
+// ❌ AVOID - Obsolete static Application:
 public void Refresh ()
 {
     Application.TopRunnableView?.SetNeedsDraw (); // Obsolete!
@@ -796,33 +847,38 @@ public void Refresh ()
 ### DO: Pass IApplication as Dependency
 
 ```csharp
-✅ GOOD:
+// ✅ GOOD - Dependency injection:
 public class Service
 {
-    public Service (IApplication app) { }
+    private readonly IApplication _app;
+    
+    public Service (IApplication app)
+    {
+        _app = app;
+    }
 }
 ```
 
 ### DON'T: Use Static Application in New Code
 
 ```csharp
-❌ AVOID (obsolete pattern):
+// ❌ AVOID - Obsolete static Application in new code:
 public void Refresh ()
 {
-    Application.TopRunnableView?.SetNeedsDraw (); // Obsolete static access
+    Application.TopRunnableView?.SetNeedsDraw (); // Obsolete!
 }
 
-✅ PREFERRED:
+// ✅ PREFERRED - Use View.App property:
 public void Refresh ()
 {
-    App?.TopRunnableView?.SetNeedsDraw (); // Use View.App property
+    App?.TopRunnableView?.SetNeedsDraw ();
 }
 ```
 
 ### DO: Override GetApp() for Custom Resolution
 
 ```csharp
-✅ GOOD:
+// ✅ GOOD - Custom application resolution:
 public class SpecialView : View
 {
     private IApplication? _customApp;
@@ -842,39 +898,23 @@ The instance-based architecture enables multiple applications:
 
 ```csharp
 // Application 1
-using IApplication app1 = Application.Create ();
-app1.Init ("windows");
-Window top1 = new () { Title = "App 1" };
-// ... configure top1
+using (IApplication app1 = Application.Create ())
+{
+    app1.Init ("fake");
+    Window top1 = new () { Title = "App 1" };
+    // ... configure and run top1
+}
 
 // Application 2 (different driver!)
-using IApplication app2 = Application.Create ();
-app2.Init ("unix");
-Window top2 = new () { Title = "App 2" };
-// ... configure top2
+using (IApplication app2 = Application.Create ())
+{
+    app2.Init ("fake");
+    Window top2 = new () { Title = "App 2" };
+    // ... configure and run top2
+}
 
 // Views in top1 use app1
 // Views in top2 use app2
-```
-
-### Application-Agnostic Views
-
-Create views that work with any application:
-
-```csharp
-public class UniversalView : View
-{
-    public void ShowMessage (string message)
-    {
-        // Works regardless of which application context
-        IApplication? app = GetApp ();
-        if (app != null)
-        {
-            MessageBox msg = new (message);
-            app.Begin (msg);
-        }
-    }
-}
 ```
 
 ## See Also

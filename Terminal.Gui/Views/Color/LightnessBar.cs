@@ -1,5 +1,3 @@
-
-
 using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 

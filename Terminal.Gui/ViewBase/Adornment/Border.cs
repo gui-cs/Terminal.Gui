@@ -111,7 +111,6 @@ public partial class Border : Adornment
         if (App is { })
         {
             App.Mouse.GrabbingMouse += Application_GrabbingMouse;
-            App.Mouse.UnGrabbingMouse += Application_UnGrabbingMouse;
         }
 
         if (Parent is null)
@@ -241,7 +240,7 @@ public partial class Border : Adornment
 
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Thickness == Thickness.Empty)
         {
@@ -539,8 +538,6 @@ public partial class Border : Adornment
         }
 
         return true;
-
-        ;
     }
 
     /// <summary>

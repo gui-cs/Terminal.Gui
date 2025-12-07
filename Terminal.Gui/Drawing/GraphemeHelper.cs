@@ -46,4 +46,27 @@ public static class GraphemeHelper
             yield return element;
         }
     }
+
+    /// <summary>
+    ///     Counts the number of grapheme clusters in a string without allocating intermediate collections.
+    /// </summary>
+    /// <param name="text">The string to count graphemes in.</param>
+    /// <returns>The number of grapheme clusters, or 0 if the string is null or empty.</returns>
+    public static int GetGraphemeCount (string text)
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return 0;
+        }
+
+        TextElementEnumerator enumerator = StringInfo.GetTextElementEnumerator (text);
+        var count = 0;
+
+        while (enumerator.MoveNext ())
+        {
+            count++;
+        }
+
+        return count;
+    }
 }

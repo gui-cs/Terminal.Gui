@@ -5,6 +5,66 @@ namespace ApplicationTests;
 
 public class ApplicationImplTests
 {
+
+    [Fact]
+    public void Internal_Properties_Correct ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+
+        Assert.True (app.Initialized);
+        Assert.Null (app.TopRunnableView);
+        SessionToken? rs = app.Begin (new Runnable<bool> ());
+        Assert.Equal (app.TopRunnable, rs!.Runnable);
+        Assert.Null (app.Mouse.MouseGrabView); // public
+
+        app.Dispose ();
+    }
+
+
+    #region DisposeTests
+
+    [Fact]
+    public async Task Dispose_Allows_Async ()
+    {
+        var isCompletedSuccessfully = false;
+
+        async Task TaskWithAsyncContinuation ()
+        {
+            await Task.Yield ();
+            await Task.Yield ();
+
+            isCompletedSuccessfully = true;
+        }
+
+        IApplication app = Application.Create ();
+        app.Dispose ();
+
+        Assert.False (isCompletedSuccessfully);
+        await TaskWithAsyncContinuation ();
+        Thread.Sleep (100);
+        Assert.True (isCompletedSuccessfully);
+    }
+
+    [Fact]
+    public void Dispose_Resets_SyncContext ()
+    {
+        IApplication app = Application.Create ();
+        app.Dispose ();
+        Assert.Null (SynchronizationContext.Current);
+    }
+
+    [Fact]
+    public void Dispose_Alone_Does_Nothing ()
+    {
+        IApplication app = Application.Create ();
+        app.Dispose ();
+    }
+
+
+    #endregion
+
+
     /// <summary>
     ///     Crates a new ApplicationImpl instance for testing. The input, output, and size monitor components are mocked.
     /// </summary>
@@ -44,21 +104,6 @@ public class ApplicationImplTests
                 .Verifiable (Times.Once);
     }
 
-    [Fact]
-    public void Init_CreatesKeybindings ()
-    {
-        IApplication app = NewMockedApplicationImpl ();
-
-        app.Keyboard.KeyBindings.Clear ();
-
-        Assert.Empty (app.Keyboard.KeyBindings.GetBindings ());
-
-        app.Init ("fake");
-
-        Assert.NotEmpty (app.Keyboard.KeyBindings.GetBindings ());
-
-        app.Dispose ();
-    }
 
     [Fact]
     public void NoInitThrowOnRun ()
@@ -380,11 +425,10 @@ public class ApplicationImplTests
         if (app.TopRunnableView != null)
         {
             app.RequestStop ();
-
-            return true;
         }
 
-        return true;
+        // Return false so the timer does not repeat
+        return false;
     }
 
     [Fact]
@@ -480,82 +524,5 @@ public class ApplicationImplTests
         //Assert.Null (v2.Navigation);
         Assert.Null (v2.TopRunnableView);
         Assert.Empty (v2.SessionStack!);
-    }
-
-    [Fact]
-    public void Init_Begin_End_Cleans_Up ()
-    {
-        IApplication? app = Application.Create ();
-
-        SessionToken? newSessionToken = null;
-
-        EventHandler<SessionTokenEventArgs> newSessionTokenFn = (s, e) =>
-                                                                {
-                                                                    Assert.NotNull (e.State);
-                                                                    newSessionToken = e.State;
-                                                                };
-        app.SessionBegun += newSessionTokenFn;
-
-        Runnable<bool> runnable = new ();
-        SessionToken sessionToken = app.Begin (runnable)!;
-        Assert.NotNull (sessionToken);
-        Assert.NotNull (newSessionToken);
-        Assert.Equal (sessionToken, newSessionToken);
-
-        // Assert.Equal (runnable, Application.TopRunnable);
-
-        app.SessionBegun -= newSessionTokenFn;
-        app.End (newSessionToken);
-
-        Assert.Null (app.TopRunnable);
-        Assert.Null (app.Driver);
-
-        runnable.Dispose ();
-    }
-
-    [Fact]
-    public void Run_RequestStop_Stops ()
-    {
-        IApplication? app = Application.Create ();
-        app.Init ("fake");
-
-        var top = new Runnable ();
-        SessionToken? sessionToken = app.Begin (top);
-        Assert.NotNull (sessionToken);
-
-        app.Iteration += OnApplicationOnIteration;
-        app.Run (top);
-        app.Iteration -= OnApplicationOnIteration;
-
-        top.Dispose ();
-
-        return;
-
-        void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a) { app.RequestStop (); }
-    }
-
-    [Fact]
-    public void Run_T_Init_Driver_Cleared_with_Runnable_Throws ()
-    {
-        IApplication? app = Application.Create ();
-
-        app.Init ("fake");
-        app.Driver = null;
-
-        app.StopAfterFirstIteration = true;
-
-        // Init has been called, but Driver has been set to null. Bad.
-        Assert.Throws<InvalidOperationException> (() => app.Run<Runnable> ());
-    }
-
-    [Fact]
-    public void Init_Unbalanced_Throws ()
-    {
-        IApplication? app = Application.Create ();
-        app.Init ("fake");
-
-        Assert.Throws<InvalidOperationException> (() =>
-                                                      app.Init ("fake")
-                                                 );
     }
 }

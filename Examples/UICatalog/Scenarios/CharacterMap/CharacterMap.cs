@@ -25,7 +25,7 @@ public class CharacterMap : Scenario
 
     public override List<Key> GetDemoKeyStrokes ()
     {
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         for (var i = 0; i < 200; i++)
         {
@@ -91,7 +91,7 @@ public class CharacterMap : Scenario
         };
         top.Add (jumpEdit);
 
-        _charMap.SelectedCodePointChanged += (sender, args) =>
+        _charMap.SelectedCodePointChanged += (_, args) =>
                                              {
                                                  if (Rune.IsValid (args.Value))
                                                  {
@@ -134,27 +134,33 @@ public class CharacterMap : Scenario
         _categoryList.Table = CreateCategoryTable (0, isDescending);
 
         // if user clicks the mouse in TableView
-        _categoryList.MouseClick += (s, e) =>
-                                    {
-                                        _categoryList.ScreenToCell (e.Position, out int? clickedCol);
+        _categoryList.Selecting += (_, e) =>
+                                   {
+                                       // Only handle mouse clicks
+                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                       {
+                                           return;
+                                       }
 
-                                        if (clickedCol != null && e.Flags.HasFlag (MouseFlags.Button1Clicked))
-                                        {
-                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
-                                            isDescending = !isDescending;
+                                       _categoryList.ScreenToCell (mouseArgs.Position, out int? clickedCol);
 
-                                            _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+                                       if (clickedCol != null && mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                       {
+                                           EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                           string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                                           isDescending = !isDescending;
 
-                                            table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                           _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
-                                            _categoryList.SelectedRow = table.Data
-                                                                             .Select ((item, index) => new { item, index })
-                                                                             .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                                             ?.index
-                                                                        ?? -1;
-                                        }
-                                    };
+                                           table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+
+                                           _categoryList.SelectedRow = table.Data
+                                                                            .Select ((item, index) => new { item, index })
+                                                                            .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                                            ?.index
+                                                                       ?? -1;
+                                       }
+                                   };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 
@@ -167,7 +173,7 @@ public class CharacterMap : Scenario
 
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
-        _categoryList.SelectedCellChanged += (s, args) =>
+        _categoryList.SelectedCellChanged += (_, args) =>
                                              {
                                                  EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                                                  _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
@@ -219,7 +225,7 @@ public class CharacterMap : Scenario
 
             _errorLabel.Visible = true;
 
-            uint result = 0;
+            uint result;
 
             if (jumpEdit.Text.Length == 1)
             {
@@ -283,7 +289,7 @@ public class CharacterMap : Scenario
                                         ?? -1;
             _categoryList.EnsureSelectedCellIsVisible ();
 
-            // Ensure the typed glyph is selected 
+            // Ensure the typed glyph is selected
             _charMap.SelectedCodePoint = (int)result;
             _charMap.SetFocus ();
 

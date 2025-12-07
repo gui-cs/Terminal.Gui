@@ -152,6 +152,9 @@ public class ViewCommandTests
         Assert.Equal (1, btnAcceptedCount);
         Assert.Equal (0, wAcceptedCount);
 
+        // The above grabbed the mouse. Need to ungrab.
+        Application.Mouse.UngrabMouse ();
+
         w.Dispose ();
         Application.ResetState (true);
     }
