@@ -89,7 +89,7 @@ public abstract class OutputBase
                     {
                         if (output.Length > 0)
                         {
-                            WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                            WriteToConsole (output, ref lastCol, ref outputWidth);
                         }
                         else if (lastCol == -1)
                         {
@@ -112,11 +112,8 @@ public abstract class OutputBase
                     }
 
                     Cell cell = buffer.Contents [row, col];
-                    AppendCellAnsi (cell, output, ref redrawAttr, ref _redrawTextStyle, cols, ref col);
-
-                    outputWidth++;
-
                     buffer.Contents [row, col].IsDirty = false;
+                    AppendCellAnsi (cell, output, ref redrawAttr, ref _redrawTextStyle, cols, ref col, ref outputWidth);
                 }
             }
 
@@ -221,7 +218,8 @@ public abstract class OutputBase
                 }
 
                 Cell cell = buffer.Contents! [row, col];
-                AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col);
+                int outputWidth = -1;
+                AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col, ref outputWidth);
             }
 
             // Add newline at end of row if requested
@@ -241,7 +239,8 @@ public abstract class OutputBase
     /// <param name="redrawTextStyle">The current text style for optimization.</param>
     /// <param name="maxCol">The maximum column, used for wide character handling.</param>
     /// <param name="currentCol">The current column, updated for wide characters.</param>
-    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol)
+    /// <param name="outputWidth">The current output width, updated for wide characters.</param>
+    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol, ref int outputWidth)
     {
         Attribute? attribute = cell.Attribute;
 
@@ -256,11 +255,13 @@ public abstract class OutputBase
         // Add the grapheme
         string grapheme = cell.Grapheme;
         output.Append (grapheme);
+        outputWidth++;
 
         // Handle wide grapheme
         if (grapheme.GetColumns () > 1 && currentCol + 1 < maxCol)
         {
             currentCol++; // Skip next cell for wide character
+            outputWidth++;
         }
     }
 
@@ -280,7 +281,7 @@ public abstract class OutputBase
         return output.ToString ();
     }
 
-    private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+    private void WriteToConsole (StringBuilder output, ref int lastCol, ref int outputWidth)
     {
         if (IsLegacyConsole)
         {
