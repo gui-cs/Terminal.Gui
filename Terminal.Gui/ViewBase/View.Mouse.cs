@@ -702,7 +702,7 @@ public partial class View // Mouse APIs
     protected virtual void OnMouseStateChanged (EventArgs<MouseState> args) { }
 
     /// <summary>
-    ///     RaisedCalled when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The
+    ///     Raised when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The
     ///     <see cref="MouseState"/> passed in the event
     ///     indicates the highlight style that will be applied.
     /// </summary>
