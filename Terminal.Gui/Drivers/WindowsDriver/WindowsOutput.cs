@@ -332,6 +332,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
         }
     }
 
+    /// <inheritdoc />
+    public string GetLastOutput () => _everythingStringBuilder.ToString ();
+
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {

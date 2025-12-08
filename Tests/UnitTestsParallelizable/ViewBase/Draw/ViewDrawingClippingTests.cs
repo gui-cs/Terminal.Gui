@@ -601,9 +601,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                            output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
+        FakeOutput? fakeOutput = driverImpl!.GetOutput () as FakeOutput;
 
-        output.WriteLine ("Driver Output After Redraw:\n" + fakeOutput!.Output);
+        output.WriteLine ("Driver Output After Redraw:\n" + driver.GetOutput().GetLastOutput());
 
         // BUGBUG: Border.set_LineStyle does not call SetNeedsDraw
         viewWithBorderAtX1!.Border!.LineStyle = LineStyle.Single;
@@ -690,9 +690,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
+        FakeOutput? fakeOutput = driverImpl!.GetOutput () as FakeOutput;
 
-        output.WriteLine ("Driver Output:\n" + fakeOutput!.Output);
+        output.WriteLine ("Driver Output:\n" + fakeOutput!.GetLastOutput ());
     }
 
 
@@ -754,9 +754,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
+        FakeOutput? fakeOutput = driverImpl!.GetOutput () as FakeOutput;
 
-        output.WriteLine ("Driver Output:\n" + fakeOutput!.Output);
+        output.WriteLine ("Driver Output:\n" + fakeOutput!.GetLastOutput ());
     }
 
     [Fact]

@@ -7,7 +7,7 @@ public class OutputBaseTests
     {
         // Arrange
         var output = new FakeOutput ();
-        IOutputBuffer buffer = output.LastBuffer!;
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
         // Act
@@ -38,7 +38,7 @@ public class OutputBaseTests
 
         driver.Force16Colors = force16Colors;
 
-        IOutputBuffer buffer = output.LastBuffer!;
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
         // Use a known RGB color and attribute
@@ -76,7 +76,7 @@ public class OutputBaseTests
     {
         // Arrange
         var output = new FakeOutput ();
-        IOutputBuffer buffer = output.LastBuffer!;
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (2, 1);
 
         // Mark two characters as dirty by writing them into the buffer
@@ -90,7 +90,7 @@ public class OutputBaseTests
         output.Write (buffer); // calls OutputBase.Write via FakeOutput
 
         // Assert: content was written to the fake output and dirty flags cleared
-        Assert.Contains ("AB", output.Output);
+        Assert.Contains ("AB", output.GetLastOutput ());
         Assert.False (buffer.Contents! [0, 0].IsDirty);
         Assert.False (buffer.Contents! [0, 1].IsDirty);
     }
@@ -103,7 +103,7 @@ public class OutputBaseTests
         // Arrange
         // FakeOutput exposes this because it's in test scope
         var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
-        IOutputBuffer buffer = output.LastBuffer!;
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (3, 1);
 
         // Write 'A' at col 0 and 'C' at col 2; leave col 1 untouched (not dirty)
@@ -120,8 +120,8 @@ public class OutputBaseTests
         output.Write (buffer);
 
         // Assert: both characters were written (use Contains to avoid CI side effects)
-        Assert.Contains ("A", output.Output);
-        Assert.Contains ("C", output.Output);
+        Assert.Contains ("A", output.GetLastOutput ());
+        Assert.Contains ("C", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells
         Assert.False (buffer.Contents! [0, 0].IsDirty);
@@ -141,8 +141,8 @@ public class OutputBaseTests
         output.Write (buffer);
 
         // Assert: both characters were written (use Contains to avoid CI side effects)
-        Assert.Contains ("A", output.Output);
-        Assert.Contains ("C", output.Output);
+        Assert.Contains ("A", output.GetLastOutput ());
+        Assert.Contains ("C", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells
         Assert.False (buffer.Contents! [0, 0].IsDirty);
@@ -160,7 +160,7 @@ public class OutputBaseTests
         // Arrange
         // FakeOutput exposes this because it's in test scope
         var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
-        IOutputBuffer buffer = output.LastBuffer!;
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (3, 1);
 
         // Write '🦮' at col 0 and 'A' at col 2
@@ -182,8 +182,8 @@ public class OutputBaseTests
         // Act
         output.Write (buffer);
 
-        Assert.Contains ("🦮", output.Output);
-        Assert.Contains ("A", output.Output);
+        Assert.Contains ("🦮", output.GetLastOutput ());
+        Assert.Contains ("A", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells
         // Column 0 was written (wide glyph)
@@ -209,8 +209,8 @@ public class OutputBaseTests
 
         output.Write (buffer);
 
-        Assert.Contains ("�", output.Output);
-        Assert.Contains ("X", output.Output);
+        Assert.Contains ("�", output.GetLastOutput ());
+        Assert.Contains ("X", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells
         Assert.False (buffer.Contents! [0, 0].IsDirty);
@@ -228,7 +228,7 @@ public class OutputBaseTests
     {
         // Arrange
         var output = new FakeOutput ();
-        IOutputBuffer buffer = output.LastBuffer!;
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
         // Ensure the buffer has some content so Write traverses rows
@@ -261,7 +261,7 @@ public class OutputBaseTests
         if (!isLegacyConsole)
         {
             // Assert: Sixel data was emitted (use Contains to avoid equality/side-effects)
-            Assert.Contains ("SIXEL-DATA", output.Output);
+            Assert.Contains ("SIXEL-DATA", output.GetLastOutput ());
 
             // Cursor was moved to Sixel position
             Assert.Equal (s.ScreenPosition, output.GetCursorPosition ());
@@ -269,7 +269,7 @@ public class OutputBaseTests
         else
         {
             // Assert: Sixel data was NOT emitted
-            Assert.DoesNotContain ("SIXEL-DATA", output.Output);
+            Assert.DoesNotContain ("SIXEL-DATA", output.GetLastOutput ());
 
             // Cursor was NOT moved to Sixel position
             Assert.NotEqual (s.ScreenPosition, output.GetCursorPosition ());

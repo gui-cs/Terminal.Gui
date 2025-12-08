@@ -179,4 +179,37 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 
         driver.Dispose ();
     }
+
+
+
+    [Fact]
+    public void AddStr_Glyph_On_Second_Cell_Of_Wide_Glyph_Outputs_Correctly ()
+    {
+        IDriver? driver = CreateFakeDriver ();
+        driver.SetScreenSize (6, 3);
+
+        driver!.Clip = new (driver.Screen);
+
+        driver.Move (0, 0);
+        driver.AddStr ("🍎🍎🍎🍎");
+
+        driver.Move (1, 0);
+        driver.AddStr ("┌");
+        driver.Move (2, 0);
+        driver.AddStr ("─");
+        driver.Move (3, 0);
+        driver.AddStr ("┐");
+
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              �┌─┐🍎
+                                              """,
+                                              output,
+                                              driver);
+
+        driver.Refresh ();
+
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m�┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+                                           output, driver);
+    }
 }
