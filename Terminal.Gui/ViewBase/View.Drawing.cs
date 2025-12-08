@@ -735,6 +735,7 @@ public partial class View // Drawing APIs
 
             // PERF: Report the entire LineCanvas bounds as drawn, not each individual cell
             // Reporting per-cell caused 10x slowdown (90s vs 9s) in AllViews_Draw_Does_Not_Layout test
+            // Note: LineCanvas.Bounds is already in screen-relative coordinates (cells are stored with screen positions)
             context?.AddDrawnRectangle (LineCanvas.Bounds);
 
             LineCanvas.Clear ();
