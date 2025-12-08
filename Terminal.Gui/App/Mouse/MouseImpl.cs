@@ -165,11 +165,6 @@ internal class MouseImpl : IMouse, IDisposable
             RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
         }
 
-        if (mouseEvent.IsSingleDoubleOrTripleClicked)
-        {
-
-        }
-
         while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && MouseGrabView is not { })
         {
             if (deepestViewUnderMouse is Adornment adornmentView)
