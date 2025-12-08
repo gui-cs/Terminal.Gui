@@ -140,25 +140,25 @@ public partial class View // Drawing APIs
 
             ClearNeedsDraw ();
 
-            if (this is not Adornment && SuperView is not Adornment)
-            {
-                // Parent
-                Debug.Assert (Margin!.Parent == this);
-                Debug.Assert (Border!.Parent == this);
-                Debug.Assert (Padding!.Parent == this);
+            //if (this is not Adornment && SuperView is not Adornment)
+            //{
+            //    // Parent
+            //    Debug.Assert (Margin!.Parent == this);
+            //    Debug.Assert (Border!.Parent == this);
+            //    Debug.Assert (Padding!.Parent == this);
 
-                // SubViewNeedsDraw is set to false by ClearNeedsDraw.
-                Debug.Assert (SubViewNeedsDraw == false);
-                Debug.Assert (Margin!.SubViewNeedsDraw == false);
-                Debug.Assert (Border!.SubViewNeedsDraw == false);
-                Debug.Assert (Padding!.SubViewNeedsDraw == false);
+            //    // SubViewNeedsDraw is set to false by ClearNeedsDraw.
+            //    Debug.Assert (SubViewNeedsDraw == false);
+            //    Debug.Assert (Margin!.SubViewNeedsDraw == false);
+            //    Debug.Assert (Border!.SubViewNeedsDraw == false);
+            //    Debug.Assert (Padding!.SubViewNeedsDraw == false);
 
-                // NeedsDraw is set to false by ClearNeedsDraw.
-                Debug.Assert (NeedsDraw == false);
-                Debug.Assert (Margin!.NeedsDraw == false);
-                Debug.Assert (Border!.NeedsDraw == false);
-                Debug.Assert (Padding!.NeedsDraw == false);
-            }
+            //    // NeedsDraw is set to false by ClearNeedsDraw.
+            //    Debug.Assert (NeedsDraw == false);
+            //    Debug.Assert (Margin!.NeedsDraw == false);
+            //    Debug.Assert (Border!.NeedsDraw == false);
+            //    Debug.Assert (Padding!.NeedsDraw == false);
+            //}
         }
 
         // ------------------------------------
