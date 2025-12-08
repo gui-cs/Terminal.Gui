@@ -614,5 +614,11 @@ public partial class View // Mouse APIs
 
     #endregion MouseState Handling
 
-    private void DisposeMouse () { }
+    private void DisposeMouse ()
+    {
+        if (App?.Mouse.MouseGrabView == this)
+        {
+            App.Mouse.UngrabMouse ();
+        }
+    }
 }
