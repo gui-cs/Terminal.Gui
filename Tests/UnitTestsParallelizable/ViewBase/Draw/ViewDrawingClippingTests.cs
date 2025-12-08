@@ -638,7 +638,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         IApplication app = Application.Create ();
         app.Init ("fake");
         IDriver driver = app!.Driver!;
-        driver.SetScreenSize (6, 3);  // Minimal: 3 cols wide, 1 row high (+ 2 for border top/bottom)
+        driver.SetScreenSize (6, 3);  // Minimal: 6 cols wide (3 for content + 2 for border + 1), 3 rows high (1 for content + 2 for border)
 
         driver!.Clip = new (driver.Screen);
 
