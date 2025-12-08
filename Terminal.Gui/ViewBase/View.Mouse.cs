@@ -414,8 +414,8 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed and the mouse is pressed, this method handles the pressed events from
     ///     the driver.
-    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Clicked/Activating event
-    ///     each time it is called (after the first time the mouse is pressed).
+    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Clicked/Selecting event
+    ///     via <see cref="Command.Select"/> each time it is called (after the first time the mouse is pressed).
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if processing should stop, <see langword="false"/> otherwise.</returns>
@@ -440,7 +440,7 @@ public partial class View // Mouse APIs
                 SetFocus ();
             }
 
-            // This prevents raising Clicked/Activating the first time the mouse is pressed.
+            // This prevents raising Clicked/Selecting the first time the mouse is pressed.
             mouseEvent.Handled = true;
         }
 
@@ -469,7 +469,7 @@ public partial class View // Mouse APIs
             }
         }
 
-        if (!mouseEvent.Handled && WantContinuousButtonPressed && App!.Mouse.MouseGrabView == this)
+        if (!mouseEvent.Handled && WantContinuousButtonPressed && App?.Mouse.MouseGrabView == this)
         {
             // Ignore the return value here, because the semantics of WhenGrabbedHandlePressed is the return
             // value indicates whether processing should stop or not.
@@ -487,7 +487,6 @@ public partial class View // Mouse APIs
     ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
     /// </summary>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, the mouse  <see langword="false"/> otherwise.</returns>
     internal void WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
         if (App is { } && App.Mouse.MouseGrabView == this)
@@ -550,22 +549,16 @@ public partial class View // Mouse APIs
 
         MouseEventArgs clickedArgs = new ();
 
-        if (args.IsPressed)
-        {
-            // If the mouse is pressed, we want to invoke the related clicked event.
-            clickedArgs.Flags = args.Flags switch
-            {
-                MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
-                MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
-                MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
-                MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
-                _ => clickedArgs.Flags
-            };
-        }
-        else
-        {
-            clickedArgs.Flags = args.Flags;
-        }
+        clickedArgs.Flags = args.IsPressed
+            ? args.Flags switch
+                {
+                    MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
+                    MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
+                    MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
+                    MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+                    _ => clickedArgs.Flags
+                }
+            : args.Flags;
 
         clickedArgs.Position = args.Position;
         clickedArgs.ScreenPosition = args.ScreenPosition;
@@ -578,7 +571,7 @@ public partial class View // Mouse APIs
         return args.Handled;
     }
 
-    #endregion Mouse Clicked Events
+    #endregion Mouse Click Events
 
     #region Mouse Wheel Events
 
@@ -703,7 +696,7 @@ public partial class View // Mouse APIs
     protected virtual void OnMouseStateChanged (EventArgs<MouseState> args) { }
 
     /// <summary>
-    ///     RaisedCalled when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The
+    ///     Raised when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The
     ///     <see cref="MouseState"/> passed in the event
     ///     indicates the highlight style that will be applied.
     /// </summary>
