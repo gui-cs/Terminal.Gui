@@ -193,6 +193,77 @@ public class LineCanvas : IDisposable
     }
 
     /// <summary>
+    ///     Evaluates the lines and returns both the cell map and a Region encompassing the drawn cells.
+    ///     This is more efficient than calling <see cref="GetCellMap"/> and <see cref="GetRegion"/> separately
+    ///     as it builds both in a single pass through the canvas bounds.
+    /// </summary>
+    /// <returns>A tuple containing the cell map and the Region of drawn cells</returns>
+    public (Dictionary<Point, Cell?> CellMap, Region Region) GetCellMapWithRegion ()
+    {
+        Dictionary<Point, Cell?> map = new ();
+        Region region = new Region ();
+
+        List<IntersectionDefinition> intersectionsBufferList = [];
+        List<int> rowXValues = [];
+
+        // walk through each pixel of the bitmap, row by row
+        for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++)
+        {
+            rowXValues.Clear ();
+
+            for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
+            {
+                intersectionsBufferList.Clear ();
+                foreach (var line in _lines)
+                {
+                    if (line.Intersects (x, y) is { } intersect)
+                    {
+                        intersectionsBufferList.Add (intersect);
+                    }
+                }
+                // Safe as long as the list is not modified while the span is in use.
+                ReadOnlySpan<IntersectionDefinition> intersects = CollectionsMarshal.AsSpan(intersectionsBufferList);
+                Cell? cell = GetCellForIntersects (intersects);
+                
+                if (cell is { } && _exclusionRegion?.Contains (x, y) is null or false)
+                {
+                    map.Add (new (x, y), cell);
+                    rowXValues.Add (x);
+                }
+            }
+
+            // Build Region spans for this completed row
+            if (rowXValues.Count > 0)
+            {
+                // X values are already sorted (inner loop iterates x in order)
+                int spanStart = rowXValues [0];
+                int spanEnd = rowXValues [0];
+
+                for (int i = 1; i < rowXValues.Count; i++)
+                {
+                    if (rowXValues [i] == spanEnd + 1)
+                    {
+                        // Continue the span
+                        spanEnd = rowXValues [i];
+                    }
+                    else
+                    {
+                        // End the current span and add it to the region
+                        region.Combine (new Rectangle (spanStart, y, spanEnd - spanStart + 1, 1), RegionOp.Union);
+                        spanStart = rowXValues [i];
+                        spanEnd = rowXValues [i];
+                    }
+                }
+
+                // Add the final span for this row
+                region.Combine (new Rectangle (spanStart, y, spanEnd - spanStart + 1, 1), RegionOp.Union);
+            }
+        }
+
+        return (map, region);
+    }
+
+    /// <summary>
     ///     Efficiently builds a <see cref="Region"/> from line cells by grouping contiguous horizontal spans.
     ///     This avoids the performance overhead of adding each cell individually while accurately
     ///     representing the non-rectangular shape of the lines.

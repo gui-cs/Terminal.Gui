@@ -720,7 +720,9 @@ public partial class View // Drawing APIs
 
         if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
         {
-            Dictionary<Point, Cell?> cellMap = LineCanvas.GetCellMap ();
+            // PERF: Get both cell map and Region in a single pass through the canvas
+            // This is more efficient than calling GetCellMap() and GetRegion() separately
+            (Dictionary<Point, Cell?> cellMap, Region lineRegion) = LineCanvas.GetCellMapWithRegion ();
             
             foreach (KeyValuePair<Point, Cell?> p in cellMap)
             {
@@ -735,12 +737,10 @@ public partial class View // Drawing APIs
                 }
             }
 
-            // PERF: Build a Region from the line cells efficiently by grouping into horizontal spans
-            // This avoids per-cell AddDrawnRectangle calls (10x slowdown) while accurately representing
-            // only the drawn lines (not the entire bounding box)
+            // Report the drawn region for transparency support
+            // Region was built during the GetCellMapWithRegion() call above
             if (context is { } && cellMap.Count > 0)
             {
-                Region lineRegion = Drawing.LineCanvas.GetRegion (cellMap);
                 context.AddDrawnRegion (lineRegion);
             }
 
