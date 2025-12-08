@@ -440,7 +440,7 @@ public partial class View // Mouse APIs
                 SetFocus ();
             }
 
-            // This prevents raising Clicked/Activating the first time the mouse is pressed.
+            // This prevents raising Clicked/Selecting the first time the mouse is pressed.
             mouseEvent.Handled = true;
         }
 
