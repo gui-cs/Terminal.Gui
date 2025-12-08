@@ -720,7 +720,9 @@ public partial class View // Drawing APIs
 
         if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
         {
-            foreach (KeyValuePair<Point, Cell?> p in LineCanvas.GetCellMap ())
+            Dictionary<Point, Cell?> cellMap = LineCanvas.GetCellMap ();
+            
+            foreach (KeyValuePair<Point, Cell?> p in cellMap)
             {
                 // Get the entire map
                 if (p.Value is { })
@@ -733,13 +735,71 @@ public partial class View // Drawing APIs
                 }
             }
 
-            // PERF: Report the entire LineCanvas bounds as drawn, not each individual cell
-            // Reporting per-cell caused 10x slowdown (90s vs 9s) in AllViews_Draw_Does_Not_Layout test
-            // Note: LineCanvas.Bounds is already in screen-relative coordinates (cells are stored with screen positions)
-            context?.AddDrawnRectangle (LineCanvas.Bounds);
+            // PERF: Build a Region from the line cells efficiently by grouping into horizontal spans
+            // This avoids per-cell AddDrawnRectangle calls (10x slowdown) while accurately representing
+            // only the drawn lines (not the entire bounding box)
+            if (context is { } && cellMap.Count > 0)
+            {
+                Region lineRegion = BuildRegionFromLineCells (cellMap);
+                context.AddDrawnRegion (lineRegion);
+            }
 
             LineCanvas.Clear ();
         }
+    }
+
+    /// <summary>
+    /// Efficiently builds a Region from line cells by grouping contiguous horizontal spans.
+    /// This avoids the performance overhead of adding each cell individually while accurately
+    /// representing the non-rectangular shape of the lines.
+    /// </summary>
+    /// <param name="cellMap">Dictionary of points where line cells are drawn</param>
+    /// <returns>A Region encompassing all the line cells</returns>
+    private static Region BuildRegionFromLineCells (Dictionary<Point, Cell?> cellMap)
+    {
+        if (cellMap.Count == 0)
+        {
+            return new Region ();
+        }
+
+        // Group cells by row for efficient horizontal span detection
+        var rowGroups = cellMap.Keys
+                               .OrderBy (p => p.Y)
+                               .ThenBy (p => p.X)
+                               .GroupBy (p => p.Y);
+
+        Region region = new Region ();
+
+        foreach (var row in rowGroups)
+        {
+            int y = row.Key;
+            List<int> xValues = row.Select (p => p.X).OrderBy (x => x).ToList ();
+
+            // Merge contiguous x values into horizontal spans
+            int spanStart = xValues [0];
+            int spanEnd = xValues [0];
+
+            for (int i = 1; i < xValues.Count; i++)
+            {
+                if (xValues [i] == spanEnd + 1)
+                {
+                    // Continue the span
+                    spanEnd = xValues [i];
+                }
+                else
+                {
+                    // End the current span and add it to the region
+                    region.Combine (new Rectangle (spanStart, y, spanEnd - spanStart + 1, 1), RegionOp.Union);
+                    spanStart = xValues [i];
+                    spanEnd = xValues [i];
+                }
+            }
+
+            // Add the final span for this row
+            region.Combine (new Rectangle (spanStart, y, spanEnd - spanStart + 1, 1), RegionOp.Union);
+        }
+
+        return region;
     }
 
     #endregion DrawLineCanvas
