@@ -256,8 +256,16 @@ public partial class View // Command APIs
     ///     event. The default <see cref="Command.Activate"/> handler calls this method.
     /// </summary>
     /// <remarks>
-    ///     The <see cref="Activating"/> event should be raised after the state of the View has been changed and before see
-    ///     <see cref="Accepting"/>.
+    ///     <para>
+    ///         The <see cref="Activating"/> event should be raised after the state of the View has been changed and before see
+    ///         <see cref="Accepting"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the event is not handled and the <see cref="SuperView"/> is not null, the event will be propagated
+    ///         to the <see cref="SuperView"/>'s <see cref="RaiseActivating"/> method, allowing hierarchical components
+    ///         (e.g. <see cref="MenuBar"/>) to handle activation events from subviews. Derived classes can override
+    ///         <see cref="RaiseActivating"/> to implement custom propagation handling.
+    ///     </para>
     /// </remarks>
     /// <returns>
     ///     <see langword="null"/> if no event was raised; input processing should continue.
@@ -279,6 +287,17 @@ public partial class View // Command APIs
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         Activating?.Invoke (this, args);
+
+        // If the event was not handled and there's a SuperView, propagate the event up the hierarchy.
+        // This allows hierarchical components like MenuBar to handle activation events from subviews.
+        if (!args.Handled && SuperView is { })
+        {
+            bool? superResult = SuperView.RaiseActivating (ctx);
+            if (superResult is true)
+            {
+                return true;
+            }
+        }
 
         return Activating is null ? null : args.Handled;
     }
