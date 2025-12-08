@@ -197,8 +197,8 @@ public class LineCanvas : IDisposable
     ///     This avoids the performance overhead of adding each cell individually while accurately
     ///     representing the non-rectangular shape of the lines.
     /// </summary>
-    /// <param name="cellMap">Dictionary of points where line cells are drawn (must not be empty)</param>
-    /// <returns>A Region encompassing all the line cells</returns>
+    /// <param name="cellMap">Dictionary of points where line cells are drawn. If empty, returns an empty Region.</param>
+    /// <returns>A Region encompassing all the line cells, or an empty Region if cellMap is empty</returns>
     public static Region BuildRegionFromCells (Dictionary<Point, Cell?> cellMap)
     {
         // Group cells by row for efficient horizontal span detection
@@ -216,9 +216,10 @@ public class LineCanvas : IDisposable
             // X values are sorted due to ThenBy above
             List<int> xValues = row.Select (p => p.X).ToList ();
 
+            // Note: GroupBy on non-empty Keys guarantees non-empty groups, but check anyway for safety
             if (xValues.Count == 0)
             {
-                continue; // Defensive: skip empty groups (shouldn't happen)
+                continue;
             }
 
             // Merge contiguous x values into horizontal spans
