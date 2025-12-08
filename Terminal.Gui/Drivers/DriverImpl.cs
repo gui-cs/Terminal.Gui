@@ -143,6 +143,8 @@ internal class DriverImpl : IDriver
 
     private readonly IOutput _output;
 
+    internal IOutput Output => _output;
+
     /// <inheritdoc/>
     public IInputProcessor InputProcessor { get; }
 

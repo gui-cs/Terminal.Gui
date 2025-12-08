@@ -47,7 +47,7 @@ internal partial class DriverAssert
         {
             driver = Application.Driver;
         }
-        ArgumentNullException.ThrowIfNull(driver);
+        ArgumentNullException.ThrowIfNull (driver);
 
         Cell [,] contents = driver!.Contents!;
 
@@ -193,6 +193,141 @@ internal partial class DriverAssert
         Assert.Equal (expectedLook, actualLook);
     }
 
+#pragma warning disable xUnit1013 // Public method should be marked as test
+    /// <summary>Asserts that the driver raw ANSI output matches the expected output.</summary>
+    /// <param name="expectedLook">Expected output with C# escape sequences (e.g., \x1b for ESC)</param>
+    /// <param name="output"></param>
+    /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    public static void AssertDriverOutputIs (
+        string expectedLook,
+        ITestOutputHelper output,
+        IDriver? driver = null
+    )
+    {
+#pragma warning restore xUnit1013 // Public method should be marked as test
+        if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
+        {
+            driver = Application.Driver;
+        }
+        ArgumentNullException.ThrowIfNull (driver);
+        DriverImpl? driverImpl = driver as DriverImpl;
+        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
+
+        if (fakeOutput is null)
+        {
+            Assert.Fail ("driver must be FakeDriver");
+        }
+
+        string? actualLook = fakeOutput.Output;
+
+        // Unescape the expected string to convert C# escape sequences like \x1b to actual characters
+        string unescapedExpected = UnescapeString (expectedLook);
+
+        // Trim trailing whitespace from actual (screen padding)
+        actualLook = actualLook.TrimEnd ();
+        unescapedExpected = unescapedExpected.TrimEnd ();
+
+        if (string.Equals (unescapedExpected, actualLook))
+        {
+            return;
+        }
+
+        // If test is about to fail show user what things looked like
+        if (!string.Equals (unescapedExpected, actualLook))
+        {
+            output?.WriteLine ($"Expected (length={unescapedExpected.Length}):" + Environment.NewLine + unescapedExpected);
+            output?.WriteLine ($" But Was (length={actualLook.Length}):" + Environment.NewLine + actualLook);
+
+            // Show the difference at the end
+            int minLen = Math.Min (unescapedExpected.Length, actualLook.Length);
+            output?.WriteLine ($"Lengths: Expected={unescapedExpected.Length}, Actual={actualLook.Length}, MinLen={minLen}");
+            if (actualLook.Length > unescapedExpected.Length)
+            {
+                output?.WriteLine ($"Actual has {actualLook.Length - unescapedExpected.Length} extra characters at the end");
+            }
+        }
+
+        Assert.Equal (unescapedExpected, actualLook);
+    }
+
+    /// <summary>
+    ///     Unescapes a C# string literal by processing escape sequences like \x1b, \n, \r, \t, etc.
+    /// </summary>
+    /// <param name="input">String with C# escape sequences</param>
+    /// <returns>String with escape sequences converted to actual characters</returns>
+    private static string UnescapeString (string input)
+    {
+        if (string.IsNullOrEmpty (input))
+        {
+            return input;
+        }
+
+        var result = new StringBuilder (input.Length);
+        int i = 0;
+
+        while (i < input.Length)
+        {
+            if (input [i] == '\\' && i + 1 < input.Length)
+            {
+                char next = input [i + 1];
+
+                switch (next)
+                {
+                    case 'x' when i + 3 < input.Length:
+                        // Handle \xHH (2-digit hex)
+                        string hex = input.Substring (i + 2, 2);
+                        if (int.TryParse (hex, System.Globalization.NumberStyles.HexNumber, null, out int hexValue))
+                        {
+                            result.Append ((char)hexValue);
+                            i += 4; // Skip \xHH
+                            continue;
+                        }
+                        break;
+
+                    case 'n':
+                        result.Append ('\n');
+                        i += 2;
+                        continue;
+
+                    case 'r':
+                        result.Append ('\r');
+                        i += 2;
+                        continue;
+
+                    case 't':
+                        result.Append ('\t');
+                        i += 2;
+                        continue;
+
+                    case '\\':
+                        result.Append ('\\');
+                        i += 2;
+                        continue;
+
+                    case '"':
+                        result.Append ('"');
+                        i += 2;
+                        continue;
+
+                    case '\'':
+                        result.Append ('\'');
+                        i += 2;
+                        continue;
+
+                    case '0':
+                        result.Append ('\0');
+                        i += 2;
+                        continue;
+                }
+            }
+
+            // Not an escape sequence, add the character as-is
+            result.Append (input [i]);
+            i++;
+        }
+
+        return result.ToString ();
+    }
     /// <summary>
     ///     Asserts that the driver contents are equal to the provided string.
     /// </summary>

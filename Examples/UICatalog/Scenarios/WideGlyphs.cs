@@ -25,7 +25,7 @@ public sealed class WideGlyphs : Scenario
         };
 
         // Build the array of codepoints once when subviews are laid out
-        appWindow.SubViewsLaidOut += (s, e) =>
+        appWindow.SubViewsLaidOut += (s, _) =>
         {
             View? view = s as View;
             if (view is null)
@@ -53,7 +53,7 @@ public sealed class WideGlyphs : Scenario
         // Fill the window with the pre-built codepoints array
         // For detailed documentation on the draw code flow from Application.Run to this event,
         // see WideGlyphs.DrawFlow.md in this directory
-        appWindow.DrawingContent += (s, e) =>
+        appWindow.DrawingContent += (s, _) =>
         {
             View? view = s as View;
             if (view is null || _codepoints is null)
@@ -99,8 +99,12 @@ public sealed class WideGlyphs : Scenario
             Y = 5,
             Width = 15,
             Height = 5,
-            BorderStyle = LineStyle.Dashed,
+            //BorderStyle = LineStyle.Dashed,
         };
+
+        // Proves it's not LineCanvas related
+        arrangeableViewAtEven!.Border!.Thickness = new (1);
+        arrangeableViewAtEven.Border.Add(new View () { Height = Dim.Auto(), Width = Dim.Auto(), Text = "Even" });
         appWindow.Add (arrangeableViewAtEven);
 
         View arrangeableViewAtOdd = new ()
@@ -114,7 +118,6 @@ public sealed class WideGlyphs : Scenario
             BorderStyle = LineStyle.Dashed,
         };
         appWindow.Add (arrangeableViewAtOdd);
-
 
         var superView = new View
         {
@@ -191,6 +194,6 @@ public sealed class WideGlyphs : Scenario
     {
         Random random = new ();
         int codepoint = random.Next (0x4E00, 0x9FFF);
-        return new Rune (codepoint);
+        return new (codepoint);
     }
 }
