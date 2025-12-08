@@ -727,7 +727,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             e.Cancel = true;
         };
 
-        // Minimal border at X=1 (odd column), Width=3, Height=3 (includes border)
+        // Minimal border at X=3 (odd column), Width=3, Height=3 (includes border)
         var viewWithBorder = new View
         {
             Text = "X",
