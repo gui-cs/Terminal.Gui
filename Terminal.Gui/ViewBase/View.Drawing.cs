@@ -108,13 +108,6 @@ public partial class View // Drawing APIs
             DoClearViewport (context);
 
             // ------------------------------------
-            // Draw the subviews first (order matters: SubViews, Text, Content)
-            if (SubViewNeedsDraw)
-            {
-                DoDrawSubViews (context);
-            }
-
-            // ------------------------------------
             // Draw the text
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoDrawText (context);
@@ -122,6 +115,13 @@ public partial class View // Drawing APIs
             // ------------------------------------
             // Draw the content
             DoDrawContent (context);
+
+            // ------------------------------------
+            // Draw the subviews first (order matters: SubViews, Text, Content)
+            if (SubViewNeedsDraw)
+            {
+                DoDrawSubViews (context);
+            }
 
             // ------------------------------------
             // Draw the line canvas
@@ -180,8 +180,6 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
-        // NOTE: We do not support subviews of Margin?
-
         if (Margin?.SubViews is { } && Margin.Thickness != Thickness.Empty && Margin.NeedsDraw)
         {
             foreach (View subview in Margin.SubViews)
@@ -242,12 +240,6 @@ public partial class View // Drawing APIs
             SetClip (clipAdornments);
         }
 
-        if (Margin?.NeedsLayout == true)
-        {
-            Margin.NeedsLayout = false;
-            Margin?.Thickness.Draw (Driver, FrameToScreen ());
-            Margin?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
-        }
 
         if (SubViewNeedsDraw)
         {
@@ -293,7 +285,7 @@ public partial class View // Drawing APIs
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-            //Margin?.Draw ();
+            Margin?.Draw ();
         }
     }
 
