@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Stores the desired output state for the whole application. This is updated during
@@ -14,7 +12,7 @@ public class OutputBufferImpl : IOutputBuffer
     ///     UpdateScreen is called.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
-    public Cell [,]? Contents { get; set; } = new Cell[0, 0];
+    public Cell [,]? Contents { get; set; } = new Cell [0, 0];
 
     private int _cols;
     private int _rows;
@@ -66,7 +64,7 @@ public class OutputBufferImpl : IOutputBuffer
     public virtual int Top { get; set; } = 0;
 
     /// <summary>
-    /// Indicates which lines have been modified and need to be redrawn.
+    ///     Indicates which lines have been modified and need to be redrawn.
     /// </summary>
     public bool [] DirtyLines { get; set; } = [];
 
@@ -138,103 +136,49 @@ public class OutputBufferImpl : IOutputBuffer
     {
         foreach (string grapheme in GraphemeHelper.GetGraphemes (str))
         {
-            string text = grapheme;
+            AddGrapheme (grapheme);
+        }
+    }
 
-            if (Contents is null)
+    /// <summary>
+    ///     Adds a single grapheme to the display at the current cursor position.
+    /// </summary>
+    /// <param name="grapheme">The grapheme to add.</param>
+    private void AddGrapheme (string grapheme)
+    {
+        if (Contents is null)
+        {
+            return;
+        }
+
+        Clip ??= new (Screen);
+        Rectangle clipRect = Clip!.GetBounds ();
+
+        string text = grapheme;
+        int textWidth = -1;
+
+        lock (Contents)
+        {
+            bool validLocation = IsValidLocation (text, Col, Row);
+
+            if (validLocation)
             {
-                return;
+                text = text.MakePrintable ();
+                textWidth = text.GetColumns ();
+
+                // Set attribute and mark dirty for current cell
+                Contents [Row, Col].Attribute = CurrentAttribute;
+                Contents [Row, Col].IsDirty = true;
+
+                InvalidateOverlappedWideGlyph ();
+
+                WriteGraphemeByWidth (text, textWidth, clipRect);
+
+                DirtyLines [Row] = true;
             }
 
-            Clip ??= new (Screen);
-
-            Rectangle clipRect = Clip!.GetBounds ();
-
-            int textWidth = -1;
-            bool validLocation = false;
-
-            lock (Contents)
-            {
-                validLocation = IsValidLocation (text, Col, Row);
-
-                if (validLocation)
-                {
-                    text = text.MakePrintable ();
-                    textWidth = text.GetColumns ();
-
-                    Contents [Row, Col].Attribute = CurrentAttribute;
-                    Contents [Row, Col].IsDirty = true;
-
-                    // Handle overlap with existing wide glyphs
-                    // If we're writing at an odd column (e.g., 1, 3, 5) and there's a wide glyph
-                    // to our left (at column 0, 2, 4), invalidate it since we're overwriting
-                    // the second half of that wide glyph
-                    if (Col > 0)
-                    {
-                        if (Contents [Row, Col - 1].Grapheme.GetColumns () > 1)
-                        {
-                            Contents [Row, Col - 1].Grapheme = Rune.ReplacementChar.ToString ();
-                            Contents [Row, Col - 1].IsDirty = true;
-                        }
-                    }
-
-                    if (textWidth is 0 or 1)
-                    {
-                        // Single-width character (most common case: ASCII, single-column Unicode)
-                        Contents [Row, Col].Grapheme = text;
-
-                        // Mark the next cell as dirty to ensure proper rendering of adjacent content
-                        if (Col < clipRect.Right - 1 && Col + 1 < Cols)
-                        {
-                            Contents [Row, Col + 1].IsDirty = true;
-                        }
-                    }
-                    else if (textWidth == 2)
-                    {
-                        // Wide character (e.g., CJK ideographs, emoji, some symbols)
-                        // These occupy 2 columns when rendered
-                        if (!Clip.Contains (Col + 1, Row))
-                        {
-                            // Second column is outside clip - can't fit wide char here
-                            // Use replacement char instead
-                            Contents [Row, Col].Grapheme = Rune.ReplacementChar.ToString ();
-                        }
-                        else if (!Clip.Contains (Col, Row))
-                        {
-                            // First column is outside clip but second isn't
-                            // Mark second column as replacement to indicate partial overlap
-                            if (Col + 1 < Cols)
-                            {
-                                Contents [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
-                            }
-                        }
-                        else
-                        {
-                            // Both columns are in bounds - write the wide character
-                            // It will naturally render across both columns when output to the terminal
-                            Contents [Row, Col].Grapheme = text;
-
-                            if (Col < clipRect.Right - 1 && Col + 1 < Cols)
-                            {
-                                // Set second column to replacement char to indicate it's occupied
-                                // by a wide glyph. If something else later writes to Col+1,
-                                // it will overwrite this.
-                                Contents [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
-                                Contents [Row, Col + 1].IsDirty = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Zero-width or non-spacing character (e.g., combining marks)
-                        // These don't occupy screen space on their own
-                        Contents [Row, Col].Grapheme = " ";
-                        Contents [Row, Col].IsDirty = false;
-                    }
-
-                    DirtyLines [Row] = true;
-                }
-            }
-
+            // Always advance cursor (even if location was invalid)
+            // Keep Col/Row updates inside the lock to prevent race conditions
             Col++;
 
             if (textWidth > 1)
@@ -242,9 +186,98 @@ public class OutputBufferImpl : IOutputBuffer
                 // Skip the second column of a wide character
                 // IMPORTANT: We do NOT modify column N+1's IsDirty or Attribute here.
                 // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
-
                 Col++;
             }
+        }
+    }
+
+    /// <summary>
+    ///     If we're writing at an odd column and there's a wide glyph to our left,
+    ///     invalidate it since we're overwriting the second half.
+    /// </summary>
+    private void InvalidateOverlappedWideGlyph ()
+    {
+        if (Col > 0 && Contents! [Row, Col - 1].Grapheme.GetColumns () > 1)
+        {
+            Contents [Row, Col - 1].Grapheme = Rune.ReplacementChar.ToString ();
+            Contents [Row, Col - 1].IsDirty = true;
+        }
+    }
+
+    /// <summary>
+    ///     Writes a grapheme to the buffer based on its width (0, 1, or 2 columns).
+    /// </summary>
+    /// <param name="text">The printable text to write.</param>
+    /// <param name="textWidth">The column width of the text.</param>
+    /// <param name="clipRect">The clipping rectangle.</param>
+    private void WriteGraphemeByWidth (string text, int textWidth, Rectangle clipRect)
+    {
+        switch (textWidth)
+        {
+            case 0:
+            case 1:
+                WriteSingleWidthGrapheme (text, clipRect);
+
+                break;
+
+            case 2:
+                WriteWideGrapheme (text);
+
+                break;
+
+            default:
+                // Zero-width or non-spacing character (e.g., combining marks)
+                Contents! [Row, Col].Grapheme = " ";
+                Contents [Row, Col].IsDirty = false;
+
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     Writes a single-width character (0 or 1 column wide).
+    /// </summary>
+    private void WriteSingleWidthGrapheme (string text, Rectangle clipRect)
+    {
+        Contents! [Row, Col].Grapheme = text;
+
+        // Mark the next cell as dirty to ensure proper rendering of adjacent content
+        if (Col < clipRect.Right - 1 && Col + 1 < Cols)
+        {
+            Contents [Row, Col + 1].IsDirty = true;
+        }
+    }
+
+    /// <summary>
+    ///     Writes a wide character (2 columns wide) handling clipping and partial overlap cases.
+    /// </summary>
+    private void WriteWideGrapheme (string text)
+    {
+        if (!Clip!.Contains (Col + 1, Row))
+        {
+            // Second column is outside clip - can't fit wide char here
+            Contents! [Row, Col].Grapheme = Rune.ReplacementChar.ToString ();
+        }
+        else if (!Clip.Contains (Col, Row))
+        {
+            // First column is outside clip but second isn't
+            // Mark second column as replacement to indicate partial overlap
+            if (Col + 1 < Cols)
+            {
+                Contents! [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
+            }
+        }
+        else
+        {
+            // Both columns are in bounds - write the wide character
+            // It will naturally render across both columns when output to the terminal
+            Contents! [Row, Col].Grapheme = text;
+
+            // DO NOT modify column N+1 here!
+            // The wide glyph will naturally render across both columns.
+            // If we set column N+1 to replacement char, we would overwrite
+            // any content that was intentionally drawn there (like borders at odd columns).
+            // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
         }
     }
 

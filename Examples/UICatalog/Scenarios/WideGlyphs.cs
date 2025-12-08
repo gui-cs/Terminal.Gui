@@ -99,8 +99,11 @@ public sealed class WideGlyphs : Scenario
             Y = 5,
             Width = 15,
             Height = 5,
-            BorderStyle = LineStyle.Dashed,
+            //BorderStyle = LineStyle.Dashed,
         };
+
+        arrangeableViewAtEven!.Border.Thickness = new Thickness (1);
+        arrangeableViewAtEven.Border.Add(new View () { Height = Dim.Auto(), Width = Dim.Auto(), Text = "Even" });
         appWindow.Add (arrangeableViewAtEven);
 
         View arrangeableViewAtOdd = new ()
@@ -114,7 +117,6 @@ public sealed class WideGlyphs : Scenario
             BorderStyle = LineStyle.Dashed,
         };
         appWindow.Add (arrangeableViewAtOdd);
-
 
         var superView = new View
         {
