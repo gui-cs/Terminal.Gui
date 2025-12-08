@@ -758,7 +758,7 @@ public partial class View // Drawing APIs
     private static Region BuildRegionFromLineCells (Dictionary<Point, Cell?> cellMap)
     {
         // Group cells by row for efficient horizontal span detection
-        // Points are already sorted by Y then X, so each row group has sorted X values
+        // Sort by Y then X so that within each row group, X values are in order
         var rowGroups = cellMap.Keys
                                .OrderBy (p => p.Y)
                                .ThenBy (p => p.X)
@@ -769,8 +769,13 @@ public partial class View // Drawing APIs
         foreach (var row in rowGroups)
         {
             int y = row.Key;
-            // X values are already sorted from the OrderBy above
+            // X values are sorted due to ThenBy above
             List<int> xValues = row.Select (p => p.X).ToList ();
+
+            if (xValues.Count == 0)
+            {
+                continue; // Defensive: skip empty groups (shouldn't happen)
+            }
 
             // Merge contiguous x values into horizontal spans
             int spanStart = xValues [0];
