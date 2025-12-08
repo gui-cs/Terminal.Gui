@@ -740,68 +740,12 @@ public partial class View // Drawing APIs
             // only the drawn lines (not the entire bounding box)
             if (context is { } && cellMap.Count > 0)
             {
-                Region lineRegion = BuildRegionFromLineCells (cellMap);
+                Region lineRegion = Drawing.LineCanvas.BuildRegionFromCells (cellMap);
                 context.AddDrawnRegion (lineRegion);
             }
 
             LineCanvas.Clear ();
         }
-    }
-
-    /// <summary>
-    /// Efficiently builds a Region from line cells by grouping contiguous horizontal spans.
-    /// This avoids the performance overhead of adding each cell individually while accurately
-    /// representing the non-rectangular shape of the lines.
-    /// </summary>
-    /// <param name="cellMap">Dictionary of points where line cells are drawn (must not be empty)</param>
-    /// <returns>A Region encompassing all the line cells</returns>
-    private static Region BuildRegionFromLineCells (Dictionary<Point, Cell?> cellMap)
-    {
-        // Group cells by row for efficient horizontal span detection
-        // Sort by Y then X so that within each row group, X values are in order
-        var rowGroups = cellMap.Keys
-                               .OrderBy (p => p.Y)
-                               .ThenBy (p => p.X)
-                               .GroupBy (p => p.Y);
-
-        Region region = new Region ();
-
-        foreach (var row in rowGroups)
-        {
-            int y = row.Key;
-            // X values are sorted due to ThenBy above
-            List<int> xValues = row.Select (p => p.X).ToList ();
-
-            if (xValues.Count == 0)
-            {
-                continue; // Defensive: skip empty groups (shouldn't happen)
-            }
-
-            // Merge contiguous x values into horizontal spans
-            int spanStart = xValues [0];
-            int spanEnd = xValues [0];
-
-            for (int i = 1; i < xValues.Count; i++)
-            {
-                if (xValues [i] == spanEnd + 1)
-                {
-                    // Continue the span
-                    spanEnd = xValues [i];
-                }
-                else
-                {
-                    // End the current span and add it to the region
-                    region.Combine (new Rectangle (spanStart, y, spanEnd - spanStart + 1, 1), RegionOp.Union);
-                    spanStart = xValues [i];
-                    spanEnd = xValues [i];
-                }
-            }
-
-            // Add the final span for this row
-            region.Combine (new Rectangle (spanStart, y, spanEnd - spanStart + 1, 1), RegionOp.Union);
-        }
-
-        return region;
     }
 
     #endregion DrawLineCanvas
