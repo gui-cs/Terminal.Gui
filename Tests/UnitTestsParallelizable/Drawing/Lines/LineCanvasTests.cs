@@ -741,7 +741,8 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData (-1, 0, -2, Orientation.Vertical, "│\r\n│")]
     [InlineData (0, -1, -2, Orientation.Vertical, "│\r\n│")]
     [InlineData (-1, -1, -2, Orientation.Vertical, "│\r\n│")]
-    [Theory]    public void Length_n_Is_n_Long (int x, int y, int length, Orientation orientation, string expected)
+    [Theory]
+    public void Length_n_Is_n_Long (int x, int y, int length, Orientation orientation, string expected)
     {
         LineCanvas canvas = new ();
         canvas.AddLine (new (x, y), length, orientation, LineStyle.Single);
@@ -1515,7 +1516,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     {
         Dictionary<Point, Cell?> cellMap = new ();
         Region region = LineCanvas.GetRegion (cellMap);
-        
+
         Assert.NotNull (region);
         Assert.True (region.IsEmpty ());
     }
@@ -1523,13 +1524,13 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_SingleCell_ReturnsSingleRectangle ()
     {
-        Dictionary<Point, Cell?> cellMap = new () 
-        { 
-            { new Point (5, 10), new Cell { Grapheme = "X" } } 
+        Dictionary<Point, Cell?> cellMap = new ()
+        {
+            { new Point (5, 10), new Cell { Grapheme = "X" } }
         };
-        
+
         Region region = LineCanvas.GetRegion (cellMap);
-        
+
         Assert.NotNull (region);
         Assert.False (region.IsEmpty ());
         Assert.True (region.Contains (5, 10));
@@ -1544,9 +1545,9 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         {
             cellMap.Add (new Point (x, 10), new Cell { Grapheme = "─" });
         }
-        
+
         Region region = LineCanvas.GetRegion (cellMap);
-        
+
         Assert.NotNull (region);
         // All cells in the horizontal span should be in the region
         for (int x = 5; x <= 9; x++)
@@ -1569,9 +1570,9 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         {
             cellMap.Add (new Point (5, y), new Cell { Grapheme = "│" });
         }
-        
+
         Region region = LineCanvas.GetRegion (cellMap);
-        
+
         Assert.NotNull (region);
         // All cells in the vertical line should be in the region
         for (int y = 10; y <= 14; y++)
@@ -1596,9 +1597,9 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         {
             cellMap.Add (new Point (5, y), new Cell { Grapheme = "│" });
         }
-        
+
         Region region = LineCanvas.GetRegion (cellMap);
-        
+
         // Horizontal part
         for (int x = 0; x <= 5; x++)
         {
@@ -1617,7 +1618,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_DiscontiguousHorizontalCells_CreatesSeparateSpans ()
     {
-        Dictionary<Point, Cell?> cellMap = new () 
+        Dictionary<Point, Cell?> cellMap = new ()
         {
             { new Point (0, 5), new Cell { Grapheme = "X" } },
             { new Point (1, 5), new Cell { Grapheme = "X" } },
@@ -1625,9 +1626,9 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
             { new Point (3, 5), new Cell { Grapheme = "X" } },
             { new Point (4, 5), new Cell { Grapheme = "X" } }
         };
-        
+
         Region region = LineCanvas.GetRegion (cellMap);
-        
+
         Assert.True (region.Contains (0, 5));
         Assert.True (region.Contains (1, 5));
         Assert.False (region.Contains (2, 5)); // Gap
@@ -1649,9 +1650,9 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         {
             cellMap [new Point (2, y)] = new Cell { Grapheme = "┼" };
         }
-        
+
         Region region = LineCanvas.GetRegion (cellMap);
-        
+
         // Horizontal line
         for (int x = 0; x <= 4; x++)
         {
@@ -1672,9 +1673,9 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     public void GetCellMapWithRegion_EmptyCanvas_ReturnsEmptyMapAndRegion ()
     {
         LineCanvas canvas = new ();
-        
+
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
-        
+
         Assert.NotNull (cellMap);
         Assert.Empty (cellMap);
         Assert.NotNull (region);
@@ -1686,14 +1687,14 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     {
         LineCanvas canvas = new ();
         canvas.AddLine (new Point (5, 10), 5, Orientation.Horizontal, LineStyle.Single);
-        
+
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
-        
+
         Assert.NotNull (cellMap);
         Assert.NotEmpty (cellMap);
         Assert.NotNull (region);
         Assert.False (region.IsEmpty ());
-        
+
         // Both cellMap and region should contain the same cells
         foreach (Point p in cellMap.Keys)
         {
@@ -1706,14 +1707,14 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     {
         LineCanvas canvas = new ();
         canvas.AddLine (new Point (5, 10), 5, Orientation.Vertical, LineStyle.Single);
-        
+
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
-        
+
         Assert.NotNull (cellMap);
         Assert.NotEmpty (cellMap);
         Assert.NotNull (region);
         Assert.False (region.IsEmpty ());
-        
+
         // Both cellMap and region should contain the same cells
         foreach (Point p in cellMap.Keys)
         {
@@ -1728,17 +1729,17 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         // Create a cross pattern
         canvas.AddLine (new Point (0, 2), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (2, 0), 5, Orientation.Vertical, LineStyle.Single);
-        
+
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
-        
+
         Assert.NotNull (cellMap);
         Assert.NotEmpty (cellMap);
         Assert.NotNull (region);
-        
+
         // Verify intersection point is in both
         Assert.True (cellMap.ContainsKey (new Point (2, 2)), "Intersection should be in cellMap");
         Assert.True (region.Contains (2, 2), "Intersection should be in region");
-        
+
         // All cells should be in both structures
         foreach (Point p in cellMap.Keys)
         {
@@ -1755,19 +1756,19 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         canvas.AddLine (new Point (0, 3), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, 0), 4, Orientation.Vertical, LineStyle.Single);
         canvas.AddLine (new Point (4, 0), 4, Orientation.Vertical, LineStyle.Single);
-        
+
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
-        
+
         Assert.NotNull (cellMap);
         Assert.NotEmpty (cellMap);
         Assert.NotNull (region);
-        
+
         // Every cell in the map should be in the region
         foreach (Point p in cellMap.Keys)
         {
             Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
         }
-        
+
         // Cells not in the map should not be in the region (interior of box)
         Assert.False (cellMap.ContainsKey (new Point (2, 1)));
         // Note: Region might contain interior if it's filled, so we just verify consistency
@@ -1781,21 +1782,21 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (5, 0), 10, Orientation.Vertical, LineStyle.Single);
         canvas.AddLine (new Point (0, 5), 10, Orientation.Horizontal, LineStyle.Double);
-        
+
         // Get results from combined method
         (Dictionary<Point, Cell?> combinedCellMap, Region combinedRegion) = canvas.GetCellMapWithRegion ();
-        
+
         // Get results from separate calls
         Dictionary<Point, Cell?> separateCellMap = canvas.GetCellMap ();
         Region separateRegion = LineCanvas.GetRegion (separateCellMap);
-        
+
         // Cell maps should be identical
         Assert.Equal (separateCellMap.Count, combinedCellMap.Count);
         foreach (KeyValuePair<Point, Cell?> kvp in separateCellMap)
         {
             Assert.True (combinedCellMap.ContainsKey (kvp.Key), $"Combined map missing key {kvp.Key}");
         }
-        
+
         // Regions should contain the same points
         foreach (Point p in combinedCellMap.Keys)
         {
@@ -1810,16 +1811,16 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         LineCanvas canvas = new ();
         canvas.AddLine (new Point (-5, -5), 10, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, -5), 10, Orientation.Vertical, LineStyle.Single);
-        
+
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
-        
+
         Assert.NotNull (cellMap);
         Assert.NotEmpty (cellMap);
         Assert.NotNull (region);
-        
+
         // Verify negative coordinates are handled
         Assert.True (cellMap.Keys.Any (p => p.X < 0 || p.Y < 0), "Should have negative coordinates");
-        
+
         // All cells should be in region
         foreach (Point p in cellMap.Keys)
         {
@@ -1832,29 +1833,29 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     {
         LineCanvas canvas = new ();
         canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
-        
+
         // Exclude middle section
         Region exclusionRegion = new ();
         exclusionRegion.Combine (new Rectangle (3, 0, 4, 1), RegionOp.Union);
         canvas.Exclude (exclusionRegion);
-        
+
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
-        
+
         Assert.NotNull (cellMap);
         Assert.NotEmpty (cellMap);
-        
+
         // Excluded cells should not be in cellMap
         for (int x = 3; x < 7; x++)
         {
             Assert.False (cellMap.ContainsKey (new Point (x, 0)), $"({x}, 0) should be excluded from cellMap");
         }
-        
+
         // Region should match cellMap
         foreach (Point p in cellMap.Keys)
         {
             Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
         }
-        
+
         // Excluded points should not be in region
         for (int x = 3; x < 7; x++)
         {

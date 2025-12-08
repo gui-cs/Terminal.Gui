@@ -221,7 +221,7 @@ public partial class View // Drawing APIs
         {
             // Set the clip to be just the thicknesses of the adornments
             // TODO: Put this union logic in a method on View?
-            Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
+            Region clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
             clipAdornments.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
             clipAdornments.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
             clipAdornments.Combine (originalClip, RegionOp.Intersect);
@@ -692,7 +692,7 @@ public partial class View // Drawing APIs
     protected virtual bool OnRenderingLineCanvas () { return false; }
 
     /// <summary>The canvas that any line drawing that is to be shared by subviews of this view should add lines to.</summary>
-    /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
+    /// <remarks><see cref="Border"/> adds lines to this LineCanvas.</remarks>
     public LineCanvas LineCanvas { get; } = new ();
 
     /// <summary>
@@ -720,10 +720,9 @@ public partial class View // Drawing APIs
 
         if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
         {
-            // PERF: Get both cell map and Region in a single pass through the canvas
-            // This is more efficient than calling GetCellMap() and GetRegion() separately
+            // Get both cell map and Region in a single pass through the canvas
             (Dictionary<Point, Cell?> cellMap, Region lineRegion) = LineCanvas.GetCellMapWithRegion ();
-            
+
             foreach (KeyValuePair<Point, Cell?> p in cellMap)
             {
                 // Get the entire map
