@@ -109,6 +109,7 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
+        base.Write (output);
         try
         {
             Console.Out.Write (output);
@@ -140,7 +141,7 @@ public class NetOutput : OutputBase, IOutput
             }
             catch (Exception)
             {
-                return false;
+                return true;
             }
         }
 

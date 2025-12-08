@@ -1,16 +1,43 @@
 using Xunit.Abstractions;
 
-namespace ApplicationTests;
+namespace ApplicationTests.Screen;
 
 /// <summary>
 ///     Parallelizable tests for IApplication.ScreenChanged event and Screen property.
 ///     Tests using the modern instance-based IApplication API.
 /// </summary>
-public class IApplicationScreenChangedTests (ITestOutputHelper output)
+public class ScreenTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
     #region ScreenChanged Event Tests
+
+    [Fact]
+    public void Screen_Size_Changes ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+
+        IDriver? driver = app.Driver;
+
+        app.Driver!.SetScreenSize (80, 25);
+
+        Assert.Equal (new (0, 0, 80, 25), driver!.Screen);
+        Assert.Equal (new (0, 0, 80, 25), app.Screen);
+
+        // TODO: Should not be possible to manually change these at whim!
+        driver.Cols = 100;
+        driver.Rows = 30;
+
+        app.Driver!.SetScreenSize (100, 30);
+
+        Assert.Equal (new (0, 0, 100, 30), driver.Screen);
+
+        app.Screen = new (0, 0, driver.Cols, driver.Rows);
+        Assert.Equal (new (0, 0, 100, 30), driver.Screen);
+
+        app.Dispose ();
+    }
 
     [Fact]
     public void ScreenChanged_Event_Fires_When_Driver_Size_Changes ()

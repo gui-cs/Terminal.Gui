@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Extension methods for making any <see cref="View"/> runnable with typed results.

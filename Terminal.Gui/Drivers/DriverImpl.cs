@@ -45,19 +45,19 @@ internal class DriverImpl : IDriver
         ISizeMonitor sizeMonitor
     )
     {
-        InputProcessor = inputProcessor;
+        _inputProcessor = inputProcessor;
         _output = output;
         OutputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
 
-        InputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
-        InputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
+        GetInputProcessor ().KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+        GetInputProcessor ().KeyUp += (s, e) => KeyUp?.Invoke (s, e);
 
-        InputProcessor.MouseEvent += (s, e) =>
-                                     {
-                                         //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
-                                         MouseEvent?.Invoke (s, e);
-                                     };
+        GetInputProcessor ().MouseEvent += (s, e) =>
+                                           {
+                                               //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
+                                               MouseEvent?.Invoke (s, e);
+                                           };
 
         SizeMonitor = sizeMonitor;
         SizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
@@ -73,15 +73,18 @@ internal class DriverImpl : IDriver
     public void Init () { throw new NotSupportedException (); }
 
     /// <inheritdoc/>
-    public void Refresh () { _output.Write (OutputBuffer); }
+    public void Refresh ()
+    {
+        _output.Write (OutputBuffer);
+    }
 
     /// <inheritdoc/>
-    public string? GetName () => InputProcessor.DriverName?.ToLowerInvariant ();
+    public string? GetName () => GetInputProcessor ().DriverName?.ToLowerInvariant ();
 
     /// <inheritdoc/>
     public virtual string GetVersionInfo ()
     {
-        string type = InputProcessor.DriverName ?? throw new ArgumentNullException (nameof (InputProcessor.DriverName));
+        string type = GetInputProcessor ().DriverName ?? throw new InvalidOperationException ("Driver name is not set.");
 
         return type;
     }
@@ -143,8 +146,12 @@ internal class DriverImpl : IDriver
 
     private readonly IOutput _output;
 
+    public IOutput GetOutput () => _output;
+
+    private readonly IInputProcessor _inputProcessor;
+
     /// <inheritdoc/>
-    public IInputProcessor InputProcessor { get; }
+    public IInputProcessor GetInputProcessor () => _inputProcessor;
 
     /// <inheritdoc/>
     public IOutputBuffer OutputBuffer { get; }
@@ -157,7 +164,7 @@ internal class DriverImpl : IDriver
 
     private void CreateClipboard ()
     {
-        if (InputProcessor.DriverName is { } && InputProcessor.DriverName.Contains ("fake"))
+        if (GetInputProcessor ().DriverName is { } && GetInputProcessor ()!.DriverName!.Contains ("fake"))
         {
             if (Clipboard is null)
             {
@@ -414,7 +421,7 @@ internal class DriverImpl : IDriver
     public event EventHandler<Key>? KeyUp;
 
     /// <inheritdoc/>
-    public void EnqueueKeyEvent (Key key) { InputProcessor.EnqueueKeyDownEvent (key); }
+    public void EnqueueKeyEvent (Key key) { GetInputProcessor ().EnqueueKeyDownEvent (key); }
 
     #endregion Input Events
 

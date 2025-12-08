@@ -61,7 +61,12 @@ public interface IDriver : IDisposable
     ///     e.g. <see cref="ConsoleKeyInfo"/> into <see cref="Key"/> events
     ///     and detecting and processing ansi escape sequences.
     /// </summary>
-    IInputProcessor InputProcessor { get; }
+    IInputProcessor GetInputProcessor ();
+
+    /// <summary>
+    ///     Gets the output handler responsible for writing to the terminal.
+    /// </summary>
+    IOutput GetOutput ();
 
     /// <summary>Get the operating system clipboard.</summary>
     IClipboard? Clipboard { get; }
