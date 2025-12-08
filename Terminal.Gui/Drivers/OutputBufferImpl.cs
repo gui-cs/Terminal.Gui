@@ -154,7 +154,6 @@ public class OutputBufferImpl : IOutputBuffer
 
             lock (Contents)
             {
-                // Validate location inside the lock to prevent race conditions
                 validLocation = IsValidLocation (text, Col, Row);
 
                 if (validLocation)
@@ -165,12 +164,14 @@ public class OutputBufferImpl : IOutputBuffer
                     Contents [Row, Col].Attribute = CurrentAttribute;
                     Contents [Row, Col].IsDirty = true;
 
+                    // Handle overlap with existing wide glyphs
+                    // If we're writing at an odd column (e.g., 1, 3, 5) and there's a wide glyph
+                    // to our left (at column 0, 2, 4), invalidate it since we're overwriting
+                    // the second half of that wide glyph
                     if (Col > 0)
                     {
-                        // Check if cell to left has a wide glyph
                         if (Contents [Row, Col - 1].Grapheme.GetColumns () > 1)
                         {
-                            // Invalidate cell to left
                             Contents [Row, Col - 1].Grapheme = Rune.ReplacementChar.ToString ();
                             Contents [Row, Col - 1].IsDirty = true;
                         }
@@ -178,8 +179,10 @@ public class OutputBufferImpl : IOutputBuffer
 
                     if (textWidth is 0 or 1)
                     {
+                        // Single-width character (most common case: ASCII, single-column Unicode)
                         Contents [Row, Col].Grapheme = text;
 
+                        // Mark the next cell as dirty to ensure proper rendering of adjacent content
                         if (Col < clipRect.Right - 1 && Col + 1 < Cols)
                         {
                             Contents [Row, Col + 1].IsDirty = true;
@@ -187,14 +190,18 @@ public class OutputBufferImpl : IOutputBuffer
                     }
                     else if (textWidth == 2)
                     {
+                        // Wide character (e.g., CJK ideographs, emoji, some symbols)
+                        // These occupy 2 columns when rendered
                         if (!Clip.Contains (Col + 1, Row))
                         {
-                            // We're at the right edge of the clip, so we can't display a wide character.
+                            // Second column is outside clip - can't fit wide char here
+                            // Use replacement char instead
                             Contents [Row, Col].Grapheme = Rune.ReplacementChar.ToString ();
                         }
                         else if (!Clip.Contains (Col, Row))
                         {
-                            // Our 1st column is outside the clip, so we can't display a wide character.
+                            // First column is outside clip but second isn't
+                            // Mark second column as replacement to indicate partial overlap
                             if (Col + 1 < Cols)
                             {
                                 Contents [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
@@ -202,11 +209,15 @@ public class OutputBufferImpl : IOutputBuffer
                         }
                         else
                         {
+                            // Both columns are in bounds - write the wide character
+                            // It will naturally render across both columns when output to the terminal
                             Contents [Row, Col].Grapheme = text;
 
                             if (Col < clipRect.Right - 1 && Col + 1 < Cols)
                             {
-                                // Invalidate cell to right so that it doesn't get drawn
+                                // Set second column to replacement char to indicate it's occupied
+                                // by a wide glyph. If something else later writes to Col+1,
+                                // it will overwrite this.
                                 Contents [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
                                 Contents [Row, Col + 1].IsDirty = true;
                             }
@@ -214,7 +225,8 @@ public class OutputBufferImpl : IOutputBuffer
                     }
                     else
                     {
-                        // This is a non-spacing character, so we don't need to do anything
+                        // Zero-width or non-spacing character (e.g., combining marks)
+                        // These don't occupy screen space on their own
                         Contents [Row, Col].Grapheme = " ";
                         Contents [Row, Col].IsDirty = false;
                     }
@@ -227,23 +239,9 @@ public class OutputBufferImpl : IOutputBuffer
 
             if (textWidth > 1)
             {
-                Debug.Assert (textWidth <= 2);
-
-                if (validLocation)
-                {
-                    lock (Contents!)
-                    {
-                        // Re-validate Col is still in bounds after increment
-                        if (Col < Cols && Row < Rows && Col < clipRect.Right)
-                        {
-                            // This is a double-width character, and we are not at the end of the line.
-                            // Col now points to the second column of the character. Ensure it doesn't
-                            // Get rendered.
-                            Contents [Row, Col].IsDirty = false;
-                            Contents [Row, Col].Attribute = CurrentAttribute;
-                        }
-                    }
-                }
+                // Skip the second column of a wide character
+                // IMPORTANT: We do NOT modify column N+1's IsDirty or Attribute here.
+                // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
 
                 Col++;
             }

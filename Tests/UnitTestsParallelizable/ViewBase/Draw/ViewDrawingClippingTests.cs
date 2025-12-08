@@ -510,11 +510,12 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     {
         IApplication app = Application.Create ();
         app.Init ("fake");
-        IDriver driver = app.Driver;
-        ;
-        driver.Clip = new (driver.Screen);
+        IDriver driver = app!.Driver!;
+        driver.SetScreenSize (30, 20);
 
-        var superView = new Runnable()
+        driver!.Clip = new (driver.Screen);
+
+        var superView = new Runnable ()
         {
             X = 0,
             Y = 0,
@@ -577,7 +578,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         // Begin calls LayoutAndDraw, so no need to call it again here
         // app.LayoutAndDraw();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsAre (
                                                        """
                                                        🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
                                                        ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎
@@ -596,34 +597,166 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                                        output,
                                                        driver);
 
-        string fakeDriverOutput = driver.ToAnsi ();
-        output.WriteLine ("Driver Output After Redraw:\n" + fakeDriverOutput);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┆viewWithBorderAtX0┆🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�┆viewWithBorderAtX1┆ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┆viewWithBorderAtX2┆🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+                                           output, driver);
+
+        DriverImpl? driverImpl = driver as DriverImpl;
+        FakeOutput? fakeOutput = driverImpl.Output as FakeOutput;
+
+        output.WriteLine ("Driver Output After Redraw:\n" + fakeOutput.Output);
 
         // BUGBUG: Border.set_LineStyle does not call SetNeedsDraw
         viewWithBorderAtX1!.Border!.LineStyle = LineStyle.Single;
         viewWithBorderAtX1.Border!.SetNeedsDraw ();
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       """
-                                                       🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
-                                                       ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎
-                                                       ┆viewWithBorderAtX0┆🍎🍎🍎
-                                                       └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎
-                                                       🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
-                                                       �┌──────────────────┐ 🍎🍎
-                                                       �│viewWithBorderAtX1│ 🍎🍎
-                                                       �└──────────────────┘ 🍎🍎
-                                                       🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
-                                                       🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎
-                                                       🍎┆viewWithBorderAtX2┆🍎🍎
-                                                       🍎└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎
-                                                       🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
-                                                       """,
-                                                       output,
-                                                       driver);
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
+                                              ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎
+                                              ┆viewWithBorderAtX0┆🍎🍎🍎
+                                              └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎
+                                              🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
+                                              �┌──────────────────┐ 🍎🍎
+                                              �│viewWithBorderAtX1│ 🍎🍎
+                                              �└──────────────────┘ 🍎🍎
+                                              🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
+                                              🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎
+                                              🍎┆viewWithBorderAtX2┆🍎🍎
+                                              🍎└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎
+                                              🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
+                                              """,
+                                              output,
+                                              driver);
 
 
+    }
+
+    [Fact]
+    public void Draw_WithBorderSubView_At_Col1_In_WideGlyph_DrawsCorrectly ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+        IDriver driver = app!.Driver!;
+        driver.SetScreenSize (6, 3);  // Minimal: 3 cols wide, 1 row high (+ 2 for border top/bottom)
+
+        driver!.Clip = new (driver.Screen);
+
+        var superView = new Runnable ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Driver = driver
+        };
+
+        Rune codepoint = Glyphs.Apple;
+
+        superView.DrawingContent += (s, e) =>
+                                    {
+                                        var view = s as View;
+                                        view.AddStr (0, 0, "🍎🍎🍎🍎");
+                                        view.AddStr (0, 1, "🍎🍎🍎🍎");
+                                        view.AddStr (0, 2, "🍎🍎🍎🍎");
+                                        e.DrawContext?.AddDrawnRectangle (view.Viewport);
+                                        e.Cancel = true;
+                                    };
+
+        // Minimal border at X=1 (odd column), Width=3, Height=3 (includes border)
+        var viewWithBorder = new View
+        {
+            Text = "X",
+            BorderStyle = LineStyle.Single,
+            X = 1,
+            Y = 0,
+            Width = 3,
+            Height = 3
+        };
+
+        superView.Add (viewWithBorder);
+        app.Begin (superView);
+
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              �┌─┐🍎
+                                              �│X│🍎
+                                              �└─┘🍎
+                                              """,
+                                              output,
+                                              driver);
+
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�┌─┐🍎�│X│🍎�└─┘🍎",
+            output, driver);
+
+        DriverImpl? driverImpl = driver as DriverImpl;
+        FakeOutput? fakeOutput = driverImpl.Output as FakeOutput;
+
+        output.WriteLine ("Driver Output:\n" + fakeOutput.Output);
+    }
+
+
+    [Fact]
+    public void Draw_WithBorderSubView_At_Col3_In_WideGlyph_DrawsCorrectly ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+        IDriver driver = app!.Driver!;
+        driver.SetScreenSize (6, 3);  // Minimal: 3 cols wide, 1 row high (+ 2 for border top/bottom)
+
+        driver!.Clip = new (driver.Screen);
+
+        var superView = new Runnable ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Driver = driver
+        };
+
+        Rune codepoint = Glyphs.Apple;
+
+        superView.DrawingContent += (s, e) =>
+        {
+            var view = s as View;
+            view.AddStr (0, 0, "🍎🍎🍎🍎");
+            view.AddStr (0, 1, "🍎🍎🍎🍎");
+            view.AddStr (0, 2, "🍎🍎🍎🍎");
+            e.DrawContext?.AddDrawnRectangle (view.Viewport);
+            e.Cancel = true;
+        };
+
+        // Minimal border at X=1 (odd column), Width=3, Height=3 (includes border)
+        var viewWithBorder = new View
+        {
+            Text = "X",
+            BorderStyle = LineStyle.Single,
+            X = 3,
+            Y = 0,
+            Width = 3,
+            Height = 3
+        };
+
+        superView.Add (viewWithBorder);
+        app.Begin (superView);
+
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              🍎�┌─┐
+                                              🍎�│X│
+                                              🍎�└─┘
+                                              """,
+                                              output,
+                                              driver);
+
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎�┌─┐🍎�│X│🍎�└─┘",
+            output, driver);
+
+        DriverImpl? driverImpl = driver as DriverImpl;
+        FakeOutput? fakeOutput = driverImpl.Output as FakeOutput;
+
+        output.WriteLine ("Driver Output:\n" + fakeOutput.Output);
     }
 
     [Fact]
