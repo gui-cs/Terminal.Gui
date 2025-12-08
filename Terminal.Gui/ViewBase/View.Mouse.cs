@@ -577,7 +577,7 @@ public partial class View // Mouse APIs
         return args.Handled;
     }
 
-    #endregion Mouse Clicked Events
+    #endregion Mouse Click Events
 
     #region Mouse Wheel Events
 
