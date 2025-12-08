@@ -549,22 +549,16 @@ public partial class View // Mouse APIs
 
         MouseEventArgs clickedArgs = new ();
 
-        if (args.IsPressed)
-        {
-            // If the mouse is pressed, we want to invoke the related clicked event.
-            clickedArgs.Flags = args.Flags switch
-            {
-                MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
-                MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
-                MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
-                MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
-                _ => clickedArgs.Flags
-            };
-        }
-        else
-        {
-            clickedArgs.Flags = args.Flags;
-        }
+        clickedArgs.Flags = args.IsPressed
+            ? args.Flags switch
+                {
+                    MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
+                    MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
+                    MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
+                    MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+                    _ => clickedArgs.Flags
+                }
+            : args.Flags;
 
         clickedArgs.Position = args.Position;
         clickedArgs.ScreenPosition = args.ScreenPosition;
