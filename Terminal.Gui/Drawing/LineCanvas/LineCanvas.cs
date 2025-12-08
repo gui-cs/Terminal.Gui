@@ -201,7 +201,7 @@ public class LineCanvas : IDisposable
     public (Dictionary<Point, Cell?> CellMap, Region Region) GetCellMapWithRegion ()
     {
         Dictionary<Point, Cell?> map = new ();
-        Region region = new Region ();
+        Region region = new ();
 
         List<IntersectionDefinition> intersectionsBufferList = [];
         List<int> rowXValues = [];
@@ -214,7 +214,7 @@ public class LineCanvas : IDisposable
             for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
             {
                 intersectionsBufferList.Clear ();
-                foreach (var line in _lines)
+                foreach (StraightLine line in _lines)
                 {
                     if (line.Intersects (x, y) is { } intersect)
                     {
@@ -274,14 +274,14 @@ public class LineCanvas : IDisposable
     {
         // Group cells by row for efficient horizontal span detection
         // Sort by Y then X so that within each row group, X values are in order
-        var rowGroups = cellMap.Keys
-                               .OrderBy (p => p.Y)
-                               .ThenBy (p => p.X)
-                               .GroupBy (p => p.Y);
+        IEnumerable<IGrouping<int, Point>> rowGroups = cellMap.Keys
+                                                              .OrderBy (p => p.Y)
+                                                              .ThenBy (p => p.X)
+                                                              .GroupBy (p => p.Y);
 
-        Region region = new Region ();
+        Region region = new ();
 
-        foreach (var row in rowGroups)
+        foreach (IGrouping<int, Point> row in rowGroups)
         {
             int y = row.Key;
             // X values are sorted due to ThenBy above

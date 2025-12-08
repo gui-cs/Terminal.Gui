@@ -17,14 +17,14 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Empty_Canvas_ToString_Returns_EmptyString ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Equal (string.Empty, canvas.ToString ());
     }
 
     [Fact]
     public void Clear_Removes_All_Lines ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (0, 0), 3, Orientation.Vertical, LineStyle.Single);
 
@@ -38,7 +38,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Lines_Property_Returns_ReadOnly_Collection ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Single (canvas.Lines);
@@ -48,7 +48,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddLine_Adds_Line_To_Collection ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Empty (canvas.Lines);
 
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
@@ -94,7 +94,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         int expectedHeight
     )
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (x, y), length, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (x, y), length, Orientation.Vertical, LineStyle.Single);
 
@@ -119,7 +119,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         int expectedHeight
     )
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (x, y), length, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
@@ -128,7 +128,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Specific_Coordinates ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (5, 5), 3, Orientation.Horizontal, LineStyle.Single);
         Assert.Equal (new (5, 5, 3, 1), canvas.Bounds);
     }
@@ -136,14 +136,14 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Empty_Canvas_Returns_Empty_Rectangle ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Equal (Rectangle.Empty, canvas.Bounds);
     }
 
     [Fact]
     public void Bounds_Single_Point_Zero_Length ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (5, 5), 0, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Equal (new (5, 5, 1, 1), canvas.Bounds);
@@ -152,7 +152,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Horizontal_Line ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (2, 3), 5, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Equal (new (2, 3, 5, 1), canvas.Bounds);
@@ -161,7 +161,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Vertical_Line ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (2, 3), 5, Orientation.Vertical, LineStyle.Single);
 
         Assert.Equal (new (2, 3, 1, 5), canvas.Bounds);
@@ -170,7 +170,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Multiple_Lines_Returns_Union ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (0, 0), 3, Orientation.Vertical, LineStyle.Single);
 
@@ -180,7 +180,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Negative_Length_Line ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (5, 5), -3, Orientation.Horizontal, LineStyle.Single);
 
         // Line from (5,5) going left 3 positions: includes points 3, 4, 5 (width 3, X starts at 3)
@@ -190,7 +190,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Complex_Box ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // top
         canvas.AddLine (new (0, 0), 3, Orientation.Horizontal, LineStyle.Single);
@@ -214,7 +214,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void ClearExclusions_Clears_Exclusion_Region ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
 
         var region = new Region (new (0, 0, 2, 1));
@@ -229,7 +229,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Exclude_Removes_Points_From_Map ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
 
         var region = new Region (new (0, 0, 2, 1));
@@ -260,7 +260,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Fill_Property_Defaults_To_Null ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Null (canvas.Fill);
     }
 
@@ -688,7 +688,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Theory]
     public void Length_0_Is_1_Long (int x, int y, Orientation orientation, string expected)
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Add a line at 5, 5 that's has length of 1
         canvas.AddLine (new (x, y), 1, orientation, LineStyle.Single);
@@ -743,7 +743,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData (-1, -1, -2, Orientation.Vertical, "│\r\n│")]
     [Theory]    public void Length_n_Is_n_Long (int x, int y, int length, Orientation orientation, string expected)
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (x, y), length, orientation, LineStyle.Single);
 
         var result = canvas.ToString ();
@@ -755,7 +755,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     {
         var offset = new Point (5, 5);
 
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (offset, -3, Orientation.Horizontal, LineStyle.Single);
 
         var looksLike = "───";
@@ -820,7 +820,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Upper box
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
@@ -927,7 +927,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Top_Left_From_TopRight_LeftUp ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Upper box
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
@@ -943,7 +943,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Top_With_1Down ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Top      ─  
         canvas.AddLine (Point.Empty, 1, Orientation.Horizontal, LineStyle.Single);
@@ -1328,7 +1328,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Window ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Frame
         canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Single);
@@ -1513,7 +1513,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_EmptyCellMap_ReturnsEmptyRegion ()
     {
-        var cellMap = new Dictionary<Point, Cell?> ();
+        Dictionary<Point, Cell?> cellMap = new ();
         Region region = LineCanvas.GetRegion (cellMap);
         
         Assert.NotNull (region);
@@ -1523,7 +1523,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_SingleCell_ReturnsSingleRectangle ()
     {
-        var cellMap = new Dictionary<Point, Cell?> 
+        Dictionary<Point, Cell?> cellMap = new () 
         { 
             { new Point (5, 10), new Cell { Grapheme = "X" } } 
         };
@@ -1538,7 +1538,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_HorizontalLine_CreatesHorizontalSpan ()
     {
-        var cellMap = new Dictionary<Point, Cell?> ();
+        Dictionary<Point, Cell?> cellMap = new ();
         // Horizontal line from (5, 10) to (9, 10)
         for (int x = 5; x <= 9; x++)
         {
@@ -1563,7 +1563,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_VerticalLine_CreatesMultipleHorizontalSpans ()
     {
-        var cellMap = new Dictionary<Point, Cell?> ();
+        Dictionary<Point, Cell?> cellMap = new ();
         // Vertical line from (5, 10) to (5, 14)
         for (int y = 10; y <= 14; y++)
         {
@@ -1586,7 +1586,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_LShape_CreatesCorrectSpans ()
     {
-        var cellMap = new Dictionary<Point, Cell?> ();
+        Dictionary<Point, Cell?> cellMap = new ();
         // L-shape: horizontal line from (0, 0) to (5, 0), then vertical to (5, 3)
         for (int x = 0; x <= 5; x++)
         {
@@ -1617,7 +1617,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_DiscontiguousHorizontalCells_CreatesSeparateSpans ()
     {
-        var cellMap = new Dictionary<Point, Cell?> 
+        Dictionary<Point, Cell?> cellMap = new () 
         {
             { new Point (0, 5), new Cell { Grapheme = "X" } },
             { new Point (1, 5), new Cell { Grapheme = "X" } },
@@ -1638,7 +1638,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetRegion_IntersectingLines_CreatesCorrectRegion ()
     {
-        var cellMap = new Dictionary<Point, Cell?> ();
+        Dictionary<Point, Cell?> cellMap = new ();
         // Horizontal line
         for (int x = 0; x <= 4; x++)
         {
@@ -1671,7 +1671,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_EmptyCanvas_ReturnsEmptyMapAndRegion ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
         
@@ -1684,7 +1684,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_SingleHorizontalLine_ReturnsCellMapAndRegion ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new Point (5, 10), 5, Orientation.Horizontal, LineStyle.Single);
         
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
@@ -1704,7 +1704,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_SingleVerticalLine_ReturnsCellMapAndRegion ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new Point (5, 10), 5, Orientation.Vertical, LineStyle.Single);
         
         (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
@@ -1724,7 +1724,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_IntersectingLines_CorrectlyHandlesIntersection ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         // Create a cross pattern
         canvas.AddLine (new Point (0, 2), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (2, 0), 5, Orientation.Vertical, LineStyle.Single);
@@ -1749,7 +1749,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_ComplexShape_RegionMatchesCellMap ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         // Create a box
         canvas.AddLine (new Point (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, 3), 5, Orientation.Horizontal, LineStyle.Single);
@@ -1776,7 +1776,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_ResultsMatchSeparateCalls ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         // Create a complex pattern
         canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (5, 0), 10, Orientation.Vertical, LineStyle.Single);
@@ -1791,7 +1791,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         
         // Cell maps should be identical
         Assert.Equal (separateCellMap.Count, combinedCellMap.Count);
-        foreach (var kvp in separateCellMap)
+        foreach (KeyValuePair<Point, Cell?> kvp in separateCellMap)
         {
             Assert.True (combinedCellMap.ContainsKey (kvp.Key), $"Combined map missing key {kvp.Key}");
         }
@@ -1807,7 +1807,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_NegativeCoordinates_HandlesCorrectly ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new Point (-5, -5), 10, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new Point (0, -5), 10, Orientation.Vertical, LineStyle.Single);
         
@@ -1830,11 +1830,11 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void GetCellMapWithRegion_WithExclusion_RegionExcludesExcludedCells ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
         
         // Exclude middle section
-        var exclusionRegion = new Region ();
+        Region exclusionRegion = new ();
         exclusionRegion.Combine (new Rectangle (3, 0, 4, 1), RegionOp.Union);
         canvas.Exclude (exclusionRegion);
         
