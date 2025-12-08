@@ -52,6 +52,17 @@ public sealed class Transparent : Scenario
                                };
         appWindow.Add (appButton);
 
+        // Add BigText demonstration
+        var bigText = new BigText ()
+        {
+            X = Pos.Center (),
+            Y = 1,
+            Text = "tui",
+            GlyphHeight = 6,
+            Style = LineStyle.Double
+        };
+        appWindow.Add (bigText);
+
         var tv = new TransparentView ()
         {
             X = 2,

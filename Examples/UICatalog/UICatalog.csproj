@@ -33,6 +33,7 @@
         <PackageReference Include="Serilog.Extensions.Logging" />
         <PackageReference Include="Serilog.Sinks.Debug" />
         <PackageReference Include="Serilog.Sinks.File" />
+        <PackageReference Include="SixLabors.Fonts" />
         <PackageReference Include="SixLabors.ImageSharp" />
         <PackageReference Include="CsvHelper" />
         <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" />
