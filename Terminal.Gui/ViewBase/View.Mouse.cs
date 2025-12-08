@@ -487,7 +487,6 @@ public partial class View // Mouse APIs
     ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
     /// </summary>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, the mouse  <see langword="false"/> otherwise.</returns>
     internal void WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
         if (App is { } && App.Mouse.MouseGrabView == this)
