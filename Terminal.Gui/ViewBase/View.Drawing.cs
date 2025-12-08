@@ -6,7 +6,7 @@ namespace Terminal.Gui.ViewBase;
 public partial class View // Drawing APIs
 {
     /// <summary>
-    ///     Draws a set of views.
+    ///     Draws a set of peer views (views that share the same SuperView).
     /// </summary>
     /// <param name="views">The peer views to draw.</param>
     /// <param name="force">If <see langword="true"/>, <see cref="View.SetNeedsDraw()"/> will be called on each view to force it to be drawn.</param>
@@ -39,8 +39,8 @@ public partial class View // Drawing APIs
 
         // After all peer views have been drawn and cleared, we can now clear the SuperView's SubViewNeedsDraw flag.
         // ClearNeedsDraw() does not clear SuperView.SubViewNeedsDraw (by design, to avoid premature clearing
-        // when siblings still need drawing), so we must do it here after ALL peers are processed.
-        // We only clear the flag if ALL the SuperView's subviews no longer need drawing.
+        // when peer subviews still need drawing), so we must do it here after ALL peers are processed.
+        // We only clear the flag if ALL the SuperView's SubViews no longer need drawing.
         View? lastSuperView = null;
         foreach (View view in viewsArray)
         {
@@ -85,8 +85,8 @@ public partial class View // Drawing APIs
         if (NeedsDraw || SubViewNeedsDraw)
         {
             // ------------------------------------
-            // Draw the Border and Padding.
-            // Note Margin with a Shadow is special-cased and drawn in a separate pass to support
+            // Draw the Border and Padding Adornments.
+            // Note: Margin with a Shadow is special-cased and drawn in a separate pass to support
             // transparent shadows.
             DoDrawAdornments (originalClip);
             SetClip (originalClip);
@@ -106,7 +106,7 @@ public partial class View // Drawing APIs
             DoClearViewport (context);
 
             // ------------------------------------
-            // Draw the subviews first (order matters: SubViews, Text, Content)
+            // Draw the SubViews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
                 DoDrawSubViews (context);
@@ -130,8 +130,8 @@ public partial class View // Drawing APIs
             DoRenderLineCanvas (context);
 
             // ------------------------------------
-            // Re-draw the border and padding subviews
-            // HACK: This is a hack to ensure that the border and padding subviews are drawn after the line canvas.
+            // Re-draw the Border and Padding Adornment SubViews
+            // HACK: This is a hack to ensure that the Border and Padding Adornment SubViews are drawn after the line canvas.
             DoDrawAdornmentsSubViews ();
 
             // ------------------------------------
@@ -170,15 +170,20 @@ public partial class View // Drawing APIs
         SetClip (originalClip);
 
         // ------------------------------------
-        // We're done drawing - The Clip is reset to what it was before we started.
+        // We're done drawing - The Clip is reset to what it was before we started
+        // But the context contains the region that was drawn by this view
         DoDrawComplete (context);
+
+        // When DoDrawComplete returns, Driver.Clip has been updated to exclude this view's area.
+        // The next view drawn (earlier in Z-order, typically a peer view or the SuperView) will see
+        // a clip with "holes" where this view (and any SubViews drawn before it) are located.
     }
 
     #region DrawAdornments
 
     private void DoDrawAdornmentsSubViews ()
     {
-        // NOTE: We do not support subviews of Margin?
+        // NOTE: We do not support SubViews of Margin
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
         {
@@ -302,7 +307,7 @@ public partial class View // Drawing APIs
     /// <summary>
     ///     Called when the View's Adornments are to be drawn. Prepares <see cref="View.LineCanvas"/>. If
     ///     <see cref="SuperViewRendersLineCanvas"/> is true, only the
-    ///     <see cref="LineCanvas"/> of this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
+    ///     <see cref="LineCanvas"/> of this view's SubViews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
     ///     false (the default), this method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
     /// </summary>
     /// <returns><see langword="true"/> to stop further drawing of the Adornments.</returns>
@@ -481,7 +486,7 @@ public partial class View // Drawing APIs
                                  Rectangle.Empty);
         }
 
-        // We assume that the text has been drawn over the entire area; ensure that the subviews are redrawn.
+        // We assume that the text has been drawn over the entire area; ensure that the SubViews are redrawn.
         SetSubViewNeedsDrawDownHierarchy ();
     }
 
@@ -571,7 +576,7 @@ public partial class View // Drawing APIs
     ///         such as <see cref="View.AddRune(int, int, Rune)"/>, <see cref="View.AddStr(string)"/>, and <see cref="View.FillRect(Rectangle, Rune)"/>.
     ///     </para>
     ///     <para>
-    ///         The event is invoked after <see cref="ClearingViewport"/> and <see cref="Text"/> have been drawn, but before any <see cref="SubViews"/> are drawn.
+    ///         The event is invoked after <see cref="ClearingViewport"/> and <see cref="Text"/> have been drawn, but after <see cref="SubViews"/> have been drawn.
     ///     </para>
     ///     <para>
     ///         <b>Transparency Support:</b> If the View has <see cref="ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/>
@@ -650,7 +655,8 @@ public partial class View // Drawing APIs
             return;
         }
 
-        // Draw the subviews in reverse order to leverage clipping.
+        // Draw the SubViews in reverse Z-order to leverage clipping.
+        // SubViews earlier in the collection are drawn last (on top).
         foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
         {
             // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
@@ -696,18 +702,17 @@ public partial class View // Drawing APIs
     public LineCanvas LineCanvas { get; } = new ();
 
     /// <summary>
-    ///     Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for rendering any
-    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this Frame will be done by its parent's
+    ///     Gets or sets whether this View will use its SuperView's <see cref="LineCanvas"/> for rendering any
+    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this view will be done by its
     ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawingAdornments"/> method will
-    ///     be
-    ///     called to render the borders.
+    ///     be called to render the borders.
     /// </summary>
     public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
     /// <summary>
     ///     Causes the contents of <see cref="LineCanvas"/> to be drawn.
     ///     If <see cref="SuperViewRendersLineCanvas"/> is true, only the
-    ///     <see cref="LineCanvas"/> of this view's subviews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
+    ///     <see cref="LineCanvas"/> of this view's SubViews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
     ///     false (the default), this method will cause the <see cref="LineCanvas"/> to be rendered.
     /// </summary>
     /// <param name="context"></param>
@@ -751,60 +756,153 @@ public partial class View // Drawing APIs
 
     #region DrawComplete
 
+    /// <summary>
+    ///     Called at the end of <see cref="Draw(DrawContext)"/> to finalize drawing and update the clip region.
+    /// </summary>
+    /// <param name="context">
+    ///     The <see cref="DrawContext"/> tracking what regions were drawn by this view and its subviews.
+    ///     May be <see langword="null"/> if not tracking drawn regions.
+    /// </param>
     private void DoDrawComplete (DrawContext? context)
     {
+        // Phase 1: Notify that drawing is complete
+        // Raise virtual method first, then event. This allows subclasses to override behavior
+        // before subscribers see the event.
         OnDrawComplete (context);
         DrawComplete?.Invoke (this, new (Viewport, Viewport, context));
 
-        // Now, update the clip to exclude this view (not including Margin)
+        // Phase 2: Update Driver.Clip to exclude this view's drawn area
+        // This prevents views "behind" this one (earlier in draw order/Z-order) from drawing over it.
+        // Adornments (Margin, Border, Padding) are handled by their Adornment.Parent view and don't exclude themselves.
         if (this is not Adornment)
         {
             if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
             {
-                // context!.DrawnRegion is the region that was drawn by this view. It may include regions outside
-                // the Viewport. We need to clip it to the Viewport.
+                // Transparent View Path:
+                // Only exclude the regions that were actually drawn, allowing views beneath
+                // to show through in areas where nothing was drawn.
+
+                // The context.DrawnRegion may include areas outside the Viewport (e.g., if content
+                // was drawn with ViewportSettingsFlags.AllowContentOutsideViewport). We need to clip
+                // it to the Viewport bounds to prevent excluding areas that aren't visible.
                 context!.ClipDrawnRegion (ViewportToScreen (Viewport));
 
-                // Exclude the drawn region from the clip
+                // Exclude the actually-drawn region from Driver.Clip
                 ExcludeFromClip (context.GetDrawnRegion ());
 
-                // Exclude the Border and Padding from the clip
+                // Border and Padding are always opaque (they draw lines/fills), so exclude them too
                 ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
                 ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
             }
             else
             {
-                // Exclude this view (not including Margin) from the Clip
+                // Opaque View Path (default):
+                // Exclude the entire view area from Driver.Clip. This is the typical case where
+                // the view is considered fully opaque.
+
+                // Start with the Frame in screen coordinates
                 Rectangle borderFrame = FrameToScreen ();
 
+                // If there's a Border, use its frame instead (includes the border thickness)
                 if (Border is { })
                 {
                     borderFrame = Border.FrameToScreen ();
                 }
 
-                // In the non-transparent (typical case), we want to exclude the entire view area (borderFrame) from the clip
+                // Exclude this view's entire area (Border inward, but not Margin) from the clip.
+                // This prevents any view drawn after this one from drawing in this area.
                 ExcludeFromClip (borderFrame);
 
-                // Update context.DrawnRegion to include the entire view (borderFrame), but clipped to our SuperView's viewport
-                // This enables the SuperView to know what was drawn by this view.
+                // Update the DrawContext to track that we drew this entire rectangle.
+                // This allows our SuperView (if any) to know what area we occupied,
+                // which is important for transparency calculations at higher levels.
                 context?.AddDrawnRectangle (borderFrame);
             }
         }
 
-        // TODO: Determine if we need another event that conveys the FINAL DrawContext
+        // When this method returns, Driver.Clip has been updated to exclude this view's area.
+        // The next view drawn (earlier in Z-order, typically a peer view or the SuperView) will see
+        // a clip with "holes" where this view (and any SubViews drawn before it) are located.
     }
 
     /// <summary>
-    ///     Called when the View is completed drawing.
+    ///     Called when the View has completed drawing and is about to update the clip region.
     /// </summary>
+    /// <param name="context">
+    ///     The <see cref="DrawContext"/> containing the regions that were drawn by this view and its subviews.
+    ///     May be <see langword="null"/> if not tracking drawn regions.
+    /// </param>
     /// <remarks>
-    ///     The <paramref name="context"/> parameter provides the drawn region of the View.
+    ///     <para>
+    ///         This method is called at the very end of <see cref="Draw(DrawContext)"/>, after all drawing
+    ///         (adornments, content, text, subviews, line canvas) has completed but before the view's area
+    ///         is excluded from <see cref="IDriver.Clip"/>.
+    ///     </para>
+    ///     <para>
+    ///         Use this method to:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Perform any final drawing operations that need to happen after SubViews are drawn</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Inspect what was drawn via the <paramref name="context"/> parameter</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Add additional regions to the <paramref name="context"/> if needed</description>
+    ///         </item>
+    ///     </list>
+    ///     <para>
+    ///         <b>Important:</b> At this point, <see cref="IDriver.Clip"/> has been restored to the state
+    ///         it was in when <see cref="Draw(DrawContext)"/> began. After this method returns, the view's
+    ///         area will be excluded from the clip (see <see cref="DoDrawComplete"/> for details).
+    ///     </para>
+    ///     <para>
+    ///         <b>Transparency Support:</b> If <see cref="ViewportSettings"/> includes
+    ///         <see cref="ViewportSettingsFlags.Transparent"/>, the <paramref name="context"/> parameter
+    ///         contains the actual regions that were drawn. You can inspect this to see what areas
+    ///         will be excluded from the clip, and optionally add more regions if needed.
+    ///     </para>
     /// </remarks>
+    /// <seealso cref="DrawComplete"/>
+    /// <seealso cref="Draw(DrawContext)"/>
+    /// <seealso cref="DoDrawComplete"/>
     protected virtual void OnDrawComplete (DrawContext? context) { }
 
-    /// <summary>Raised when the View is completed drawing.</summary>
+    /// <summary>Raised when the View has completed drawing and is about to update the clip region.</summary>
     /// <remarks>
+    ///     <para>
+    ///         This event is raised at the very end of <see cref="Draw(DrawContext)"/>, after all drawing
+    ///         operations have completed but before the view's area is excluded from <see cref="IDriver.Clip"/>.
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="DrawEventArgs.DrawContext"/> property provides information about what regions
+    ///         were drawn by this view and its subviews. This is particularly useful for views with
+    ///         <see cref="ViewportSettingsFlags.Transparent"/> enabled, as it shows exactly which areas
+    ///         will be excluded from the clip.
+    ///     </para>
+    ///     <para>
+    ///         Use this event to:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Perform any final drawing operations</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Inspect what was drawn</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Track drawing statistics or metrics</description>
+    ///         </item>
+    ///     </list>
+    ///     <para>
+    ///         <b>Note:</b> This event fires <i>after</i> <see cref="OnDrawComplete(DrawContext)"/>. If you need
+    ///         to override the behavior, prefer overriding the virtual method in a subclass rather than
+    ///         subscribing to this event.
+    ///     </para>
     /// </remarks>
+    /// <seealso cref="OnDrawComplete(DrawContext)"/>
+    /// <seealso cref="Draw(DrawContext)"/>
     public event EventHandler<DrawEventArgs>? DrawComplete;
 
     #endregion DrawComplete
