@@ -456,8 +456,7 @@ public partial class View // Mouse APIs
             // Always clear PressedOutside when the mouse is pressed inside the Viewport
             MouseState &= ~MouseState.PressedOutside;
         }
-
-        if (!Viewport.Contains (mouseEvent.Position))
+        else
         {
             // Logging.Debug ($"{Id} - Outside Viewport: {MouseState}");
             // The mouse is outside.
@@ -551,13 +550,13 @@ public partial class View // Mouse APIs
 
         clickedArgs.Flags = args.IsPressed
             ? args.Flags switch
-                {
-                    MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
-                    MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
-                    MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
-                    MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
-                    _ => clickedArgs.Flags
-                }
+            {
+                MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
+                MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
+                MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
+                MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+                _ => clickedArgs.Flags
+            }
             : args.Flags;
 
         clickedArgs.Position = args.Position;
