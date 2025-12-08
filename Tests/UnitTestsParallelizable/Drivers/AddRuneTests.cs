@@ -3,14 +3,10 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-// Alias Console to MockConsole so we don't accidentally use Console
-
 namespace DriverTests;
 
 public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public void AddRune ()
     {
@@ -180,8 +176,6 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         driver.Dispose ();
     }
 
-
-
     [Fact]
     public void AddStr_Glyph_On_Second_Cell_Of_Wide_Glyph_Outputs_Correctly ()
     {
@@ -190,15 +184,16 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 
         driver!.Clip = new (driver.Screen);
 
-        driver.Move (0, 0);
-        driver.AddStr ("🍎🍎🍎🍎");
-
         driver.Move (1, 0);
         driver.AddStr ("┌");
         driver.Move (2, 0);
         driver.AddStr ("─");
         driver.Move (3, 0);
         driver.AddStr ("┐");
+        driver.Clip.Exclude (new Region (new (1, 0, 3, 1)));
+
+        driver.Move (0, 0);
+        driver.AddStr ("🍎🍎🍎🍎");
 
         DriverAssert.AssertDriverContentsAre (
                                               """

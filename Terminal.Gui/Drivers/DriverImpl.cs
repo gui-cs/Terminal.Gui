@@ -73,7 +73,10 @@ internal class DriverImpl : IDriver
     public void Init () { throw new NotSupportedException (); }
 
     /// <inheritdoc/>
-    public void Refresh () { _output.Write (OutputBuffer); }
+    public void Refresh ()
+    {
+        _output.Write (OutputBuffer);
+    }
 
     /// <inheritdoc/>
     public string? GetName () => GetInputProcessor ().DriverName?.ToLowerInvariant ();

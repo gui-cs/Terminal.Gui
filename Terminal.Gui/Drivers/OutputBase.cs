@@ -56,6 +56,8 @@ public abstract class OutputBase
     /// <param name="visibility"></param>
     public abstract void SetCursorVisibility (CursorVisibility visibility);
 
+    StringBuilder _lastOutputStringBuilder = new ();
+
     /// <summary>
     ///     Writes dirty cells from the buffer to the console. Hides cursor, iterates rows/cols,
     ///     skips clean cells, batches dirty cells into ANSI sequences, wraps URLs with OSC 8,
@@ -63,11 +65,11 @@ public abstract class OutputBase
     /// </summary>
     public virtual void Write (IOutputBuffer buffer)
     {
+        StringBuilder outputStringBuilder = new ();
         int top = 0;
         int left = 0;
         int rows = buffer.Rows;
         int cols = buffer.Cols;
-        StringBuilder outputStringBuilder = new ();
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
@@ -166,6 +168,9 @@ public abstract class OutputBase
         // Cursor visibility restored by ApplicationMainLoop.SetCursor() to prevent flicker
     }
 
+    /// <inheritdoc cref="IOutput.GetLastOutput" />
+    public virtual string GetLastOutput () => _lastOutputStringBuilder.ToString ();
+
     /// <summary>
     ///     Changes the color and text style of the console to the given <paramref name="attr"/> and
     ///     <paramref name="redrawTextStyle"/>.
@@ -190,7 +195,10 @@ public abstract class OutputBase
     ///     Output the contents of the <paramref name="output"/> to the console.
     /// </summary>
     /// <param name="output"></param>
-    protected abstract void Write (StringBuilder output);
+    protected virtual void Write (StringBuilder output)
+    {
+        _lastOutputStringBuilder.Append (output);
+    }
 
     /// <summary>
     ///     Builds ANSI escape sequences for the specified rectangular region of the buffer.

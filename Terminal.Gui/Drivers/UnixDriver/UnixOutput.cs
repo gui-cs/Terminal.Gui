@@ -66,11 +66,9 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
+        base.Write (output);
         try
         {
-            _outputStringBuilder.Clear ();
-            _outputStringBuilder.Append (output.ToString ());
-
             byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
 
             // Write to stdout (fd 1)
@@ -81,12 +79,6 @@ internal class UnixOutput : OutputBase, IOutput
             // ignore for unit tests
         }
     }
-
-
-    private readonly StringBuilder _outputStringBuilder = new ();
-
-    /// <inheritdoc />
-    public string GetLastOutput () => _outputStringBuilder.ToString ();
 
     private Point? _lastCursorPosition;
 

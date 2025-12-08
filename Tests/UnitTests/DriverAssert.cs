@@ -210,15 +210,8 @@ internal partial class DriverAssert
             driver = Application.Driver;
         }
         ArgumentNullException.ThrowIfNull (driver);
-        DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl!.GetOutput () as FakeOutput;
 
-        if (fakeOutput is null)
-        {
-            Assert.Fail ("driver must be FakeDriver");
-        }
-
-        string? actualLook = fakeOutput.GetLastOutput ();
+        string? actualLook = driver.GetOutput().GetLastOutput ();
 
         // Unescape the expected string to convert C# escape sequences like \x1b to actual characters
         string unescapedExpected = UnescapeString (expectedLook);

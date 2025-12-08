@@ -109,10 +109,9 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
+        base.Write (output);
         try
         {
-            _outputStringBuilder.Clear ();
-            _outputStringBuilder.Append (output.ToString ());
             Console.Out.Write (output);
         }
         catch (IOException)
@@ -120,11 +119,6 @@ public class NetOutput : OutputBase, IOutput
             // Not connected to a terminal; do nothing
         }
     }
-
-    private readonly StringBuilder _outputStringBuilder = new();
-
-    /// <inheritdoc />
-    public string GetLastOutput () => _outputStringBuilder.ToString ();
 
     /// <inheritdoc />
     protected override bool SetCursorPositionImpl (int col, int row)
@@ -147,7 +141,7 @@ public class NetOutput : OutputBase, IOutput
             }
             catch (Exception)
             {
-                return false;
+                return true;
             }
         }
 
