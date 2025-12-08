@@ -199,7 +199,7 @@ public class LineCanvas : IDisposable
     /// </summary>
     /// <param name="cellMap">Dictionary of points where line cells are drawn. If empty, returns an empty Region.</param>
     /// <returns>A Region encompassing all the line cells, or an empty Region if cellMap is empty</returns>
-    public static Region BuildRegionFromCells (Dictionary<Point, Cell?> cellMap)
+    public static Region GetRegion (Dictionary<Point, Cell?> cellMap)
     {
         // Group cells by row for efficient horizontal span detection
         // Sort by Y then X so that within each row group, X values are in order

@@ -740,7 +740,7 @@ public partial class View // Drawing APIs
             // only the drawn lines (not the entire bounding box)
             if (context is { } && cellMap.Count > 0)
             {
-                Region lineRegion = Drawing.LineCanvas.BuildRegionFromCells (cellMap);
+                Region lineRegion = Drawing.LineCanvas.GetRegion (cellMap);
                 context.AddDrawnRegion (lineRegion);
             }
 
