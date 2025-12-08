@@ -85,7 +85,7 @@ public class ListView : View, IDesignable
                         return OnOpenSelectedItem ();
                     });
 
-        // Select (Space key and single-click) - If markable, change mark and raise Select event
+        // Activate (Space key and single-click) - If markable, change mark and raise Activate event
         AddCommand (
                     Command.Activate,
                     ctx =>
@@ -103,7 +103,7 @@ public class ListView : View, IDesignable
                         return MarkUnmarkSelectedItem ();
                     });
 
-        // Hotkey - If none set, select and raise Select event. SetFocus. - DO NOT raise Accept
+        // Hotkey - If none set, activate and raise Activate event. SetFocus. - DO NOT raise Accept
         AddCommand (
                     Command.HotKey,
                     ctx =>
@@ -151,7 +151,7 @@ public class ListView : View, IDesignable
 
         KeyBindings.Add (Key.End, Command.End);
 
-        // Key.Space is already bound to Command.Activate; this gives us select then move down
+        // Key.Space is already bound to Command.Activate; this gives us activate then move down
         KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);
 
         // Use the form of Add that lets us pass context to the handler

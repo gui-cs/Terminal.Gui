@@ -4,12 +4,12 @@ namespace Terminal.Gui.Views;
 // Click - Focus, Select (Toggle), and do NOT Accept the item under the mouse.
 // Not Focused:
 //  HotKey - Restore Focus. Do NOT change Active.
-//  Item HotKey - Focus item. Select (Toggle) item. Do NOT Accept.
+//  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
 // Focused:
-//  Space key - Select (Toggle) focused item. Do NOT Accept.
-//  Enter key - Select (Toggle) and Accept the focused item.
+//  Space key - Activate (Toggle) focused item. Do NOT Accept.
+//  Enter key - Activate (Toggle) and Accept the focused item.
 //  HotKey - No-op.
-//  Item HotKey - Focus item, Select (Toggle), and do NOT Accept.
+//  Item HotKey - Focus item, Activate (Toggle), and do NOT Accept.
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary.

@@ -12,8 +12,8 @@ namespace Terminal.Gui.Views;
 //  HotKey - Do NOT Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Do NOT Focus item. If item is not active, make Active. Do NOT Accept.
 // Focused:
-//  Space key - If focused item is Active, move focus to and Acivate next. Else, Select current. Do NOT Accept.
-//  Enter key - Select and Accept the focused item.
+//  Space key - If focused item is Active, move focus to and Acivate next. Else, Activate current. Do NOT Accept.
+//  Enter key - Activate and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - If item is not active, make Active. Do NOT Accept.
 

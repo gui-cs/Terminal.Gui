@@ -75,7 +75,7 @@ public class Button : View, IDesignable
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
-        // Replace default Select binding with HotKey for mouse clicks
+        // Replace default Activate binding with HotKey for mouse clicks
         MouseBindings.Clear ();
         MouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
         MouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
