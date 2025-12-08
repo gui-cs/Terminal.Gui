@@ -414,8 +414,8 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed and the mouse is pressed, this method handles the pressed events from
     ///     the driver.
-    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Clicked/Activating event
-    ///     each time it is called (after the first time the mouse is pressed).
+    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Clicked/Selecting event
+    ///     via <see cref="Command.Select"/> each time it is called (after the first time the mouse is pressed).
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if processing should stop, <see langword="false"/> otherwise.</returns>
