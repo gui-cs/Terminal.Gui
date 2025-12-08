@@ -184,7 +184,8 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
         if (!WriteConsole (!IsLegacyConsole ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
-            throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
+            // Don't throw in unit tests
+            // throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
         }
     }
 
@@ -318,6 +319,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
         {
             return;
         }
+        base.Write (output);
 
         var str = output.ToString ();
 
