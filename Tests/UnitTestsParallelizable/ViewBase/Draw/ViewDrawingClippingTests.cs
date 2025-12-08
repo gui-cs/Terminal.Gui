@@ -601,9 +601,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                            output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl.Output as FakeOutput;
+        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
 
-        output.WriteLine ("Driver Output After Redraw:\n" + fakeOutput.Output);
+        output.WriteLine ("Driver Output After Redraw:\n" + fakeOutput!.Output);
 
         // BUGBUG: Border.set_LineStyle does not call SetNeedsDraw
         viewWithBorderAtX1!.Border!.LineStyle = LineStyle.Single;
@@ -655,11 +655,11 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
 
         superView.DrawingContent += (s, e) =>
                                     {
-                                        var view = s as View;
-                                        view.AddStr (0, 0, "🍎🍎🍎🍎");
-                                        view.AddStr (0, 1, "🍎🍎🍎🍎");
-                                        view.AddStr (0, 2, "🍎🍎🍎🍎");
-                                        e.DrawContext?.AddDrawnRectangle (view.Viewport);
+                                        View? view = s as View;
+                                        view?.AddStr (0, 0, "🍎🍎🍎🍎");
+                                        view?.AddStr (0, 1, "🍎🍎🍎🍎");
+                                        view?.AddStr (0, 2, "🍎🍎🍎🍎");
+                                        e.DrawContext?.AddDrawnRectangle (view!.Viewport);
                                         e.Cancel = true;
                                     };
 
@@ -690,9 +690,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl.Output as FakeOutput;
+        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
 
-        output.WriteLine ("Driver Output:\n" + fakeOutput.Output);
+        output.WriteLine ("Driver Output:\n" + fakeOutput!.Output);
     }
 
 
@@ -719,11 +719,11 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
 
         superView.DrawingContent += (s, e) =>
         {
-            var view = s as View;
-            view.AddStr (0, 0, "🍎🍎🍎🍎");
-            view.AddStr (0, 1, "🍎🍎🍎🍎");
-            view.AddStr (0, 2, "🍎🍎🍎🍎");
-            e.DrawContext?.AddDrawnRectangle (view.Viewport);
+            View? view = s as View;
+            view?.AddStr (0, 0, "🍎🍎🍎🍎");
+            view?.AddStr (0, 1, "🍎🍎🍎🍎");
+            view?.AddStr (0, 2, "🍎🍎🍎🍎");
+            e.DrawContext?.AddDrawnRectangle (view!.Viewport);
             e.Cancel = true;
         };
 
@@ -754,9 +754,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl.Output as FakeOutput;
+        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
 
-        output.WriteLine ("Driver Output:\n" + fakeOutput.Output);
+        output.WriteLine ("Driver Output:\n" + fakeOutput!.Output);
     }
 
     [Fact]

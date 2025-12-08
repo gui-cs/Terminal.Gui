@@ -211,7 +211,7 @@ internal partial class DriverAssert
         }
         ArgumentNullException.ThrowIfNull (driver);
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl.Output as FakeOutput;
+        FakeOutput? fakeOutput = driverImpl!.Output as FakeOutput;
 
         if (fakeOutput is null)
         {

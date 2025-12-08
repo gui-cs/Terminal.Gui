@@ -756,77 +756,6 @@ public partial class View // Drawing APIs
     ///     The <see cref="DrawContext"/> tracking what regions were drawn by this view and its subviews.
     ///     May be <see langword="null"/> if not tracking drawn regions.
     /// </param>
-    /// <remarks>
-    ///     <para>
-    ///         This method performs three main tasks:
-    ///     </para>
-    ///     <list type="number">
-    ///         <item>
-    ///             <description>
-    ///                 Raises the <see cref="OnDrawComplete"/> virtual method and <see cref="DrawComplete"/> event
-    ///                 to allow subclasses and subscribers to perform post-draw operations.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 Updates <see cref="Driver.Clip"/> to exclude this view's drawn area, preventing views "behind"
-    ///                 this one (earlier in Z-order) from drawing over it. The exclusion behavior differs based on
-    ///                 <see cref="ViewportSettings"/>:
-    ///             </description>
-    ///             <list type="bullet">
-    ///                 <item>
-    ///                     <description>
-    ///                         <b>Transparent views</b> (<see cref="ViewportSettingsFlags.Transparent"/>): Only the
-    ///                         regions that were actually drawn (tracked in <paramref name="context"/>) are excluded
-    ///                         from the clip. This allows views beneath to show through in areas where nothing was drawn.
-    ///                         The drawn region is first clipped to the <see cref="Viewport"/> to prevent excluding
-    ///                         areas outside the visible area. Border and Padding are also excluded as they are opaque.
-    ///                     </description>
-    ///                 </item>
-    ///                 <item>
-    ///                     <description>
-    ///                         <b>Opaque views</b> (default): The entire view area (including Border but not Margin)
-    ///                         is excluded from the clip. This is the typical case where the view is considered
-    ///                         fully opaque and nothing beneath should be visible.
-    ///                     </description>
-    ///                 </item>
-    ///             </list>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 Updates the <paramref name="context"/> to track what was drawn by this view, enabling
-    ///                 the SuperView (if any) to know what regions of its area were covered by this subview.
-    ///             </description>
-    ///         </item>
-    ///     </list>
-    ///     <para>
-    ///         <b>Margin Handling:</b> The <see cref="Margin"/> is never excluded from the clip in this method
-    ///         because margins with shadows are drawn in a separate pass (see <see cref="Margin.DrawMargins"/>)
-    ///         to support transparent shadows that render on top of all content.
-    ///     </para>
-    ///     <para>
-    ///         <b>Adornment Special Case:</b> If this view is an <see cref="Adornment"/> (Margin, Border, or Padding),
-    ///         no clip exclusion occurs. Adornments are managed by their <see cref="Adornment.Parent"/> view's drawing logic.
-    ///     </para>
-    ///     <para>
-    ///         <b>Clip State:</b> When this method is called, <see cref="Driver.Clip"/> has already been restored
-    ///         to the state it was in when <see cref="Draw(DrawContext)"/> began (see the call to
-    ///         <c>SetClip(originalClip)</c> at the end of <see cref="Draw(DrawContext)"/>). This method then
-    ///         further modifies the clip by excluding this view's area.
-    ///     </para>
-    ///     <para>
-    ///         <b>Drawing Order Impact:</b> Because SubViews are drawn before the SuperView's content, and each
-    ///         SubView excludes its area from the clip in its <see cref="DoDrawComplete"/>, when the SuperView's
-    ///         <see cref="DrawingContent"/> event fires, the clip already has "holes" where the SubViews are.
-    ///         This ensures SuperView content doesn't draw over its SubViews.
-    ///     </para>
-    /// </remarks>
-    /// <seealso cref="Draw(DrawContext)"/>
-    /// <seealso cref="OnDrawComplete(DrawContext)"/>
-    /// <seealso cref="DrawComplete"/>
-    /// <seealso cref="ExcludeFromClip(Rectangle)"/>
-    /// <seealso cref="ExcludeFromClip(Region)"/>
-    /// <seealso cref="DrawContext"/>
     private void DoDrawComplete (DrawContext? context)
     {
         // Phase 1: Notify that drawing is complete
@@ -900,7 +829,7 @@ public partial class View // Drawing APIs
     ///     <para>
     ///         This method is called at the very end of <see cref="Draw(DrawContext)"/>, after all drawing
     ///         (adornments, content, text, subviews, line canvas) has completed but before the view's area
-    ///         is excluded from <see cref="Driver.Clip"/>.
+    ///         is excluded from <see cref="IDriver.Clip"/>.
     ///     </para>
     ///     <para>
     ///         Use this method to:
@@ -917,7 +846,7 @@ public partial class View // Drawing APIs
     ///         </item>
     ///     </list>
     ///     <para>
-    ///         <b>Important:</b> At this point, <see cref="Driver.Clip"/> has been restored to the state
+    ///         <b>Important:</b> At this point, <see cref="IDriver.Clip"/> has been restored to the state
     ///         it was in when <see cref="Draw(DrawContext)"/> began. After this method returns, the view's
     ///         area will be excluded from the clip (see <see cref="DoDrawComplete"/> for details).
     ///     </para>
@@ -937,7 +866,7 @@ public partial class View // Drawing APIs
     /// <remarks>
     ///     <para>
     ///         This event is raised at the very end of <see cref="Draw(DrawContext)"/>, after all drawing
-    ///         operations have completed but before the view's area is excluded from <see cref="Driver.Clip"/>.
+    ///         operations have completed but before the view's area is excluded from <see cref="IDriver.Clip"/>.
     ///     </para>
     ///     <para>
     ///         The <see cref="DrawEventArgs.DrawContext"/> property provides information about what regions
