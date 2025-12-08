@@ -18,7 +18,7 @@ public partial class View // Drawing APIs
         // The draw context is used to track the region drawn by each view.
         DrawContext context = new DrawContext ();
 
-        foreach (View view in viewsArray)
+        foreach (View view in viewsArray.Reverse ())
         {
             if (force)
             {
@@ -27,9 +27,6 @@ public partial class View // Drawing APIs
 
             view.Draw (context);
         }
-
-        // Draw the margins last to ensure they are drawn on top of the content.
-        Margin.DrawMargins (viewsArray);
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
@@ -79,6 +76,11 @@ public partial class View // Drawing APIs
             return;
         }
         Region? originalClip = GetClip ();
+
+        if (SuperView is null && Driver is { } && originalClip?.GetRectangles().Length == 0)
+        {
+            originalClip = new (new (Driver.Screen.Location, Driver.Screen.Size));
+        }
 
         // TODO: This can be further optimized by checking NeedsDraw below and only
         // TODO: clearing, drawing text, drawing content, etc. if it is true.
@@ -179,6 +181,18 @@ public partial class View // Drawing APIs
     private void DoDrawAdornmentsSubViews ()
     {
         // NOTE: We do not support subviews of Margin?
+
+        if (Margin?.SubViews is { } && Margin.Thickness != Thickness.Empty && Margin.NeedsDraw)
+        {
+            foreach (View subview in Margin.SubViews)
+            {
+                subview.SetNeedsDraw ();
+            }
+
+            Region? saved = Margin?.AddFrameToClip ();
+            Margin?.DoDrawSubViews ();
+            SetClip (saved);
+        }
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
         {

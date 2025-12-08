@@ -71,7 +71,10 @@ public partial class View
             NeedsDrawRect = new (x, y, w, h);
         }
 
-        // Do not set on Margin - it will be drawn in a separate pass.
+        if (Margin is { } && Margin.Thickness != Thickness.Empty)
+        {
+            Margin?.SetNeedsDraw ();
+        }
 
         if (Border is { } && Border.Thickness != Thickness.Empty)
         {
