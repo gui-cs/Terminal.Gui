@@ -753,15 +753,10 @@ public partial class View // Drawing APIs
     /// This avoids the performance overhead of adding each cell individually while accurately
     /// representing the non-rectangular shape of the lines.
     /// </summary>
-    /// <param name="cellMap">Dictionary of points where line cells are drawn</param>
+    /// <param name="cellMap">Dictionary of points where line cells are drawn (must not be empty)</param>
     /// <returns>A Region encompassing all the line cells</returns>
     private static Region BuildRegionFromLineCells (Dictionary<Point, Cell?> cellMap)
     {
-        if (cellMap.Count == 0)
-        {
-            return new Region ();
-        }
-
         // Group cells by row for efficient horizontal span detection
         var rowGroups = cellMap.Keys
                                .OrderBy (p => p.Y)
@@ -774,6 +769,11 @@ public partial class View // Drawing APIs
         {
             int y = row.Key;
             List<int> xValues = row.Select (p => p.X).OrderBy (x => x).ToList ();
+
+            if (xValues.Count == 0)
+            {
+                continue; // Skip empty rows (shouldn't happen but be safe)
+            }
 
             // Merge contiguous x values into horizontal spans
             int spanStart = xValues [0];
