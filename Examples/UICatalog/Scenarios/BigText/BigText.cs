@@ -247,28 +247,21 @@ public class BigText : View
             return true;
         }
 
-        var lineCanvas = new LineCanvas ();
-        DrawText (lineCanvas, Text, 0, 0, _font, Style, GetAttributeForRole (VisualRole.Normal));
+        // Render directly to a dictionary of filled cells
+        var filledCells = new Dictionary<Point, bool> ();
+        DrawText (filledCells, Text, 0, 0, _font);
 
-        // Get the cell map and render it
-        Dictionary<Point, Cell?> cellMap = lineCanvas.GetCellMap ();
-
-        foreach (KeyValuePair<Point, Cell?> kvp in cellMap)
+        // Render the filled cells
+        foreach (KeyValuePair<Point, bool> kvp in filledCells)
         {
-            if (kvp.Value.HasValue)
+            // Check if position is within viewport
+            if (kvp.Key.X < 0 || kvp.Key.X >= Viewport.Width || kvp.Key.Y < 0 || kvp.Key.Y >= Viewport.Height)
             {
-                Cell cell = kvp.Value.Value;
-
-                // Check if position is within viewport
-                if (kvp.Key.X < 0 || kvp.Key.X >= Viewport.Width || kvp.Key.Y < 0 || kvp.Key.Y >= Viewport.Height)
-                {
-                    continue;
-                }
-
-                // Move to the viewport position and add the grapheme string
-                Move (kvp.Key.X, kvp.Key.Y);
-                AddStr (cell.Grapheme);
+                continue;
             }
+
+            Move (kvp.Key.X, kvp.Key.Y);
+            AddStr ("?"); // Full block character
         }
 
         return true;
@@ -301,23 +294,21 @@ public class BigText : View
     }
 
     /// <summary>
-    ///     Draws text using LineCanvas at the specified position.
+    ///     Draws text as filled glyphs at the specified position.
     /// </summary>
-    /// <param name="canvas">The LineCanvas to draw on.</param>
+    /// <param name="filledCells">Dictionary to store which cells should be filled.</param>
     /// <param name="text">The text to draw.</param>
     /// <param name="x">Starting X position.</param>
     /// <param name="y">Starting Y position.</param>
     /// <param name="font">The font to use for rendering.</param>
-    /// <param name="style">Line style to use.</param>
-    /// <param name="attribute">Optional attribute for the lines.</param>
-    private static void DrawText (LineCanvas canvas, string text, int x, int y, Font? font, LineStyle style, Attribute? attribute)
+    private static void DrawText (Dictionary<Point, bool> filledCells, string text, int x, int y, Font? font)
     {
         if (font is null || string.IsNullOrEmpty (text))
         {
             return;
         }
 
-        var glyphRenderer = new LineCanvasGlyphRenderer (canvas, style, attribute);
+        var glyphRenderer = new FilledGlyphRenderer (filledCells);
         var renderer = new TextRenderer (glyphRenderer);
 
         var options = new TextOptions (font)
@@ -361,22 +352,18 @@ public class BigText : View
     }
 
     /// <summary>
-    ///     A custom glyph renderer that converts font glyph outlines to LineCanvas lines.
+    ///     A custom glyph renderer that fills font glyph outlines with solid blocks.
     /// </summary>
-    private class LineCanvasGlyphRenderer : IGlyphRenderer
+    private class FilledGlyphRenderer : IGlyphRenderer
     {
-        private readonly LineCanvas _canvas;
-        private readonly LineStyle _style;
-        private readonly Attribute? _attribute;
+        private readonly Dictionary<Point, bool> _filledCells;
         private Vector2 _currentPoint;
         private readonly List<Vector2> _currentPath = new ();
-        private readonly int _samplesPerSegment = 5; // Number of line segments to approximate curves
+        private readonly int _samplesPerSegment = 10; // Number of line segments to approximate curves
 
-        public LineCanvasGlyphRenderer (LineCanvas canvas, LineStyle style, Attribute? attribute)
+        public FilledGlyphRenderer (Dictionary<Point, bool> filledCells)
         {
-            _canvas = canvas;
-            _style = style;
-            _attribute = attribute;
+            _filledCells = filledCells;
         }
 
         public bool BeginGlyph (in FontRectangle bounds, in GlyphRendererParameters parameters)
@@ -456,40 +443,76 @@ public class BigText : View
 
         private void ProcessPath ()
         {
-            if (_currentPath.Count < 2)
+            if (_currentPath.Count < 3)
             {
                 return;
             }
 
-            // Convert the path to horizontal and vertical line segments
-            for (var i = 0; i < _currentPath.Count - 1; i++)
+            // Find the bounding box of the path
+            float minY = float.MaxValue;
+            float maxY = float.MinValue;
+
+            foreach (Vector2 point in _currentPath)
             {
-                Vector2 start = _currentPath [i];
-                Vector2 end = _currentPath [i + 1];
+                minY = Math.Min (minY, point.Y);
+                maxY = Math.Max (maxY, point.Y);
+            }
 
-                // Convert to terminal cells (rounding to nearest integer)
-                var x1 = (int)Math.Round (start.X);
-                var y1 = (int)Math.Round (start.Y);
-                var x2 = (int)Math.Round (end.X);
-                var y2 = (int)Math.Round (end.Y);
+            var startRow = (int)Math.Floor (minY);
+            var endRow = (int)Math.Ceiling (maxY);
 
-                // Determine if this is more horizontal or vertical
-                int dx = Math.Abs (x2 - x1);
-                int dy = Math.Abs (y2 - y1);
+            // For each row (scanline), find where the path outline intersects
+            // and fill the cells between intersection pairs
+            for (int row = startRow; row <= endRow; row++)
+            {
+                var intersections = new List<float> ();
 
-                if (dx > dy && dx > 0)
+                // Check each edge of the path polygon
+                for (var i = 0; i < _currentPath.Count; i++)
                 {
-                    // More horizontal - draw horizontal line
-                    int length = Math.Abs (x2 - x1);
-                    int startX = Math.Min (x1, x2);
-                    _canvas.AddLine (new (startX, y1), length, Orientation.Horizontal, _style, _attribute);
+                    Vector2 p1 = _currentPath [i];
+                    Vector2 p2 = _currentPath [(i + 1) % _currentPath.Count];
+
+                    float y1 = p1.Y;
+                    float y2 = p2.Y;
+
+                    // Check if this edge crosses the current scanline
+                    if ((y1 < row && y2 >= row) || (y2 < row && y1 >= row))
+                    {
+                        // Calculate x coordinate where edge intersects this row
+                        if (Math.Abs (y2 - y1) < 0.001f)
+                        {
+                            // Horizontal edge at this row
+                            intersections.Add (p1.X);
+                            intersections.Add (p2.X);
+                        }
+                        else
+                        {
+                            // Interpolate to find x
+                            float t = (row - y1) / (y2 - y1);
+                            float x = p1.X + t * (p2.X - p1.X);
+                            intersections.Add (x);
+                        }
+                    }
                 }
-                else if (dy > 0)
+
+                // Sort intersections and fill cells between pairs
+                if (intersections.Count >= 2)
                 {
-                    // More vertical - draw vertical line
-                    int length = Math.Abs (y2 - y1);
-                    int startY = Math.Min (y1, y2);
-                    _canvas.AddLine (new (x1, startY), length, Orientation.Vertical, _style, _attribute);
+                    intersections.Sort ();
+
+                    // Fill cells between pairs of intersections
+                    for (var i = 0; i < intersections.Count - 1; i += 2)
+                    {
+                        var x1 = (int)Math.Round (intersections [i]);
+                        var x2 = (int)Math.Round (intersections [i + 1]);
+
+                        // Fill all cells in this horizontal span
+                        for (int x = x1; x <= x2; x++)
+                        {
+                            _filledCells [new Point (x, row)] = true;
+                        }
+                    }
                 }
             }
         }
