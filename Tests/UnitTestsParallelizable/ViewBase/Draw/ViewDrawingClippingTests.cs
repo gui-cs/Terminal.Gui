@@ -638,7 +638,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         IApplication app = Application.Create ();
         app.Init ("fake");
         IDriver driver = app!.Driver!;
-        driver.SetScreenSize (6, 3);  // Minimal: 3 cols wide, 1 row high (+ 2 for border top/bottom)
+        driver.SetScreenSize (6, 3);  // Minimal: 6 cols wide (3 for content + 2 for border + 1), 3 rows high (1 for content + 2 for border)
 
         driver!.Clip = new (driver.Screen);
 
@@ -702,7 +702,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         IApplication app = Application.Create ();
         app.Init ("fake");
         IDriver driver = app!.Driver!;
-        driver.SetScreenSize (6, 3);  // Minimal: 3 cols wide, 1 row high (+ 2 for border top/bottom)
+        driver.SetScreenSize (6, 3);  // Screen: 6 cols wide, 3 rows high; enough for 3x3 border subview at col 3 plus content on the left
 
         driver!.Clip = new (driver.Screen);
 
@@ -727,7 +727,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             e.Cancel = true;
         };
 
-        // Minimal border at X=1 (odd column), Width=3, Height=3 (includes border)
+        // Minimal border at X=3 (odd column), Width=3, Height=3 (includes border)
         var viewWithBorder = new View
         {
             Text = "X",

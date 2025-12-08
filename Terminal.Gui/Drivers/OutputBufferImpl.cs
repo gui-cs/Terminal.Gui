@@ -226,7 +226,7 @@ public class OutputBufferImpl : IOutputBuffer
                 break;
 
             default:
-                // Zero-width or non-spacing character (e.g., combining marks)
+                // Negative width or non-spacing character (shouldn't normally occur)
                 Contents! [Row, Col].Grapheme = " ";
                 Contents [Row, Col].IsDirty = false;
 
