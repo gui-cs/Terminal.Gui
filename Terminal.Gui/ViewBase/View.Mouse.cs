@@ -469,7 +469,7 @@ public partial class View // Mouse APIs
             }
         }
 
-        if (!mouseEvent.Handled && WantContinuousButtonPressed && App!.Mouse.MouseGrabView == this)
+        if (!mouseEvent.Handled && WantContinuousButtonPressed && App?.Mouse.MouseGrabView == this)
         {
             // Ignore the return value here, because the semantics of WhenGrabbedHandlePressed is the return
             // value indicates whether processing should stop or not.
