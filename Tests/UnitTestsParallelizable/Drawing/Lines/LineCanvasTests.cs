@@ -1507,4 +1507,360 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
 
         return v;
     }
+
+    #region GetRegion Tests
+
+    [Fact]
+    public void GetRegion_EmptyCellMap_ReturnsEmptyRegion ()
+    {
+        var cellMap = new Dictionary<Point, Cell?> ();
+        Region region = LineCanvas.GetRegion (cellMap);
+        
+        Assert.NotNull (region);
+        Assert.True (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void GetRegion_SingleCell_ReturnsSingleRectangle ()
+    {
+        var cellMap = new Dictionary<Point, Cell?> 
+        { 
+            { new Point (5, 10), new Cell { Grapheme = "X" } } 
+        };
+        
+        Region region = LineCanvas.GetRegion (cellMap);
+        
+        Assert.NotNull (region);
+        Assert.False (region.IsEmpty ());
+        Assert.True (region.Contains (5, 10));
+    }
+
+    [Fact]
+    public void GetRegion_HorizontalLine_CreatesHorizontalSpan ()
+    {
+        var cellMap = new Dictionary<Point, Cell?> ();
+        // Horizontal line from (5, 10) to (9, 10)
+        for (int x = 5; x <= 9; x++)
+        {
+            cellMap.Add (new Point (x, 10), new Cell { Grapheme = "─" });
+        }
+        
+        Region region = LineCanvas.GetRegion (cellMap);
+        
+        Assert.NotNull (region);
+        // All cells in the horizontal span should be in the region
+        for (int x = 5; x <= 9; x++)
+        {
+            Assert.True (region.Contains (x, 10), $"Expected ({x}, 10) to be in region");
+        }
+        // Cells outside the span should not be in the region
+        Assert.False (region.Contains (4, 10));
+        Assert.False (region.Contains (10, 10));
+        Assert.False (region.Contains (7, 9));
+        Assert.False (region.Contains (7, 11));
+    }
+
+    [Fact]
+    public void GetRegion_VerticalLine_CreatesMultipleHorizontalSpans ()
+    {
+        var cellMap = new Dictionary<Point, Cell?> ();
+        // Vertical line from (5, 10) to (5, 14)
+        for (int y = 10; y <= 14; y++)
+        {
+            cellMap.Add (new Point (5, y), new Cell { Grapheme = "│" });
+        }
+        
+        Region region = LineCanvas.GetRegion (cellMap);
+        
+        Assert.NotNull (region);
+        // All cells in the vertical line should be in the region
+        for (int y = 10; y <= 14; y++)
+        {
+            Assert.True (region.Contains (5, y), $"Expected (5, {y}) to be in region");
+        }
+        // Cells outside should not be in the region
+        Assert.False (region.Contains (4, 12));
+        Assert.False (region.Contains (6, 12));
+    }
+
+    [Fact]
+    public void GetRegion_LShape_CreatesCorrectSpans ()
+    {
+        var cellMap = new Dictionary<Point, Cell?> ();
+        // L-shape: horizontal line from (0, 0) to (5, 0), then vertical to (5, 3)
+        for (int x = 0; x <= 5; x++)
+        {
+            cellMap.Add (new Point (x, 0), new Cell { Grapheme = "─" });
+        }
+        for (int y = 1; y <= 3; y++)
+        {
+            cellMap.Add (new Point (5, y), new Cell { Grapheme = "│" });
+        }
+        
+        Region region = LineCanvas.GetRegion (cellMap);
+        
+        // Horizontal part
+        for (int x = 0; x <= 5; x++)
+        {
+            Assert.True (region.Contains (x, 0), $"Expected ({x}, 0) to be in region");
+        }
+        // Vertical part
+        for (int y = 1; y <= 3; y++)
+        {
+            Assert.True (region.Contains (5, y), $"Expected (5, {y}) to be in region");
+        }
+        // Empty cells should not be in region
+        Assert.False (region.Contains (1, 1));
+        Assert.False (region.Contains (4, 2));
+    }
+
+    [Fact]
+    public void GetRegion_DiscontiguousHorizontalCells_CreatesSeparateSpans ()
+    {
+        var cellMap = new Dictionary<Point, Cell?> 
+        {
+            { new Point (0, 5), new Cell { Grapheme = "X" } },
+            { new Point (1, 5), new Cell { Grapheme = "X" } },
+            // Gap at (2, 5)
+            { new Point (3, 5), new Cell { Grapheme = "X" } },
+            { new Point (4, 5), new Cell { Grapheme = "X" } }
+        };
+        
+        Region region = LineCanvas.GetRegion (cellMap);
+        
+        Assert.True (region.Contains (0, 5));
+        Assert.True (region.Contains (1, 5));
+        Assert.False (region.Contains (2, 5)); // Gap
+        Assert.True (region.Contains (3, 5));
+        Assert.True (region.Contains (4, 5));
+    }
+
+    [Fact]
+    public void GetRegion_IntersectingLines_CreatesCorrectRegion ()
+    {
+        var cellMap = new Dictionary<Point, Cell?> ();
+        // Horizontal line
+        for (int x = 0; x <= 4; x++)
+        {
+            cellMap.Add (new Point (x, 2), new Cell { Grapheme = "─" });
+        }
+        // Vertical line intersecting at (2, 2)
+        for (int y = 0; y <= 4; y++)
+        {
+            cellMap [new Point (2, y)] = new Cell { Grapheme = "┼" };
+        }
+        
+        Region region = LineCanvas.GetRegion (cellMap);
+        
+        // Horizontal line
+        for (int x = 0; x <= 4; x++)
+        {
+            Assert.True (region.Contains (x, 2), $"Expected ({x}, 2) to be in region");
+        }
+        // Vertical line
+        for (int y = 0; y <= 4; y++)
+        {
+            Assert.True (region.Contains (2, y), $"Expected (2, {y}) to be in region");
+        }
+    }
+
+    #endregion
+
+    #region GetCellMapWithRegion Tests
+
+    [Fact]
+    public void GetCellMapWithRegion_EmptyCanvas_ReturnsEmptyMapAndRegion ()
+    {
+        var canvas = new LineCanvas ();
+        
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+        
+        Assert.NotNull (cellMap);
+        Assert.Empty (cellMap);
+        Assert.NotNull (region);
+        Assert.True (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_SingleHorizontalLine_ReturnsCellMapAndRegion ()
+    {
+        var canvas = new LineCanvas ();
+        canvas.AddLine (new Point (5, 10), 5, Orientation.Horizontal, LineStyle.Single);
+        
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+        
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+        Assert.False (region.IsEmpty ());
+        
+        // Both cellMap and region should contain the same cells
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_SingleVerticalLine_ReturnsCellMapAndRegion ()
+    {
+        var canvas = new LineCanvas ();
+        canvas.AddLine (new Point (5, 10), 5, Orientation.Vertical, LineStyle.Single);
+        
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+        
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+        Assert.False (region.IsEmpty ());
+        
+        // Both cellMap and region should contain the same cells
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_IntersectingLines_CorrectlyHandlesIntersection ()
+    {
+        var canvas = new LineCanvas ();
+        // Create a cross pattern
+        canvas.AddLine (new Point (0, 2), 5, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (2, 0), 5, Orientation.Vertical, LineStyle.Single);
+        
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+        
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+        
+        // Verify intersection point is in both
+        Assert.True (cellMap.ContainsKey (new Point (2, 2)), "Intersection should be in cellMap");
+        Assert.True (region.Contains (2, 2), "Intersection should be in region");
+        
+        // All cells should be in both structures
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_ComplexShape_RegionMatchesCellMap ()
+    {
+        var canvas = new LineCanvas ();
+        // Create a box
+        canvas.AddLine (new Point (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (0, 3), 5, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (0, 0), 4, Orientation.Vertical, LineStyle.Single);
+        canvas.AddLine (new Point (4, 0), 4, Orientation.Vertical, LineStyle.Single);
+        
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+        
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+        
+        // Every cell in the map should be in the region
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+        
+        // Cells not in the map should not be in the region (interior of box)
+        Assert.False (cellMap.ContainsKey (new Point (2, 1)));
+        // Note: Region might contain interior if it's filled, so we just verify consistency
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_ResultsMatchSeparateCalls ()
+    {
+        var canvas = new LineCanvas ();
+        // Create a complex pattern
+        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (5, 0), 10, Orientation.Vertical, LineStyle.Single);
+        canvas.AddLine (new Point (0, 5), 10, Orientation.Horizontal, LineStyle.Double);
+        
+        // Get results from combined method
+        (Dictionary<Point, Cell?> combinedCellMap, Region combinedRegion) = canvas.GetCellMapWithRegion ();
+        
+        // Get results from separate calls
+        Dictionary<Point, Cell?> separateCellMap = canvas.GetCellMap ();
+        Region separateRegion = LineCanvas.GetRegion (separateCellMap);
+        
+        // Cell maps should be identical
+        Assert.Equal (separateCellMap.Count, combinedCellMap.Count);
+        foreach (var kvp in separateCellMap)
+        {
+            Assert.True (combinedCellMap.ContainsKey (kvp.Key), $"Combined map missing key {kvp.Key}");
+        }
+        
+        // Regions should contain the same points
+        foreach (Point p in combinedCellMap.Keys)
+        {
+            Assert.True (combinedRegion.Contains (p.X, p.Y), $"Combined region missing ({p.X}, {p.Y})");
+            Assert.True (separateRegion.Contains (p.X, p.Y), $"Separate region missing ({p.X}, {p.Y})");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_NegativeCoordinates_HandlesCorrectly ()
+    {
+        var canvas = new LineCanvas ();
+        canvas.AddLine (new Point (-5, -5), 10, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (0, -5), 10, Orientation.Vertical, LineStyle.Single);
+        
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+        
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+        
+        // Verify negative coordinates are handled
+        Assert.True (cellMap.Keys.Any (p => p.X < 0 || p.Y < 0), "Should have negative coordinates");
+        
+        // All cells should be in region
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_WithExclusion_RegionExcludesExcludedCells ()
+    {
+        var canvas = new LineCanvas ();
+        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+        
+        // Exclude middle section
+        var exclusionRegion = new Region ();
+        exclusionRegion.Combine (new Rectangle (3, 0, 4, 1), RegionOp.Union);
+        canvas.Exclude (exclusionRegion);
+        
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+        
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        
+        // Excluded cells should not be in cellMap
+        for (int x = 3; x < 7; x++)
+        {
+            Assert.False (cellMap.ContainsKey (new Point (x, 0)), $"({x}, 0) should be excluded from cellMap");
+        }
+        
+        // Region should match cellMap
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+        
+        // Excluded points should not be in region
+        for (int x = 3; x < 7; x++)
+        {
+            Assert.False (region.Contains (x, 0), $"({x}, 0) should be excluded from region");
+        }
+    }
+
+    #endregion
 }
