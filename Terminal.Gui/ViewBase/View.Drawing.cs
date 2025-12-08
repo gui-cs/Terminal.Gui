@@ -735,8 +735,13 @@ public partial class View // Drawing APIs
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddStr (p.Value.Value.Grapheme);
+
+                    // Add each drawn cell to the context
+                    //context?.AddDrawnRectangle (new Rectangle (p.Key, new (1, 1)) );
                 }
             }
+
+            LineCanvas.Clear ();
         }
     }
 
