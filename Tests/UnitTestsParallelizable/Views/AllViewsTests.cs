@@ -147,12 +147,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         }
 
         var selectingCount = 0;
-        view.Selecting += (s, e) => selectingCount++;
+        view.Activating += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
         view.Accepting += (s, e) => { acceptedCount++; };
 
-        if (view.InvokeCommand (Command.Select) == true)
+        if (view.InvokeCommand (Command.Activate) == true)
         {
             Assert.Equal (1, selectingCount);
             Assert.Equal (0, acceptedCount);
@@ -179,7 +179,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         }
 
         var selectingCount = 0;
-        view.Selecting += (s, e) => selectingCount++;
+        view.Activating += (s, e) => selectingCount++;
 
         var acceptingCount = 0;
         view.Accepting += (s, e) => { acceptingCount++; };

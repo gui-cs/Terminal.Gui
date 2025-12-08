@@ -58,7 +58,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         var selectingCount = 0;
-        testView.Selecting += (sender, args) => selectingCount++;
+        testView.Activating += (sender, args) => selectingCount++;
 
         testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);

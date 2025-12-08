@@ -24,7 +24,7 @@ internal class TabRow : View
             Visible = false,
             Text = Glyphs.RightArrow.ToString ()
         };
-        _rightScrollIndicator.Selecting += (s, e) =>
+        _rightScrollIndicator.Activating += (s, e) =>
         {
             _host.Tab_Selecting (s, e);
         };
@@ -37,7 +37,7 @@ internal class TabRow : View
             Visible = false,
             Text = Glyphs.LeftArrow.ToString ()
         };
-        _leftScrollIndicator.Selecting += (s, e) =>
+        _leftScrollIndicator.Activating += (s, e) =>
         {
             _host.Tab_Selecting (s, e);
         };

@@ -287,7 +287,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         var selectingCount = 0;
 
-        button.Selecting += (s, e) => selectingCount++;
+        button.Activating += (s, e) => selectingCount++;
         var acceptedCount = 0;
 
         button.Accepting += (s, e) =>
@@ -343,7 +343,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         var selectingCount = 0;
 
-        button.Selecting += (s, e) =>
+        button.Activating += (s, e) =>
                             {
                                 selectingCount++;
                                 e.Handled = true;

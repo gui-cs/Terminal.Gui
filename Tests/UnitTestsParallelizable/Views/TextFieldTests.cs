@@ -49,7 +49,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     {
         TextField tf = new ();
 
-        tf.Selecting += (sender, args) => Assert.Fail ("Selected should not be raied.");
+        tf.Activating += (sender, args) => Assert.Fail ("Selected should not be raied.");
 
         Runnable top = new ();
         top.Add (tf);
@@ -65,7 +65,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         TextField tf = new ();
 
         var selectingCount = 0;
-        tf.Selecting += (sender, args) => selectingCount++;
+        tf.Activating += (sender, args) => selectingCount++;
 
         Runnable top = new ();
         top.Add (tf);

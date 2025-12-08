@@ -80,15 +80,15 @@ public abstract class SelectorBase : View, IOrientation
         if ((HasFocus || !CanFocus) && HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
         {
             // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Select)
-            return Focused?.InvokeCommand (Command.Select, args.Context) is true;
+            return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
         }
         return base.OnHandlingHotKey (args);
     }
 
     /// <inheritdoc />
-    protected override bool OnSelecting (CommandEventArgs args)
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        return base.OnSelecting (args);
+        return base.OnActivating (args);
     }
 
     private int? _value;

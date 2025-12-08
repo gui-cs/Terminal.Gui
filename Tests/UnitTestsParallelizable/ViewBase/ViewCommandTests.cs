@@ -256,7 +256,7 @@ public class ViewCommandTests
         Assert.Equal (canFocus, view.CanFocus);
         Assert.False (view.HasFocus);
 
-        view.InvokeCommand (Command.Select);
+        view.InvokeCommand (Command.Activate);
 
         Assert.Equal (1, view.OnSelectingCount);
 
@@ -271,8 +271,8 @@ public class ViewCommandTests
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        view.HandleOnSelecting = true;
-        Assert.True (view.InvokeCommand (Command.Select));
+        view.HandleOnActivating = true;
+        Assert.True (view.InvokeCommand (Command.Activate));
 
         Assert.Equal (1, view.OnSelectingCount);
 
@@ -285,9 +285,9 @@ public class ViewCommandTests
         var view = new View ();
         var selectingInvoked = false;
 
-        view.Selecting += ViewOnSelect;
+        view.Activating += ViewOnSelect;
 
-        bool? ret = view.InvokeCommand (Command.Select);
+        bool? ret = view.InvokeCommand (Command.Activate);
         Assert.True (ret);
         Assert.True (selectingInvoked);
 
@@ -306,14 +306,14 @@ public class ViewCommandTests
         var view = new View ();
         var selecting = false;
 
-        view.Selecting += ViewOnSelecting;
+        view.Activating += ViewOnActivating;
 
-        view.InvokeCommand (Command.Select);
+        view.InvokeCommand (Command.Activate);
         Assert.True (selecting);
 
         return;
 
-        void ViewOnSelecting (object? sender, CommandEventArgs e) { selecting = true; }
+        void ViewOnActivating (object? sender, CommandEventArgs e) { selecting = true; }
     }
 
     [Fact]
@@ -402,7 +402,7 @@ public class ViewCommandTests
                                   HandlingHotKeyCount++;
                               };
 
-            Selecting += (s, a) =>
+            Activating += (s, a) =>
                          {
                              a.Handled = HandleSelecting;
                              SelectingCount++;
@@ -445,16 +445,16 @@ public class ViewCommandTests
 
         public int OnSelectingCount { get; set; }
         public int SelectingCount { get; set; }
-        public bool HandleOnSelecting { get; set; }
+        public bool HandleOnActivating { get; set; }
         public bool HandleSelecting { get; set; }
 
 
         /// <inheritdoc/>
-        protected override bool OnSelecting (CommandEventArgs args)
+        protected override bool OnActivating (CommandEventArgs args)
         {
             OnSelectingCount++;
 
-            return HandleOnSelecting;
+            return HandleOnActivating;
         }
 
         public int OnCommandNotBoundCount { get; set; }

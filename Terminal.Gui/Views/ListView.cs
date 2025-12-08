@@ -59,10 +59,10 @@ public class ListView : View, IDesignable
 
         // Things this view knows how to do
         // 
-        AddCommand (Command.Up, ctx => RaiseSelecting (ctx) == true || MoveUp ());
-        AddCommand (Command.Down, ctx => RaiseSelecting (ctx) == true || MoveDown ());
+        AddCommand (Command.Up, ctx => RaiseActivating (ctx) == true || MoveUp ());
+        AddCommand (Command.Down, ctx => RaiseActivating (ctx) == true || MoveDown ());
 
-        // TODO: add RaiseSelecting to all of these
+        // TODO: add RaiseActivating to all of these
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => MovePageUp ());
@@ -87,7 +87,7 @@ public class ListView : View, IDesignable
 
         // Select (Space key and single-click) - If markable, change mark and raise Select event
         AddCommand (
-                    Command.Select,
+                    Command.Activate,
                     ctx =>
                     {
                         if (!_allowsMarking)
@@ -95,7 +95,7 @@ public class ListView : View, IDesignable
                             return false;
                         }
 
-                        if (RaiseSelecting (ctx) == true)
+                        if (RaiseActivating (ctx) == true)
                         {
                             return true;
                         }
@@ -115,7 +115,7 @@ public class ListView : View, IDesignable
 
                         SelectedItem = 0;
 
-                        if (RaiseSelecting (ctx) == true)
+                        if (RaiseActivating (ctx) == true)
                         {
                             return true;
                         }
@@ -151,8 +151,8 @@ public class ListView : View, IDesignable
 
         KeyBindings.Add (Key.End, Command.End);
 
-        // Key.Space is already bound to Command.Select; this gives us select then move down
-        KeyBindings.Add (Key.Space.WithShift, Command.Select, Command.Down);
+        // Key.Space is already bound to Command.Activate; this gives us select then move down
+        KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);
 
         // Use the form of Add that lets us pass context to the handler
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));

@@ -31,7 +31,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.CheckedStateChanging += OnCheckboxOnCheckedStateChanging;
         checkbox.CheckedStateChanged += OnCheckboxOnCheckedStateChanged;
-        checkbox.Selecting += OnCheckboxOnSelecting;
+        checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
@@ -76,7 +76,7 @@ public class FlagSelector : SelectorBase, IDesignable
         Value = newValue;
     }
 
-    private void OnCheckboxOnSelecting (object? sender, CommandEventArgs args)
+    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -91,7 +91,7 @@ public class FlagSelector : SelectorBase, IDesignable
         }
 
         // Selecting doesn't normally propogate, so we do it here
-        if (InvokeCommand (Command.Select, args.Context) is true)
+        if (InvokeCommand (Command.Activate, args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
             args.Handled = true;

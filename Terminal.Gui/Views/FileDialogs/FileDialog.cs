@@ -194,8 +194,8 @@ public class FileDialog : Dialog, IDesignable
             Id = "_tableView"
         };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
-        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
-        _tableView.Selecting += OnTableViewSelecting;
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        _tableView.Activating += OnTableViewSelecting;
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);

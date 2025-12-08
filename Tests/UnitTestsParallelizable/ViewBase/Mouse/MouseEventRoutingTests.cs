@@ -195,7 +195,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
 
         int selectingCount = 0;
-        subView.Selecting += (_, _) => selectingCount++;
+        subView.Activating += (_, _) => selectingCount++;
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -395,7 +395,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         bool selectingCalled = false;
-        view.Selecting += (_, _) => { selectingCalled = true; };
+        view.Activating += (_, _) => { selectingCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -468,7 +468,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (view);
 
         int selectingCount = 0;
-        view.Selecting += (_, _) => selectingCount++;
+        view.Activating += (_, _) => selectingCount++;
 
         MouseEventArgs mouseEvent = new ()
         {

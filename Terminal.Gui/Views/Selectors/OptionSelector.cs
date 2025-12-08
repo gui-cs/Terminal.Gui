@@ -43,14 +43,14 @@ public class OptionSelector : SelectorBase, IDesignable
         }
         if (!CanFocus)
         {
-            if (RaiseSelecting (args.Context) is true)
+            if (RaiseActivating (args.Context) is true)
             {
                 return true;
             }
         }
         else if (!HasFocus && Value is null)
         {
-            if (RaiseSelecting (args.Context) is true)
+            if (RaiseActivating (args.Context) is true)
             {
                 return true;
             }
@@ -63,9 +63,9 @@ public class OptionSelector : SelectorBase, IDesignable
     }
 
     /// <inheritdoc />
-    protected override bool OnSelecting (CommandEventArgs args)
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        if (base.OnSelecting (args) is true)
+        if (base.OnActivating (args) is true)
         {
             return true;
         }
@@ -112,12 +112,12 @@ public class OptionSelector : SelectorBase, IDesignable
 
         checkbox.RadioStyle = true;
 
-        checkbox.Selecting += OnCheckboxOnSelecting;
+        checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
 
-    private void OnCheckboxOnSelecting (object? sender, CommandEventArgs args)
+    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -149,7 +149,7 @@ public class OptionSelector : SelectorBase, IDesignable
         }
 
         // Selecting doesn't normally propogate, so we do it here
-        if (InvokeCommand (Command.Select, args.Context) is true)
+        if (InvokeCommand (Command.Activate, args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
             args.Handled = true;

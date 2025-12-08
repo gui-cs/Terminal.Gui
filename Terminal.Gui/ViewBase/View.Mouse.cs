@@ -19,11 +19,11 @@ public partial class View // Mouse APIs
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
-        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button2Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button3Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Select);
+        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button2Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
     }
 
     /// <summary>
@@ -472,7 +472,7 @@ public partial class View // Mouse APIs
             // If mouse is still in bounds, generate a click
             if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
             {
-                // By default, this will raise Selecting/OnSelecting - Subclasses can override this via AddCommand (Command.Select ...).
+                // By default, this will raise Activating/OnActivating - Subclasses can override this via AddCommand (Command.Activate ...).
                 mouseEvent.Handled = InvokeCommandsBoundToMouse (mouseEvent) == true;
             }
 

@@ -119,7 +119,7 @@ public class MouseTests : TestsAllViews
 
         var selectingCount = 0;
 
-        view.Selecting += (s, e) => selectingCount++;
+        view.Activating += (s, e) => selectingCount++;
 
         me.Flags = clicked;
         view.NewMouseEvent (me);

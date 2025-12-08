@@ -42,7 +42,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         _tableView = table;
         _tree = tree;
         _tableView.KeyDown += Table_KeyPress;
-        _tableView.Selecting += Table_Selecting;
+        _tableView.Activating += Table_Selecting;
 
         List<string> colList = subsequentColumns.Keys.ToList ();
         colList.Insert (0, firstColumnName);
@@ -56,7 +56,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     public void Dispose ()
     {
         _tableView.KeyDown -= Table_KeyPress;
-        _tableView.Selecting -= Table_Selecting;
+        _tableView.Activating -= Table_Selecting;
         _tree.Dispose ();
     }
 
