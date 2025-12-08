@@ -730,11 +730,12 @@ public partial class View // Drawing APIs
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddStr (p.Value.Value.Grapheme);
-
-                    // Add each drawn cell to the context
-                    context?.AddDrawnRectangle (new Rectangle (p.Key, new (1, 1)) );
                 }
             }
+
+            // PERF: Report the entire LineCanvas bounds as drawn, not each individual cell
+            // Reporting per-cell caused 10x slowdown (90s vs 9s) in AllViews_Draw_Does_Not_Layout test
+            context?.AddDrawnRectangle (LineCanvas.Bounds);
 
             LineCanvas.Clear ();
         }
