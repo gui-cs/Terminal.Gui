@@ -27,15 +27,6 @@ public class Label : View, IDesignable
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
 
         TitleChanged += Label_TitleChanged;
-        MouseClick += Label_MouseClick;
-    }
-
-    private void Label_MouseClick (object? sender, MouseEventArgs e)
-    {
-        if (!CanFocus)
-        {
-            e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, this)) == true;
-        }
     }
 
     private void Label_TitleChanged (object? sender, EventArgs<string> e)
@@ -87,6 +78,18 @@ public class Label : View, IDesignable
         }
 
         return false;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnSelecting (CommandEventArgs args)
+    {
+        // If Label can't focus and is clicked, invoke HotKey on next peer
+        if (!CanFocus)
+        {
+            return InvokeCommand (Command.HotKey, args.Context) == true;
+        }
+
+        return base.OnSelecting (args);
     }
 
     /// <inheritdoc/>

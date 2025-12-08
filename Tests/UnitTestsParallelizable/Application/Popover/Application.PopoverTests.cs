@@ -2,7 +2,7 @@
 using Moq;
 using Terminal.Gui.App;
 
-namespace ApplicationTests;
+namespace ApplicationTests.Popover;
 
 public class ApplicationPopoverTests
 {

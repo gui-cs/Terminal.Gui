@@ -4,10 +4,7 @@ using System.ComponentModel;
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Specifies the event arguments for <see cref="MouseEventArgs"/>. This is a higher-level construct than
-///     the wrapped <see cref="MouseEventArgs"/> class and is used for the events defined on
-///     <see cref="View"/> and subclasses
-///     of View (e.g. <see cref="View.MouseEnter"/> and <see cref="View.MouseClick"/>).
+///     Specifies the event arguments for <see cref="MouseEventArgs"/>.
 /// </summary>
 public class MouseEventArgs : HandledEventArgs
 {

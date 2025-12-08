@@ -195,7 +195,7 @@ public class FileDialog : Dialog, IDesignable
         };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
-        _tableView.MouseClick += OnTableViewMouseClick;
+        _tableView.Selecting += OnTableViewSelecting;
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -1046,29 +1046,35 @@ public class FileDialog : Dialog, IDesignable
         }
     }
 
-    private void OnTableViewMouseClick (object? sender, MouseEventArgs e)
+    private void OnTableViewSelecting (object? sender, CommandEventArgs e)
     {
-        Point? clickedCell = _tableView.ScreenToCell (e.Position.X, e.Position.Y, out int? clickedCol);
+        // Only handle mouse clicks, not keyboard selections
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        {
+            return;
+        }
+
+        Point? clickedCell = _tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
-            if (e.Flags.HasFlag (MouseFlags.Button1Clicked))
+            if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
             }
-            else if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+            else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in a header
-                ShowHeaderContextMenu (clickedCol.Value, e);
+                ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
             }
         }
         else
         {
-            if (clickedCell is { } && e.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in rest of table
-                ShowCellContextMenu (clickedCell, e);
+                ShowCellContextMenu (clickedCell, mouseArgs);
             }
         }
     }

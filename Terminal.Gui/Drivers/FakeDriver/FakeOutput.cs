@@ -7,29 +7,29 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class FakeOutput : OutputBase, IOutput
 {
-    private readonly StringBuilder _output = new ();
+   // private readonly StringBuilder _outputStringBuilder = new ();
     private int _cursorLeft;
     private int _cursorTop;
     private Size _consoleSize = new (80, 25);
+    private IOutputBuffer? _lastBuffer;
 
     /// <summary>
     /// 
     /// </summary>
     public FakeOutput ()
     {
-        LastBuffer = new OutputBufferImpl ();
-        LastBuffer.SetSize (80, 25);
+        _lastBuffer = new OutputBufferImpl ();
+        _lastBuffer.SetSize (80, 25);
     }
 
     /// <summary>
-    ///     Gets or sets the last output buffer written.
+    ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
+    ///     a reference to the buffer last written with <see cref="Write(IOutputBuffer)"/>.
     /// </summary>
-    public IOutputBuffer? LastBuffer { get; set; }
+    public IOutputBuffer? GetLastBuffer () => _lastBuffer;
 
-    /// <summary>
-    ///     Gets the captured output as a string.
-    /// </summary>
-    public string Output => _output.ToString ();
+    ///// <inheritdoc cref="IOutput.GetLastOutput"/>
+    //public override string GetLastOutput () => _outputStringBuilder.ToString ();
 
     /// <inheritdoc />
     public Point GetCursorPosition ()
@@ -61,26 +61,26 @@ public class FakeOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
-        _output.Append (text);
+//        _outputStringBuilder.Append (text);
     }
 
-    /// <inheritdoc cref="IDriver"/>
+    /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public override void Write (IOutputBuffer buffer)
     {
-        LastBuffer = buffer;
+        _lastBuffer = buffer;
         base.Write (buffer);
     }
+
+    ///// <inheritdoc/>
+    //protected override void Write (StringBuilder output)
+    //{
+    //    _outputStringBuilder.Append (output);
+    //}
 
     /// <inheritdoc cref="IDriver"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
         // Capture but don't act on it in fake output
-    }
-
-    /// <inheritdoc/>
-    public void Dispose ()
-    {
-        // Nothing to dispose
     }
 
     /// <inheritdoc/>
@@ -123,8 +123,8 @@ public class FakeOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
-    protected override void Write (StringBuilder output)
+    public void Dispose ()
     {
-        _output.Append (output);
+        // Nothing to dispose
     }
 }
