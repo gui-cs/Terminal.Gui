@@ -59,26 +59,43 @@ This diagram illustrates the complete command flow in a complex hierarchical sce
 
 ```mermaid
 flowchart TD
-    subgraph ShortcutActivation["Scenario 1: Shortcut (Alt+F)"]
-        sc_input["Alt+F"] --> sc_find["Shortcut finds MenuBarItem"]
+    subgraph Scenario1["Scenario 1: Shortcut Activation (Alt+F)"]
+        sc_input["Alt+F pressed"] --> sc_find["Shortcut finds MenuBarItem"]
         sc_find --> sc_hotkey["MenuBarItem.InvokeCommand(HotKey)"]
-        sc_hotkey --> sc_focus["MenuBarItem sets focus"]
+        sc_hotkey --> sc_pre["OnHandlingHotKey + HandlingHotKey"]
+        sc_pre --> sc_focus["MenuBarItem sets focus"]
         sc_focus --> sc_show["MenuBar shows popover for MenuBarItem"]
     end
 
-    subgraph MenuNavigation["Scenario 2: Navigate items"]
-        nav_input["Arrow keys"] --> nav_activate["MenuItem.InvokeCommand(Activate)"]
-        nav_activate --> nav_pre["OnActivating + Activating"]
-        nav_pre --> nav_focus["MenuItem focus + Menu.SelectedMenuItemChanged"]
+    subgraph Scenario2["Scenario 2: Menu Navigation (Arrow Keys)"]
+        nav_input["Arrow keys pressed"] --> nav_activate["MenuItem.InvokeCommand(Activate)"]
+        nav_activate --> nav_pre["MenuItem OnActivating + Activating"]
+        nav_pre --> |not canceled| nav_focus["MenuItem sets focus"]
+        nav_focus --> nav_changed["Menu.SelectedMenuItemChanged raised"]
+        nav_changed --> nav_bar["MenuBar.OnSelectedMenuItemChanged"]
+        nav_bar --> nav_done["Update popover visibility if needed"]
+        nav_pre --> |canceled| nav_stop["Stop"]
     end
 
-    subgraph MenuAccept["Scenario 3: Accept item (Enter)"]
-        acc_input["Enter"] --> acc_pre["MenuItem OnAccepting + Accepting"]
-        acc_pre --> |has action| acc_exec["Execute action"]
-        acc_exec --> acc_accept["RaiseAccepted (MenuItem → Menu → MenuBar)"]
-        acc_accept --> acc_close["MenuBar hides popover, focus returns"]
-
-        acc_pre --> |has submenu| acc_sub["Invoke parent Menu.Accept"]
+    subgraph Scenario3["Scenario 3: Accept Menu Item (Enter)"]
+        acc_input["Enter pressed on MenuItem"] --> acc_pre["MenuItem OnAccepting + Accepting"]
+        acc_pre --> |canceled| acc_stop["Stop"]
+        acc_pre --> |has action| acc_exec["Execute menu item action"]
+        acc_exec --> acc_accepted["MenuItem.RaiseAccepted"]
+        acc_accepted --> acc_menu["Menu.OnAccepted propagates"]
+        acc_menu --> acc_bar["MenuBar.OnAccepted"]
+        acc_bar --> acc_close["MenuBar hides popover, deactivates"]
+        
+        acc_pre --> |has submenu| acc_sub["Propagate to parent Menu.Accept"]
         acc_sub --> acc_popover["Show submenu popover"]
+        acc_popover --> acc_submenu_done["Submenu displayed"]
     end
 ```
+
+**Key Points:**
+- **Scenario 1 (HotKey)**: Shortcut activates menu bar item via `Command.HotKey`, which sets focus and triggers MenuBar to show the popover
+- **Scenario 2 (Activate)**: Arrow keys navigate menu items via `Command.Activate`, which is handled locally but raises `SelectedMenuItemChanged` for MenuBar coordination
+- **Scenario 3 (Accept)**: Enter key executes menu items via `Command.Accept`, followed by `Accepted` event propagating up (MenuItem → Menu → MenuBar) to close menus
+- `Command.Activate` doesn't propagate but uses view-specific event (`SelectedMenuItemChanged`) for hierarchical coordination
+- `Accepted` is a post-event (not part of Cancellable Work Pattern pre-event phase) that signals action completion
+- MenuBar uses `SelectedMenuItemChanged` to manage popover visibility, demonstrating current workaround for lack of generic `Activate` propagation
