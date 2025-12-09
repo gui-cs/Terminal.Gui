@@ -77,7 +77,7 @@ public partial class View // Drawing APIs
         }
         Region? originalClip = GetClip ();
 
-        if (SuperView is null && Driver is { } && originalClip?.GetRectangles().Length == 0)
+        if (SuperView is null && Driver is { })
         {
             originalClip = new (new (Driver.Screen.Location, Driver.Screen.Size));
         }
@@ -164,10 +164,6 @@ public partial class View // Drawing APIs
         }
 
         // ------------------------------------
-        // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
-        Margin?.CacheClip ();
-
-        // ------------------------------------
         // Reset the clip to what it was when we started
         SetClip (originalClip);
 
@@ -244,9 +240,9 @@ public partial class View // Drawing APIs
         if (SubViewNeedsDraw)
         {
             // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
+            Margin?.SetNeedsDraw ();
             Border?.SetNeedsDraw ();
             Padding?.SetNeedsDraw ();
-            Margin?.SetNeedsDraw ();
         }
 
         if (OnDrawingAdornments ())
@@ -269,7 +265,10 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void DrawAdornments ()
     {
-        // We do not attempt to draw Margin. It is drawn in a separate pass.
+        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
+        {
+            Margin?.Draw ();
+        }
 
         // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
@@ -281,11 +280,6 @@ public partial class View // Drawing APIs
         if (Padding is { } && Padding.Thickness != Thickness.Empty)
         {
             Padding?.Draw ();
-        }
-
-        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
-        {
-            Margin?.Draw ();
         }
     }
 
