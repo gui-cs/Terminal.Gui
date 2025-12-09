@@ -3,11 +3,20 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Mouse;
 
-
-[Collection ("Global Test Setup")]
 [Trait ("Category", "Input")]
 public class MouseTests (ITestOutputHelper output) : TestsAllViews
 {
+    [Fact]
+    public void Default_MouseBindings ()
+    {
+        var testView = new View ();
+
+        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+//        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+
+        Assert.Equal (5, testView.MouseBindings.GetBindings ().Count ());
+    }
+
     [Theory]
     [InlineData (false, false, false)]
     [InlineData (true, false, true)]
@@ -39,7 +48,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (false, false, 1)]
     [InlineData (true, false, 1)]
     [InlineData (true, true, 1)]
-    public void MouseClick_Raises_Selecting (bool canFocus, bool setFocus, int expectedSelectingCount)
+    public void MouseClick_Raises_Activating (bool canFocus, bool setFocus, int expectedActivatingCount)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
@@ -57,12 +66,12 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             testView.SetFocus ();
         }
 
-        var selectingCount = 0;
-        testView.Selecting += (sender, args) => selectingCount++;
+        var activatingCount = 0;
+        testView.Activating += (sender, args) => activatingCount++;
 
         testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);
-        Assert.Equal (expectedSelectingCount, selectingCount);
+        Assert.Equal (expectedActivatingCount, activatingCount);
     }
 
     [Theory]

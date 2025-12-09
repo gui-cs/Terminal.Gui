@@ -134,7 +134,7 @@ public class CharacterMap : Scenario
         _categoryList.Table = CreateCategoryTable (0, isDescending);
 
         // if user clicks the mouse in TableView
-        _categoryList.Selecting += (_, e) =>
+        _categoryList.Activating += (_, e) =>
                                    {
                                        // Only handle mouse clicks
                                        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })

@@ -60,7 +60,7 @@ public class TreeViewFileSystem : Scenario
         };
 
         win.Add (_detailsFrame);
-        _treeViewFiles.Selecting += TreeViewFiles_Selecting;
+        _treeViewFiles.Activating += TreeViewFiles_Selecting;
         _treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
         _treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 

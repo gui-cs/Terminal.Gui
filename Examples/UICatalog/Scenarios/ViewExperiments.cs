@@ -86,7 +86,7 @@ public class ViewExperiments : Scenario
             //App?.Popover!.Visible = true;
         }
 
-        testFrame.Selecting += (sender, e) =>
+        testFrame.Activating += (sender, e) =>
         {
             if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {

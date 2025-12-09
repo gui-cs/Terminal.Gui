@@ -242,11 +242,11 @@ public class ViewCommandTests
 
     #endregion Accepted tests
 
-    #region OnSelect/Select tests
+    #region OnActivating/Activating tests
 
     [Theory]
     [CombinatorialData]
-    public void Select_Command_Raises_SetsFocus (bool canFocus)
+    public void Activate_Command_Raises_SetsFocus (bool canFocus)
     {
         var view = new ViewEventTester
         {
@@ -256,76 +256,76 @@ public class ViewCommandTests
         Assert.Equal (canFocus, view.CanFocus);
         Assert.False (view.HasFocus);
 
-        view.InvokeCommand (Command.Select);
+        view.InvokeCommand (Command.Activate);
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnActivatingCount);
 
-        Assert.Equal (1, view.SelectingCount);
+        Assert.Equal (1, view.ActivatingCount);
 
         Assert.Equal (canFocus, view.HasFocus);
     }
 
     [Fact]
-    public void Select_Command_Handle_OnSelecting_NoEvent ()
+    public void Activate_Command_Handle_OnActivating_NoEvent ()
     {
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        view.HandleOnSelecting = true;
-        Assert.True (view.InvokeCommand (Command.Select));
+        view.HandleOnActivating = true;
+        Assert.True (view.InvokeCommand (Command.Activate));
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnActivatingCount);
 
-        Assert.Equal (0, view.SelectingCount);
+        Assert.Equal (0, view.ActivatingCount);
     }
 
     [Fact]
-    public void Select_Handle_Event_OnSelecting_Returns_True ()
+    public void Activate_Command_Handle_Event_OnActivating_Returns_True ()
     {
         var view = new View ();
-        var selectingInvoked = false;
+        var activatingInvoked = false;
 
-        view.Selecting += ViewOnSelect;
+        view.Activating += ViewOnActivating;
 
-        bool? ret = view.InvokeCommand (Command.Select);
+        bool? ret = view.InvokeCommand (Command.Activate);
         Assert.True (ret);
-        Assert.True (selectingInvoked);
+        Assert.True (activatingInvoked);
 
         return;
 
-        void ViewOnSelect (object? sender, CommandEventArgs e)
+        void ViewOnActivating (object? sender, CommandEventArgs e)
         {
-            selectingInvoked = true;
+            activatingInvoked = true;
             e.Handled = true;
         }
     }
 
     [Fact]
-    public void Select_Command_Invokes_Selecting_Event ()
+    public void Activate_Command_Invokes_Activating_Event ()
     {
         var view = new View ();
-        var selecting = false;
+        var activating = false;
 
-        view.Selecting += ViewOnSelecting;
+        view.Activating += ViewOnActivating;
 
-        view.InvokeCommand (Command.Select);
-        Assert.True (selecting);
+        view.InvokeCommand (Command.Activate);
+        Assert.True (activating);
 
         return;
 
-        void ViewOnSelecting (object? sender, CommandEventArgs e) { selecting = true; }
+        void ViewOnActivating (object? sender, CommandEventArgs e) { activating = true; }
     }
 
     [Fact]
-    public void MouseClick_Invokes_Select_Command ()
+    public void MouseClick_Invokes_Activate_Command ()
     {
         var view = new ViewEventTester ();
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnActivatingCount);
     }
 
-    #endregion OnSelect/Select tests
+    #endregion OnActivating/Activating tests
 
     #region OnHotKey/HotKey tests
 
@@ -390,25 +390,25 @@ public class ViewCommandTests
             Id = "viewEventTester";
             CanFocus = true;
 
-            Accepting += (s, a) =>
+            Accepting += (_, a) =>
                          {
                              a.Handled = HandleAccepted;
                              AcceptedCount++;
                          };
 
-            HandlingHotKey += (s, a) =>
+            HandlingHotKey += (_, a) =>
                               {
                                   a.Handled = HandleHandlingHotKey;
                                   HandlingHotKeyCount++;
                               };
 
-            Selecting += (s, a) =>
+            Activating += (_, a) =>
                          {
-                             a.Handled = HandleSelecting;
-                             SelectingCount++;
+                             a.Handled = HandleActivating;
+                             ActivatingCount++;
                          };
 
-            CommandNotBound += (s, a) =>
+            CommandNotBound += (_, a) =>
                                {
                                    a.Handled = HandleCommandNotBound;
                                    CommandNotBoundCount++;
@@ -443,18 +443,18 @@ public class ViewCommandTests
 
         public bool HandleHandlingHotKey { get; set; }
 
-        public int OnSelectingCount { get; set; }
-        public int SelectingCount { get; set; }
-        public bool HandleOnSelecting { get; set; }
-        public bool HandleSelecting { get; set; }
+        public int OnActivatingCount { get; set; }
+        public int ActivatingCount { get; set; }
+        public bool HandleOnActivating { get; set; }
+        public bool HandleActivating { get; set; }
 
 
         /// <inheritdoc/>
-        protected override bool OnSelecting (CommandEventArgs args)
+        protected override bool OnActivating (CommandEventArgs args)
         {
-            OnSelectingCount++;
+            OnActivatingCount++;
 
-            return HandleOnSelecting;
+            return HandleOnActivating;
         }
 
         public int OnCommandNotBoundCount { get; set; }

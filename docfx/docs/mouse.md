@@ -44,9 +44,9 @@ public class MyView : View
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         MouseBindings.Add (MouseFlags.WheelDown, Command.ScrollDown);
         
-        // Mouse clicks invoke Command.Select by default
+        // Mouse clicks invoke Command.Activate by default
         // Override to customize click behavior
-        AddCommand (Command.Select, () => {
+        AddCommand (Command.Activate, () => {
             SelectItem();
             return true;
         });
@@ -60,7 +60,7 @@ The @Terminal.Gui.Input.Command enum lists generic operations that are implement
 
 Here are some common mouse binding patterns used throughout Terminal.Gui:
 
-* **Click Events**: `MouseFlags.Button1Clicked` for primary selection/activation - maps to `Command.Select` by default
+* **Click Events**: `MouseFlags.Button1Clicked` for primary selection/activation - maps to `Command.Activate` by default
 * **Double-Click Events**: `MouseFlags.Button1DoubleClicked` for default actions (like opening/accepting)
 * **Right-Click Events**: `MouseFlags.Button3Clicked` for context menus
 * **Scroll Events**: `MouseFlags.WheelUp` and `MouseFlags.WheelDown` for scrolling content
@@ -71,22 +71,22 @@ Here are some common mouse binding patterns used throughout Terminal.Gui:
 By default, all views have the following mouse bindings configured:
 
 ```cs
-MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button2Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button3Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button4Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Select);
+MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button2Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
 ```
 
-When a mouse click occurs, the `Command.Select` is invoked, which raises the `Selecting` event. Views can override `OnSelecting` or subscribe to the `Selecting` event to handle clicks:
+When a mouse click occurs, the `Command.Activate` is invoked, which raises the `Activating` event. Views can override `OnActivating` or subscribe to the `Activating` event to handle clicks:
 
 ```cs
 public class MyView : View
 {
     public MyView()
     {
-        // Option 1: Subscribe to Selecting event
-        Selecting += (s, e) =>
+        // Option 1: Subscribe to Activating event
+        Activating += (s, e) =>
         {
             if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
@@ -97,8 +97,8 @@ public class MyView : View
         };
     }
     
-    // Option 2: Override OnSelecting
-    protected override bool OnSelecting(CommandEventArgs args)
+    // Option 2: Override OnActivating
+    protected override bool OnActivating(CommandEventArgs args)
     {
         if (args.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
         {
@@ -109,7 +109,7 @@ public class MyView : View
                 return true;
             }
         }
-        return base.OnSelecting(args);
+        return base.OnActivating(args);
     }
 }
 ```
@@ -126,12 +126,16 @@ Mouse events are processed through the following workflow using the [Cancellable
 
 1. **Driver Level**: The driver captures platform-specific mouse events and converts them to `MouseEventArgs`
 2. **Application Level**: `IApplication.Mouse.RaiseMouseEvent` determines the target view and routes the event
-3. **View Level**: The target view processes the event through:
-   - `OnMouseEvent` (virtual method that can be overridden)
-   - `MouseEvent` event (for event subscribers)
-   - Mouse bindings (if the event wasn't handled) which invoke commands
-   - Command handlers (e.g., `OnSelecting` for `Command.Select`)
-   - High-level events like `MouseEnter`, `MouseLeave`
+3. **View Level**: The target view processes the event through `View.NewMouseEvent()`:
+   1. **Pre-condition validation** - Checks if view is enabled, visible, and wants the event type
+   2. **Low-level MouseEvent** - Raises `OnMouseEvent()` and `MouseEvent` event
+   3. **Mouse grab handling** - If `HighlightStates` or `WantContinuousButtonPressed` are set:
+      - Automatically grabs mouse on button press
+      - Handles press/release/click lifecycle
+      - Sets focus if view is focusable
+      - Updates `MouseState` (Pressed, PressedOutside)
+   4. **Command invocation** - For click events, invokes commands via `MouseBindings` (default: `Command.Select` ? `Selecting` event)
+   5. **Mouse wheel handling** - Raises `OnMouseWheel()` and `MouseWheel` event
 
 ### Handling Mouse Events Directly
 
@@ -169,17 +173,17 @@ public class CustomView : View
 
 ### Handling Mouse Clicks
 
-The recommended pattern for handling mouse clicks is to use the `Selecting` event or override `OnSelecting`. This integrates with the command system and provides access to mouse event details through the command context:
+The recommended pattern for handling mouse clicks is to use the `Activating` event or override `OnActivating`. This integrates with the command system and provides access to mouse event details through the command context:
 
 ```cs
 public class ClickableView : View
 {
     public ClickableView()
     {
-        Selecting += OnSelecting;
+        Activating += OnActivating;
     }
     
-    private void OnSelecting(object sender, CommandEventArgs e)
+    private void OnActivating(object sender, CommandEventArgs e)
     {
         // Extract mouse event information from command context
         if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
@@ -214,7 +218,7 @@ public class MultiButtonView : View
         MouseBindings.Clear();
         
         // Map different buttons to different commands
-        MouseBindings.Add(MouseFlags.Button1Clicked, Command.Select);
+        MouseBindings.Add(MouseFlags.Button1Clicked, Command.Activate);
         MouseBindings.Add(MouseFlags.Button3Clicked, Command.ContextMenu);
         
         AddCommand(Command.ContextMenu, HandleContextMenu);
@@ -228,15 +232,17 @@ public class MultiButtonView : View
 }
 ```
 
-## Mouse State
+## Mouse State and Mouse Grab
+
+### Mouse State
 
 The @Terminal.Gui.ViewBase.View.MouseState property provides an abstraction for the current state of the mouse, enabling views to do interesting things like change their appearance based on the mouse state.
 
 Mouse states include:
-* **Normal** - Default state when mouse is not interacting with the view
+* **None** - No mouse interaction with the view
 * **In** - Mouse is positioned over the view (inside the viewport)
 * **Pressed** - Mouse button is pressed down while over the view
-* **PressedOutside** - Mouse was pressed inside but moved outside the view
+* **PressedOutside** - Mouse was pressed inside but moved outside the view (when not using `WantContinuousButtonPressed`)
 
 It works in conjunction with the @Terminal.Gui.ViewBase.View.HighlightStates which is a list of mouse states that will cause a view to become highlighted.
 
@@ -253,6 +259,9 @@ view.MouseStateChanged += (sender, e) =>
         case MouseState.Pressed:
             // Change appearance when pressed
             break;
+        case MouseState.PressedOutside:
+            // Mouse was pressed inside but moved outside
+            break;
     }
 };
 ```
@@ -262,6 +271,59 @@ Configure which states should cause highlighting:
 ```cs
 // Highlight when mouse is over the view or when pressed
 view.HighlightStates = MouseState.In | MouseState.Pressed;
+```
+
+### Mouse Grab
+
+Views with `HighlightStates` or `WantContinuousButtonPressed` enabled automatically **grab the mouse** when a button is pressed. This means:
+
+1. **Automatic Grab**: The view receives all mouse events until the button is released, even if the mouse moves outside the view's `Viewport`
+2. **Focus Management**: If the view is focusable (`CanFocus = true`), it automatically receives focus on the first button press
+3. **State Tracking**: The view's `MouseState` is updated to reflect press/release/outside states
+4. **Automatic Ungrab**: The mouse is released when:
+   - The button is released (via `WhenGrabbedHandleClicked()`)
+   - The view is removed from its parent hierarchy (via `View.OnRemoved()`)
+   - The application ends (via `App.End()`)
+
+#### Continuous Button Press
+
+When `WantContinuousButtonPressed` is set to `true`, the view receives repeated click events while the button is held down:
+
+```cs
+view.WantContinuousButtonPressed = true;
+
+view.Selecting += (s, e) =>
+{
+    // This will be called repeatedly while the button is held down
+    // Useful for scroll buttons, increment/decrement buttons, etc.
+    DoRepeatAction();
+    e.Handled = true;
+};
+```
+
+**Note**: With `WantContinuousButtonPressed`, the `MouseState.PressedOutside` flag has no effect - the view continues to receive events and maintains the pressed state even when the mouse moves outside.
+
+#### Mouse Grab Lifecycle
+
+```
+Button Press (inside view)
+    ?
+Mouse Grabbed Automatically
+    ?? View receives focus (if CanFocus)
+    ?? MouseState |= MouseState.Pressed
+    ?? All mouse events route to this view
+    
+Mouse Move (while grabbed)
+    ?? Inside Viewport: MouseState remains Pressed
+    ?? Outside Viewport: MouseState |= MouseState.PressedOutside
+        (unless WantContinuousButtonPressed is true)
+    
+Button Release
+    ?
+Mouse Ungrabbed Automatically
+    ?? MouseState &= ~MouseState.Pressed
+    ?? MouseState &= ~MouseState.PressedOutside
+    ?? Click event raised (if still in bounds)
 ```
 
 ## Mouse Button and Movement Concepts
@@ -355,12 +417,25 @@ view.MouseEvent += (s, e) =>
 
 * **Use Mouse Bindings and Commands** for simple mouse interactions - they integrate well with the Command system and work alongside keyboard bindings
 * **Use the `Selecting` event** to handle mouse clicks - it's raised by the default `Command.Select` binding for all mouse buttons
-* **Access mouse details via CommandContext** when you need position or flags in `Selecting` handlers
-* **Handle Mouse Events directly** for complex interactions like drag-and-drop or custom gestures  
+* **Access mouse details via CommandContext** when you need position or flags in `Selecting` handlers:
+  ```cs
+  view.Selecting += (s, e) =>
+  {
+      if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+      {
+          Point position = mouseArgs.Position;
+          MouseFlags flags = mouseArgs.Flags;
+          // Handle with position and flags
+      }
+  };
+  ```
+* **Handle Mouse Events directly** only for complex interactions like drag-and-drop or custom gestures (override `OnMouseEvent` or subscribe to `MouseEvent`)
+* **Use `HighlightStates`** to enable automatic mouse grab and visual feedback - views will automatically grab the mouse and update their appearance
+* **Use `WantContinuousButtonPressed`** for repeating actions (scroll buttons, increment/decrement) - the view will receive repeated events while the button is held
 * **Respect platform conventions** - use right-click for context menus, double-click for default actions
 * **Provide keyboard alternatives** - ensure all mouse functionality has keyboard equivalents
 * **Test with different terminals** - mouse support varies between terminal applications
-* **Use Mouse State** to provide visual feedback when users hover or interact with views
+* **Mouse grab is automatic** - you don't need to manually call `GrabMouse()`/`UngrabMouse()` when using `HighlightStates` or `WantContinuousButtonPressed`
 
 ## Limitations and Considerations
 

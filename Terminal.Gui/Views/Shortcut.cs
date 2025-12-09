@@ -248,14 +248,14 @@ public class Shortcut : View, IOrientation, IDesignable
         // Hotkey -
         AddCommand (Command.HotKey, DispatchCommand);
 
-        // Select (Space key or click) -
-        AddCommand (Command.Select, DispatchCommand);
+        // Activate (Space key or click) -
+        AddCommand (Command.Activate, DispatchCommand);
     }
 
     /// <summary>
-    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Selected, then Accepting, then invoke the
+    ///     Dispatches the Command in the <paramref name="commandContext"/> (Raises Activating, then Accepting, then invoke the
     ///     Action, if any).
-    ///     Called when Command.Select, Accept, or HotKey has been invoked on this Shortcut.
+    ///     Called when Command.Activate, Accept, or HotKey has been invoked on this Shortcut.
     /// </summary>
     /// <param name="commandContext"></param>
     /// <returns>
@@ -273,18 +273,18 @@ public class Shortcut : View, IOrientation, IDesignable
         if (keyCommandContext?.Binding.Data != this)
         {
             // TODO: Optimize this to only do this if CommandView is custom (non View)
-            // Invoke Select on the CommandView to cause it to change state if it wants to
+            // Invoke Activate on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
             keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
 
-            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Select on CommandView ({CommandView.GetType ().Name}).");
+            Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-            CommandView.InvokeCommand (Command.Select, keyCommandContext);
+            CommandView.InvokeCommand (Command.Activate, keyCommandContext);
         }
 
-        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseSelecting ...");
+        Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }
@@ -426,7 +426,7 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 
             // Clean up old 
-            _commandView.Selecting -= CommandViewOnSelecting;
+            _commandView.Activating -= CommandViewOnActivating;
             _commandView.Accepting -= CommandViewOnAccepted;
             Remove (_commandView);
             _commandView?.Dispose ();
@@ -452,7 +452,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             Title = _commandView.Text;
 
-            _commandView.Selecting += CommandViewOnSelecting;
+            _commandView.Activating += CommandViewOnActivating;
             _commandView.Accepting += CommandViewOnAccepted;
 
             //ShowHide ();
@@ -466,13 +466,13 @@ public class Shortcut : View, IOrientation, IDesignable
                 e.Handled = true;
             }
 
-            void CommandViewOnSelecting (object? sender, CommandEventArgs e)
+            void CommandViewOnActivating (object? sender, CommandEventArgs e)
             {
                 if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Data != this)
                     || e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
-                    InvokeCommand<KeyBinding> (Command.Select, new ([Command.Select], null, this));
+                    InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
                 }
 
                 e.Handled = true;
