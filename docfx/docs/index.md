@@ -22,7 +22,7 @@ Welcome to the Terminal.Gui documentation! This comprehensive guide covers every
 - [Arrangement](~/docs/arrangement.md) - View arrangement and positioning strategies
 - [Cancellable Work Pattern](~/docs/cancellable-work-pattern.md) - Core design pattern for extensible workflows
 - [Character Map Scenario](~/docs/CharacterMap.md) - Complex drawing, scrolling, and Unicode rendering example
-- [Command System](~/docs/command.md) - Command execution, key bindings, and the Selecting/Accepting concepts
+- [Command System](~/docs/command.md) - Command execution, key bindings, and the Activating/Accepting concepts
 - [Configuration Management](~/docs/config.md) - Persistent settings, themes, and configuration scopes
 - [Cross-Platform Driver Model](~/docs/drivers.md) - Platform abstraction and console driver architecture
 - [Cursor System](~/docs/cursor.md) - Modern cursor management and positioning (proposed design)
