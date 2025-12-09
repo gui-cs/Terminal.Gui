@@ -44,9 +44,9 @@ public class MyView : View
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         MouseBindings.Add (MouseFlags.WheelDown, Command.ScrollDown);
         
-        // Mouse clicks invoke Command.Select by default
+        // Mouse clicks invoke Command.Activate by default
         // Override to customize click behavior
-        AddCommand (Command.Select, () => {
+        AddCommand (Command.Activate, () => {
             SelectItem();
             return true;
         });
@@ -60,7 +60,7 @@ The @Terminal.Gui.Input.Command enum lists generic operations that are implement
 
 Here are some common mouse binding patterns used throughout Terminal.Gui:
 
-* **Click Events**: `MouseFlags.Button1Clicked` for primary selection/activation - maps to `Command.Select` by default
+* **Click Events**: `MouseFlags.Button1Clicked` for primary selection/activation - maps to `Command.Activate` by default
 * **Double-Click Events**: `MouseFlags.Button1DoubleClicked` for default actions (like opening/accepting)
 * **Right-Click Events**: `MouseFlags.Button3Clicked` for context menus
 * **Scroll Events**: `MouseFlags.WheelUp` and `MouseFlags.WheelDown` for scrolling content
@@ -71,22 +71,22 @@ Here are some common mouse binding patterns used throughout Terminal.Gui:
 By default, all views have the following mouse bindings configured:
 
 ```cs
-MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button2Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button3Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button4Clicked, Command.Select);
-MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Select);
+MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button2Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
 ```
 
-When a mouse click occurs, the `Command.Select` is invoked, which raises the `Selecting` event. Views can override `OnSelecting` or subscribe to the `Selecting` event to handle clicks:
+When a mouse click occurs, the `Command.Activate` is invoked, which raises the `Activating` event. Views can override `OnActivating` or subscribe to the `Activating` event to handle clicks:
 
 ```cs
 public class MyView : View
 {
     public MyView()
     {
-        // Option 1: Subscribe to Selecting event
-        Selecting += (s, e) =>
+        // Option 1: Subscribe to Activating event
+        Activating += (s, e) =>
         {
             if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
@@ -97,8 +97,8 @@ public class MyView : View
         };
     }
     
-    // Option 2: Override OnSelecting
-    protected override bool OnSelecting(CommandEventArgs args)
+    // Option 2: Override OnActivating
+    protected override bool OnActivating(CommandEventArgs args)
     {
         if (args.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
         {
@@ -109,7 +109,7 @@ public class MyView : View
                 return true;
             }
         }
-        return base.OnSelecting(args);
+        return base.OnActivating(args);
     }
 }
 ```
@@ -173,17 +173,17 @@ public class CustomView : View
 
 ### Handling Mouse Clicks
 
-The recommended pattern for handling mouse clicks is to use the `Selecting` event or override `OnSelecting`. This integrates with the command system and provides access to mouse event details through the command context:
+The recommended pattern for handling mouse clicks is to use the `Activating` event or override `OnActivating`. This integrates with the command system and provides access to mouse event details through the command context:
 
 ```cs
 public class ClickableView : View
 {
     public ClickableView()
     {
-        Selecting += OnSelecting;
+        Activating += OnActivating;
     }
     
-    private void OnSelecting(object sender, CommandEventArgs e)
+    private void OnActivating(object sender, CommandEventArgs e)
     {
         // Extract mouse event information from command context
         if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
@@ -218,7 +218,7 @@ public class MultiButtonView : View
         MouseBindings.Clear();
         
         // Map different buttons to different commands
-        MouseBindings.Add(MouseFlags.Button1Clicked, Command.Select);
+        MouseBindings.Add(MouseFlags.Button1Clicked, Command.Activate);
         MouseBindings.Add(MouseFlags.Button3Clicked, Command.ContextMenu);
         
         AddCommand(Command.ContextMenu, HandleContextMenu);

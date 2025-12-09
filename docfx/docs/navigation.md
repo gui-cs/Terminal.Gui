@@ -442,7 +442,7 @@ view.HasFocusChanged += (sender, e) =>
 
 The following table summarizes how built-in views respond to various input methods:
 
-| View | States | Static | Default | HotKeys | Select Cmd | Accept Cmd | HotKey Cmd | Click Focus | DblClick | RightClick | GrabMouse |
+| View | States | Static | Default | HotKeys | Activate Cmd | Accept Cmd | HotKey Cmd | Click Focus | DblClick | RightClick | GrabMouse |
 |------|--------|--------|---------|---------|------------|------------|------------|-------------|----------|------------|-----------|
 | **View** | 1 | Yes | No | 1 | OnSelect | OnAccept | Focus | Focus | - | - | No |
 | **Label** | 1 | Yes | No | 1 | OnSelect | OnAccept | FocusNext | Focus | - | FocusNext | No |
@@ -460,7 +460,7 @@ The following table summarizes how built-in views respond to various input metho
 - **Static**: Whether the view is primarily for display (non-interactive)
 - **Default**: Whether the view can be a default button (activated by Enter)
 - **HotKeys**: Number of hotkeys the view typically supports
-- **Select Cmd**: What happens when Command.Select is invoked
+- **Activate Cmd**: What happens when Command.Activate is invoked
 - **Accept Cmd**: What happens when Command.Accept is invoked
 - **HotKey Cmd**: What happens when the view's hotkey is pressed
 - **Click Focus**: Behavior when clicked (if CanFocus=true)
@@ -560,7 +560,7 @@ foreach (var view in container.Subviews)
 
 // Provide keyboard alternatives to mouse actions
 view.KeyBindings.Add(Key.F10, Command.Context); // Right-click equivalent
-view.KeyBindings.Add(Key.Space, Command.Select); // Click equivalent
+view.KeyBindings.Add(Key.Space, Command.Activate); // Click equivalent
 ```
 
 For more information on accessibility standards, see:

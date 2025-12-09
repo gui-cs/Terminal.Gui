@@ -610,7 +610,7 @@ public class TableEditor : Scenario
         };
 
         // if user clicks the mouse in TableView
-        _tableView!.Selecting += (s, e) =>
+        _tableView!.Activating += (s, e) =>
                                  {
                                      if (_currentTable == null)
                                      {
