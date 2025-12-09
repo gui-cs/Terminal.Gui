@@ -75,7 +75,7 @@ public class Button : View, IDesignable
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
-        // Replace default Select binding with HotKey for mouse clicks
+        // Replace default Activate binding with HotKey for mouse clicks
         MouseBindings.Clear ();
         MouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
         MouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
@@ -98,7 +98,7 @@ public class Button : View, IDesignable
     {
         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }

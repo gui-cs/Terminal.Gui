@@ -236,7 +236,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
         OnScrolled (distance);
         Scrolled?.Invoke (this, new (in distance));
 
-        RaiseSelecting (new CommandContext<KeyBinding> (Command.Select, this, new KeyBinding ([Command.Select], null, distance)));
+        RaiseActivating (new CommandContext<KeyBinding> (Command.Activate, this, new KeyBinding ([Command.Activate], null, distance)));
     }
 
     /// <summary>
