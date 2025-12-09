@@ -230,11 +230,102 @@ public sealed class Transparent : Scenario
             return false;
         }
 
+        protected override bool OnRenderingLineCanvas ()
+        {
+            // Draw "dotnet" using LineCanvas 
+            Point screenPos = ViewportToScreen (new Point (7, 16));
+            DrawDotnet (LineCanvas, screenPos.X, screenPos.Y, LineStyle.Single, GetAttributeForRole (VisualRole.Normal));
+
+            return false;
+        }
+
         /// <inheritdoc />
         protected override bool OnClearingViewport () { return false; }
 
         /// <inheritdoc />
         protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
+
+
+        /// <summary>
+        /// Draws "dotnet" text using LineCanvas. The 'd' is 8 cells high.
+        /// </summary>
+        /// <param name="canvas">The LineCanvas to draw on</param>
+        /// <param name="x">Starting X position</param>
+        /// <param name="y">Starting Y position</param>
+        /// <param name="style">Line style to use</param>
+        /// <param name="attribute">Optional attribute for the lines</param>
+        private void DrawDotnet (LineCanvas canvas, int x, int y, LineStyle style = LineStyle.Single, Attribute? attribute = null)
+        {
+            int currentX = x;
+            int letterHeight = 8;
+            int letterSpacing = 2;
+
+            // Letter 'd' - lowercase, height 8
+            // Vertical stem on right (goes up full 8 cells)
+            canvas.AddLine (new (currentX + 3, y), letterHeight, Orientation.Vertical, style, attribute);
+            // Top horizontal
+            canvas.AddLine (new (currentX, y + 3), 4, Orientation.Horizontal, style, attribute);
+            // Left vertical (only bottom 5 cells, leaving top 3 for ascender space)
+            canvas.AddLine (new (currentX, y + 3), 5, Orientation.Vertical, style, attribute);
+            // Bottom horizontal
+            canvas.AddLine (new (currentX, y + 7), 4, Orientation.Horizontal, style, attribute);
+            currentX += 4 + letterSpacing;
+
+            // Letter 'o' - height 5 (x-height)
+            int oY = y + 3; // Align with x-height (leaving 3 cells for ascenders)
+                            // Top
+            canvas.AddLine (new (currentX, oY), 4, Orientation.Horizontal, style, attribute);
+            // Left
+            canvas.AddLine (new (currentX, oY), 5, Orientation.Vertical, style, attribute);
+            // Right
+            canvas.AddLine (new (currentX + 3, oY), 5, Orientation.Vertical, style, attribute);
+            // Bottom
+            canvas.AddLine (new (currentX, oY + 4), 4, Orientation.Horizontal, style, attribute);
+            currentX += 4 + letterSpacing;
+
+            // Letter 't' - height 7 (has ascender above x-height)
+            int tY = y + 1; // Starts 1 cell above x-height
+                            // Vertical stem
+            canvas.AddLine (new (currentX + 1, tY), 7, Orientation.Vertical, style, attribute);
+            // Top cross bar (at x-height)
+            canvas.AddLine (new (currentX, tY + 2), 3, Orientation.Horizontal, style, attribute);
+            // Bottom horizontal (foot)
+            canvas.AddLine (new (currentX + 1, tY + 6), 2, Orientation.Horizontal, style, attribute);
+            currentX += 3 + letterSpacing;
+
+            // Letter 'n' - height 5 (x-height)
+            int nY = y + 3;
+            // Left vertical
+            canvas.AddLine (new (currentX, nY), 5, Orientation.Vertical, style, attribute);
+            // Top horizontal
+            canvas.AddLine (new (currentX + 1, nY), 3, Orientation.Horizontal, style, attribute);
+            // Right vertical
+            canvas.AddLine (new (currentX + 3, nY), 5, Orientation.Vertical, style, attribute);
+            currentX += 4 + letterSpacing;
+
+            // Letter 'e' - height 5 (x-height)
+            int eY = y + 3;
+            // Top
+            canvas.AddLine (new (currentX, eY), 4, Orientation.Horizontal, style, attribute);
+            // Left
+            canvas.AddLine (new (currentX, eY), 5, Orientation.Vertical, style, attribute);
+            // Right
+            canvas.AddLine (new (currentX + 3, eY), 3, Orientation.Vertical, style, attribute);
+            // Middle horizontal bar
+            canvas.AddLine (new (currentX, eY + 2), 4, Orientation.Horizontal, style, attribute);
+            // Bottom
+            canvas.AddLine (new (currentX, eY + 4), 4, Orientation.Horizontal, style, attribute);
+            currentX += 4 + letterSpacing;
+
+            // Letter 't' - height 7 (has ascender above x-height) - second 't'
+            int t2Y = y + 1;
+            // Vertical stem
+            canvas.AddLine (new (currentX + 1, t2Y), 7, Orientation.Vertical, style, attribute);
+            // Top cross bar (at x-height)
+            canvas.AddLine (new (currentX, t2Y + 2), 3, Orientation.Horizontal, style, attribute);
+            // Bottom horizontal (foot)
+            canvas.AddLine (new (currentX + 1, t2Y + 6), 2, Orientation.Horizontal, style, attribute);
+        }
     }
 
 }
