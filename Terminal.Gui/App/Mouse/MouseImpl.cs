@@ -291,13 +291,6 @@ internal class MouseImpl : IMouse, IDisposable
             return;
         }
 
-#if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts)
-        {
-            ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
-        }
-#endif
-
         if (!RaiseUnGrabbingMouseEvent (MouseGrabView))
         {
             View view = MouseGrabView;

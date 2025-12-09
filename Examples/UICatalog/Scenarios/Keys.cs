@@ -158,7 +158,7 @@ public class Keys : Scenario
         appKeyListView.SchemeName = "Runnable";
         win.Add (onSwallowedListView);
 
-        Application.Driver!.InputProcessor.AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
+        Application.Driver!.GetInputProcessor ().AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
 
         Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
         Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
