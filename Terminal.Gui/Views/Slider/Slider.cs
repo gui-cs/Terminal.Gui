@@ -1426,7 +1426,7 @@ public class Slider<T> : View, IOrientation
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
-        AddCommand (Command.Select, () => Select ());
+        AddCommand (Command.Activate, () => Select ());
         AddCommand (Command.Accept, (ctx) => Accept (ctx));
 
         SetKeyBindings ();
@@ -1467,7 +1467,7 @@ public class Slider<T> : View, IOrientation
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.Accept);
         KeyBindings.Remove (Key.Space);
-        KeyBindings.Add (Key.Space, Command.Select);
+        KeyBindings.Add (Key.Space, Command.Activate);
     }
 
     private Dictionary<int, SliderOption<T>> GetSetOptionDictionary () { return _setOptions.ToDictionary (e => e, e => _options [e]); }

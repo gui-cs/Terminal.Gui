@@ -81,7 +81,7 @@ public class EventLog : ListView
 
                 _viewToLog.MouseWheel += (_, args) => { Log ($"MouseWheel: {args}"); };
                 _viewToLog.HandlingHotKey += (_, args) => { Log ($"HandlingHotKey: {args.Context}"); };
-                _viewToLog.Selecting += (_, args) => { Log ($"Selecting: {args.Context}"); };
+                _viewToLog.Activating += (_, args) => { Log ($"Activating: {args.Context}"); };
                 _viewToLog.Accepting += (_, args) => { Log ($"Accepting: {args.Context}"); };
             }
         }
