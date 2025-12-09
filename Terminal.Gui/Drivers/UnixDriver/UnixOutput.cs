@@ -66,6 +66,7 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc />
     protected override void Write (StringBuilder output)
     {
+        base.Write (output);
         try
         {
             byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
