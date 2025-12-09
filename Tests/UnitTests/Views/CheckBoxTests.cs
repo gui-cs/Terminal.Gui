@@ -271,10 +271,10 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         ckb.CheckedState = initialState;
 
-        ckb.Selecting += OnActivating;
+        ckb.Activating += OnActivating;
 
         Assert.Equal (initialState, ckb.CheckedState);
-        bool? ret = ckb.InvokeCommand (Command.Select);
+        bool? ret = ckb.InvokeCommand (Command.Activate);
         Assert.True (ret);
         Assert.True (checkedInvoked);
         Assert.Equal (initialState, ckb.CheckedState);

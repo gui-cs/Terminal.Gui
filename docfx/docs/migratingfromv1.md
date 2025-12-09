@@ -577,9 +577,9 @@ view.MouseClick += (mouseEvent) =>
 
 **v2:**
 ```csharp
-// v2 - Use MouseBindings + Commands + Selecting event
-view.MouseBindings.Add(MouseFlags.Button1Clicked, Command.Select);
-view.Selecting += (s, e) =>
+// v2 - Use MouseBindings + Commands + Activating event
+view.MouseBindings.Add(MouseFlags.Button1Clicked, Command.Activate);
+view.Activating += (s, e) =>
 {
     // Handle selection (called when Button1Clicked)
     DoSomething();
@@ -599,8 +599,8 @@ view.MouseEvent += (s, e) =>
 **Key Changes:**
 - `View.MouseClick` event has been **removed**
 - Use `MouseBindings` to map mouse events to `Command`s
-- Default mouse bindings invoke `Command.Select` which raises the `Selecting` event
-- For custom behavior, override `OnSelecting` or subscribe to the `Selecting` event
+- Default mouse bindings invoke `Command.Activate` which raises the `Activating` event
+- For custom behavior, override `OnActivating` or subscribe to the `Activating` event
 - For low-level mouse handling, use `MouseEvent` directly
 
 **Migration Pattern:**
@@ -616,8 +616,8 @@ protected override bool OnMouseClick(MouseEventArgs mouseEvent)
     return base.OnMouseClick(mouseEvent);
 }
 
-// ✅ v2 - OnSelecting override
-protected override bool OnSelecting(CommandEventArgs args)
+// ✅ v2 - OnActivating override
+protected override bool OnActivating(CommandEventArgs args)
 {
     if (args.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
     {
@@ -628,20 +628,20 @@ protected override bool OnSelecting(CommandEventArgs args)
             return true;
         }
     }
-    return base.OnSelecting(args);
+    return base.OnActivating(args);
 }
 
-// ✅ v2 - Selecting event (simpler)
-view.Selecting += (s, e) =>
+// ✅ v2 - Activating event (simpler)
+view.Activating += (s, e) =>
 {
     PerformAction();
     e.Handled = true;
 };
 ```
 
-**Accessing Mouse Position in Selecting Event:**
+**Accessing Mouse Position in Activating Event:**
 ```csharp
-view.Selecting += (s, e) =>
+view.Activating += (s, e) =>
 {
     // Extract mouse event args from command context
     if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })

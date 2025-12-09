@@ -517,18 +517,18 @@ public class ScrollBar : View, IOrientation, IDesignable
 
     // TODO: Change this to work OnMouseEvent with continuouse press and grab so it's continous.
     /// <inheritdoc/>
-    protected override bool OnSelecting (CommandEventArgs args)
+    protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
         if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
         {
-            return base.OnSelecting (args);
+            return base.OnActivating (args);
         }
 
         // Check if the mouse click is a single click
         if (!mouseArgs.IsSingleClicked)
         {
-            return base.OnSelecting (args);
+            return base.OnActivating (args);
         }
 
         int sliderCenter;

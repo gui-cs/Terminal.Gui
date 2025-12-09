@@ -159,7 +159,7 @@ public class KeyBindingsTests
 
         view.HandlingHotKey += (s, e) => hotKeyRaised = true;
         view.Accepting += (s, e) => acceptRaised = true;
-        view.Selecting += (s, e) => selectRaised = true;
+        view.Activating += (s, e) => selectRaised = true;
 
         Assert.Equal (KeyCode.T, view.HotKey);
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.T));

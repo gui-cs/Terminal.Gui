@@ -1,12 +1,13 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Mouse APIs
 {
     /// <summary>
-    /// Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
-    /// down in the view and have grabbed the mouse.
+    ///     Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
+    ///     down in the view and have grabbed the mouse.
     /// </summary>
     public IMouseHeldDown? MouseHeldDown { get; set; }
 
@@ -19,11 +20,11 @@ public partial class View // Mouse APIs
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
-        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button2Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button3Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Select);
+        MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button2Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
     }
 
     /// <summary>
@@ -227,22 +228,76 @@ public partial class View // Mouse APIs
     public bool WantMousePositionReports { get; set; }
 
     /// <summary>
-    ///     Processes a new <see cref="MouseEvent"/>. This method is called by <see cref="IMouse.RaiseMouseEvent"/> when a
-    ///     mouse
-    ///     event occurs.
+    ///     Processes a mouse event for this view. This is the main entry point for mouse input handling,
+    ///     called by <see cref="IMouse.RaiseMouseEvent"/> when the mouse interacts with this view.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         A view must be both enabled and visible to receive mouse events.
+    ///         This method orchestrates the complete mouse event handling pipeline:
+    ///     </para>
+    ///     <list type="number">
+    ///         <item>
+    ///             <description>
+    ///                 Validates pre-conditions (view must be enabled and visible)
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 Raises <see cref="MouseEvent"/> for low-level handling via <see cref="OnMouseEvent"/>
+    ///                 and event subscribers
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 Handles mouse grab scenarios when <see cref="HighlightStates"/> or
+    ///                 <see cref="WantContinuousButtonPressed"/> are set (press/release/click)
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 Invokes commands bound to mouse clicks via <see cref="MouseBindings"/>
+    ///                 (default: <see cref="Command.Select"/> → <see cref="Selecting"/> event)
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 Handles mouse wheel events via <see cref="OnMouseWheel"/> and <see cref="MouseWheel"/>
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    ///     <para>
+    ///         <strong>Continuous Button Press:</strong> When <see cref="WantContinuousButtonPressed"/> is
+    ///         <see langword="true"/> and the user holds a mouse button down, this method is repeatedly called
+    ///         with <see cref="MouseFlags.Button1Pressed"/> (or Button2-4) events, enabling repeating button
+    ///         behavior (e.g., scroll buttons).
     ///     </para>
     ///     <para>
-    ///         If <see cref="WantContinuousButtonPressed"/> is <see langword="true"/>, and the user presses and holds the
-    ///         mouse button, <see cref="NewMouseEvent"/> will be repeatedly called with the same <see cref="MouseFlags"/> for
-    ///         as long as the mouse button remains pressed.
+    ///         <strong>Mouse Grab:</strong> Views with <see cref="HighlightStates"/> or
+    ///         <see cref="WantContinuousButtonPressed"/> enabled automatically grab the mouse on button press,
+    ///         receiving all subsequent mouse events until the button is released, even if the mouse moves
+    ///         outside the view's <see cref="Viewport"/>.
+    ///     </para>
+    ///     <para>
+    ///         Most views should handle mouse clicks by subscribing to the <see cref="Activating"/> event or
+    ///         overriding <see cref="OnActivating"/> rather than overriding this method. Override this method
+    ///         only for custom low-level mouse handling (e.g., drag-and-drop).
     ///     </para>
     /// </remarks>
-    /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/> if the event was handled, <see langword="false"/> otherwise.</returns>
+    /// <param name="mouseEvent">
+    ///     The mouse event to process. Coordinates in <see cref="MouseEventArgs.Position"/> are relative
+    ///     to the view's <see cref="Viewport"/>.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if the event was handled and should not be propagated;
+    ///     <see langword="false"/> if the event was not handled and should continue propagating;
+    ///     <see langword="null"/> if the view declined to handle the event (e.g., disabled or not visible).
+    /// </returns>
+    /// <seealso cref="MouseEvent"/>
+    /// <seealso cref="OnMouseEvent"/>
+    /// <seealso cref="MouseBindings"/>
+    /// <seealso cref="Selecting"/>
+    /// <seealso cref="WantContinuousButtonPressed"/>
+    /// <seealso cref="HighlightStates"/>
     public bool? NewMouseEvent (MouseEventArgs mouseEvent)
     {
         // Pre-conditions
@@ -269,22 +324,31 @@ public partial class View // Mouse APIs
         }
 
         // Post-Conditions
+
         if (HighlightStates != MouseState.None || WantContinuousButtonPressed)
         {
             if (WhenGrabbedHandlePressed (mouseEvent))
             {
-                return mouseEvent.Handled;
+                // If we raised Clicked/Activated on the grabbed view, we are done
+                // regardless of whether the event was handled.
+                return true;
             }
 
-            if (WhenGrabbedHandleReleased (mouseEvent))
-            {
-                return mouseEvent.Handled;
-            }
+            WhenGrabbedHandleReleased (mouseEvent);
 
             if (WhenGrabbedHandleClicked (mouseEvent))
             {
                 return mouseEvent.Handled;
             }
+        }
+
+        // We get here if the view did not handle the mouse event via OnMouseEvent/MouseEvent, and
+        // it did not handle the press/release/clicked events via HandlePress/HandleRelease/HandleClicked
+        if (mouseEvent.IsSingleDoubleOrTripleClicked)
+        {
+            // Logging.Debug ($"{mouseEvent.Flags};{mouseEvent.Position}");
+
+            return RaiseCommandsBoundToMouse (mouseEvent);
         }
 
         if (mouseEvent.IsWheel)
@@ -322,11 +386,6 @@ public partial class View // Mouse APIs
 
         MouseEvent?.Invoke (this, mouseEvent);
 
-        if (!mouseEvent.Handled)
-        {
-            mouseEvent.Handled = InvokeCommandsBoundToMouse (mouseEvent) == true;
-        }
-
         return mouseEvent.Handled;
     }
 
@@ -353,137 +412,165 @@ public partial class View // Mouse APIs
     #region WhenGrabbed Handlers
 
     /// <summary>
-    ///     INTERNAL For cases where the view is grabbed and the mouse is clicked, this method handles the released event
-    ///     (typically
-    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
+    ///     INTERNAL: For cases where the view is grabbed and the mouse is pressed, this method handles the pressed events from
+    ///     the driver.
+    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Clicked/Selecting event
+    ///     via <see cref="Command.Select"/> each time it is called (after the first time the mouse is pressed).
     /// </summary>
-    /// <remarks>
-    ///     Marked internal just to support unit tests
-    /// </remarks>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    internal bool WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
-    {
-        mouseEvent.Handled = false;
-
-        if (mouseEvent.IsReleased)
-        {
-            if (App?.Mouse.MouseGrabView == this)
-            {
-                //Logging.Debug ($"{Id} - {MouseState}");
-                MouseState &= ~MouseState.Pressed;
-                MouseState &= ~MouseState.PressedOutside;
-            }
-
-            return mouseEvent.Handled = true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    ///     INTERNAL For cases where the view is grabbed and the mouse is clicked, this method handles the released event
-    ///     (typically
-    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Marked internal just to support unit tests
-    ///     </para>
-    /// </remarks>
-    /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
+    /// <returns><see langword="true"/>, if processing should stop, <see langword="false"/> otherwise.</returns>
     private bool WhenGrabbedHandlePressed (MouseEventArgs mouseEvent)
     {
-        mouseEvent.Handled = false;
-
-        if (mouseEvent.IsPressed)
+        if (!mouseEvent.IsPressed)
         {
-            // The first time we get pressed event, grab the mouse and set focus
-            if (App?.Mouse.MouseGrabView != this)
-            {
-                App?.Mouse.GrabMouse (this);
-
-                if (!HasFocus && CanFocus)
-                {
-                    // Set the focus, but don't invoke Accept
-                    SetFocus ();
-                }
-
-                mouseEvent.Handled = true;
-            }
-
-            if (Viewport.Contains (mouseEvent.Position))
-            {
-                //Logging.Debug ($"{Id} - Inside Viewport: {MouseState}");
-                // The mouse is inside.
-                if (HighlightStates.HasFlag (MouseState.Pressed))
-                {
-                    MouseState |= MouseState.Pressed;
-                }
-
-                // Always clear PressedOutside when the mouse is pressed inside the Viewport
-                MouseState &= ~MouseState.PressedOutside;
-            }
-
-            if (!Viewport.Contains (mouseEvent.Position))
-            {
-                // Logging.Debug ($"{Id} - Outside Viewport: {MouseState}");
-                // The mouse is outside.
-                // When WantContinuousButtonPressed is set we want to keep the mouse state as pressed (e.g. a repeating button).
-                // This shows the user that the button is doing something, even if the mouse is outside the Viewport.
-                if (HighlightStates.HasFlag (MouseState.PressedOutside) && !WantContinuousButtonPressed)
-                {
-                    MouseState |= MouseState.PressedOutside;
-                }
-            }
-
-            return mouseEvent.Handled = true;
+            return false;
         }
 
-        return false;
+        Debug.Assert (!mouseEvent.Handled);
+        mouseEvent.Handled = false;
+
+        // If the user has just pressed the mouse, grab the mouse and set focus
+        if (App is null || App.Mouse.MouseGrabView != this)
+        {
+            App?.Mouse.GrabMouse (this);
+
+            if (!HasFocus && CanFocus)
+            {
+                // Set the focus, but don't invoke Accept
+                SetFocus ();
+            }
+
+            // This prevents raising Clicked/Selecting the first time the mouse is pressed.
+            mouseEvent.Handled = true;
+        }
+
+        if (Viewport.Contains (mouseEvent.Position))
+        {
+            //Logging.Debug ($"{Id} - Inside Viewport: {MouseState}");
+            // The mouse is inside.
+            if (HighlightStates.HasFlag (MouseState.Pressed))
+            {
+                MouseState |= MouseState.Pressed;
+            }
+
+            // Always clear PressedOutside when the mouse is pressed inside the Viewport
+            MouseState &= ~MouseState.PressedOutside;
+        }
+        else
+        {
+            // Logging.Debug ($"{Id} - Outside Viewport: {MouseState}");
+            // The mouse is outside.
+            // When WantContinuousButtonPressed is set we want to keep the mouse state as pressed (e.g. a repeating button).
+            // This shows the user that the button is doing something, even if the mouse is outside the Viewport.
+            if (HighlightStates.HasFlag (MouseState.PressedOutside) && !WantContinuousButtonPressed)
+            {
+                MouseState |= MouseState.PressedOutside;
+            }
+        }
+
+        if (!mouseEvent.Handled && WantContinuousButtonPressed && App?.Mouse.MouseGrabView == this)
+        {
+            // Ignore the return value here, because the semantics of WhenGrabbedHandlePressed is the return
+            // value indicates whether processing should stop or not.
+            RaiseCommandsBoundToMouse (mouseEvent);
+
+            return true;
+        }
+
+        return mouseEvent.Handled = true;
     }
 
-
     /// <summary>
-    ///     INTERNAL For cases where the view is grabbed and the mouse is clicked, this method handles the click event
+    ///     INTERNAL: For cases where the view is grabbed, this method handles the released events from the driver
     ///     (typically
     ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
     /// </summary>
-    /// <remarks>
-    ///     Marked internal just to support unit tests
-    /// </remarks>
     /// <param name="mouseEvent"></param>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
+    internal void WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
-        mouseEvent.Handled = false;
-
-        if (App?.Mouse.MouseGrabView == this && mouseEvent.IsSingleClicked)
+        if (App is { } && App.Mouse.MouseGrabView == this)
         {
-            // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
-            App?.Mouse.UngrabMouse ();
-
-            // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
-            // TODO: There may be perf gains if we don't unset these flags here
+            //Logging.Debug ($"{Id} - {MouseState}");
             MouseState &= ~MouseState.Pressed;
             MouseState &= ~MouseState.PressedOutside;
-
-            // If mouse is still in bounds, generate a click
-            if (!WantMousePositionReports && Viewport.Contains (mouseEvent.Position))
-            {
-                // By default, this will raise Selecting/OnSelecting - Subclasses can override this via AddCommand (Command.Select ...).
-                mouseEvent.Handled = InvokeCommandsBoundToMouse (mouseEvent) == true;
-            }
-
-            return mouseEvent.Handled = true;
         }
-
-        return false;
     }
 
+    /// <summary>
+    ///     INTERNAL: For cases where the view is grabbed, this method handles the click events from the driver
+    ///     (typically
+    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
+    /// </summary>
+    /// <param name="mouseEvent"></param>
+    /// <returns><see langword="true"/>, if processing should stop; <see langword="false"/> otherwise.</returns>
+    internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
+    {
+        if (App is null || App.Mouse.MouseGrabView != this || !mouseEvent.IsSingleClicked)
+        {
+            return false;
+        }
+
+        // Logging.Debug ($"{mouseEvent.Flags};{mouseEvent.Position}");
+
+        // We're grabbed. Clicked event comes after the last Release. This is our signal to ungrab
+        App?.Mouse.UngrabMouse ();
+
+        // TODO: Prove we need to unset MouseState.Pressed and MouseState.PressedOutside here
+        // TODO: There may be perf gains if we don't unset these flags here
+        MouseState &= ~MouseState.Pressed;
+        MouseState &= ~MouseState.PressedOutside;
+
+        // If mouse is still in bounds, return false to indicate a click should be raised.
+        return WantMousePositionReports || !Viewport.Contains (mouseEvent.Position);
+    }
 
     #endregion WhenGrabbed Handlers
+
+    #region Mouse Click Events
+
+    /// <summary>
+    ///     INTERNAL API: Converts mouse click events into <see cref="Command"/>s by invoking the commands bound
+    ///     to the mouse button via <see cref="MouseBindings"/>. By default, all mouse clicks are bound to
+    ///     <see cref="Command.Select"/> which raises the <see cref="Selecting"/> event.
+    /// </summary>
+    protected bool RaiseCommandsBoundToMouse (MouseEventArgs args)
+    {
+        // Pre-conditions
+        if (!Enabled)
+        {
+            // QUESTION: Is this right? Should a disabled view eat mouse clicks?
+            return args.Handled = false;
+        }
+
+        Debug.Assert (!args.Handled);
+
+        // Logging.Debug ($"{args.Flags};{args.Position}");
+
+        MouseEventArgs clickedArgs = new ();
+
+        clickedArgs.Flags = args.IsPressed
+            ? args.Flags switch
+            {
+                MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
+                MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
+                MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
+                MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+                _ => clickedArgs.Flags
+            }
+            : args.Flags;
+
+        clickedArgs.Position = args.Position;
+        clickedArgs.ScreenPosition = args.ScreenPosition;
+        clickedArgs.View = args.View;
+
+        // By default, this will raise Activating/OnActivating - Subclasses can override this via
+        // ReplaceCommand (Command.Activate ...).
+        args.Handled = InvokeCommandsBoundToMouse (clickedArgs) == true;
+
+        return args.Handled;
+    }
+
+    #endregion Mouse Click Events
 
     #region Mouse Wheel Events
 
@@ -601,18 +688,26 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     Called when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The <see cref="MouseState"/> passed in the event
+    ///     Called when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The
+    ///     <see cref="MouseState"/> passed in the event
     ///     indicates the highlight style that will be applied.
     /// </summary>
     protected virtual void OnMouseStateChanged (EventArgs<MouseState> args) { }
 
     /// <summary>
-    ///     RaisedCalled when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The <see cref="MouseState"/> passed in the event
+    ///     Raised when <see cref="MouseState"/> has changed, indicating the View should be highlighted or not. The
+    ///     <see cref="MouseState"/> passed in the event
     ///     indicates the highlight style that will be applied.
     /// </summary>
     public event EventHandler<EventArgs<MouseState>>? MouseStateChanged;
 
     #endregion MouseState Handling
 
-    private void DisposeMouse () { }
+    private void DisposeMouse ()
+    {
+        if (App?.Mouse.MouseGrabView == this)
+        {
+            App.Mouse.UngrabMouse ();
+        }
+    }
 }
