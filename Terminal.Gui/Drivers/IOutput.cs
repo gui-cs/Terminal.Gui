@@ -66,6 +66,12 @@ public interface IOutput : IDisposable
     void Write (IOutputBuffer buffer);
 
     /// <summary>
+    ///     Gets a string containing the ANSI escape sequences and content most recently written
+    ///     to the terminal via <see cref="Write(IOutputBuffer)"/>
+    /// </summary>
+    string GetLastOutput ();
+
+    /// <summary>
     ///     Generates an ANSI escape sequence string representation of the given <paramref name="buffer"/> contents.
     ///     This is the same output that would be written to the terminal to recreate the current screen contents.
     /// </summary>
