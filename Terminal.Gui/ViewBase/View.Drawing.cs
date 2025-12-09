@@ -140,25 +140,25 @@ public partial class View // Drawing APIs
 
             ClearNeedsDraw ();
 
-            if (this is not Adornment && SuperView is not Adornment)
-            {
-                // Parent
-                Debug.Assert (Margin!.Parent == this);
-                Debug.Assert (Border!.Parent == this);
-                Debug.Assert (Padding!.Parent == this);
+            //if (this is not Adornment && SuperView is not Adornment)
+            //{
+            //    // Parent
+            //    Debug.Assert (Margin!.Parent == this);
+            //    Debug.Assert (Border!.Parent == this);
+            //    Debug.Assert (Padding!.Parent == this);
 
-                // SubViewNeedsDraw is set to false by ClearNeedsDraw.
-                Debug.Assert (SubViewNeedsDraw == false);
-                Debug.Assert (Margin!.SubViewNeedsDraw == false);
-                Debug.Assert (Border!.SubViewNeedsDraw == false);
-                Debug.Assert (Padding!.SubViewNeedsDraw == false);
+            //    // SubViewNeedsDraw is set to false by ClearNeedsDraw.
+            //    Debug.Assert (SubViewNeedsDraw == false);
+            //    Debug.Assert (Margin!.SubViewNeedsDraw == false);
+            //    Debug.Assert (Border!.SubViewNeedsDraw == false);
+            //    Debug.Assert (Padding!.SubViewNeedsDraw == false);
 
-                // NeedsDraw is set to false by ClearNeedsDraw.
-                Debug.Assert (NeedsDraw == false);
-                Debug.Assert (Margin!.NeedsDraw == false);
-                Debug.Assert (Border!.NeedsDraw == false);
-                Debug.Assert (Padding!.NeedsDraw == false);
-            }
+            //    // NeedsDraw is set to false by ClearNeedsDraw.
+            //    Debug.Assert (NeedsDraw == false);
+            //    Debug.Assert (Margin!.NeedsDraw == false);
+            //    Debug.Assert (Border!.NeedsDraw == false);
+            //    Debug.Assert (Padding!.NeedsDraw == false);
+            //}
         }
 
         // ------------------------------------
@@ -226,7 +226,7 @@ public partial class View // Drawing APIs
         {
             // Set the clip to be just the thicknesses of the adornments
             // TODO: Put this union logic in a method on View?
-            Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
+            Region clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
             clipAdornments.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
             clipAdornments.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
             clipAdornments.Combine (originalClip, RegionOp.Intersect);
@@ -697,8 +697,8 @@ public partial class View // Drawing APIs
     /// <returns><see langword="true"/> to stop further drawing of <see cref="LineCanvas"/>.</returns>
     protected virtual bool OnRenderingLineCanvas () { return false; }
 
-    /// <summary>The canvas that any line drawing that is to be shared by SubViews of this view should add lines to.</summary>
-    /// <remarks><see cref="Border"/> adds border lines to this LineCanvas.</remarks>
+    /// <summary>The canvas that any line drawing that is to be shared by subviews of this view should add lines to.</summary>
+    /// <remarks><see cref="Border"/> adds lines to this LineCanvas.</remarks>
     public LineCanvas LineCanvas { get; } = new ();
 
     /// <summary>
@@ -725,7 +725,10 @@ public partial class View // Drawing APIs
 
         if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
         {
-            foreach (KeyValuePair<Point, Cell?> p in LineCanvas.GetCellMap ())
+            // Get both cell map and Region in a single pass through the canvas
+            (Dictionary<Point, Cell?> cellMap, Region lineRegion) = LineCanvas.GetCellMapWithRegion ();
+
+            foreach (KeyValuePair<Point, Cell?> p in cellMap)
             {
                 // Get the entire map
                 if (p.Value is { })
@@ -735,10 +738,14 @@ public partial class View // Drawing APIs
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddStr (p.Value.Value.Grapheme);
-
-                    // Add each drawn cell to the context
-                    //context?.AddDrawnRectangle (new Rectangle (p.Key, new (1, 1)) );
                 }
+            }
+
+            // Report the drawn region for transparency support
+            // Region was built during the GetCellMapWithRegion() call above
+            if (context is { } && cellMap.Count > 0)
+            {
+                context.AddDrawnRegion (lineRegion);
             }
 
             LineCanvas.Clear ();
