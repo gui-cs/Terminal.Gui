@@ -256,7 +256,7 @@ public partial class View // Mouse APIs
     ///         <item>
     ///             <description>
     ///                 Invokes commands bound to mouse clicks via <see cref="MouseBindings"/>
-    ///                 (default: <see cref="Command.Select"/> → <see cref="Selecting"/> event)
+    ///                 (default: <see cref="Command.Activate"/> → <see cref="Activating"/> event)
     ///             </description>
     ///         </item>
     ///         <item>
@@ -295,7 +295,7 @@ public partial class View // Mouse APIs
     /// <seealso cref="MouseEvent"/>
     /// <seealso cref="OnMouseEvent"/>
     /// <seealso cref="MouseBindings"/>
-    /// <seealso cref="Selecting"/>
+    /// <seealso cref="Activating"/>
     /// <seealso cref="WantContinuousButtonPressed"/>
     /// <seealso cref="HighlightStates"/>
     public bool? NewMouseEvent (MouseEventArgs mouseEvent)
@@ -329,7 +329,7 @@ public partial class View // Mouse APIs
         {
             if (WhenGrabbedHandlePressed (mouseEvent))
             {
-                // If we raised Clicked/Activated on the grabbed view, we are done
+                // If we raised a command on the grabbed view, and it handled it, we are done
                 // regardless of whether the event was handled.
                 return true;
             }
@@ -342,8 +342,8 @@ public partial class View // Mouse APIs
             }
         }
 
-        // We get here if the view did not handle the mouse event via OnMouseEvent/MouseEvent, and
-        // it did not handle the press/release/clicked events via HandlePress/HandleRelease/HandleClicked
+        // We get here if the view did not handle the mouse event via RaiseMouseEvent, and
+        // it did not handle the commands via WhenGrabbed* methods.
         if (mouseEvent.IsSingleDoubleOrTripleClicked)
         {
             // Logging.Debug ($"{mouseEvent.Flags};{mouseEvent.Position}");
@@ -414,8 +414,8 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed and the mouse is pressed, this method handles the pressed events from
     ///     the driver.
-    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Clicked/Selecting event
-    ///     via <see cref="Command.Select"/> each time it is called (after the first time the mouse is pressed).
+    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Activate event
+    ///     via <see cref="Command.Activate"/> each time it is called (after the first time the mouse is pressed).
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if processing should stop, <see langword="false"/> otherwise.</returns>
@@ -440,7 +440,7 @@ public partial class View // Mouse APIs
                 SetFocus ();
             }
 
-            // This prevents raising Clicked/Selecting the first time the mouse is pressed.
+            // This prevents raising Activate the first time the mouse is pressed.
             mouseEvent.Handled = true;
         }
 
@@ -531,7 +531,7 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL API: Converts mouse click events into <see cref="Command"/>s by invoking the commands bound
     ///     to the mouse button via <see cref="MouseBindings"/>. By default, all mouse clicks are bound to
-    ///     <see cref="Command.Select"/> which raises the <see cref="Selecting"/> event.
+    ///     <see cref="Command.Activate"/> which raises the <see cref="Activating"/> event.
     /// </summary>
     protected bool RaiseCommandsBoundToMouse (MouseEventArgs args)
     {
