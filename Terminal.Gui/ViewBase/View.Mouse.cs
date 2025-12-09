@@ -278,8 +278,8 @@ public partial class View // Mouse APIs
     ///         outside the view's <see cref="Viewport"/>.
     ///     </para>
     ///     <para>
-    ///         Most views should handle mouse clicks by subscribing to the <see cref="Selecting"/> event or
-    ///         overriding <see cref="OnSelecting"/> rather than overriding this method. Override this method
+    ///         Most views should handle mouse clicks by subscribing to the <see cref="Activating"/> event or
+    ///         overriding <see cref="OnActivating"/> rather than overriding this method. Override this method
     ///         only for custom low-level mouse handling (e.g., drag-and-drop).
     ///     </para>
     /// </remarks>
