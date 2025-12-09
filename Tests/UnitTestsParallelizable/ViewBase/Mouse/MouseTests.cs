@@ -11,7 +11,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var testView = new View ();
 
-        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Select));
+        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Activate));
 //        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
 
         Assert.Equal (5, testView.MouseBindings.GetBindings ().Count ());
