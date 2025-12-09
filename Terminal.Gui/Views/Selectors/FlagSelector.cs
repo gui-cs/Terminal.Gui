@@ -85,7 +85,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         if (checkbox.CanFocus)
         {
-            // For Select, if the view is focusable and SetFocus succeeds, by definition,
+            // For Activate, if the view is focusable and SetFocus succeeds, by definition,
             // the event is handled. So return what SetFocus returns.
             checkbox.SetFocus ();
         }
