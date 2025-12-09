@@ -148,7 +148,7 @@ public class OptionSelector : SelectorBase, IDesignable
             checkbox.SetFocus ();
         }
 
-        // Selecting doesn't normally propogate, so we do it here
+        // Selecting doesn't normally propagate, so we do it here
         if (InvokeCommand (Command.Activate, args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
