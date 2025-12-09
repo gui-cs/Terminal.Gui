@@ -106,6 +106,8 @@ internal class MouseImpl : IMouse, IDisposable
             return;
         }
 
+        Logging.Trace($"Mouse Event: {mouseEvent.Flags} at {mouseEvent.ScreenPosition} on {deepestViewUnderMouse}");
+
         if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
         {
             return;
