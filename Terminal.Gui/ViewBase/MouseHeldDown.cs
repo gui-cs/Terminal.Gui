@@ -7,8 +7,29 @@ namespace Terminal.Gui.ViewBase;
 ///     repeatedly trigger an action (via events) while the mouse button is held down, such as for auto-repeat in
 ///     scrollbars or buttons.
 /// </summary>
+/// <remarks>
+///     <para>
+///         This class implements an accelerating timeout pattern: the first tick occurs after 500ms, 
+///         subsequent ticks occur every 50ms with a 0.5 acceleration factor.
+///     </para>
+///     <para>
+///         When started, it automatically grabs the mouse to ensure all mouse events are directed to the host view.
+///         The <see cref="MouseIsHeldDownTick"/> event is raised periodically until <see cref="Stop"/> is called
+///         or the event is cancelled.
+///     </para>
+///     <para>
+///         This is typically used by views that set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/>,
+///         enabling behaviors like auto-scrolling or button repeat.
+///     </para>
+/// </remarks>
 internal class MouseHeldDown : IMouseHeldDown
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MouseHeldDown"/> class.
+    /// </summary>
+    /// <param name="host">The view that will receive the mouse held down events.</param>
+    /// <param name="timedEvents">The timed events service for scheduling periodic ticks. Can be null for testing.</param>
+    /// <param name="mouseGrabber">The mouse grab handler for managing mouse capture. Can be null for testing.</param>
     public MouseHeldDown (View host, ITimedEvents? timedEvents, IMouseGrabHandler? mouseGrabber)
     {
         _mouseGrabView = host;
@@ -25,9 +46,12 @@ internal class MouseHeldDown : IMouseHeldDown
     private bool _isDown;
     private object? _timeout;
 
-    public event EventHandler<CancelEventArgs>? MouseIsHeldDownTick;
+    /// <summary>
+    /// The most recent mouse event arguments associated with the mouse held down action.
+    /// </summary>
+    private MouseEventArgs? _mouseEvent;
 
-    public void Start ()
+    public void Start (MouseEventArgs? mouseEvent)
     {
         if (_isDown)
         {
@@ -67,11 +91,20 @@ internal class MouseHeldDown : IMouseHeldDown
         }
     }
 
-    protected virtual bool OnMouseIsHeldDownTick (CancelEventArgs eventArgs) { return false; }
+    public event EventHandler<CancelEventArgs<MouseEventArgs>>? MouseIsHeldDownTick;
+
+    /// <summary>
+    ///     Called when a mouse held down tick occurs. Override to customize the tick behavior.
+    /// </summary>
+    /// <param name="eventArgs">The event arguments. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop the mouse held down operation.</param>
+    /// <returns><see langword="true"/> if the event was cancelled; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnMouseIsHeldDownTick (CancelEventArgs<MouseEventArgs> eventArgs) { return false; }
 
     private bool RaiseMouseIsHeldDownTick ()
     {
-        CancelEventArgs args = new ();
+        MouseEventArgs? currMouseEventArgs = _mouseEvent ?? new MouseEventArgs ();
+        MouseEventArgs? newMouseEventArgs = _mouseEvent ?? new MouseEventArgs();
+        CancelEventArgs<MouseEventArgs> args = new (currentValue: ref currMouseEventArgs, newValue: ref newMouseEventArgs);
 
         args.Cancel = OnMouseIsHeldDownTick (args) || args.Cancel;
 

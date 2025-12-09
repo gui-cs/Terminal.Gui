@@ -218,10 +218,10 @@ public class TimedEvents : ITimedEvents
 
                 // Re-evaluate current time for each iteration
                 now = GetTimestampTicks ();
-                
+
                 // Check if the earliest timeout is due
                 scheduledTime = _timeouts.Keys [0];
-                
+
                 if (scheduledTime >= now)
                 {
                     // Earliest timeout is not yet due, we're done
@@ -238,7 +238,7 @@ public class TimedEvents : ITimedEvents
             if (timeoutToExecute != null)
             {
                 bool repeat = timeoutToExecute.Callback! ();
-                
+
                 if (repeat)
                 {
                     AddTimeout (timeoutToExecute.Span, timeoutToExecute);

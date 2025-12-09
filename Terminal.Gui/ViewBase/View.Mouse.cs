@@ -5,18 +5,13 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View // Mouse APIs
 {
-    /// <summary>
-    ///     Handles <see cref="WantContinuousButtonPressed"/>, we have detected a button
-    ///     down in the view and have grabbed the mouse.
-    /// </summary>
-    public IMouseHeldDown? MouseHeldDown { get; set; }
+
 
     /// <summary>Gets the mouse bindings for this view.</summary>
     public MouseBindings MouseBindings { get; internal set; } = null!;
 
     private void SetupMouse ()
     {
-        MouseHeldDown = new MouseHeldDown (this, App?.TimedEvents, App?.Mouse);
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
@@ -25,30 +20,6 @@ public partial class View // Mouse APIs
         MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
         MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
         MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
-    }
-
-    /// <summary>
-    ///     Invokes the Commands bound to the MouseFlags specified by <paramref name="mouseEventArgs"/>.
-    ///     <para>See <see href="../docs/mouse.md">for an overview of Terminal.Gui mouse APIs.</see></para>
-    /// </summary>
-    /// <param name="mouseEventArgs">The mouse event passed.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was invoked; input processing should continue.
-    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
-    ///     should continue.
-    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    protected bool? InvokeCommandsBoundToMouse (MouseEventArgs mouseEventArgs)
-    {
-        if (!MouseBindings.TryGet (mouseEventArgs.Flags, out MouseBinding binding))
-        {
-            return null;
-        }
-
-        binding.MouseEventArgs = mouseEventArgs;
-
-        return InvokeCommands (binding.Commands, binding);
     }
 
     #region MouseEnterLeave
@@ -259,11 +230,6 @@ public partial class View // Mouse APIs
     ///                 (default: <see cref="Command.Activate"/> → <see cref="Activating"/> event)
     ///             </description>
     ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 Handles mouse wheel events via <see cref="OnMouseWheel"/> and <see cref="MouseWheel"/>
-    ///             </description>
-    ///         </item>
     ///     </list>
     ///     <para>
     ///         <strong>Continuous Button Press:</strong> When <see cref="WantContinuousButtonPressed"/> is
@@ -346,18 +312,38 @@ public partial class View // Mouse APIs
         // it did not handle the commands via WhenGrabbed* methods.
         if (mouseEvent.IsSingleDoubleOrTripleClicked)
         {
-            // Logging.Debug ($"{mouseEvent.Flags};{mouseEvent.Position}");
-
-            return RaiseCommandsBoundToMouse (mouseEvent);
+            return RaiseCommandsBoundToButtonClickedFlags (mouseEvent);
         }
 
         if (mouseEvent.IsWheel)
         {
-            return RaiseMouseWheelEvent (mouseEvent);
+            return RaiseCommandsBoundToWheelFlags (mouseEvent);
         }
 
         return false;
     }
+
+    /// <summary>
+    ///     INTERNAL: Manages continuous button press behavior for views that have <see cref="WantContinuousButtonPressed"/> set to <see langword="true"/>.
+    ///     When a mouse button is held down on such a view, this instance periodically raises events to enable auto-repeat functionality
+    ///     (e.g., scrollbars that continue scrolling while the button is held, or buttons that repeat their action).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is automatically instantiated when needed in <see cref="RaiseMouseEvent"/>. It implements an accelerating timeout
+    ///         pattern where the first event fires after 500ms, with subsequent events occurring every 50ms with a 0.5 acceleration factor.
+    ///     </para>
+    ///     <para>
+    ///         When a button press is detected, the mouse is grabbed and periodic <see cref="IMouseHeldDown.MouseIsHeldDownTick"/> events
+    ///         are raised until the button is released. Each tick event triggers command execution via <see cref="RaiseCommandsBoundToButtonClickedFlags"/>,
+    ///         enabling continuous actions like scrolling or button repetition.
+    ///     </para>
+    ///     <para>
+    ///         This is used for UI elements that benefit from auto-repeat behavior, such as scrollbar arrows, spin buttons, or other
+    ///         controls where holding down a button should continue the action.
+    ///     </para>
+    /// </remarks>
+    internal IMouseHeldDown? MouseHeldDown { get; set; }
 
     /// <summary>
     ///     Raises the <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/> event.
@@ -367,14 +353,22 @@ public partial class View // Mouse APIs
     public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
         // TODO: probably this should be moved elsewhere, please advise
-        if (WantContinuousButtonPressed && MouseHeldDown != null)
+
+        if (MouseHeldDown is null)
+        {
+            MouseHeldDown = new MouseHeldDown (this, App?.TimedEvents, App?.Mouse);
+        }
+
+        if (WantContinuousButtonPressed)
         {
             if (mouseEvent.IsPressed)
             {
-                MouseHeldDown.Start ();
+                MouseHeldDown.MouseIsHeldDownTick += MouseHeldDownOnMouseIsHeldDownTick;
+                MouseHeldDown.Start (mouseEvent);
             }
             else
             {
+                MouseHeldDown.MouseIsHeldDownTick -= MouseHeldDownOnMouseIsHeldDownTick;
                 MouseHeldDown.Stop ();
             }
         }
@@ -387,6 +381,13 @@ public partial class View // Mouse APIs
         MouseEvent?.Invoke (this, mouseEvent);
 
         return mouseEvent.Handled;
+    }
+
+    private void MouseHeldDownOnMouseIsHeldDownTick (object? sender, CancelEventArgs<MouseEventArgs> e)
+    {
+        Logging.Trace ("Mouse is held down");
+
+        e.Cancel = RaiseCommandsBoundToButtonClickedFlags (e.NewValue);
     }
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
@@ -472,7 +473,7 @@ public partial class View // Mouse APIs
         {
             // Ignore the return value here, because the semantics of WhenGrabbedHandlePressed is the return
             // value indicates whether processing should stop or not.
-            RaiseCommandsBoundToMouse (mouseEvent);
+            RaiseCommandsBoundToButtonClickedFlags (mouseEvent);
 
             return true;
         }
@@ -526,14 +527,27 @@ public partial class View // Mouse APIs
 
     #endregion WhenGrabbed Handlers
 
-    #region Mouse Click Events
+    #region Command Invocation
 
     /// <summary>
     ///     INTERNAL API: Converts mouse click events into <see cref="Command"/>s by invoking the commands bound
-    ///     to the mouse button via <see cref="MouseBindings"/>. By default, all mouse clicks are bound to
+    ///     to the mouse buttons via <see cref="MouseBindings"/>. By default, all mouse clicks are bound to
     ///     <see cref="Command.Activate"/> which raises the <see cref="Activating"/> event.
     /// </summary>
-    protected bool RaiseCommandsBoundToMouse (MouseEventArgs args)
+    /// <param name="args">The mouse event arguments containing the mouse flags and position information.</param>
+    /// <returns>
+    ///     <see langword="true"/> if a command was invoked and handled; <see langword="false"/> if no command was invoked
+    ///     or the command was not handled. Also sets <see cref="MouseEventArgs.Handled"/> on the input <paramref name="args"/>
+    ///     .
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         The converted click event is then passed to <see cref="InvokeCommandsBoundToMouse"/> to execute
+    ///         any commands bound to the mouse flags via <see cref="MouseBindings"/>. By default, all mouse clicks
+    ///         are bound to <see cref="Command.Activate"/>, which raises the <see cref="Activating"/> event.
+    ///     </para>
+    /// </remarks>
+    protected bool RaiseCommandsBoundToButtonClickedFlags (MouseEventArgs args)
     {
         // Pre-conditions
         if (!Enabled)
@@ -542,22 +556,22 @@ public partial class View // Mouse APIs
             return args.Handled = false;
         }
 
-        Debug.Assert (!args.Handled);
-
-        // Logging.Debug ($"{args.Flags};{args.Position}");
-
+        // The MouseBindings system binds commands to clicked events (like Button1Clicked),
+        // but the actual mouse events coming from the driver are often pressed events (Button1Pressed).
+        // This switch expression bridges that gap by converting pressed events to clicked
+        // events so they can be matched against the command bindings.
         MouseEventArgs clickedArgs = new ();
 
         clickedArgs.Flags = args.IsPressed
-            ? args.Flags switch
-            {
-                MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
-                MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
-                MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
-                MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
-                _ => clickedArgs.Flags
-            }
-            : args.Flags;
+                                ? args.Flags switch
+                                  {
+                                      MouseFlags.Button1Pressed => MouseFlags.Button1Clicked,
+                                      MouseFlags.Button2Pressed => MouseFlags.Button2Clicked,
+                                      MouseFlags.Button3Pressed => MouseFlags.Button3Clicked,
+                                      MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+                                      _ => clickedArgs.Flags
+                                  }
+                                : args.Flags;
 
         clickedArgs.Position = args.Position;
         clickedArgs.ScreenPosition = args.ScreenPosition;
@@ -570,35 +584,29 @@ public partial class View // Mouse APIs
         return args.Handled;
     }
 
-    #endregion Mouse Click Events
-
-    #region Mouse Wheel Events
-
-    /// <summary>Raises the <see cref="OnMouseWheel"/>/<see cref="MouseWheel"/> event.</summary>
+    /// <summary>
+    ///     INTERNAL API: Converts mouse wheel events into <see cref="Command"/>s by invoking the commands bound
+    ///     to the mouse wheel via <see cref="MouseBindings"/>. By default, all mouse wheel events are not bound.
+    /// </summary>
+    /// <param name="args">The mouse event arguments containing the mouse flags and position information.</param>
+    /// <returns>
+    ///     <see langword="true"/> if a command was invoked and handled; <see langword="false"/> if no command was invoked
+    ///     or the command was not handled. Also sets <see cref="MouseEventArgs.Handled"/> on the input <paramref name="args"/>
+    ///     .
+    /// </returns>
     /// <remarks>
+    ///     <para>
+    ///         The converted wheel event is then passed to <see cref="InvokeCommandsBoundToMouse"/> to execute
+    ///         any commands bound to the mouse flags via <see cref="MouseBindings"/>.
+    ///     </para>
     /// </remarks>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected bool RaiseMouseWheelEvent (MouseEventArgs args)
+    protected bool RaiseCommandsBoundToWheelFlags (MouseEventArgs args)
     {
         // Pre-conditions
         if (!Enabled)
         {
-            // QUESTION: Is this right? Should a disabled view eat mouse?
+            // QUESTION: Is this right? Should a disabled view eat mouse wheel?
             return args.Handled = false;
-        }
-
-        // Cancellable event
-
-        if (OnMouseWheel (args) || args.Handled)
-        {
-            return args.Handled;
-        }
-
-        MouseWheel?.Invoke (this, args);
-
-        if (args.Handled)
-        {
-            return true;
         }
 
         args.Handled = InvokeCommandsBoundToMouse (args) == true;
@@ -606,22 +614,32 @@ public partial class View // Mouse APIs
         return args.Handled;
     }
 
+
     /// <summary>
-    ///     Called when a mouse wheel event occurs. Check <see cref="MouseEventArgs.Flags"/> to see which wheel was moved was
-    ///     clicked.
+    ///     INTERNAL API: Invokes the Commands bound to the MouseFlags specified by <paramref name="mouseEventArgs"/>.
+    ///     <para>See <see href="../docs/mouse.md">for an overview of Terminal.Gui mouse APIs.</see></para>
     /// </summary>
-    /// <remarks>
-    /// </remarks>
-    /// <param name="args"></param>
-    /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool OnMouseWheel (MouseEventArgs args) { return false; }
+    /// <param name="mouseEventArgs">The mouse event passed.</param>
+    /// <returns>
+    ///     <see langword="null"/> if no command was invoked; input processing should continue.
+    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
+    ///     should continue.
+    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
+    ///     stop.
+    /// </returns>
+    protected bool? InvokeCommandsBoundToMouse (MouseEventArgs mouseEventArgs)
+    {
+        if (!MouseBindings.TryGet (mouseEventArgs.Flags, out MouseBinding binding))
+        {
+            return null;
+        }
 
-    /// <summary>Raised when a mouse wheel event occurs.</summary>
-    /// <remarks>
-    /// </remarks>
-    public event EventHandler<MouseEventArgs>? MouseWheel;
+        binding.MouseEventArgs = mouseEventArgs;
 
-    #endregion Mouse Wheel Events
+        return InvokeCommands (binding.Commands, binding);
+    }
+
+    #endregion Command Invocation
 
     #region MouseState Handling
 
@@ -705,6 +723,12 @@ public partial class View // Mouse APIs
 
     private void DisposeMouse ()
     {
+        if (MouseHeldDown is { })
+        {
+            MouseHeldDown.MouseIsHeldDownTick -= MouseHeldDownOnMouseIsHeldDownTick;
+            MouseHeldDown.Dispose ();
+        }
+
         if (App?.Mouse.MouseGrabView == this)
         {
             App.Mouse.UngrabMouse ();

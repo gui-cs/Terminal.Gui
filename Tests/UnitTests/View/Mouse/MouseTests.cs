@@ -150,7 +150,7 @@ public class MouseTests : TestsAllViews
 
         // Setup components for mouse held down
         TimedEvents timed = new ();
-        MouseGrabHandler grab = new ();
+        MouseImpl grab = new ();
         view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
@@ -210,7 +210,7 @@ public class MouseTests : TestsAllViews
 
         // Setup components for mouse held down
         TimedEvents timed = new ();
-        MouseGrabHandler grab = new ();
+        MouseImpl grab = new ();
         view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
@@ -263,7 +263,7 @@ public class MouseTests : TestsAllViews
 
         // Setup components for mouse held down
         TimedEvents timed = new ();
-        MouseGrabHandler grab = new ();
+        MouseImpl grab = new ();
         view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
