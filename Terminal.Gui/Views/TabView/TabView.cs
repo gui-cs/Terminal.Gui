@@ -563,8 +563,8 @@ public class TabView : View
             if (maxWidth == 0)
             {
                 tab.Visible = true;
-                tab.Selecting += Tab_Selecting!;
-                tab.Border!.Selecting += Tab_Selecting!;
+                tab.Activating += Tab_Selecting!;
+                tab.Border!.Activating += Tab_Selecting!;
 
                 yield return tab;
 
@@ -594,8 +594,8 @@ public class TabView : View
 
             // there is enough space!
             tab.Visible = true;
-            tab.Selecting += Tab_Selecting!;
-            tab.Border!.Selecting += Tab_Selecting!;
+            tab.Activating += Tab_Selecting!;
+            tab.Border!.Activating += Tab_Selecting!;
 
             yield return tab;
 
@@ -655,8 +655,8 @@ public class TabView : View
 
                 if (tab.Visible)
                 {
-                    tab.Selecting -= Tab_Selecting!;
-                    tab.Border!.Selecting -= Tab_Selecting!;
+                    tab.Activating -= Tab_Selecting!;
+                    tab.Border!.Activating -= Tab_Selecting!;
                     tab.Visible = false;
                 }
             }
@@ -665,8 +665,8 @@ public class TabView : View
         {
             foreach (Tab tabToRender in _tabLocations)
             {
-                tabToRender.Selecting -= Tab_Selecting!;
-                tabToRender.Border!.Selecting -= Tab_Selecting!;
+                tabToRender.Activating -= Tab_Selecting!;
+                tabToRender.Border!.Activating -= Tab_Selecting!;
                 tabToRender.Visible = false;
             }
 

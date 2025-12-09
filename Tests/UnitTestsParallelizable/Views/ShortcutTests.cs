@@ -484,7 +484,7 @@ public class ShortcutTests
                               };
 
         var selected = 0;
-        shortcut.Selecting += (s, e) => selected++;
+        shortcut.Activating += (s, e) => selected++;
 
         app.Keyboard.RaiseKeyDownEvent (key);
 

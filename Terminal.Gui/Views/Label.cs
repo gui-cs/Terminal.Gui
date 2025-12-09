@@ -81,7 +81,7 @@ public class Label : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnSelecting (CommandEventArgs args)
+    protected override bool OnActivating (CommandEventArgs args)
     {
         // If Label can't focus and is clicked, invoke HotKey on next peer
         if (!CanFocus)
@@ -89,7 +89,7 @@ public class Label : View, IDesignable
             return InvokeCommand (Command.HotKey, args.Context) == true;
         }
 
-        return base.OnSelecting (args);
+        return base.OnActivating (args);
     }
 
     /// <inheritdoc/>
