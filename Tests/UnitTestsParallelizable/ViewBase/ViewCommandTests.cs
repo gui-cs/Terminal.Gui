@@ -258,9 +258,9 @@ public class ViewCommandTests
 
         view.InvokeCommand (Command.Activate);
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnactivatingCount);
 
-        Assert.Equal (1, view.SelectingCount);
+        Assert.Equal (1, view.activatingCount);
 
         Assert.Equal (canFocus, view.HasFocus);
     }
@@ -274,9 +274,9 @@ public class ViewCommandTests
         view.HandleOnActivating = true;
         Assert.True (view.InvokeCommand (Command.Activate));
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnactivatingCount);
 
-        Assert.Equal (0, view.SelectingCount);
+        Assert.Equal (0, view.activatingCount);
     }
 
     [Fact]
@@ -322,7 +322,7 @@ public class ViewCommandTests
         var view = new ViewEventTester ();
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
 
-        Assert.Equal (1, view.OnSelectingCount);
+        Assert.Equal (1, view.OnactivatingCount);
     }
 
     #endregion OnSelect/Select tests
@@ -405,7 +405,7 @@ public class ViewCommandTests
             Activating += (s, a) =>
                          {
                              a.Handled = HandleSelecting;
-                             SelectingCount++;
+                             activatingCount++;
                          };
 
             CommandNotBound += (s, a) =>
@@ -443,8 +443,8 @@ public class ViewCommandTests
 
         public bool HandleHandlingHotKey { get; set; }
 
-        public int OnSelectingCount { get; set; }
-        public int SelectingCount { get; set; }
+        public int OnactivatingCount { get; set; }
+        public int activatingCount { get; set; }
         public bool HandleOnActivating { get; set; }
         public bool HandleSelecting { get; set; }
 
@@ -452,7 +452,7 @@ public class ViewCommandTests
         /// <inheritdoc/>
         protected override bool OnActivating (CommandEventArgs args)
         {
-            OnSelectingCount++;
+            OnactivatingCount++;
 
             return HandleOnActivating;
         }

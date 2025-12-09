@@ -69,9 +69,9 @@ public class ShortcutTests
     public void MouseClick_Default_CommandView_Raises_Accepted_Selected_Correctly (
         int mouseX,
         int expectedCommandViewAccepted,
-        int expectedCommandViewSelected,
+        int expectedCommandViewActivated,
         int expectedShortcutAccepted,
-        int expectedShortcutSelected
+        int expectedShortcutActivated
     )
     {
         Application.Begin (new Runnable<bool> ());
@@ -85,8 +85,8 @@ public class ShortcutTests
 
         var commandViewAcceptCount = 0;
         shortcut.CommandView.Accepting += (s, e) => { commandViewAcceptCount++; };
-        var commandViewSelectCount = 0;
-        shortcut.CommandView.Activating += (s, e) => { commandViewSelectCount++; };
+        var commandViewActivatingCount = 0;
+        shortcut.CommandView.Activating += (s, e) => { commandViewActivatingCount++; };
 
         var shortcutAcceptCount = 0;
         shortcut.Accepting += (s, e) => { shortcutAcceptCount++; };
@@ -105,9 +105,9 @@ public class ShortcutTests
                                   });
 
         Assert.Equal (expectedShortcutAccepted, shortcutAcceptCount);
-        Assert.Equal (expectedShortcutSelected, shortcutSelectCount);
+        Assert.Equal (expectedShortcutActivated, shortcutSelectCount);
         Assert.Equal (expectedCommandViewAccepted, commandViewAcceptCount);
-        Assert.Equal (expectedCommandViewSelected, commandViewSelectCount);
+        Assert.Equal (expectedCommandViewActivated, commandViewActivatingCount);
 
         Application.TopRunnableView.Dispose ();
         Application.ResetState (true);
@@ -202,24 +202,24 @@ public class ShortcutTests
         var checkboxAccepted = 0;
         shortcut.CommandView.Accepting += (s, e) => { checkboxAccepted++; };
 
-        var checkboxSelected = 0;
+        var checkboxActivated = 0;
         shortcut.CommandView.Activating += (s, e) =>
                                          {
                                              if (e.Handled)
                                              {
                                                  return;
                                              }
-                                             checkboxSelected++;
+                                             checkboxActivated++;
                                          };
 
         Application.TopRunnableView.Add (shortcut);
         Application.TopRunnableView.SetRelativeLayout (new (100, 100));
         Application.TopRunnableView.LayoutSubViews ();
 
-        var selected = 0;
+        var activatingCount = 0;
         shortcut.Activating += (s, e) =>
         {
-            selected++;
+            activatingCount++;
         };
 
         var accepted = 0;
@@ -237,9 +237,9 @@ public class ShortcutTests
                                   });
 
         Assert.Equal (expectedAccepted, accepted);
-        Assert.Equal (expectedAccepted, selected);
+        Assert.Equal (expectedAccepted, activatingCount);
         Assert.Equal (expectedCheckboxAccepted, checkboxAccepted);
-        Assert.Equal (expectedCheckboxAccepted, checkboxSelected);
+        Assert.Equal (expectedCheckboxAccepted, checkboxActivated);
 
         Application.TopRunnableView.Dispose ();
         Application.ResetState (true);

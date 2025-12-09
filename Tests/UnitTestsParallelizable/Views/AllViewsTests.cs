@@ -146,15 +146,15 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             designable.EnableForDesign ();
         }
 
-        var selectingCount = 0;
-        view.Activating += (s, e) => selectingCount++;
+        var activatingCount = 0;
+        view.Activating += (s, e) => activatingCount++;
 
         var acceptedCount = 0;
         view.Accepting += (s, e) => { acceptedCount++; };
 
         if (view.InvokeCommand (Command.Activate) == true)
         {
-            Assert.Equal (1, selectingCount);
+            Assert.Equal (1, activatingCount);
             Assert.Equal (0, acceptedCount);
         }
         view?.Dispose ();
@@ -178,15 +178,15 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             designable.EnableForDesign ();
         }
 
-        var selectingCount = 0;
-        view.Activating += (s, e) => selectingCount++;
+        var activatingCount = 0;
+        view.Activating += (s, e) => activatingCount++;
 
         var acceptingCount = 0;
         view.Accepting += (s, e) => { acceptingCount++; };
 
         if (view.InvokeCommand (Command.Accept) == true)
         {
-            Assert.Equal (0, selectingCount);
+            Assert.Equal (0, activatingCount);
             Assert.Equal (1, acceptingCount);
         }
         view?.Dispose ();

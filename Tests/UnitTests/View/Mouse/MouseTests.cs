@@ -106,7 +106,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button2Clicked)]
     [InlineData (MouseFlags.Button3Clicked)]
     [InlineData (MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Selecting (MouseFlags clicked)
+    public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Activating (MouseFlags clicked)
     {
         MouseEventArgs me = new ();
 
@@ -117,13 +117,13 @@ public class MouseTests : TestsAllViews
             WantContinuousButtonPressed = true
         };
 
-        var selectingCount = 0;
+        var activatingCount = 0;
 
-        view.Activating += (s, e) => selectingCount++;
+        view.Activating += (s, e) => activatingCount++;
 
         me.Flags = clicked;
         view.NewMouseEvent (me);
-        Assert.Equal (1, selectingCount);
+        Assert.Equal (1, activatingCount);
 
         view.Dispose ();
 

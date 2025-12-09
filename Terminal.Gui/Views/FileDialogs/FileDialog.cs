@@ -195,7 +195,7 @@ public class FileDialog : Dialog, IDesignable
         };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
-        _tableView.Activating += OnTableViewSelecting;
+        _tableView.Activating += OnTableViewActivating;
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -1046,7 +1046,7 @@ public class FileDialog : Dialog, IDesignable
         }
     }
 
-    private void OnTableViewSelecting (object? sender, CommandEventArgs e)
+    private void OnTableViewActivating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
         if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
