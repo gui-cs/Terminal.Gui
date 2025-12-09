@@ -12,6 +12,25 @@ The `Command` system in Terminal.Gui provides a standardized framework for defin
 
 This deep dive explores the `Command` and `View.Command` APIs, focusing on the `Activating` and `Accepting` concepts, their implementation, and their propagation behavior. It critically evaluates the need for additional events (`Selected`/`Accepted`) and the propagation of `Activating` events, drawing on insights from `Menu`, `MenuItemv2`, `MenuBar`, `CheckBox`, and `FlagSelector`. These implementations highlight the system’s application in hierarchical (menus) and stateful (checkboxes, flag selectors) contexts. The document reflects the current implementation, including the `Cancel` property in `CommandEventArgs` and local handling of `Command.Activate`. An appendix briefly summarizes proposed changes from a filed issue noting the rename from `Command.Select` to `Command.Activate` has been completed, replace `Cancel` with `Handled`, and introduce a propagation mechanism, addressing limitations in the current system.
 
+
+This diagram shows the fundamental command invocation flow within a single view, demonstrating the Cancellable Work Pattern with pre-events (e.g., `Activating`, `Accepting`) and the command handler execution.
+
+```mermaid
+flowchart TD
+    input["User input (key/mouse)"] --> invoke["View.InvokeCommand(command)"]
+    invoke --> |Command.Activate| act_pre["OnActivating + Activating handlers"]
+    invoke --> |Command.Accept| acc_pre["OnAccepting + Accepting handlers"]
+
+    act_pre --> |canceled| act_stop["Stop"]
+    act_pre --> |not canceled| act_handler["Execute command handler"]
+    act_handler --> act_done["Complete (returns bool?)"]
+
+    acc_pre --> |canceled| acc_stop["Stop"]
+    acc_pre --> |not canceled| acc_handler["Execute command handler"]
+    acc_handler --> acc_prop["Propagate to default button/superview if unhandled"]
+    acc_prop --> acc_done["Complete (returns bool?)"]
+```
+
 ## Overview of the Command System
 
 The `Command` system in Terminal.Gui defines a set of standard actions via the `Command` enum (e.g., `Command.Activate`, `Command.Accept`, `Command.HotKey`, `Command.StartOfPage`). These actions are triggered by user inputs (e.g., key presses, mouse clicks) or programmatically, enabling consistent view interactions.
