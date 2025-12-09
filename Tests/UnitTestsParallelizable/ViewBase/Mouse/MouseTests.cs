@@ -3,11 +3,20 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Mouse;
 
-
-[Collection ("Global Test Setup")]
 [Trait ("Category", "Input")]
 public class MouseTests (ITestOutputHelper output) : TestsAllViews
 {
+    [Fact]
+    public void Default_MouseBindings ()
+    {
+        var testView = new View ();
+
+        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Select));
+//        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+
+        Assert.Equal (5, testView.MouseBindings.GetBindings ().Count ());
+    }
+
     [Theory]
     [InlineData (false, false, false)]
     [InlineData (true, false, true)]
