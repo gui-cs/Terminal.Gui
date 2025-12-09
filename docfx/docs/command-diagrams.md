@@ -59,37 +59,37 @@ This diagram illustrates the complete command flow in a complex hierarchical sce
 
 ```mermaid
 flowchart TD
-    subgraph Scenario1["Scenario 1: Shortcut Activation (Alt+F)"]
-        sc_input["Alt+F pressed"] --> sc_find["Shortcut finds MenuBarItem"]
-        sc_find --> sc_hotkey["MenuBarItem.InvokeCommand(HotKey)"]
-        sc_hotkey --> sc_pre["OnHandlingHotKey + HandlingHotKey"]
-        sc_pre --> sc_focus["MenuBarItem sets focus"]
-        sc_focus --> sc_show["MenuBar shows popover for MenuBarItem"]
-    end
-
-    subgraph Scenario2["Scenario 2: Menu Navigation (Arrow Keys)"]
-        nav_input["Arrow keys pressed"] --> nav_activate["MenuItem.InvokeCommand(Activate)"]
-        nav_activate --> nav_pre["MenuItem OnActivating + Activating"]
-        nav_pre --> |not canceled| nav_focus["MenuItem sets focus"]
-        nav_focus --> nav_changed["Menu.SelectedMenuItemChanged raised"]
-        nav_changed --> nav_bar["MenuBar.OnSelectedMenuItemChanged"]
-        nav_bar --> nav_done["Update popover visibility if needed"]
-        nav_pre --> |canceled| nav_stop["Stop"]
-    end
-
-    subgraph Scenario3["Scenario 3: Accept Menu Item (Enter)"]
-        acc_input["Enter pressed on MenuItem"] --> acc_pre["MenuItem OnAccepting + Accepting"]
-        acc_pre --> |canceled| acc_stop["Stop"]
-        acc_pre --> |has action| acc_exec["Execute menu item action"]
-        acc_exec --> acc_accepted["MenuItem.RaiseAccepted"]
-        acc_accepted --> acc_menu["Menu.OnAccepted propagates"]
-        acc_menu --> acc_bar["MenuBar.OnAccepted"]
-        acc_bar --> acc_close["MenuBar hides popover, deactivates"]
-        
-        acc_pre --> |has submenu| acc_sub["Propagate to parent Menu.Accept"]
-        acc_sub --> acc_popover["Show submenu popover"]
-        acc_popover --> acc_submenu_done["Submenu displayed"]
-    end
+    sc_header["=== Scenario 1: Shortcut Activation (Alt+F) ==="]
+    sc_header --> sc_input["Alt+F pressed"]
+    sc_input --> sc_find["Shortcut finds MenuBarItem"]
+    sc_find --> sc_hotkey["MenuBarItem.InvokeCommand(HotKey)"]
+    sc_hotkey --> sc_pre["OnHandlingHotKey + HandlingHotKey"]
+    sc_pre --> sc_focus["MenuBarItem sets focus"]
+    sc_focus --> sc_show["MenuBar shows popover for MenuBarItem"]
+    
+    sc_show --> nav_header["=== Scenario 2: Menu Navigation (Arrow Keys) ==="]
+    nav_header --> nav_input["Arrow keys pressed"]
+    nav_input --> nav_activate["MenuItem.InvokeCommand(Activate)"]
+    nav_activate --> nav_pre["MenuItem OnActivating + Activating"]
+    nav_pre --> |canceled| nav_stop["Stop"]
+    nav_pre --> |not canceled| nav_focus["MenuItem sets focus"]
+    nav_focus --> nav_changed["Menu.SelectedMenuItemChanged raised"]
+    nav_changed --> nav_bar["MenuBar.OnSelectedMenuItemChanged"]
+    nav_bar --> nav_done["Update popover visibility if needed"]
+    
+    nav_done --> acc_header["=== Scenario 3: Accept Menu Item (Enter) ==="]
+    acc_header --> acc_input["Enter pressed on MenuItem"]
+    acc_input --> acc_pre["MenuItem OnAccepting + Accepting"]
+    acc_pre --> |canceled| acc_stop["Stop"]
+    acc_pre --> |has action| acc_exec["Execute menu item action"]
+    acc_exec --> acc_accepted["MenuItem.RaiseAccepted"]
+    acc_accepted --> acc_menu["Menu.OnAccepted propagates"]
+    acc_menu --> acc_bar["MenuBar.OnAccepted"]
+    acc_bar --> acc_close["MenuBar hides popover, deactivates"]
+    
+    acc_pre --> |has submenu| acc_sub["Propagate to parent Menu.Accept"]
+    acc_sub --> acc_popover["Show submenu popover"]
+    acc_popover --> acc_submenu_done["Submenu displayed"]
 ```
 
 **Key Points:**
