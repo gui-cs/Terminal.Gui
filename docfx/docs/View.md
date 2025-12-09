@@ -127,7 +127,7 @@ See the [Command Deep Dive](command.md).
 
 - [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Declares commands the View supports
 - [View.InvokeCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Invokes a command
-- [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Select, HotKey, etc.)
+- [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
 
 ### Input Handling
 
