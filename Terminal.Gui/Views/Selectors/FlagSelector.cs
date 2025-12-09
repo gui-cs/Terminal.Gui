@@ -4,12 +4,12 @@ namespace Terminal.Gui.Views;
 // Click - Focus, Select (Toggle), and do NOT Accept the item under the mouse.
 // Not Focused:
 //  HotKey - Restore Focus. Do NOT change Active.
-//  Item HotKey - Focus item. Select (Toggle) item. Do NOT Accept.
+//  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
 // Focused:
-//  Space key - Select (Toggle) focused item. Do NOT Accept.
-//  Enter key - Select (Toggle) and Accept the focused item.
+//  Space key - Activate (Toggle) focused item. Do NOT Accept.
+//  Enter key - Activate (Toggle) and Accept the focused item.
 //  HotKey - No-op.
-//  Item HotKey - Focus item, Select (Toggle), and do NOT Accept.
+//  Item HotKey - Focus item, Activate (Toggle), and do NOT Accept.
 
 /// <summary>
 ///     Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary.
@@ -31,7 +31,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.CheckedStateChanging += OnCheckboxOnCheckedStateChanging;
         checkbox.CheckedStateChanged += OnCheckboxOnCheckedStateChanged;
-        checkbox.Selecting += OnCheckboxOnSelecting;
+        checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
@@ -76,7 +76,7 @@ public class FlagSelector : SelectorBase, IDesignable
         Value = newValue;
     }
 
-    private void OnCheckboxOnSelecting (object? sender, CommandEventArgs args)
+    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -85,13 +85,13 @@ public class FlagSelector : SelectorBase, IDesignable
 
         if (checkbox.CanFocus)
         {
-            // For Select, if the view is focusable and SetFocus succeeds, by defition,
+            // For Activate, if the view is focusable and SetFocus succeeds, by definition,
             // the event is handled. So return what SetFocus returns.
             checkbox.SetFocus ();
         }
 
-        // Selecting doesn't normally propogate, so we do it here
-        if (InvokeCommand (Command.Select, args.Context) is true)
+        // Activating doesn't normally propagate, so we do it here
+        if (InvokeCommand (Command.Activate, args.Context) is true)
         {
             // Do not return here; we want to toggle the checkbox state
             args.Handled = true;

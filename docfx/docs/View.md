@@ -127,7 +127,7 @@ See the [Command Deep Dive](command.md).
 
 - [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Declares commands the View supports
 - [View.InvokeCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Invokes a command
-- [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Select, HotKey, etc.)
+- [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
 
 ### Input Handling
 
@@ -228,8 +228,8 @@ Events:
 - `HasFocusChanged` - After focus changes
 - `Accepting` - When Command.Accept is invoked (typically Enter key)
 - `Accepted` - After Command.Accept completes
-- `Selecting` - When Command.Select is invoked (typically Space or mouse click)
-- `Selected` - After Command.Select completes
+- `Activating` - When Command.Activate is invoked (typically Space or mouse click)
+- `Activated` - After Command.Activate completes
 
 ### Scrolling
 
@@ -340,7 +340,7 @@ view.AddCommand (Command.Accept, () =>
 view.KeyBindings.Add (Key.Enter, Command.Accept);
 
 // Bind a mouse action to the command
-view.MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
+view.MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
 ```
 
 ### Input
@@ -610,7 +610,7 @@ Color? result = Application.Create()
 
 if (result is { })
 {
-    Console.WriteLine($"Selected: {result}");
+    Console.WriteLine($"Activated: {result}");
 }
 ```
 

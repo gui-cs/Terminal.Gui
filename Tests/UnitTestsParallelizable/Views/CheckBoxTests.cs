@@ -22,7 +22,7 @@ public class CheckBoxTests ()
         ckb.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
         var selectCount = 0;
-        ckb.Selecting += (s, e) => selectCount++;
+        ckb.Activating += (s, e) => selectCount++;
 
         var acceptCount = 0;
         ckb.Accepting += (s, e) => acceptCount++;
@@ -250,7 +250,7 @@ public class CheckBoxTests ()
         checkBox.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
         var selectCount = 0;
-        checkBox.Selecting += (s, e) => selectCount++;
+        checkBox.Activating += (s, e) => selectCount++;
 
         var acceptCount = 0;
         checkBox.Accepting += (s, e) => acceptCount++;
@@ -292,7 +292,7 @@ public class CheckBoxTests ()
         checkBox.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
         var selectCount = 0;
-        checkBox.Selecting += (s, e) => selectCount++;
+        checkBox.Activating += (s, e) => selectCount++;
 
         var acceptCount = 0;
 
