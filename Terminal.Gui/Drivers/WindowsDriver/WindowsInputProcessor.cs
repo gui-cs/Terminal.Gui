@@ -73,7 +73,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             case WindowsConsole.EventType.Mouse:
                 MouseEventArgs me = ToMouseEvent (inputEvent.MouseEvent);
 
-                RaiseMouseEvent (me);
+                RaiseSyntheticMouseEvent (me);
 
                 break;
         }

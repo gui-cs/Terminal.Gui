@@ -341,7 +341,7 @@ public class Buttons : Scenario
         {
             X = 0,
             Y = Pos.Bottom (moveUnicodeHotKeyBtn) + 1,
-            Title = "_Numeric Up/Down (press-and-hold):",
+            Title = "Numeric Up/Down (press-and-_hold):",
         };
 
         var numericUpDown = new NumericUpDown<int>
@@ -360,7 +360,7 @@ public class Buttons : Scenario
         {
             X = 0,
             Y = Pos.Bottom (numericUpDown) + 1,
-            Title = "_No Repeat:"
+            Title = "No Repea_t:"
         };
         var noRepeatAcceptCount = 0;
 
@@ -368,22 +368,48 @@ public class Buttons : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accept Cou_nt: {noRepeatAcceptCount}",
+            Title = $"Accepting Count: {noRepeatAcceptCount}",
             WantContinuousButtonPressed = false
         };
         noRepeatButton.Accepting += (s, e) =>
                                  {
-                                     noRepeatButton.Title = $"Accept Cou_nt: {++noRepeatAcceptCount}";
+                                     noRepeatButton.Title = $"Accepting Count: {++noRepeatAcceptCount}";
+                                     Logging.Trace ("noRepeatButton Button Pressed");
                                      e.Handled = true;
                                  };
         main.Add (label, noRepeatButton);
 
         label = new ()
         {
+            X = Pos.Right (noRepeatButton) + 1,
+            Y = Pos.Top (label),
+            Title = "N_o Repeat (no highlight):"
+        };
+        var noRepeatNoHighlightAcceptCount = 0;
+
+        var noRepeatNoHighlight = new Button
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Title = $"Accepting Count: {noRepeatNoHighlightAcceptCount}",
+            WantContinuousButtonPressed = false,
+            HighlightStates = MouseState.None
+        };
+        noRepeatNoHighlight.Accepting += (s, e) =>
+                                         {
+                                             noRepeatNoHighlight.Title = $"Accepting Count: {++noRepeatNoHighlightAcceptCount}";
+                                             Logging.Trace ("noRepeatNoHighlight Button Pressed");
+                                             e.Handled = true;
+                                         };
+        main.Add (label, noRepeatNoHighlight);
+
+        label = new ()
+        {
             X = 0,
             Y = Pos.Bottom (label) + 1,
-            Title = "_Repeat (press-and-hold):"
+            Title = "Repeat (_press-and-hold):"
         };
+
         var acceptCount = 0;
 
         var repeatButton = new Button
@@ -391,12 +417,12 @@ public class Buttons : Scenario
             Id = "repeatButton",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accept Co_unt: {acceptCount}",
+            Title = $"Accepting Count: {acceptCount}",
             WantContinuousButtonPressed = true
         };
         repeatButton.Accepting += (s, e) =>
                                {
-                                   repeatButton.Title = $"Accept Co_unt: {++acceptCount}";
+                                   repeatButton.Title = $"Accepting Count: {++acceptCount}";
                                    e.Handled = true;
                                };
 

@@ -94,5 +94,5 @@ public class MouseEventArgs : HandledEventArgs
 
     /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEventArgs"/>.</summary>
     /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEventArgs"/>.</returns>
-    public override string ToString () { return $"({ScreenPosition}):{Flags}:{View?.Id}:{Position}"; }
+    public override string ToString () { return $"{ScreenPosition}:{Flags}:{View?.Id}:{Position}"; }
 }

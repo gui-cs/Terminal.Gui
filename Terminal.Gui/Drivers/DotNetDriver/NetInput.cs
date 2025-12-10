@@ -42,6 +42,10 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
             //Set cursor key to application.
             Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
+            // CSI_EnableMouseEvents enables
+            // Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons
+            // Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)
+            // Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
             Console.TreatControlCAsInput = true;
         }

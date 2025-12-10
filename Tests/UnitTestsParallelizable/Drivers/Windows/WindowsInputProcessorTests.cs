@@ -111,7 +111,7 @@ public class WindowsInputProcessorTests
 
         List<MouseEventArgs> mouseEvents = [];
 
-        processor.MouseEvent += (s, e) => { mouseEvents.Add (e); };
+        processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
         Assert.Empty (mouseEvents);
 
@@ -148,7 +148,7 @@ public class WindowsInputProcessorTests
 
         List<MouseEventArgs> mouseEvents = [];
 
-        processor.MouseEvent += (s, e) => { mouseEvents.Add (e); };
+        processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
         Assert.Empty (mouseEvents);
 
@@ -183,7 +183,7 @@ public class WindowsInputProcessorTests
 
         List<MouseEventArgs> mouseEvents = [];
 
-        processor.MouseEvent += (s, e) => { mouseEvents.Add (e); };
+        processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
         Assert.Empty (mouseEvents);
 

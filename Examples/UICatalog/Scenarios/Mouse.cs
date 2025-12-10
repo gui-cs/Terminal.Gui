@@ -56,16 +56,47 @@ public class Mouse : Scenario
             Y = Pos.Bottom (filterSlider) + 1
         };
         win.Add (clearButton);
-        Label ml;
-        var count = 0;
-        ml = new () { X = Pos.Right (filterSlider), Y = 0, Text = "Mouse: " };
 
-        win.Add (ml);
+        var driverCount = 0;
+        View lastDriverEvent = new ()
+        {
+            Height = 1,
+            Width = Dim.Auto (),
+            X = Pos.Right (filterSlider),
+            Y = 0,
+            Text = "Last Driver Event: "
+        };
+
+        win.Add (lastDriverEvent);
+
+        var appCount = 0;
+        View lastAppEvent = new ()
+        {
+            Height = 1,
+            Width = Dim.Auto (),
+            X = Pos.Right (filterSlider),
+            Y = Pos.Bottom(lastDriverEvent),
+            Text = "Last App Event: "
+        };
+
+        win.Add (lastAppEvent);
+
+        var winCount = 0;
+        View lastWinEvent = new ()
+        {
+            Height = 1,
+            Width = Dim.Auto (),
+            X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (lastAppEvent),
+            Text = "Last Win Event: "
+        };
+
+        win.Add (lastWinEvent);
 
         CheckBox cbWantContinuousPresses = new ()
         {
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (ml),
+            Y = Pos.Bottom (lastWinEvent),
             Title = "_Want Continuous Button Pressed"
         };
 
@@ -234,8 +265,40 @@ public class Mouse : Scenario
 
         var label = new Label
         {
-            Text = "_App Events:",
+            Text = "Dri_ver Events:",
             X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (demo)
+        };
+
+        ObservableCollection<string> driverLogList = new ();
+
+        var driverLog = new ListView
+        {
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+            Width = Dim.Auto (),
+            Height = Dim.Fill (),
+            SchemeName = "Runnable",
+            Source = new ListWrapper<string> (driverLogList)
+        };
+        win.Add (label, driverLog);
+
+        Application.Driver.GetInputProcessor ().MouseEventParsed += (_, mouseEvent) =>
+                                  {
+                                      int i = filterSlider.Options.FindIndex (o => mouseEvent.Flags.HasFlag (o.Data));
+
+                                      //if (filterSlider.GetSetOptions ().Contains (i))
+                                      {
+                                          lastDriverEvent.Text = $"Last Driver Event: {mouseEvent}";
+                                          Logging.Trace (lastDriverEvent.Text);
+                                          driverLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}:{winCount++}");
+                                          driverLog.MoveEnd ();
+                                      }
+                                  };
+        label = new Label
+        {
+            Text = "_App Events:",
+            X = Pos.Right (driverLog) + 1,
             Y = Pos.Bottom (demo)
         };
 
@@ -245,22 +308,22 @@ public class Mouse : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = 50,
+            Width = Dim.Auto (),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
 
-        Application.MouseEvent += (_, a) =>
+        Application.MouseEvent += (_, mouseEvent) =>
                                   {
-                                      int i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
+                                      int i = filterSlider.Options.FindIndex (o => mouseEvent.Flags.HasFlag (o.Data));
 
                                       if (filterSlider.GetSetOptions ().Contains (i))
                                       {
-                                          ml.Text = $"MouseEvent: ({a.Position}) - {a.Flags} {count}";
-                                          appLogList.Add ($"({a.Position}) - {a.Flags} {count++}");
-                                          appLog.MoveDown ();
+                                          lastAppEvent.Text = $"   Last App Event: {mouseEvent}";
+                                          appLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}:{winCount++}");
+                                          appLog.MoveEnd ();
                                       }
                                   };
 
@@ -276,7 +339,7 @@ public class Mouse : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Percent (50),
+            Width = Dim.Auto (),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (winLogList)
@@ -285,20 +348,23 @@ public class Mouse : Scenario
 
         clearButton.Accepting += (_, _) =>
                                  {
+                                     driverLogList.Clear ();
+                                     driverLog.SetSource (driverLogList);
                                      appLogList.Clear ();
                                      appLog.SetSource (appLogList);
                                      winLogList.Clear ();
                                      winLog.SetSource (winLogList);
                                  };
 
-        win.MouseEvent += (_, a) =>
+        win.MouseEvent += (_, mouseEvent) =>
                           {
-                              int i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
+                              int i = filterSlider.Options.FindIndex (o => mouseEvent.Flags.HasFlag (o.Data));
 
                               if (filterSlider.GetSetOptions ().Contains (i))
                               {
-                                  winLogList.Add ($"MouseEvent: ({a.Position}) - {a.Flags} {count++}");
-                                  winLog.MoveDown ();
+                                  lastWinEvent.Text = $"   Last Win Event: {mouseEvent}";
+                                  winLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}:{winCount++}");
+                                  winLog.MoveEnd ();
                               }
                           };
 

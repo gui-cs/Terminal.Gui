@@ -18,7 +18,7 @@ public interface IMouse : IMouseGrabHandler
     IApplication? App { get; set; }
 
     /// <summary>
-    ///     Gets or sets the last known position of the mouse.
+    ///     Gets or sets the last known position of the mouse in screen coordinates.
     /// </summary>
     Point? LastMousePosition { get; set; }
 

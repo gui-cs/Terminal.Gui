@@ -29,28 +29,18 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public bool IsMouseDisabled { get; set; }
 
+    // Event handler for Application static property changes
+    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e)
+    {
+        IsMouseDisabled = e.NewValue;
+    }
+
     /// <inheritdoc/>
     public List<View?> CachedViewsUnderMouse { get; } = [];
 
     /// <inheritdoc/>
     public event EventHandler<MouseEventArgs>? MouseEvent;
 
-    // Mouse grab functionality merged from MouseGrabHandler
-
-    /// <inheritdoc/>
-    public View? MouseGrabView { get; private set; }
-
-    /// <inheritdoc/>
-    public event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
-
-    /// <inheritdoc/>
-    public event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
-
-    /// <inheritdoc/>
-    public event EventHandler<ViewEventArgs>? GrabbedMouse;
-
-    /// <inheritdoc/>
-    public event EventHandler<ViewEventArgs>? UnGrabbedMouse;
 
     /// <inheritdoc/>
     public void RaiseMouseEvent (MouseEventArgs mouseEvent)
@@ -224,7 +214,7 @@ internal class MouseImpl : IMouse, IDisposable
             }
 
             CachedViewsUnderMouse.Add (view);
-            var raise = false;
+            bool raise;
 
             if (view is Adornment { Parent: { } } adornmentView)
             {
@@ -252,16 +242,22 @@ internal class MouseImpl : IMouse, IDisposable
         }
     }
 
-    /// <inheritdoc/>
-    public void ResetState ()
-    {
-        // Do not clear LastMousePosition; Popover's require it to stay set with last mouse pos.
-        CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
-        MouseGrabView = null;
-    }
+    #region IMouseGrabHandler Implementation
 
-    // Mouse grab functionality merged from MouseGrabHandler
+    /// <inheritdoc/>
+    public View? MouseGrabView { get; private set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
+
+    /// <inheritdoc/>
+    public event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
+
+    /// <inheritdoc/>
+    public event EventHandler<ViewEventArgs>? GrabbedMouse;
+
+    /// <inheritdoc/>
+    public event EventHandler<ViewEventArgs>? UnGrabbedMouse;
 
     /// <inheritdoc/>
     public void GrabMouse (View? view)
@@ -273,7 +269,7 @@ internal class MouseImpl : IMouse, IDisposable
 
         if (view is null)
         {
-            UngrabMouse();
+            UngrabMouse ();
             return;
         }
 
@@ -395,15 +391,23 @@ internal class MouseImpl : IMouse, IDisposable
         return false;
     }
 
-    // Event handler for Application static property changes
-    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e)
+    #endregion IMouseGrabHandler Implementation
+
+
+    /// <inheritdoc/>
+    public void ResetState ()
     {
-        IsMouseDisabled = e.NewValue;
+        // Do not clear LastMousePosition; Popovers require it to stay set with last mouse pos.
+        CachedViewsUnderMouse.Clear ();
+        MouseEvent = null;
+        MouseGrabView = null;
     }
 
     /// <inheritdoc/>
     public void Dispose ()
     {
+        ResetState ();
+
         // Unsubscribe from Application static property change events
         Application.IsMouseDisabledChanged -= OnIsMouseDisabledChanged;
     }

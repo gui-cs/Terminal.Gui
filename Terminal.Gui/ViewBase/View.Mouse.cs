@@ -310,10 +310,8 @@ public partial class View // Mouse APIs
                 return true;
             }
 
-            if (WhenGrabbedHandleReleased (mouseEvent))
-            {
-                return mouseEvent.Handled;
-            }
+            // This will change mouseEvent.Flags to clicked if appropriate.
+            WhenGrabbedHandleReleased (mouseEvent);
 
             if (WhenGrabbedHandleClicked (mouseEvent))
             {
@@ -378,7 +376,9 @@ public partial class View // Mouse APIs
     private void MouseHeldDownOnMouseIsHeldDownTick (object? sender, CancelEventArgs<MouseEventArgs> e)
     {
         Logging.Trace ($"MouseHeldDown tick - raising commands bound {e.NewValue.Flags}");
-        /*e.Cancel = */RaiseCommandsBoundToButtonClickedFlags (e.NewValue);
+        e.NewValue.ScreenPosition = App?.Mouse.LastMousePosition ?? e.NewValue.ScreenPosition;
+        /*e.Cancel = */
+        RaiseCommandsBoundToButtonClickedFlags (e.NewValue);
     }
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
@@ -472,25 +472,25 @@ public partial class View // Mouse APIs
 
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed, this method handles the released events from the driver
-    ///     (typically
-    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
+    ///     (when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set). If <see cref="MouseState"/>
+    ///     is <see cref="MouseState.In"/>, this method modifies the <see cref="MouseEventArgs.Flags"/> to be the corresponding
+    ///     clicked flag (e.g., <see cref="MouseFlags.LeftButtonClicked"/>).
     /// </summary>
     /// <param name="mouseEvent"></param>
-    internal bool WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
+    internal void WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
     {
-        if (App is { } && App.Mouse.MouseGrabView == this)
+        if (App is null || App.Mouse.MouseGrabView != this)
         {
-            MouseState &= ~MouseState.Pressed;
-            MouseState &= ~MouseState.PressedOutside;
-
-            if (MouseState.HasFlag (MouseState.In))
-            {
-                mouseEvent.Flags = MouseFlags.LeftButtonPressed;
-                mouseEvent.Flags |= MouseFlags.LeftButtonClicked;
-            }
+            return;
         }
 
-        return false;//mouseEvent.Handled = true;
+        MouseState &= ~MouseState.Pressed;
+        MouseState &= ~MouseState.PressedOutside;
+
+        if (!WantContinuousButtonPressed && MouseState.HasFlag (MouseState.In))
+        {
+            ConvertReleasedToClicked(mouseEvent);
+        }
     }
 
     /// <summary>
@@ -554,29 +554,49 @@ public partial class View // Mouse APIs
         // but the actual mouse events coming from the driver are often pressed events (LeftButtonPressed).
         // This switch expression bridges that gap by converting pressed events to clicked
         // events so they can be matched against the command bindings.
-        MouseEventArgs clickedArgs = new ();
+        ConvertPressedToClicked (args);
 
-        clickedArgs.Flags = args.IsPressed
-                                ? args.Flags switch
-                                {
-                                    MouseFlags.LeftButtonPressed => MouseFlags.LeftButtonClicked,
-                                    MouseFlags.MiddleButtonPressed => MouseFlags.MiddleButtonClicked,
-                                    MouseFlags.RightButtonPressed => MouseFlags.RightButtonClicked,
-                                    MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
-                                    _ => clickedArgs.Flags
-                                }
-                                : args.Flags;
-
-        clickedArgs.Position = args.Position;
-        clickedArgs.ScreenPosition = args.ScreenPosition;
-        clickedArgs.View = args.View;
-
-        Logging.Trace ($"Invoking commands bound to mouse: {clickedArgs.Flags}");
+        //Logging.Trace ($"Invoking commands bound to mouse: {args.Flags}");
         // By default, this will raise Activating/OnActivating - Subclasses can override this via
         // ReplaceCommand (Command.Activate ...).
-        args.Handled = InvokeCommandsBoundToMouse (clickedArgs) == true;
+        args.Handled = InvokeCommandsBoundToMouse (args) == true;
 
         return args.Handled;
+    }
+
+
+    private static void ConvertPressedToClicked (MouseEventArgs args)
+    {
+        if (!args.IsPressed)
+        {
+            return;
+        }
+
+        args.Flags = args.Flags switch
+        {
+            MouseFlags.LeftButtonPressed => MouseFlags.LeftButtonClicked,
+            MouseFlags.MiddleButtonPressed => MouseFlags.MiddleButtonClicked,
+            MouseFlags.RightButtonPressed => MouseFlags.RightButtonClicked,
+            MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+            _ => args.Flags
+        };
+    }
+
+    private static void ConvertReleasedToClicked (MouseEventArgs args)
+    {
+        if (!args.IsReleased)
+        {
+            return;
+        }
+
+        args.Flags = args.Flags switch
+        {
+            MouseFlags.LeftButtonReleased => MouseFlags.LeftButtonClicked,
+            MouseFlags.MiddleButtonReleased => MouseFlags.MiddleButtonClicked,
+            MouseFlags.RightButtonReleased => MouseFlags.RightButtonClicked,
+            MouseFlags.Button4Released => MouseFlags.Button4Clicked,
+            _ => args.Flags
+        };
     }
 
     /// <summary>

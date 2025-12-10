@@ -3,9 +3,57 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Parses mouse ansi escape sequences into <see cref="MouseEventArgs"/>
-///     including support for pressed, released and mouse wheel.
+///     Parses ANSI mouse escape sequences into <see cref="MouseEventArgs"/> including support for button
+///     press/release, mouse wheel, and motion events.
 /// </summary>
+/// <remarks>
+///     <para>
+///         This parser handles SGR (1006) extended mouse mode format: <c>ESC[&lt;button;x;yM/m</c>
+///         where 'M' indicates button press and 'm' indicates button release.
+///     </para>
+///     <para>
+///         <b>Prerequisites:</b> The terminal must have mouse tracking enabled via <see cref="EscSeqUtils.CSI_EnableMouseEvents"/>,
+///         which enables modes 1003 (any-event tracking), 1015 (URXVT), and 1006 (SGR format).
+///     </para>
+///     <para>
+///         <b>Common User Actions and ANSI Behavior:</b>
+///     </para>
+///     <list type="bullet">
+///         <item>
+///             <description>
+///                 <b>Click:</b> Terminal sends one press event (M) at button down, one release event (m) at button up.
+///                 No auto-repeat while held stationary.
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 <b>Drag:</b> Terminal sends one press event (M), multiple motion events with <see cref="MouseFlags.ReportMousePosition"/>
+///                 and the button flag set (e.g., button code 32-34 for drag), then one release event (m).
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 <b>Mouse Move (no button):</b> Terminal sends motion events with button code 35-63 and
+///                 <see cref="MouseFlags.ReportMousePosition"/> flag (mode 1003 only).
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 <b>Scroll Wheel:</b> Terminal sends single events with button codes 64 (up) or 65 (down).
+///                 No press/release distinction - wheel events don't use M/m terminators.
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 <b>Horizontal Wheel:</b> Terminal sends button codes 68 (left) or 69 (right), typically with Shift modifier.
+///             </description>
+///         </item>
+///     </list>
+///     <para>
+///         <b>Coordinate System:</b> ANSI uses 1-based coordinates where (1,1) is the top-left corner.
+///         This parser converts to 0-based coordinates for Terminal.Gui's internal representation.
+///     </para>
+/// </remarks>
 public class AnsiMouseParser
 {
     // Regex patterns for button press/release, wheel scroll, and mouse position reporting
@@ -51,7 +99,7 @@ public class AnsiMouseParser
                 Flags = GetFlags (buttonCode, terminator)
             };
 
-            //Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
+            Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
 
             return m;
         }
