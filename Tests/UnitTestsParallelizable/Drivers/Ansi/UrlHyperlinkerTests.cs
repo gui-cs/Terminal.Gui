@@ -2,7 +2,7 @@
 using System.Text;
 using Xunit.Abstractions;
 
-namespace DriverTests;
+namespace DriverTests.Ansi;
 
 public class Osc8UrlLinkerTests (ITestOutputHelper output)
 {

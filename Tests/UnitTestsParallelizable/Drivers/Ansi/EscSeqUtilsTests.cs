@@ -2,7 +2,7 @@
 
 // ReSharper disable HeuristicUnreachableCode
 
-namespace DriverTests;
+namespace DriverTests.Ansi;
 
 public class EscSeqUtilsTests
 {

@@ -5,7 +5,7 @@ using EventFlags = Terminal.Gui.Drivers.WindowsConsole.EventFlags;
 using ControlKeyState = Terminal.Gui.Drivers.WindowsConsole.ControlKeyState;
 using MouseEventRecord = Terminal.Gui.Drivers.WindowsConsole.MouseEventRecord;
 
-namespace DriverTests;
+namespace DriverTests.Windows;
 
 public class WindowsInputProcessorTests
 {

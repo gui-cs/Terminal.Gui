@@ -1,6 +1,6 @@
 ﻿using UnitTests;
 
-namespace DriverTests;
+namespace DriverTests.Ansi;
 
 public class EscSeqRequestsTests : FakeDriverBase
 {

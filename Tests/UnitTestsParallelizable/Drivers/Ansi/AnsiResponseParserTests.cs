@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using Xunit.Abstractions;
 
-namespace DriverTests;
+namespace DriverTests.Ansi;
 
 // BUGBUG: These tests use TInputRecord of `int`, but that's not a realistic type for keyboard input.
 public class AnsiResponseParserTests (ITestOutputHelper output)

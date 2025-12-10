@@ -1,5 +1,5 @@
 ﻿#nullable disable
-namespace DriverTests;
+namespace DriverTests.Mouse;
 
 public class MouseInterpreterTests
 {

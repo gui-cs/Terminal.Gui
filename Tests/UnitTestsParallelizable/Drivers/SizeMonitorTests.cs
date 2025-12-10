@@ -2,10 +2,10 @@
 
 namespace DriverTests;
 
-public class WindowSizeMonitorTests
+public class SizeMonitorTests
 {
     [Fact]
-    public void TestWindowSizeMonitor_RaisesEventWhenChanges ()
+    public void TestSizeMonitor_RaisesEventWhenChanges ()
     {
         Mock<IOutput> consoleOutput = new ();
 
@@ -39,7 +39,7 @@ public class WindowSizeMonitorTests
     }
 
     [Fact]
-    public void TestWindowSizeMonitor_DoesNotRaiseEventWhen_NoChanges ()
+    public void TestSizeMonitor_DoesNotRaiseEventWhen_NoChanges ()
     {
         Mock<IOutput> consoleOutput = new ();
 
