@@ -25,7 +25,7 @@ public interface IMouseHeldDown : IDisposable
     ///     be undertaken (start timers, <see cref="IMouseGrabHandler.GrabMouse"/> etc).
     /// </summary>
     /// <param name="mouseEventArgs"></param>
-    void Start (MouseEventArgs? mouseEventArgs);
+    void Start (MouseEventArgs mouseEventArgs);
 
     /// <summary>
     ///     Call to indicate that the mouse has been released and any relevant actions should

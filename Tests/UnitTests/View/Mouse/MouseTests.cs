@@ -102,9 +102,9 @@ public class MouseTests : TestsAllViews
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonClicked)]
+    //[InlineData (MouseFlags.RightButtonClicked)]
     [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Activating (MouseFlags clicked)
     {

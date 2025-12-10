@@ -49,14 +49,23 @@ internal class MouseHeldDown : IMouseHeldDown
     /// <summary>
     /// The most recent mouse event arguments associated with the mouse held down action.
     /// </summary>
-    private MouseEventArgs? _mouseEvent;
+    private MouseEventArgs? _mouseEvent = null;
 
-    public void Start (MouseEventArgs? mouseEvent)
+    public void Start (MouseEventArgs mouseEvent)
     {
         if (_isDown)
         {
             return;
         }
+
+        _mouseEvent = new ()
+        {
+                        Flags = mouseEvent.Flags,
+                        Position = mouseEvent.Position,
+                        ScreenPosition = mouseEvent.ScreenPosition,
+                        View = mouseEvent.View
+        };
+        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View!.Id}: {_mouseEvent.Flags}");
 
         _isDown = true;
         _mouseGrabber?.GrabMouse (_mouseGrabView);
@@ -67,6 +76,15 @@ internal class MouseHeldDown : IMouseHeldDown
 
     public void Stop ()
     {
+        if (_mouseEvent is null)
+        {
+            Logging.Trace ($"host: {_mouseGrabView.Id}");
+
+            return;
+        }
+        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View!.Id}: {_mouseEvent.Flags}");
+
+        _mouseEvent = null;
         _smoothTimeout.Reset ();
 
         if (_mouseGrabber?.MouseGrabView == _mouseGrabView)
@@ -87,6 +105,7 @@ internal class MouseHeldDown : IMouseHeldDown
     {
         if (_mouseGrabber?.MouseGrabView == _mouseGrabView)
         {
+            Logging.Trace ($"host: {_mouseGrabView.Id} Disposing and ungrabbing mouse");
             Stop ();
         }
     }
@@ -102,9 +121,9 @@ internal class MouseHeldDown : IMouseHeldDown
 
     private bool RaiseMouseIsHeldDownTick ()
     {
-        MouseEventArgs? currMouseEventArgs = _mouseEvent ?? new MouseEventArgs ();
-        MouseEventArgs? newMouseEventArgs = _mouseEvent ?? new MouseEventArgs();
-        CancelEventArgs<MouseEventArgs> args = new (currentValue: ref currMouseEventArgs, newValue: ref newMouseEventArgs);
+        MouseEventArgs currentMouseEventArgs = _mouseEvent ?? new MouseEventArgs ();
+        MouseEventArgs newMouseEventArgs = _mouseEvent ?? new MouseEventArgs();
+        CancelEventArgs<MouseEventArgs> args = new (currentValue: ref currentMouseEventArgs, newValue: ref newMouseEventArgs);
 
         args.Cancel = OnMouseIsHeldDownTick (args) || args.Cancel;
 
@@ -117,6 +136,7 @@ internal class MouseHeldDown : IMouseHeldDown
         // stop the currently running operation.
         if (args.Cancel)
         {
+            Logging.Trace ($"host: {_mouseGrabView.Id} MouseIsHeldDownTick cancelled, stopping");
             Stop ();
         }
 
@@ -125,8 +145,6 @@ internal class MouseHeldDown : IMouseHeldDown
 
     private bool TickWhileMouseIsHeldDown ()
     {
-        Logging.Debug ("Raising TickWhileMouseIsHeldDown...");
-
         if (_isDown)
         {
             _smoothTimeout.AdvanceStage ();
