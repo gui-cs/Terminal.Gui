@@ -75,7 +75,7 @@ public class Mouse : Scenario
             Height = 1,
             Width = Dim.Auto (),
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom(lastDriverEvent),
+            Y = Pos.Bottom (lastDriverEvent),
             Text = "Last App Event: "
         };
 
@@ -276,7 +276,7 @@ public class Mouse : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (driverLogList)
@@ -308,7 +308,7 @@ public class Mouse : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (appLogList)
@@ -339,7 +339,7 @@ public class Mouse : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (winLogList)

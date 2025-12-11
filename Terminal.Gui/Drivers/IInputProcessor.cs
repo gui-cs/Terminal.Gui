@@ -111,7 +111,7 @@ public interface IInputProcessor
     /// </summary>
     /// <param name="app">
     ///     Application instance for cross-thread marshalling. When called from non-main thread,
-    ///     uses <see cref="IApplication.Invoke"/> to raise events on the main thread.
+    ///     uses <see cref="IApplication.Invoke(Action)"/> to raise events on the main thread.
     /// </param>
     /// <param name="mouseEvent">The mouse event to enqueue.</param>
     void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent);

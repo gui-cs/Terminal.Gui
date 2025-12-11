@@ -33,8 +33,32 @@ public class AnsiMouseParserTests
         else
         {
             Assert.NotNull (result); // Expect non-null result for valid inputs
-            Assert.Equal (new (expectedX, expectedY), result!.Position); // Verify position
+            Assert.Equal (new (expectedX, expectedY), result!.ScreenPosition); // Verify position
             Assert.Equal (expectedFlags, result.Flags); // Verify flags
         }
+    }
+
+    /// <summary>
+    /// Tests that ProcessMouseInput sets ScreenPosition and NOT Position.
+    /// Position is View-relative and should only be set by MouseImpl or View.Mouse code.
+    /// </summary>
+    [Theory]
+    [InlineData ("\u001b[<0;10;20M", 9, 19)] // Button 1 Pressed at screen (9, 19) 
+    [InlineData ("\u001b[<64;50;75M", 49, 74)] // Wheel up at screen (49, 74)
+    [InlineData ("\u001b[<35;1;1m", 0, 0)] // Mouse move at screen (0, 0)
+    public void ProcessMouseInput_SetsScreenPosition_NotPosition (string input, int expectedX, int expectedY)
+    {
+        // Act
+        MouseEventArgs? result = _parser.ProcessMouseInput (input);
+
+        // Assert
+        Assert.NotNull (result);
+
+        // ScreenPosition should be set to the parsed coordinates (0-based)
+        Assert.Equal (new Point (expectedX, expectedY), result!.ScreenPosition);
+
+        // Position should be (0,0) - the default value for Point
+        // Position should NEVER be set by parsers; it's View-relative and set by MouseImpl/View.Mouse
+        Assert.Equal (Point.Empty, result.Position);
     }
 }

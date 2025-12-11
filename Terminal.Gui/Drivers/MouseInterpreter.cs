@@ -138,14 +138,16 @@ internal class MouseInterpreter
     /// </summary>
     /// <param name="button">The zero-based button index (0=Button1/Left, 1=Button2/Middle, 2=Button3/Right, 3=Button4).</param>
     /// <param name="numberOfClicks">The number of consecutive clicks detected (1=single, 2=double, 3+=triple).</param>
-    /// <param name="mouseEventArgs">The original mouse event to copy position and view information from.</param>
+    /// <param name="mouseEventArgs">The original mouse event to copy screen position and view information from.</param>
     /// <returns>
     ///     A new <see cref="MouseEventArgs"/> with the appropriate click flag (LeftButtonClicked, LeftButtonDoubleClicked,
-    ///     LeftButtonTripleClicked, etc.) and position/view copied from the input event.
+    ///     LeftButtonTripleClicked, etc.) and screen position/view copied from the input event.
     /// </returns>
     /// <remarks>
-    ///     The returned event has <see cref="HandledEventArgs.Handled"/> set to <see langword="false"/> to allow
-    ///     propagation through the event system. Logs a trace message when raising the click event.
+    ///     <para>
+    ///         The returned event has <see cref="HandledEventArgs.Handled"/> set to <see langword="false"/> to allow
+    ///         propagation through the event system. Logs a trace message when raising the click event.
+    ///     </para>
     /// </remarks>
     private MouseEventArgs CreateClickEvent (int button, int numberOfClicks, MouseEventArgs mouseEventArgs)
     {
@@ -154,8 +156,8 @@ internal class MouseInterpreter
             Handled = false,
             Flags = ToClicks (button, numberOfClicks),
             ScreenPosition = mouseEventArgs.ScreenPosition,
-            View = mouseEventArgs.View,
-            Position = mouseEventArgs.Position
+            // View is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
+            // Position is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
         };
         Logging.Trace ($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");
 

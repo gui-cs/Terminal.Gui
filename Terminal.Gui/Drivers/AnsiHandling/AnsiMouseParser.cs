@@ -82,141 +82,74 @@ public class AnsiMouseParser
         // Match mouse wheel events first
         Match match = _mouseEventPattern.Match (input!);
 
-        if (match.Success)
+        if (!match.Success)
         {
-            int buttonCode = int.Parse (match.Groups [1].Value);
-
-            // The top-left corner of the terminal corresponds to (1, 1) for both X (column) and Y (row) coordinates.
-            // ANSI standards and terminal conventions historically treat screen positions as 1 - based.
-
-            int x = int.Parse (match.Groups [2].Value) - 1;
-            int y = int.Parse (match.Groups [3].Value) - 1;
-            char terminator = match.Groups [4].Value.Single ();
-
-            var m = new MouseEventArgs
-            {
-                Position = new (x, y),
-                Flags = GetFlags (buttonCode, terminator)
-            };
-
-            Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
-
-            return m;
+            return null;
         }
 
-        // its some kind of odd mouse event that doesn't follow expected format?
-        return null;
+        int buttonCode = int.Parse (match.Groups [1].Value);
+
+        // The top-left corner of the terminal corresponds to (1, 1) for both X (column) and Y (row) coordinates.
+        // ANSI standards and terminal conventions historically treat screen positions as 1 - based.
+
+        int x = int.Parse (match.Groups [2].Value) - 1;
+        int y = int.Parse (match.Groups [3].Value) - 1;
+        char terminator = match.Groups [4].Value.Single ();
+
+        MouseEventArgs m = new ()
+        {
+            ScreenPosition = new (x, y),
+            Flags = GetFlags (buttonCode, terminator)
+        };
+
+        Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
+
+        return m;
     }
 
     private static MouseFlags GetFlags (int buttonCode, char terminator)
     {
-        MouseFlags buttonState = 0;
+        MouseFlags buttonState = buttonCode switch
+                                 {
+                                     0 or 8 or 16 or 24 or 32 or 36 or 40 or 48 or 56 => terminator == 'M'
+                                                                                             ? MouseFlags.Button1Pressed
+                                                                                             : MouseFlags.Button1Released,
+                                     1 or 9 or 17 or 25 or 33 or 37 or 41 or 45 or 49 or 53 or 57 or 61 => terminator == 'M'
+                                         ? MouseFlags.Button2Pressed
+                                         : MouseFlags.Button2Released,
+                                     2 or 10 or 14 or 18 or 22 or 26 or 30 or 34 or 42 or 46 or 50 or 54 or 58 or 62 => terminator == 'M'
+                                         ? MouseFlags.Button3Pressed
+                                         : MouseFlags.Button3Released,
 
-        switch (buttonCode)
-        {
-            case 0:
-            case 8:
-            case 16:
-            case 24:
-            case 32:
-            case 36:
-            case 40:
-            case 48:
-            case 56:
-                buttonState = terminator == 'M'
-                                  ? MouseFlags.Button1Pressed
-                                  : MouseFlags.Button1Released;
-
-                break;
-            case 1:
-            case 9:
-            case 17:
-            case 25:
-            case 33:
-            case 37:
-            case 41:
-            case 45:
-            case 49:
-            case 53:
-            case 57:
-            case 61:
-                buttonState = terminator == 'M'
-                                  ? MouseFlags.Button2Pressed
-                                  : MouseFlags.Button2Released;
-
-                break;
-            case 2:
-            case 10:
-            case 14:
-            case 18:
-            case 22:
-            case 26:
-            case 30:
-            case 34:
-            case 42:
-            case 46:
-            case 50:
-            case 54:
-            case 58:
-            case 62:
-                buttonState = terminator == 'M'
-                                  ? MouseFlags.Button3Pressed
-                                  : MouseFlags.Button3Released;
-
-                break;
-            case 35:
-            //// Needed for Windows OS
-            //if (isButtonPressed && c == 'm'
-            //	&& (lastMouseEvent.ButtonState == MouseFlags.Button1Pressed
-            //	|| lastMouseEvent.ButtonState == MouseFlags.Button2Pressed
-            //	|| lastMouseEvent.ButtonState == MouseFlags.Button3Pressed)) {
-
-            //	switch (lastMouseEvent.ButtonState) {
-            //	case MouseFlags.Button1Pressed:
-            //		buttonState = MouseFlags.Button1Released;
-            //		break;
-            //	case MouseFlags.Button2Pressed:
-            //		buttonState = MouseFlags.Button2Released;
-            //		break;
-            //	case MouseFlags.Button3Pressed:
-            //		buttonState = MouseFlags.Button3Released;
-            //		break;
-            //	}
-            //} else {
-            //	buttonState = MouseFlags.ReportMousePosition;
-            //}
-            //break;
-            case 39:
-            case 43:
-            case 47:
-            case 51:
-            case 55:
-            case 59:
-            case 63:
-                buttonState = MouseFlags.ReportMousePosition;
-
-                break;
-            case 64:
-                buttonState = MouseFlags.WheeledUp;
-
-                break;
-            case 65:
-                buttonState = MouseFlags.WheeledDown;
-
-                break;
-            case 68:
-            case 72:
-            case 80:
-                buttonState = MouseFlags.WheeledLeft; // Shift/Ctrl+WheeledUp
-
-                break;
-            case 69:
-            case 73:
-            case 81:
-                buttonState = MouseFlags.WheeledRight; // Shift/Ctrl+WheeledDown
-
-                break;
-        }
+                                     //// Needed for Windows OS
+                                     //if (isButtonPressed && c == 'm'
+                                     //	&& (lastMouseEvent.ButtonState == MouseFlags.Button1Pressed
+                                     //	|| lastMouseEvent.ButtonState == MouseFlags.Button2Pressed
+                                     //	|| lastMouseEvent.ButtonState == MouseFlags.Button3Pressed)) {
+                                     //	switch (lastMouseEvent.ButtonState) {
+                                     //	case MouseFlags.Button1Pressed:
+                                     //		buttonState = MouseFlags.Button1Released;
+                                     //		break;
+                                     //	case MouseFlags.Button2Pressed:
+                                     //		buttonState = MouseFlags.Button2Released;
+                                     //		break;
+                                     //	case MouseFlags.Button3Pressed:
+                                     //		buttonState = MouseFlags.Button3Released;
+                                     //		break;
+                                     //	}
+                                     //} else {
+                                     //	buttonState = MouseFlags.ReportMousePosition;
+                                     //}
+                                     //break;
+                                     35 or 39 or 43 or 47 or 51 or 55 or 59 or 63 => MouseFlags.ReportMousePosition,
+                                     64 => MouseFlags.WheeledUp,
+                                     65 => MouseFlags.WheeledDown,
+                                     68 or 72 or 80 => MouseFlags.WheeledLeft // Shift/Ctrl+WheeledUp
+                                    ,
+                                     69 or 73 or 81 => MouseFlags.WheeledRight // Shift/Ctrl+WheeledDown
+                                    ,
+                                     _ => 0
+                                 };
 
         // Modifiers.
         switch (buttonCode)
