@@ -12,7 +12,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         var testView = new View ();
 
         Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Activate));
-//        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+        //        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
 
         Assert.Equal (5, testView.MouseBindings.GetBindings ().Count ());
     }
@@ -107,6 +107,80 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         view.NewMouseEvent (me);
         Assert.True (mouseEventInvoked);
         Assert.True (me.Handled);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void NewMouseEvent_DoubleClick_Pattern_MouseEvent_Raised_Correctly ()
+    {
+        View view = new ()
+        {
+            Visible = true,
+            Enabled = true,
+            Width = 1,
+            Height = 1
+        };
+        int mouseEventCount = 0;
+
+        view.MouseEvent += (s, e) =>
+                           {
+                               mouseEventCount++;
+                              // e.Handled = true;
+                           };
+
+        Mouse mouseEventPressed1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        view.NewMouseEvent (mouseEventPressed1);
+        Mouse mouseEventReleased1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        view.NewMouseEvent (mouseEventReleased1);
+        Mouse mouseEventClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Clicked };
+        view.NewMouseEvent (mouseEventClicked);
+
+        Mouse mouseEventPressed2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        view.NewMouseEvent (mouseEventPressed2);
+        Mouse mouseEventReleased2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        view.NewMouseEvent (mouseEventReleased2);
+        Mouse mouseEventDoubleClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1DoubleClicked };
+        view.NewMouseEvent (mouseEventDoubleClicked);
+
+        Assert.Equal (6, mouseEventCount);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void NewMouseEvent_DoubleClick_Pattern_Raises_Accept_Once ()
+    {
+        View view = new ()
+        {
+            Visible = true,
+            Enabled = true,
+            Width = 1,
+            Height = 1
+        };
+        int acceptingCount = 0;
+
+        view.Accepting += (s, e) =>
+                           {
+                               acceptingCount++;
+                               e.Handled = true;
+                           };
+
+        Mouse mouseEventPressed1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        view.NewMouseEvent (mouseEventPressed1);
+        Mouse mouseEventReleased1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        view.NewMouseEvent (mouseEventReleased1);
+        Mouse mouseEventClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Clicked };
+        view.NewMouseEvent (mouseEventClicked);
+
+        Mouse mouseEventPressed2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        view.NewMouseEvent (mouseEventPressed2);
+        Mouse mouseEventReleased2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        view.NewMouseEvent (mouseEventReleased2);
+        Mouse mouseEventDoubleClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1DoubleClicked };
+        view.NewMouseEvent (mouseEventDoubleClicked);
+
+        Assert.Equal (1, acceptingCount);
 
         view.Dispose ();
     }

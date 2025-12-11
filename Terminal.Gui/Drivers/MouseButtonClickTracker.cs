@@ -36,8 +36,6 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     private int _consecutiveClicks;
     private Point _lastPosition;
 
-    // Deferred click tracking (DEPRECATED - kept for backwards compatibility, no longer used)
-    // ReSharper disable once NotAccessedField.Local
     private int? _pendingClickCount;
     private Point _pendingClickPosition;
     private DateTime _pendingClickTime;
@@ -144,7 +142,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
             // EMIT CLICKS IMMEDIATELY - no deferral
             // Applications handle timing if they need to distinguish single vs double-click
             numClicks = _consecutiveClicks;
-            
+
             // Track for potential next click in sequence
             _pendingClickPosition = mouse.ScreenPosition;
             _pendingClickTime = _now ();
@@ -241,12 +239,12 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     private bool IsPressed (int btn, MouseFlags eFlags)
     {
         return btn switch
-               {
-                   0 => eFlags.HasFlag (MouseFlags.Button1Pressed),
-                   1 => eFlags.HasFlag (MouseFlags.Button2Pressed),
-                   2 => eFlags.HasFlag (MouseFlags.Button3Pressed),
-                   3 => eFlags.HasFlag (MouseFlags.Button4Pressed),
-                   _ => throw new ArgumentOutOfRangeException (nameof (btn))
-               };
+        {
+            0 => eFlags.HasFlag (MouseFlags.Button1Pressed),
+            1 => eFlags.HasFlag (MouseFlags.Button2Pressed),
+            2 => eFlags.HasFlag (MouseFlags.Button3Pressed),
+            3 => eFlags.HasFlag (MouseFlags.Button4Pressed),
+            _ => throw new ArgumentOutOfRangeException (nameof (btn))
+        };
     }
 }

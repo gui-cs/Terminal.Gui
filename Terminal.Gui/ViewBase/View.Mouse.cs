@@ -13,11 +13,13 @@ public partial class View // Mouse APIs
         MouseBindings = new ();
 
         // TODO: Should the default really work with any button or just button1?
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
-        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.MiddleButtonPressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button4Pressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.RightButtonPressed, Command.Context);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.ButtonCtrl, Command.Context);
+
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
     }
 
     #region MouseEnterLeave

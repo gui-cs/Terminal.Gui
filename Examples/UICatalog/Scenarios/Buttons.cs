@@ -410,19 +410,19 @@ public class Buttons : Scenario
             Title = "Repeat (_press-and-hold):"
         };
 
-        var acceptCount = 0;
+        var repeatButtonAcceptingCount = 0;
 
         var repeatButton = new Button
         {
             Id = "repeatButton",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accepting Count: {acceptCount}",
+            Title = $"Accepting Count: {repeatButtonAcceptingCount}",
             WantContinuousButtonPressed = true
         };
         repeatButton.Accepting += (s, e) =>
                                {
-                                   repeatButton.Title = $"Accepting Count: {++acceptCount}";
+                                   repeatButton.Title = $"Accepting Count: {++repeatButtonAcceptingCount}";
                                    e.Handled = true;
                                };
 
