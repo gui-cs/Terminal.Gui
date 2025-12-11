@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Parses ANSI mouse escape sequences into <see cref="MouseEventArgs"/> including support for button
+///     Parses ANSI mouse escape sequences into <see cref="Mouse"/> including support for button
 ///     press/release, mouse wheel, and motion events.
 /// </summary>
 /// <remarks>
@@ -77,7 +77,7 @@ public class AnsiMouseParser
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public MouseEventArgs? ProcessMouseInput (string? input)
+    public Mouse? ProcessMouseInput (string? input)
     {
         // Match mouse wheel events first
         Match match = _mouseEventPattern.Match (input!);
@@ -96,7 +96,7 @@ public class AnsiMouseParser
         int y = int.Parse (match.Groups [3].Value) - 1;
         char terminator = match.Groups [4].Value.Single ();
 
-        MouseEventArgs m = new ()
+        Mouse m = new ()
         {
             Timestamp = DateTime.Now,
             ScreenPosition = new (x, y),

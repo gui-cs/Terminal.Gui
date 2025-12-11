@@ -5470,7 +5470,7 @@ TAB to jump between text field",
     {
         var tv = new TextView { Width = 10, Text = " " };
 
-        var ev = new MouseEventArgs { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new Mouse { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tv.NewMouseEvent (ev);
         Assert.Equal (1, tv.SelectedLength);

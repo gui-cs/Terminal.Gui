@@ -245,10 +245,10 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     private readonly MouseInterpreter _mouseInterpreter = new ();
 
     /// <inheritdoc />
-    public event EventHandler<MouseEventArgs>? MouseEventParsed;
+    public event EventHandler<Mouse>? MouseEventParsed;
 
     /// <inheritdoc />
-    public void RaiseMouseEventParsed (MouseEventArgs mouseEvent)
+    public void RaiseMouseEventParsed (Mouse mouseEvent)
     {
         Logging.Trace ($"{mouseEvent}");
         MouseEventParsed?.Invoke (this, mouseEvent);
@@ -256,14 +256,14 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     }
 
     /// <inheritdoc />
-    public event EventHandler<MouseEventArgs>? SyntheticMouseEvent;
+    public event EventHandler<Mouse>? SyntheticMouseEvent;
 
     /// <inheritdoc />
-    public void RaiseSyntheticMouseEvent (MouseEventArgs mouseEvent)
+    public void RaiseSyntheticMouseEvent (Mouse mouseEvent)
     {
         // Process through MouseInterpreter to generate clicks
         // The interpreter yields the original event first, then any synthetic click events
-        foreach (MouseEventArgs e in _mouseInterpreter.Process (mouseEvent))
+        foreach (Mouse e in _mouseInterpreter.Process (mouseEvent))
         {
             Logging.Trace ($"{e}");
 
@@ -273,7 +273,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     }
 
     /// <inheritdoc />
-    public virtual void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent)
+    public virtual void EnqueueMouseEvent (IApplication? app, Mouse mouseEvent)
     {
         // Base implementation: For drivers where TInputRecord cannot represent mouse events
         // (e.g., ConsoleKeyInfo), derived classes should override this method.

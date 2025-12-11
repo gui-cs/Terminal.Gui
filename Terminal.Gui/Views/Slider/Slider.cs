@@ -1288,7 +1288,7 @@ public class Slider<T> : View, IOrientation
     private Point? _moveRenderPosition;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouseEvent)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
         //                    That will make OptionFocused Event more relevant.

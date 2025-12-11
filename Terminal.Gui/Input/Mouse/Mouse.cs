@@ -3,14 +3,14 @@ using System.ComponentModel;
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Specifies the event arguments for <see cref="MouseEventArgs"/>.
+///     Specifies the event arguments for <see cref="Mouse"/>.
 /// </summary>
-public class MouseEventArgs : HandledEventArgs
+public class Mouse : HandledEventArgs
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseEventArgs"/> class.
+    ///     Initializes a new instance of the <see cref="Mouse"/> class.
     /// </summary>
-    public MouseEventArgs ()
+    public Mouse ()
     {
     }
 
@@ -103,7 +103,7 @@ public class MouseEventArgs : HandledEventArgs
                            || Flags.HasFlag (MouseFlags.WheeledLeft)
                            || Flags.HasFlag (MouseFlags.WheeledRight);
 
-    /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="MouseEventArgs"/>.</summary>
-    /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEventArgs"/>.</returns>
+    /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="Mouse"/>.</summary>
+    /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="Mouse"/>.</returns>
     public override string ToString () { return $"{Timestamp:ss.fff}:{ScreenPosition}:{Flags}:{View?.Id}:{Position}"; }
 }

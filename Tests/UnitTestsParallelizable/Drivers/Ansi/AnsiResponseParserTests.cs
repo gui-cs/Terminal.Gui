@@ -487,7 +487,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         parser.HandleMouse = true;
         string? foundDar = null;
-        List<MouseEventArgs> mouseEventArgs = new ();
+        List<Terminal.Gui.Input.Mouse> mouseEventArgs = new ();
 
         parser.Mouse += (s, e) => mouseEventArgs.Add (e);
         parser.ExpectResponse ("c", dar => foundDar = dar, null, false);

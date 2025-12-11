@@ -406,7 +406,7 @@ public partial class Border
         HotKeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
+    private void ApplicationOnMouseEvent (object? sender, Mouse e)
     {
         if (e.Flags != MouseFlags.Button1Clicked)
         {
@@ -478,7 +478,7 @@ public partial class Border
     private Point _startGrabPoint;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouseEvent)
     {
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
@@ -651,7 +651,7 @@ public partial class Border
     /// <summary>
     /// Handles drag operations for moving and resizing
     /// </summary>
-    internal void HandleDragOperation (MouseEventArgs mouseEvent)
+    internal void HandleDragOperation (Mouse mouseEvent)
     {
         if (Parent!.SuperView is null)
         {

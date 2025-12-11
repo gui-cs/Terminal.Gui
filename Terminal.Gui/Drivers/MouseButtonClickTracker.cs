@@ -101,7 +101,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     ///         The timestamp comes from the event itself, eliminating the need for external time injection.
     ///     </para>
     /// </remarks>
-    public void UpdateState (MouseEventArgs mouseEvent, out int? numClicks)
+    public void UpdateState (Mouse mouseEvent, out int? numClicks)
     {
         bool isPressedNow = IsPressed (_buttonIdx, mouseEvent.Flags);
         bool isSamePosition = _lastPosition == mouseEvent.ScreenPosition;
@@ -172,7 +172,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     /// <remarks>
     ///     Updates <see cref="Pressed"/>, <see cref="At"/>, and the last known position to match the current event.
     /// </remarks>
-    private void OverwriteState (MouseEventArgs e)
+    private void OverwriteState (Mouse e)
     {
         Pressed = IsPressed (_buttonIdx, e.Flags);
         At = _now ();

@@ -175,5 +175,5 @@ internal partial class ApplicationImpl
 
     private void Driver_KeyUp (object? sender, Key e) { Keyboard?.RaiseKeyUpEvent (e); }
 
-    private void Driver_MouseEvent (object? sender, MouseEventArgs e) { Mouse?.RaiseMouseEvent (e); }
+    private void Driver_MouseEvent (object? sender, Mouse e) { Mouse?.RaiseMouseEvent (e); }
 }

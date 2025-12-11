@@ -241,7 +241,7 @@ public partial class View // Mouse APIs
     ///     </para>
     /// </remarks>
     /// <param name="mouseEvent">
-    ///     The mouse event to process. Coordinates in <see cref="MouseEventArgs.Position"/> are relative
+    ///     The mouse event to process. Coordinates in <see cref="Mouse.Position"/> are relative
     ///     to the view's <see cref="Viewport"/>.
     /// </param>
     /// <returns>
@@ -255,7 +255,7 @@ public partial class View // Mouse APIs
     /// <seealso cref="Activating"/>
     /// <seealso cref="WantContinuousButtonPressed"/>
     /// <seealso cref="HighlightStates"/>
-    public bool? NewMouseEvent (MouseEventArgs mouseEvent)
+    public bool? NewMouseEvent (Mouse mouseEvent)
     {
         // Pre-conditions
 
@@ -368,7 +368,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
+    public bool RaiseMouseEvent (Mouse mouseEvent)
     {
         if (OnMouseEvent (mouseEvent) || mouseEvent.Handled)
         {
@@ -380,7 +380,7 @@ public partial class View // Mouse APIs
         return mouseEvent.Handled;
     }
 
-    private void MouseHeldDownOnMouseIsHeldDownTick (object? sender, CancelEventArgs<MouseEventArgs> e)
+    private void MouseHeldDownOnMouseIsHeldDownTick (object? sender, CancelEventArgs<Mouse> e)
     {
         Logging.Trace ($"MouseHeldDown tick - raising commands bound {e.NewValue.Flags}");
         e.NewValue.ScreenPosition = App?.Mouse.LastMousePosition ?? e.NewValue.ScreenPosition;
@@ -396,7 +396,7 @@ public partial class View // Mouse APIs
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
+    protected virtual bool OnMouseEvent (Mouse mouseEvent) { return false; }
 
     /// <summary>Raised when a mouse event occurs.</summary>
     /// <remarks>
@@ -404,7 +404,7 @@ public partial class View // Mouse APIs
     ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
-    public event EventHandler<MouseEventArgs>? MouseEvent;
+    public event EventHandler<Mouse>? MouseEvent;
 
     #endregion Low Level Mouse Events
 
@@ -418,7 +418,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if processing should stop, <see langword="false"/> otherwise.</returns>
-    private bool WhenGrabbedHandlePressed (MouseEventArgs mouseEvent)
+    private bool WhenGrabbedHandlePressed (Mouse mouseEvent)
     {
         if (!mouseEvent.IsPressed)
         {
@@ -480,11 +480,11 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed, this method handles the released events from the driver
     ///     (when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set). If <see cref="MouseState"/>
-    ///     is <see cref="MouseState.In"/>, this method modifies the <see cref="MouseEventArgs.Flags"/> to be the corresponding
+    ///     is <see cref="MouseState.In"/>, this method modifies the <see cref="Mouse.Flags"/> to be the corresponding
     ///     clicked flag (e.g., <see cref="MouseFlags.LeftButtonClicked"/>).
     /// </summary>
     /// <param name="mouseEvent"></param>
-    internal void WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
+    internal void WhenGrabbedHandleReleased (Mouse mouseEvent)
     {
         if (App is null || App.Mouse.MouseGrabView != this)
         {
@@ -507,7 +507,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if processing should stop; <see langword="false"/> otherwise.</returns>
-    internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
+    internal bool WhenGrabbedHandleClicked (Mouse mouseEvent)
     {
         if (App is null || App.Mouse.MouseGrabView != this || !mouseEvent.IsSingleClicked)
         {
@@ -548,7 +548,7 @@ public partial class View // Mouse APIs
     ///         are bound to <see cref="Command.Activate"/>, which raises the <see cref="Activating"/> event.
     ///     </para>
     /// </remarks>
-    protected bool RaiseCommandsBoundToButtonClickedFlags (MouseEventArgs args)
+    protected bool RaiseCommandsBoundToButtonClickedFlags (Mouse args)
     {
         // Pre-conditions
         if (!Enabled)
@@ -572,7 +572,7 @@ public partial class View // Mouse APIs
     }
 
 
-    private static void ConvertPressedToClicked (MouseEventArgs args)
+    private static void ConvertPressedToClicked (Mouse args)
     {
         if (!args.IsPressed)
         {
@@ -589,7 +589,7 @@ public partial class View // Mouse APIs
         };
     }
 
-    private static void ConvertReleasedToClicked (MouseEventArgs args)
+    private static void ConvertReleasedToClicked (Mouse args)
     {
         if (!args.IsReleased)
         {
@@ -622,7 +622,7 @@ public partial class View // Mouse APIs
     ///         any commands bound to the mouse flags via <see cref="MouseBindings"/>.
     ///     </para>
     /// </remarks>
-    protected bool RaiseCommandsBoundToWheelFlags (MouseEventArgs args)
+    protected bool RaiseCommandsBoundToWheelFlags (Mouse args)
     {
         // Pre-conditions
         if (!Enabled)
@@ -649,7 +649,7 @@ public partial class View // Mouse APIs
     ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    protected bool? InvokeCommandsBoundToMouse (MouseEventArgs mouseEventArgs)
+    protected bool? InvokeCommandsBoundToMouse (Mouse mouseEventArgs)
     {
         if (!MouseBindings.TryGet (mouseEventArgs.Flags, out MouseBinding binding))
         {

@@ -27,6 +27,6 @@ public abstract partial class PopupAutocomplete
             return true;
         }
 
-        protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
+        protected override bool OnMouseEvent (Mouse mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
     }
 }

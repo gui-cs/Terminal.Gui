@@ -1508,7 +1508,7 @@ public class TextView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouseEvent)
     {
         if (mouseEvent is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
             && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
@@ -4043,7 +4043,7 @@ public class TextView : View, IDesignable
         KillWordForward ();
     }
 
-    private void ProcessMouseClick (MouseEventArgs mouseEvent, out List<Cell> line)
+    private void ProcessMouseClick (Mouse mouseEvent, out List<Cell> line)
     {
         List<Cell>? r = null;
 

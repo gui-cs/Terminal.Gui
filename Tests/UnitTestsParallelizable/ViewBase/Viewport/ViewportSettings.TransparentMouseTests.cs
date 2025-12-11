@@ -8,7 +8,7 @@ public class TransparentMouseTests
     {
         public bool MouseEventReceived { get; private set; }
 
-        protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+        protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouseEvent)
         {
             MouseEventReceived = true;
             return true;
@@ -34,7 +34,7 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new MouseEventArgs
+        var mouseEvent = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -63,7 +63,7 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new MouseEventArgs
+        var mouseEvent = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -96,7 +96,7 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new MouseEventArgs
+        var mouseEvent = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked

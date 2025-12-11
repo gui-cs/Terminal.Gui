@@ -40,7 +40,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new Point (screenX, screenY),
             Flags = MouseFlags.Button1Clicked
@@ -98,7 +98,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (viewRelativeX, viewRelativeY),
             Flags = MouseFlags.Button1Clicked
@@ -155,7 +155,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         // Click at position (2, 2) relative to subView (which is at 5,5 relative to superView)
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new Point (2, 2), // Relative to subView
             Flags = MouseFlags.Button1Clicked
@@ -197,7 +197,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         int activatingCount = 0;
         subView.Activating += (_, _) => activatingCount++;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -233,7 +233,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, e) => { clickHandlerCalled = !e.IsSingleDoubleOrTripleClicked; ; };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -263,7 +263,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             // Don't set Handled = true
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -306,7 +306,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             }
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (5, 5),
             Flags = flags
@@ -335,7 +335,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, a) => clickCount += a.IsSingleDoubleOrTripleClicked ? 1 : 0;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (5, 5),
             Flags = clickFlag
@@ -368,7 +368,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool eventCalled = false;
         view.MouseEvent += (_, _) => { eventCalled = true; };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -397,7 +397,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool selectingCalled = false;
         view.Activating += (_, _) => { selectingCalled = true; };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -435,7 +435,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
         superView.SetFocus (); // Give superView focus first
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (2, 2),
             Flags = MouseFlags.Button1Clicked
@@ -470,7 +470,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         int activatingCount = 0;
         view.Activating += (_, _) => activatingCount++;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked

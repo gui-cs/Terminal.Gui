@@ -59,11 +59,11 @@ public partial class GuiTestContext
 
     /// <summary>
     /// Enqueues a mouse event to the current driver's input processor.
-    /// This method sets the <see cref="MouseEventArgs.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns></returns>
-    private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    private GuiTestContext EnqueueMouseEvent (Mouse mouseEvent)
     {
             // Enqueue the mouse event
         WaitIteration ((app) =>
@@ -86,7 +86,7 @@ public partial class GuiTestContext
     }
 
 
-    private GuiTestContext EnqueueMouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
+    private GuiTestContext EnqueueMouseEvent<TView> (Mouse mouseEvent, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 

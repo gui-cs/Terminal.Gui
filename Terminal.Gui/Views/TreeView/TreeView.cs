@@ -1011,7 +1011,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
     // BUGBUG: OnMouseEvent is internal. TreeView should not be overriding.
     ///<inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
         // If it is not an event we care about
         if (me is { IsSingleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }

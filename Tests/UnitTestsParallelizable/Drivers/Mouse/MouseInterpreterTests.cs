@@ -5,16 +5,16 @@ public class MouseInterpreterTests
 {
     [Theory]
     [MemberData (nameof (SequenceTests))]
-    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<MouseEventArgs> events, params MouseFlags? [] expected)
+    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<Terminal.Gui.Input.Mouse> events, params MouseFlags? [] expected)
     {
         // Arrange: Mock dependencies and set up the interpreter
         MouseInterpreter interpreter = new  ();
 
         // Collect all results from processing the event sequence
-        List<MouseEventArgs> allResults = [];
+        List<Terminal.Gui.Input.Mouse> allResults = [];
 
         // Act
-        foreach (MouseEventArgs mouseEvent in events)
+        foreach (Terminal.Gui.Input.Mouse mouseEvent in events)
         {
             allResults.AddRange (interpreter.Process (mouseEvent));
         }
@@ -26,7 +26,7 @@ public class MouseInterpreterTests
         }
 
         // Also verify all original input events were passed through
-        foreach (MouseEventArgs inputEvent in events)
+        foreach (Terminal.Gui.Input.Mouse inputEvent in events)
         {
             Assert.Contains (allResults, e => e.Flags == inputEvent.Flags);
         }
@@ -36,7 +36,7 @@ public class MouseInterpreterTests
     {
         yield return
         [
-            new List<MouseEventArgs>
+            new List<Terminal.Gui.Input.Mouse>
             {
                 new () { Flags = MouseFlags.Button1Pressed },
                 new ()
@@ -46,7 +46,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<MouseEventArgs>
+            new List<Terminal.Gui.Input.Mouse>
             {
                 new () { Flags = MouseFlags.Button1Pressed },
                 new (),
@@ -58,7 +58,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<MouseEventArgs>
+            new List<Terminal.Gui.Input.Mouse>
             {
                 new () { Flags = MouseFlags.Button1Pressed },
                 new (),
@@ -72,7 +72,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<MouseEventArgs>
+            new List<Terminal.Gui.Input.Mouse>
             {
                 new () { Flags = MouseFlags.Button2Pressed },
                 new (),
@@ -86,7 +86,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<MouseEventArgs>
+            new List<Terminal.Gui.Input.Mouse>
             {
                 new () { Flags = MouseFlags.Button3Pressed },
                 new (),
@@ -100,7 +100,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<MouseEventArgs>
+            new List<Terminal.Gui.Input.Mouse>
             {
                 new () { Flags = MouseFlags.Button4Pressed },
                 new (),
@@ -114,7 +114,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<MouseEventArgs>
+            new List<Terminal.Gui.Input.Mouse>
             {
                 new () { Flags = MouseFlags.Button1Pressed, Position = new (10, 11) },
                 new () { Position = new (10, 11) },

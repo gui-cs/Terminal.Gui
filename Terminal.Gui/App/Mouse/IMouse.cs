@@ -37,19 +37,19 @@ public interface IMouse : IMouseGrabHandler
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="MouseEventArgs.ScreenPosition"/> coordinates are screen-relative.
+    ///         <see cref="Mouse.ScreenPosition"/> coordinates are screen-relative.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEventArgs.View"/> will be the deepest view under the mouse.
+    ///         <see cref="Mouse.View"/> will be the deepest view under the mouse.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEventArgs.Position"/> coordinates are view-relative. Only valid if <see cref="MouseEventArgs.View"/> is set.
+    ///         <see cref="Mouse.Position"/> coordinates are view-relative. Only valid if <see cref="Mouse.View"/> is set.
     ///     </para>
     ///     <para>
     ///         Use this even to handle mouse events at the application level, before View-specific handling.
     ///     </para>
     /// </remarks>
-    event EventHandler<MouseEventArgs>? MouseEvent;
+    event EventHandler<Mouse>? MouseEvent;
 
     /// <summary>
     ///     INTERNAL API: Called when a mouse event is raised by the driver. Determines the view under the mouse and
@@ -57,7 +57,7 @@ public interface IMouse : IMouseGrabHandler
     /// </summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
     /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    void RaiseMouseEvent (MouseEventArgs mouseEvent);
+    void RaiseMouseEvent (Mouse mouseEvent);
 
     /// <summary>
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.

@@ -27,7 +27,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        List<MouseEventArgs> receivedEvents = [];
+        List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a complete click: press → release → click
@@ -76,7 +76,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        ConcurrentBag<MouseEventArgs> receivedEvents = [];
+        ConcurrentBag<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         const int threadCount = 10;
@@ -156,10 +156,10 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        List<MouseEventArgs> receivedEvents = [];
+        List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
@@ -191,14 +191,14 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Simulate the user pressing and releasing the mouse button. This should cause
         // 3 synthetic events: Pressed, Released, Clicked
-        MouseEventArgs [] events =
+        Terminal.Gui.Input.Mouse [] events =
         [
             new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.Button1Pressed },
             new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.Button1Released },
         ];
 
-        List<MouseEventArgs> receivedParsedEvents = [];
-        List<MouseEventArgs> receivedSyntheticEvents = [];
+        List<Terminal.Gui.Input.Mouse> receivedParsedEvents = [];
+        List<Terminal.Gui.Input.Mouse> receivedSyntheticEvents = [];
 
         // FakeInputProcessor.EnqueueMouseEvent calls RaiseMouseEventParsed directly (bypasses queue)
         processor.MouseEventParsed += (_, e) => receivedParsedEvents.Add (e);
@@ -207,7 +207,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act
         // Note: FakeInputProcessor.EnqueueMouseEvent bypasses the queue and calls RaiseMouseEventParsed directly
         // This means SimulateInputThread and ProcessQueue are not needed for this test
-        foreach (MouseEventArgs mouseEvent in events)
+        foreach (Terminal.Gui.Input.Mouse mouseEvent in events)
         {
             processor.EnqueueMouseEvent (null, mouseEvent);
         }
@@ -244,14 +244,14 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
             Flags = flags
         };
 
-        MouseEventArgs? receivedEvent = null;
+        Terminal.Gui.Input.Mouse? receivedEvent = null;
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
@@ -279,14 +279,14 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (x, y),
             Flags = MouseFlags.Button1Clicked
         };
 
-        MouseEventArgs? receivedEvent = null;
+        Terminal.Gui.Input.Mouse? receivedEvent = null;
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
@@ -318,14 +318,14 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
             Flags = MouseFlags.Button1Clicked | modifiers
         };
 
-        MouseEventArgs? receivedEvent = null;
+        Terminal.Gui.Input.Mouse? receivedEvent = null;
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
@@ -368,14 +368,14 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouseEvent = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
             Flags = wheelFlag
         };
 
-        MouseEventArgs? receivedEvent = null;
+        Terminal.Gui.Input.Mouse? receivedEvent = null;
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
@@ -399,10 +399,10 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        List<MouseEventArgs> receivedEvents = [];
+        List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
-        MouseEventArgs [] events =
+        Terminal.Gui.Input.Mouse [] events =
         [
             new () { Timestamp = DateTime.Now, Position = new (0, 0), Flags = MouseFlags.ReportMousePosition },
             new () { Timestamp = DateTime.Now, Position = new (5, 5), Flags = MouseFlags.ReportMousePosition },
@@ -410,7 +410,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         ];
 
         // Act
-        foreach (MouseEventArgs mouseEvent in events)
+        foreach (Terminal.Gui.Input.Mouse mouseEvent in events)
         {
             processor.EnqueueMouseEvent (null, mouseEvent);
         }
@@ -467,7 +467,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        List<MouseEventArgs> receivedEvents = [];
+        List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Enqueue multiple events before processing

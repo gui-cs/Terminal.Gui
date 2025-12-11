@@ -63,7 +63,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_False_Button_Press_Release_DoesNotClick (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
     {
-        MouseEventArgs me = new ();
+        Mouse me = new ();
 
         View view = new ()
         {
@@ -108,7 +108,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Clicked)]
     public void WantContinuousButtonPressed_True_Button_Clicked_Raises_Activating (MouseFlags clicked)
     {
-        MouseEventArgs me = new ();
+        Mouse me = new ();
 
         View view = new ()
         {
@@ -138,7 +138,7 @@ public class MouseTests : TestsAllViews
     [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Button_Press_Release_Clicks (MouseFlags pressed, MouseFlags released)
     {
-        MouseEventArgs me = new ();
+        Mouse me = new ();
 
         View view = new ()
         {
@@ -198,7 +198,7 @@ public class MouseTests : TestsAllViews
         MouseFlags clicked
     )
     {
-        MouseEventArgs me = new ();
+        Mouse me = new ();
 
         View view = new ()
         {
@@ -251,7 +251,7 @@ public class MouseTests : TestsAllViews
     [Fact]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
-        MouseEventArgs mouseEvent = new ()
+        Mouse mouseEvent = new ()
         {
             Position = Point.Empty
         };

@@ -13,7 +13,7 @@ namespace Terminal.Gui.Drivers;
 ///         independently using <see cref="MouseButtonClickTracker"/> instances.
 ///     </para>
 ///     <para>
-///         For each incoming <see cref="MouseEventArgs"/>, the interpreter:
+///         For each incoming <see cref="Mouse"/>, the interpreter:
 ///     </para>
 ///     <list type="number">
 ///         <item><description>Yields the original event unchanged (for low-level handling)</description></item>
@@ -95,7 +95,7 @@ internal class MouseInterpreter
     /// </summary>
     /// <param name="mouseEvent">The mouse event to process, typically from a driver layer.</param>
     /// <returns>
-    ///     An enumerable sequence of <see cref="MouseEventArgs"/>:
+    ///     An enumerable sequence of <see cref="Mouse"/>:
     ///     <list type="bullet">
     ///         <item><description>The original input event (always yielded first)</description></item>
     ///         <item><description>Zero or more synthetic click events (LeftButtonClicked, LeftButtonDoubleClicked, LeftButtonTripleClicked, etc.)</description></item>
@@ -117,7 +117,7 @@ internal class MouseInterpreter
     ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonDoubleClicked
     ///     </code>
     /// </remarks>
-    public IEnumerable<MouseEventArgs> Process (MouseEventArgs mouseEvent)
+    public IEnumerable<Mouse> Process (Mouse mouseEvent)
     {
         yield return mouseEvent;
 
@@ -140,7 +140,7 @@ internal class MouseInterpreter
     /// <param name="numberOfClicks">The number of consecutive clicks detected (1=single, 2=double, 3+=triple).</param>
     /// <param name="mouseEventArgs">The original mouse event to copy screen position and view information from.</param>
     /// <returns>
-    ///     A new <see cref="MouseEventArgs"/> with the appropriate click flag (LeftButtonClicked, LeftButtonDoubleClicked,
+    ///     A new <see cref="Mouse"/> with the appropriate click flag (LeftButtonClicked, LeftButtonDoubleClicked,
     ///     LeftButtonTripleClicked, etc.) and screen position/view copied from the input event.
     /// </returns>
     /// <remarks>
@@ -149,9 +149,9 @@ internal class MouseInterpreter
     ///         propagation through the event system. Logs a trace message when raising the click event.
     ///     </para>
     /// </remarks>
-    private MouseEventArgs CreateClickEvent (int button, int numberOfClicks, MouseEventArgs mouseEventArgs)
+    private Mouse CreateClickEvent (int button, int numberOfClicks, Mouse mouseEventArgs)
     {
-        var newClick = new MouseEventArgs
+        var newClick = new Mouse
         {
             Timestamp = Now (),
             Handled = false,

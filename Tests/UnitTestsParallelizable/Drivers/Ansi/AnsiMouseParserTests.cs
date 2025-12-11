@@ -23,7 +23,7 @@ public class AnsiMouseParserTests
     public void ProcessMouseInput_ReturnsCorrectFlags (string input, int expectedX, int expectedY, MouseFlags expectedFlags)
     {
         // Act
-        MouseEventArgs? result = _parser.ProcessMouseInput (input);
+        Terminal.Gui.Input.Mouse? result = _parser.ProcessMouseInput (input);
 
         // Assert
         if (expectedFlags == MouseFlags.None)
@@ -50,7 +50,7 @@ public class AnsiMouseParserTests
     public void ProcessMouseInput_SetsScreenPosition_NotPosition (string input, int expectedX, int expectedY)
     {
         // Act
-        MouseEventArgs? result = _parser.ProcessMouseInput (input);
+        Terminal.Gui.Input.Mouse? result = _parser.ProcessMouseInput (input);
 
         // Assert
         Assert.NotNull (result);

@@ -287,7 +287,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
     public int SliderPadding { get; set; }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouseEvent)
     {
         if (SuperView is null)
         {

@@ -26,7 +26,7 @@ public class FakeInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
     }
 
     /// <inheritdoc />
-    public override void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent)
+    public override void EnqueueMouseEvent (IApplication? app, Mouse mouseEvent)
     {
         // FakeDriver uses ConsoleKeyInfo as its input record type, which cannot represent mouse events.
 

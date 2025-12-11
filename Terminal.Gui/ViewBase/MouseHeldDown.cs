@@ -49,9 +49,9 @@ internal sealed class MouseHeldDown : IMouseHeldDown
     /// <summary>
     /// The most recent mouse event arguments associated with the mouse held down action.
     /// </summary>
-    private MouseEventArgs? _mouseEvent = null;
+    private Mouse? _mouseEvent = null;
 
-    public void Start (MouseEventArgs mouseEvent)
+    public void Start (Mouse mouseEvent)
     {
         if (_isDown)
         {
@@ -111,13 +111,13 @@ internal sealed class MouseHeldDown : IMouseHeldDown
         }
     }
 
-    public event EventHandler<CancelEventArgs<MouseEventArgs>>? MouseIsHeldDownTick;
+    public event EventHandler<CancelEventArgs<Mouse>>? MouseIsHeldDownTick;
 
     private bool RaiseMouseIsHeldDownTick ()
     {
-        MouseEventArgs currentMouseEventArgs = _mouseEvent ?? new MouseEventArgs ();
-        MouseEventArgs newMouseEventArgs = _mouseEvent ?? new MouseEventArgs ();
-        CancelEventArgs<MouseEventArgs> args = new (currentValue: ref currentMouseEventArgs, newValue: ref newMouseEventArgs);
+        Mouse currentMouseEventArgs = _mouseEvent ?? new Mouse ();
+        Mouse newMouseEventArgs = _mouseEvent ?? new Mouse ();
+        CancelEventArgs<Mouse> args = new (currentValue: ref currentMouseEventArgs, newValue: ref newMouseEventArgs);
 
         MouseIsHeldDownTick?.Invoke (this, args);
 

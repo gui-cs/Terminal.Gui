@@ -365,7 +365,7 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
         selector.Value = 0;
 
-        var mouseEvent = new MouseEventArgs
+        var mouseEvent = new Mouse
         {
             Position = checkBox.Frame.Location,
             Flags = MouseFlags.Button1Clicked
@@ -395,7 +395,7 @@ public class FlagSelectorTests
         selector.Value = 0;
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        var mouseEvent = new MouseEventArgs
+        var mouseEvent = new Mouse
         {
             Position = checkBox.Frame.Location,
             Flags = MouseFlags.Button1Clicked

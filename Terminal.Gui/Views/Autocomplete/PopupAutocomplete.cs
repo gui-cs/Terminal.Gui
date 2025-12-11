@@ -100,7 +100,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <param name="mouseEvent">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    public override bool OnMouseEvent (MouseEventArgs mouseEvent, bool fromHost = false)
+    public override bool OnMouseEvent (Mouse mouseEvent, bool fromHost = false)
     {
         if (fromHost)
         {
@@ -489,7 +489,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
 
     /// <summary>Render the current selection in the Autocomplete context menu by the mouse reporting.</summary>
     /// <param name="me"></param>
-    protected void RenderSelectedIdxByMouse (MouseEventArgs me)
+    protected void RenderSelectedIdxByMouse (Mouse me)
     {
         if (SelectedIdx != me.Position!.Value.Y - ScrollOffset)
         {

@@ -332,7 +332,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     {
         var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEventArgs { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new Mouse { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);

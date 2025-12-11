@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Input;
 
-/// <summary>Mouse flags reported in <see cref="MouseEventArgs"/>.</summary>
+/// <summary>Mouse flags reported in <see cref="Mouse"/>.</summary>
 /// <remarks>
 ///     <para>
 ///         The definition of these flags is based on the ncurses mouse event reporting.
@@ -21,7 +21,7 @@ namespace Terminal.Gui.Input;
 public enum MouseFlags
 {
     /// <summary>
-    ///     No mouse event. This is the default value for <see cref="MouseEventArgs.Flags"/> when no mouse event is being
+    ///     No mouse event. This is the default value for <see cref="Mouse.Flags"/> when no mouse event is being
     ///     reported.
     /// </summary>
     None = 0,

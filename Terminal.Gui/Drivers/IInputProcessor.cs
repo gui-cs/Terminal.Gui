@@ -84,12 +84,12 @@ public interface IInputProcessor
     ///     Raises the <see cref="MouseEventParsed"/> event after a mouse event is parsed from the driver.
     /// </summary>
     /// <param name="mouseEvent">The parsed mouse event data.</param>
-    void RaiseMouseEventParsed (MouseEventArgs mouseEvent);
+    void RaiseMouseEventParsed (Mouse mouseEvent);
 
     /// <summary>
     ///     Event raised when a mouse event is parsed from the driver. For debugging and unit tests.
     /// </summary>
-    event EventHandler<MouseEventArgs>? MouseEventParsed;
+    event EventHandler<Mouse>? MouseEventParsed;
 
     /// <summary>
     ///     Raises the <see cref="SyntheticMouseEvent"/> event for generated click/double-click/triple-click events.
@@ -99,12 +99,12 @@ public interface IInputProcessor
     ///     to generate higher-level click events based on timing and position.
     /// </remarks>
     /// <param name="mouseEvent">The synthetic mouse event data.</param>
-    void RaiseSyntheticMouseEvent (MouseEventArgs mouseEvent);
+    void RaiseSyntheticMouseEvent (Mouse mouseEvent);
 
     /// <summary>
     ///     Event raised when synthetic mouse events (clicks, double-clicks, triple-clicks) are generated.
     /// </summary>
-    event EventHandler<MouseEventArgs>? SyntheticMouseEvent;
+    event EventHandler<Mouse>? SyntheticMouseEvent;
 
     /// <summary>
     ///     Enqueues a mouse event. For unit tests.
@@ -114,7 +114,7 @@ public interface IInputProcessor
     ///     uses <see cref="IApplication.Invoke(Action)"/> to raise events on the main thread.
     /// </param>
     /// <param name="mouseEvent">The mouse event to enqueue.</param>
-    void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent);
+    void EnqueueMouseEvent (IApplication? app, Mouse mouseEvent);
 
     #endregion
 

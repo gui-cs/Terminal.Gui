@@ -571,7 +571,7 @@ public class ScrollBar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouseEvent)
     {
         if (SuperView is null)
         {

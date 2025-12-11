@@ -103,7 +103,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
                                e.Handled = true;
                            };
 
-        MouseEventArgs me = new () { Timestamp = DateTime.Now };
+        Terminal.Gui.Input.Mouse me = new () { Timestamp = DateTime.Now };
         view.NewMouseEvent (me);
         Assert.True (mouseEventInvoked);
         Assert.True (me.Handled);
@@ -125,7 +125,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         view.Enabled = false;
-        var me = new MouseEventArgs () { Timestamp = DateTime.Now };
+        var me = new Terminal.Gui.Input.Mouse () { Timestamp = DateTime.Now };
         view.NewMouseEvent (me);
         Assert.False (me.Handled);
         view.Dispose ();
@@ -146,7 +146,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         view.Enabled = false;
 
-        var me = new MouseEventArgs
+        var me = new Terminal.Gui.Input.Mouse
         {
             Timestamp = DateTime.Now,
             Flags = MouseFlags.Button1Clicked

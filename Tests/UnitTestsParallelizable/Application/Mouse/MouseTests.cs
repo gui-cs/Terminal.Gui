@@ -73,7 +73,7 @@ public class MouseTests
         Assert.Empty (mouse.CachedViewsUnderMouse);
 
         // Event handlers should be cleared
-        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
         mouse.RaiseMouseEvent (mouseEvent);
         Assert.False (eventFired, "Event should not fire after ResetState");
     }
@@ -83,7 +83,7 @@ public class MouseTests
     {
         // Arrange
         MouseImpl mouse = new ();
-        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouseEvent = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.Button1Pressed };
 
         // Act - Application is not initialized, so LastMousePosition should not be set
         mouse.RaiseMouseEvent (mouseEvent);
@@ -100,11 +100,11 @@ public class MouseTests
         // Arrange
         MouseImpl mouse = new ();
         var eventCount = 0;
-        EventHandler<MouseEventArgs> handler = (sender, args) => eventCount++;
+        EventHandler<Terminal.Gui.Input.Mouse> handler = (sender, args) => eventCount++;
 
         // Act - Subscribe
         mouse.MouseEvent += handler;
-        MouseEventArgs mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouseEvent = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
         mouse.RaiseMouseEvent (mouseEvent);
 
         // Assert - Event fired once
@@ -204,7 +204,7 @@ public class MouseTests
 
         application.TopRunnableView.Add (view);
 
-        var mouseEvent = new MouseEventArgs { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouseEvent = new Terminal.Gui.Input.Mouse { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
         view.MouseEvent += (_s, e) =>
         {

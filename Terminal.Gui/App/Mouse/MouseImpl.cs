@@ -39,11 +39,11 @@ internal class MouseImpl : IMouse, IDisposable
     public List<View?> CachedViewsUnderMouse { get; } = [];
 
     /// <inheritdoc/>
-    public event EventHandler<MouseEventArgs>? MouseEvent;
+    public event EventHandler<Mouse>? MouseEvent;
 
 
     /// <inheritdoc/>
-    public void RaiseMouseEvent (MouseEventArgs mouseEvent)
+    public void RaiseMouseEvent (Mouse mouseEvent)
     {
         //Debug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
         if (App?.Initialized is true)
@@ -116,7 +116,7 @@ internal class MouseImpl : IMouse, IDisposable
         }
 
         // Create a view-relative mouse event to send to the view that is under the mouse.
-        MouseEventArgs viewMouseEvent;
+        Mouse viewMouseEvent;
 
         if (deepestViewUnderMouse is Adornment adornment)
         {
@@ -354,7 +354,7 @@ internal class MouseImpl : IMouse, IDisposable
     /// <param name="deepestViewUnderMouse">The deepest view under the mouse.</param>
     /// <param name="mouseEvent">The mouse event to handle.</param>
     /// <returns><see langword="true"/> if the event was handled by the grab handler; otherwise <see langword="false"/>.</returns>
-    public bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
+    public bool HandleMouseGrab (View? deepestViewUnderMouse, Mouse mouseEvent)
     {
         if (MouseGrabView is { })
         {
@@ -369,7 +369,7 @@ internal class MouseImpl : IMouse, IDisposable
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
             Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
 
-            MouseEventArgs viewRelativeMouseEvent = new ()
+            Mouse viewRelativeMouseEvent = new ()
             {
                 Timestamp = mouseEvent.Timestamp,
                 Position = frameLoc,

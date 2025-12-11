@@ -118,7 +118,7 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouseEvent)
     {
         if (base.OnMouseEvent (mouseEvent) || mouseEvent.Handled)
         {

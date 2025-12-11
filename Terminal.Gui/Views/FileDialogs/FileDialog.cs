@@ -1223,7 +1223,7 @@ public class FileDialog : Dialog, IDesignable
 
     private FileSystemInfoStats RowToStats (int rowIndex) { return State?.Children [rowIndex]!; }
 
-    private void ShowCellContextMenu (Point? clickedCell, MouseEventArgs e)
+    private void ShowCellContextMenu (Point? clickedCell, Mouse e)
     {
         if (clickedCell is null)
         {
@@ -1246,7 +1246,7 @@ public class FileDialog : Dialog, IDesignable
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, Mouse e)
     {
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 

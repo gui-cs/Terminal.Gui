@@ -18,7 +18,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     }
 
     /// <inheritdoc />
-    public override void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent)
+    public override void EnqueueMouseEvent (IApplication? app, Mouse mouseEvent)
     {
         InputQueue.Enqueue (new ()
         {
@@ -71,7 +71,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
                 break;
 
             case WindowsConsole.EventType.Mouse:
-                MouseEventArgs me = ToMouseEvent (inputEvent.MouseEvent);
+                Mouse me = ToMouseEvent (inputEvent.MouseEvent);
 
                 RaiseSyntheticMouseEvent (me);
 
@@ -80,11 +80,11 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     }
 
     /// <summary>
-    ///     Converts a Windows-specific mouse event to a <see cref="MouseEventArgs"/>.
+    ///     Converts a Windows-specific mouse event to a <see cref="Mouse"/>.
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
-    public MouseEventArgs ToMouseEvent (WindowsConsole.MouseEventRecord e)
+    public Mouse ToMouseEvent (WindowsConsole.MouseEventRecord e)
     {
         var mouseFlags = MouseFlags.None;
 
@@ -176,7 +176,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             }
         }
 
-        var result = new MouseEventArgs
+        var result = new Mouse
         {
             Timestamp = DateTime.Now,
             Position = new (e.MousePosition.X, e.MousePosition.Y),
@@ -215,11 +215,11 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     }
 
     /// <summary>
-    ///     Converts a <see cref="MouseEventArgs"/> to a Windows-specific <see cref="WindowsConsole.MouseEventRecord"/>.
+    ///     Converts a <see cref="Mouse"/> to a Windows-specific <see cref="WindowsConsole.MouseEventRecord"/>.
     /// </summary>
     /// <param name="mouseEvent"></param>
     /// <returns></returns>
-    public WindowsConsole.MouseEventRecord ToMouseEventRecord (MouseEventArgs mouseEvent)
+    public WindowsConsole.MouseEventRecord ToMouseEventRecord (Mouse mouseEvent)
     {
         var buttonState = WindowsConsole.ButtonState.NoButtonPressed;
         var eventFlags = WindowsConsole.EventFlags.NoEvent;

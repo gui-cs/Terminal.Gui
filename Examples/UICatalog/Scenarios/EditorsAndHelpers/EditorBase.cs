@@ -148,7 +148,7 @@ public abstract class EditorBase : View
         ViewToEdit = Application.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs mouseEvent)
+    private void ApplicationOnMouseEvent (object? sender, Terminal.Gui.Input.Mouse mouseEvent)
     {
         if (mouseEvent.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
         {

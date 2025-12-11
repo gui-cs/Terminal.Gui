@@ -232,7 +232,7 @@ public sealed class Transparent : Scenario
         protected override bool OnClearingViewport () { return false; }
 
         /// <inheritdoc />
-        protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
+        protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouseEvent) { return false; }
 
 
         /// <summary>

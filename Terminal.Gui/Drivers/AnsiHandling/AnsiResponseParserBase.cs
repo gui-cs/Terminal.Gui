@@ -474,7 +474,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent) : IAnsiRespon
     ///     Mouse events follow SGR extended format (ESC[&lt;button;x;yM/m) when
     ///     <see cref="EscSeqUtils.CSI_EnableMouseEvents"/> is enabled.
     /// </remarks>
-    public event EventHandler<MouseEventArgs>? Mouse;
+    public event EventHandler<Mouse>? Mouse;
 
     /// <summary>
     ///     Gets or sets whether to explicitly handle mouse escape sequences by raising the <see cref="Mouse"/> event.
@@ -487,7 +487,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent) : IAnsiRespon
 
     private void RaiseMouseEvent (string? cur)
     {
-        MouseEventArgs? ev = _mouseParser.ProcessMouseInput (cur);
+        Mouse? ev = _mouseParser.ProcessMouseInput (cur);
 
         if (ev != null)
         {

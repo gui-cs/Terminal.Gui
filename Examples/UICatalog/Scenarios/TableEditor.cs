@@ -1380,7 +1380,7 @@ public class TableEditor : Scenario
         _tableView!.Update ();
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, Terminal.Gui.Input.Mouse e)
     {
         if (HasCheckboxes () && clickedCol == 0)
         {

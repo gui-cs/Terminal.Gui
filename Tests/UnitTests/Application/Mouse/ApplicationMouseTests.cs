@@ -43,10 +43,10 @@ public class ApplicationMouseTests
         bool expectedClicked
     )
     {
-        var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Pressed };
+        var mouseEvent = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Pressed };
         var clicked = false;
 
-        void OnApplicationOnMouseEvent (object? s, MouseEventArgs e)
+        void OnApplicationOnMouseEvent (object? s, Mouse e)
         {
             Assert.Equal (expectedX, e.ScreenPosition.X);
             Assert.Equal (expectedY, e.ScreenPosition.Y);
@@ -117,7 +117,7 @@ public class ApplicationMouseTests
             Height = size.Height
         };
 
-        var mouseEventToRaise = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouseEventToRaise = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
         view.MouseEvent += (s, mouseEvent) =>
                            {
@@ -347,7 +347,7 @@ public class ApplicationMouseTests
         Application.Mouse.GrabMouse (grabView);
         Assert.Equal (grabView, Application.Mouse.MouseGrabView);
 
-        Application.RaiseMouseEvent (new MouseEventArgs
+        Application.RaiseMouseEvent (new Mouse
         {
             ScreenPosition = new (2, 2), // Inside both views
             Flags = MouseFlags.Button1Clicked

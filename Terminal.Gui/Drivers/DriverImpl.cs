@@ -407,7 +407,7 @@ internal class DriverImpl : IDriver
     #region Input Events
 
     /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<MouseEventArgs>? MouseEvent;
+    public event EventHandler<Mouse>? MouseEvent;
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
