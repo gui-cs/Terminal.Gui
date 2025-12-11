@@ -18,7 +18,7 @@ public partial class GuiTestContext
     {
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.Button3Clicked,
+            Flags = MouseFlags.RightButtonClicked,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
         });
@@ -36,7 +36,7 @@ public partial class GuiTestContext
     {
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked,
+            Flags = MouseFlags.LeftButtonClicked,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
         });
@@ -53,7 +53,7 @@ public partial class GuiTestContext
     {
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         }, evaluator);
     }
 
@@ -137,9 +137,9 @@ public partial class GuiTestContext
 
     //            int netButton = btn switch
     //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.LeftButtonPressed => 0,
+    //                WindowsConsole.ButtonState.MiddleButtonPressed => 1,
+    //                WindowsConsole.ButtonState.RightButtonPressed => 2,
     //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
     //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
     //            };
@@ -155,9 +155,9 @@ public partial class GuiTestContext
 
     //            int unixButton = btn switch
     //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.LeftButtonPressed => 0,
+    //                WindowsConsole.ButtonState.MiddleButtonPressed => 1,
+    //                WindowsConsole.ButtonState.RightButtonPressed => 2,
     //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
     //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
     //            };
@@ -173,9 +173,9 @@ public partial class GuiTestContext
 
     //            int fakeButton = btn switch
     //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.LeftButtonPressed => 0,
+    //                WindowsConsole.ButtonState.MiddleButtonPressed => 1,
+    //                WindowsConsole.ButtonState.RightButtonPressed => 2,
     //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
     //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
     //            };

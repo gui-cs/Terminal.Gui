@@ -570,7 +570,7 @@ public class TreeViewFileSystem : Scenario
         }
 
         // if user right clicks
-        if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
         {
             IFileSystemInfo? rightClicked = _treeViewFiles.GetObjectOnRow (mouse.Position!.Value.Y);
 

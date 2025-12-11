@@ -45,7 +45,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 10), // Screen position
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act - Start drag
@@ -55,7 +55,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 15), // New screen position
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -107,7 +107,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (15, 15), // 5+10 offset
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -116,7 +116,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (18, 18), // Moved 3,3
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -164,7 +164,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -173,7 +173,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -182,7 +182,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse releaseEvent = new ()
         {
             ScreenPosition = new (15, 15),
-            Flags = MouseFlags.Button1Released
+            Flags = MouseFlags.LeftButtonReleased
         };
 
         app.Mouse.RaiseMouseEvent (releaseEvent);
@@ -234,7 +234,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (19, 15),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -243,7 +243,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (24, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -293,7 +293,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (15, 19),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -302,7 +302,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 24),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -352,7 +352,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 15),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -361,7 +361,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (7, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -411,7 +411,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (15, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -420,7 +420,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 8),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -474,7 +474,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (19, 19),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -483,7 +483,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (24, 24),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -533,7 +533,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
@@ -542,7 +542,7 @@ public class MouseDragTests
         Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (7, 8),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -597,7 +597,7 @@ public class MouseDragTests
         {
             Position = new (8, 5), // Drag 8 units right, would make width 2
             ScreenPosition = new (18, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         // Act
@@ -648,7 +648,7 @@ public class MouseDragTests
         {
             Position = new (5, 8), // Drag 8 units down, would make height 2
             ScreenPosition = new (15, 18),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         // Act

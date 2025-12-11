@@ -189,7 +189,7 @@ public class Bars : Scenario
 
         void MenuLikeExamplesMouseEvent (object _, Terminal.Gui.Input.Mouse mouse)
         {
-            if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 popOverMenu.X = mouse.Position!.Value.X;
                 popOverMenu.Y = mouse.Position!.Value.Y;
@@ -275,7 +275,7 @@ public class Bars : Scenario
 
     //private void ShowContextMenu (object s, MouseEventEventArgs e)
     //{
-    //    if (e.Flags != MouseFlags.Button3Clicked)
+    //    if (e.Flags != MouseFlags.RightButtonClicked)
     //    {
     //        return;
     //    }
@@ -392,7 +392,7 @@ public class Bars : Scenario
     //        // If user clicks outside of the menuWindow, close it
     //        if (!contextMenu.Frame.Contains (e.Position.X, e.Position.Y))
     //        {
-    //            if (e.Flags is (MouseFlags.Button1Clicked or MouseFlags.Button3Clicked))
+    //            if (e.Flags is (MouseFlags.LeftButtonClicked or MouseFlags.RightButtonClicked))
     //            {
     //                contextMenu.RequestStop ();
     //            }
@@ -415,7 +415,7 @@ public class Bars : Scenario
             Title = "_File",
             HelpText = "File Menu",
             Key = Key.D0.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         var editMenuBarItem = new Shortcut
@@ -423,7 +423,7 @@ public class Bars : Scenario
             Title = "_Edit",
             HelpText = "Edit Menu",
             Key = Key.D1.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         var helpMenuBarItem = new Shortcut
@@ -431,7 +431,7 @@ public class Bars : Scenario
             Title = "_Help",
             HelpText = "Halp Menu",
             Key = Key.D2.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
@@ -445,7 +445,7 @@ public class Bars : Scenario
             Title = "Z_igzag",
             Key = Key.I.WithCtrl,
             Text = "Gonna zig zag",
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         var shortcut2 = new Shortcut
@@ -453,7 +453,7 @@ public class Bars : Scenario
             Title = "Za_G",
             Text = "Gonna zag",
             Key = Key.G.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         var shortcut3 = new Shortcut
@@ -461,7 +461,7 @@ public class Bars : Scenario
             Title = "_Three",
             Text = "The 3rd item",
             Key = Key.D3.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         var line = new Line ()
@@ -475,13 +475,13 @@ public class Bars : Scenario
             Title = "_Four",
             Text = "Below the line",
             Key = Key.D3.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         shortcut4.CommandView = new CheckBox ()
         {
             Title = shortcut4.Title,
-            HighlightStates = MouseState.None,
+            MouseHighlightStates = MouseState.None,
             CanFocus = false
         };
         // This ensures the checkbox state toggles when the hotkey of Title is pressed.
@@ -523,18 +523,18 @@ public class Bars : Scenario
 
         bar.Add (shortcut);
 
-        var button1 = new Button
+        var LeftButton = new Button
         {
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accepting += Button_Clicked;
-        bar.Add (button1);
+        LeftButton.Accepting += Button_Clicked;
+        bar.Add (LeftButton);
 
         shortcut.Accepting += (s, e) =>
                                                     {
-                                                        button1.Visible = !button1.Visible;
-                                                        button1.Enabled = button1.Visible;
+                                                        LeftButton.Visible = !LeftButton.Visible;
+                                                        LeftButton.Enabled = LeftButton.Visible;
                                                         e.Handled = true;
                                                     };
 
@@ -545,13 +545,13 @@ public class Bars : Scenario
             CanFocus = true
         });
 
-        var button2 = new Button
+        var MiddleButton = new Button
         {
             Text = "Or me!",
         };
-        button2.Accepting += (s, e) => Application.RequestStop ();
+        MiddleButton.Accepting += (s, e) => Application.RequestStop ();
 
-        bar.Add (button2);
+        bar.Add (MiddleButton);
 
         return;
 

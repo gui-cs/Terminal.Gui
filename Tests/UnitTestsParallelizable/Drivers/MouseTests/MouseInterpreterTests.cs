@@ -1,6 +1,6 @@
 ﻿// ReSharper disable AccessToModifiedClosure
 #nullable disable
-namespace DriverTests.Mouse;
+namespace DriverTests.MouseTests;
 
 public class MouseInterpreterTests
 {
@@ -39,64 +39,64 @@ public class MouseInterpreterTests
         [
             new List<Terminal.Gui.Input.Mouse>
             {
-                new () { Flags = MouseFlags.Button1Pressed },
+                new () { Flags = MouseFlags.LeftButtonPressed },
                 new ()
             },
-            new MouseFlags? [] { null, MouseFlags.Button1Clicked }
+            new MouseFlags? [] { null, MouseFlags.LeftButtonClicked }
         ];
 
         yield return
         [
             new List<Terminal.Gui.Input.Mouse>
             {
-                new () { Flags = MouseFlags.Button1Pressed },
+                new () { Flags = MouseFlags.LeftButtonPressed },
                 new (),
-                new () { Flags = MouseFlags.Button1Pressed },
+                new () { Flags = MouseFlags.LeftButtonPressed },
                 new ()
             },
-            new MouseFlags? [] { null, MouseFlags.Button1Clicked, null, MouseFlags.Button1DoubleClicked }
+            new MouseFlags? [] { null, MouseFlags.LeftButtonClicked, null, MouseFlags.LeftButtonDoubleClicked }
         ];
 
         yield return
         [
             new List<Terminal.Gui.Input.Mouse>
             {
-                new () { Flags = MouseFlags.Button1Pressed },
+                new () { Flags = MouseFlags.LeftButtonPressed },
                 new (),
-                new () { Flags = MouseFlags.Button1Pressed },
+                new () { Flags = MouseFlags.LeftButtonPressed },
                 new (),
-                new () { Flags = MouseFlags.Button1Pressed },
+                new () { Flags = MouseFlags.LeftButtonPressed },
                 new ()
             },
-            new MouseFlags? [] { null, MouseFlags.Button1Clicked, null, MouseFlags.Button1DoubleClicked, null, MouseFlags.Button1TripleClicked }
+            new MouseFlags? [] { null, MouseFlags.LeftButtonClicked, null, MouseFlags.LeftButtonDoubleClicked, null, MouseFlags.LeftButtonTripleClicked }
         ];
 
         yield return
         [
             new List<Terminal.Gui.Input.Mouse>
             {
-                new () { Flags = MouseFlags.Button2Pressed },
+                new () { Flags = MouseFlags.MiddleButtonPressed },
                 new (),
-                new () { Flags = MouseFlags.Button2Pressed },
+                new () { Flags = MouseFlags.MiddleButtonPressed },
                 new (),
-                new () { Flags = MouseFlags.Button2Pressed },
+                new () { Flags = MouseFlags.MiddleButtonPressed },
                 new ()
             },
-            new MouseFlags? [] { null, MouseFlags.Button2Clicked, null, MouseFlags.Button2DoubleClicked, null, MouseFlags.Button2TripleClicked }
+            new MouseFlags? [] { null, MouseFlags.MiddleButtonClicked, null, MouseFlags.MiddleButtonDoubleClicked, null, MouseFlags.MiddleButtonTripleClicked }
         ];
 
         yield return
         [
             new List<Terminal.Gui.Input.Mouse>
             {
-                new () { Flags = MouseFlags.Button3Pressed },
+                new () { Flags = MouseFlags.RightButtonPressed },
                 new (),
-                new () { Flags = MouseFlags.Button3Pressed },
+                new () { Flags = MouseFlags.RightButtonPressed },
                 new (),
-                new () { Flags = MouseFlags.Button3Pressed },
+                new () { Flags = MouseFlags.RightButtonPressed },
                 new ()
             },
-            new MouseFlags? [] { null, MouseFlags.Button3Clicked, null, MouseFlags.Button3DoubleClicked, null, MouseFlags.Button3TripleClicked }
+            new MouseFlags? [] { null, MouseFlags.RightButtonClicked, null, MouseFlags.RightButtonDoubleClicked, null, MouseFlags.RightButtonTripleClicked }
         ];
 
         yield return
@@ -117,14 +117,14 @@ public class MouseInterpreterTests
         [
             new List<Terminal.Gui.Input.Mouse>
             {
-                new () { Flags = MouseFlags.Button1Pressed, Position = new (10, 11) },
+                new () { Flags = MouseFlags.LeftButtonPressed, Position = new (10, 11) },
                 new () { Position = new (10, 11) },
 
                 // Clicking the line below means no double click because it's a different location
-                new () { Flags = MouseFlags.Button1Pressed, Position = new (10, 12) },
+                new () { Flags = MouseFlags.LeftButtonPressed, Position = new (10, 12) },
                 new () { Position = new (10, 12) }
             },
-            new MouseFlags? [] { null, MouseFlags.Button1Clicked, null, MouseFlags.Button1Clicked } //release is click because new position
+            new MouseFlags? [] { null, MouseFlags.LeftButtonClicked, null, MouseFlags.LeftButtonClicked } //release is click because new position
         ];
     }
 
@@ -145,22 +145,22 @@ public class MouseInterpreterTests
         List<Terminal.Gui.Input.Mouse> allEvents = [];
 
         // Act - Simulate a double-click: Press, Release, Press, Release
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
 
         // Assert - Extract only the synthetic click events (not pressed/released)
         List<Terminal.Gui.Input.Mouse> clickEvents = allEvents
-                                                     .Where (e => e.Flags.HasFlag (MouseFlags.Button1Clicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+                                                     .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
                                                      .ToList ();
 
         // With immediate emission, we get BOTH Clicked and DoubleClicked
         Assert.Equal (2, clickEvents.Count);
-        Assert.Equal (MouseFlags.Button1Clicked, clickEvents [0].Flags);
-        Assert.Equal (MouseFlags.Button1DoubleClicked, clickEvents [1].Flags);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonDoubleClicked, clickEvents [1].Flags);
 
         // CheckForExpiredClicks should now return nothing (clicks emitted immediately)
         List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
@@ -182,25 +182,25 @@ public class MouseInterpreterTests
         List<Terminal.Gui.Input.Mouse> allEvents = [];
 
         // Act - Simulate a triple-click: Press, Release, Press, Release, Press, Release
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
 
         // Assert - Extract only the synthetic click events
         List<Terminal.Gui.Input.Mouse> clickEvents = allEvents
-                                                     .Where (e => e.Flags.HasFlag (MouseFlags.Button1Clicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+                                                     .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
                                                      .ToList ();
 
         // With immediate emission, we get ALL THREE click events
         Assert.Equal (3, clickEvents.Count);
-        Assert.Equal (MouseFlags.Button1Clicked, clickEvents [0].Flags);
-        Assert.Equal (MouseFlags.Button1DoubleClicked, clickEvents [1].Flags);
-        Assert.Equal (MouseFlags.Button1TripleClicked, clickEvents [2].Flags);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonDoubleClicked, clickEvents [1].Flags);
+        Assert.Equal (MouseFlags.LeftButtonTripleClicked, clickEvents [2].Flags);
     }
 
     /// <summary>
@@ -222,15 +222,15 @@ public class MouseInterpreterTests
         List<Terminal.Gui.Input.Mouse> allEvents = [];
 
         // Act - Simulate a single click
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
 
         // Assert - With immediate emission, click event should be emitted right away
-        List<Terminal.Gui.Input.Mouse> immediateClickEvents = allEvents.Where (e => e.Flags.HasFlag (MouseFlags.Button1Clicked)).ToList ();
+        List<Terminal.Gui.Input.Mouse> immediateClickEvents = allEvents.Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)).ToList ();
 
         // NEW (correct) behavior: immediateClickEvents.Count == 1
         Assert.Single (immediateClickEvents);
-        Assert.Equal (MouseFlags.Button1Clicked, immediateClickEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonClicked, immediateClickEvents [0].Flags);
 
         // CheckForExpiredClicks should return nothing (clicks already emitted)
         List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
@@ -252,20 +252,20 @@ public class MouseInterpreterTests
         List<Terminal.Gui.Input.Mouse> allEvents = [];
 
         // Act - Simulate a double-click
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
 
         // Assert - Verify exact sequence (WITH click events, emitted immediately)
         // Expected: Pressed, Released, Clicked, Pressed, Released, DoubleClicked
         Assert.Equal (6, allEvents.Count);
-        Assert.Equal (MouseFlags.Button1Pressed, allEvents [0].Flags);
-        Assert.Equal (MouseFlags.Button1Released, allEvents [1].Flags);
-        Assert.Equal (MouseFlags.Button1Clicked, allEvents [2].Flags);
-        Assert.Equal (MouseFlags.Button1Pressed, allEvents [3].Flags);
-        Assert.Equal (MouseFlags.Button1Released, allEvents [4].Flags);
-        Assert.Equal (MouseFlags.Button1DoubleClicked, allEvents [5].Flags);
+        Assert.Equal (MouseFlags.LeftButtonPressed, allEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonReleased, allEvents [1].Flags);
+        Assert.Equal (MouseFlags.LeftButtonClicked, allEvents [2].Flags);
+        Assert.Equal (MouseFlags.LeftButtonPressed, allEvents [3].Flags);
+        Assert.Equal (MouseFlags.LeftButtonReleased, allEvents [4].Flags);
+        Assert.Equal (MouseFlags.LeftButtonDoubleClicked, allEvents [5].Flags);
     }
 
     /// <summary>
@@ -285,18 +285,18 @@ public class MouseInterpreterTests
 
         // Act - Simulate a double-click at the same position
         Point pos = new (10, 10);
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = pos }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = pos }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = pos }));
-        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = pos }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = pos }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = pos }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = pos }));
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = pos }));
 
         // Get the index of each event type
-        List<int> pressedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.Button1Pressed).Select (x => x.i).ToList ();
-        List<int> releasedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.Button1Released).Select (x => x.i).ToList ();
-        List<int> clickedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.Button1Clicked).Select (x => x.i).ToList ();
+        List<int> pressedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.LeftButtonPressed).Select (x => x.i).ToList ();
+        List<int> releasedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.LeftButtonReleased).Select (x => x.i).ToList ();
+        List<int> clickedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.LeftButtonClicked).Select (x => x.i).ToList ();
 
         List<int> doubleClickedIndices = allEvents.Select ((e, i) => new { e, i })
-                                                  .Where (x => x.e.Flags == MouseFlags.Button1DoubleClicked)
+                                                  .Where (x => x.e.Flags == MouseFlags.LeftButtonDoubleClicked)
                                                   .Select (x => x.i)
                                                   .ToList ();
 

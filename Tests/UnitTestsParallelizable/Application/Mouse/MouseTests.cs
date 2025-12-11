@@ -73,7 +73,7 @@ public class MouseTests
         Assert.Empty (mouseImpl.CachedViewsUnderMouse);
 
         // Event handlers should be cleared
-        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
         mouseImpl.RaiseMouseEvent (mouse);
         Assert.False (eventFired, "Event should not fire after ResetState");
     }
@@ -83,7 +83,7 @@ public class MouseTests
     {
         // Arrange
         MouseImpl mouseImpl = new ();
-        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act - Application is not initialized, so LastMousePosition should not be set
         mouseImpl.RaiseMouseEvent (mouse);
@@ -104,7 +104,7 @@ public class MouseTests
 
         // Act - Subscribe
         mouseImpl.MouseEvent += handler;
-        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
         mouseImpl.RaiseMouseEvent (mouse);
 
         // Assert - Event fired once
@@ -203,7 +203,7 @@ public class MouseTests
 
         application.TopRunnableView.Add (view);
 
-        var mouse = new Terminal.Gui.Input.Mouse { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouse = new Terminal.Gui.Input.Mouse { Position = new (clickX, clickY), ScreenPosition = new (clickX, clickY), Flags = MouseFlags.LeftButtonClicked };
 
         view.MouseEvent += (_s, e) =>
         {

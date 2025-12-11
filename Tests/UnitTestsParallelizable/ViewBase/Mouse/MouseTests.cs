@@ -11,8 +11,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var testView = new View ();
 
-        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
-        //        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+        Assert.Contains (MouseFlags.LeftButtonClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+        //        Assert.Contains (MouseFlags.LeftButtonDoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
 
         Assert.Equal (6, testView.MouseBindings.GetBindings ().Count ());
     }
@@ -71,14 +71,14 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         var acceptingCount = 0;
         testView.Accepting += (sender, args) => acceptingCount++;
 
-        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.Button1Clicked });
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedAcceptingCount, acceptingCount);
     }
 
     [Theory]
-    [InlineData (MouseFlags.WheeledUp | MouseFlags.ButtonCtrl, MouseFlags.WheeledLeft)]
-    [InlineData (MouseFlags.WheeledDown | MouseFlags.ButtonCtrl, MouseFlags.WheeledRight)]
+    [InlineData (MouseFlags.WheeledUp | MouseFlags.Ctrl, MouseFlags.WheeledLeft)]
+    [InlineData (MouseFlags.WheeledDown | MouseFlags.Ctrl, MouseFlags.WheeledRight)]
     public void WheeledLeft_WheeledRight (MouseFlags mouseFlags, MouseFlags expectedMouseFlagsFromEvent)
     {
         var mouseFlagsFromEvent = MouseFlags.None;
@@ -131,18 +131,18 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
                               // e.Handled = true;
                            };
 
-        Mouse mouseEventPressed1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        Mouse mouseEventPressed1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed };
         view.NewMouseEvent (mouseEventPressed1);
-        Mouse mouseEventReleased1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        Mouse mouseEventReleased1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonReleased };
         view.NewMouseEvent (mouseEventReleased1);
-        Mouse mouseEventClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Clicked };
+        Mouse mouseEventClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonClicked };
         view.NewMouseEvent (mouseEventClicked);
 
-        Mouse mouseEventPressed2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        Mouse mouseEventPressed2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed };
         view.NewMouseEvent (mouseEventPressed2);
-        Mouse mouseEventReleased2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        Mouse mouseEventReleased2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonReleased };
         view.NewMouseEvent (mouseEventReleased2);
-        Mouse mouseEventDoubleClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1DoubleClicked };
+        Mouse mouseEventDoubleClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonDoubleClicked };
         view.NewMouseEvent (mouseEventDoubleClicked);
 
         Assert.Equal (6, mouseEventCount);
@@ -168,18 +168,18 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
                                e.Handled = true;
                            };
 
-        Mouse mouseEventPressed1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        Mouse mouseEventPressed1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed };
         view.NewMouseEvent (mouseEventPressed1);
-        Mouse mouseEventReleased1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        Mouse mouseEventReleased1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonReleased };
         view.NewMouseEvent (mouseEventReleased1);
-        Mouse mouseEventClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Clicked };
+        Mouse mouseEventClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonClicked };
         view.NewMouseEvent (mouseEventClicked);
 
-        Mouse mouseEventPressed2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Pressed };
+        Mouse mouseEventPressed2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed };
         view.NewMouseEvent (mouseEventPressed2);
-        Mouse mouseEventReleased2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1Released };
+        Mouse mouseEventReleased2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonReleased };
         view.NewMouseEvent (mouseEventReleased2);
-        Mouse mouseEventDoubleClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.Button1DoubleClicked };
+        Mouse mouseEventDoubleClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonDoubleClicked };
         view.NewMouseEvent (mouseEventDoubleClicked);
 
         Assert.Equal (1, acceptingCount);
@@ -225,7 +225,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         var me = new Terminal.Gui.Input.Mouse
         {
             Timestamp = DateTime.Now,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
         view.NewMouseEvent (me);
         Assert.False (me.Handled);

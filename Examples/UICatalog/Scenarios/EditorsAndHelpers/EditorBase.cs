@@ -150,7 +150,7 @@ public abstract class EditorBase : View
 
     private void ApplicationOnMouseEvent (object? sender, Terminal.Gui.Input.Mouse mouse)
     {
-        if (mouse.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
+        if (mouse.Flags != MouseFlags.LeftButtonClicked || !AutoSelectViewToEdit)
         {
             return;
         }

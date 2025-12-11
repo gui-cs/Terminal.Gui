@@ -101,8 +101,8 @@ public class HexView : View, IDesignable
         KeyBindings.Remove (Key.Enter);
 
         // The Activate handler deals with both single and double clicks
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 
@@ -411,7 +411,7 @@ public class HexView : View, IDesignable
             Address = Math.Min (lineStart + item, GetEditedSize ());
         }
 
-        if (mouseCommandContext.Binding.MouseEventArgs.Flags == MouseFlags.Button1DoubleClicked)
+        if (mouseCommandContext.Binding.MouseEventArgs.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             _leftSideHasFocus = !clickIsOnLeftSide;
 

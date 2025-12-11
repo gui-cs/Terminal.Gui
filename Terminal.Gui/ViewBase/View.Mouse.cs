@@ -12,12 +12,12 @@ public partial class View // Mouse APIs
     {
         MouseBindings = new ();
 
-        // TODO: Should the default really work with any button or just button1?
+        // TODO: Should the default really work with any button or just LeftButton?
         MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
         MouseBindings.Add (MouseFlags.MiddleButtonPressed, Command.Activate);
         MouseBindings.Add (MouseFlags.Button4Pressed, Command.Activate);
         MouseBindings.Add (MouseFlags.RightButtonPressed, Command.Context);
-        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Context);
 
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
     }
@@ -60,7 +60,7 @@ public partial class View // Mouse APIs
 
         MouseState |= MouseState.In;
 
-        if (HighlightStates != MouseState.None)
+        if (MouseHighlightStates != MouseState.None)
         {
             SetNeedsDraw ();
         }
@@ -148,7 +148,7 @@ public partial class View // Mouse APIs
 
         // TODO: Should we also MouseState &= ~MouseState.Pressed; ??
 
-        if (HighlightStates != MouseState.None)
+        if (MouseHighlightStates != MouseState.None)
         {
             SetNeedsDraw ();
         }
@@ -190,11 +190,11 @@ public partial class View // Mouse APIs
     ///     and the user presses and holds the mouse button, <see cref="NewMouseEvent"/> will be
     ///     repeatedly called with the same <see cref="MouseFlags"/> for as long as the mouse button remains pressed.
     /// </summary>
-    public bool WantContinuousButtonPressed { get; set; }
+    public bool MouseHoldRepeat { get; set; }
 
     /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
     /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
-    public bool WantMousePositionReports { get; set; }
+    public bool MousePositionTracking  { get; set; }
 
     /// <summary>
     ///     Processes a mouse event for this view. This is the main entry point for mouse input handling,
@@ -218,8 +218,8 @@ public partial class View // Mouse APIs
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 Handles mouse grab scenarios when <see cref="HighlightStates"/> or
-    ///                 <see cref="WantContinuousButtonPressed"/> are set (press/release/click)
+    ///                 Handles mouse grab scenarios when <see cref="MouseHighlightStates"/> or
+    ///                 <see cref="MouseHoldRepeat"/> are set (press/release/click)
     ///             </description>
     ///         </item>
     ///         <item>
@@ -230,14 +230,14 @@ public partial class View // Mouse APIs
     ///         </item>
     ///     </list>
     ///     <para>
-    ///         <strong>Continuous Button Press:</strong> When <see cref="WantContinuousButtonPressed"/> is
+    ///         <strong>Continuous Button Press:</strong> When <see cref="MouseHoldRepeat"/> is
     ///         <see langword="true"/> and the user holds a mouse button down, this method is repeatedly called
     ///         with <see cref="MouseFlags.LeftButtonPressed"/> (or other button pressed) events, enabling repeating button
     ///         behavior (e.g., scroll buttons).
     ///     </para>
     ///     <para>
-    ///         <strong>Mouse Grab:</strong> Views with <see cref="HighlightStates"/> or
-    ///         <see cref="WantContinuousButtonPressed"/> enabled automatically grab the mouse on button press,
+    ///         <strong>Mouse Grab:</strong> Views with <see cref="MouseHighlightStates"/> or
+    ///         <see cref="MouseHoldRepeat"/> enabled automatically grab the mouse on button press,
     ///         receiving all subsequent mouse events until the button is released, even if the mouse moves
     ///         outside the view's <see cref="Viewport"/>.
     ///     </para>
@@ -255,8 +255,8 @@ public partial class View // Mouse APIs
     /// <seealso cref="OnMouseEvent"/>
     /// <seealso cref="MouseBindings"/>
     /// <seealso cref="Activating"/>
-    /// <seealso cref="WantContinuousButtonPressed"/>
-    /// <seealso cref="HighlightStates"/>
+    /// <seealso cref="MouseHoldRepeat"/>
+    /// <seealso cref="MouseHighlightStates"/>
     public bool? NewMouseEvent (Mouse mouse)
     {
         // Pre-conditions
@@ -278,7 +278,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (!WantMousePositionReports && mouse.Flags == MouseFlags.ReportMousePosition)
+        if (!MousePositionTracking  && mouse.Flags == MouseFlags.PositionReport)
         {
             return false;
         }
@@ -288,7 +288,7 @@ public partial class View // Mouse APIs
             MouseHeldDown = new MouseHeldDown (this, App?.TimedEvents, App?.Mouse);
         }
 
-        if (WantContinuousButtonPressed)
+        if (MouseHoldRepeat)
         {
             if (mouse.IsPressed)
             {
@@ -310,7 +310,7 @@ public partial class View // Mouse APIs
 
         // Post-Conditions
 
-        if (HighlightStates != MouseState.None || WantContinuousButtonPressed)
+        if (MouseHighlightStates != MouseState.None || MouseHoldRepeat)
         {
             if (WhenGrabbedHandlePressed (mouse))
             {
@@ -344,7 +344,7 @@ public partial class View // Mouse APIs
     }
 
     /// <summary>
-    ///     INTERNAL: Manages continuous button press behavior for views that have <see cref="WantContinuousButtonPressed"/> set to <see langword="true"/>.
+    ///     INTERNAL: Manages continuous button press behavior for views that have <see cref="MouseHoldRepeat"/> set to <see langword="true"/>.
     ///     When a mouse button is held down on such a view, this instance periodically raises events to enable auto-repeat functionality
     ///     (e.g., scrollbars that continue scrolling while the button is held, or buttons that repeat their action).
     /// </summary>
@@ -415,7 +415,7 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed and the mouse is pressed, this method handles the pressed events from
     ///     the driver.
-    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Activate event
+    ///     When  <see cref="MouseHoldRepeat"/> is set, this method will raise the Activate event
     ///     via <see cref="Command.Activate"/> each time it is called (after the first time the mouse is pressed).
     /// </summary>
     /// <param name="mouse"></param>
@@ -448,7 +448,7 @@ public partial class View // Mouse APIs
         if (mouse.Position is {} position && Viewport.Contains (position))
         {
             // The mouse is inside.
-            if (HighlightStates.HasFlag (MouseState.Pressed))
+            if (MouseHighlightStates.HasFlag (MouseState.Pressed))
             {
                 MouseState |= MouseState.Pressed;
             }
@@ -459,15 +459,15 @@ public partial class View // Mouse APIs
         else
         {
             // The mouse is outside.
-            // When WantContinuousButtonPressed is set we want to keep the mouse state as pressed (e.g. a repeating button).
+            // When MouseHoldRepeat is set we want to keep the mouse state as pressed (e.g. a repeating button).
             // This shows the user that the button is doing something, even if the mouse is outside the Viewport.
-            if (HighlightStates.HasFlag (MouseState.PressedOutside) && !WantContinuousButtonPressed)
+            if (MouseHighlightStates.HasFlag (MouseState.PressedOutside) && !MouseHoldRepeat)
             {
                 MouseState |= MouseState.PressedOutside;
             }
         }
 
-        if (!mouse.Handled && WantContinuousButtonPressed && App?.Mouse.MouseGrabView == this)
+        if (!mouse.Handled && MouseHoldRepeat && App?.Mouse.MouseGrabView == this)
         {
             // Ignore the return value here, because the semantics of WhenGrabbedHandlePressed is the return
             // value indicates whether processing should stop or not.
@@ -481,7 +481,7 @@ public partial class View // Mouse APIs
 
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed, this method handles the released events from the driver
-    ///     (when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set). If <see cref="MouseState"/>
+    ///     (when <see cref="MouseHoldRepeat"/> or <see cref="MouseHighlightStates"/> are set). If <see cref="MouseState"/>
     ///     is <see cref="MouseState.In"/>, this method modifies the <see cref="Mouse.Flags"/> to be the corresponding
     ///     clicked flag (e.g., <see cref="MouseFlags.LeftButtonClicked"/>).
     /// </summary>
@@ -496,7 +496,7 @@ public partial class View // Mouse APIs
         MouseState &= ~MouseState.Pressed;
         MouseState &= ~MouseState.PressedOutside;
 
-        if (!WantContinuousButtonPressed && MouseState.HasFlag (MouseState.In))
+        if (!MouseHoldRepeat && MouseState.HasFlag (MouseState.In))
         {
             ConvertReleasedToClicked(mouse);
         }
@@ -505,7 +505,7 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed, this method handles the click events from the driver
     ///     (typically
-    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
+    ///     when <see cref="MouseHoldRepeat"/> or <see cref="MouseHighlightStates"/> are set).
     /// </summary>
     /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if processing should stop; <see langword="false"/> otherwise.</returns>
@@ -710,11 +710,11 @@ public partial class View // Mouse APIs
     ///     </para>
     ///     <para>
     ///         <see cref="MouseState.PressedOutside"/> means the View will be highlighted when the mouse was pressed
-    ///         inside it and then moved outside of it, unless <see cref="WantContinuousButtonPressed"/> is set to
+    ///         inside it and then moved outside of it, unless <see cref="MouseHoldRepeat"/> is set to
     ///         <see langword="true"/>, in which case the flag has no effect.
     ///     </para>
     /// </remarks>
-    public MouseState HighlightStates { get; set; }
+    public MouseState MouseHighlightStates { get; set; }
 
     /// <summary>
     ///     INTERNAL Raises the <see cref="MouseStateChanged"/> event.

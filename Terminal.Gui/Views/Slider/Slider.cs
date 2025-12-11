@@ -1296,19 +1296,19 @@ public class Slider<T> : View, IOrientation
         //       adds too much friction to UI.
         // TODO(jmperricone): Make Range Type work with mouse.
 
-        if (!(mouse.Flags.HasFlag (MouseFlags.Button1Clicked)
-              || mouse.Flags.HasFlag (MouseFlags.Button1Pressed)
-              || mouse.Flags.HasFlag (MouseFlags.ReportMousePosition)
-              || mouse.Flags.HasFlag (MouseFlags.Button1Released)))
+        if (!(mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+              || mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed)
+              || mouse.Flags.HasFlag (MouseFlags.PositionReport)
+              || mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased)))
         {
             return false;
         }
 
         SetFocus ();
 
-        if (!_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (!_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            if (mouse.Flags.HasFlag (MouseFlags.ReportMousePosition))
+            if (mouse.Flags.HasFlag (MouseFlags.PositionReport))
             {
                 _dragPosition = mouse.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
@@ -1321,8 +1321,8 @@ public class Slider<T> : View, IOrientation
         }
 
         if (_dragPosition.HasValue
-            && mouse.Flags.HasFlag (MouseFlags.ReportMousePosition)
-            && mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+            && mouse.Flags.HasFlag (MouseFlags.PositionReport)
+            && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             // Continue Drag
             _dragPosition = mouse.Position;
@@ -1354,8 +1354,8 @@ public class Slider<T> : View, IOrientation
             return true;
         }
 
-        if ((_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.Button1Released))
-            || mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if ((_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+            || mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             // End Drag
             App?.Mouse.UngrabMouse ();

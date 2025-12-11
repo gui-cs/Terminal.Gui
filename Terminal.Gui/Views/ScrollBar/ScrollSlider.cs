@@ -17,7 +17,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
     public ScrollSlider ()
     {
         Id = "scrollSlider";
-        WantMousePositionReports = true;
+        MousePositionTracking  = true;
 
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
@@ -26,7 +26,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
         OnOrientationChanged (Orientation);
 
-        HighlightStates = ViewBase.MouseState.In;
+        MouseHighlightStates = ViewBase.MouseState.In;
     }
 
     #region IOrientation members
@@ -305,7 +305,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
         if (mouse.IsPressed || mouse.IsReleased)
         {
-            if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed) && _lastLocation == -1)
+            if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed) && _lastLocation == -1)
             {
                 if (Application.Mouse.MouseGrabView != this)
                 {
@@ -313,7 +313,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
                     _lastLocation = location;
                 }
             }
-            else if (mouse.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+            else if (mouse.Flags == (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
             {
                 int currentLocation;
                 if (Orientation == Orientation.Vertical)
@@ -329,7 +329,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
                 int newLocation = currentLocation + offsetFromLastLocation;
                 Position = newLocation;
             }
-            else if (mouse.Flags == MouseFlags.Button1Released)
+            else if (mouse.Flags == MouseFlags.LeftButtonReleased)
             {
                 _lastLocation = -1;
 

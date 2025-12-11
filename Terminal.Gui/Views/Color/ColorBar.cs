@@ -123,7 +123,7 @@ internal abstract class ColorBar : View, IColorBar
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (mouse.Position!.Value.X >= _barStartsAt)
             {

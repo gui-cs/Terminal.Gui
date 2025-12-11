@@ -839,10 +839,10 @@ public class DialogTests (ITestOutputHelper output)
         Application.Driver?.SetScreenSize (buttonRow.Length, 3);
 
         // Default (Center)
-        Button button1 = new () { Text = btn1Text };
-        Button button2 = new () { Text = btn2Text };
-        (sessionToken, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, button1, button2);
-        button1.Visible = false;
+        Button LeftButton = new () { Text = btn1Text };
+        Button MiddleButton = new () { Text = btn2Text };
+        (sessionToken, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, LeftButton, MiddleButton);
+        LeftButton.Visible = false;
         AutoInitShutdownAttribute.RunIteration ();
 
         buttonRow = $@"{Glyphs.VLine}         {btn2} {Glyphs.VLine}";
@@ -853,10 +853,10 @@ public class DialogTests (ITestOutputHelper output)
 
         // Justify
         Assert.Equal (width, buttonRow.Length);
-        button1 = new () { Text = btn1Text };
-        button2 = new () { Text = btn2Text };
-        (sessionToken, dlg) = BeginButtonTestDialog (title, width, Alignment.Fill, button1, button2);
-        button1.Visible = false;
+        LeftButton = new () { Text = btn1Text };
+        MiddleButton = new () { Text = btn2Text };
+        (sessionToken, dlg) = BeginButtonTestDialog (title, width, Alignment.Fill, LeftButton, MiddleButton);
+        LeftButton.Visible = false;
         AutoInitShutdownAttribute.RunIteration ();
 
         buttonRow = $@"{Glyphs.VLine}          {btn2}{Glyphs.VLine}";
@@ -866,10 +866,10 @@ public class DialogTests (ITestOutputHelper output)
 
         // Right
         Assert.Equal (width, buttonRow.Length);
-        button1 = new () { Text = btn1Text };
-        button2 = new () { Text = btn2Text };
-        (sessionToken, dlg) = BeginButtonTestDialog (title, width, Alignment.End, button1, button2);
-        button1.Visible = false;
+        LeftButton = new () { Text = btn1Text };
+        MiddleButton = new () { Text = btn2Text };
+        (sessionToken, dlg) = BeginButtonTestDialog (title, width, Alignment.End, LeftButton, MiddleButton);
+        LeftButton.Visible = false;
         AutoInitShutdownAttribute.RunIteration ();
 
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
@@ -878,10 +878,10 @@ public class DialogTests (ITestOutputHelper output)
 
         // Left
         Assert.Equal (width, buttonRow.Length);
-        button1 = new () { Text = btn1Text };
-        button2 = new () { Text = btn2Text };
-        (sessionToken, dlg) = BeginButtonTestDialog (title, width, Alignment.Start, button1, button2);
-        button1.Visible = false;
+        LeftButton = new () { Text = btn1Text };
+        MiddleButton = new () { Text = btn2Text };
+        (sessionToken, dlg) = BeginButtonTestDialog (title, width, Alignment.Start, LeftButton, MiddleButton);
+        LeftButton.Visible = false;
         AutoInitShutdownAttribute.RunIteration ();
 
         buttonRow = $@"{Glyphs.VLine}        {btn2}  {Glyphs.VLine}";
@@ -1348,7 +1348,7 @@ public class DialogTests (ITestOutputHelper output)
             else if (iterations == 2)
             {
                 // Mouse click outside of dialog
-                Application.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (0, 0) });
+                Application.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.LeftButtonClicked, ScreenPosition = new (0, 0) });
             }
         }
     }

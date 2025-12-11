@@ -12,7 +12,7 @@ This document specifies the complete mouse behavior for Terminal.Gui, based on a
 
 1. **ClickCount is metadata** on every mouse event (AppKit model)
 2. **Flag type changes** based on ClickCount (Clicked → DoubleClicked → TripleClicked)
-3. **WantContinuousButtonPressed** is about timer-based repetition, NOT multi-click semantics
+3. **MouseHoldRepeat** is about timer-based repetition, NOT multi-click semantics
 4. **MouseState** provides visual feedback, independent of command execution
 5. **One event per physical action** - no duplicate event emission
 
@@ -25,8 +25,8 @@ This document specifies the complete mouse behavior for Terminal.Gui, based on a
 var button = new Button
 {
     Title = "Normal Button",
-    WantContinuousButtonPressed = false,  // DEFAULT
-    HighlightStates = MouseState.In | MouseState.Pressed  // DEFAULT
+    MouseHoldRepeat = false,  // DEFAULT
+    MouseHighlightStates = MouseState.In | MouseState.Pressed  // DEFAULT
 };
 button.Accepting += (s, e) =>
 {
@@ -40,8 +40,8 @@ button.Accepting += (s, e) =>
 var repeatButton = new Button
 {
     Title = "Repeat Button",
-    WantContinuousButtonPressed = true,  // ENABLES TIMER
-    HighlightStates = MouseState.In | MouseState.Pressed
+    MouseHoldRepeat = true,  // ENABLES TIMER
+    MouseHighlightStates = MouseState.In | MouseState.Pressed
 };
 repeatButton.Accepting += (s, e) =>
 {
@@ -55,8 +55,8 @@ repeatButton.Accepting += (s, e) =>
 var noHighlight = new Button
 {
     Title = "No Visual Feedback",
-    WantContinuousButtonPressed = false,
-    HighlightStates = MouseState.None  // NO VISUAL FEEDBACK
+    MouseHoldRepeat = false,
+    MouseHighlightStates = MouseState.None  // NO VISUAL FEEDBACK
 };
 ```
 
@@ -64,7 +64,7 @@ var noHighlight = new Button
 
 ## Complete Behavior Matrix
 
-### Normal Button (WantContinuousButtonPressed = false)
+### Normal Button (MouseHoldRepeat = false)
 
 | User Action | MouseState | Accept Count | ClickCount Values | Notes |
 |-------------|------------|--------------|-------------------|-------|
@@ -77,7 +77,7 @@ var noHighlight = new Button
 
 ---
 
-### Repeat Button (WantContinuousButtonPressed = true)
+### Repeat Button (MouseHoldRepeat = true)
 
 | User Action | MouseState | Accept Count | ClickCount Values | Notes |
 |-------------|------------|--------------|-------------------|-------|
@@ -98,8 +98,8 @@ var noHighlight = new Button
 ANSI: ESC[<0;10;5M (button=0, x=10, y=5, terminator='M')
       ESC[<0;10;5m (button=0, x=10, y=5, terminator='m')
       
-Output: Mouse { Timestamp = 0, Flags=Button1Pressed, ScreenPosition=(9,4) }
-        Mouse { Timestamp = 42, Flags=Button1Released, ScreenPosition=(9,4) }
+Output: Mouse { Timestamp = 0, Flags=LeftButtonPressed, ScreenPosition=(9,4) }
+        Mouse { Timestamp = 42, Flags=LeftButtonReleased, ScreenPosition=(9,4) }
 ```
 
 ### Stage 2: MouseInterpreter (Click Synthesis + ClickCount)
@@ -147,20 +147,20 @@ Similar pattern, third release emits:
 ```
 1. Find deepest view under mouse
 2. Convert screen → viewport coordinates
-3. Handle mouse grab (if HighlightStates or WantContinuous)
+3. Handle mouse grab (if MouseHighlightStates or WantContinuous)
 4. Send to View.NewMouseEvent()
 ```
 
 ### Stage 4: View.NewMouseEvent (Visual State + Commands)
 
-**For Views with HighlightStates:**
+**For Views with MouseHighlightStates:**
 ```
 Pressed  → Grab mouse, MouseState |= Pressed (visual feedback)
 Released → MouseState &= ~Pressed, Ungrab
          → Invoke commands bound to Clicked/DoubleClicked/etc.
 ```
 
-**For Views with WantContinuousButtonPressed:**
+**For Views with MouseHoldRepeat:**
 ```
 Pressed  → Grab mouse, MouseState |= Pressed, Start timer
 Timer    → Fire Accept command repeatedly (~50ms intervals using `SmoothAcceleratingTimeout`)
@@ -194,7 +194,7 @@ private void SetupMouse()
 ```csharp
 // Normal button: inherits defaults, uses Accept on Clicked/DoubleClicked
 
-// Repeat button (WantContinuousButtonPressed = true):
+// Repeat button (MouseHoldRepeat = true):
 // Sets HightlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
 // Timer fires Accept repeatedly via MouseHeldDown
 // Bindings stay the same - Accept on Clicked/DoubleClicked for quick clicks
@@ -250,7 +250,7 @@ ClickCount = 2  →  MouseFlags.DoubleClicked  →  Command.Accept
   ↑ Metadata        ↑ Event type                  ↑ Action
 ```
 
-**Example:** Button with `HighlightStates = MouseState.Pressed`
+**Example:** Button with `MouseHighlightStates = MouseState.Pressed`
 ```
 Press   → MouseState |= Pressed (button LOOKS pressed)
         → Command.Activate fires (action on press)
@@ -263,11 +263,11 @@ Release → MouseState &= ~Pressed (button looks normal)
 
 ---
 
-## WantContinuousButtonPressed Deep Dive
+## MouseHoldRepeat Deep Dive
 
 ### Timer Behavior
 ```csharp
-// When WantContinuousButtonPressed = true:
+// When MouseHoldRepeat = true:
 
 Press → Grab → Start Timer (500ms initial delay)
   ↓
@@ -439,7 +439,7 @@ A: We emit Clicked on first release, DoubleClicked on second. Apps bind to the f
 **Q: Should apps track timing themselves for single vs double-click?**  
 A: No! Framework provides Clicked vs DoubleClicked flags. Apps just bind to the appropriate flag and handle the corresponding command.
 
-**Q: What about WantContinuousButtonPressed and double-click?**  
+**Q: What about MouseHoldRepeat and double-click?**  
 A: They're independent. Timer fires Accept repeatedly with ClickCount=1. Quick double-click fires Accept twice with ClickCount=1 and 2. Both work correctly.
 
 **Q: When is ClickCount actually useful?**  
@@ -462,7 +462,7 @@ A: No. MouseState is visual state (button looks pressed). ClickCount is semantic
 ✅ **ClickCount on every event** - AppKit-style metadata  
 ✅ **Flag type changes** - Clicked → DoubleClicked → TripleClicked  
 ✅ **Immediate emission** - no 500ms delay (already fixed)  
-✅ **WantContinuousButtonPressed** - timer-based, independent of ClickCount  
+✅ **MouseHoldRepeat** - timer-based, independent of ClickCount  
 ✅ **MouseState** - visual feedback, independent of commands  
 ✅ **Backward compatible** - existing code works unchanged  
 ✅ **Flexible** - apps can use flags OR check ClickCount  

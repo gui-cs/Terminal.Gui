@@ -92,16 +92,16 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
                                        mouseFlags,
                                        e.ButtonState,
                                        WindowsConsole.ButtonState.Button1Pressed,
-                                       MouseFlags.Button1Pressed,
-                                       MouseFlags.Button1Released,
+                                       MouseFlags.LeftButtonPressed,
+                                       MouseFlags.LeftButtonReleased,
                                        0);
 
         mouseFlags = UpdateMouseFlags (
                                        mouseFlags,
                                        e.ButtonState,
                                        WindowsConsole.ButtonState.Button2Pressed,
-                                       MouseFlags.Button2Pressed,
-                                       MouseFlags.Button2Released,
+                                       MouseFlags.MiddleButtonPressed,
+                                       MouseFlags.MiddleButtonReleased,
                                        1);
 
         mouseFlags = UpdateMouseFlags (
@@ -115,14 +115,14 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         // Deal with button 3 separately because it is considered same as 'rightmost button'
         if (e.ButtonState.HasFlag (WindowsConsole.ButtonState.Button3Pressed) || e.ButtonState.HasFlag (WindowsConsole.ButtonState.RightmostButtonPressed))
         {
-            mouseFlags |= MouseFlags.Button3Pressed;
+            mouseFlags |= MouseFlags.RightButtonPressed;
             _lastWasPressed [2] = true;
         }
         else
         {
             if (_lastWasPressed [2])
             {
-                mouseFlags |= MouseFlags.Button3Released;
+                mouseFlags |= MouseFlags.RightButtonReleased;
 
                 _lastWasPressed [2] = false;
             }
@@ -149,7 +149,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             switch (e.EventFlags)
             {
                 case WindowsConsole.EventFlags.MouseMoved:
-                    mouseFlags |= MouseFlags.ReportMousePosition;
+                    mouseFlags |= MouseFlags.PositionReport;
 
                     break;
             }
@@ -161,16 +161,16 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             {
                 case WindowsConsole.ControlKeyState.RightAltPressed:
                 case WindowsConsole.ControlKeyState.LeftAltPressed:
-                    mouseFlags |= MouseFlags.ButtonAlt;
+                    mouseFlags |= MouseFlags.Alt;
 
                     break;
                 case WindowsConsole.ControlKeyState.RightControlPressed:
                 case WindowsConsole.ControlKeyState.LeftControlPressed:
-                    mouseFlags |= MouseFlags.ButtonCtrl;
+                    mouseFlags |= MouseFlags.Ctrl;
 
                     break;
                 case WindowsConsole.ControlKeyState.ShiftPressed:
-                    mouseFlags |= MouseFlags.ButtonShift;
+                    mouseFlags |= MouseFlags.Shift;
 
                     break;
             }
@@ -226,17 +226,17 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         var controlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed;
 
         // Convert button states
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button1Pressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.Button2Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.MiddleButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button2Pressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.Button3Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.RightButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button3Pressed;
         }
@@ -259,23 +259,23 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         }
 
         // Convert movement flag
-        if (mouse.Flags.HasFlag (MouseFlags.ReportMousePosition))
+        if (mouse.Flags.HasFlag (MouseFlags.PositionReport))
         {
             eventFlags |= WindowsConsole.EventFlags.MouseMoved;
         }
 
         // Convert modifier keys
-        if (mouse.Flags.HasFlag (MouseFlags.ButtonAlt))
+        if (mouse.Flags.HasFlag (MouseFlags.Alt))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftAltPressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.ButtonCtrl))
+        if (mouse.Flags.HasFlag (MouseFlags.Ctrl))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftControlPressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.ButtonShift))
+        if (mouse.Flags.HasFlag (MouseFlags.Shift))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.ShiftPressed;
         }

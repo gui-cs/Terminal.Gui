@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 // ReSharper disable AccessToModifiedClosure
 #pragma warning disable CS9113 // Parameter is unread
 
-namespace DriverTests.Mouse;
+namespace DriverTests.MouseTests;
 
 /// <summary>
 ///     Extended unit tests for <see cref="MouseInterpreter"/> click detection and event generation.
@@ -22,10 +22,10 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.Button1Pressed }; // Different position
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonPressed }; // Different position
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         _ = interpreter.Process (press1).ToList (); // Discard - just need to process the press
@@ -38,11 +38,11 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Assert
         Assert.Equal (2, events2.Count); // Original release + Button1Clicked
-        Assert.Contains (events2, e => e.Flags == MouseFlags.Button1Clicked);
+        Assert.Contains (events2, e => e.Flags == MouseFlags.LeftButtonClicked);
 
         Assert.Equal (2, events4.Count); // Original release + Button1Clicked (not double-click due to position change)
-        Assert.Contains (events4, e => e.Flags == MouseFlags.Button1Clicked);
-        Assert.DoesNotContain (events4, e => e.Flags == MouseFlags.Button1DoubleClicked);
+        Assert.Contains (events4, e => e.Flags == MouseFlags.LeftButtonClicked);
+        Assert.DoesNotContain (events4, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
     }
 
     #endregion
@@ -57,10 +57,10 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased };
 
         // Act
         List<Terminal.Gui.Input.Mouse> events1 = interpreter.Process (press1).ToList ();
@@ -73,18 +73,18 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Assert
         Assert.Single (events1); // Just Button1Pressed
-        Assert.Equal (MouseFlags.Button1Pressed, events1[0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonPressed, events1[0].Flags);
 
         // NOTE: This test demonstrates the quirk documented in MouseButtonClickTrackerTests:
         // When Button2 is pressed (Button1 not in flags), Button1's tracker sees: Pressed→Released
         // This generates a spurious Button1Clicked event
         Assert.Equal (2, events2.Count); // Button2Pressed + spurious Button1Clicked
-        Assert.Contains (events2, e => e.Flags == MouseFlags.Button1Clicked); // Spurious click
+        Assert.Contains (events2, e => e.Flags == MouseFlags.LeftButtonClicked); // Spurious click
 
         // When Button1 is actually released, Button1's tracker already thinks it's released (no change)
         // But Button2's tracker sees: Pressed→Released, generating Button2Clicked
         Assert.Equal (2, events3.Count); // Button1Released + spurious Button2Clicked
-        Assert.Contains (events3, e => e.Flags == MouseFlags.Button2Clicked);
+        Assert.Contains (events3, e => e.Flags == MouseFlags.MiddleButtonClicked);
 
         // Button2 release: both trackers already think their buttons are released
         Assert.Single (events4); // Just Button2Released
@@ -102,31 +102,31 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         List<Terminal.Gui.Input.Mouse> allEvents = [];
 
         // Button1 first click
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button1 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button2 first click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Pressed }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Released }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Button2 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Pressed }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Released }));
+        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Assert
-        Assert.Contains (allEvents, e => e.Flags == MouseFlags.Button1DoubleClicked);
-        Assert.Contains (allEvents, e => e.Flags == MouseFlags.Button2DoubleClicked);
+        Assert.Contains (allEvents, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
+        Assert.Contains (allEvents, e => e.Flags == MouseFlags.MiddleButtonDoubleClicked);
     }
 
     #endregion
@@ -141,15 +141,15 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         List<Terminal.Gui.Input.Mouse> events = interpreter.Process (release).ToList ();
 
         // Assert
         Assert.Single (events); // Only the original release event
-        Assert.Equal (MouseFlags.Button1Released, events [0].Flags);
-        Assert.DoesNotContain (events, e => e.Flags == MouseFlags.Button1Clicked);
+        Assert.Equal (MouseFlags.LeftButtonReleased, events [0].Flags);
+        Assert.DoesNotContain (events, e => e.Flags == MouseFlags.LeftButtonClicked);
     }
 
     // CoPilot: claude-3-7-sonnet-20250219
@@ -160,9 +160,9 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         List<Terminal.Gui.Input.Mouse> events1 = interpreter.Process (press1).ToList ();
@@ -175,8 +175,8 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         Assert.Single (events1); // Just Button1Pressed
         Assert.Single (events2); // Just Button1Pressed (no state change)
         Assert.Equal (2, events3.Count); // Button1Released + Button1Clicked (single, not double)
-        Assert.Contains (events3, e => e.Flags == MouseFlags.Button1Clicked);
-        Assert.DoesNotContain (events3, e => e.Flags == MouseFlags.Button1DoubleClicked);
+        Assert.Contains (events3, e => e.Flags == MouseFlags.LeftButtonClicked);
+        Assert.DoesNotContain (events3, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
     }
 
     #endregion
@@ -185,18 +185,18 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
     // CoPilot: claude-3-7-sonnet-20250219
     [Theory]
-    [InlineData (MouseFlags.ButtonShift)]
-    [InlineData (MouseFlags.ButtonCtrl)]
-    [InlineData (MouseFlags.ButtonAlt)]
-    [InlineData (MouseFlags.ButtonShift | MouseFlags.ButtonCtrl)]
+    [InlineData (MouseFlags.Shift)]
+    [InlineData (MouseFlags.Ctrl)]
+    [InlineData (MouseFlags.Alt)]
+    [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)]
     public void Process_ClickWithModifier_DoesNotPreserveModifier (MouseFlags modifier)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed | modifier };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released | modifier };
+        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed | modifier };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased | modifier };
 
         // Act
         _ = interpreter.Process (press).ToList (); // Discard - just need to process the press
@@ -205,7 +205,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Assert
         Assert.Equal (2, events2.Count); // Release + Clicked
-        Terminal.Gui.Input.Mouse? clickEvent = events2.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.Button1Clicked));
+        Terminal.Gui.Input.Mouse? clickEvent = events2.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
         Assert.NotNull (clickEvent);
 
         // NOTE: This documents a known limitation - MouseInterpreter's CreateClickEvent method
@@ -226,8 +226,8 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        MouseFlags modifiedPressed = MouseFlags.Button1Pressed | MouseFlags.ButtonShift;
-        MouseFlags modifiedReleased = MouseFlags.Button1Released | MouseFlags.ButtonShift;
+        MouseFlags modifiedPressed = MouseFlags.LeftButtonPressed | MouseFlags.Shift;
+        MouseFlags modifiedReleased = MouseFlags.LeftButtonReleased | MouseFlags.Shift;
 
         // Act - Double-click with Shift held
         List<Terminal.Gui.Input.Mouse> allEvents = [];
@@ -241,19 +241,19 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Assert
         Terminal.Gui.Input.Mouse? singleClick =
-            allEvents.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.Button1Clicked) && !e.Flags.HasFlag (MouseFlags.Button1DoubleClicked));
-        Terminal.Gui.Input.Mouse? doubleClick = allEvents.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.Button1DoubleClicked));
+            allEvents.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked) && !e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked));
+        Terminal.Gui.Input.Mouse? doubleClick = allEvents.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked));
 
         Assert.NotNull (singleClick);
         Assert.NotNull (doubleClick);
 
         // NOTE: This documents a known limitation - modifiers are NOT preserved in synthetic events
         Assert.False (
-                      singleClick.Flags.HasFlag (MouseFlags.ButtonShift),
+                      singleClick.Flags.HasFlag (MouseFlags.Shift),
                       "KNOWN LIMITATION: Single click synthetic event does not preserve Shift modifier");
 
         Assert.False (
-                      doubleClick.Flags.HasFlag (MouseFlags.ButtonShift),
+                      doubleClick.Flags.HasFlag (MouseFlags.Shift),
                       "KNOWN LIMITATION: Double click synthetic event does not preserve Shift modifier");
     }
 
@@ -269,8 +269,8 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = new (2025, 1, 1, 12, 0, 0);
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act - First click at T=0
         _ = interpreter.Process (press).ToList (); // Discard - just need to process the press
@@ -284,9 +284,9 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         List<Terminal.Gui.Input.Mouse> events4 = interpreter.Process (release).ToList ();
 
         // Assert
-        Assert.Contains (events2, e => e.Flags == MouseFlags.Button1Clicked);
-        Assert.Contains (events4, e => e.Flags == MouseFlags.Button1Clicked); // Single click, not double
-        Assert.DoesNotContain (events4, e => e.Flags == MouseFlags.Button1DoubleClicked);
+        Assert.Contains (events2, e => e.Flags == MouseFlags.LeftButtonClicked);
+        Assert.Contains (events4, e => e.Flags == MouseFlags.LeftButtonClicked); // Single click, not double
+        Assert.DoesNotContain (events4, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
     }
 
     // CoPilot: claude-3-7-sonnet-20250219
@@ -298,8 +298,8 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
         MouseInterpreter interpreter = new (() => currentTime, threshold);
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act - First click
         interpreter.Process (press).ToList ();
@@ -313,8 +313,8 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         List<Terminal.Gui.Input.Mouse> events2 = interpreter.Process (release).ToList ();
 
         // Assert - Should be single click, not double (threshold exceeded)
-        Assert.Contains (events2, e => e.Flags == MouseFlags.Button1Clicked);
-        Assert.DoesNotContain (events2, e => e.Flags == MouseFlags.Button1DoubleClicked);
+        Assert.Contains (events2, e => e.Flags == MouseFlags.LeftButtonClicked);
+        Assert.DoesNotContain (events2, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
     }
 
     #endregion
@@ -329,8 +329,8 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         List<Terminal.Gui.Input.Mouse> pressEvents = interpreter.Process (press).ToList ();
@@ -339,10 +339,10 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Assert - First event should always be the original
         Assert.True (pressEvents.Count >= 1);
-        Assert.Equal (MouseFlags.Button1Pressed, pressEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonPressed, pressEvents [0].Flags);
 
         Assert.True (releaseEvents.Count >= 1);
-        Assert.Equal (MouseFlags.Button1Released, releaseEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonReleased, releaseEvents [0].Flags);
     }
 
     // CoPilot: claude-3-7-sonnet-20250219
@@ -351,7 +351,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     [InlineData (MouseFlags.WheeledDown)]
     [InlineData (MouseFlags.WheeledLeft)]
     [InlineData (MouseFlags.WheeledRight)]
-    [InlineData (MouseFlags.ReportMousePosition)]
+    [InlineData (MouseFlags.PositionReport)]
     public void Process_NonClickEvents_PassThroughWithoutModification (MouseFlags flags)
     {
         // Arrange

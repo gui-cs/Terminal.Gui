@@ -119,7 +119,7 @@ public class ViewCommandTests
     public void MouseClick_Invokes_Accept_Command ()
     {
         var view = new ViewEventTester ();
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
+        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonClicked, Position = Point.Empty, View = view });
 
         Assert.Equal (1, view.OnAcceptedCount);
     }

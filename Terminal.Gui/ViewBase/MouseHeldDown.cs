@@ -18,7 +18,7 @@ namespace Terminal.Gui.ViewBase;
 ///         or the event is cancelled.
 ///     </para>
 ///     <para>
-///         This is typically used by views that set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/>,
+///         This is typically used by views that set <see cref="View.MouseHoldRepeat"/> to <see langword="true"/>,
 ///         enabling behaviors like auto-scrolling or button repeat.
 ///     </para>
 /// </remarks>

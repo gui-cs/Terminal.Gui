@@ -113,7 +113,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
         view.MouseEvent += (s, e) =>
         {
-            if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 rightClickCount++;
             }

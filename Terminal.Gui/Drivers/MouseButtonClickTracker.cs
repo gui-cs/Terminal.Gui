@@ -25,8 +25,8 @@
 /// <param name="_now">Function to get the current time, allowing for time injection in tests.</param>
 /// <param name="_repeatClickThreshold">Maximum time between clicks to count as consecutive (e.g., double-click timeout).</param>
 /// <param name="_buttonIdx">
-///     Zero-based index of the button being tracked (0=Button1/Left, 1=Button2/Middle,
-///     2=Button3/Right, 3=Button4).
+///     Zero-based index of the button being tracked (0=LeftButton/Left, 1=MiddleButton/Middle,
+///     2=RightButton/Right, 3=Button4).
 /// </param>
 
 // ReSharper disable InconsistentNaming
@@ -207,7 +207,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     /// <summary>
     ///     Determines if a specific button is pressed based on the mouse flags.
     /// </summary>
-    /// <param name="btn">The zero-based button index (0=Button1/Left, 1=Button2/Middle, 2=Button3/Right, 3=Button4).</param>
+    /// <param name="btn">The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right, 3=Button4).</param>
     /// <param name="eFlags">The mouse flags to check for the pressed state.</param>
     /// <returns><see langword="true"/> if the specified button is pressed; otherwise <see langword="false"/>.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="btn"/> is not 0-3.</exception>
@@ -220,15 +220,15 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     ///         </listheader>
     ///         <item>
     ///             <term>0</term>
-    ///             <description>Button1 (Left) / <see cref="MouseFlags.Button1Pressed"/></description>
+    ///             <description>LeftButton (Left) / <see cref="MouseFlags.LeftButtonPressed"/></description>
     ///         </item>
     ///         <item>
     ///             <term>1</term>
-    ///             <description>Button2 (Middle) / <see cref="MouseFlags.Button2Pressed"/></description>
+    ///             <description>MiddleButton (Middle) / <see cref="MouseFlags.MiddleButtonPressed"/></description>
     ///         </item>
     ///         <item>
     ///             <term>2</term>
-    ///             <description>Button3 (Right) / <see cref="MouseFlags.Button3Pressed"/></description>
+    ///             <description>RightButton (Right) / <see cref="MouseFlags.RightButtonPressed"/></description>
     ///         </item>
     ///         <item>
     ///             <term>3</term>
@@ -240,9 +240,9 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     {
         return btn switch
         {
-            0 => eFlags.HasFlag (MouseFlags.Button1Pressed),
-            1 => eFlags.HasFlag (MouseFlags.Button2Pressed),
-            2 => eFlags.HasFlag (MouseFlags.Button3Pressed),
+            0 => eFlags.HasFlag (MouseFlags.LeftButtonPressed),
+            1 => eFlags.HasFlag (MouseFlags.MiddleButtonPressed),
+            2 => eFlags.HasFlag (MouseFlags.RightButtonPressed),
             3 => eFlags.HasFlag (MouseFlags.Button4Pressed),
             _ => throw new ArgumentOutOfRangeException (nameof (btn))
         };

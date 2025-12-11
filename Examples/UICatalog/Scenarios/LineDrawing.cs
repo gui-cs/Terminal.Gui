@@ -15,7 +15,7 @@ internal class DrawLineTool : ITool
     /// <inheritdoc/>
     public void OnMouseEvent (DrawingArea area, Terminal.Gui.Input.Mouse mouse)
     {
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (_currentLine == null)
             {
@@ -434,7 +434,7 @@ public class AttributeView : View
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
     {
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {

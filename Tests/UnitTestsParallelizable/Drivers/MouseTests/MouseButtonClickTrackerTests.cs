@@ -2,7 +2,7 @@
 // ReSharper disable AccessToModifiedClosure
 // ReSharper disable InconsistentNaming
 
-namespace DriverTests.Mouse;
+namespace DriverTests.MouseTests;
 
 /// <summary>
 ///     Unit tests for <see cref="MouseButtonClickTracker"/> state machine and click detection logic.
@@ -25,7 +25,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         // Arrange
         DateTime now = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
-        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
         tracker.UpdateState (mouse, out int? numClicks);
@@ -43,8 +43,8 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime now = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse pressEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse pressEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (pressEvent, out int? pressClicks);
@@ -63,10 +63,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse pressEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse releaseEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse pressEvent2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse releaseEvent2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse pressEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse releaseEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse pressEvent2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse releaseEvent2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (pressEvent1, out int? clicks1);
@@ -92,8 +92,8 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act - Three complete click sequences
         tracker.UpdateState (press, out _);
@@ -128,10 +128,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.Button1Pressed }; // Different position!
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonPressed }; // Different position!
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -160,10 +160,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -189,10 +189,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
         MouseButtonClickTracker tracker = new (() => currentTime, threshold, 0);
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -219,10 +219,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
         MouseButtonClickTracker tracker = new (() => currentTime, threshold, 0);
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -250,7 +250,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         // Arrange
         DateTime now = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
-        Terminal.Gui.Input.Mouse releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (releaseEvent, out int? numClicks);
@@ -268,10 +268,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse press3 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse press3 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (press1, out int? clicks1);
@@ -297,10 +297,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse release3 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse release3 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (press, out int? clicks1);
@@ -326,9 +326,9 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         tracker.UpdateState (press1, out int? clicks1);
@@ -349,9 +349,9 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
 
     // CoPilot: claude-3-7-sonnet-20250219
     [Theory]
-    [InlineData (0, MouseFlags.Button1Pressed, MouseFlags.Button1Released)]
-    [InlineData (1, MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
-    [InlineData (2, MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
+    [InlineData (0, MouseFlags.LeftButtonPressed, MouseFlags.LeftButtonReleased)]
+    [InlineData (1, MouseFlags.MiddleButtonPressed, MouseFlags.MiddleButtonReleased)]
+    [InlineData (2, MouseFlags.RightButtonPressed, MouseFlags.RightButtonReleased)]
     [InlineData (3, MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
     public void UpdateState_CorrectButtonIndex_TracksCorrectButton (int buttonIdx, MouseFlags pressedFlag, MouseFlags releasedFlag)
     {
@@ -381,10 +381,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         MouseButtonClickTracker tracker1 = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0); // Tracking Button1
         MouseButtonClickTracker tracker2 = new (() => currentTime, TimeSpan.FromMilliseconds (500), 1); // Tracking Button2
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Pressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Released };
+        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed };
+        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased };
 
         // Act - Press Button1, press Button2, release Button1, release Button2
         tracker1.UpdateState (press1, out int? t1_press1);

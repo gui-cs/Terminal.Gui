@@ -10,7 +10,7 @@ public abstract partial class PopupAutocomplete
             _autoComplete = autoComplete;
             CanFocus = true;
             TabStop = TabBehavior.NoStop;
-            WantMousePositionReports = true;
+            MousePositionTracking  = true;
         }
 
         private readonly PopupAutocomplete _autoComplete;

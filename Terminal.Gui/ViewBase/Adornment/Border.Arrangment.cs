@@ -408,7 +408,7 @@ public partial class Border
 
     private void ApplicationOnMouseEvent (object? sender, Mouse e)
     {
-        if (e.Flags != MouseFlags.Button1Clicked)
+        if (e.Flags != MouseFlags.LeftButtonClicked)
         {
             return;
         }
@@ -481,7 +481,7 @@ public partial class Border
     protected override bool OnMouseEvent (Mouse mouse)
     {
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
-        if (!_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (!_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             Parent!.SetFocus ();
 
@@ -515,7 +515,7 @@ public partial class Border
             return true;
         }
 
-        if (mouse.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && App?.Mouse.MouseGrabView == this)
+        if (mouse.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport) && App?.Mouse.MouseGrabView == this)
         {
             if (_dragPosition.HasValue)
             {
@@ -524,7 +524,7 @@ public partial class Border
             }
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue)
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased) && _dragPosition.HasValue)
         {
             _dragPosition = null;
             App?.Mouse.UngrabMouse ();
@@ -771,7 +771,7 @@ public partial class Border
     /// </summary>
     /// <remarks>
     ///     During an Arrange Mode drag (<see cref="_dragPosition"/> has a value), Border owns the mouse grab and
-    ///     must receive all mouse events until Button1Released. If another view (e.g., scrollbar, slider) were allowed
+    ///     must receive all mouse events until LeftButtonReleased. If another view (e.g., scrollbar, slider) were allowed
     ///     to grab the mouse, the drag would freeze, leaving Border in an inconsistent state with no cleanup.
     ///     Canceling follows the CWP pattern, ensuring Border maintains exclusive mouse control until it explicitly
     ///     releases via <see cref="IMouseGrabHandler.UngrabMouse"/> in <see cref="OnMouseEvent"/>.

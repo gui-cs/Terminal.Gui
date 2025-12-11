@@ -1058,12 +1058,12 @@ public class FileDialog : Dialog, IDesignable
 
         if (clickedCol is { })
         {
-            if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
+            if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
             }
-            else if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
+            else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 // right click in a header
                 ShowHeaderContextMenu (clickedCol.Value, mouse);
@@ -1071,7 +1071,7 @@ public class FileDialog : Dialog, IDesignable
         }
         else
         {
-            if (clickedCell is { } && mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 // right click in rest of table
                 ShowCellContextMenu (clickedCell, mouse);

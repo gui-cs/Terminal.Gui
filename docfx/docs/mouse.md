@@ -48,12 +48,12 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 | Scenario                                      | Visual pressed state                                      | `Command.Accept` invocations                                                                 | `Command.Activate` invocations | Rationale & Rule |
 |-----------------------------------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------------|------------------|
-| Simple single click (press + release inside)  | Pressed on **Button1Pressed** → stays until **Button1Released** (anywhere) | **Exactly 1** on release inside the button                                           | Never                           | Universal UI contract |
-| Hold mouse (WantContinuousButtonPressed = **false** – default) | Pressed immediately → stays until release                 | **Exactly 1** on release inside                                                       | Never                           | Normal push-button |
-| Hold mouse (WantContinuousButtonPressed = **true**) | Same visual behavior                                      | Starts repeating after ~300 ms, then ~30–60 ms **only while cursor remains inside**    | Never                           | Scrollbar arrow / spin button behavior |
-| Drag outside while holding → release outside  | Visual pressed cleared on any **Button1Released**        | **None** (canceled)                                                                   | Never                           | Standard click cancellation |
-| **Double-click** (WantContinuousButtonPressed = **false**) | Normal press → release → press → release cycle          | **Exactly 2** (one per release inside)                                               | Never                           | Required – users double-click buttons constantly |
-| **Double-click** (WantContinuousButtonPressed = **true**) | Same visual cycle                                         | **Exactly 2** (repeating only applies to continuous hold, not discrete clicks)       | Never                           | Repeating ≠ double-click |
+| Simple single click (press + release inside)  | Pressed on **LeftButtonPressed** → stays until **LeftButtonReleased** (anywhere) | **Exactly 1** on release inside the button                                           | Never                           | Universal UI contract |
+| Hold mouse (MouseHoldRepeat = **false** – default) | Pressed immediately → stays until release                 | **Exactly 1** on release inside                                                       | Never                           | Normal push-button |
+| Hold mouse (MouseHoldRepeat = **true**) | Same visual behavior                                      | Starts repeating after ~300 ms, then ~30–60 ms **only while cursor remains inside**    | Never                           | Scrollbar arrow / spin button behavior |
+| Drag outside while holding → release outside  | Visual pressed cleared on any **LeftButtonReleased**        | **None** (canceled)                                                                   | Never                           | Standard click cancellation |
+| **Double-click** (MouseHoldRepeat = **false**) | Normal press → release → press → release cycle          | **Exactly 2** (one per release inside)                                               | Never                           | Required – users double-click buttons constantly |
+| **Double-click** (MouseHoldRepeat = **true**) | Same visual cycle                                         | **Exactly 2** (repeating only applies to continuous hold, not discrete clicks)       | Never                           | Repeating ≠ double-click |
 | Triple-click or faster multi-click            | Same rule                                                 | One `Accept` per release inside → 3 Accepts on triple-click                          | Never                           | No coalescing for normal buttons |
 
 This behavior matches Qt QPushButton, GTK Button, Win32 BUTTON, WPF Button, NSButton, Flutter ElevatedButton, Android Button, etc. – all established since the 1990s.
@@ -62,7 +62,7 @@ This behavior matches Qt QPushButton, GTK Button, Win32 BUTTON, WPF Button, NSBu
 
 | Scenario                                      | Visual selection state                                    | `Command.Accept` invocations                                                                 | `Command.Activate` invocations | Rationale & Rule |
 |-----------------------------------------------|-----------------------------------------------------------|----------------------------------------------------------------------------------------------|--------------------------------|------------------|
-| Simple single click (press + release inside)  | Item selected immediately on **Button1Clicked**          | Never                                                                                        | **Exactly 1** on click         | Selection happens on click |
+| Simple single click (press + release inside)  | Item selected immediately on **LeftButtonClicked**          | Never                                                                                        | **Exactly 1** on click         | Selection happens on click |
 | Hold mouse on item                            | Selection changes immediately on click                    | Never                                                                                        | **Exactly 1** on initial click | No continuous action |
 | Click different items rapidly                 | Selection updates with each click                         | Never                                                                                        | **Exactly 1** per click        | Each click selects new item |
 | Drag outside while holding → release outside  | Selection remains on last clicked item                    | Never                                                                                        | Never                          | Drag doesn't change selection |
@@ -117,22 +117,22 @@ The @Terminal.Gui.Input.Command enum lists generic operations that are implement
 
 Here are some common mouse binding patterns used throughout Terminal.Gui:
 
-* **Click Events**: `MouseFlags.Button1Clicked` for primary selection/activation - maps to `Command.Activate` by default
-* **Double-Click Events**: `MouseFlags.Button1DoubleClicked` for default actions (like opening/accepting)
-* **Right-Click Events**: `MouseFlags.Button3Clicked` for context menus
+* **Click Events**: `MouseFlags.LeftButtonClicked` for primary selection/activation - maps to `Command.Activate` by default
+* **Double-Click Events**: `MouseFlags.LeftButtonDoubleClicked` for default actions (like opening/accepting)
+* **Right-Click Events**: `MouseFlags.RightButtonClicked` for context menus
 * **Scroll Events**: `MouseFlags.WheelUp` and `MouseFlags.WheelDown` for scrolling content
-* **Drag Events**: `MouseFlags.Button1Pressed` combined with mouse move tracking for drag operations
+* **Drag Events**: `MouseFlags.LeftButtonPressed` combined with mouse move tracking for drag operations
 
 ### Default Mouse Bindings
 
 By default, all views have the following mouse bindings configured:
 
 ```cs
-MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
-MouseBindings.Add (MouseFlags.Button2Clicked, Command.Activate);
-MouseBindings.Add (MouseFlags.Button3Clicked, Command.Activate);
+MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
+MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.Activate);
+MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Activate);
 MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
-MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Activate);
+MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.ButtonCtrl, Command.Activate);
 ```
 
 When a mouse click occurs, the `Command.Activate` is invoked, which raises the `Activating` event. Views can override `OnActivating` or subscribe to the `Activating` event to handle clicks:
@@ -186,7 +186,7 @@ Mouse events are processed through the following workflow using the [Cancellable
 3. **View Level**: The target view processes the event through `View.NewMouseEvent()`:
    1. **Pre-condition validation** - Checks if view is enabled, visible, and wants the event type
    2. **Low-level MouseEvent** - Raises `OnMouseEvent()` and `MouseEvent` event
-   3. **Mouse grab handling** - If `HighlightStates` or `WantContinuousButtonPressed` are set:
+   3. **Mouse grab handling** - If `MouseHighlightStates` or `MouseHoldRepeat` are set:
       - Automatically grabs mouse on button press
       - Handles press/release/click lifecycle
       - Sets focus if view is focusable
@@ -208,7 +208,7 @@ public class CustomView : View
     
     private void OnMouseEventHandler(object sender, Mouse e)
     {
-        if (e.Flags.HasFlag(MouseFlags.Button1Pressed))
+        if (e.Flags.HasFlag(MouseFlags.LeftButtonPressed))
         {
             // Handle drag start
             e.Handled = true;
@@ -218,7 +218,7 @@ public class CustomView : View
     // Alternative: Override the virtual method
     protected override bool OnMouseEvent(Mouse mouse)
     {
-        if (mouse.Flags.HasFlag(MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag(MouseFlags.LeftButtonPressed))
         {
             // Handle drag start
             return true;
@@ -249,11 +249,11 @@ public class ClickableView : View
             Point clickPosition = mouseArgs.Position;
             
             // Check which button was clicked
-            if (mouseArgs.Flags.HasFlag(MouseFlags.Button1Clicked))
+            if (mouseArgs.Flags.HasFlag(MouseFlags.LeftButtonClicked))
             {
                 HandleLeftClick(clickPosition);
             }
-            else if (mouseArgs.Flags.HasFlag(MouseFlags.Button3Clicked))
+            else if (mouseArgs.Flags.HasFlag(MouseFlags.RightButtonClicked))
             {
                 ShowContextMenu(clickPosition);
             }
@@ -275,8 +275,8 @@ public class MultiButtonView : View
         MouseBindings.Clear();
         
         // Map different buttons to different commands
-        MouseBindings.Add(MouseFlags.Button1Clicked, Command.Activate);
-        MouseBindings.Add(MouseFlags.Button3Clicked, Command.ContextMenu);
+        MouseBindings.Add(MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.Add(MouseFlags.RightButtonClicked, Command.ContextMenu);
         
         AddCommand(Command.ContextMenu, HandleContextMenu);
     }
@@ -299,9 +299,9 @@ Mouse states include:
 * **None** - No mouse interaction with the view
 * **In** - Mouse is positioned over the view (inside the viewport)
 * **Pressed** - Mouse button is pressed down while over the view
-* **PressedOutside** - Mouse was pressed inside but moved outside the view (when not using `WantContinuousButtonPressed`)
+* **PressedOutside** - Mouse was pressed inside but moved outside the view (when not using `MouseHoldRepeat`)
 
-It works in conjunction with the @Terminal.Gui.ViewBase.View.HighlightStates which is a list of mouse states that will cause a view to become highlighted.
+It works in conjunction with the @Terminal.Gui.ViewBase.View.MouseHighlightStates which is a list of mouse states that will cause a view to become highlighted.
 
 Subscribe to the @Terminal.Gui.ViewBase.View.MouseStateChanged event to be notified when the mouse state changes:
 
@@ -327,12 +327,12 @@ Configure which states should cause highlighting:
 
 ```cs
 // Highlight when mouse is over the view or when pressed
-view.HighlightStates = MouseState.In | MouseState.Pressed;
+view.MouseHighlightStates = MouseState.In | MouseState.Pressed;
 ```
 
 ### Mouse Grab
 
-Views with `HighlightStates` or `WantContinuousButtonPressed` enabled automatically **grab the mouse** when a button is pressed. This means:
+Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled automatically **grab the mouse** when a button is pressed. This means:
 
 1. **Automatic Grab**: The view receives all mouse events until the button is released, even if the mouse moves outside the view's `Viewport`
 2. **Focus Management**: If the view is focusable (`CanFocus = true`), it automatically receives focus on the first button press
@@ -344,10 +344,10 @@ Views with `HighlightStates` or `WantContinuousButtonPressed` enabled automatica
 
 #### Continuous Button Press
 
-When `WantContinuousButtonPressed` is set to `true`, the view receives repeated click events while the button is held down:
+When `MouseHoldRepeat` is set to `true`, the view receives repeated click events while the button is held down:
 
 ```cs
-view.WantContinuousButtonPressed = true;
+view.MouseHoldRepeat = true;
 
 view.Activating += (s, e) =>
 {
@@ -358,7 +358,7 @@ view.Activating += (s, e) =>
 };
 ```
 
-**Note**: With `WantContinuousButtonPressed`, the `MouseState.PressedOutside` flag has no effect - the view continues to receive events and maintains the pressed state even when the mouse moves outside.
+**Note**: With `MouseHoldRepeat`, the `MouseState.PressedOutside` flag has no effect - the view continues to receive events and maintains the pressed state even when the mouse moves outside.
 
 #### Mouse Grab Lifecycle
 
@@ -373,7 +373,7 @@ Mouse Grabbed Automatically
 Mouse Move (while grabbed)
     ?? Inside Viewport: MouseState remains Pressed
     ?? Outside Viewport: MouseState |= MouseState.PressedOutside
-        (unless WantContinuousButtonPressed is true)
+        (unless MouseHoldRepeat is true)
     
 Button Release
     ?
@@ -402,7 +402,7 @@ The @Terminal.Gui.App.Application.MouseEvent event can be used if an application
 App.Mouse.MouseEvent += (sender, e) => 
 {
     // Handle application-wide mouse events
-    if (e.Flags.HasFlag(MouseFlags.Button3Clicked))
+    if (e.Flags.HasFlag(MouseFlags.RightButtonClicked))
     {
         ShowGlobalContextMenu(e.Position);
         e.Handled = true;
@@ -417,7 +417,7 @@ public class MyView : View
 {
     protected override bool OnMouseEvent(Mouse mouse)
     {
-        if (mouse.Flags.HasFlag(MouseFlags.Button3Clicked))
+        if (mouse.Flags.HasFlag(MouseFlags.RightButtonClicked))
         {
             // Access application mouse functionality through View.App
             App?.Mouse?.RaiseMouseEvent(mouse);
@@ -487,12 +487,12 @@ view.MouseEvent += (s, e) =>
   };
   ```
 * **Handle Mouse Events directly** only for complex interactions like drag-and-drop or custom gestures (override `OnMouseEvent` or subscribe to `MouseEvent`)
-* **Use `HighlightStates`** to enable automatic mouse grab and visual feedback - views will automatically grab the mouse and update their appearance
-* **Use `WantContinuousButtonPressed`** for repeating actions (scroll buttons, increment/decrement) - the view will receive repeated events while the button is held
+* **Use `MouseHighlightStates`** to enable automatic mouse grab and visual feedback - views will automatically grab the mouse and update their appearance
+* **Use `MouseHoldRepeat`** for repeating actions (scroll buttons, increment/decrement) - the view will receive repeated events while the button is held
 * **Respect platform conventions** - use right-click for context menus, double-click for default actions
 * **Provide keyboard alternatives** - ensure all mouse functionality has keyboard equivalents
 * **Test with different terminals** - mouse support varies between terminal applications
-* **Mouse grab is automatic** - you don't need to manually call `GrabMouse()`/`UngrabMouse()` when using `HighlightStates` or `WantContinuousButtonPressed`
+* **Mouse grab is automatic** - you don't need to manually call `GrabMouse()`/`UngrabMouse()` when using `MouseHighlightStates` or `MouseHoldRepeat`
 
 ## Limitations and Considerations
 
@@ -526,13 +526,13 @@ sequenceDiagram
     
     Driver->>AnsiParser: ProcessMouseInput(ansiString)
     Note over AnsiParser: Parses button code, x, y, terminator<br/>Converts to 0-based coords<br/>Maps to MouseFlags
-    AnsiParser->>Driver: Mouse { Flags=Button1Pressed, ScreenPosition=(9,4) }
+    AnsiParser->>Driver: Mouse { Flags=LeftButtonPressed, ScreenPosition=(9,4) }
     
     Driver->>InputProcessor: Queue mouse event
     InputProcessor->>Interpreter: Process(Mouse)
     Note over Interpreter: Tracks press/release pairs<br/>Generates clicked events<br/>Detects double/triple clicks<br/>Tracks timing & position
     
-    Interpreter->>InputProcessor: Mouse { Flags=Button1Clicked, ... }
+    Interpreter->>InputProcessor: Mouse { Flags=LeftButtonClicked, ... }
     
     InputProcessor->>AppMouse: RaiseMouseEvent(Mouse)
     Note over AppMouse: 1. Find deepest view under mouse<br/>2. Check for popover dismissal<br/>3. Handle mouse grab<br/>4. Convert to view coordinates<br/>5. Raise MouseEnter/Leave
@@ -542,10 +542,10 @@ sequenceDiagram
     Note over View: View Processing Pipeline:
     View->>View: 1. Pre-conditions (enabled, visible)
     View->>View: 2. RaiseMouseEvent → MouseEvent
-    View->>View: 3. Mouse grab handling<br/>(if HighlightStates or WantContinuous)
+    View->>View: 3. Mouse grab handling<br/>(if MouseHighlightStates or WantContinuous)
     View->>View: 4. Convert flags<br/>(Pressed→Clicked if needed)
     View->>Commands: 5. InvokeCommandsBoundToMouse
-    Note over Commands: Default: Button1Clicked → Command.Activate
+    Note over Commands: Default: LeftButtonClicked → Command.Activate
     Commands->>View: RaiseActivating/Accepting
     View->>View: OnActivating/OnAccepting
 ```
@@ -566,7 +566,7 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, terminator='m')
 - `M` terminator = press, `m` terminator = release
 - Button codes: 0=left, 1=middle, 2=right, 64/65=wheel up/down
 - Modifiers encoded in button code (8=Alt, 16=Ctrl, 4=Shift)
-- Motion tracking: button codes 32-34 with `ReportMousePosition` flag
+- Motion tracking: button codes 32-34 with `PositionReport` flag
 
 ### Stage 2: ANSI Parsing (AnsiMouseParser)
 
@@ -577,15 +577,15 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, terminator='m')
 2. Extract button code, x, y, terminator
 3. Convert coordinates to **0-based** (subtract 1 from both x and y)
 4. Map button code + terminator to `MouseFlags`:
-   - Button codes 0-2 → `Button1/2/3` + `Pressed/Released` based on terminator
+   - Button codes 0-2 → `LeftButton/2/3` + `Pressed/Released` based on terminator
    - Button codes 64-65 → `WheeledUp/Down`
    - Button codes 68-69 → `WheeledLeft/Right`
-   - Button codes 32-34 → Drag with `ReportMousePosition` flag
-   - Button codes 35-63 → Motion with `ReportMousePosition`
+   - Button codes 32-34 → Drag with `PositionReport` flag
+   - Button codes 35-63 → Motion with `PositionReport`
 5. Extract modifiers from button code (Alt=8, Ctrl=16, Shift=4 bit flags)
 6. Create `Mouse` instance with `ScreenPosition` and `Flags`
 
-**Output:** `Mouse { Timestamp=now, ScreenPosition=(9,4), Flags=Button1Pressed }`
+**Output:** `Mouse { Timestamp=now, ScreenPosition=(9,4), Flags=LeftButtonPressed }`
 
 **Code Location:** `AnsiMouseParser.ProcessMouseInput(string input)`
 
@@ -600,9 +600,9 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, terminator='m')
    - Position proximity (same location)
    - Same button
 3. **Emit synthetic events:**
-   - When release follows press → emit `Button1Clicked`
-   - When second click within threshold → emit `Button1DoubleClicked`
-   - When third click within threshold → emit `Button1TripleClicked`
+   - When release follows press → emit `LeftButtonClicked`
+   - When second click within threshold → emit `LeftButtonDoubleClicked`
+   - When third click within threshold → emit `LeftButtonTripleClicked`
 4. **Maintain state** across events:
    - Last click time, position, button
    - Click count for current sequence
@@ -703,8 +703,8 @@ deepestView.NewMouseEvent(viewMouseEvent);
 ```csharp
 if (!Enabled) return false;                    // Disabled views don't eat events
 if (!CanBeVisible(this)) return false;          // Invisible views ignored
-if (!WantMousePositionReports &&                // Filter unwanted motion
-    mouse.Flags == MouseFlags.ReportMousePosition) 
+if (!MousePositionTracking  &&                // Filter unwanted motion
+    mouse.Flags == MouseFlags.PositionReport) 
     return false;
 ```
 
@@ -719,7 +719,7 @@ if (RaiseMouseEvent(mouse) || mouse.Handled)
 **This is where views can handle mouse events directly** before command processing.
 
 #### 5.3: Mouse Grab Handling
-**Conditions:** `HighlightStates != None` OR `WantContinuousButtonPressed == true`
+**Conditions:** `MouseHighlightStates != None` OR `MouseHoldRepeat == true`
 
 ##### 5.3a: Pressed Event
 ```csharp
@@ -733,7 +733,7 @@ WhenGrabbedHandlePressed(mouse):
         MouseState |= MouseState.Pressed;
         MouseState &= ~MouseState.PressedOutside;
     else
-        if (!WantContinuousButtonPressed)
+        if (!MouseHoldRepeat)
             MouseState |= MouseState.PressedOutside;
 ```
 
@@ -743,9 +743,9 @@ WhenGrabbedHandleReleased(mouse):
     MouseState &= ~MouseState.Pressed;
     MouseState &= ~MouseState.PressedOutside;
     
-    if (!WantContinuousButtonPressed && MouseState.HasFlag(MouseState.In))
+    if (!MouseHoldRepeat && MouseState.HasFlag(MouseState.In))
         // Convert Released → Clicked for command invocation
-        mouse.Flags = Button1Released → Button1Clicked;
+        mouse.Flags = LeftButtonReleased → LeftButtonClicked;
 ```
 
 ##### 5.3c: Clicked Event
@@ -762,9 +762,9 @@ WhenGrabbedHandleClicked(mouse):
 // MouseBindings bind to Clicked events, but driver sends Pressed
 // Convert Pressed → Clicked for binding lookup
 ConvertPressedToClicked(mouse):
-    Button1Pressed  → Button1Clicked
-    Button2Pressed  → Button2Clicked
-    Button3Pressed  → Button3Clicked
+    LeftButtonPressed  → LeftButtonClicked
+    MiddleButtonPressed  → MiddleButtonClicked
+    RightButtonPressed  → RightButtonClicked
     Button4Pressed  → Button4Clicked
 ```
 
@@ -792,7 +792,7 @@ MouseBindings.Add(MouseFlags.LeftButtonClicked | MouseFlags.ButtonCtrl, Command.
 #### 5.6: Command Execution
 See [Command Deep Dive](command.md) for details on command execution flow.
 
-**Example: Button1Clicked → Command.Activate:**
+**Example: LeftButtonClicked → Command.Activate:**
 ```csharp
 InvokeCommand(Command.Activate, context):
     RaiseActivating(context):
@@ -805,7 +805,7 @@ InvokeCommand(Command.Activate, context):
 
 **Location:** `Terminal.Gui/ViewBase/MouseHeldDown.cs`
 
-**Enabled When:** `View.WantContinuousButtonPressed == true`
+**Enabled When:** `View.MouseHoldRepeat == true`
 
 **Behavior:**
 1. On button press → Start timer (500ms initial delay)
@@ -821,7 +821,7 @@ InvokeCommand(Command.Activate, context):
 **Code Flow:**
 ```csharp
 NewMouseEvent(mouse):
-    if (WantContinuousButtonPressed)
+    if (MouseHoldRepeat)
         if (mouse.IsPressed)
             MouseHeldDown.Start(mouse);
             MouseHeldDown.MouseIsHeldDownTick += (s, e) => 
@@ -839,7 +839,7 @@ NewMouseEvent(mouse):
 4. **View**: Viewport-relative coordinates (0,0 = top-left of view's Viewport)
 
 #### Mouse Grab Semantics
-- **Automatic**: Views with `HighlightStates` or `WantContinuousButtonPressed` auto-grab on press
+- **Automatic**: Views with `MouseHighlightStates` or `MouseHoldRepeat` auto-grab on press
 - **Manual**: Views can call `App.Mouse.GrabMouse(this)` explicitly
 - **Ungrab**: Automatic on clicked, or manual via `App.Mouse.UngrabMouse()`
 - **Grabbed view receives ALL events** until ungrabbed, even if mouse outside viewport
@@ -848,7 +848,7 @@ NewMouseEvent(mouse):
 **Problem:** Drivers emit `Pressed` and `Released`, but MouseBindings expect `Clicked`
 
 **Current Solution:** `ConvertPressedToClicked()` in `View.NewMouseEvent()`
-- Converts `Button1Pressed` → `Button1Clicked` before binding lookup
+- Converts `LeftButtonPressed` → `LeftButtonClicked` before binding lookup
 - **Only for grabbed views** or when mouse is released inside viewport
 
 **Limitation:** This is confusing and error-prone. See recommendations below.
@@ -916,14 +916,14 @@ Based on the pipeline analysis above, here are recommended changes (backwards co
 **Solution:** Emit clicks immediately, like OSes do
 ```csharp
 // MouseInterpreter should emit:
-Press   → Button1Pressed   (immediate)
-Release → Button1Released  (immediate)
-        → Button1Clicked   (immediate after release)
+Press   → LeftButtonPressed   (immediate)
+Release → LeftButtonReleased  (immediate)
+        → LeftButtonClicked   (immediate after release)
 
 // If second click within threshold:
-Press   → Button1Pressed
-Release → Button1Released
-        → Button1DoubleClicked  (NOT Button1Clicked!)
+Press   → LeftButtonPressed
+Release → LeftButtonReleased
+        → LeftButtonDoubleClicked  (NOT LeftButtonClicked!)
 ```
 
 **Impact:** 
@@ -938,14 +938,14 @@ Release → Button1Released
 ```csharp
 // MouseInterpreter already tracks press/release pairs
 // Just emit Clicked instead of maintaining separate flags
-Press → Button1Pressed (immediate, for drag/grab detection)
-Release → Button1Clicked (immediate, for command binding)
+Press → LeftButtonPressed (immediate, for drag/grab detection)
+Release → LeftButtonClicked (immediate, for command binding)
 ```
 
 **Option B: MouseBindings accept Pressed**
 ```csharp
 // Change default bindings to use Pressed instead of Clicked
-MouseBindings.Add(MouseFlags.Button1Pressed, Command.Activate);
+MouseBindings.Add(MouseFlags.LeftButtonPressed, Command.Activate);
 // Remove ConvertPressedToClicked logic
 ```
 
@@ -959,7 +959,7 @@ MouseBindings.Add(MouseFlags.Button1Pressed, Command.Activate);
 // View.NewMouseEvent should have clear sections:
 // 1. Pre-conditions
 // 2. Low-level event (MouseEvent)
-// 3. GRAB HANDLING (if HighlightStates or WantContinuous):
+// 3. GRAB HANDLING (if MouseHighlightStates or WantContinuous):
 //    a. On Pressed: Grab, set focus, update MouseState
 //    b. On Released: Convert to Clicked, update MouseState  
 //    c. On Clicked: Ungrab
@@ -970,7 +970,7 @@ MouseBindings.Add(MouseFlags.Button1Pressed, Command.Activate);
 - When grab happens (automatically vs manual)
 - What grabbed view receives (all events, converted coordinates)
 - When ungrab happens (clicked vs manual)
-- How WantContinuousButtonPressed affects grab
+- How MouseHoldRepeat affects grab
 
 #### 4. **Unify Coordinate Conversion**
 **Problem:** Coordinate conversion happens in multiple places
@@ -985,23 +985,23 @@ Point viewportLocation = view.ScreenToViewport(mouse.ScreenPosition);
 ```
 
 #### 5. **Separate Press/Release from Click in MouseFlags**
-**Problem:** `Button1Pressed` and `Button1Clicked` are both present, causing confusion
+**Problem:** `LeftButtonPressed` and `LeftButtonClicked` are both present, causing confusion
 
 **Proposed Flag Reorganization:**
 ```csharp
 // Raw events (from driver, immediate):
-Button1Pressed   // Button went down
-Button1Released  // Button came up
+LeftButtonPressed   // Button went down
+LeftButtonReleased  // Button came up
 
 // Synthetic events (from MouseInterpreter, after release):
-Button1Clicked        // Press + Release in same location
-Button1DoubleClicked  // Second click within threshold
-Button1TripleClicked  // Third click within threshold
+LeftButtonClicked        // Press + Release in same location
+LeftButtonDoubleClicked  // Second click within threshold
+LeftButtonTripleClicked  // Third click within threshold
 
 // Current state:
-Button1Down      // Button is currently down (for drag detection)
+LeftButtonDown      // Button is currently down (for drag detection)
 
-// Remove: Button1Pressed used for both "event" and "state" - confusing!
+// Remove: LeftButtonPressed used for both "event" and "state" - confusing!
 ```
 
 **Benefits:**
@@ -1056,13 +1056,13 @@ Logging.Trace($"[View] {mouse.Flags} → Command.{command}");
 **Pipeline should support:**
 ```csharp
 // ListView example from mouse.md tables:
-First click:   Button1Clicked → Command.Activate (select item)
-Second click:  Button1Clicked → Command.Activate (still!)
+First click:   LeftButtonClicked → Command.Activate (select item)
+Second click:  LeftButtonClicked → Command.Activate (still!)
                BUT ListView tracks timing and invokes Command.Accept itself
 
 // Default MouseBindings should be:
-MouseBindings.Add(MouseFlags.Button1Clicked, Command.Activate);
-MouseBindings.Add(MouseFlags.Button1DoubleClicked, Command.Accept);  // NEW!
+MouseBindings.Add(MouseFlags.LeftButtonClicked, Command.Activate);
+MouseBindings.Add(MouseFlags.LeftButtonDoubleClicked, Command.Accept);  // NEW!
 
 // Then Button handles:
 Command.Accept → Button action (matches single click)
@@ -1086,7 +1086,7 @@ Command.Accept → Open item (from DoubleClicked or Enter key)
 | **MouseInterpreter** | Emits `Clicked` 500ms after `Released` | Emit `Clicked` immediately after `Released` | Simplifies timing |
 | **View.NewMouseEvent** | Converts `Pressed`→`Clicked` in multiple places | Driver emits `Clicked`, no conversion needed | Clearer code |
 | **MouseImpl** | Coordinate conversion | Already correct, just document | Better clarity |
-| **MouseBindings** | Only `Button1Clicked` → `Activate` | Add `Button1DoubleClicked` → `Accept` | Matches command.md design |
+| **MouseBindings** | Only `LeftButtonClicked` → `Activate` | Add `LeftButtonDoubleClicked` → `Accept` | Matches command.md design |
 | **Documentation** | Scattered | Centralized pipeline doc (this section) | Developer productivity |
 
 

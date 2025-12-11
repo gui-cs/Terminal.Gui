@@ -52,7 +52,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            WantContinuousButtonPressed = true
+            MouseHoldRepeat = true
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
@@ -69,7 +69,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            WantContinuousButtonPressed = true
+            MouseHoldRepeat = true
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, _slider, _increaseButton);

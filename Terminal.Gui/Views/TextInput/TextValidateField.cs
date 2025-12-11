@@ -152,7 +152,7 @@ public class TextValidateField : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             int c = _provider!.Cursor (mouse.Position!.Value.X - GetMargins (Viewport.Width).left);
 

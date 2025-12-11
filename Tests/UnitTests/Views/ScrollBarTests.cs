@@ -569,7 +569,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new ()
         {
             ScreenPosition = btnPoint,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         });
 
         AutoInitShutdownAttribute.RunIteration ();
@@ -617,7 +617,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new ()
         {
             ScreenPosition = btnPoint,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         });
         AutoInitShutdownAttribute.RunIteration ();
 

@@ -43,7 +43,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (screenX, screenY),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -101,7 +101,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (viewRelativeX, viewRelativeY),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -158,7 +158,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (2, 2), // Relative to subView
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -200,7 +200,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -236,7 +236,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -266,7 +266,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -283,9 +283,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     #region Mouse Button Events
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, 1, 0)]
-    [InlineData (MouseFlags.Button1Released, 0, 1)]
-    [InlineData (MouseFlags.Button1Clicked, 0, 0)]
+    [InlineData (MouseFlags.LeftButtonPressed, 1, 0)]
+    [InlineData (MouseFlags.LeftButtonReleased, 0, 1)]
+    [InlineData (MouseFlags.LeftButtonClicked, 0, 0)]
     public void View_MouseButtonEvents_RaiseCorrectHandlers (MouseFlags flags, int expectedPressed, int expectedReleased)
     {
         // Arrange
@@ -295,12 +295,12 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, args) =>
         {
-            if (args.Flags.HasFlag (MouseFlags.Button1Pressed))
+            if (args.Flags.HasFlag (MouseFlags.LeftButtonPressed))
             {
                 pressedCount++;
             }
 
-            if (args.Flags.HasFlag (MouseFlags.Button1Released))
+            if (args.Flags.HasFlag (MouseFlags.LeftButtonReleased))
             {
                 releasedCount++;
             }
@@ -323,9 +323,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonClicked)]
+    [InlineData (MouseFlags.RightButtonClicked)]
     [InlineData (MouseFlags.Button4Clicked)]
     public void View_AllMouseButtons_TriggerClickEvent (MouseFlags clickFlag)
     {
@@ -371,7 +371,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -400,7 +400,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -438,7 +438,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (2, 2),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -473,7 +473,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act

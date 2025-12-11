@@ -37,7 +37,7 @@ public class TransparentMouseTests
         var mouse = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -66,7 +66,7 @@ public class TransparentMouseTests
         var mouse = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new Point (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -99,7 +99,7 @@ public class TransparentMouseTests
         var mouse = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new Point (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         bool topHandled = false;

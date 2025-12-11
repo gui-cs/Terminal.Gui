@@ -39,7 +39,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var pressEvent = new Mouse
         {
             Position = new (1, 0), // Top border area
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         bool? result = movableView.Border.NewMouseEvent (pressEvent);
@@ -52,7 +52,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var dragEvent = new Mouse
         {
             Position = new (5, 2),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         result = movableView.Border.NewMouseEvent (dragEvent);
@@ -65,7 +65,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var releaseEvent = new Mouse
         {
             Position = new (5, 2),
-            Flags = MouseFlags.Button1Released
+            Flags = MouseFlags.LeftButtonReleased
         };
 
         result = movableView.Border.NewMouseEvent (releaseEvent);
@@ -108,7 +108,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var pressEvent = new Mouse
         {
             Position = new (resizableView.Border.Frame.Width - 1, 5), // Right border area
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         bool? result = resizableView.Border.NewMouseEvent (pressEvent);
@@ -121,7 +121,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var dragEvent = new Mouse
         {
             Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         result = resizableView.Border.NewMouseEvent (dragEvent);
@@ -132,7 +132,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var releaseEvent = new Mouse
         {
             Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.Button1Released
+            Flags = MouseFlags.LeftButtonReleased
         };
 
         result = resizableView.Border.NewMouseEvent (releaseEvent);
@@ -178,7 +178,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var pressEvent1 = new Mouse
         {
             Position = new (1, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         view1.Border!.NewMouseEvent (pressEvent1);
@@ -188,7 +188,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var releaseEvent1 = new Mouse
         {
             Position = new (1, 0),
-            Flags = MouseFlags.Button1Released
+            Flags = MouseFlags.LeftButtonReleased
         };
 
         view1.Border.NewMouseEvent (releaseEvent1);
@@ -198,7 +198,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var pressEvent2 = new Mouse
         {
             Position = new (1, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         view2.Border!.NewMouseEvent (pressEvent2);
@@ -208,7 +208,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var releaseEvent2 = new Mouse
         {
             Position = new (1, 0),
-            Flags = MouseFlags.Button1Released
+            Flags = MouseFlags.LeftButtonReleased
         };
 
         view2.Border.NewMouseEvent (releaseEvent2);

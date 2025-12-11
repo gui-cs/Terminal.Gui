@@ -55,7 +55,7 @@ public class ColorPicker16Tests
 
         Assert.False (colorPicker.NewMouseEvent (new ()));
 
-        Assert.True (colorPicker.NewMouseEvent (new () { Position = new (4, 1), Flags = MouseFlags.Button1Clicked }));
+        Assert.True (colorPicker.NewMouseEvent (new () { Position = new (4, 1), Flags = MouseFlags.LeftButtonClicked }));
         Assert.Equal (ColorName16.Blue, colorPicker.SelectedColor);
         top.Dispose ();
     }

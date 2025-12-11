@@ -22,14 +22,14 @@ graph TB
         Menu[MenuBar]
         Status[StatusBar]
         Content[Content View]
-        Button1[Button]
-        Button2[Button]
+        LeftButton[Button]
+        MiddleButton[Button]
         
         Top --> Menu
         Top --> Status
         Top --> Content
-        Content --> Button1
-        Content --> Button2
+        Content --> LeftButton
+        Content --> MiddleButton
     end
     
     subgraph Stack["app.SessionStack"]

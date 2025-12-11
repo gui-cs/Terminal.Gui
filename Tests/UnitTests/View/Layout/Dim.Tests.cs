@@ -174,20 +174,20 @@ public class DimTests
                        Assert.Equal (99, f2.Frame.Width); // 100-1=99
                        Assert.Equal (5, f2.Frame.Height);
 
-                       v1.Text = "Button1";
+                       v1.Text = "LeftButton";
                        Assert.Equal ($"Combine(View(Width,FrameView(){f1.Frame})-Absolute(2))", v1.Width.ToString ());
                        Assert.Equal ("Combine(Fill(Absolute(0))-Absolute(2))", v1.Height.ToString ());
                        Assert.Equal (97, v1.Frame.Width); // 99-2=97
                        Assert.Equal (189, v1.Frame.Height); // 198-2-7=189
 
-                       v2.Text = "Button2";
+                       v2.Text = "MiddleButton";
 
                        Assert.Equal ($"Combine(View(Width,FrameView(){f2.Frame})-Absolute(2))", v2.Width.ToString ());
                        Assert.Equal ("Combine(Fill(Absolute(0))-Absolute(2))", v2.Height.ToString ());
                        Assert.Equal (97, v2.Frame.Width); // 99-2=97
                        Assert.Equal (189, v2.Frame.Height); // 198-2-7=189
 
-                       v3.Text = "Button3";
+                       v3.Text = "RightButton";
 
                        // 198*10%=19 * Percent is related to the super-view if it isn't null otherwise the view width
                        Assert.Equal (19, v3.Frame.Width);

@@ -368,7 +368,7 @@ public class FlagSelectorTests
         var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         checkBox.NewMouseEvent (mouse);
@@ -398,7 +398,7 @@ public class FlagSelectorTests
         var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         checkBox.NewMouseEvent (mouse);
@@ -628,8 +628,8 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.Checked, checkBox.CheckedState); // FIXED: Was UnChecked
         Assert.Equal (1, selector.Value); // Verify Value is set to first value
 
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1Clicked });
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.Button1DoubleClicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonClicked });
+        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal (1, acceptCount);
         // After double-clicking on an already-checked flag checkbox, it should still be checked (flags don't uncheck on double-click in FlagSelector)

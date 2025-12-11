@@ -125,7 +125,7 @@ public class DateField : TextField
             return true;
         }
 
-        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             AdjCursorPosition (mouse.Position!.Value.X);
         }

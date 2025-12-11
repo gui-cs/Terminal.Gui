@@ -38,7 +38,7 @@ public class Padding : Adornment
             return false;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             if (Parent.CanFocus && !Parent.HasFocus)
             {

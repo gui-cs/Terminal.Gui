@@ -63,58 +63,58 @@ public class Mouse : EventArgs
     /// <summary>
     ///     Gets a value indicating whether a mouse button was pressed.
     /// </summary>
-    public bool IsPressed => Flags.HasFlag (MouseFlags.Button1Pressed)
-                             || Flags.HasFlag (MouseFlags.Button2Pressed)
-                             || Flags.HasFlag (MouseFlags.Button3Pressed)
+    public bool IsPressed => Flags.HasFlag (MouseFlags.LeftButtonPressed)
+                             || Flags.HasFlag (MouseFlags.MiddleButtonPressed)
+                             || Flags.HasFlag (MouseFlags.RightButtonPressed)
                              || Flags.HasFlag (MouseFlags.Button4Pressed);
 
     /// <summary>
     ///     Gets a value indicating whether a mouse button was released.
     /// </summary>
-    public bool IsReleased => Flags.HasFlag (MouseFlags.Button1Released)
-                              || Flags.HasFlag (MouseFlags.Button2Released)
-                              || Flags.HasFlag (MouseFlags.Button3Released)
+    public bool IsReleased => Flags.HasFlag (MouseFlags.LeftButtonReleased)
+                              || Flags.HasFlag (MouseFlags.MiddleButtonReleased)
+                              || Flags.HasFlag (MouseFlags.RightButtonReleased)
                               || Flags.HasFlag (MouseFlags.Button4Released);
 
     /// <summary>
     ///     Gets a value indicating whether a single-click mouse event occurred.
     /// </summary>
-    public bool IsSingleClicked => Flags.HasFlag (MouseFlags.Button1Clicked)
-                                   || Flags.HasFlag (MouseFlags.Button2Clicked)
-                                   || Flags.HasFlag (MouseFlags.Button3Clicked)
+    public bool IsSingleClicked => Flags.HasFlag (MouseFlags.LeftButtonClicked)
+                                   || Flags.HasFlag (MouseFlags.MiddleButtonClicked)
+                                   || Flags.HasFlag (MouseFlags.RightButtonClicked)
                                    || Flags.HasFlag (MouseFlags.Button4Clicked);
 
     /// <summary>
     ///     Gets a value indicating whether a double-click mouse event occurred.
     /// </summary>
-    public bool IsDoubleClicked => Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-                                   || Flags.HasFlag (MouseFlags.Button2DoubleClicked)
-                                   || Flags.HasFlag (MouseFlags.Button3DoubleClicked)
+    public bool IsDoubleClicked => Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+                                   || Flags.HasFlag (MouseFlags.MiddleButtonDoubleClicked)
+                                   || Flags.HasFlag (MouseFlags.RightButtonDoubleClicked)
                                    || Flags.HasFlag (MouseFlags.Button4DoubleClicked);
 
     /// <summary>
     ///     Gets a value indicating whether a triple-click mouse event occurred.
     /// </summary>
-    public bool IsTripleClicked => Flags.HasFlag (MouseFlags.Button1TripleClicked)
-                                   || Flags.HasFlag (MouseFlags.Button2TripleClicked)
-                                   || Flags.HasFlag (MouseFlags.Button3TripleClicked)
+    public bool IsTripleClicked => Flags.HasFlag (MouseFlags.LeftButtonTripleClicked)
+                                   || Flags.HasFlag (MouseFlags.MiddleButtonTripleClicked)
+                                   || Flags.HasFlag (MouseFlags.RightButtonTripleClicked)
                                    || Flags.HasFlag (MouseFlags.Button4TripleClicked);
 
     /// <summary>
     ///     Gets a value indicating whether a single, double, or triple-click mouse event occurred.
     /// </summary>
     public bool IsSingleDoubleOrTripleClicked =>
-        Flags.HasFlag (MouseFlags.Button1Clicked)
-        || Flags.HasFlag (MouseFlags.Button2Clicked)
-        || Flags.HasFlag (MouseFlags.Button3Clicked)
+        Flags.HasFlag (MouseFlags.LeftButtonClicked)
+        || Flags.HasFlag (MouseFlags.MiddleButtonClicked)
+        || Flags.HasFlag (MouseFlags.RightButtonClicked)
         || Flags.HasFlag (MouseFlags.Button4Clicked)
-        || Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-        || Flags.HasFlag (MouseFlags.Button2DoubleClicked)
-        || Flags.HasFlag (MouseFlags.Button3DoubleClicked)
+        || Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+        || Flags.HasFlag (MouseFlags.MiddleButtonDoubleClicked)
+        || Flags.HasFlag (MouseFlags.RightButtonDoubleClicked)
         || Flags.HasFlag (MouseFlags.Button4DoubleClicked)
-        || Flags.HasFlag (MouseFlags.Button1TripleClicked)
-        || Flags.HasFlag (MouseFlags.Button2TripleClicked)
-        || Flags.HasFlag (MouseFlags.Button3TripleClicked)
+        || Flags.HasFlag (MouseFlags.LeftButtonTripleClicked)
+        || Flags.HasFlag (MouseFlags.MiddleButtonTripleClicked)
+        || Flags.HasFlag (MouseFlags.RightButtonTripleClicked)
         || Flags.HasFlag (MouseFlags.Button4TripleClicked);
 
     /// <summary>

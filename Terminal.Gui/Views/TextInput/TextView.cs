@@ -1511,9 +1511,9 @@ public class TextView : View, IDesignable
     protected override bool OnMouseEvent (Mouse mouse)
     {
         if (mouse is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
-            && !mouse.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
-            && !mouse.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)
-            && !mouse.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Shift)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Shift)
             && !mouse.Flags.HasFlag (ContextMenu!.MouseFlags))
         {
             return false;
@@ -1537,7 +1537,7 @@ public class TextView : View, IDesignable
             return true;
         }
 
-        if (mouse.Flags == MouseFlags.Button1Clicked)
+        if (mouse.Flags == MouseFlags.LeftButtonClicked)
         {
             if (_isButtonReleased)
             {
@@ -1594,7 +1594,7 @@ public class TextView : View, IDesignable
             _columnTrack = CurrentColumn;
             ScrollTo (_leftColumn - 1, false);
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
         {
             ProcessMouseClick (mouse, out List<Cell> line);
             PositionCursor ();
@@ -1639,7 +1639,7 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Shift))
         {
             if (!_shiftSelecting)
             {
@@ -1652,7 +1652,7 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (_shiftSelecting)
             {
@@ -1676,14 +1676,14 @@ public class TextView : View, IDesignable
                 App?.Mouse.GrabMouse (this);
             }
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.Button1Released))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
         {
             _isButtonReleased = true;
             App?.Mouse.UngrabMouse ();
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
-            if (mouse.Flags.HasFlag (MouseFlags.ButtonShift))
+            if (mouse.Flags.HasFlag (MouseFlags.Shift))
             {
                 if (!IsSelecting)
                 {
@@ -1716,7 +1716,7 @@ public class TextView : View, IDesignable
             _columnTrack = CurrentColumn;
             SetNeedsDraw ();
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
         {
             if (IsSelecting)
             {

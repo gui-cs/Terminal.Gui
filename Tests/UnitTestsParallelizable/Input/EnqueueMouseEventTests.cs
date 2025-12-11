@@ -95,7 +95,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                     {
                                                                         Timestamp = DateTime.Now,
                                                                         Position = new (threadId, i),
-                                                                        Flags = MouseFlags.Button1Clicked
+                                                                        Flags = MouseFlags.LeftButtonClicked
                                                                     });
                                    }
                                });
@@ -160,7 +160,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
@@ -190,8 +190,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // 3 synthetic events: Pressed, Released, Clicked
         Terminal.Gui.Input.Mouse [] events =
         [
-            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.Button1Pressed },
-            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.Button1Released },
+            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.LeftButtonPressed },
+            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.LeftButtonReleased },
         ];
 
         List<Terminal.Gui.Input.Mouse> receivedParsedEvents = [];
@@ -211,26 +211,26 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Assert
         // MouseEventParsed fires for all raw events (pressed, released)
-        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.Button1Pressed && e.Position == new Point (10, 5));
-        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.Button1Released && e.Position == new Point (10, 5));
+        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.LeftButtonPressed && e.Position == new Point (10, 5));
+        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.LeftButtonReleased && e.Position == new Point (10, 5));
         Assert.Equal (2, receivedParsedEvents.Count);
 
-        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.Button1Pressed && e.Position == new Point (10, 5));
-        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.Button1Released && e.Position == new Point (10, 5));
-        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.Button1Clicked && e.Position == new Point (10, 5));
+        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonPressed && e.Position == new Point (10, 5));
+        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonReleased && e.Position == new Point (10, 5));
+        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonClicked && e.Position == new Point (10, 5));
         Assert.Equal (4, receivedSyntheticEvents.Count);
 
-        // Should have two Button1Clicked events
-        Assert.Equal (2, receivedSyntheticEvents.Count (e => e.Flags == MouseFlags.Button1Clicked && e.Position == new Point (10, 5)));
+        // Should have two LeftButtonClicked events
+        Assert.Equal (2, receivedSyntheticEvents.Count (e => e.Flags == MouseFlags.LeftButtonClicked && e.Position == new Point (10, 5)));
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonClicked)]
+    [InlineData (MouseFlags.RightButtonClicked)]
     [InlineData (MouseFlags.Button4Clicked)]
-    [InlineData (MouseFlags.Button1DoubleClicked)]
-    [InlineData (MouseFlags.Button1TripleClicked)]
+    [InlineData (MouseFlags.LeftButtonDoubleClicked)]
+    [InlineData (MouseFlags.LeftButtonTripleClicked)]
     public void FakeInput_EnqueueMouseEvent_SupportsAllButtonClicks (MouseFlags flags)
     {
         // Arrange
@@ -280,7 +280,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         {
             Timestamp = DateTime.Now,
             Position = new (x, y),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         Terminal.Gui.Input.Mouse? receivedEvent = null;
@@ -298,13 +298,13 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.ButtonShift)]
-    [InlineData (MouseFlags.ButtonCtrl)]
-    [InlineData (MouseFlags.ButtonAlt)]
-    [InlineData (MouseFlags.ButtonShift | MouseFlags.ButtonCtrl)]
-    [InlineData (MouseFlags.ButtonShift | MouseFlags.ButtonAlt)]
-    [InlineData (MouseFlags.ButtonCtrl | MouseFlags.ButtonAlt)]
-    [InlineData (MouseFlags.ButtonShift | MouseFlags.ButtonCtrl | MouseFlags.ButtonAlt)]
+    [InlineData (MouseFlags.Shift)]
+    [InlineData (MouseFlags.Ctrl)]
+    [InlineData (MouseFlags.Alt)]
+    [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)]
+    [InlineData (MouseFlags.Shift | MouseFlags.Alt)]
+    [InlineData (MouseFlags.Ctrl | MouseFlags.Alt)]
+    [InlineData (MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)]
     public void FakeInput_EnqueueMouseEvent_PreservesModifiers (MouseFlags modifiers)
     {
         // Arrange
@@ -319,7 +319,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
-            Flags = MouseFlags.Button1Clicked | modifiers
+            Flags = MouseFlags.LeftButtonClicked | modifiers
         };
 
         Terminal.Gui.Input.Mouse? receivedEvent = null;
@@ -332,21 +332,21 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Assert
         Assert.NotNull (receivedEvent);
-        Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.Button1Clicked));
+        Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.LeftButtonClicked));
 
-        if (modifiers.HasFlag (MouseFlags.ButtonShift))
+        if (modifiers.HasFlag (MouseFlags.Shift))
         {
-            Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.ButtonShift));
+            Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.Shift));
         }
 
-        if (modifiers.HasFlag (MouseFlags.ButtonCtrl))
+        if (modifiers.HasFlag (MouseFlags.Ctrl))
         {
-            Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.ButtonCtrl));
+            Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.Ctrl));
         }
 
-        if (modifiers.HasFlag (MouseFlags.ButtonAlt))
+        if (modifiers.HasFlag (MouseFlags.Alt))
         {
-            Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.ButtonAlt));
+            Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.Alt));
         }
     }
 
@@ -401,9 +401,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         Terminal.Gui.Input.Mouse [] events =
         [
-            new () { Timestamp = DateTime.Now, Position = new (0, 0), Flags = MouseFlags.ReportMousePosition },
-            new () { Timestamp = DateTime.Now, Position = new (5, 5), Flags = MouseFlags.ReportMousePosition },
-            new () { Timestamp = DateTime.Now, Position = new (10, 10), Flags = MouseFlags.ReportMousePosition }
+            new () { Timestamp = DateTime.Now, Position = new (0, 0), Flags = MouseFlags.PositionReport },
+            new () { Timestamp = DateTime.Now, Position = new (5, 5), Flags = MouseFlags.PositionReport },
+            new () { Timestamp = DateTime.Now, Position = new (10, 10), Flags = MouseFlags.PositionReport }
         ];
 
         // Act
@@ -444,7 +444,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                                   {
                                                                                       Timestamp = DateTime.Now,
                                                                                       Position = new (10, 5),
-                                                                                      Flags = MouseFlags.Button1Clicked
+                                                                                      Flags = MouseFlags.LeftButtonClicked
                                                                                   });
                                                      processor.ProcessQueue ();
                                                  });
@@ -468,9 +468,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Enqueue multiple events before processing
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (1, 1), Flags = MouseFlags.Button1Pressed });
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (2, 2), Flags = MouseFlags.ReportMousePosition });
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (3, 3), Flags = MouseFlags.Button1Released });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (1, 1), Flags = MouseFlags.LeftButtonPressed });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (2, 2), Flags = MouseFlags.PositionReport });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (3, 3), Flags = MouseFlags.LeftButtonReleased });
 
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
@@ -526,7 +526,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                                   {
                                                                                       Timestamp = DateTime.Now,
                                                                                       Position = new (-10, -5),
-                                                                                      Flags = MouseFlags.Button1Clicked
+                                                                                      Flags = MouseFlags.LeftButtonClicked
                                                                                   });
                                                      SimulateInputThread (fakeInput, queue);
                                                      processor.ProcessQueue ();

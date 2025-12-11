@@ -180,7 +180,7 @@ public class OptionSelectorTests
         var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         checkBox.NewMouseEvent (mouse);
@@ -208,7 +208,7 @@ public class OptionSelectorTests
         var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         checkBox.NewMouseEvent (mouse);

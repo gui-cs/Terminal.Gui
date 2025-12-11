@@ -361,10 +361,10 @@ public class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>
     ///     Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>. Defaults to double click (
-    ///     <see cref="MouseFlags.Button1DoubleClicked"/>). Set to null to disable this feature.
+    ///     <see cref="MouseFlags.LeftButtonDoubleClicked"/>). Set to null to disable this feature.
     /// </summary>
     /// <value></value>
-    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
+    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.LeftButtonDoubleClicked;
 
     // TODO: Update to use Key instead of KeyCode
     /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
@@ -1015,7 +1015,7 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         // If it is not an event we care about
         if (me is { IsSingleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
-            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked))
+            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.LeftButtonDoubleClicked))
         {
             // do nothing
             return false;
@@ -1056,7 +1056,7 @@ public class TreeView<T> : View, ITreeView where T : class
             return true;
         }
 
-        if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (me.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             // The line they clicked on a branch
             Branch<T> clickedBranch = HitTest (me.Position!.Value.Y);

@@ -828,8 +828,8 @@ public class ListView : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse me)
     {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+        if (!me.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+            && !me.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
             && me.Flags != MouseFlags.WheeledDown
             && me.Flags != MouseFlags.WheeledUp
             && me.Flags != MouseFlags.WheeledRight
@@ -898,7 +898,7 @@ public class ListView : View, IDesignable
 
         SetNeedsDraw ();
 
-        if (me.Flags == MouseFlags.Button1DoubleClicked)
+        if (me.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             return InvokeCommand (Command.Accept) is true;
         }

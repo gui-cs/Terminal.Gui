@@ -99,7 +99,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse testEvent = new ()
         {
             ScreenPosition = new (5, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act
@@ -126,7 +126,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act - Fire once
@@ -156,7 +156,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act
@@ -167,12 +167,12 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed)]
-    [InlineData (MouseFlags.Button1Released)]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed)]
+    [InlineData (MouseFlags.LeftButtonPressed)]
+    [InlineData (MouseFlags.LeftButtonReleased)]
+    [InlineData (MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonPressed)]
     [InlineData (MouseFlags.WheeledUp)]
-    [InlineData (MouseFlags.ReportMousePosition)]
+    [InlineData (MouseFlags.PositionReport)]
     public void Mouse_RaiseMouseEvent_CorrectlyPassesFlags (MouseFlags flags)
     {
         // Arrange
@@ -230,7 +230,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Verify event fires before reset
@@ -299,7 +299,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act

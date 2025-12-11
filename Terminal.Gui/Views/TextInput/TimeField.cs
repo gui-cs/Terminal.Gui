@@ -170,7 +170,7 @@ public class TimeField : TextField
             return true;
         }
 
-        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             int point = mouse.Position!.Value.X;
             AdjCursorPosition (point);

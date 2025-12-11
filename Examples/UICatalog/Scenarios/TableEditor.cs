@@ -627,12 +627,12 @@ public class TableEditor : Scenario
 
                                      if (clickedCol != null)
                                      {
-                                         if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
                                          {
                                              // left click in a header
                                              SortColumn (clickedCol.Value);
                                          }
-                                         else if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                         else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
                                          {
                                              // right click in a header
                                              ShowHeaderContextMenu (clickedCol.Value, mouse);

@@ -144,7 +144,7 @@ public class CharacterMap : Scenario
 
                                        _categoryList.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                       if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                       if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
                                        {
                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;

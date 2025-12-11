@@ -149,14 +149,14 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (mouse.Flags == MouseFlags.ReportMousePosition)
+        if (mouse.Flags == MouseFlags.PositionReport)
         {
             RenderSelectedIdxByMouse (mouse);
 
             return true;
         }
 
-        if (mouse.Flags == MouseFlags.Button1Clicked)
+        if (mouse.Flags == MouseFlags.LeftButtonClicked)
         {
             SelectedIdx = mouse.Position!.Value.Y - ScrollOffset;
 

@@ -322,7 +322,7 @@ public class TextValidateField_NET_Provider_Tests : FakeDriverBase
         Assert.False (field.IsValid);
         Assert.Equal ("--(1   )--", field.Provider.Text);
 
-        field.NewMouseEvent (new Mouse { Position = new (25, 0), Flags = MouseFlags.Button1Pressed });
+        field.NewMouseEvent (new Mouse { Position = new (25, 0), Flags = MouseFlags.LeftButtonPressed });
 
         field.NewKeyDownEvent (Key.D1);
 

@@ -48,7 +48,7 @@ internal class MouseInterpreter
     /// </param>
     /// <remarks>
     ///     Creates four <see cref="MouseButtonClickTracker"/> instances, one for each supported mouse button
-    ///     (Button1/Left, Button2/Middle, Button3/Right, Button4), all using the same time function and threshold.
+    ///     (LeftButton/Left, MiddleButton/Middle, RightButton/Right, Button4), all using the same time function and threshold.
     /// </remarks>
     public MouseInterpreter (
         Func<DateTime>? now = null,
@@ -105,7 +105,7 @@ internal class MouseInterpreter
     ///     An enumerable sequence of <see cref="Mouse"/>:
     ///     <list type="bullet">
     ///         <item><description>The original input event (always yielded first)</description></item>
-    ///         <item><description>Synthesized click events (Button1Clicked, Button1DoubleClicked, etc.) immediately when button released</description></item>
+    ///         <item><description>Synthesized click events (LeftButtonClicked, LeftButtonDoubleClicked, etc.) immediately when button released</description></item>
     ///     </list>
     /// </returns>
     /// <remarks>
@@ -174,7 +174,7 @@ internal class MouseInterpreter
     /// <summary>
     ///     Creates a synthetic click event based on button index and click count.
     /// </summary>
-    /// <param name="button">The zero-based button index (0=Button1/Left, 1=Button2/Middle, 2=Button3/Right, 3=Button4).</param>
+    /// <param name="button">The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right, 3=Button4).</param>
     /// <param name="numberOfClicks">The number of consecutive clicks detected (1=single, 2=double, 3+=triple).</param>
     /// <param name="mouseEventArgs">The original mouse event to copy screen position and view information from.</param>
     /// <returns>
@@ -206,7 +206,7 @@ internal class MouseInterpreter
     /// <summary>
     ///     Converts a button index and click count into the appropriate <see cref="MouseFlags"/> click flag.
     /// </summary>
-    /// <param name="buttonIdx">The zero-based button index (0=Button1/Left, 1=Button2/Middle, 2=Button3/Right, 3=Button4).</param>
+    /// <param name="buttonIdx">The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right, 3=Button4).</param>
     /// <param name="numberOfClicks">
     ///     The number of consecutive clicks detected:
     ///     <list type="bullet">
@@ -234,15 +234,15 @@ internal class MouseInterpreter
     ///         </listheader>
     ///         <item>
     ///             <term>0</term>
-    ///             <description>Button1 (Left) → LeftButtonClicked, LeftButtonDoubleClicked, LeftButtonTripleClicked</description>
+    ///             <description>LeftButton (Left) → LeftButtonClicked, LeftButtonDoubleClicked, LeftButtonTripleClicked</description>
     ///         </item>
     ///         <item>
     ///             <term>1</term>
-    ///             <description>Button2 (Middle) → MiddleButtonClicked, MiddleButtonDoubleClicked, MiddleButtonTripleClicked</description>
+    ///             <description>MiddleButton (Middle) → MiddleButtonClicked, MiddleButtonDoubleClicked, MiddleButtonTripleClicked</description>
     ///         </item>
     ///         <item>
     ///             <term>2</term>
-    ///             <description>Button3 (Right) → RightButtonClicked, RightButtonDoubleClicked, RightButtonTripleClicked</description>
+    ///             <description>RightButton (Right) → RightButtonClicked, RightButtonDoubleClicked, RightButtonTripleClicked</description>
     ///         </item>
     ///         <item>
     ///             <term>3</term>

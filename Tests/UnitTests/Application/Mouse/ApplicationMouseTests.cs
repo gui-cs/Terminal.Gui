@@ -43,7 +43,7 @@ public class ApplicationMouseTests
         bool expectedClicked
     )
     {
-        var mouse = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Pressed };
+        var mouse = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.LeftButtonPressed };
         var clicked = false;
 
         void OnApplicationOnMouseEvent (object? s, Mouse e)
@@ -117,7 +117,7 @@ public class ApplicationMouseTests
             Height = size.Height
         };
 
-        var mouseEventToRaise = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouseEventToRaise = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.LeftButtonClicked };
 
         view.MouseEvent += (s, mouse) =>
                            {
@@ -163,7 +163,7 @@ public class ApplicationMouseTests
         //                                 Assert.True (tf.HasFocus);
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
 
-        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.ReportMousePosition });
+        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.PositionReport });
 
         //                                 Assert.Equal (sv, Application.Mouse.MouseGrabView);
 
@@ -177,15 +177,15 @@ public class ApplicationMouseTests
         //                                 // another runnable (Dialog) was opened
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
 
-        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.ReportMousePosition });
+        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.PositionReport });
 
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
 
-        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (40, 12), Flags = MouseFlags.ReportMousePosition });
+        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (40, 12), Flags = MouseFlags.PositionReport });
 
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
 
-        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
+        //                                 Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
 
         //                                 Assert.Null (Application.Mouse.MouseGrabView);
 
@@ -304,7 +304,7 @@ public class ApplicationMouseTests
         Assert.True (view.WasDisposed);
 #endif
 
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Pressed });
+        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.Null (Application.Mouse.MouseGrabView);
         Assert.Equal (0, count);
         top.Dispose ();
@@ -350,7 +350,7 @@ public class ApplicationMouseTests
         Application.RaiseMouseEvent (new Mouse
         {
             ScreenPosition = new (2, 2), // Inside both views
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         });
 
         // EXPECTED: Event sent to grab view has View == grabView.

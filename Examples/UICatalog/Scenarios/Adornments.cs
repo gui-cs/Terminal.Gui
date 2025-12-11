@@ -130,7 +130,7 @@ public class Adornments : Scenario
                                       Y = 1,
                                       Text = "_Button in Padding Y = 1",
                                       CanFocus = true,
-                                      HighlightStates = MouseState.None,
+                                      MouseHighlightStates = MouseState.None,
                                   };
                                   btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (appWindow.App, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   btnButtonInPadding.BorderStyle = LineStyle.Dashed;

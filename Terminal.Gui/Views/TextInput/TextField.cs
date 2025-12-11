@@ -36,7 +36,7 @@ public class TextField : View, IDesignable
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
         Used = true;
-        WantMousePositionReports = true;
+        MousePositionTracking  = true;
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -819,9 +819,9 @@ public class TextField : View, IDesignable
     protected override bool OnMouseEvent (Mouse ev)
     {
         if (ev is { IsPressed: false, IsReleased: false }
-            && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
-            && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-            && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
+            && !ev.Flags.HasFlag (MouseFlags.PositionReport)
+            && !ev.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+            && !ev.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked)
             && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
         {
             return false;
@@ -832,7 +832,7 @@ public class TextField : View, IDesignable
             return true;
         }
 
-        if (!HasFocus && ev.Flags != MouseFlags.ReportMousePosition)
+        if (!HasFocus && ev.Flags != MouseFlags.PositionReport)
         {
             SetFocus ();
         }
@@ -843,7 +843,7 @@ public class TextField : View, IDesignable
             return true;
         }
 
-        if (ev.Flags == MouseFlags.Button1Pressed)
+        if (ev.Flags == MouseFlags.LeftButtonPressed)
         {
             EnsureHasFocus ();
             PositionCursor (ev);
@@ -856,7 +856,7 @@ public class TextField : View, IDesignable
             _isButtonReleased = true;
             _isButtonPressed = true;
         }
-        else if (ev.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && _isButtonPressed)
+        else if (ev.Flags == (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport) && _isButtonPressed)
         {
             int x = PositionCursor (ev);
             _isButtonReleased = false;
@@ -867,13 +867,13 @@ public class TextField : View, IDesignable
                 App?.Mouse.GrabMouse (this);
             }
         }
-        else if (ev.Flags == MouseFlags.Button1Released)
+        else if (ev.Flags == MouseFlags.LeftButtonReleased)
         {
             _isButtonReleased = true;
             _isButtonPressed = false;
             App?.Mouse.UngrabMouse ();
         }
-        else if (ev.Flags == MouseFlags.Button1DoubleClicked)
+        else if (ev.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             EnsureHasFocus ();
             int x = PositionCursor (ev);
@@ -887,7 +887,7 @@ public class TextField : View, IDesignable
             SelectedStart = newPos.Value.startCol;
             CursorPosition = newPos.Value.col;
         }
-        else if (ev.Flags == MouseFlags.Button1TripleClicked)
+        else if (ev.Flags == MouseFlags.LeftButtonTripleClicked)
         {
             EnsureHasFocus ();
             PositionCursor (0);
