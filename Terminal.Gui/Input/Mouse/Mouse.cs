@@ -1,18 +1,30 @@
-using System.ComponentModel;
-
 namespace Terminal.Gui.Input;
 
 /// <summary>
-///     Specifies the event arguments for <see cref="Mouse"/>.
+///     Represents a mouse event, including position, button state, and other flags.
 /// </summary>
-public class Mouse : HandledEventArgs
+/// <remarks>
+///     <para>
+///         This class is used for mouse events. It contains the mouse position, button state, and other flags.
+///     </para>
+///     <para>
+///         The <see cref="View.MouseEvent"/> event uses this class.
+///     </para>
+/// </remarks>
+public class Mouse : EventArgs
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Mouse"/> class.
     /// </summary>
-    public Mouse ()
-    {
-    }
+    public Mouse () { }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the mouse event was handled.
+    /// </summary>
+    /// <remarks>
+    ///     Set this to <see langword="true"/> to prevent the event from being processed by other views.
+    /// </remarks>
+    public bool Handled { get; set; }
 
     /// <summary>
     ///     The timestamp when this mouse event was created. Used for multi-click detection timing.
@@ -25,21 +37,28 @@ public class Mouse : HandledEventArgs
     public MouseFlags Flags { get; set; }
 
     /// <summary>
-    ///     The screen-relative mouse position.
+    ///     The screen-relative mouse position, in columns and rows.
     /// </summary>
     public Point ScreenPosition { get; set; }
 
-    /// <summary>The deepest View who's <see cref="View.Frame"/> contains <see cref="ScreenPosition"/>.</summary>
+    /// <summary>
+    ///     The view that is the target of the mouse event.
+    /// </summary>
+    /// <remarks>
+    ///     This is the deepest view in the view hierarchy that contains the mouse position.
+    /// </remarks>
     public View? View { get; set; }
 
     /// <summary>
-    ///     The position of the mouse in <see cref="View"/>'s Viewport-relative coordinates. Only valid if <see cref="View"/>
-    ///     is set.
+    ///     The position of the mouse in <see cref="View"/>'s viewport-relative coordinates.
     /// </summary>
+    /// <remarks>
+    ///     This property is only valid if <see cref="View"/> is not <see langword="null"/>.
+    /// </remarks>
     public Point? Position { get; set; }
 
     /// <summary>
-    ///     Gets whether <see cref="Flags"/> contains any of the button pressed related flags.
+    ///     Gets a value indicating whether a mouse button was pressed.
     /// </summary>
     public bool IsPressed => Flags.HasFlag (MouseFlags.Button1Pressed)
                              || Flags.HasFlag (MouseFlags.Button2Pressed)
@@ -47,7 +66,7 @@ public class Mouse : HandledEventArgs
                              || Flags.HasFlag (MouseFlags.Button4Pressed);
 
     /// <summary>
-    ///     Gets whether <see cref="Flags"/> contains any of the button released related flags.
+    ///     Gets a value indicating whether a mouse button was released.
     /// </summary>
     public bool IsReleased => Flags.HasFlag (MouseFlags.Button1Released)
                               || Flags.HasFlag (MouseFlags.Button2Released)
@@ -55,7 +74,7 @@ public class Mouse : HandledEventArgs
                               || Flags.HasFlag (MouseFlags.Button4Released);
 
     /// <summary>
-    ///     Gets whether <see cref="Flags"/> contains any of the single-clicked related flags.
+    ///     Gets a value indicating whether a single-click mouse event occurred.
     /// </summary>
     public bool IsSingleClicked => Flags.HasFlag (MouseFlags.Button1Clicked)
                                    || Flags.HasFlag (MouseFlags.Button2Clicked)
@@ -63,7 +82,7 @@ public class Mouse : HandledEventArgs
                                    || Flags.HasFlag (MouseFlags.Button4Clicked);
 
     /// <summary>
-    ///     Gets whether <see cref="Flags"/> contains any of the double-clicked related flags.
+    ///     Gets a value indicating whether a double-click mouse event occurred.
     /// </summary>
     public bool IsDoubleClicked => Flags.HasFlag (MouseFlags.Button1DoubleClicked)
                                    || Flags.HasFlag (MouseFlags.Button2DoubleClicked)
@@ -71,7 +90,7 @@ public class Mouse : HandledEventArgs
                                    || Flags.HasFlag (MouseFlags.Button4DoubleClicked);
 
     /// <summary>
-    ///     Gets whether <see cref="Flags"/> contains any of the triple-clicked related flags.
+    ///     Gets a value indicating whether a triple-click mouse event occurred.
     /// </summary>
     public bool IsTripleClicked => Flags.HasFlag (MouseFlags.Button1TripleClicked)
                                    || Flags.HasFlag (MouseFlags.Button2TripleClicked)
@@ -79,7 +98,7 @@ public class Mouse : HandledEventArgs
                                    || Flags.HasFlag (MouseFlags.Button4TripleClicked);
 
     /// <summary>
-    ///     Gets whether <see cref="Flags"/> contains any of the mouse button clicked related flags.
+    ///     Gets a value indicating whether a single, double, or triple-click mouse event occurred.
     /// </summary>
     public bool IsSingleDoubleOrTripleClicked =>
         Flags.HasFlag (MouseFlags.Button1Clicked)
@@ -96,14 +115,14 @@ public class Mouse : HandledEventArgs
         || Flags.HasFlag (MouseFlags.Button4TripleClicked);
 
     /// <summary>
-    ///     Gets whether <see cref="Flags"/> contains any of the mouse wheel related flags.
+    ///     Gets a value indicating whether a mouse wheel event occurred.
     /// </summary>
     public bool IsWheel => Flags.HasFlag (MouseFlags.WheeledDown)
                            || Flags.HasFlag (MouseFlags.WheeledUp)
                            || Flags.HasFlag (MouseFlags.WheeledLeft)
                            || Flags.HasFlag (MouseFlags.WheeledRight);
 
-    /// <summary>Returns a <see cref="T:System.String"/> that represents the current <see cref="Mouse"/>.</summary>
-    /// <returns>A <see cref="T:System.String"/> that represents the current <see cref="Mouse"/>.</returns>
+    /// <summary>Returns a string that represents the current mouse event.</summary>
+    /// <returns>A string that represents the current mouse event.</returns>
     public override string ToString () { return $"{Timestamp:ss.fff}:{ScreenPosition}:{Flags}:{View?.Id}:{Position}"; }
 }
