@@ -18,12 +18,14 @@ namespace Terminal.Gui.Drivers;
 ///     <list type="number">
 ///         <item><description>Yields the original event unchanged (for low-level handling)</description></item>
 ///         <item><description>Updates the state of all four button trackers</description></item>
-///         <item><description>Yields synthetic click events when button releases are detected within the threshold</description></item>
+///         <item><description>Defers all click events to allow complete multi-click sequences to be detected</description></item>
 ///     </list>
 ///     <para>
 ///         Click detection follows standard UI conventions: clicks are counted on button **release**, not press,
 ///         and consecutive clicks must occur within <see cref="RepeatedClickThreshold"/> milliseconds at the same
-///         position to be counted as multi-clicks.
+///         position to be counted as multi-clicks. ALL clicks (single, double, triple, etc.) are deferred and
+///         emitted via <see cref="CheckForExpiredClicks"/> after the threshold expires, ensuring applications
+///         only receive the final click type without intermediate events.
 ///     </para>
 /// </remarks>
 internal class MouseInterpreter
@@ -98,23 +100,29 @@ internal class MouseInterpreter
     ///     An enumerable sequence of <see cref="Mouse"/>:
     ///     <list type="bullet">
     ///         <item><description>The original input event (always yielded first)</description></item>
-    ///         <item><description>Zero or more synthetic click events (LeftButtonClicked, LeftButtonDoubleClicked, LeftButtonTripleClicked, etc.)</description></item>
+    ///         <item><description>No click events are yielded immediately - all are deferred for multi-click detection</description></item>
     ///     </list>
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         This method uses a generator pattern (yield return) to produce multiple events from a single input.
-    ///         The original event is always yielded first to allow low-level handling, followed by any
-    ///         click events detected by the button state trackers.
+    ///         This method uses a generator pattern (yield return) to produce events from input.
+    ///         The original event is always yielded first to allow low-level handling. Click events
+    ///         are NOT yielded from this method - they are deferred and must be retrieved via
+    ///         <see cref="CheckForExpiredClicks"/>.
+    ///     </para>
+    ///     <para>
+    ///         Single clicks are deferred to allow double-click detection.
     ///     </para>
     ///     <para>
     ///         Example sequence for a double click:
     ///     </para>
     ///     <code>
     ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed
-    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonClicked
-    ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed
-    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonDoubleClicked
+    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased (click count=1 deferred)
+    ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed (deferred click cancelled)
+    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased (click count=2 deferred)
+    ///         [After threshold expires]
+    ///         CheckForExpiredClicks()   → Yields: LeftButtonDoubleClicked
     ///     </code>
     /// </remarks>
     public IEnumerable<Mouse> Process (Mouse mouse)
@@ -122,13 +130,49 @@ internal class MouseInterpreter
         yield return mouse;
 
         // For each mouse button
-        for (var i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             _mouseButtonClickTracker [i].UpdateState (mouse, out int? numClicks);
 
             if (numClicks.HasValue)
             {
                 yield return CreateClickEvent (i, numClicks.Value, mouse);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Checks all button trackers for expired pending clicks and returns them as synthetic click events.
+    /// </summary>
+    /// <returns>
+    ///     An enumerable sequence of <see cref="Mouse"/> containing expired single-click events that were deferred
+    ///     waiting for potential multi-clicks.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method should be called periodically (e.g., during input processing) to ensure deferred
+    ///         single-click events are eventually emitted after the double-click threshold expires.
+    ///     </para>
+    /// </remarks>
+    public IEnumerable<Mouse> CheckForExpiredClicks ()
+    {
+        // Check each button tracker for expired clicks
+        for (int i = 0; i < 4; i++)
+        {
+            if (_mouseButtonClickTracker [i].CheckForExpiredClicks (out int? numClicks, out Point position))
+            {
+                Mouse expiredClick = new ()
+                {
+                    Timestamp = Now (),
+                    Handled = false,
+                    Flags = ToClicks (i, numClicks!.Value),
+                    ScreenPosition = position
+                    // View and Position intentionally NOT set - set by MouseImpl/View.Mouse
+                };
+                
+                Logging.Trace ($"Raising expired click event:{expiredClick.Flags} at screen {expiredClick.ScreenPosition}");
+                
+                yield return expiredClick;
             }
         }
     }

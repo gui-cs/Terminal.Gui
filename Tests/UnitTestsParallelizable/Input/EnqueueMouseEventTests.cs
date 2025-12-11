@@ -20,22 +20,21 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void FakeInput_EnqueueMouseEvent_HandlesCompleteClickSequence ()
     {
         // Arrange
-        var fakeInput = new FakeInput ();
+        FakeInput fakeInput = new ();
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         fakeInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
+        FakeInputProcessor processor = new (queue);
         processor.InputImpl = fakeInput;
 
         List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
-        // Act - Simulate a complete click: press → release → click
+        // Act - Simulate a complete click: press → release
         processor.EnqueueMouseEvent (
                                      null,
                                      new ()
                                      {
-                                         Timestamp = DateTime.Now,
                                          Position = new (10, 5),
                                          Flags = MouseFlags.LeftButtonPressed
                                      });
@@ -44,19 +43,25 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                      null,
                                      new ()
                                      {
-                                         Timestamp = DateTime.Now,
                                          Position = new (10, 5),
                                          Flags = MouseFlags.LeftButtonReleased
                                      });
 
-        // The MouseInterpreter in the processor should synthesize a clicked event
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
-        // Assert
-        // We should see whole synthetic sequence: Pressed, Released, Clicked
+        // Assert - Process() emits Pressed and Released immediately (clicks are deferred)
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonPressed));
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonReleased));
+        Assert.Equal (2, receivedEvents.Count);
+
+        // Wait for the deferred click threshold to expire (500ms default)
+        Thread.Sleep (600);
+
+        // Process queue again to emit deferred clicks
+        processor.ProcessQueue ();
+
+        // Now we should see the Clicked event
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
         Assert.Equal (3, receivedEvents.Count);
     }

@@ -97,6 +97,27 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         {
             ProcessAfterParsing (input);
         }
+
+        // Check for expired deferred clicks
+        CheckForExpiredMouseClicks ();
+    }
+
+    /// <summary>
+    ///     Checks for and emits any deferred single-click events that have exceeded the double-click threshold.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method polls the <see cref="_mouseInterpreter"/> for expired pending clicks that were deferred
+    ///         to allow double-click detection. Expired clicks are emitted through the normal mouse event pipeline.
+    ///     </para>
+    /// </remarks>
+    private void CheckForExpiredMouseClicks ()
+    {
+        foreach (Mouse expiredClick in _mouseInterpreter.CheckForExpiredClicks ())
+        {
+            Logging.Trace ($"Emitting expired click: {expiredClick}");
+            SyntheticMouseEvent?.Invoke (this, expiredClick);
+        }
     }
 
     /// <summary>
