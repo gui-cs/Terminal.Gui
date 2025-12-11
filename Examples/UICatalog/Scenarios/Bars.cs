@@ -187,12 +187,12 @@ public class Bars : Scenario
 
         menuLikeExamples.MouseEvent += MenuLikeExamplesMouseEvent;
 
-        void MenuLikeExamplesMouseEvent (object _, Terminal.Gui.Input.Mouse mouseEvent)
+        void MenuLikeExamplesMouseEvent (object _, Terminal.Gui.Input.Mouse mouse)
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
-                popOverMenu.X = mouseEvent.Position!.Value.X;
-                popOverMenu.Y = mouseEvent.Position!.Value.Y;
+                popOverMenu.X = mouse.Position!.Value.X;
+                popOverMenu.Y = mouse.Position!.Value.Y;
                 popOverMenu.Visible = true;
                 //popOverMenu.Enabled = popOverMenu.Visible;
                 popOverMenu.SetFocus ();

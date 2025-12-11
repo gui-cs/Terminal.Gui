@@ -61,19 +61,19 @@ public partial class GuiTestContext
     /// Enqueues a mouse event to the current driver's input processor.
     /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
     /// </summary>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns></returns>
-    private GuiTestContext EnqueueMouseEvent (Mouse mouseEvent)
+    private GuiTestContext EnqueueMouseEvent (Mouse mouse)
     {
             // Enqueue the mouse event
         WaitIteration ((app) =>
         {
             if (app.Driver is { })
             {
-                mouseEvent.Timestamp = DateTime.Now;
-                mouseEvent.Position = mouseEvent.ScreenPosition;
+                mouse.Timestamp = DateTime.Now;
+                mouse.Position = mouse.ScreenPosition;
 
-                app.Driver.GetInputProcessor ().EnqueueMouseEvent (app, mouseEvent);
+                app.Driver.GetInputProcessor ().EnqueueMouseEvent (app, mouse);
             }
             else
             {
@@ -86,7 +86,7 @@ public partial class GuiTestContext
     }
 
 
-    private GuiTestContext EnqueueMouseEvent<TView> (Mouse mouseEvent, Func<TView, bool> evaluator) where TView : View
+    private GuiTestContext EnqueueMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 
@@ -95,10 +95,10 @@ public partial class GuiTestContext
                                                 TView v = Find (evaluator);
                                                 screen = v.ViewportToScreen (new Point (0, 0));
                                             });
-        mouseEvent.ScreenPosition = screen;
-        mouseEvent.Position = screen;
+        mouse.ScreenPosition = screen;
+        mouse.Position = screen;
 
-        EnqueueMouseEvent (mouseEvent);
+        EnqueueMouseEvent (mouse);
 
         return ctx;
     }

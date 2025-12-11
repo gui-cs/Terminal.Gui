@@ -137,14 +137,14 @@ public class CharacterMap : Scenario
         _categoryList.Activating += (_, e) =>
                                    {
                                        // Only handle mouse clicks
-                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
+                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
                                        {
                                            return;
                                        }
 
-                                       _categoryList.ScreenToCell (mouseEvent.Position!.Value, out int? clickedCol);
+                                       _categoryList.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                       if (clickedCol != null && mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                       if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
                                        {
                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;

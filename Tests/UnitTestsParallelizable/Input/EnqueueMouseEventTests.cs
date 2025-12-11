@@ -159,7 +159,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
@@ -167,15 +167,15 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouseEvent);
+        processor.EnqueueMouseEvent (null, mouse);
 
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
         // Assert - Verify the mouse event made it through
         Assert.Single (receivedEvents);
-        Assert.Equal (mouseEvent.Position, receivedEvents [0].Position);
-        Assert.Equal (mouseEvent.Flags, receivedEvents [0].Flags);
+        Assert.Equal (mouse.Position, receivedEvents [0].Position);
+        Assert.Equal (mouse.Flags, receivedEvents [0].Flags);
     }
 
     [Fact (Skip = "Skip for now")]
@@ -207,9 +207,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act
         // Note: FakeInputProcessor.EnqueueMouseEvent bypasses the queue and calls RaiseMouseEventParsed directly
         // This means SimulateInputThread and ProcessQueue are not needed for this test
-        foreach (Terminal.Gui.Input.Mouse mouseEvent in events)
+        foreach (Terminal.Gui.Input.Mouse mouse in events)
         {
-            processor.EnqueueMouseEvent (null, mouseEvent);
+            processor.EnqueueMouseEvent (null, mouse);
         }
 
         // Assert
@@ -244,7 +244,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
@@ -255,7 +255,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouseEvent);
+        processor.EnqueueMouseEvent (null, mouse);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -279,7 +279,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (x, y),
@@ -290,7 +290,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouseEvent);
+        processor.EnqueueMouseEvent (null, mouse);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -318,7 +318,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
@@ -329,7 +329,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouseEvent);
+        processor.EnqueueMouseEvent (null, mouse);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -368,7 +368,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         var processor = new FakeInputProcessor (queue);
         processor.InputImpl = fakeInput;
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
             Position = new (10, 5),
@@ -379,7 +379,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouseEvent);
+        processor.EnqueueMouseEvent (null, mouse);
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
@@ -410,9 +410,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         ];
 
         // Act
-        foreach (Terminal.Gui.Input.Mouse mouseEvent in events)
+        foreach (Terminal.Gui.Input.Mouse mouse in events)
         {
-            processor.EnqueueMouseEvent (null, mouseEvent);
+            processor.EnqueueMouseEvent (null, mouse);
         }
 
         SimulateInputThread (fakeInput, queue);

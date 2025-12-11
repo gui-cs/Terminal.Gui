@@ -365,13 +365,13 @@ public class FlagSelectorTests
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
         selector.Value = 0;
 
-        var mouseEvent = new Mouse
+        var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
             Flags = MouseFlags.Button1Clicked
         };
 
-        checkBox.NewMouseEvent (mouseEvent);
+        checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (0, selector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
@@ -395,13 +395,13 @@ public class FlagSelectorTests
         selector.Value = 0;
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        var mouseEvent = new Mouse
+        var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
             Flags = MouseFlags.Button1Clicked
         };
 
-        checkBox.NewMouseEvent (mouseEvent);
+        checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (0, selector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);

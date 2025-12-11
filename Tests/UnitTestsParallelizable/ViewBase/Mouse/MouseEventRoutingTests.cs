@@ -40,14 +40,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (screenX, screenY),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         if (shouldReceive)
@@ -98,14 +98,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (viewRelativeX, viewRelativeY),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         if (shouldReceive)
@@ -155,14 +155,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         // Click at position (2, 2) relative to subView (which is at 5,5 relative to superView)
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (2, 2), // Relative to subView
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        subView.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouse);
 
         // Assert
         Assert.True (subViewEventReceived);
@@ -197,14 +197,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         int activatingCount = 0;
         subView.Activating += (_, _) => activatingCount++;
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        subView.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (1, activatingCount);
@@ -233,14 +233,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, e) => { clickHandlerCalled = !e.IsSingleDoubleOrTripleClicked; ; };
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        bool? result = view.NewMouseEvent (mouseEvent);
+        bool? result = view.NewMouseEvent (mouse);
 
         // Assert
         Assert.True (result.HasValue && result.Value); // Event was handled
@@ -263,14 +263,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             // Don't set Handled = true
         };
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.True (eventHandlerCalled);
@@ -306,14 +306,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             }
         };
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = flags
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (expectedPressed, pressedCount);
@@ -335,14 +335,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, a) => clickCount += a.IsSingleDoubleOrTripleClicked ? 1 : 0;
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = clickFlag
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (1, clickCount);
@@ -368,14 +368,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool eventCalled = false;
         view.MouseEvent += (_, _) => { eventCalled = true; };
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.False (eventCalled);
@@ -397,14 +397,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool selectingCalled = false;
         view.Activating += (_, _) => { selectingCalled = true; };
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.False (selectingCalled);
@@ -435,14 +435,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
         superView.SetFocus (); // Give superView focus first
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (2, 2),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        subView.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (expectFocus, subView.HasFocus);
@@ -470,14 +470,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         int activatingCount = 0;
         view.Activating += (_, _) => activatingCount++;
 
-        Terminal.Gui.Input.Mouse mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (1, activatingCount);

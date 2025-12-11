@@ -520,13 +520,13 @@ public class ScrollBar : View, IOrientation, IDesignable
     protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
-        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
+        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
         {
             return base.OnActivating (args);
         }
 
         // Check if the mouse click is a single click
-        if (!mouseEvent.IsSingleClicked)
+        if (!mouse.IsSingleClicked)
         {
             return base.OnActivating (args);
         }
@@ -537,12 +537,12 @@ public class ScrollBar : View, IOrientation, IDesignable
         if (Orientation == Orientation.Vertical)
         {
             sliderCenter = 1 + _slider.Frame.Y + _slider.Frame.Height / 2;
-            distanceFromCenter = mouseEvent.Position!.Value.Y - sliderCenter;
+            distanceFromCenter = mouse.Position!.Value.Y - sliderCenter;
         }
         else
         {
             sliderCenter = 1 + _slider.Frame.X + _slider.Frame.Width / 2;
-            distanceFromCenter = mouseEvent.Position!.Value.X - sliderCenter;
+            distanceFromCenter = mouse.Position!.Value.X - sliderCenter;
         }
 
 #if PROPORTIONAL_SCROLL_JUMP
@@ -571,38 +571,38 @@ public class ScrollBar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Mouse mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         if (SuperView is null)
         {
             return false;
         }
 
-        if (!mouseEvent.IsWheel)
+        if (!mouse.IsWheel)
         {
             return false;
         }
 
         if (Orientation == Orientation.Vertical)
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledDown))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
             {
                 Position += Increment;
             }
 
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledUp))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
             {
                 Position -= Increment;
             }
         }
         else
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledRight))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledRight))
             {
                 Position += Increment;
             }
 
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledLeft))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledLeft))
             {
                 Position -= Increment;
             }

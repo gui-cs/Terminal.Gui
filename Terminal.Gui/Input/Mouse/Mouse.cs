@@ -1,12 +1,10 @@
 namespace Terminal.Gui.Input;
 
 /// <summary>
+///     Provides an abstraction for common mouse operations and state.
 ///     Represents a mouse event, including position, button state, and other flags.
 /// </summary>
 /// <remarks>
-///     <para>
-///         This class is used for mouse events. It contains the mouse position, button state, and other flags.
-///     </para>
 ///     <para>
 ///         The <see cref="View.MouseEvent"/> event uses this class.
 ///     </para>

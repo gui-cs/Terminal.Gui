@@ -96,10 +96,10 @@ public static partial class Application // Mouse handling
     ///     calls the appropriate View mouse event handlers.
     /// </summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
-    /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
+    /// <param name="mouse">The mouse event with coordinates relative to the screen.</param>
     [Obsolete ("The legacy static Application object is going away.")]
-    internal static void RaiseMouseEvent (Mouse mouseEvent)
+    internal static void RaiseMouseEvent (Mouse mouse)
     {
-        Mouse.RaiseMouseEvent (mouseEvent);
+        Mouse.RaiseMouseEvent (mouse);
     }
 }

@@ -118,19 +118,19 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Mouse mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (base.OnMouseEvent (mouseEvent) || mouseEvent.Handled)
+        if (base.OnMouseEvent (mouse) || mouse.Handled)
         {
             return true;
         }
 
-        if (SelectedLength == 0 && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            AdjCursorPosition (mouseEvent.Position!.Value.X);
+            AdjCursorPosition (mouse.Position!.Value.X);
         }
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>

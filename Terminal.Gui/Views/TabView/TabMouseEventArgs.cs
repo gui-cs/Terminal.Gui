@@ -8,11 +8,11 @@ public class TabMouseEventArgs : HandledEventArgs
 {
     /// <summary>Creates a new instance of the <see cref="TabMouseEventArgs"/> class.</summary>
     /// <param name="tab"><see cref="Tab"/> that the mouse was over when the event occurred.</param>
-    /// <param name="mouseEvent">The mouse activity being reported</param>
-    public TabMouseEventArgs (Tab? tab, Mouse mouseEvent)
+    /// <param name="mouse">The mouse activity being reported</param>
+    public TabMouseEventArgs (Tab? tab, Mouse mouse)
     {
         Tab = tab;
-        MouseEvent = mouseEvent;
+        MouseEvent = mouse;
     }
 
     /// <summary>

@@ -48,7 +48,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     /// <summary>
     ///     Updates the button state based on a new mouse event and determines if a multi-click occurred.
     /// </summary>
-    /// <param name="mouseEvent">The mouse event arguments containing button flags, position, and timestamp.</param>
+    /// <param name="mouse">The mouse event arguments containing button flags, position, and timestamp.</param>
     /// <param name="numClicks">
     ///     Output parameter indicating the number of consecutive clicks detected. Returns:
     ///     <list type="bullet">
@@ -101,10 +101,10 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     ///         The timestamp comes from the event itself, eliminating the need for external time injection.
     ///     </para>
     /// </remarks>
-    public void UpdateState (Mouse mouseEvent, out int? numClicks)
+    public void UpdateState (Mouse mouse, out int? numClicks)
     {
-        bool isPressedNow = IsPressed (_buttonIdx, mouseEvent.Flags);
-        bool isSamePosition = _lastPosition == mouseEvent.ScreenPosition;
+        bool isPressedNow = IsPressed (_buttonIdx, mouse.Flags);
+        bool isSamePosition = _lastPosition == mouse.ScreenPosition;
 
         TimeSpan elapsed = _now () - At;
 
@@ -133,7 +133,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
         }
 
         // Record new state
-        OverwriteState (mouseEvent);
+        OverwriteState (mouse);
     }
 
     /// <summary>

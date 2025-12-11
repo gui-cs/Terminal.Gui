@@ -358,10 +358,10 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse mouseEvent = new () { ScreenPosition = new (10, 10), Flags = flags };
+        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = flags };
 
         // Act
-        List<Terminal.Gui.Input.Mouse> events = interpreter.Process (mouseEvent).ToList ();
+        List<Terminal.Gui.Input.Mouse> events = interpreter.Process (mouse).ToList ();
 
         // Assert - Should only yield the original event, no synthetic events
         Assert.Single (events);

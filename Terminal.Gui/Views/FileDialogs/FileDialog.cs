@@ -1049,32 +1049,32 @@ public class FileDialog : Dialog, IDesignable
     private void OnTableViewActivating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
         {
             return;
         }
 
-        Point? clickedCell = _tableView.ScreenToCell (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y, out int? clickedCol);
+        Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+            if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
             }
-            else if (mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            else if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in a header
-                ShowHeaderContextMenu (clickedCol.Value, mouseEvent);
+                ShowHeaderContextMenu (clickedCol.Value, mouse);
             }
         }
         else
         {
-            if (clickedCell is { } && mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in rest of table
-                ShowCellContextMenu (clickedCell, mouseEvent);
+                ShowCellContextMenu (clickedCell, mouse);
             }
         }
     }

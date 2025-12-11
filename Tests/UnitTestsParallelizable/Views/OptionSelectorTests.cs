@@ -177,13 +177,13 @@ public class OptionSelectorTests
         Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
 
-        var mouseEvent = new Mouse
+        var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
             Flags = MouseFlags.Button1Clicked
         };
 
-        checkBox.NewMouseEvent (mouseEvent);
+        checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);
@@ -205,13 +205,13 @@ public class OptionSelectorTests
         Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").CheckedState);
         Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
 
-        var mouseEvent = new Mouse
+        var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
             Flags = MouseFlags.Button1Clicked
         };
 
-        checkBox.NewMouseEvent (mouseEvent);
+        checkBox.NewMouseEvent (mouse);
 
         Assert.Equal (1, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.CheckedState);

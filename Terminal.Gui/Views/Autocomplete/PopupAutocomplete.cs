@@ -97,10 +97,10 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the
     ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
-    /// <param name="mouseEvent">The mouse event.</param>
+    /// <param name="mouse">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    public override bool OnMouseEvent (Mouse mouseEvent, bool fromHost = false)
+    public override bool OnMouseEvent (Mouse mouse, bool fromHost = false)
     {
         if (fromHost)
         {
@@ -149,28 +149,28 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (mouseEvent.Flags == MouseFlags.ReportMousePosition)
+        if (mouse.Flags == MouseFlags.ReportMousePosition)
         {
-            RenderSelectedIdxByMouse (mouseEvent);
+            RenderSelectedIdxByMouse (mouse);
 
             return true;
         }
 
-        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
+        if (mouse.Flags == MouseFlags.Button1Clicked)
         {
-            SelectedIdx = mouseEvent.Position!.Value.Y - ScrollOffset;
+            SelectedIdx = mouse.Position!.Value.Y - ScrollOffset;
 
             return Select ();
         }
 
-        if (mouseEvent.Flags == MouseFlags.WheeledDown)
+        if (mouse.Flags == MouseFlags.WheeledDown)
         {
             MoveDown ();
 
             return true;
         }
 
-        if (mouseEvent.Flags == MouseFlags.WheeledUp)
+        if (mouse.Flags == MouseFlags.WheeledUp)
         {
             MoveUp ();
 

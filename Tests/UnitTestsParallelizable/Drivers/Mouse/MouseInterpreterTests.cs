@@ -14,9 +14,9 @@ public class MouseInterpreterTests
         List<Terminal.Gui.Input.Mouse> allResults = [];
 
         // Act
-        foreach (Terminal.Gui.Input.Mouse mouseEvent in events)
+        foreach (Terminal.Gui.Input.Mouse mouse in events)
         {
-            allResults.AddRange (interpreter.Process (mouseEvent));
+            allResults.AddRange (interpreter.Process (mouse));
         }
 
         // Assert - verify all expected click events were generated

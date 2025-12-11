@@ -251,7 +251,7 @@ public class MouseTests : TestsAllViews
     [Fact]
     public void WantContinuousButtonPressed_True_And_WantMousePositionReports_True_Move_InViewport_OutOfViewport_Keeps_Counting ()
     {
-        Mouse mouseEvent = new ()
+        Mouse mouse = new ()
         {
             Position = Point.Empty
         };
@@ -274,11 +274,11 @@ public class MouseTests : TestsAllViews
         view.MouseHeldDown.MouseIsHeldDownTick += (_, _) => clickedCount++;
 
         // Start in Viewport
-        mouseEvent.Flags = MouseFlags.Button1Pressed;
-        mouseEvent.Position = mouseEvent.Position!.Value with { X = 0 };
-        view.NewMouseEvent (mouseEvent);
+        mouse.Flags = MouseFlags.Button1Pressed;
+        mouse.Position = mouse.Position!.Value with { X = 0 };
+        view.NewMouseEvent (mouse);
         Assert.Equal (0, clickedCount);
-        mouseEvent.Handled = false;
+        mouse.Handled = false;
 
         // Mouse is held down so timer should be ticking
         Assert.NotEmpty (timed.Timeouts);
@@ -289,33 +289,33 @@ public class MouseTests : TestsAllViews
         Assert.Equal (1, clickedCount);
 
         // Move out of Viewport
-        mouseEvent.Flags = MouseFlags.Button1Pressed;
-        mouseEvent.Position = mouseEvent.Position!.Value with { X = 1 };
-        view.NewMouseEvent (mouseEvent);
+        mouse.Flags = MouseFlags.Button1Pressed;
+        mouse.Position = mouse.Position!.Value with { X = 1 };
+        view.NewMouseEvent (mouse);
 
         Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
         Assert.Equal (2, clickedCount);
 
-        mouseEvent.Handled = false;
+        mouse.Handled = false;
 
         // Move into Viewport
-        mouseEvent.Flags = MouseFlags.Button1Pressed;
-        mouseEvent.Position = mouseEvent.Position!.Value with { X = 0 };
-        view.NewMouseEvent (mouseEvent);
+        mouse.Flags = MouseFlags.Button1Pressed;
+        mouse.Position = mouse.Position!.Value with { X = 0 };
+        view.NewMouseEvent (mouse);
 
         Assert.NotEmpty (timed.Timeouts);
         Assert.Equal (2, clickedCount);
-        mouseEvent.Handled = false;
+        mouse.Handled = false;
 
         // Stay in Viewport
-        mouseEvent.Flags = MouseFlags.Button1Pressed;
-        mouseEvent.Position = mouseEvent.Position!.Value with { X = 0 };
-        view.NewMouseEvent (mouseEvent);
+        mouse.Flags = MouseFlags.Button1Pressed;
+        mouse.Position = mouse.Position!.Value with { X = 0 };
+        view.NewMouseEvent (mouse);
 
         Assert.Single (timed.Timeouts).Value.Callback.Invoke ();
 
         Assert.Equal (3, clickedCount);
-        mouseEvent.Handled = false;
+        mouse.Handled = false;
 
         view.Dispose ();
     }

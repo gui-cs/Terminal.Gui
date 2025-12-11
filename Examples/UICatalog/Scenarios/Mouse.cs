@@ -280,15 +280,15 @@ public class Mouse : Scenario
         };
         win.Add (label, driverLog);
 
-        Application.Driver.GetInputProcessor ().MouseEventParsed += (_, mouseEvent) =>
+        Application.Driver.GetInputProcessor ().MouseEventParsed += (_, mouse) =>
                                   {
-                                      int i = filterSlider.Options.FindIndex (o => mouseEvent.Flags.HasFlag (o.Data));
+                                      int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
 
                                       if (filterSlider.GetSetOptions ().Contains (i))
                                       {
-                                          lastDriverEvent.Text = $"Last Driver Event: {mouseEvent}";
+                                          lastDriverEvent.Text = $"Last Driver Event: {mouse}";
                                           Logging.Trace (lastDriverEvent.Text);
-                                          driverLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}");
+                                          driverLogList.Add ($"{mouse.Position}:{mouse.Flags}");
                                           driverLog.MoveEnd ();
                                       }
                                   };
@@ -312,14 +312,14 @@ public class Mouse : Scenario
         };
         win.Add (label, appLog);
 
-        Application.MouseEvent += (_, mouseEvent) =>
+        Application.MouseEvent += (_, mouse) =>
                                   {
-                                      int i = filterSlider.Options.FindIndex (o => mouseEvent.Flags.HasFlag (o.Data));
+                                      int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
 
                                       if (filterSlider.GetSetOptions ().Contains (i))
                                       {
-                                          lastAppEvent.Text = $"   Last App Event: {mouseEvent}";
-                                          appLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}");
+                                          lastAppEvent.Text = $"   Last App Event: {mouse}";
+                                          appLogList.Add ($"{mouse.Position}:{mouse.Flags}");
                                           appLog.MoveEnd ();
                                       }
                                   };
@@ -353,14 +353,14 @@ public class Mouse : Scenario
                                      winLog.SetSource (winLogList);
                                  };
 
-        win.MouseEvent += (_, mouseEvent) =>
+        win.MouseEvent += (_, mouse) =>
                           {
-                              int i = filterSlider.Options.FindIndex (o => mouseEvent.Flags.HasFlag (o.Data));
+                              int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
 
                               if (filterSlider.GetSetOptions ().Contains (i))
                               {
-                                  lastWinEvent.Text = $"   Last Win Event: {mouseEvent}";
-                                  winLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}");
+                                  lastWinEvent.Text = $"   Last Win Event: {mouse}";
+                                  winLogList.Add ($"{mouse.Position}:{mouse.Flags}");
                                   winLog.MoveEnd ();
                               }
                           };

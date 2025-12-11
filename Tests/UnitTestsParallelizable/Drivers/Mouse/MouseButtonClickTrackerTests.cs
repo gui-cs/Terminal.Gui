@@ -25,10 +25,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         // Arrange
         DateTime now = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
-        Terminal.Gui.Input.Mouse mouseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
 
         // Act
-        tracker.UpdateState (mouseEvent, out int? numClicks);
+        tracker.UpdateState (mouse, out int? numClicks);
 
         // Assert
         Assert.Null (numClicks);

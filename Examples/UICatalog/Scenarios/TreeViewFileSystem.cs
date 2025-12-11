@@ -564,15 +564,15 @@ public class TreeViewFileSystem : Scenario
         }
 
         // Only handle mouse clicks
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
         {
             return;
         }
 
         // if user right clicks
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
         {
-            IFileSystemInfo? rightClicked = _treeViewFiles.GetObjectOnRow (mouseEvent.Position!.Value.Y);
+            IFileSystemInfo? rightClicked = _treeViewFiles.GetObjectOnRow (mouse.Position!.Value.Y);
 
             // nothing was clicked
             if (rightClicked is null)
@@ -582,8 +582,8 @@ public class TreeViewFileSystem : Scenario
 
             ShowContextMenu (
                              new (
-                                  mouseEvent.Position!.Value.X + _treeViewFiles.Frame.X,
-                                  mouseEvent.Position!.Value.Y + _treeViewFiles.Frame.Y + 2
+                                  mouse.Position!.Value.X + _treeViewFiles.Frame.X,
+                                  mouse.Position!.Value.Y + _treeViewFiles.Frame.Y + 2
                                  ),
                              rightClicked
                             );

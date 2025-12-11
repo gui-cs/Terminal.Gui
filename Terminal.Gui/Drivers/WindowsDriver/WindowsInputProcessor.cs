@@ -18,12 +18,12 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     }
 
     /// <inheritdoc />
-    public override void EnqueueMouseEvent (IApplication? app, Mouse mouseEvent)
+    public override void EnqueueMouseEvent (IApplication? app, Mouse mouse)
     {
         InputQueue.Enqueue (new ()
         {
             EventType = WindowsConsole.EventType.Mouse,
-            MouseEvent = ToMouseEventRecord (mouseEvent)
+            MouseEvent = ToMouseEventRecord (mouse)
         });
     }
 
@@ -217,72 +217,72 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     /// <summary>
     ///     Converts a <see cref="Mouse"/> to a Windows-specific <see cref="WindowsConsole.MouseEventRecord"/>.
     /// </summary>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns></returns>
-    public WindowsConsole.MouseEventRecord ToMouseEventRecord (Mouse mouseEvent)
+    public WindowsConsole.MouseEventRecord ToMouseEventRecord (Mouse mouse)
     {
         var buttonState = WindowsConsole.ButtonState.NoButtonPressed;
         var eventFlags = WindowsConsole.EventFlags.NoEvent;
         var controlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed;
 
         // Convert button states
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button1Pressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.Button2Pressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button2Pressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.Button3Pressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button3Pressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button4Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.Button4Pressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button4Pressed;
         }
 
         // Convert mouse wheel events
-        if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledUp))
+        if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
         {
             eventFlags = WindowsConsole.EventFlags.MouseWheeled;
             buttonState = (WindowsConsole.ButtonState)0x00780000; // Positive value for wheel up
         }
-        else if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledDown))
+        else if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
         {
             eventFlags = WindowsConsole.EventFlags.MouseWheeled;
             buttonState = (WindowsConsole.ButtonState)unchecked((int)0xFF880000); // Negative value for wheel down
         }
 
         // Convert movement flag
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
+        if (mouse.Flags.HasFlag (MouseFlags.ReportMousePosition))
         {
             eventFlags |= WindowsConsole.EventFlags.MouseMoved;
         }
 
         // Convert modifier keys
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonAlt))
+        if (mouse.Flags.HasFlag (MouseFlags.ButtonAlt))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftAltPressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonCtrl))
+        if (mouse.Flags.HasFlag (MouseFlags.ButtonCtrl))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftControlPressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonShift))
+        if (mouse.Flags.HasFlag (MouseFlags.ButtonShift))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.ShiftPressed;
         }
 
         return new ()
         {
-            MousePosition = new ((short)mouseEvent.ScreenPosition.X, (short)mouseEvent.ScreenPosition.Y),
+            MousePosition = new ((short)mouse.ScreenPosition.X, (short)mouse.ScreenPosition.Y),
             ButtonState = buttonState,
             ControlKeyState = controlKeyState,
             EventFlags = eventFlags

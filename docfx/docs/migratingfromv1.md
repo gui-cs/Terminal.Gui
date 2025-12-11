@@ -568,7 +568,7 @@ view.MouseEvent += (s, e) =>
 **v1:**
 ```csharp
 // v1 - MouseClick event
-view.MouseClick += (mouseEvent) =>
+view.MouseClick += (mouse) =>
 {
     // Handle click
     DoSomething();
@@ -606,14 +606,14 @@ view.MouseEvent += (s, e) =>
 **Migration Pattern:**
 ```csharp
 // ❌ v1 - OnMouseClick override
-protected override bool OnMouseClick(MouseEventArgs mouseEvent)
+protected override bool OnMouseClick(MouseEventArgs mouse)
 {
-    if (mouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
+    if (mouse.Flags.HasFlag(MouseFlags.Button1Clicked))
     {
         PerformAction();
         return true;
     }
-    return base.OnMouseClick(mouseEvent);
+    return base.OnMouseClick(mouse);
 }
 
 // ✅ v2 - OnActivating override

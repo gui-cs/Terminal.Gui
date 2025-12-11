@@ -51,7 +51,7 @@ internal sealed class MouseHeldDown : IMouseHeldDown
     /// </summary>
     private Mouse? _mouseEvent = null;
 
-    public void Start (Mouse mouseEvent)
+    public void Start (Mouse mouse)
     {
         if (_isDown)
         {
@@ -60,11 +60,11 @@ internal sealed class MouseHeldDown : IMouseHeldDown
 
         _mouseEvent = new ()
         {
-            Timestamp = mouseEvent.Timestamp,
-            Flags = mouseEvent.Flags,
-            Position = mouseEvent.Position,
-            ScreenPosition = mouseEvent.ScreenPosition,
-            View = mouseEvent.View
+            Timestamp = mouse.Timestamp,
+            Flags = mouse.Flags,
+            Position = mouse.Position,
+            ScreenPosition = mouse.ScreenPosition,
+            View = mouse.View
         };
         Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 

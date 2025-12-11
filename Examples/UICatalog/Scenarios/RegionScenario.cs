@@ -324,23 +324,23 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouseEvent)
+    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            if (IsForegroundPoint (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y))
+            if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y))
+            else if (IsBackgroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }
         }
 
-        mouseEvent.Handled = true;
+        mouse.Handled = true;
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     private bool IsForegroundPoint (int x, int y) { return _foregroundPoints.Contains ((x, y)); }

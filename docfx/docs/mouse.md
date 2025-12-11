@@ -159,14 +159,14 @@ public class CustomView : View
     }
     
     // Alternative: Override the virtual method
-    protected override bool OnMouseEvent(MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent(MouseEventArgs mouse)
     {
-        if (mouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag(MouseFlags.Button1Pressed))
         {
             // Handle drag start
             return true; // Event was handled
         }
-        return base.OnMouseEvent(mouseEvent);
+        return base.OnMouseEvent(mouse);
     }
 }
 ```
@@ -358,15 +358,15 @@ For view-specific mouse handling that needs access to application context, use `
 ```csharp
 public class MyView : View
 {
-    protected override bool OnMouseEvent(MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent(MouseEventArgs mouse)
     {
-        if (mouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked))
+        if (mouse.Flags.HasFlag(MouseFlags.Button3Clicked))
         {
             // Access application mouse functionality through View.App
-            App?.Mouse?.RaiseMouseEvent(mouseEvent);
+            App?.Mouse?.RaiseMouseEvent(mouse);
             return true;
         }
-        return base.OnMouseEvent(mouseEvent);
+        return base.OnMouseEvent(mouse);
     }
 }
 ```

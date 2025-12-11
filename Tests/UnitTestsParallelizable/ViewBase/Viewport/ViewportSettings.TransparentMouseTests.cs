@@ -8,7 +8,7 @@ public class TransparentMouseTests
     {
         public bool MouseEventReceived { get; private set; }
 
-        protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouseEvent)
+        protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
         {
             MouseEventReceived = true;
             return true;
@@ -34,14 +34,14 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new Terminal.Gui.Input.Mouse
+        var mouse = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        app.Mouse.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouse);
 
         // Assert
         Assert.True (underlying.MouseEventReceived);
@@ -63,14 +63,14 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new Terminal.Gui.Input.Mouse
+        var mouse = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
         // Act
-        app.Mouse.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouse);
 
         // Assert
         Assert.True (overlay.MouseEventReceived);
@@ -96,7 +96,7 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new Terminal.Gui.Input.Mouse
+        var mouse = new Terminal.Gui.Input.Mouse
         {
             ScreenPosition = new Point (5, 5),
             Flags = MouseFlags.Button1Clicked
@@ -110,7 +110,7 @@ public class TransparentMouseTests
                           };
 
         // Act
-        app.Mouse.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouse);
 
         // Assert
         Assert.False (overlay.MouseEventReceived);

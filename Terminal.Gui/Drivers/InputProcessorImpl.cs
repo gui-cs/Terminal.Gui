@@ -57,7 +57,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
         // Enable mouse handling
         Parser.HandleMouse = true;
-        Parser.Mouse += (_, mouseEvent) => RaiseMouseEventParsed (mouseEvent);
+        Parser.Mouse += (_, mouse) => RaiseMouseEventParsed (mouse);
 
         // Enable keyboard handling
         Parser.HandleKeyboard = true;
@@ -248,22 +248,22 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public event EventHandler<Mouse>? MouseEventParsed;
 
     /// <inheritdoc />
-    public void RaiseMouseEventParsed (Mouse mouseEvent)
+    public void RaiseMouseEventParsed (Mouse mouse)
     {
-        Logging.Trace ($"{mouseEvent}");
-        MouseEventParsed?.Invoke (this, mouseEvent);
-        RaiseSyntheticMouseEvent (mouseEvent);
+        Logging.Trace ($"{mouse}");
+        MouseEventParsed?.Invoke (this, mouse);
+        RaiseSyntheticMouseEvent (mouse);
     }
 
     /// <inheritdoc />
     public event EventHandler<Mouse>? SyntheticMouseEvent;
 
     /// <inheritdoc />
-    public void RaiseSyntheticMouseEvent (Mouse mouseEvent)
+    public void RaiseSyntheticMouseEvent (Mouse mouse)
     {
         // Process through MouseInterpreter to generate clicks
         // The interpreter yields the original event first, then any synthetic click events
-        foreach (Mouse e in _mouseInterpreter.Process (mouseEvent))
+        foreach (Mouse e in _mouseInterpreter.Process (mouse))
         {
             Logging.Trace ($"{e}");
 
@@ -273,7 +273,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     }
 
     /// <inheritdoc />
-    public virtual void EnqueueMouseEvent (IApplication? app, Mouse mouseEvent)
+    public virtual void EnqueueMouseEvent (IApplication? app, Mouse mouse)
     {
         // Base implementation: For drivers where TInputRecord cannot represent mouse events
         // (e.g., ConsoleKeyInfo), derived classes should override this method.

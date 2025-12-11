@@ -56,8 +56,8 @@ public interface IMouse : IMouseGrabHandler
     ///     calls the appropriate View mouse event handlers.
     /// </summary>
     /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
-    /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    void RaiseMouseEvent (Mouse mouseEvent);
+    /// <param name="mouse">The mouse event with coordinates relative to the screen.</param>
+    void RaiseMouseEvent (Mouse mouse);
 
     /// <summary>
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.

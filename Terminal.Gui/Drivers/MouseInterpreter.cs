@@ -93,7 +93,7 @@ internal class MouseInterpreter
     /// <summary>
     ///     Processes a raw mouse event and generates both the original event and any synthetic click events.
     /// </summary>
-    /// <param name="mouseEvent">The mouse event to process, typically from a driver layer.</param>
+    /// <param name="mouse">The mouse event to process, typically from a driver layer.</param>
     /// <returns>
     ///     An enumerable sequence of <see cref="Mouse"/>:
     ///     <list type="bullet">
@@ -117,18 +117,18 @@ internal class MouseInterpreter
     ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonDoubleClicked
     ///     </code>
     /// </remarks>
-    public IEnumerable<Mouse> Process (Mouse mouseEvent)
+    public IEnumerable<Mouse> Process (Mouse mouse)
     {
-        yield return mouseEvent;
+        yield return mouse;
 
         // For each mouse button
         for (var i = 0; i < 4; i++)
         {
-            _mouseButtonClickTracker [i].UpdateState (mouseEvent, out int? numClicks);
+            _mouseButtonClickTracker [i].UpdateState (mouse, out int? numClicks);
 
             if (numClicks.HasValue)
             {
-                yield return CreateClickEvent (i, numClicks.Value, mouseEvent);
+                yield return CreateClickEvent (i, numClicks.Value, mouse);
             }
         }
     }
