@@ -373,7 +373,7 @@ public class HexView : View, IDesignable
             SetFocus ();
         }
 
-        if (mouseCommandContext.Binding.MouseEventArgs.Position.X < GetLeftSideStartColumn ())
+        if (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X < GetLeftSideStartColumn ())
         {
             return true;
         }
@@ -382,14 +382,14 @@ public class HexView : View, IDesignable
         int blocksSize = blocks * HEX_COLUMN_WIDTH;
         int blocksRightOffset = GetLeftSideStartColumn () + blocksSize - 1;
 
-        if (mouseCommandContext.Binding.MouseEventArgs.Position.X > blocksRightOffset + BytesPerLine - 1)
+        if (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X > blocksRightOffset + BytesPerLine - 1)
         {
             return true;
         }
 
-        bool clickIsOnLeftSide = mouseCommandContext.Binding.MouseEventArgs.Position.X >= blocksRightOffset;
-        long lineStart = mouseCommandContext.Binding.MouseEventArgs.Position.Y * BytesPerLine + Viewport.Y * BytesPerLine;
-        int x = mouseCommandContext.Binding.MouseEventArgs.Position.X - GetLeftSideStartColumn () + 1;
+        bool clickIsOnLeftSide = mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X >= blocksRightOffset;
+        long lineStart = mouseCommandContext.Binding.MouseEventArgs.Position!.Value.Y * BytesPerLine + Viewport.Y * BytesPerLine;
+        int x = mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X - GetLeftSideStartColumn () + 1;
         int block = x / HEX_COLUMN_WIDTH;
         x -= block * 2;
         int empty = x % 3;
@@ -404,7 +404,7 @@ public class HexView : View, IDesignable
 
         if (clickIsOnLeftSide)
         {
-            Address = Math.Min (lineStart + mouseCommandContext.Binding.MouseEventArgs.Position.X - blocksRightOffset, GetEditedSize ());
+            Address = Math.Min (lineStart + mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X - blocksRightOffset, GetEditedSize ());
         }
         else
         {

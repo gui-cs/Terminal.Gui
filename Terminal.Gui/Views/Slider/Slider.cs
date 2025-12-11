@@ -1334,11 +1334,11 @@ public class Slider<T> : View, IOrientation
             // how far has user dragged from original location?
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position!.Value.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
 
             if (!_config._allowEmpty && success)
@@ -1368,11 +1368,11 @@ public class Slider<T> : View, IOrientation
 
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouseEvent.Position!.Value.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouseEvent.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
 
             if (success)

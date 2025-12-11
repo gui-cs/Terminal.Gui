@@ -153,6 +153,7 @@ internal class MouseInterpreter
     {
         var newClick = new MouseEventArgs
         {
+            Timestamp = Now (),
             Handled = false,
             Flags = ToClicks (button, numberOfClicks),
             ScreenPosition = mouseEventArgs.ScreenPosition,

@@ -57,7 +57,6 @@ public class Mouse : Scenario
         };
         win.Add (clearButton);
 
-        var driverCount = 0;
         View lastDriverEvent = new ()
         {
             Height = 1,
@@ -69,7 +68,6 @@ public class Mouse : Scenario
 
         win.Add (lastDriverEvent);
 
-        var appCount = 0;
         View lastAppEvent = new ()
         {
             Height = 1,
@@ -81,7 +79,6 @@ public class Mouse : Scenario
 
         win.Add (lastAppEvent);
 
-        var winCount = 0;
         View lastWinEvent = new ()
         {
             Height = 1,
@@ -291,7 +288,7 @@ public class Mouse : Scenario
                                       {
                                           lastDriverEvent.Text = $"Last Driver Event: {mouseEvent}";
                                           Logging.Trace (lastDriverEvent.Text);
-                                          driverLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}:{winCount++}");
+                                          driverLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}");
                                           driverLog.MoveEnd ();
                                       }
                                   };
@@ -322,7 +319,7 @@ public class Mouse : Scenario
                                       if (filterSlider.GetSetOptions ().Contains (i))
                                       {
                                           lastAppEvent.Text = $"   Last App Event: {mouseEvent}";
-                                          appLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}:{winCount++}");
+                                          appLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}");
                                           appLog.MoveEnd ();
                                       }
                                   };
@@ -363,7 +360,7 @@ public class Mouse : Scenario
                               if (filterSlider.GetSetOptions ().Contains (i))
                               {
                                   lastWinEvent.Text = $"   Last Win Event: {mouseEvent}";
-                                  winLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}:{winCount++}");
+                                  winLogList.Add ($"{mouseEvent.Position}:{mouseEvent.Flags}");
                                   winLog.MoveEnd ();
                               }
                           };

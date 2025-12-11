@@ -852,7 +852,7 @@ public class CharMap : View, IDesignable
         if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
             // If the mouse is clicked on the headers, map it to the first glyph of the row/col
-            position = mouseCommandContext.Binding.MouseEventArgs.Position;
+            position = mouseCommandContext.Binding.MouseEventArgs.Position!.Value;
 
             if (position.Y == 0)
             {
@@ -904,7 +904,7 @@ public class CharMap : View, IDesignable
                 SetFocus ();
             }
 
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out int cp))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out int cp))
             {
                 return false;
             }
@@ -923,7 +923,7 @@ public class CharMap : View, IDesignable
 
         if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out newCodePoint))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out newCodePoint))
             {
                 return false;
             }

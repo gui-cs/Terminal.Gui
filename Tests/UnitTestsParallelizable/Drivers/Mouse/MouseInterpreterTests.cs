@@ -8,15 +8,15 @@ public class MouseInterpreterTests
     public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<MouseEventArgs> events, params MouseFlags? [] expected)
     {
         // Arrange: Mock dependencies and set up the interpreter
-        var interpreter = new MouseInterpreter ();
+        MouseInterpreter interpreter = new  ();
 
         // Collect all results from processing the event sequence
-        var allResults = new List<MouseEventArgs> ();
+        List<MouseEventArgs> allResults = [];
 
         // Act
-        for (var i = 0; i < events.Count; i++)
+        foreach (MouseEventArgs mouseEvent in events)
         {
-            allResults.AddRange (interpreter.Process (events [i]));
+            allResults.AddRange (interpreter.Process (mouseEvent));
         }
 
         // Assert - verify all expected click events were generated

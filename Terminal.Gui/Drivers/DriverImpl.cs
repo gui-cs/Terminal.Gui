@@ -273,7 +273,7 @@ internal class DriverImpl : IDriver
     public void ClearContents ()
     {
         _outputBuffer.ClearContents ();
-        ClearedContents?.Invoke (this, new MouseEventArgs ());
+        ClearedContents?.Invoke (this, EventArgs.Empty);
     }
 
     /// <inheritdoc/>

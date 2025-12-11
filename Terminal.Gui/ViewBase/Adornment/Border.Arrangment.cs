@@ -492,7 +492,7 @@ public partial class Border
 
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
-            if (Contains (new (mouseEvent.Position.X + Parent.Frame.X + Frame.X, mouseEvent.Position.Y + Parent.Frame.Y + Frame.Y)))
+            if (Contains (new (mouseEvent.Position!.Value.X + Parent.Frame.X + Frame.X, mouseEvent.Position!.Value.Y + Parent.Frame.Y + Frame.Y)))
             {
                 if (Arranging != ViewArrangement.Fixed)
                 {
@@ -500,7 +500,7 @@ public partial class Border
                 }
 
                 // Set the start grab point to the Frame coords
-                _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
+                _startGrabPoint = new (mouseEvent.Position!.Value.X + Frame.X, mouseEvent.Position!.Value.Y + Frame.Y);
                 _dragPosition = mouseEvent.Position;
                 App?.Mouse.GrabMouse (this);
 

@@ -882,14 +882,14 @@ public class ListView : View, IDesignable
             return true;
         }
 
-        if (me.Position.Y + Viewport.Y >= Source.Count
-            || me.Position.Y + Viewport.Y < 0
-            || me.Position.Y + Viewport.Y > Viewport.Y + Viewport.Height)
+        if (me.Position!.Value.Y + Viewport.Y >= Source.Count
+            || me.Position!.Value.Y + Viewport.Y < 0
+            || me.Position!.Value.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        SelectedItem = Viewport.Y + me.Position.Y;
+        SelectedItem = Viewport.Y + me.Position!.Value.Y;
 
         if (MarkUnmarkSelectedItem ())
         {

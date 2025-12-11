@@ -1,4 +1,3 @@
-
 using System.ComponentModel;
 
 namespace Terminal.Gui.Input;
@@ -9,18 +8,16 @@ namespace Terminal.Gui.Input;
 public class MouseEventArgs : HandledEventArgs
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseEventArgs"/> class with the current timestamp.
+    ///     Initializes a new instance of the <see cref="MouseEventArgs"/> class.
     /// </summary>
     public MouseEventArgs ()
     {
-        Timestamp = DateTime.Now;
     }
 
     /// <summary>
     ///     The timestamp when this mouse event was created. Used for multi-click detection timing.
-    ///     Defaults to <see cref="DateTime.Now"/> but can be overridden for testing.
     /// </summary>
-    public DateTime Timestamp { get; init; }
+    public DateTime? Timestamp { get; set; }
 
     /// <summary>
     ///     Flags indicating the state of the mouse buttons and the type of event that occurred.
@@ -39,7 +36,7 @@ public class MouseEventArgs : HandledEventArgs
     ///     The position of the mouse in <see cref="View"/>'s Viewport-relative coordinates. Only valid if <see cref="View"/>
     ///     is set.
     /// </summary>
-    public Point Position { get; set; }
+    public Point? Position { get; set; }
 
     /// <summary>
     ///     Gets whether <see cref="Flags"/> contains any of the button pressed related flags.

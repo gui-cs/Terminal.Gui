@@ -60,6 +60,7 @@ internal sealed class MouseHeldDown : IMouseHeldDown
 
         _mouseEvent = new ()
         {
+            Timestamp = mouseEvent.Timestamp,
             Flags = mouseEvent.Flags,
             Position = mouseEvent.Position,
             ScreenPosition = mouseEvent.ScreenPosition,

@@ -299,7 +299,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
             return true;
         }
 
-        int location = (Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X);
+        int location = (Orientation == Orientation.Vertical ? mouseEvent.Position!.Value.Y : mouseEvent.Position!.Value.X);
         int offsetFromLastLocation = _lastLocation > -1 ? location - _lastLocation : 0;
         int superViewDimension = VisibleContentSize;
 

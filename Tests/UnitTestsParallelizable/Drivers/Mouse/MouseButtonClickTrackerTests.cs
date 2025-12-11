@@ -25,7 +25,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         // Arrange
         DateTime now = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
-        MouseEventArgs mouseEvent = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs mouseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
 
         // Act
         tracker.UpdateState (mouseEvent, out int? numClicks);
@@ -43,8 +43,8 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime now = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs pressEvent = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs releaseEvent = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs pressEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (pressEvent, out int? pressClicks);
@@ -63,10 +63,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs pressEvent1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs releaseEvent1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs pressEvent2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs releaseEvent2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs pressEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs releaseEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs pressEvent2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs releaseEvent2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (pressEvent1, out int? clicks1);
@@ -92,8 +92,8 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs press = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act - Three complete click sequences
         tracker.UpdateState (press, out _);
@@ -118,20 +118,20 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
 
     #endregion
 
-    #region Position Change Tests
+    #region ScreenPosition Change Tests
 
     // CoPilot: claude-3-7-sonnet-20250219
     [Fact]
-    public void UpdateState_PositionChangeDuringSequence_ResetsCount ()
+    public void UpdateState_ScreenPositionChangeDuringSequence_ResetsCount ()
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs press2 = new () { Position = new (20, 20), Flags = MouseFlags.Button1Pressed }; // Different position!
-        MouseEventArgs release2 = new () { Position = new (20, 20), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.Button1Pressed }; // Different position!
+        MouseEventArgs release2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -160,10 +160,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -189,10 +189,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
         MouseButtonClickTracker tracker = new (() => currentTime, threshold, 0);
 
-        MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -219,10 +219,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
         MouseButtonClickTracker tracker = new (() => currentTime, threshold, 0);
 
-        MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (press1, out _);
@@ -250,7 +250,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         // Arrange
         DateTime now = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
-        MouseEventArgs releaseEvent = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (releaseEvent, out int? numClicks);
@@ -268,10 +268,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs press3 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs press3 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (press1, out int? clicks1);
@@ -297,10 +297,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs press = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs release2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs release3 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs release3 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (press, out int? clicks1);
@@ -326,9 +326,9 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
 
-        MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
 
         // Act
         tracker.UpdateState (press1, out int? clicks1);
@@ -359,8 +359,8 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), buttonIdx);
 
-        MouseEventArgs press = new () { Position = new (10, 10), Flags = pressedFlag };
-        MouseEventArgs release = new () { Position = new (10, 10), Flags = releasedFlag };
+        MouseEventArgs press = new () { ScreenPosition = new (10, 10), Flags = pressedFlag };
+        MouseEventArgs release = new () { ScreenPosition = new (10, 10), Flags = releasedFlag };
 
         // Act
         tracker.UpdateState (press, out int? clicks1);
@@ -381,10 +381,10 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         MouseButtonClickTracker tracker1 = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0); // Tracking Button1
         MouseButtonClickTracker tracker2 = new (() => currentTime, TimeSpan.FromMilliseconds (500), 1); // Tracking Button2
 
-        MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
-        MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button2Pressed };
-        MouseEventArgs release1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
-        MouseEventArgs release2 = new () { Position = new (10, 10), Flags = MouseFlags.Button2Released };
+        MouseEventArgs press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Pressed };
+        MouseEventArgs press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Pressed };
+        MouseEventArgs release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button1Released };
+        MouseEventArgs release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.Button2Released };
 
         // Act - Press Button1, press Button2, release Button1, release Button2
         tracker1.UpdateState (press1, out int? t1_press1);

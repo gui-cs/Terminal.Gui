@@ -172,12 +172,12 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     private void Table_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
         {
             return;
         }
 
-        Point? hit = _tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? headerIfAny, out int? offsetX);
+        Point? hit = _tableView.ScreenToCell (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y, out int? headerIfAny, out int? offsetX);
 
         if (hit is null || headerIfAny is { } || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)
         {

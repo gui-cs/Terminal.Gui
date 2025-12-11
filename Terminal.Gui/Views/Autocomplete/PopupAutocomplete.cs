@@ -97,10 +97,10 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     ///     Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like report/click apply to the
     ///     autocomplete control instead of changing the cursor position in the underlying text view.
     /// </summary>
-    /// <param name="me">The mouse event.</param>
+    /// <param name="mouseEvent">The mouse event.</param>
     /// <param name="fromHost">If was called from the popup or from the host.</param>
     /// <returns><c>true</c>if the mouse can be handled <c>false</c>otherwise.</returns>
-    public override bool OnMouseEvent (MouseEventArgs me, bool fromHost = false)
+    public override bool OnMouseEvent (MouseEventArgs mouseEvent, bool fromHost = false)
     {
         if (fromHost)
         {
@@ -149,28 +149,28 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             return false;
         }
 
-        if (me.Flags == MouseFlags.ReportMousePosition)
+        if (mouseEvent.Flags == MouseFlags.ReportMousePosition)
         {
-            RenderSelectedIdxByMouse (me);
+            RenderSelectedIdxByMouse (mouseEvent);
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.Button1Clicked)
+        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
-            SelectedIdx = me.Position.Y - ScrollOffset;
+            SelectedIdx = mouseEvent.Position!.Value.Y - ScrollOffset;
 
             return Select ();
         }
 
-        if (me.Flags == MouseFlags.WheeledDown)
+        if (mouseEvent.Flags == MouseFlags.WheeledDown)
         {
             MoveDown ();
 
             return true;
         }
 
-        if (me.Flags == MouseFlags.WheeledUp)
+        if (mouseEvent.Flags == MouseFlags.WheeledUp)
         {
             MoveUp ();
 
@@ -491,9 +491,9 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
     /// <param name="me"></param>
     protected void RenderSelectedIdxByMouse (MouseEventArgs me)
     {
-        if (SelectedIdx != me.Position.Y - ScrollOffset)
+        if (SelectedIdx != me.Position!.Value.Y - ScrollOffset)
         {
-            SelectedIdx = me.Position.Y - ScrollOffset;
+            SelectedIdx = me.Position!.Value.Y - ScrollOffset;
 
             if (LastPopupPos is { })
             {

@@ -258,6 +258,13 @@ public partial class View // Mouse APIs
     public bool? NewMouseEvent (MouseEventArgs mouseEvent)
     {
         // Pre-conditions
+
+        if (mouseEvent.Position is null )
+        {
+            // Support unit tests that don't set Position
+            mouseEvent.Position = mouseEvent.ScreenPosition;
+        }
+
         if (!Enabled)
         {
             // A disabled view should not eat mouse events
@@ -436,7 +443,7 @@ public partial class View // Mouse APIs
             mouseEvent.Handled = true;
         }
 
-        if (Viewport.Contains (mouseEvent.Position))
+        if (mouseEvent.Position is {} position && Viewport.Contains (position))
         {
             // The mouse is inside.
             if (HighlightStates.HasFlag (MouseState.Pressed))
@@ -516,7 +523,7 @@ public partial class View // Mouse APIs
         MouseState &= ~MouseState.PressedOutside;
 
         // If mouse is still in bounds, return false to indicate a click should be raised.
-        return !Viewport.Contains (mouseEvent.Position);
+        return !Viewport.Contains (mouseEvent.Position!.Value);
     }
 
     #endregion WhenGrabbed Handlers

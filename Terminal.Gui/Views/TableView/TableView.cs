@@ -876,8 +876,8 @@ public class TableView : View, IDesignable
                 return true;
         }
 
-        int boundsX = me.Position.X;
-        int boundsY = me.Position.Y;
+        int boundsX = me.Position!.Value.X;
+        int boundsY = me.Position!.Value.Y;
 
         if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
         {

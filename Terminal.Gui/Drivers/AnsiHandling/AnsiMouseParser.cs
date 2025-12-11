@@ -98,6 +98,7 @@ public class AnsiMouseParser
 
         MouseEventArgs m = new ()
         {
+            Timestamp = DateTime.Now,
             ScreenPosition = new (x, y),
             Flags = GetFlags (buttonCode, terminator)
         };

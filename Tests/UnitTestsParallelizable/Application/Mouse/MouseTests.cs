@@ -208,8 +208,8 @@ public class MouseTests
 
         view.MouseEvent += (_s, e) =>
         {
-            Assert.Equal (expectedX, e.Position.X);
-            Assert.Equal (expectedY, e.Position.Y);
+            Assert.Equal (expectedX, e.Position!.Value.X);
+            Assert.Equal (expectedY, e.Position!.Value.Y);
             clickedCount += e.IsSingleDoubleOrTripleClicked ? 1 : 0;
         };
 

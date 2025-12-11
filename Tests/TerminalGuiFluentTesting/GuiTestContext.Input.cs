@@ -19,7 +19,8 @@ public partial class GuiTestContext
         return EnqueueMouseEvent (new ()
         {
             Flags = MouseFlags.Button3Clicked,
-            ScreenPosition = new (screenX, screenY)
+            ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
         });
     }
 
@@ -37,6 +38,7 @@ public partial class GuiTestContext
         {
             Flags = MouseFlags.Button1Clicked,
             ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
         });
     }
 
@@ -51,10 +53,16 @@ public partial class GuiTestContext
     {
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked,
+            Flags = MouseFlags.Button1Clicked
         }, evaluator);
     }
 
+    /// <summary>
+    /// Enqueues a mouse event to the current driver's input processor.
+    /// This method sets the <see cref="MouseEventArgs.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// </summary>
+    /// <param name="mouseEvent"></param>
+    /// <returns></returns>
     private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
     {
             // Enqueue the mouse event
@@ -62,6 +70,7 @@ public partial class GuiTestContext
         {
             if (app.Driver is { })
             {
+                mouseEvent.Timestamp = DateTime.Now;
                 mouseEvent.Position = mouseEvent.ScreenPosition;
 
                 app.Driver.GetInputProcessor ().EnqueueMouseEvent (app, mouseEvent);
@@ -87,7 +96,7 @@ public partial class GuiTestContext
                                                 screen = v.ViewportToScreen (new Point (0, 0));
                                             });
         mouseEvent.ScreenPosition = screen;
-        mouseEvent.Position = new Point (0, 0);
+        mouseEvent.Position = screen;
 
         EnqueueMouseEvent (mouseEvent);
 

@@ -520,13 +520,13 @@ public class ScrollBar : View, IOrientation, IDesignable
     protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
-        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
         {
             return base.OnActivating (args);
         }
 
         // Check if the mouse click is a single click
-        if (!mouseArgs.IsSingleClicked)
+        if (!mouseEvent.IsSingleClicked)
         {
             return base.OnActivating (args);
         }
@@ -537,12 +537,12 @@ public class ScrollBar : View, IOrientation, IDesignable
         if (Orientation == Orientation.Vertical)
         {
             sliderCenter = 1 + _slider.Frame.Y + _slider.Frame.Height / 2;
-            distanceFromCenter = mouseArgs.Position.Y - sliderCenter;
+            distanceFromCenter = mouseEvent.Position!.Value.Y - sliderCenter;
         }
         else
         {
             sliderCenter = 1 + _slider.Frame.X + _slider.Frame.Width / 2;
-            distanceFromCenter = mouseArgs.Position.X - sliderCenter;
+            distanceFromCenter = mouseEvent.Position!.Value.X - sliderCenter;
         }
 
 #if PROPORTIONAL_SCROLL_JUMP

@@ -124,6 +124,7 @@ internal class MouseImpl : IMouse, IDisposable
 
             viewMouseEvent = new ()
             {
+                Timestamp = mouseEvent.Timestamp,
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
@@ -136,6 +137,7 @@ internal class MouseImpl : IMouse, IDisposable
 
             viewMouseEvent = new ()
             {
+                Timestamp = mouseEvent.Timestamp,
                 Position = viewportLocation,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
@@ -175,6 +177,7 @@ internal class MouseImpl : IMouse, IDisposable
 
             viewMouseEvent = new ()
             {
+                Timestamp = mouseEvent.Timestamp,
                 Position = boundsPoint,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
@@ -368,10 +371,11 @@ internal class MouseImpl : IMouse, IDisposable
 
             MouseEventArgs viewRelativeMouseEvent = new ()
             {
+                Timestamp = mouseEvent.Timestamp,
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
-                View = MouseGrabView // Always set to the grab view. See Issue #4370
+                View = MouseGrabView, // Always set to the grab view. See Issue #4370
             };
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");

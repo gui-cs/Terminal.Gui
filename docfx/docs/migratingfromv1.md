@@ -646,11 +646,14 @@ view.Activating += (s, e) =>
     // Extract mouse event args from command context
     if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
     {
-        Point position = mouseArgs.Position;
+        Point? position = mouseArgs.Position;
         MouseFlags flags = mouseArgs.Flags;
         
         // Use position and flags for custom logic
-        HandleClick(position, flags);
+        if (position.HasValue)
+        {
+            HandleClick(position.Value, flags);
+        }
         e.Handled = true;
     }
 };

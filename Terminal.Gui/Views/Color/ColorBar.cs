@@ -125,9 +125,9 @@ internal abstract class ColorBar : View, IColorBar
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            if (mouseEvent.Position.X >= _barStartsAt)
+            if (mouseEvent.Position!.Value.X >= _barStartsAt)
             {
-                double v = MaxValue * ((double)mouseEvent.Position.X - _barStartsAt) / (_barWidth - 1);
+                double v = MaxValue * ((double)mouseEvent.Position!.Value.X - _barStartsAt) / (_barWidth - 1);
                 Value = Math.Clamp ((int)v, 0, MaxValue);
             }
 

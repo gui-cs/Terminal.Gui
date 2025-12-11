@@ -178,6 +178,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
 
         var result = new MouseEventArgs
         {
+            Timestamp = DateTime.Now,
             Position = new (e.MousePosition.X, e.MousePosition.Y),
             ScreenPosition = new (e.MousePosition.X, e.MousePosition.Y),
             Flags = mouseFlags
@@ -279,9 +280,9 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             controlKeyState |= WindowsConsole.ControlKeyState.ShiftPressed;
         }
 
-        return new WindowsConsole.MouseEventRecord
+        return new ()
         {
-            MousePosition = new WindowsConsole.Coord ((short)mouseEvent.Position.X, (short)mouseEvent.Position.Y),
+            MousePosition = new ((short)mouseEvent.ScreenPosition.X, (short)mouseEvent.ScreenPosition.Y),
             ButtonState = buttonState,
             ControlKeyState = controlKeyState,
             EventFlags = eventFlags

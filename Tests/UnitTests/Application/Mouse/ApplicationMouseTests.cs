@@ -117,12 +117,12 @@ public class ApplicationMouseTests
             Height = size.Height
         };
 
-        var mouseEvent = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
+        var mouseEventToRaise = new MouseEventArgs { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.Button1Clicked };
 
-        view.MouseEvent += (s, e) =>
+        view.MouseEvent += (s, mouseEvent) =>
                            {
-                               Assert.Equal (expectedX, e.Position.X);
-                               Assert.Equal (expectedY, e.Position.Y);
+                               Assert.Equal (expectedX, mouseEvent.Position!.Value.X);
+                               Assert.Equal (expectedY, mouseEvent.Position!.Value.Y);
                                clicked = true;
                            };
 
@@ -130,7 +130,7 @@ public class ApplicationMouseTests
         top.Add (view);
         Application.Begin (top);
 
-        Application.RaiseMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouseEventToRaise);
         Assert.Equal (expectedClicked, clicked);
         top.Dispose ();
     }

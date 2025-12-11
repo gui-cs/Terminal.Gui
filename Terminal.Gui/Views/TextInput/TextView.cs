@@ -1508,13 +1508,13 @@ public class TextView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs ev)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
-        if (ev is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
-            && !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
-            && !ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)
-            && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
-            && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
+        if (mouseEvent is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
+            && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)
+            && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)
+            && !mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked | MouseFlags.ButtonShift)
+            && !mouseEvent.Flags.HasFlag (ContextMenu!.MouseFlags))
         {
             return false;
         }
@@ -1532,12 +1532,12 @@ public class TextView : View, IDesignable
         _continuousFind = false;
 
         // Give autocomplete first opportunity to respond to mouse clicks
-        if (SelectedLength == 0 && Autocomplete.OnMouseEvent (ev, true))
+        if (SelectedLength == 0 && Autocomplete.OnMouseEvent (mouseEvent, true))
         {
             return true;
         }
 
-        if (ev.Flags == MouseFlags.Button1Clicked)
+        if (mouseEvent.Flags == MouseFlags.Button1Clicked)
         {
             if (_isButtonReleased)
             {
@@ -1556,7 +1556,7 @@ public class TextView : View, IDesignable
                 StopSelecting ();
             }
 
-            ProcessMouseClick (ev, out _);
+            ProcessMouseClick (mouseEvent, out _);
 
             if (Used)
             {
@@ -1570,33 +1570,33 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (ev.Flags == MouseFlags.WheeledDown)
+        else if (mouseEvent.Flags == MouseFlags.WheeledDown)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
             ScrollTo (_topRow + 1);
         }
-        else if (ev.Flags == MouseFlags.WheeledUp)
+        else if (mouseEvent.Flags == MouseFlags.WheeledUp)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
             ScrollTo (_topRow - 1);
         }
-        else if (ev.Flags == MouseFlags.WheeledRight)
+        else if (mouseEvent.Flags == MouseFlags.WheeledRight)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
             ScrollTo (_leftColumn + 1, false);
         }
-        else if (ev.Flags == MouseFlags.WheeledLeft)
+        else if (mouseEvent.Flags == MouseFlags.WheeledLeft)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
             ScrollTo (_leftColumn - 1, false);
         }
-        else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
         {
-            ProcessMouseClick (ev, out List<Cell> line);
+            ProcessMouseClick (mouseEvent, out List<Cell> line);
             PositionCursor ();
 
             if (_model.Count > 0 && _shiftSelecting && IsSelecting)
@@ -1609,11 +1609,11 @@ public class TextView : View, IDesignable
                 {
                     ScrollTo (_topRow - Viewport.Height);
                 }
-                else if (ev.Position.Y >= Viewport.Height)
+                else if (mouseEvent.Position!.Value.Y >= Viewport.Height)
                 {
                     ScrollTo (_model.Count);
                 }
-                else if (ev.Position.Y < 0 && _topRow > 0)
+                else if (mouseEvent.Position!.Value.Y < 0 && _topRow > 0)
                 {
                     ScrollTo (0);
                 }
@@ -1626,11 +1626,11 @@ public class TextView : View, IDesignable
                 {
                     ScrollTo (_leftColumn - Viewport.Width, false);
                 }
-                else if (ev.Position.X >= Viewport.Width)
+                else if (mouseEvent.Position!.Value.X >= Viewport.Width)
                 {
                     ScrollTo (line.Count, false);
                 }
-                else if (ev.Position.X < 0 && _leftColumn > 0)
+                else if (mouseEvent.Position!.Value.X < 0 && _leftColumn > 0)
                 {
                     ScrollTo (0, false);
                 }
@@ -1639,7 +1639,7 @@ public class TextView : View, IDesignable
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift))
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift))
         {
             if (!_shiftSelecting)
             {
@@ -1647,12 +1647,12 @@ public class TextView : View, IDesignable
                 StartSelecting ();
             }
 
-            ProcessMouseClick (ev, out _);
+            ProcessMouseClick (mouseEvent, out _);
             PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed))
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
             if (_shiftSelecting)
             {
@@ -1660,7 +1660,7 @@ public class TextView : View, IDesignable
                 StopSelecting ();
             }
 
-            ProcessMouseClick (ev, out _);
+            ProcessMouseClick (mouseEvent, out _);
             PositionCursor ();
 
             if (!IsSelecting)
@@ -1676,14 +1676,14 @@ public class TextView : View, IDesignable
                 App?.Mouse.GrabMouse (this);
             }
         }
-        else if (ev.Flags.HasFlag (MouseFlags.Button1Released))
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
         {
             _isButtonReleased = true;
             App?.Mouse.UngrabMouse ();
         }
-        else if (ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
         {
-            if (ev.Flags.HasFlag (MouseFlags.ButtonShift))
+            if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonShift))
             {
                 if (!IsSelecting)
                 {
@@ -1695,7 +1695,7 @@ public class TextView : View, IDesignable
                 StopSelecting ();
             }
 
-            ProcessMouseClick (ev, out List<Cell> line);
+            ProcessMouseClick (mouseEvent, out List<Cell> line);
 
             if (!IsSelecting)
             {
@@ -1716,14 +1716,14 @@ public class TextView : View, IDesignable
             _columnTrack = CurrentColumn;
             SetNeedsDraw ();
         }
-        else if (ev.Flags.HasFlag (MouseFlags.Button1TripleClicked))
+        else if (mouseEvent.Flags.HasFlag (MouseFlags.Button1TripleClicked))
         {
             if (IsSelecting)
             {
                 StopSelecting ();
             }
 
-            ProcessMouseClick (ev, out List<Cell> line);
+            ProcessMouseClick (mouseEvent, out List<Cell> line);
             CurrentColumn = 0;
 
             if (!IsSelecting)
@@ -1737,9 +1737,9 @@ public class TextView : View, IDesignable
             _columnTrack = CurrentColumn;
             SetNeedsDraw ();
         }
-        else if (ev.Flags == ContextMenu!.MouseFlags)
+        else if (mouseEvent.Flags == ContextMenu!.MouseFlags)
         {
-            ShowContextMenu (ev.ScreenPosition);
+            ShowContextMenu (mouseEvent.ScreenPosition);
         }
 
         OnUnwrappedCursorPosition ();
@@ -4043,7 +4043,7 @@ public class TextView : View, IDesignable
         KillWordForward ();
     }
 
-    private void ProcessMouseClick (MouseEventArgs ev, out List<Cell> line)
+    private void ProcessMouseClick (MouseEventArgs mouseEvent, out List<Cell> line)
     {
         List<Cell>? r = null;
 
@@ -4051,17 +4051,17 @@ public class TextView : View, IDesignable
         {
             int maxCursorPositionableLine = Math.Max (_model.Count - 1 - _topRow, 0);
 
-            if (Math.Max (ev.Position.Y, 0) > maxCursorPositionableLine)
+            if (Math.Max (mouseEvent.Position!.Value.Y, 0) > maxCursorPositionableLine)
             {
                 CurrentRow = maxCursorPositionableLine + _topRow;
             }
             else
             {
-                CurrentRow = Math.Max (ev.Position.Y + _topRow, 0);
+                CurrentRow = Math.Max (mouseEvent.Position!.Value.Y + _topRow, 0);
             }
 
             r = GetCurrentLine ();
-            int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (ev.Position.X, 0), TabWidth);
+            int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (mouseEvent.Position!.Value.X, 0), TabWidth);
 
             if (idx - _leftColumn >= r.Count)
             {

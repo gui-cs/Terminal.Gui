@@ -148,20 +148,20 @@ public abstract class EditorBase : View
         ViewToEdit = Application.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
+    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs mouseEvent)
     {
-        if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
+        if (mouseEvent.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
         {
             return;
         }
 
-        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (e.Position))
-            || FrameToScreen ().Contains (e.Position))
+        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (mouseEvent.Position!.Value))
+            || FrameToScreen ().Contains (mouseEvent.Position!.Value))
         {
             return;
         }
 
-        View? view = e.View;
+        View? view = mouseEvent.View;
 
         if (view is null)
         {

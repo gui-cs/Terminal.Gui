@@ -154,7 +154,7 @@ public class TextValidateField : View, IDesignable
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
         {
-            int c = _provider!.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
+            int c = _provider!.Cursor (mouseEvent.Position!.Value.X - GetMargins (Viewport.Width).left);
 
             if (_provider.Fixed == false && TextAlignment == Alignment.End && Text.Length > 0)
             {

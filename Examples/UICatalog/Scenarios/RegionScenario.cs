@@ -328,11 +328,11 @@ public class AttributeView : View
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            if (IsForegroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            if (IsForegroundPoint (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            else if (IsBackgroundPoint (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }

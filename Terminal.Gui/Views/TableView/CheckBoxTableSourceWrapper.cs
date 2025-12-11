@@ -156,18 +156,18 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     private void TableView_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
         {
             return;
         }
 
         // we only care about clicks (not movements)
-        if (!mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (!mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
             return;
         }
 
-        Point? hit = tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? headerIfAny);
+        Point? hit = tableView.ScreenToCell (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y, out int? headerIfAny);
 
         if (headerIfAny.HasValue && headerIfAny.Value == 0)
         {

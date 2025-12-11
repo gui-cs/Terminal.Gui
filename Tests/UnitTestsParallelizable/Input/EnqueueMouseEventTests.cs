@@ -35,6 +35,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                      null,
                                      new ()
                                      {
+                                         Timestamp = DateTime.Now,
                                          Position = new (10, 5),
                                          Flags = MouseFlags.LeftButtonPressed
                                      });
@@ -43,6 +44,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                      null,
                                      new ()
                                      {
+                                         Timestamp = DateTime.Now,
                                          Position = new (10, 5),
                                          Flags = MouseFlags.LeftButtonReleased
                                      });
@@ -94,6 +96,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                     null,
                                                                     new ()
                                                                     {
+                                                                        Timestamp = DateTime.Now,
                                                                         Position = new (threadId, i),
                                                                         Flags = MouseFlags.Button1Clicked
                                                                     });
@@ -158,6 +161,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
+            Timestamp = DateTime.Now,
             Position = new (10, 5),
             Flags = MouseFlags.Button1Clicked
         };
@@ -189,8 +193,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // 3 synthetic events: Pressed, Released, Clicked
         MouseEventArgs [] events =
         [
-            new () { Position = new (10, 5), Flags = MouseFlags.Button1Pressed },
-            new () { Position = new (10, 5), Flags = MouseFlags.Button1Released },
+            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.Button1Pressed },
+            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.Button1Released },
         ];
 
         List<MouseEventArgs> receivedParsedEvents = [];
@@ -242,6 +246,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
+            Timestamp = DateTime.Now,
             Position = new (10, 5),
             Flags = flags
         };
@@ -276,6 +281,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
+            Timestamp = DateTime.Now,
             Position = new (x, y),
             Flags = MouseFlags.Button1Clicked
         };
@@ -290,8 +296,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Assert
         Assert.NotNull (receivedEvent);
-        Assert.Equal (x, receivedEvent.Position.X);
-        Assert.Equal (y, receivedEvent.Position.Y);
+        Assert.Equal (x, receivedEvent.Position!.Value.X);
+        Assert.Equal (y, receivedEvent.Position!.Value.Y);
     }
 
     [Theory]
@@ -314,6 +320,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
+            Timestamp = DateTime.Now,
             Position = new (10, 5),
             Flags = MouseFlags.Button1Clicked | modifiers
         };
@@ -363,6 +370,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
+            Timestamp = DateTime.Now,
             Position = new (10, 5),
             Flags = wheelFlag
         };
@@ -396,9 +404,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         MouseEventArgs [] events =
         [
-            new () { Position = new (0, 0), Flags = MouseFlags.ReportMousePosition },
-            new () { Position = new (5, 5), Flags = MouseFlags.ReportMousePosition },
-            new () { Position = new (10, 10), Flags = MouseFlags.ReportMousePosition }
+            new () { Timestamp = DateTime.Now, Position = new (0, 0), Flags = MouseFlags.ReportMousePosition },
+            new () { Timestamp = DateTime.Now, Position = new (5, 5), Flags = MouseFlags.ReportMousePosition },
+            new () { Timestamp = DateTime.Now, Position = new (10, 10), Flags = MouseFlags.ReportMousePosition }
         ];
 
         // Act
@@ -437,6 +445,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                                   null,
                                                                                   new ()
                                                                                   {
+                                                                                      Timestamp = DateTime.Now,
                                                                                       Position = new (10, 5),
                                                                                       Flags = MouseFlags.Button1Clicked
                                                                                   });
@@ -462,9 +471,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Enqueue multiple events before processing
-        processor.EnqueueMouseEvent (null, new () { Position = new (1, 1), Flags = MouseFlags.Button1Pressed });
-        processor.EnqueueMouseEvent (null, new () { Position = new (2, 2), Flags = MouseFlags.ReportMousePosition });
-        processor.EnqueueMouseEvent (null, new () { Position = new (3, 3), Flags = MouseFlags.Button1Released });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (1, 1), Flags = MouseFlags.Button1Pressed });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (2, 2), Flags = MouseFlags.ReportMousePosition });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (3, 3), Flags = MouseFlags.Button1Released });
 
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
@@ -518,6 +527,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                                   null,
                                                                                   new ()
                                                                                   {
+                                                                                      Timestamp = DateTime.Now,
                                                                                       Position = new (-10, -5),
                                                                                       Flags = MouseFlags.Button1Clicked
                                                                                   });

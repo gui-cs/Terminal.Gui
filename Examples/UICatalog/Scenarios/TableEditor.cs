@@ -618,24 +618,24 @@ public class TableEditor : Scenario
                                      }
 
                                      // Only handle mouse clicks
-                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseEvent })
                                      {
                                          return;
                                      }
 
-                                     _tableView!.ScreenToCell (mouseArgs.Position, out int? clickedCol);
+                                     _tableView!.ScreenToCell (mouseEvent.Position!.Value, out int? clickedCol);
 
                                      if (clickedCol != null)
                                      {
-                                         if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
                                          {
                                              // left click in a header
                                              SortColumn (clickedCol.Value);
                                          }
-                                         else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                         else if (mouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
                                          {
                                              // right click in a header
-                                             ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
+                                             ShowHeaderContextMenu (clickedCol.Value, mouseEvent);
                                          }
                                      }
                                  };

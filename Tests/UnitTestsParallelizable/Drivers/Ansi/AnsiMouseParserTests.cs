@@ -33,6 +33,7 @@ public class AnsiMouseParserTests
         else
         {
             Assert.NotNull (result); // Expect non-null result for valid inputs
+            Assert.NotNull (result.Timestamp);
             Assert.Equal (new (expectedX, expectedY), result!.ScreenPosition); // Verify position
             Assert.Equal (expectedFlags, result.Flags); // Verify flags
         }
@@ -56,9 +57,9 @@ public class AnsiMouseParserTests
 
         // ScreenPosition should be set to the parsed coordinates (0-based)
         Assert.Equal (new Point (expectedX, expectedY), result!.ScreenPosition);
+        Assert.NotNull (result.Timestamp);
 
-        // Position should be (0,0) - the default value for Point
         // Position should NEVER be set by parsers; it's View-relative and set by MouseImpl/View.Mouse
-        Assert.Equal (Point.Empty, result.Position);
+        Assert.Null (result.Position);
     }
 }

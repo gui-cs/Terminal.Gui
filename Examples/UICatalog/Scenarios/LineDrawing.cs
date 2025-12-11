@@ -21,7 +21,7 @@ internal class DrawLineTool : ITool
             {
                 // Mouse pressed down
                 _currentLine = new (
-                                    mouseEvent.Position,
+                                    mouseEvent.Position!.Value,
                                     0,
                                     Orientation.Vertical,
                                     LineStyle,
@@ -34,7 +34,7 @@ internal class DrawLineTool : ITool
             {
                 // Mouse dragged
                 Point start = _currentLine.Start;
-                Point end = mouseEvent.Position;
+                Point end = mouseEvent.Position!.Value;
                 var orientation = Orientation.Vertical;
                 int length = end.Y - start.Y;
 
@@ -436,11 +436,11 @@ public class AttributeView : View
     {
         if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            if (IsForegroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            if (IsForegroundPoint (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            else if (IsBackgroundPoint (mouseEvent.Position!.Value.X, mouseEvent.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }

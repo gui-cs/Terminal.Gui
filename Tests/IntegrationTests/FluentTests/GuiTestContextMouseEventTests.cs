@@ -65,10 +65,10 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
             Height = 5
         };
 
-        view.MouseEvent += (s, e) =>
+        view.MouseEvent += (_, mouseEvent) =>
         {
             mouseReceived = true;
-            receivedPosition = e.Position;
+            receivedPosition = mouseEvent.Position!.Value;
         };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)

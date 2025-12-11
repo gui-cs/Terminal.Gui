@@ -16,8 +16,9 @@ public record struct MouseBinding : IInputBinding
     {
         Commands = commands;
 
-        MouseEventArgs = new MouseEventArgs()
+        MouseEventArgs = new ()
         {
+            Timestamp = DateTime.Now,
             Flags = mouseFlags
         };
     }

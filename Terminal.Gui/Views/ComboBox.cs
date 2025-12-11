@@ -248,8 +248,8 @@ public class ComboBox : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnMouseEvent (MouseEventArgs me)
     {
-        if (me.Position.X == Viewport.Right - 1
-            && me.Position.Y == Viewport.Top
+        if (me.Position!.Value.X == Viewport.Right - 1
+            && me.Position!.Value.Y == Viewport.Top
             && me.Flags == MouseFlags.Button1Pressed
             && _autoHide)
         {
@@ -869,7 +869,7 @@ public class ComboBox : View, IDesignable
             {
                 if (isMousePositionValid)
                 {
-                    _highlighted = Math.Min (TopItem + me.Position.Y, Source.Count);
+                    _highlighted = Math.Min (TopItem + me.Position!.Value.Y, Source.Count);
                     SetNeedsDraw ();
                 }
 
@@ -991,7 +991,7 @@ public class ComboBox : View, IDesignable
 
         private bool IsMousePositionValid (MouseEventArgs me)
         {
-            if (me.Position.X >= 0 && me.Position.X < Frame.Width && me.Position.Y >= 0 && me.Position.Y < Frame.Height)
+            if (me.Position!.Value.X >= 0 && me.Position!.Value.X < Frame.Width && me.Position!.Value.Y >= 0 && me.Position!.Value.Y < Frame.Height)
             {
                 return true;
             }

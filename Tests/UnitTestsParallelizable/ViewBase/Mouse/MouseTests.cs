@@ -39,7 +39,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             testView.SetFocus ();
         }
 
-        testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedHasFocus, testView.HasFocus);
     }
@@ -69,7 +69,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         var activatingCount = 0;
         testView.Activating += (sender, args) => activatingCount++;
 
-        testView.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedActivatingCount, activatingCount);
     }
@@ -83,7 +83,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         var view = new View ();
         view.MouseEvent += (s, e) => mouseFlagsFromEvent = e.Flags;
 
-        view.NewMouseEvent (new () { Flags = mouseFlags });
+        view.NewMouseEvent (new () { Timestamp = DateTime.Now, Flags = mouseFlags });
         Assert.Equal (mouseFlagsFromEvent, expectedMouseFlagsFromEvent);
     }
 
@@ -103,7 +103,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
                                e.Handled = true;
                            };
 
-        MouseEventArgs me = new ();
+        MouseEventArgs me = new () { Timestamp = DateTime.Now };
         view.NewMouseEvent (me);
         Assert.True (mouseEventInvoked);
         Assert.True (me.Handled);
@@ -125,7 +125,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         view.Enabled = false;
-        var me = new MouseEventArgs ();
+        var me = new MouseEventArgs () { Timestamp = DateTime.Now };
         view.NewMouseEvent (me);
         Assert.False (me.Handled);
         view.Dispose ();
@@ -148,6 +148,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         var me = new MouseEventArgs
         {
+            Timestamp = DateTime.Now,
             Flags = MouseFlags.Button1Clicked
         };
         view.NewMouseEvent (me);

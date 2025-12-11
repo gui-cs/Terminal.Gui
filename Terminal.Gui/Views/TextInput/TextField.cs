@@ -1587,7 +1587,7 @@ public class TextField : View, IDesignable
         return 0; //offB;
     }
 
-    private int PositionCursor (MouseEventArgs ev) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, ev.Position.X), false); }
+    private int PositionCursor (MouseEventArgs mouseEvent) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, mouseEvent.Position!.Value.X), false); }
 
     private int PositionCursor (int x, bool getX = true)
     {
