@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using Xunit.Abstractions;
 // ReSharper disable AccessToModifiedClosure
 #pragma warning disable CS9113 // Parameter is unread
@@ -20,7 +20,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
         MouseEventArgs release1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
@@ -55,7 +55,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
         MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button2Pressed };
@@ -76,13 +76,13 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         Assert.Equal (MouseFlags.Button1Pressed, events1[0].Flags);
 
         // NOTE: This test demonstrates the quirk documented in MouseButtonClickTrackerTests:
-        // When Button2 is pressed (Button1 not in flags), Button1's tracker sees: Pressed?Released
+        // When Button2 is pressed (Button1 not in flags), Button1's tracker sees: Pressed→Released
         // This generates a spurious Button1Clicked event
         Assert.Equal (2, events2.Count); // Button2Pressed + spurious Button1Clicked
         Assert.Contains (events2, e => e.Flags == MouseFlags.Button1Clicked); // Spurious click
 
         // When Button1 is actually released, Button1's tracker already thinks it's released (no change)
-        // But Button2's tracker sees: Pressed?Released, generating Button2Clicked
+        // But Button2's tracker sees: Pressed→Released, generating Button2Clicked
         Assert.Equal (2, events3.Count); // Button1Released + spurious Button2Clicked
         Assert.Contains (events3, e => e.Flags == MouseFlags.Button2Clicked);
 
@@ -96,33 +96,33 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         // Act - Double-click Button1, then double-click Button2
         List<MouseEventArgs> allEvents = [];
 
         // Button1 first click
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button1Pressed }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button1Pressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button1Released }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button1Released }));
 
         // Button1 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button1Pressed }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button1Pressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button1Released }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button1Released }));
 
         // Button2 first click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button2Pressed }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button2Pressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button2Released }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button2Released }));
 
         // Button2 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button2Pressed }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button2Pressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = MouseFlags.Button2Released }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = MouseFlags.Button2Released }));
 
         // Assert
         Assert.Contains (allEvents, e => e.Flags == MouseFlags.Button1DoubleClicked);
@@ -139,7 +139,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
 
@@ -158,7 +158,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs press1 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
         MouseEventArgs press2 = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
@@ -193,7 +193,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs press = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed | modifier };
         MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released | modifier };
@@ -224,20 +224,20 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseFlags modifiedPressed = MouseFlags.Button1Pressed | MouseFlags.ButtonShift;
         MouseFlags modifiedReleased = MouseFlags.Button1Released | MouseFlags.ButtonShift;
 
         // Act - Double-click with Shift held
         List<MouseEventArgs> allEvents = [];
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = modifiedPressed }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = modifiedReleased }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = modifiedPressed }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Timestamp = currentTime, Position = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new MouseEventArgs { Position = new (10, 10), Flags = modifiedReleased }));
 
         // Assert
         MouseEventArgs? singleClick =
@@ -267,7 +267,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = new (2025, 1, 1, 12, 0, 0);
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs press = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
         MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
@@ -296,7 +296,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         // Arrange
         DateTime currentTime = new (2025, 1, 1, 12, 0, 0);
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
-        MouseInterpreter interpreter = new (threshold);
+        MouseInterpreter interpreter = new (() => currentTime, threshold);
 
         MouseEventArgs press = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
         MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
@@ -327,7 +327,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs press = new () { Position = new (10, 10), Flags = MouseFlags.Button1Pressed };
         MouseEventArgs release = new () { Position = new (10, 10), Flags = MouseFlags.Button1Released };
@@ -356,7 +356,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
 
         MouseEventArgs mouseEvent = new () { Position = new (10, 10), Flags = flags };
 

@@ -287,7 +287,7 @@ public class Mouse : Scenario
                                   {
                                       int i = filterSlider.Options.FindIndex (o => mouseEvent.Flags.HasFlag (o.Data));
 
-                                      //if (filterSlider.GetSetOptions ().Contains (i))
+                                      if (filterSlider.GetSetOptions ().Contains (i))
                                       {
                                           lastDriverEvent.Text = $"Last Driver Event: {mouseEvent}";
                                           Logging.Trace (lastDriverEvent.Text);

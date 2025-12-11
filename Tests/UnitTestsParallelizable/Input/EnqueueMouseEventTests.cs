@@ -36,7 +36,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                      new ()
                                      {
                                          Position = new (10, 5),
-                                         Flags = MouseFlags.Button1Pressed
+                                         Flags = MouseFlags.LeftButtonPressed
                                      });
 
         processor.EnqueueMouseEvent (
@@ -44,18 +44,19 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                      new ()
                                      {
                                          Position = new (10, 5),
-                                         Flags = MouseFlags.Button1Released
+                                         Flags = MouseFlags.LeftButtonReleased
                                      });
 
-        // The MouseInterpreter in the processor should generate a clicked event
-
+        // The MouseInterpreter in the processor should synthesize a clicked event
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
 
         // Assert
-        // We should see at least the pressed and released events
-        Assert.Single (receivedEvents);
-        Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.Button1Clicked));
+        // We should see whole synthetic sequence: Pressed, Released, Clicked
+        Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonPressed));
+        Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonReleased));
+        Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
+        Assert.Equal (3, receivedEvents.Count);
     }
 
     #endregion

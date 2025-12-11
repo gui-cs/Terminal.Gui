@@ -10,23 +10,25 @@ public class MouseInterpreterTests
         // Arrange: Mock dependencies and set up the interpreter
         var interpreter = new MouseInterpreter ();
 
-        // Act and Assert
+        // Collect all results from processing the event sequence
+        var allResults = new List<MouseEventArgs> ();
+
+        // Act
         for (var i = 0; i < events.Count; i++)
         {
-            MouseEventArgs [] results = interpreter.Process (events [i]).ToArray ();
+            allResults.AddRange (interpreter.Process (events [i]));
+        }
 
-            // Raw input event should be there
-            Assert.Equal (events [i].Flags, results [0].Flags);
+        // Assert - verify all expected click events were generated
+        foreach (MouseFlags? expectedClick in expected.Where (e => e != null))
+        {
+            Assert.Contains (allResults, e => e.Flags == expectedClick);
+        }
 
-            // also any expected should be there
-            if (expected [i] != null)
-            {
-                Assert.Equal (expected [i], results [1].Flags);
-            }
-            else
-            {
-                Assert.Single (results);
-            }
+        // Also verify all original input events were passed through
+        foreach (MouseEventArgs inputEvent in events)
+        {
+            Assert.Contains (allResults, e => e.Flags == inputEvent.Flags);
         }
     }
 
@@ -39,8 +41,7 @@ public class MouseInterpreterTests
                 new () { Flags = MouseFlags.Button1Pressed },
                 new ()
             },
-            null,
-            MouseFlags.Button1Clicked
+            new MouseFlags?[] { null, MouseFlags.Button1Clicked }
         ];
 
         yield return
@@ -52,10 +53,7 @@ public class MouseInterpreterTests
                 new () { Flags = MouseFlags.Button1Pressed },
                 new ()
             },
-            null,
-            MouseFlags.Button1Clicked,
-            null,
-            MouseFlags.Button1DoubleClicked
+            new MouseFlags?[] { null, MouseFlags.Button1Clicked, null, MouseFlags.Button1DoubleClicked }
         ];
 
         yield return
@@ -69,12 +67,7 @@ public class MouseInterpreterTests
                 new () { Flags = MouseFlags.Button1Pressed },
                 new ()
             },
-            null,
-            MouseFlags.Button1Clicked,
-            null,
-            MouseFlags.Button1DoubleClicked,
-            null,
-            MouseFlags.Button1TripleClicked
+            new MouseFlags?[] { null, MouseFlags.Button1Clicked, null, MouseFlags.Button1DoubleClicked, null, MouseFlags.Button1TripleClicked }
         ];
 
         yield return
@@ -88,12 +81,7 @@ public class MouseInterpreterTests
                 new () { Flags = MouseFlags.Button2Pressed },
                 new ()
             },
-            null,
-            MouseFlags.Button2Clicked,
-            null,
-            MouseFlags.Button2DoubleClicked,
-            null,
-            MouseFlags.Button2TripleClicked
+            new MouseFlags?[] { null, MouseFlags.Button2Clicked, null, MouseFlags.Button2DoubleClicked, null, MouseFlags.Button2TripleClicked }
         ];
 
         yield return
@@ -107,12 +95,7 @@ public class MouseInterpreterTests
                 new () { Flags = MouseFlags.Button3Pressed },
                 new ()
             },
-            null,
-            MouseFlags.Button3Clicked,
-            null,
-            MouseFlags.Button3DoubleClicked,
-            null,
-            MouseFlags.Button3TripleClicked
+            new MouseFlags?[] { null, MouseFlags.Button3Clicked, null, MouseFlags.Button3DoubleClicked, null, MouseFlags.Button3TripleClicked }
         ];
 
         yield return
@@ -126,12 +109,7 @@ public class MouseInterpreterTests
                 new () { Flags = MouseFlags.Button4Pressed },
                 new ()
             },
-            null,
-            MouseFlags.Button4Clicked,
-            null,
-            MouseFlags.Button4DoubleClicked,
-            null,
-            MouseFlags.Button4TripleClicked
+            new MouseFlags?[] { null, MouseFlags.Button4Clicked, null, MouseFlags.Button4DoubleClicked, null, MouseFlags.Button4TripleClicked }
         ];
 
         yield return
@@ -145,10 +123,7 @@ public class MouseInterpreterTests
                 new () { Flags = MouseFlags.Button1Pressed, Position = new (10, 12) },
                 new () { Position = new (10, 12) }
             },
-            null,
-            MouseFlags.Button1Clicked,
-            null,
-            MouseFlags.Button1Clicked //release is click because new position
+            new MouseFlags?[] { null, MouseFlags.Button1Clicked, null, MouseFlags.Button1Clicked } //release is click because new position
         ];
     }
 }

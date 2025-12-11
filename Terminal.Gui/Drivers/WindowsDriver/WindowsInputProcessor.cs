@@ -179,6 +179,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         var result = new MouseEventArgs
         {
             Position = new (e.MousePosition.X, e.MousePosition.Y),
+            ScreenPosition = new (e.MousePosition.X, e.MousePosition.Y),
             Flags = mouseFlags
         };
 

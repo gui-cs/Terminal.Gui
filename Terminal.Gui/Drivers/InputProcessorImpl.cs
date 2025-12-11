@@ -250,7 +250,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <inheritdoc />
     public void RaiseMouseEventParsed (MouseEventArgs mouseEvent)
     {
-        Logging.Trace ($"{mouseEvent.Flags} at {mouseEvent.Position}");
+        Logging.Trace ($"{mouseEvent}");
         MouseEventParsed?.Invoke (this, mouseEvent);
         RaiseSyntheticMouseEvent (mouseEvent);
     }
@@ -261,22 +261,13 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <inheritdoc />
     public void RaiseSyntheticMouseEvent (MouseEventArgs mouseEvent)
     {
-        // Ensure ScreenPosition is set
-        mouseEvent.ScreenPosition = mouseEvent.Position;
-
-        if (mouseEvent.IsSingleDoubleOrTripleClicked || mouseEvent.IsWheel || mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
+        // Process through MouseInterpreter to generate clicks
+        // The interpreter yields the original event first, then any synthetic click events
+        foreach (MouseEventArgs e in _mouseInterpreter.Process (mouseEvent))
         {
-            SyntheticMouseEvent?.Invoke (this, mouseEvent);
+            Logging.Trace ($"{e}");
 
-            return;
-        }
-
-        // Process through MouseInterpreter to generate clicks; skip the first (original event)
-        foreach (MouseEventArgs e in _mouseInterpreter.Process (mouseEvent).Skip (1))
-        {
-            // Logging.Trace ($"Mouse Interpreter raising {e.Flags}");
-
-            // Pass on synthetic click events
+            // Raise all events: original + synthetic clicks
             SyntheticMouseEvent?.Invoke (this, e);
         }
     }

@@ -31,27 +31,44 @@ internal class MouseInterpreter
     /// <summary>
     ///     Initializes a new instance of the <see cref="MouseInterpreter"/> class.
     /// </summary>
+    /// <param name="now">
+    ///     Optional function to get the current time. If <see langword="null"/>, defaults to <c>() => DateTime.Now</c>.
+    ///     Useful for unit tests to inject controlled time values.
+    /// </param>
     /// <param name="doubleClickThreshold">
     ///     Optional threshold for multi-click detection. If <see langword="null"/>, defaults to 500 milliseconds.
     ///     This value determines how quickly consecutive clicks must occur to be counted together.
     /// </param>
     /// <remarks>
     ///     Creates four <see cref="MouseButtonClickTracker"/> instances, one for each supported mouse button
-    ///     (Button1/Left, Button2/Middle, Button3/Right, Button4), all using the same threshold.
-    ///     Event timestamps from <see cref="MouseEventArgs.Timestamp"/> are used for timing calculations.
+    ///     (Button1/Left, Button2/Middle, Button3/Right, Button4), all using the same time function and threshold.
     /// </remarks>
-    public MouseInterpreter (TimeSpan? doubleClickThreshold = null)
+    public MouseInterpreter (
+        Func<DateTime>? now = null,
+        TimeSpan? doubleClickThreshold = null
+    )
     {
+        Now = now ?? (() => DateTime.Now);
         RepeatedClickThreshold = doubleClickThreshold ?? TimeSpan.FromMilliseconds (500);
 
         _mouseButtonClickTracker =
         [
-            new (RepeatedClickThreshold, 0),
-            new (RepeatedClickThreshold, 1),
-            new (RepeatedClickThreshold, 2),
-            new (RepeatedClickThreshold, 3)
+            new (Now, RepeatedClickThreshold, 0),
+            new (Now, RepeatedClickThreshold, 1),
+            new (Now, RepeatedClickThreshold, 2),
+            new (Now, RepeatedClickThreshold, 3)
         ];
     }
+
+    /// <summary>
+    ///     Gets or sets the function for returning the current time.
+    /// </summary>
+    /// <value>A function that returns the current <see cref="DateTime"/>.</value>
+    /// <remarks>
+    ///     This property enables time injection for unit tests, ensuring repeatable and deterministic test behavior.
+    ///     In production, this defaults to <c>() => DateTime.Now</c>.
+    /// </remarks>
+    public Func<DateTime> Now { get; set; }
 
     /// <summary>
     ///     Gets or sets the maximum time allowed between consecutive clicks for them to be counted as a multi-click
@@ -80,88 +97,38 @@ internal class MouseInterpreter
     /// <returns>
     ///     An enumerable sequence of <see cref="MouseEventArgs"/>:
     ///     <list type="bullet">
-    ///         <item><description>Zero or more expired pending click events (if threshold exceeded)</description></item>
-    ///         <item><description>The original input event (always yielded)</description></item>
-    ///         <item><description>Zero or more synthetic click events from the current action</description></item>
+    ///         <item><description>The original input event (always yielded first)</description></item>
+    ///         <item><description>Zero or more synthetic click events (LeftButtonClicked, LeftButtonDoubleClicked, LeftButtonTripleClicked, etc.)</description></item>
     ///     </list>
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         This method uses timestamp-based click detection with pending clicks:
+    ///         This method uses a generator pattern (yield return) to produce multiple events from a single input.
+    ///         The original event is always yielded first to allow low-level handling, followed by any
+    ///         click events detected by the button state trackers.
     ///     </para>
-    ///     <list type="number">
-    ///         <item><description>Check all trackers for expired pending clicks using event timestamp and yield them first</description></item>
-    ///         <item><description>Yield the original input event for low-level handling</description></item>
-    ///         <item><description>Update button state trackers and yield any clicks triggered by the current action</description></item>
-    ///     </list>
     ///     <para>
     ///         Example sequence for a double click:
     ///     </para>
     ///     <code>
     ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed
-    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased (click pending)
-    ///         Input: LeftButtonPressed  → Yields: LeftButtonClicked (pending), LeftButtonPressed
-    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased (double-click pending)
-    ///         [wait &gt; threshold]
-    ///         Next input              → Yields: LeftButtonDoubleClicked (expired pending), [original event]
+    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonClicked
+    ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed
+    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonDoubleClicked
     ///     </code>
-    ///     <para>
-    ///         For isolated single-clicks with no follow-up action, the pending click will be yielded
-    ///         on the next mouse event OR when the application calls <see cref="CheckForPendingClicks"/>.
-    ///     </para>
     /// </remarks>
     public IEnumerable<MouseEventArgs> Process (MouseEventArgs mouseEvent)
     {
-        // First, check all trackers for expired pending clicks using event timestamp
-        for (var i = 0; i < 4; i++)
-        {
-            if (_mouseButtonClickTracker [i].CheckForExpiredClicks (mouseEvent.Timestamp, out int? expiredClicks, out Point position))
-            {
-                yield return CreateClickEvent (i, expiredClicks!.Value, mouseEvent, position);
-            }
-        }
-
-        // Then yield the original event
         yield return mouseEvent;
 
-        // Finally, process the current event and yield any new clicks
+        // For each mouse button
         for (var i = 0; i < 4; i++)
         {
             _mouseButtonClickTracker [i].UpdateState (mouseEvent, out int? numClicks);
 
             if (numClicks.HasValue)
             {
-                yield return CreateClickEvent (i, numClicks.Value, mouseEvent, mouseEvent.Position);
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Checks all button trackers for pending clicks that have exceeded the threshold.
-    /// </summary>
-    /// <param name="now">The current time to use for checking expired clicks. Typically <see cref="DateTime.Now"/>.</param>
-    /// <returns>
-    ///     An enumerable sequence of <see cref="MouseEventArgs"/> for any expired pending clicks.
-    /// </returns>
-    /// <remarks>
-    ///     <para>
-    ///         This method should be called periodically by <see cref="InputProcessorImpl{TInputRecord}.ProcessQueue"/>
-    ///         to ensure isolated single-clicks (where no follow-up mouse action occurs) are eventually yielded
-    ///         to the application.
-    ///     </para>
-    ///     <para>
-    ///         In normal operation, pending clicks are typically yielded on the next mouse action via <see cref="Process"/>.
-    ///         This method handles the edge case where the user performs a single click and then doesn't move the mouse.
-    ///     </para>
-    /// </remarks>
-    public IEnumerable<MouseEventArgs> CheckForPendingClicks (DateTime now)
-    {
-        for (var i = 0; i < 4; i++)
-        {
-            if (_mouseButtonClickTracker [i].CheckForExpiredClicks (now, out int? expiredClicks, out Point position))
-            {
-                // Create a synthetic event with the stored position
-                yield return CreateClickEvent (i, expiredClicks!.Value, null, position);
+                yield return CreateClickEvent (i, numClicks.Value, mouseEvent);
             }
         }
     }
@@ -171,25 +138,24 @@ internal class MouseInterpreter
     /// </summary>
     /// <param name="button">The zero-based button index (0=Button1/Left, 1=Button2/Middle, 2=Button3/Right, 3=Button4).</param>
     /// <param name="numberOfClicks">The number of consecutive clicks detected (1=single, 2=double, 3+=triple).</param>
-    /// <param name="mouseEventArgs">The original mouse event to copy position and view information from, or null for expired pending clicks.</param>
-    /// <param name="position">The position to use for the click event (overrides mouseEventArgs.Position if provided).</param>
+    /// <param name="mouseEventArgs">The original mouse event to copy position and view information from.</param>
     /// <returns>
     ///     A new <see cref="MouseEventArgs"/> with the appropriate click flag (LeftButtonClicked, LeftButtonDoubleClicked,
-    ///     LeftButtonTripleClicked, etc.) and position/view information.
+    ///     LeftButtonTripleClicked, etc.) and position/view copied from the input event.
     /// </returns>
     /// <remarks>
     ///     The returned event has <see cref="HandledEventArgs.Handled"/> set to <see langword="false"/> to allow
     ///     propagation through the event system. Logs a trace message when raising the click event.
     /// </remarks>
-    private MouseEventArgs CreateClickEvent (int button, int numberOfClicks, MouseEventArgs? mouseEventArgs, Point position)
+    private MouseEventArgs CreateClickEvent (int button, int numberOfClicks, MouseEventArgs mouseEventArgs)
     {
         var newClick = new MouseEventArgs
         {
             Handled = false,
             Flags = ToClicks (button, numberOfClicks),
-            ScreenPosition = position,
-            View = mouseEventArgs?.View,
-            Position = position
+            ScreenPosition = mouseEventArgs.ScreenPosition,
+            View = mouseEventArgs.View,
+            Position = mouseEventArgs.Position
         };
         Logging.Trace ($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");
 
