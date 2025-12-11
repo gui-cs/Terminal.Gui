@@ -9,6 +9,20 @@ namespace Terminal.Gui.Input;
 public class MouseEventArgs : HandledEventArgs
 {
     /// <summary>
+    ///     Initializes a new instance of the <see cref="MouseEventArgs"/> class with the current timestamp.
+    /// </summary>
+    public MouseEventArgs ()
+    {
+        Timestamp = DateTime.Now;
+    }
+
+    /// <summary>
+    ///     The timestamp when this mouse event was created. Used for multi-click detection timing.
+    ///     Defaults to <see cref="DateTime.Now"/> but can be overridden for testing.
+    /// </summary>
+    public DateTime Timestamp { get; init; } = DateTime.Now;
+
+    /// <summary>
     ///     Flags indicating the state of the mouse buttons and the type of event that occurred.
     /// </summary>
     public MouseFlags Flags { get; set; }
