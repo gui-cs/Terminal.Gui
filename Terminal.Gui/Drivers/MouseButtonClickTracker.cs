@@ -11,13 +11,13 @@
 ///         independently. It uses event timestamps and position matching to determine whether consecutive button
 ///         presses should be counted as multi-clicks (e.g., double-click, triple-click).
 ///     </para>
-    ///     <para>
-    ///         Click detection uses a **deferred click** approach: when a button is released, the click event
-    ///         is deferred to allow time for potential multi-clicks. If no additional click occurs within
-    ///         the repeat-click threshold, the pending click is emitted via <see cref="CheckForExpiredClicks"/>.
-    ///         This applies to ALL clicks (single, double, triple, etc.) to allow applications to distinguish
-    ///         between different user intentions without receiving intermediate events.
-    ///     </para>
+///     <para>
+///         Click detection uses an **immediate emission** approach: when a button is released, the click event
+///         is emitted immediately (count=1 for first release, count=2 for second release within threshold, etc.).
+///         This provides instant user feedback for single clicks while still detecting multi-clicks correctly.
+///         Applications that need to distinguish between single and double-click intentions can track timing
+///         themselves (see ListView example in mouse.md).
+///     </para>
 ///     <para>
 ///         Not to be confused with <c>NetEvents.MouseButtonState</c>.
 ///     </para>
@@ -36,7 +36,8 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     private int _consecutiveClicks;
     private Point _lastPosition;
 
-    // Deferred click tracking
+    // Deferred click tracking (DEPRECATED - kept for backwards compatibility, no longer used)
+    // ReSharper disable once NotAccessedField.Local
     private int? _pendingClickCount;
     private Point _pendingClickPosition;
     private DateTime _pendingClickTime;
@@ -61,7 +62,10 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     ///     Output parameter indicating the number of consecutive clicks detected. Returns:
     ///     <list type="bullet">
     ///         <item>
-    ///             <description><see langword="null"/> - No click event (button state unchanged or click deferred)</description>
+    ///             <description><see langword="null"/> - No click event (button state unchanged)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>1 - Single click (first release, emitted immediately)</description>
     ///         </item>
     ///         <item>
     ///             <description>2 - Double click (second consecutive release within threshold)</description>
@@ -76,7 +80,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     /// </param>
     /// <remarks>
     ///     <para>
-    ///         This method implements timestamp-based multi-click detection with deferred single clicks:
+    ///         This method implements timestamp-based multi-click detection with immediate single-click emission:
     ///     </para>
     ///     <list type="number">
     ///         <item>
@@ -92,18 +96,19 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 On button press: cancel any pending single click (double-click sequence detected).
+    ///                 On button press: cancel any pending click state (start of potential multi-click sequence).
     ///             </description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 On button release: defer the click (any count) to allow further multi-click detection.
+    ///                 On button release: emit click immediately (single click on first release, multi-click on subsequent).
     ///             </description>
     ///         </item>
     ///     </list>
     ///     <para>
-    ///         ALL clicks are deferred to allow applications to distinguish user intentions. Use <see cref="CheckForExpiredClicks"/>
-    ///         to retrieve deferred clicks after the threshold expires.
+    ///         <strong>Design:</strong> Single clicks are emitted immediately for instant user feedback. Multi-clicks 
+    ///         (double, triple) are also emitted immediately when detected. Applications that need to distinguish 
+    ///         between single and double-click can track timing themselves (see ListView example in mouse.md).
     ///     </para>
     /// </remarks>
     public void UpdateState (Mouse mouse, out int? numClicks)
@@ -136,17 +141,18 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
             // Button was pressed, now released - this is a click!
             ++_consecutiveClicks;
 
-            // Defer ALL clicks - wait to see if more clicks follow
-            // This allows applications to distinguish between single, double, and triple clicks
-            _pendingClickCount = _consecutiveClicks;
+            // EMIT CLICKS IMMEDIATELY - no deferral
+            // Applications handle timing if they need to distinguish single vs double-click
+            numClicks = _consecutiveClicks;
+            
+            // Track for potential next click in sequence
             _pendingClickPosition = mouse.ScreenPosition;
             _pendingClickTime = _now ();
-            numClicks = null; // Don't emit yet - always defer
         }
         else
         {
             // Button was released, now pressed
-            // Cancel any pending click - this is start of next click in sequence
+            // Start of potential multi-click sequence
             _pendingClickCount = null;
         }
 
@@ -158,41 +164,31 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     ///     Checks if there's a pending click that has exceeded the threshold and should be yielded.
     /// </summary>
     /// <param name="numClicks">
-    ///     Output parameter indicating the number of clicks to yield if expired, or <see langword="null"/> if no expired click.
+    ///     Output parameter - always returns <see langword="null"/> in the current implementation
+    ///     (clicks are emitted immediately, not deferred).
     /// </param>
     /// <param name="position">
-    ///     Output parameter containing the position of the expired click if one exists.
+    ///     Output parameter - returns <see cref="Point.Empty"/> (no expired clicks to emit).
     /// </param>
     /// <returns>
-    ///     <see langword="true"/> if a pending click has expired and should be emitted; <see langword="false"/> otherwise.
+    ///     Always returns <see langword="false"/> in the current implementation (clicks are emitted immediately).
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         This method should be called periodically by <see cref="MouseInterpreter"/> to check for deferred single-clicks
-    ///         that have not been followed by additional clicks within the threshold time.
+    ///         <strong>DEPRECATED:</strong> This method is kept for backwards compatibility but is no longer used.
+    ///         Clicks are now emitted immediately via <see cref="UpdateState"/> instead of being deferred.
+    ///     </para>
+    ///     <para>
+    ///         In the previous implementation, single-clicks were deferred to allow double-click detection.
+    ///         This caused a 500ms delay for all single clicks, which was unacceptable UX. The new implementation
+    ///         emits clicks immediately while still correctly detecting multi-clicks.
     ///     </para>
     /// </remarks>
     public bool CheckForExpiredClicks (out int? numClicks, out Point position)
     {
-        if (_pendingClickCount.HasValue)
-        {
-            TimeSpan elapsed = _now () - _pendingClickTime;
-
-            if (elapsed > _repeatClickThreshold)
-            {
-                // Pending click has expired - emit it
-                numClicks = _pendingClickCount;
-                position = _pendingClickPosition;
-                _pendingClickCount = null; // Clear pending state
-                
-                return true;
-            }
-        }
-
-        // No expired click
+        // Clicks are now emitted immediately - no deferred clicks to check
         numClicks = null;
         position = Point.Empty;
-
         return false;
     }
 

@@ -1,7 +1,7 @@
 #nullable enable
 using System.ComponentModel;
 
-namespace ApplicationTests.Mouse;
+namespace ApplicationTests.MouseTests;
 
 [Trait ("Category", "Input")]
 public class ApplicationMouseEnterLeaveTests

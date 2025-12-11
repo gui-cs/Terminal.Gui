@@ -1,7 +1,7 @@
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace ApplicationTests.Mouse;
+namespace ApplicationTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable tests for mouse event routing and coordinate transformation.

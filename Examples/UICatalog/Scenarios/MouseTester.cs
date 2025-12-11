@@ -2,9 +2,9 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Mouse", "Demonstrates Mouse Events and States")]
+[ScenarioMetadata ("Mouse Tester", "Illustrates Mouse event flow and handling")]
 [ScenarioCategory ("Mouse and Keyboard")]
-public class Mouse : Scenario
+public class MouseTester : Scenario
 {
     public override void Main ()
     {

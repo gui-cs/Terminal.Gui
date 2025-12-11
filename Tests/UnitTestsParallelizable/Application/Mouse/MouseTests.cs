@@ -1,4 +1,4 @@
-namespace ApplicationTests.Mouse;
+namespace ApplicationTests.MouseTests;
 
 /// <summary>
 ///     Tests for the <see cref="IMouse"/> interface and <see cref="MouseImpl"/> implementation.

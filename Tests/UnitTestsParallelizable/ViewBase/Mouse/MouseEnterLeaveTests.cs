@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace ViewBaseTests.Mouse;
+namespace ViewBaseTests.MouseTests;
 
 [Trait ("Category", "Input")]
 public class MouseEnterLeaveTests

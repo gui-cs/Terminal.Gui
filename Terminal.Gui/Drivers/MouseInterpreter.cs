@@ -18,14 +18,19 @@ namespace Terminal.Gui.Drivers;
 ///     <list type="number">
 ///         <item><description>Yields the original event unchanged (for low-level handling)</description></item>
 ///         <item><description>Updates the state of all four button trackers</description></item>
-///         <item><description>Defers all click events to allow complete multi-click sequences to be detected</description></item>
+///         <item><description>Immediately emits click events (single, double, triple) when detected</description></item>
 ///     </list>
 ///     <para>
 ///         Click detection follows standard UI conventions: clicks are counted on button **release**, not press,
 ///         and consecutive clicks must occur within <see cref="RepeatedClickThreshold"/> milliseconds at the same
-///         position to be counted as multi-clicks. ALL clicks (single, double, triple, etc.) are deferred and
-///         emitted via <see cref="CheckForExpiredClicks"/> after the threshold expires, ensuring applications
-///         only receive the final click type without intermediate events.
+///         position to be counted as multi-clicks. ALL clicks are emitted immediately, providing instant user feedback
+///         while still correctly detecting multi-click sequences.
+///     </para>
+///     <para>
+///         <strong>Design Philosophy:</strong> Unlike previous implementations that deferred single clicks to detect
+///         double-clicks (causing 500ms delay), this implementation emits all clicks immediately. Applications that need
+///         to distinguish between single and double-click intentions can track timing themselves (see ListView example
+///         in mouse.md).
 ///     </para>
 /// </remarks>
 internal class MouseInterpreter
@@ -100,30 +105,32 @@ internal class MouseInterpreter
     ///     An enumerable sequence of <see cref="Mouse"/>:
     ///     <list type="bullet">
     ///         <item><description>The original input event (always yielded first)</description></item>
-    ///         <item><description>No click events are yielded immediately - all are deferred for multi-click detection</description></item>
+    ///         <item><description>Synthesized click events (Button1Clicked, Button1DoubleClicked, etc.) immediately when button released</description></item>
     ///     </list>
     /// </returns>
     /// <remarks>
     ///     <para>
     ///         This method uses a generator pattern (yield return) to produce events from input.
     ///         The original event is always yielded first to allow low-level handling. Click events
-    ///         are NOT yielded from this method - they are deferred and must be retrieved via
-    ///         <see cref="CheckForExpiredClicks"/>.
+    ///         are yielded immediately when a button is released.
     ///     </para>
     ///     <para>
-    ///         Single clicks are deferred to allow double-click detection.
+    ///         <strong>New Behavior:</strong> Clicks are emitted immediately (no deferral). This provides
+    ///         instant user feedback for single clicks while still correctly detecting multi-clicks.
     ///     </para>
     ///     <para>
     ///         Example sequence for a double click:
     ///     </para>
     ///     <code>
     ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed
-    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased (click count=1 deferred)
-    ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed (deferred click cancelled)
-    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased (click count=2 deferred)
-    ///         [After threshold expires]
-    ///         CheckForExpiredClicks()   → Yields: LeftButtonDoubleClicked
+    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonClicked (immediate!)
+    ///         Input: LeftButtonPressed  → Yields: LeftButtonPressed
+    ///         Input: LeftButtonReleased → Yields: LeftButtonReleased, LeftButtonDoubleClicked (immediate!)
     ///     </code>
+    ///     <para>
+    ///         Applications receive both LeftButtonClicked and LeftButtonDoubleClicked events. Applications
+    ///         that need to distinguish single vs double-click can track timing (see ListView in mouse.md).
+    ///     </para>
     /// </remarks>
     public IEnumerable<Mouse> Process (Mouse mouse)
     {
@@ -145,36 +152,23 @@ internal class MouseInterpreter
     ///     Checks all button trackers for expired pending clicks and returns them as synthetic click events.
     /// </summary>
     /// <returns>
-    ///     An enumerable sequence of <see cref="Mouse"/> containing expired single-click events that were deferred
-    ///     waiting for potential multi-clicks.
+    ///     An empty enumerable - clicks are now emitted immediately via <see cref="Process"/>, not deferred.
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         This method should be called periodically (e.g., during input processing) to ensure deferred
-    ///         single-click events are eventually emitted after the double-click threshold expires.
+    ///         <strong>DEPRECATED:</strong> This method is kept for backwards compatibility but no longer emits events.
+    ///         Clicks are now emitted immediately in <see cref="Process"/> instead of being deferred.
+    ///     </para>
+    ///     <para>
+    ///         In the previous implementation, this method was called periodically to retrieve deferred single-click
+    ///         events after the double-click threshold expired. This caused a 500ms delay for all single clicks,
+    ///         which was unacceptable UX.
     ///     </para>
     /// </remarks>
     public IEnumerable<Mouse> CheckForExpiredClicks ()
     {
-        // Check each button tracker for expired clicks
-        for (int i = 0; i < 4; i++)
-        {
-            if (_mouseButtonClickTracker [i].CheckForExpiredClicks (out int? numClicks, out Point position))
-            {
-                Mouse expiredClick = new ()
-                {
-                    Timestamp = Now (),
-                    Handled = false,
-                    Flags = ToClicks (i, numClicks!.Value),
-                    ScreenPosition = position
-                    // View and Position intentionally NOT set - set by MouseImpl/View.Mouse
-                };
-                
-                Logging.Trace ($"Raising expired click event:{expiredClick.Flags} at screen {expiredClick.ScreenPosition}");
-                
-                yield return expiredClick;
-            }
-        }
+        // Clicks are now emitted immediately via Process() - nothing to do here
+        yield break;
     }
 
     /// <summary>

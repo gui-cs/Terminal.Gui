@@ -130,14 +130,14 @@ public class MouseInterpreterTests
 
     /// <summary>
     ///     Tests the EXACT sequence of events for a double-click.
-    ///     With deferred clicks, Process() should not emit any click events.
-    ///     The final DoubleClicked event is retrieved via CheckForExpiredClicks().
+    ///     With immediate click emission, Process() DOES emit click events immediately.
+    ///     First release emits Button1Clicked, second release emits Button1DoubleClicked.
     /// </summary>
     /// <remarks>
-    ///     CoPilot - GitHub Copilot Edits
+    ///     Updated for immediate click emission (fix for Issue #4471).
     /// </remarks>
     [Fact]
-    public void DoubleClick_ShouldNotEmitSingleClick_BeforeDoubleClick ()
+    public void DoubleClick_ShouldEmitBothClickedAndDoubleClicked ()
     {
         // Arrange
         DateTime mockTime = DateTime.Now;
@@ -157,27 +157,25 @@ public class MouseInterpreterTests
                                                                   || e.Flags.HasFlag (MouseFlags.Button1TripleClicked))
                                                      .ToList ();
 
-        // Process() should not emit any click events (all deferred)
-        Assert.Empty (clickEvents);
+        // With immediate emission, we get BOTH Clicked and DoubleClicked
+        Assert.Equal (2, clickEvents.Count);
+        Assert.Equal (MouseFlags.Button1Clicked, clickEvents [0].Flags);
+        Assert.Equal (MouseFlags.Button1DoubleClicked, clickEvents [1].Flags);
 
-        // Advance time beyond threshold
-        mockTime = mockTime.Add (TimeSpan.FromMilliseconds (600));
-
-        // Check for expired clicks - should get DoubleClicked
+        // CheckForExpiredClicks should now return nothing (clicks emitted immediately)
         List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
-        Assert.Single (expiredClickEvents);
-        Assert.Equal (MouseFlags.Button1DoubleClicked, expiredClickEvents [0].Flags);
+        Assert.Empty (expiredClickEvents);
     }
 
     /// <summary>
     ///     Tests the EXACT sequence of events for a triple-click.
-    ///     With deferred clicks, we should get ONLY TripleClicked after threshold expires.
+    ///     With immediate click emission, we get Clicked, DoubleClicked, and TripleClicked.
     /// </summary>
     /// <remarks>
-    ///     CoPilot - GitHub Copilot Edits
+    ///     Updated for immediate click emission (fix for Issue #4471).
     /// </remarks>
     [Fact]
-    public void TripleClick_ShouldNotEmitSingleOrDoubleClick_BeforeTripleClick ()
+    public void TripleClick_ShouldEmitAllThreeClickEvents ()
     {
         // Arrange
         MouseInterpreter interpreter = new ();
@@ -198,20 +196,21 @@ public class MouseInterpreterTests
                                                                   || e.Flags.HasFlag (MouseFlags.Button1TripleClicked))
                                                      .ToList ();
 
-        // For a triple-click with deferred clicks, NO click events should be emitted from Process()
-        // ALL clicks are deferred and must be retrieved via CheckForExpiredClicks()
-        Assert.Empty (clickEvents);
+        // With immediate emission, we get ALL THREE click events
+        Assert.Equal (3, clickEvents.Count);
+        Assert.Equal (MouseFlags.Button1Clicked, clickEvents [0].Flags);
+        Assert.Equal (MouseFlags.Button1DoubleClicked, clickEvents [1].Flags);
+        Assert.Equal (MouseFlags.Button1TripleClicked, clickEvents [2].Flags);
     }
 
     /// <summary>
-    ///     Tests that a single isolated click eventually emits Clicked after the threshold expires.
-    ///     This test requires a mechanism to check for expired pending clicks.
+    ///     Tests that a single isolated click emits Clicked immediately (no delay).
     /// </summary>
     /// <remarks>
-    ///     CoPilot - GitHub Copilot Edits
+    ///     Updated for immediate click emission (fix for Issue #4471).
     /// </remarks>
     [Fact]
-    public void SingleClick_ShouldEmitClicked_AfterThresholdExpires ()
+    public void SingleClick_ShouldEmitClickedImmediately ()
     {
         // Arrange
         DateTime mockTime = DateTime.Now;
@@ -226,28 +225,24 @@ public class MouseInterpreterTests
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
 
-        // At this point, with deferred implementation, NO click event should be emitted yet
+        // Assert - With immediate emission, click event should be emitted right away
         List<Terminal.Gui.Input.Mouse> immediateClickEvents = allEvents.Where (e => e.Flags.HasFlag (MouseFlags.Button1Clicked)).ToList ();
 
-        // Current (incorrect) behavior: immediateClickEvents.Count == 1
-        // Expected (correct) behavior: immediateClickEvents.Count == 0
-        Assert.Empty (immediateClickEvents);
+        // NEW (correct) behavior: immediateClickEvents.Count == 1
+        Assert.Single (immediateClickEvents);
+        Assert.Equal (MouseFlags.Button1Clicked, immediateClickEvents [0].Flags);
 
-        // Advance time beyond threshold
-        mockTime = mockTime.Add (TimeSpan.FromMilliseconds (600));
-
-        // Check for expired clicks
+        // CheckForExpiredClicks should return nothing (clicks already emitted)
         List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
-        Assert.Single (expiredClickEvents);
-        Assert.Equal (MouseFlags.Button1Clicked, expiredClickEvents [0].Flags);
+        Assert.Empty (expiredClickEvents);
     }
 
     /// <summary>
     ///     Tests the exact event order for a complete double-click sequence.
-    ///     With deferred clicks, NO click events should be emitted from Process().
+    ///     With immediate click emission, click events ARE emitted from Process().
     /// </summary>
     /// <remarks>
-    ///     CoPilot - GitHub Copilot Edits
+    ///     Updated for immediate click emission (fix for Issue #4471).
     /// </remarks>
     [Fact]
     public void DoubleClick_EventSequence_ShouldBeCorrect ()
@@ -262,25 +257,26 @@ public class MouseInterpreterTests
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (10, 10) }));
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.Button1Released, ScreenPosition = new (10, 10) }));
 
-        // Assert - Verify exact sequence (NO click events, all deferred)
-        // Expected: Pressed, Released, Pressed, Released
-        Assert.Equal (4, allEvents.Count);
+        // Assert - Verify exact sequence (WITH click events, emitted immediately)
+        // Expected: Pressed, Released, Clicked, Pressed, Released, DoubleClicked
+        Assert.Equal (6, allEvents.Count);
         Assert.Equal (MouseFlags.Button1Pressed, allEvents [0].Flags);
         Assert.Equal (MouseFlags.Button1Released, allEvents [1].Flags);
-        Assert.Equal (MouseFlags.Button1Pressed, allEvents [2].Flags);
-        Assert.Equal (MouseFlags.Button1Released, allEvents [3].Flags);
+        Assert.Equal (MouseFlags.Button1Clicked, allEvents [2].Flags);
+        Assert.Equal (MouseFlags.Button1Pressed, allEvents [3].Flags);
+        Assert.Equal (MouseFlags.Button1Released, allEvents [4].Flags);
+        Assert.Equal (MouseFlags.Button1DoubleClicked, allEvents [5].Flags);
     }
 
     /// <summary>
-    ///     This test captures the exact issue shown in the screenshot/bug report.
-    ///     With deferred clicks, Process() emits: Pressed, Released, Pressed, Released
-    ///     The DoubleClicked is retrieved via CheckForExpiredClicks() after threshold.
+    ///     Tests that a double-click sequence emits both Clicked and DoubleClicked events.
+    ///     This captures the NEW behavior where clicks are emitted immediately.
     /// </summary>
     /// <remarks>
-    ///     CoPilot - GitHub Copilot Edits
+    ///     Updated for immediate click emission (fix for Issue #4471).
     /// </remarks>
     [Fact]
-    public void DoubleClick_ShouldNotHaveClickedBetweenReleases ()
+    public void DoubleClick_ShouldEmitClickedThenDoubleClicked ()
     {
         // Arrange
         DateTime mockTime = DateTime.Now;
@@ -304,16 +300,20 @@ public class MouseInterpreterTests
                                                   .Select (x => x.i)
                                                   .ToList ();
 
-        // Assert - There should be NO Clicked or DoubleClicked events from Process()
-        Assert.Empty (clickedIndices);
-        Assert.Empty (doubleClickedIndices);
+        // Assert - With immediate emission, we get BOTH Clicked and DoubleClicked from Process()
+        Assert.Single (clickedIndices);
+        Assert.Single (doubleClickedIndices);
 
-        // Advance time beyond threshold
-        mockTime = mockTime.Add (TimeSpan.FromMilliseconds (600));
+        // Verify order: Pressed, Released, Clicked, Pressed, Released, DoubleClicked
+        Assert.Equal (0, pressedIndices [0]);
+        Assert.Equal (1, releasedIndices [0]);
+        Assert.Equal (2, clickedIndices [0]);
+        Assert.Equal (3, pressedIndices [1]);
+        Assert.Equal (4, releasedIndices [1]);
+        Assert.Equal (5, doubleClickedIndices [0]);
 
-        // Check for expired clicks - should get DoubleClicked
+        // CheckForExpiredClicks should return nothing (clicks already emitted)
         List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
-        Assert.Single (expiredClickEvents);
-        Assert.Equal (MouseFlags.Button1DoubleClicked, expiredClickEvents [0].Flags);
+        Assert.Empty (expiredClickEvents);
     }
 }

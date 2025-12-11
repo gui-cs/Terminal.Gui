@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace ViewBaseTests.Mouse;
+namespace ViewBaseTests.MouseTests;
 
 public class TransparentMouseTests
 {

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using Xunit.Abstractions;
 
-namespace DriverTests.Mouse;
+namespace DriverTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable unit tests for IInputProcessor.EnqueueMouseEvent.
@@ -53,15 +53,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Assert - Process() emits Pressed and Released immediately (clicks are deferred)
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonPressed));
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonReleased));
-        Assert.Equal (2, receivedEvents.Count);
-
-        // Wait for the deferred click threshold to expire (500ms default)
-        Thread.Sleep (600);
-
-        // Process queue again to emit deferred clicks
-        processor.ProcessQueue ();
-
-        // Now we should see the Clicked event
+        // We should also see the synthetic Clicked event
         Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
         Assert.Equal (3, receivedEvents.Count);
     }

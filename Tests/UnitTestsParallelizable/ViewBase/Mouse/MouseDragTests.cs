@@ -1,4 +1,4 @@
-namespace ViewBaseTests.Mouse;
+namespace ViewBaseTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable tests for mouse drag functionality on movable and resizable views.

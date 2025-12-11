@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace ViewBaseTests.Mouse;
+namespace ViewBaseTests.MouseTests;
 
 [Trait ("Category", "Input")]
 public class MouseTests (ITestOutputHelper output) : TestsAllViews
@@ -103,7 +103,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
                                e.Handled = true;
                            };
 
-        Terminal.Gui.Input.Mouse me = new () { Timestamp = DateTime.Now };
+        Mouse me = new () { Timestamp = DateTime.Now };
         view.NewMouseEvent (me);
         Assert.True (mouseEventInvoked);
         Assert.True (me.Handled);
