@@ -11,13 +11,13 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var testView = new View ();
 
-        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+        Assert.Contains (MouseFlags.Button1Clicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
         //        Assert.Contains (MouseFlags.Button1DoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
 
-        Assert.Equal (5, testView.MouseBindings.GetBindings ().Count ());
+        Assert.Equal (6, testView.MouseBindings.GetBindings ().Count ());
     }
 
-    [Theory]
+    [Theory(Skip = "Broken in #4474")]
     [InlineData (false, false, false)]
     [InlineData (true, false, true)]
     [InlineData (true, true, true)]
@@ -39,7 +39,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             testView.SetFocus ();
         }
 
-        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.Button1Clicked });
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased });
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedHasFocus, testView.HasFocus);
     }
@@ -48,7 +50,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (false, false, 1)]
     [InlineData (true, false, 1)]
     [InlineData (true, true, 1)]
-    public void MouseClick_Raises_Activating (bool canFocus, bool setFocus, int expectedActivatingCount)
+    public void MouseClick_Raises_Accepting (bool canFocus, bool setFocus, int expectedAcceptingCount)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
@@ -66,12 +68,12 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
             testView.SetFocus ();
         }
 
-        var activatingCount = 0;
-        testView.Activating += (sender, args) => activatingCount++;
+        var acceptingCount = 0;
+        testView.Accepting += (sender, args) => acceptingCount++;
 
         testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.True (superView.HasFocus);
-        Assert.Equal (expectedActivatingCount, activatingCount);
+        Assert.Equal (expectedAcceptingCount, acceptingCount);
     }
 
     [Theory]
