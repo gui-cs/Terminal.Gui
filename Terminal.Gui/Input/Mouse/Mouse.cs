@@ -1,5 +1,10 @@
 namespace Terminal.Gui.Input;
 
+// NOTE: It may be tempting to think this should be a record struct.
+// NOTE: If this were a struct, it would be boxed when used in events, and the ability to
+// NOTE: modify properties like Handled would be lost on the boxed copy.
+// NOTE: Key is a class for the same reason.
+
 /// <summary>
 ///     Provides an abstraction for common mouse operations and state.
 ///     Represents a mouse event, including position, button state, and other flags.

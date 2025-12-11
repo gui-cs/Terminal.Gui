@@ -1,11 +1,33 @@
-# Mouse API
+﻿# Mouse Deep Dive
 
-## See Also
+## Table of Contents
 
-* [Cancellable Work Pattern](cancellable-work-pattern.md)
-* [Command Deep Dive](command.md)
-* [Keyboard Deep Dive](keyboard.md)
-* [Lexicon & Taxonomy](lexicon.md)
+- [Tenets for Terminal.Gui Mouse Handling](#tenets-for-terminalgui-mouse-handling-unless-you-know-better-ones)
+- [Mouse APIs](#mouse-apis)
+- [Mouse Bindings](#mouse-bindings)
+  - [Common Mouse Bindings](#common-mouse-bindings)
+  - [Default Mouse Bindings](#default-mouse-bindings)
+- [Mouse Events](#mouse-events)
+  - [Mouse Event Processing Flow](#mouse-event-processing-flow)
+  - [Handling Mouse Events Directly](#handling-mouse-events-directly)
+  - [Handling Mouse Clicks](#handling-mouse-clicks)
+- [Mouse State and Mouse Grab](#mouse-state-and-mouse-grab)
+  - [Mouse State](#mouse-state)
+  - [Mouse Grab](#mouse-grab)
+    - [Continuous Button Press](#continuous-button-press)
+    - [Mouse Grab Lifecycle](#mouse-grab-lifecycle)
+- [Mouse Button and Movement Concepts](#mouse-button-and-movement-concepts)
+- [Global Mouse Handling](#global-mouse-handling)
+- [Mouse Enter/Leave Events](#mouse-enterleave-events)
+- [Mouse Coordinate Systems](#mouse-coordinate-systems)
+- [Best Practices](#best-practices)
+- [Limitations and Considerations](#limitations-and-considerations)
+- [How Drivers Work](#how-drivers-work)
+  - [Input Processing Architecture](#input-processing-architecture)
+  - [Platform-Specific Input Processors](#platform-specific-input-processors)
+  - [Mouse Event Generation](#mouse-event-generation)
+  - [ANSI Mouse Parsing](#ansi-mouse-parsing)
+  - [Event Flow](#event-flow)
 
 ## Tenets for Terminal.Gui Mouse Handling (Unless you know better ones...)
 
@@ -19,7 +41,7 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 *Terminal.Gui* provides the following APIs for handling mouse input:
 
-* **MouseEventArgs** - @Terminal.Gui.Input.MouseEventArgs provides a platform-independent abstraction for common mouse operations. It is used for processing mouse input and raising mouse events.
+* **Mouse** - @Terminal.Gui.Input.Mouse provides a platform-independent abstraction for common mouse operations. It is used for processing mouse input and raising mouse events.
 
 * **Mouse Bindings** - Mouse Bindings provide a declarative method for handling mouse input in View implementations. The View calls @Terminal.Gui.ViewBase.View.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.Input.MouseBindings to indicate which mouse events will invoke the command. 
 
@@ -116,15 +138,15 @@ public class MyView : View
 
 ## Mouse Events
 
-At the core of *Terminal.Gui*'s mouse API is the @Terminal.Gui.Input.MouseEventArgs class. The @Terminal.Gui.Input.MouseEventArgs class provides a platform-independent abstraction for common mouse events. Every mouse event can be fully described in a @Terminal.Gui.Input.MouseEventArgs instance, and most of the mouse-related APIs are simply helper functions for decoding a @Terminal.Gui.Input.MouseEventArgs.
+At the core of *Terminal.Gui*'s mouse API is the @Terminal.Gui.Input.Mouse class. The @Terminal.Gui.Input.Mouse class provides a platform-independent abstraction for common mouse events. Every mouse event can be fully described in a @Terminal.Gui.Input.Mouse instance, and most of the mouse-related APIs are simply helper functions for decoding a @Terminal.Gui.Input.Mouse.
 
-When the user does something with the mouse, the driver maps the platform-specific mouse event into a `MouseEventArgs` and calls `IApplication.Mouse.RaiseMouseEvent`. Then, `IApplication.Mouse.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `IApplication` will then call the appropriate high-level helper APIs.
+When the user does something with the mouse, the driver maps the platform-specific mouse event into a `Mouse` and calls `IApplication.Mouse.RaiseMouseEvent`. Then, `IApplication.Mouse.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `IApplication` will then call the appropriate high-level helper APIs.
 
 ### Mouse Event Processing Flow
 
 Mouse events are processed through the following workflow using the [Cancellable Work Pattern](cancellable-work-pattern.md):
 
-1. **Driver Level**: The driver captures platform-specific mouse events and converts them to `MouseEventArgs`
+1. **Driver Level**: The driver captures platform-specific mouse events and converts them to `Mouse`
 2. **Application Level**: `IApplication.Mouse.RaiseMouseEvent` determines the target view and routes the event
 3. **View Level**: The target view processes the event through `View.NewMouseEvent()`:
    1. **Pre-condition validation** - Checks if view is enabled, visible, and wants the event type
@@ -134,8 +156,8 @@ Mouse events are processed through the following workflow using the [Cancellable
       - Handles press/release/click lifecycle
       - Sets focus if view is focusable
       - Updates `MouseState` (Pressed, PressedOutside)
-   4. **Command invocation** - For click events, invokes commands via `MouseBindings` (default: `Command.Select` ? `Selecting` event)
-   5. **Mouse wheel handling** - Raises `OnMouseWheel()` and `MouseWheel` event
+   4. **Command invocation** - For click events, invokes commands via `MouseBindings` (default: `Command.Activate` → `Activating` event)
+   5. **Mouse wheel handling** - Invokes commands bound to mouse wheel flags via `MouseBindings`
 
 ### Handling Mouse Events Directly
 
@@ -149,7 +171,7 @@ public class CustomView : View
         MouseEvent += OnMouseEventHandler;
     }
     
-    private void OnMouseEventHandler(object sender, MouseEventArgs e)
+    private void OnMouseEventHandler(object sender, Mouse e)
     {
         if (e.Flags.HasFlag(MouseFlags.Button1Pressed))
         {
@@ -159,12 +181,12 @@ public class CustomView : View
     }
     
     // Alternative: Override the virtual method
-    protected override bool OnMouseEvent(MouseEventArgs mouse)
+    protected override bool OnMouseEvent(Mouse mouse)
     {
         if (mouse.Flags.HasFlag(MouseFlags.Button1Pressed))
         {
             // Handle drag start
-            return true; // Event was handled
+            return true;
         }
         return base.OnMouseEvent(mouse);
     }
@@ -292,7 +314,7 @@ When `WantContinuousButtonPressed` is set to `true`, the view receives repeated 
 ```cs
 view.WantContinuousButtonPressed = true;
 
-view.Selecting += (s, e) =>
+view.Activating += (s, e) =>
 {
     // This will be called repeatedly while the button is held down
     // Useful for scroll buttons, increment/decrement buttons, etc.
@@ -358,7 +380,7 @@ For view-specific mouse handling that needs access to application context, use `
 ```csharp
 public class MyView : View
 {
-    protected override bool OnMouseEvent(MouseEventArgs mouse)
+    protected override bool OnMouseEvent(Mouse mouse)
     {
         if (mouse.Flags.HasFlag(MouseFlags.Button3Clicked))
         {
@@ -393,12 +415,12 @@ view.MouseLeave += (sender, e) =>
 
 Mouse coordinates in Terminal.Gui are provided in multiple coordinate systems:
 
-* **Screen Coordinates** - Relative to the entire terminal screen (0,0 is top-left of terminal) - available via `MouseEventArgs.ScreenPosition`
-* **View Coordinates** - Relative to the view's viewport (0,0 is top-left of view's viewport) - available via `MouseEventArgs.Position`
+* **Screen Coordinates** - Relative to the entire terminal screen (0,0 is top-left of terminal) - available via `Mouse.ScreenPosition`
+* **View Coordinates** - Relative to the view's viewport (0,0 is top-left of view's viewport) - available via `Mouse.Position` (nullable)
 
-The `MouseEventArgs` provides both coordinate systems:
-* `MouseEventArgs.ScreenPosition` - Screen coordinates (absolute position on screen)
-* `MouseEventArgs.Position` - Viewport-relative coordinates (position within the view's content area)
+The `Mouse` provides both coordinate systems:
+* `Mouse.ScreenPosition` - Screen coordinates (absolute position on screen)
+* `Mouse.Position` - Viewport-relative coordinates (position within the view's content area)
 
 When handling mouse events in views, use `Position` for viewport-relative coordinates:
 
@@ -416,10 +438,10 @@ view.MouseEvent += (s, e) =>
 ## Best Practices
 
 * **Use Mouse Bindings and Commands** for simple mouse interactions - they integrate well with the Command system and work alongside keyboard bindings
-* **Use the `Selecting` event** to handle mouse clicks - it's raised by the default `Command.Select` binding for all mouse buttons
-* **Access mouse details via CommandContext** when you need position or flags in `Selecting` handlers:
+* **Use the `Activating` event** to handle mouse clicks - it's raised by the default `Command.Activate` binding for all mouse buttons
+* **Access mouse details via CommandContext** when you need position or flags in `Activating` handlers:
   ```cs
-  view.Selecting += (s, e) =>
+  view.Activating += (s, e) =>
   {
       if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
       {
@@ -444,3 +466,58 @@ view.MouseEvent += (s, e) =>
 * Some terminals may not support all mouse buttons or modifier keys
 * Mouse coordinates are limited to character cell boundaries - sub-character precision is not available
 * Performance can be impacted by excessive mouse move event handling - use mouse enter/leave events when appropriate rather than tracking all mouse moves
+
+## How Drivers Work
+
+The **Driver Level** is the first stage of mouse event processing, where platform-specific mouse events are captured and converted into a standardized `Mouse` instance that the rest of Terminal.Gui can process uniformly.
+
+### Input Processing Architecture
+
+Terminal.Gui uses a layered input processing architecture:
+
+1. **Platform Input Capture** - Platform-specific APIs capture raw input events
+2. **InputProcessorImpl** - Base class that coordinates input processing using specialized parsers
+3. **AnsiResponseParser** - Parses ANSI escape sequences from the input stream
+4. **MouseInterpreter** - Generates synthetic click events from press/release pairs
+5. **AnsiMouseParser** - Parses ANSI mouse escape sequences into `Mouse` events
+
+### Platform-Specific Input Processors
+
+Different platforms use specialized input processors that inherit from `InputProcessorImpl<TInputRecord>`:
+
+* **WindowsInputProcessor** - Processes `WindowsConsole.InputRecord` structures from the Windows Console API (`ReadConsoleInput()`). Converts Windows mouse events directly to `Mouse` instances.
+* **ANSI-based Processors** - For Unix/Linux and other ANSI-compatible terminals, input is processed through ANSI escape sequence parsing.
+
+### Mouse Event Generation
+
+Mouse events are generated through a two-stage process:
+
+1. **Raw Event Capture**: Platform APIs capture basic press/release/movement events
+2. **Click Synthesis**: The `MouseInterpreter` analyzes press/release timing and position to generate single, double, and triple click events
+
+### ANSI Mouse Parsing
+
+For terminals that use ANSI escape sequences for mouse input (most modern terminals), the `AnsiMouseParser` handles:
+
+- **SGR Extended Mode** (`ESC[&lt;button;x;yM/m`) - Standard format for mouse events
+- **Button States** - Press/release detection with button codes 0-3 for left/middle/right/fourth buttons
+- **Modifiers** - Alt/Ctrl/Shift detection through extended button codes
+- **Wheel Events** - Button codes 64-65 for vertical scrolling, 68-69 for horizontal
+- **Motion Events** - Button codes 32-63 for drag operations and mouse movement
+
+### Event Flow
+
+```
+Platform API → InputProcessorImpl → AnsiResponseParser → MouseInterpreter → Application
+     ↓              ↓                        ↓                    ↓
+Raw Events    ANSI Parsing           Mouse Parsing      Click Synthesis
+```
+
+This architecture ensures consistent mouse behavior across all supported platforms while maintaining platform-specific optimizations where available.
+
+## See Also
+
+* [Cancellable Work Pattern](cancellable-work-pattern.md)
+* [Command Deep Dive](command.md)
+* [Keyboard Deep Dive](keyboard.md)
+* [Lexicon & Taxonomy](lexicon.md)
