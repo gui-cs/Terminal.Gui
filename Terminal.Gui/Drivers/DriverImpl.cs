@@ -331,9 +331,6 @@ internal class DriverImpl : IDriver
     public void FillRect (Rectangle rect, Rune rune = default) { OutputBuffer.FillRect (rect, rune); }
 
     /// <inheritdoc/>
-    public void FillRect (Rectangle rect, char c) { OutputBuffer.FillRect (rect, c); }
-
-    /// <inheritdoc/>
     public Attribute SetAttribute (Attribute newAttribute)
     {
         Attribute currentAttribute = OutputBuffer.CurrentAttribute;
