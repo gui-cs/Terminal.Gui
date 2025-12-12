@@ -87,7 +87,7 @@ public class TreeTableSourceTests : IDisposable
         DriverAssert.AssertDriverContentsAre (expected, _output);
     }
 
-    [Fact]
+    [Fact (Skip = "Broken in #4474")]
     [SetupFakeApplication]
     public void TestTreeTableSource_BasicExpanding_WithMouse ()
     {

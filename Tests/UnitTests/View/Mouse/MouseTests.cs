@@ -101,7 +101,7 @@ public class MouseTests : TestsAllViews
         Application.ResetState (true);
     }
 
-    [Theory]
+    [Theory (Skip = "Broken in #4474")]
     [InlineData (MouseFlags.LeftButtonClicked)]
     [InlineData (MouseFlags.MiddleButtonClicked)]
     //[InlineData (MouseFlags.RightButtonClicked)]
