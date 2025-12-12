@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="IsDefault"/>.
 ///     </para>
 ///     <para>
-///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
+///         Set <see cref="View.MouseHoldRepeat"/> to <see langword="true"/> to have the
 ///         <see cref="View.Accepting"/> event
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
@@ -81,12 +81,12 @@ public class Button : View, IDesignable
         MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
         MouseBindings.Add (MouseFlags.RightButtonClicked, Command.HotKey);
         MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.ButtonCtrl, Command.HotKey);
+        MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
 
         base.ShadowStyle = DefaultShadow;
-        HighlightStates = DefaultHighlightStates;
+        MouseHighlightStates = DefaultHighlightStates;
     }
 
     private bool? HandleHotKeyCommand (ICommandContext commandContext)

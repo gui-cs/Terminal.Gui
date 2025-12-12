@@ -43,7 +43,7 @@ public class ExpanderButton : Button
 
         Orientation = Orientation.Vertical;
 
-        HighlightStates = Terminal.Gui.ViewBase.MouseState.None;
+        MouseHighlightStates = Terminal.Gui.ViewBase.MouseState.None;
 
         Initialized += ExpanderButton_Initialized;
 

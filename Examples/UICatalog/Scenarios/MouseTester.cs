@@ -2,9 +2,9 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Mouse", "Demonstrates Mouse Events and States")]
+[ScenarioMetadata ("Mouse Tester", "Illustrates Mouse event flow and handling")]
 [ScenarioCategory ("Mouse and Keyboard")]
-public class Mouse : Scenario
+public class MouseTester : Scenario
 {
     public override void Main ()
     {
@@ -41,7 +41,7 @@ public class Mouse : Scenario
 
         for (var i = 0; i < filterSlider.Options.Count; i++)
         {
-            if (filterSlider.Options [i].Data != MouseFlags.ReportMousePosition)
+            if (filterSlider.Options [i].Data != MouseFlags.PositionReport)
             {
                 filterSlider.SetOption (i);
             }
@@ -56,16 +56,44 @@ public class Mouse : Scenario
             Y = Pos.Bottom (filterSlider) + 1
         };
         win.Add (clearButton);
-        Label ml;
-        var count = 0;
-        ml = new () { X = Pos.Right (filterSlider), Y = 0, Text = "Mouse: " };
 
-        win.Add (ml);
+        View lastDriverEvent = new ()
+        {
+            Height = 1,
+            Width = Dim.Auto (),
+            X = Pos.Right (filterSlider),
+            Y = 0,
+            Text = "Last Driver Event: "
+        };
+
+        win.Add (lastDriverEvent);
+
+        View lastAppEvent = new ()
+        {
+            Height = 1,
+            Width = Dim.Auto (),
+            X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (lastDriverEvent),
+            Text = "Last App Event: "
+        };
+
+        win.Add (lastAppEvent);
+
+        View lastWinEvent = new ()
+        {
+            Height = 1,
+            Width = Dim.Auto (),
+            X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (lastAppEvent),
+            Text = "Last Win Event: "
+        };
+
+        win.Add (lastWinEvent);
 
         CheckBox cbWantContinuousPresses = new ()
         {
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (ml),
+            Y = Pos.Bottom (lastWinEvent),
             Title = "_Want Continuous Button Pressed"
         };
 
@@ -141,28 +169,28 @@ public class Mouse : Scenario
 
         win.Add (demo);
 
-        cbHighlightOnPressed.CheckedState = demo.HighlightStates.HasFlag (MouseState.Pressed) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPressed.CheckedState = demo.MouseHighlightStates.HasFlag (MouseState.Pressed) ? CheckState.Checked : CheckState.UnChecked;
 
         cbHighlightOnPressed.CheckedStateChanging += (_, e) =>
                                                      {
                                                          if (e.Result == CheckState.Checked)
                                                          {
-                                                             demo.HighlightStates |= MouseState.Pressed;
+                                                             demo.MouseHighlightStates |= MouseState.Pressed;
                                                          }
                                                          else
                                                          {
-                                                             demo.HighlightStates &= ~MouseState.Pressed;
+                                                             demo.MouseHighlightStates &= ~MouseState.Pressed;
                                                          }
 
                                                          foreach (View subview in demo.SubViews)
                                                          {
                                                              if (e.Result == CheckState.Checked)
                                                              {
-                                                                 subview.HighlightStates |= MouseState.Pressed;
+                                                                 subview.MouseHighlightStates |= MouseState.Pressed;
                                                              }
                                                              else
                                                              {
-                                                                 subview.HighlightStates &= ~MouseState.Pressed;
+                                                                 subview.MouseHighlightStates &= ~MouseState.Pressed;
                                                              }
                                                          }
 
@@ -170,37 +198,37 @@ public class Mouse : Scenario
                                                          {
                                                              if (e.Result == CheckState.Checked)
                                                              {
-                                                                 subview.HighlightStates |= MouseState.Pressed;
+                                                                 subview.MouseHighlightStates |= MouseState.Pressed;
                                                              }
                                                              else
                                                              {
-                                                                 subview.HighlightStates &= ~MouseState.Pressed;
+                                                                 subview.MouseHighlightStates &= ~MouseState.Pressed;
                                                              }
                                                          }
                                                      };
 
-        cbHighlightOnPressedOutside.CheckedState = demo.HighlightStates.HasFlag (MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPressedOutside.CheckedState = demo.MouseHighlightStates.HasFlag (MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
 
         cbHighlightOnPressedOutside.CheckedStateChanging += (_, e) =>
                                                             {
                                                                 if (e.Result == CheckState.Checked)
                                                                 {
-                                                                    demo.HighlightStates |= MouseState.PressedOutside;
+                                                                    demo.MouseHighlightStates |= MouseState.PressedOutside;
                                                                 }
                                                                 else
                                                                 {
-                                                                    demo.HighlightStates &= ~MouseState.PressedOutside;
+                                                                    demo.MouseHighlightStates &= ~MouseState.PressedOutside;
                                                                 }
 
                                                                 foreach (View subview in demo.SubViews)
                                                                 {
                                                                     if (e.Result == CheckState.Checked)
                                                                     {
-                                                                        subview.HighlightStates |= MouseState.PressedOutside;
+                                                                        subview.MouseHighlightStates |= MouseState.PressedOutside;
                                                                     }
                                                                     else
                                                                     {
-                                                                        subview.HighlightStates &= ~MouseState.PressedOutside;
+                                                                        subview.MouseHighlightStates &= ~MouseState.PressedOutside;
                                                                     }
                                                                 }
 
@@ -208,34 +236,66 @@ public class Mouse : Scenario
                                                                 {
                                                                     if (e.Result == CheckState.Checked)
                                                                     {
-                                                                        subview.HighlightStates |= MouseState.PressedOutside;
+                                                                        subview.MouseHighlightStates |= MouseState.PressedOutside;
                                                                     }
                                                                     else
                                                                     {
-                                                                        subview.HighlightStates &= ~MouseState.PressedOutside;
+                                                                        subview.MouseHighlightStates &= ~MouseState.PressedOutside;
                                                                     }
                                                                 }
                                                             };
 
         cbWantContinuousPresses.CheckedStateChanging += (_, _) =>
                                                         {
-                                                            demo.WantContinuousButtonPressed = !demo.WantContinuousButtonPressed;
+                                                            demo.MouseHoldRepeat = !demo.MouseHoldRepeat;
 
                                                             foreach (View subview in demo.SubViews)
                                                             {
-                                                                subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
+                                                                subview.MouseHoldRepeat = demo.MouseHoldRepeat;
                                                             }
 
                                                             foreach (View subview in demo.Padding.SubViews)
                                                             {
-                                                                subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
+                                                                subview.MouseHoldRepeat = demo.MouseHoldRepeat;
                                                             }
                                                         };
 
         var label = new Label
         {
-            Text = "_App Events:",
+            Text = "Dri_ver Events:",
             X = Pos.Right (filterSlider),
+            Y = Pos.Bottom (demo)
+        };
+
+        ObservableCollection<string> driverLogList = new ();
+
+        var driverLog = new ListView
+        {
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
+            Height = Dim.Fill (),
+            SchemeName = "Runnable",
+            Source = new ListWrapper<string> (driverLogList)
+        };
+        win.Add (label, driverLog);
+
+        Application.Driver.GetInputProcessor ().MouseEventParsed += (_, mouse) =>
+                                  {
+                                      int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
+
+                                      if (filterSlider.GetSetOptions ().Contains (i))
+                                      {
+                                          lastDriverEvent.Text = $"Last Driver Event: {mouse}";
+                                          Logging.Trace (lastDriverEvent.Text);
+                                          driverLogList.Add ($"{mouse.Position}:{mouse.Flags}");
+                                          driverLog.MoveEnd ();
+                                      }
+                                  };
+        label = new Label
+        {
+            Text = "_App Events:",
+            X = Pos.Right (driverLog) + 1,
             Y = Pos.Bottom (demo)
         };
 
@@ -245,22 +305,22 @@ public class Mouse : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = 50,
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
 
-        Application.MouseEvent += (_, a) =>
+        Application.MouseEvent += (_, mouse) =>
                                   {
-                                      int i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
+                                      int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
 
                                       if (filterSlider.GetSetOptions ().Contains (i))
                                       {
-                                          ml.Text = $"MouseEvent: ({a.Position}) - {a.Flags} {count}";
-                                          appLogList.Add ($"({a.Position}) - {a.Flags} {count++}");
-                                          appLog.MoveDown ();
+                                          lastAppEvent.Text = $"   Last App Event: {mouse}";
+                                          appLogList.Add ($"{mouse.Position}:{mouse.Flags}");
+                                          appLog.MoveEnd ();
                                       }
                                   };
 
@@ -276,7 +336,7 @@ public class Mouse : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Percent (50),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (winLogList)
@@ -285,20 +345,23 @@ public class Mouse : Scenario
 
         clearButton.Accepting += (_, _) =>
                                  {
+                                     driverLogList.Clear ();
+                                     driverLog.SetSource (driverLogList);
                                      appLogList.Clear ();
                                      appLog.SetSource (appLogList);
                                      winLogList.Clear ();
                                      winLog.SetSource (winLogList);
                                  };
 
-        win.MouseEvent += (_, a) =>
+        win.MouseEvent += (_, mouse) =>
                           {
-                              int i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
+                              int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
 
                               if (filterSlider.GetSetOptions ().Contains (i))
                               {
-                                  winLogList.Add ($"MouseEvent: ({a.Position}) - {a.Flags} {count++}");
-                                  winLog.MoveDown ();
+                                  lastWinEvent.Text = $"   Last Win Event: {mouse}";
+                                  winLogList.Add ($"{mouse.Position}:{mouse.Flags}");
+                                  winLog.MoveEnd ();
                               }
                           };
 
@@ -355,7 +418,7 @@ public class Mouse : Scenario
         {
             if (role == VisualRole.Normal)
             {
-                if (MouseState.HasFlag (MouseState.Pressed) && HighlightStates.HasFlag (MouseState.Pressed))
+                if (MouseState.HasFlag (MouseState.Pressed) && MouseHighlightStates.HasFlag (MouseState.Pressed))
                 {
                     currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
 

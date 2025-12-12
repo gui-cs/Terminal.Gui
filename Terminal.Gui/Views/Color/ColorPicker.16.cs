@@ -201,7 +201,7 @@ public class ColorPicker16 : View
 
                                         if (ctx is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
                                         {
-                                            Cursor = new (mouseCommandContext.Binding.MouseEventArgs.Position.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position.Y / _boxHeight);
+                                            Cursor = new (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position!.Value.Y / _boxHeight);
                                             set = true;
                                         }
                                         return RaiseAccepting (ctx) == true || set;
@@ -280,7 +280,7 @@ public class ColorPicker16 : View
 
     private void SetInitialProperties ()
     {
-        HighlightStates = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed;
+        MouseHighlightStates = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed;
 
         CanFocus = true;
         AddCommands ();

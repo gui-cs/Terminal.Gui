@@ -65,10 +65,10 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
             Height = 5
         };
 
-        view.MouseEvent += (s, e) =>
+        view.MouseEvent += (_, mouse) =>
         {
             mouseReceived = true;
-            receivedPosition = e.Position;
+            receivedPosition = mouse.Position!.Value;
         };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
@@ -113,7 +113,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
         view.MouseEvent += (s, e) =>
         {
-            if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 rightClickCount++;
             }

@@ -18,14 +18,14 @@ public interface IMouseHeldDown : IDisposable
     /// <summary>
     ///     Periodically raised when the mouse is pressed down inside the view <see cref="View"/>.
     /// </summary>
-    public event EventHandler<CancelEventArgs<MouseEventArgs>> MouseIsHeldDownTick;
+    public event EventHandler<CancelEventArgs<Mouse>> MouseIsHeldDownTick;
 
     /// <summary>
     ///     Call to indicate that the mouse has been pressed down and any relevant actions should
     ///     be undertaken (start timers, <see cref="IMouseGrabHandler.GrabMouse"/> etc).
     /// </summary>
     /// <param name="mouseEventArgs"></param>
-    void Start (MouseEventArgs mouseEventArgs);
+    void Start (Mouse mouseEventArgs);
 
     /// <summary>
     ///     Call to indicate that the mouse has been released and any relevant actions should

@@ -123,26 +123,26 @@ public class TabViewTests (ITestOutputHelper output)
         top.Add (tv);
         Application.Begin (top);
 
-        MouseEventArgs args;
+        Mouse args;
 
         // Waving mouse around does not trigger click
         for (var i = 0; i < 100; i++)
         {
-            args = new () { ScreenPosition = new (i, 1), Flags = MouseFlags.ReportMousePosition };
+            args = new () { ScreenPosition = new (i, 1), Flags = MouseFlags.PositionReport };
             Application.RaiseMouseEvent (args);
             AutoInitShutdownAttribute.RunIteration ();
             Assert.Null (clicked);
             Assert.Equal (tab1, tv.SelectedTab);
         }
 
-        args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab1, tv.SelectedTab);
 
         // Click to tab2
-        args = new () { ScreenPosition = new (6, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { ScreenPosition = new (6, 1), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (tab2, clicked);
@@ -155,7 +155,7 @@ public class TabViewTests (ITestOutputHelper output)
                              e.MouseEvent.Handled = true;
                          };
 
-        args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -163,7 +163,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab2, tv.SelectedTab);
 
-        args = new () { ScreenPosition = new (12, 1), Flags = MouseFlags.Button1Clicked };
+        args = new () { ScreenPosition = new (12, 1), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
 
@@ -216,7 +216,7 @@ public class TabViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEventArgs { ScreenPosition = new (6, 2), Flags = MouseFlags.Button1Clicked };
+        var args = new Mouse { ScreenPosition = new (6, 2), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);
@@ -236,7 +236,7 @@ public class TabViewTests (ITestOutputHelper output)
                                             );
 
         // Click the left arrow
-        args = new () { ScreenPosition = new (0, 2), Flags = MouseFlags.Button1Clicked };
+        args = new () { ScreenPosition = new (0, 2), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);
@@ -306,7 +306,7 @@ public class TabViewTests (ITestOutputHelper output)
         Application.Begin (top);
 
         // Click the right arrow
-        var args = new MouseEventArgs { ScreenPosition = new (7, 3), Flags = MouseFlags.Button1Clicked };
+        var args = new Mouse { ScreenPosition = new (7, 3), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);
@@ -328,7 +328,7 @@ public class TabViewTests (ITestOutputHelper output)
                                             );
 
         // Click the left arrow
-        args = new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked };
+        args = new () { ScreenPosition = new (1, 3), Flags = MouseFlags.LeftButtonClicked };
         Application.RaiseMouseEvent (args);
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Null (clicked);

@@ -95,7 +95,7 @@ public class ContextMenus : Scenario
         {
             if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
-                if (mouseArgs.Flags == MouseFlags.Button3Clicked)
+                if (mouseArgs.Flags == MouseFlags.RightButtonClicked)
                 {
                     // ReSharper disable once AccessToDisposedClosure
                     _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);

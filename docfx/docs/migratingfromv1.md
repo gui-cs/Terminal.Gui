@@ -568,7 +568,7 @@ view.MouseEvent += (s, e) =>
 **v1:**
 ```csharp
 // v1 - MouseClick event
-view.MouseClick += (mouseEvent) =>
+view.MouseClick += (mouse) =>
 {
     // Handle click
     DoSomething();
@@ -578,17 +578,17 @@ view.MouseClick += (mouseEvent) =>
 **v2:**
 ```csharp
 // v2 - Use MouseBindings + Commands + Activating event
-view.MouseBindings.Add(MouseFlags.Button1Clicked, Command.Activate);
+view.MouseBindings.Add(MouseFlags.LeftButtonClicked, Command.Activate);
 view.Activating += (s, e) =>
 {
-    // Handle selection (called when Button1Clicked)
+    // Handle selection (called when LeftButtonClicked)
     DoSomething();
 };
 
 // Alternative: Use MouseEvent for low-level handling
 view.MouseEvent += (s, e) =>
 {
-    if (e.Flags.HasFlag(MouseFlags.Button1Clicked))
+    if (e.Flags.HasFlag(MouseFlags.LeftButtonClicked))
     {
         DoSomething();
         e.Handled = true;
@@ -606,14 +606,14 @@ view.MouseEvent += (s, e) =>
 **Migration Pattern:**
 ```csharp
 // ❌ v1 - OnMouseClick override
-protected override bool OnMouseClick(MouseEventArgs mouseEvent)
+protected override bool OnMouseClick(MouseEventArgs mouse)
 {
-    if (mouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked))
+    if (mouse.Flags.HasFlag(MouseFlags.LeftButtonClicked))
     {
         PerformAction();
         return true;
     }
-    return base.OnMouseClick(mouseEvent);
+    return base.OnMouseClick(mouse);
 }
 
 // ✅ v2 - OnActivating override
@@ -622,7 +622,7 @@ protected override bool OnActivating(CommandEventArgs args)
     if (args.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
     {
         // Access mouse position and flags via context
-        if (mouseArgs.Flags.HasFlag(MouseFlags.Button1Clicked))
+        if (mouseArgs.Flags.HasFlag(MouseFlags.LeftButtonClicked))
         {
             PerformAction();
             return true;
@@ -646,11 +646,14 @@ view.Activating += (s, e) =>
     // Extract mouse event args from command context
     if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
     {
-        Point position = mouseArgs.Position;
+        Point? position = mouseArgs.Position;
         MouseFlags flags = mouseArgs.Flags;
         
         // Use position and flags for custom logic
-        HandleClick(position, flags);
+        if (position.HasValue)
+        {
+            HandleClick(position.Value, flags);
+        }
         e.Handled = true;
     }
 };
@@ -662,7 +665,7 @@ v2 adds enhanced mouse state tracking:
 
 ```csharp
 // Configure which mouse states trigger highlighting
-view.HighlightStates = MouseState.In | MouseState.Pressed;
+view.MouseHighlightStates = MouseState.In | MouseState.Pressed;
 
 // React to mouse state changes
 view.MouseStateChanged += (s, e) =>

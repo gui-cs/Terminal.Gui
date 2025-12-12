@@ -146,7 +146,7 @@ For this to work properly, there must be logic that removes the focus-cache used
 // Mouse click behavior
 view.MouseEvent += (sender, e) => 
 {
-    if (e.Flags.HasFlag(MouseFlags.Button1Clicked) && view.CanFocus)
+    if (e.Flags.HasFlag(MouseFlags.LeftButtonClicked) && view.CanFocus)
     {
         view.SetFocus();
         e.Handled = true;

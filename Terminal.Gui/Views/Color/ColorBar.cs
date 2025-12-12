@@ -121,21 +121,21 @@ internal abstract class ColorBar : View, IColorBar
     public event EventHandler<EventArgs<int>>? ValueChanged;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            if (mouseEvent.Position.X >= _barStartsAt)
+            if (mouse.Position!.Value.X >= _barStartsAt)
             {
-                double v = MaxValue * ((double)mouseEvent.Position.X - _barStartsAt) / (_barWidth - 1);
+                double v = MaxValue * ((double)mouse.Position!.Value.X - _barStartsAt) / (_barWidth - 1);
                 Value = Math.Clamp ((int)v, 0, MaxValue);
             }
 
-            mouseEvent.Handled = true;
+            mouse.Handled = true;
             SetFocus ();
         }
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     /// <summary>

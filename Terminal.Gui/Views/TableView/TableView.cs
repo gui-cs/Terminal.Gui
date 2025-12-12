@@ -818,10 +818,10 @@ public class TableView : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+        if (!me.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+            && !me.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
             && me.Flags != MouseFlags.WheeledDown
             && me.Flags != MouseFlags.WheeledUp
             && me.Flags != MouseFlags.WheeledLeft
@@ -876,10 +876,10 @@ public class TableView : View, IDesignable
                 return true;
         }
 
-        int boundsX = me.Position.X;
-        int boundsY = me.Position.Y;
+        int boundsX = me.Position!.Value.X;
+        int boundsY = me.Position!.Value.Y;
 
-        if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (me.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             if (scrollLeftPoint != null
                 && scrollLeftPoint.Value.X == boundsX
@@ -909,7 +909,7 @@ public class TableView : View, IDesignable
                 }
                 else
                 {
-                    SetSelection (hit.Value.X, hit.Value.Y, me.Flags.HasFlag (MouseFlags.ButtonShift));
+                    SetSelection (hit.Value.X, hit.Value.Y, me.Flags.HasFlag (MouseFlags.Shift));
                 }
 
                 Update ();
@@ -917,7 +917,7 @@ public class TableView : View, IDesignable
         }
 
         // Double clicking a cell activates
-        if (me.Flags == MouseFlags.Button1DoubleClicked)
+        if (me.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             Point? hit = ScreenToCell (boundsX, boundsY);
 
@@ -1680,7 +1680,7 @@ public class TableView : View, IDesignable
         return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString ();
     }
 
-    private bool HasControlOrAlt (MouseEventArgs me) { return me.Flags.HasFlag (MouseFlags.ButtonAlt) || me.Flags.HasFlag (MouseFlags.ButtonCtrl); }
+    private bool HasControlOrAlt (Mouse me) { return me.Flags.HasFlag (MouseFlags.Alt) || me.Flags.HasFlag (MouseFlags.Ctrl); }
 
     /// <summary>
     ///     Returns true if the given <paramref name="columnIndex"/> indexes a visible column otherwise false.  Returns

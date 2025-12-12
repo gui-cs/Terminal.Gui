@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace DriverTests;
+namespace DriverTests.Output;
 
 public class ClipRegionTests (ITestOutputHelper output) : FakeDriverBase
 {

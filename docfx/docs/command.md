@@ -8,10 +8,9 @@
 
 ## Overview
 
-The `Command` system in Terminal.Gui provides a standardized framework for defining and executing actions that views can perform, such as selecting items, accepting input, or navigating content. Implemented primarily through the `View.Command` APIs, this system integrates tightly with input handling (e.g., keyboard and mouse events) and leverages the *Cancellable Work Pattern* to ensure extensibility, cancellation, and decoupling. Central to this system are the `Activating` and `Accepting` events, which encapsulate common user interactions: `Activating` for changing a view’s state or preparing it for interaction (e.g., toggling a checkbox, focusing a menu item), and `Accepting` for confirming an action or state (e.g., executing a menu command, submitting a dialog).
+The `Command` system in Terminal.Gui provides a standardized framework for defining and executing actions that views can perform, such as selecting items, accepting input, or navigating content. Implemented primarily through the `View.Command` APIs, this system integrates tightly with input handling (e.g., keyboard and mouse events) and leverages the *Cancellable Work Pattern* to ensure extensibility, cancellation, and decoupling. Central to this system are the `Activating` and `Accepting` events, which encapsulate common user interactions: `Activating` for changing a view’s state or preparing it for interaction (e.g., toggling a checkbox, focusing a menu item), and `Accepting` for confirming an action or state (e.g., executing a menu command, accepting a ListView, submitting a dialog).
 
-This deep dive explores the `Command` and `View.Command` APIs, focusing on the `Activating` and `Accepting` concepts, their implementation, and their propagation behavior. It critically evaluates the need for additional events (`Selected`/`Accepted`) and the propagation of `Activating` events, drawing on insights from `Menu`, `MenuItemv2`, `MenuBar`, `CheckBox`, and `FlagSelector`. These implementations highlight the system’s application in hierarchical (menus) and stateful (checkboxes, flag selectors) contexts. The document reflects the current implementation, including the `Cancel` property in `CommandEventArgs` and local handling of `Command.Activate`. An appendix briefly summarizes proposed changes from a filed issue noting the rename from `Command.Select` to `Command.Activate` has been completed, replace `Cancel` with `Handled`, and introduce a propagation mechanism, addressing limitations in the current system.
-
+This deep dive explores the `Command` and `View.Command` APIs, focusing on the `Activating` and `Accepting` concepts, their implementation, and their propagation behavior. It critically evaluates the need for additional events (`Activated`/`Accepted`) and the propagation of `Activating` events, drawing on insights from `Menu`, `MenuItemv2`, `MenuBar`, `CheckBox`, and `FlagSelector`. These implementations highlight the system’s application in hierarchical (menus) and stateful (checkboxes, flag selectors) contexts. The document reflects the current implementation, including the `Cancel` property in `CommandEventArgs` and local handling of `Command.Activate`. An appendix briefly summarizes proposed changes from a filed issue noting the rename from `Command.Select` to `Command.Activate` has been completed, replace `Cancel` with `Handled`, and introduce a propagation mechanism, addressing limitations in the current system.
 
 This diagram shows the fundamental command invocation flow within a single view, demonstrating the Cancellable Work Pattern with pre-events (e.g., `Activating`, `Accepting`) and the command handler execution.
 
@@ -30,6 +29,37 @@ flowchart TD
     acc_handler --> acc_prop["Propagate to default button/superview if unhandled"]
     acc_prop --> acc_done["Complete (returns bool?)"]
 ```
+
+## Command System Summary
+
+| Aspect | `Command.Activate` | `Command.Accept` |
+|--------|-------------------|------------------|
+| **Semantic Meaning** | "Interact with this view / select an item" - changes view state or prepares for interaction | "Perform the view's primary action" - confirms action or accepts current state |
+| **Typical Triggers** | • Spacebar<br>• Single mouse click<br>• Navigation keys (arrows)<br>• Mouse enter (menus) | • Enter key<br>• Double-click (via framework or application timing) |
+| **Event Name** | `Activating` | `Accepting` |
+| **Virtual Method** | `OnActivating` | `OnAccepting` |
+| **Propagation** | (Current Behavior; See [#4473](https://github.com/gui-cs/Terminal.Gui/issues/4473)) **Local only** - No propagation to superview<br>Relies on view-specific events (e.g., `SelectedMenuItemChanged`) | (Current Behavior; See [#4473](https://github.com/gui-cs/Terminal.Gui/issues/4473)) - **Hierarchical** - Propagates to:<br>• Default button (`IsDefault = true`)<br>• Superview<br>• SuperMenuItem (menus) |
+| **Post-Event** | None (use view-specific events like `CheckedStateChanged`, `SelectedMenuItemChanged`) | `Accepted` (in `Menu`, `MenuBar` - not in base `View`) |
+| **Example: Button** | Sets focus (if `CanFocus`)<br>No state change | Invokes button's primary action (e.g., submit dialog) |
+| **Example: CheckBox** | Toggles `CheckedState` (spacebar) | Confirms current `CheckedState` (Enter) |
+| **Example: ListView** | Selects item (single click, navigation) | Opens/enters selected item (double-click or Enter) |
+| **Example: Menu/MenuBar** | Focuses `MenuItemv2` (arrow keys, mouse enter)<br>Raises `SelectedMenuItemChanged` | Executes command / opens submenu (Enter)<br>Raises `Accepted` to close menu |
+| **Mouse → Command Pipeline** | See [Mouse Pipeline](mouse.md#complete-mouse-event-pipeline)<br>**Current:** `LeftButtonClicked` → `Activate`<br>**Recommended:** `LeftButtonClicked` → `Activate` (first click)<br>`LeftButtonDoubleClicked` → `Accept` (framework-provided) | See [Mouse Pipeline](mouse.md#complete-mouse-event-pipeline)<br>**Current:** Applications track timing manually<br>**Recommended:** `LeftButtonDoubleClicked` → `Accept` |
+| **Return Value Semantics** | `null`: no handler<br>`false`: executed but not handled<br>`true`: handled/canceled | Same as Activate |
+| **Current Limitation** | No generic propagation mechanism for hierarchical views | Relies on view-specific logic (e.g., `SuperMenuItem`) instead of generic propagation |
+| **Proposed Enhancement** | [#4473](https://github.com/gui-cs/Terminal.Gui/issues/4473) | Standardize propagation via subscription model instead of special properties |
+
+### Key Takeaways
+
+1. **`Activate` = Interaction/Selection** (immediate, local)
+   - Changes view state or sets focus
+   - Does NOT propagate to SuperView
+   - Views can emit view-specific events for notification (e.g., `CheckedStateChanged`, `SelectedMenuItemChanged`)
+
+2. **`Accept` = Confirmation/Action** (final, hierarchical)
+   - Confirms current state or executes primary action
+   - DOES propagate to default button or SuperView
+   - Enables dialog/menu close scenarios
 
 ## Overview of the Command System
 
@@ -148,6 +178,8 @@ The `Activating` and `Accepting` events, along with their corresponding commands
 - **Accepting**: Confirming an action or state, such as submitting a form, activating a button, or finalizing a selection.
 
 These concepts are opinionated, reflecting Terminal.Gui’s view that most UI interactions can be modeled as either state changes/preparation (selecting) or action confirmations (accepting). Below, we explore each concept, their implementation, use cases, and propagation behavior, using `Cancel` to reflect the current implementation.
+
+
 
 ### Activating
 - **Definition**: `Activating` represents a user action that changes a view’s state or prepares it for further interaction, such as selecting an item in a `ListView`, toggling a `CheckBox`, or focusing a `MenuItemv2`. It is associated with `Command.Activate`, typically triggered by a spacebar press, single mouse click, navigation keys (e.g., arrow keys), or mouse enter (e.g., in menus).

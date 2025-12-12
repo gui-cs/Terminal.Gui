@@ -38,7 +38,7 @@ public interface IComponentFactory<TInputRecord> : IComponentFactory
     /// <summary>
     ///     Creates the <see cref="InputProcessorImpl{T}"/> class for the current driver implementation i.e. the class
     ///     responsible for
-    ///     translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="MouseEventArgs"/>.
+    ///     translating raw console input into Terminal.Gui common event <see cref="Key"/> and <see cref="Mouse"/>.
     /// </summary>
     /// <param name="inputQueue">
     ///     The input queue containing raw console input events, populated by <see cref="IInput{TInputRecord}"/>

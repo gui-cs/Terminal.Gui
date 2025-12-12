@@ -20,7 +20,7 @@ public partial class GuiTestContext
         }
         LastView.MouseEvent += (_, e) =>
                                {
-                                   if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                   if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
                                    {
                                        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
                                        // and the context menu is disposed when it is closed.

@@ -1,4 +1,4 @@
-namespace ViewBaseTests.Mouse;
+namespace ViewBaseTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable tests for mouse drag functionality on movable and resizable views.
@@ -42,20 +42,20 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on border to start drag
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 10), // Screen position
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act - Start drag
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 15), // New screen position
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -104,19 +104,19 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on border
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (15, 15), // 5+10 offset
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (18, 18), // Moved 3,3
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -161,28 +161,28 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Start drag
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Drag
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
         // Release
-        MouseEventArgs releaseEvent = new ()
+        Terminal.Gui.Input.Mouse releaseEvent = new ()
         {
             ScreenPosition = new (15, 15),
-            Flags = MouseFlags.Button1Released
+            Flags = MouseFlags.LeftButtonReleased
         };
 
         app.Mouse.RaiseMouseEvent (releaseEvent);
@@ -231,19 +231,19 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on right border
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (19, 15),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag to the right
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (24, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -290,19 +290,19 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on bottom border
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (15, 19),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag down
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 24),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -349,19 +349,19 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on left border
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 15),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag to the left
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (7, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -408,19 +408,19 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on top border
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (15, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag up
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (15, 8),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -471,19 +471,19 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on bottom-right corner
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (19, 19),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag diagonally
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (24, 24),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -530,19 +530,19 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Simulate mouse press on top-left corner
-        MouseEventArgs pressEvent = new ()
+        Terminal.Gui.Input.Mouse pressEvent = new ()
         {
             ScreenPosition = new (10, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag diagonally up and left
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             ScreenPosition = new (7, 8),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
@@ -593,11 +593,11 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Try to drag far to the right (making width very small)
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             Position = new (8, 5), // Drag 8 units right, would make width 2
             ScreenPosition = new (18, 15),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         // Act
@@ -644,11 +644,11 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Try to drag far down (making height very small)
-        MouseEventArgs dragEvent = new ()
+        Terminal.Gui.Input.Mouse dragEvent = new ()
         {
             Position = new (5, 8), // Drag 8 units down, would make height 2
             ScreenPosition = new (15, 18),
-            Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         // Act

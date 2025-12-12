@@ -38,11 +38,11 @@ public class CheckBox : View
         // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
         // The default Accept handler does that.
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
 
         TitleChanged += Checkbox_TitleChanged;
 
-        HighlightStates = DefaultHighlightStates;
+        MouseHighlightStates = DefaultHighlightStates;
     }
 
     /// <inheritdoc />

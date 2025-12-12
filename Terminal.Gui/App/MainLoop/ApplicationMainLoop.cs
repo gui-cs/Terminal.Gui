@@ -134,6 +134,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
     internal void IterationImpl ()
     {
+        // TODO: Determine if this is needed here or can be done elsewhere
         AnsiRequestScheduler.RunSchedule (App?.Driver);
 
         // Pull any input events from the input queue and process them

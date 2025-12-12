@@ -12,12 +12,14 @@ public partial class View // Mouse APIs
     {
         MouseBindings = new ();
 
-        // TODO: Should the default really work with any button or just button1?
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
-        MouseBindings.Add (MouseFlags.Button4Clicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.ButtonCtrl, Command.Context);
+        // TODO: Should the default really work with any button or just LeftButton?
+        MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.MiddleButtonPressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button4Pressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.RightButtonPressed, Command.Context);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Context);
+
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
     }
 
     #region MouseEnterLeave
@@ -58,7 +60,7 @@ public partial class View // Mouse APIs
 
         MouseState |= MouseState.In;
 
-        if (HighlightStates != MouseState.None)
+        if (MouseHighlightStates != MouseState.None)
         {
             SetNeedsDraw ();
         }
@@ -146,7 +148,7 @@ public partial class View // Mouse APIs
 
         // TODO: Should we also MouseState &= ~MouseState.Pressed; ??
 
-        if (HighlightStates != MouseState.None)
+        if (MouseHighlightStates != MouseState.None)
         {
             SetNeedsDraw ();
         }
@@ -188,11 +190,11 @@ public partial class View // Mouse APIs
     ///     and the user presses and holds the mouse button, <see cref="NewMouseEvent"/> will be
     ///     repeatedly called with the same <see cref="MouseFlags"/> for as long as the mouse button remains pressed.
     /// </summary>
-    public bool WantContinuousButtonPressed { get; set; }
+    public bool MouseHoldRepeat { get; set; }
 
     /// <summary>Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
     /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
-    public bool WantMousePositionReports { get; set; }
+    public bool MousePositionTracking  { get; set; }
 
     /// <summary>
     ///     Processes a mouse event for this view. This is the main entry point for mouse input handling,
@@ -216,8 +218,8 @@ public partial class View // Mouse APIs
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 Handles mouse grab scenarios when <see cref="HighlightStates"/> or
-    ///                 <see cref="WantContinuousButtonPressed"/> are set (press/release/click)
+    ///                 Handles mouse grab scenarios when <see cref="MouseHighlightStates"/> or
+    ///                 <see cref="MouseHoldRepeat"/> are set (press/release/click)
     ///             </description>
     ///         </item>
     ///         <item>
@@ -228,20 +230,20 @@ public partial class View // Mouse APIs
     ///         </item>
     ///     </list>
     ///     <para>
-    ///         <strong>Continuous Button Press:</strong> When <see cref="WantContinuousButtonPressed"/> is
+    ///         <strong>Continuous Button Press:</strong> When <see cref="MouseHoldRepeat"/> is
     ///         <see langword="true"/> and the user holds a mouse button down, this method is repeatedly called
     ///         with <see cref="MouseFlags.LeftButtonPressed"/> (or other button pressed) events, enabling repeating button
     ///         behavior (e.g., scroll buttons).
     ///     </para>
     ///     <para>
-    ///         <strong>Mouse Grab:</strong> Views with <see cref="HighlightStates"/> or
-    ///         <see cref="WantContinuousButtonPressed"/> enabled automatically grab the mouse on button press,
+    ///         <strong>Mouse Grab:</strong> Views with <see cref="MouseHighlightStates"/> or
+    ///         <see cref="MouseHoldRepeat"/> enabled automatically grab the mouse on button press,
     ///         receiving all subsequent mouse events until the button is released, even if the mouse moves
     ///         outside the view's <see cref="Viewport"/>.
     ///     </para>
     /// </remarks>
-    /// <param name="mouseEvent">
-    ///     The mouse event to process. Coordinates in <see cref="MouseEventArgs.Position"/> are relative
+    /// <param name="mouse">
+    ///     The mouse event to process. Coordinates in <see cref="Mouse.Position"/> are relative
     ///     to the view's <see cref="Viewport"/>.
     /// </param>
     /// <returns>
@@ -253,11 +255,18 @@ public partial class View // Mouse APIs
     /// <seealso cref="OnMouseEvent"/>
     /// <seealso cref="MouseBindings"/>
     /// <seealso cref="Activating"/>
-    /// <seealso cref="WantContinuousButtonPressed"/>
-    /// <seealso cref="HighlightStates"/>
-    public bool? NewMouseEvent (MouseEventArgs mouseEvent)
+    /// <seealso cref="MouseHoldRepeat"/>
+    /// <seealso cref="MouseHighlightStates"/>
+    public bool? NewMouseEvent (Mouse mouse)
     {
         // Pre-conditions
+
+        if (mouse.Position is null )
+        {
+            // Support unit tests that don't set Position
+            mouse.Position = mouse.ScreenPosition;
+        }
+
         if (!Enabled)
         {
             // A disabled view should not eat mouse events
@@ -269,7 +278,7 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (!WantMousePositionReports && mouseEvent.Flags == MouseFlags.ReportMousePosition)
+        if (!MousePositionTracking  && mouse.Flags == MouseFlags.PositionReport)
         {
             return false;
         }
@@ -279,12 +288,12 @@ public partial class View // Mouse APIs
             MouseHeldDown = new MouseHeldDown (this, App?.TimedEvents, App?.Mouse);
         }
 
-        if (WantContinuousButtonPressed)
+        if (MouseHoldRepeat)
         {
-            if (mouseEvent.IsPressed)
+            if (mouse.IsPressed)
             {
                 MouseHeldDown.MouseIsHeldDownTick += MouseHeldDownOnMouseIsHeldDownTick;
-                MouseHeldDown.Start (mouseEvent);
+                MouseHeldDown.Start (mouse);
             }
             else
             {
@@ -294,50 +303,48 @@ public partial class View // Mouse APIs
         }
 
         // Cancellable event
-        if (RaiseMouseEvent (mouseEvent) || mouseEvent.Handled)
+        if (RaiseMouseEvent (mouse) || mouse.Handled)
         {
             return true;
         }
 
         // Post-Conditions
 
-        if (HighlightStates != MouseState.None || WantContinuousButtonPressed)
+        if (MouseHighlightStates != MouseState.None || MouseHoldRepeat)
         {
-            if (WhenGrabbedHandlePressed (mouseEvent))
+            if (WhenGrabbedHandlePressed (mouse))
             {
                 // If we raised a command on the grabbed view, and it handled it, we are done
                 // regardless of whether the event was handled.
                 return true;
             }
 
-            if (WhenGrabbedHandleReleased (mouseEvent))
-            {
-                return mouseEvent.Handled;
-            }
+            // This will change mouse.Flags to clicked if appropriate.
+            WhenGrabbedHandleReleased (mouse);
 
-            if (WhenGrabbedHandleClicked (mouseEvent))
+            if (WhenGrabbedHandleClicked (mouse))
             {
-                return mouseEvent.Handled;
+                return mouse.Handled;
             }
         }
 
         // We get here if the view did not handle the mouse event via RaiseMouseEvent, and
         // it did not handle the commands via WhenGrabbed* methods.
-        if (mouseEvent.IsSingleDoubleOrTripleClicked)
+        if (mouse.IsSingleDoubleOrTripleClicked)
         {
-            return RaiseCommandsBoundToButtonClickedFlags (mouseEvent);
+            return RaiseCommandsBoundToButtonClickedFlags (mouse);
         }
 
-        if (mouseEvent.IsWheel)
+        if (mouse.IsWheel)
         {
-            return RaiseCommandsBoundToWheelFlags (mouseEvent);
+            return RaiseCommandsBoundToWheelFlags (mouse);
         }
 
         return false;
     }
 
     /// <summary>
-    ///     INTERNAL: Manages continuous button press behavior for views that have <see cref="WantContinuousButtonPressed"/> set to <see langword="true"/>.
+    ///     INTERNAL: Manages continuous button press behavior for views that have <see cref="MouseHoldRepeat"/> set to <see langword="true"/>.
     ///     When a mouse button is held down on such a view, this instance periodically raises events to enable auto-repeat functionality
     ///     (e.g., scrollbars that continue scrolling while the button is held, or buttons that repeat their action).
     /// </summary>
@@ -361,24 +368,26 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     Raises the <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/> event.
     /// </summary>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
+    public bool RaiseMouseEvent (Mouse mouse)
     {
-        if (OnMouseEvent (mouseEvent) || mouseEvent.Handled)
+        if (OnMouseEvent (mouse) || mouse.Handled)
         {
             return true;
         }
 
-        MouseEvent?.Invoke (this, mouseEvent);
+        MouseEvent?.Invoke (this, mouse);
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
-    private void MouseHeldDownOnMouseIsHeldDownTick (object? sender, CancelEventArgs<MouseEventArgs> e)
+    private void MouseHeldDownOnMouseIsHeldDownTick (object? sender, CancelEventArgs<Mouse> e)
     {
         Logging.Trace ($"MouseHeldDown tick - raising commands bound {e.NewValue.Flags}");
-        /*e.Cancel = */RaiseCommandsBoundToButtonClickedFlags (e.NewValue);
+        e.NewValue.ScreenPosition = App?.Mouse.LastMousePosition ?? e.NewValue.ScreenPosition;
+        /*e.Cancel = */
+        RaiseCommandsBoundToButtonClickedFlags (e.NewValue);
     }
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
@@ -387,9 +396,9 @@ public partial class View // Mouse APIs
     ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected virtual bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
+    protected virtual bool OnMouseEvent (Mouse mouse) { return false; }
 
     /// <summary>Raised when a mouse event occurs.</summary>
     /// <remarks>
@@ -397,7 +406,7 @@ public partial class View // Mouse APIs
     ///         The coordinates are relative to <see cref="View.Viewport"/>.
     ///     </para>
     /// </remarks>
-    public event EventHandler<MouseEventArgs>? MouseEvent;
+    public event EventHandler<Mouse>? MouseEvent;
 
     #endregion Low Level Mouse Events
 
@@ -406,20 +415,20 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed and the mouse is pressed, this method handles the pressed events from
     ///     the driver.
-    ///     When  <see cref="WantContinuousButtonPressed"/> is set, this method will raise the Activate event
+    ///     When  <see cref="MouseHoldRepeat"/> is set, this method will raise the Activate event
     ///     via <see cref="Command.Activate"/> each time it is called (after the first time the mouse is pressed).
     /// </summary>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if processing should stop, <see langword="false"/> otherwise.</returns>
-    private bool WhenGrabbedHandlePressed (MouseEventArgs mouseEvent)
+    private bool WhenGrabbedHandlePressed (Mouse mouse)
     {
-        if (!mouseEvent.IsPressed)
+        if (!mouse.IsPressed)
         {
             return false;
         }
 
-        Debug.Assert (!mouseEvent.Handled);
-        mouseEvent.Handled = false;
+        Debug.Assert (!mouse.Handled);
+        mouse.Handled = false;
 
         // If the user has just pressed the mouse, grab the mouse and set focus
         if (App is null || App.Mouse.MouseGrabView != this)
@@ -433,13 +442,13 @@ public partial class View // Mouse APIs
             }
 
             // This prevents raising Activate the first time the mouse is pressed.
-            mouseEvent.Handled = true;
+            mouse.Handled = true;
         }
 
-        if (Viewport.Contains (mouseEvent.Position))
+        if (mouse.Position is {} position && Viewport.Contains (position))
         {
             // The mouse is inside.
-            if (HighlightStates.HasFlag (MouseState.Pressed))
+            if (MouseHighlightStates.HasFlag (MouseState.Pressed))
             {
                 MouseState |= MouseState.Pressed;
             }
@@ -450,59 +459,59 @@ public partial class View // Mouse APIs
         else
         {
             // The mouse is outside.
-            // When WantContinuousButtonPressed is set we want to keep the mouse state as pressed (e.g. a repeating button).
+            // When MouseHoldRepeat is set we want to keep the mouse state as pressed (e.g. a repeating button).
             // This shows the user that the button is doing something, even if the mouse is outside the Viewport.
-            if (HighlightStates.HasFlag (MouseState.PressedOutside) && !WantContinuousButtonPressed)
+            if (MouseHighlightStates.HasFlag (MouseState.PressedOutside) && !MouseHoldRepeat)
             {
                 MouseState |= MouseState.PressedOutside;
             }
         }
 
-        if (!mouseEvent.Handled && WantContinuousButtonPressed && App?.Mouse.MouseGrabView == this)
+        if (!mouse.Handled && MouseHoldRepeat && App?.Mouse.MouseGrabView == this)
         {
             // Ignore the return value here, because the semantics of WhenGrabbedHandlePressed is the return
             // value indicates whether processing should stop or not.
-            //RaiseCommandsBoundToButtonClickedFlags (mouseEvent);
+            //RaiseCommandsBoundToButtonClickedFlags (mouse);
 
             return true;
         }
 
-        return mouseEvent.Handled = true;
+        return mouse.Handled = true;
     }
 
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed, this method handles the released events from the driver
-    ///     (typically
-    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
+    ///     (when <see cref="MouseHoldRepeat"/> or <see cref="MouseHighlightStates"/> are set). If <see cref="MouseState"/>
+    ///     is <see cref="MouseState.In"/>, this method modifies the <see cref="Mouse.Flags"/> to be the corresponding
+    ///     clicked flag (e.g., <see cref="MouseFlags.LeftButtonClicked"/>).
     /// </summary>
-    /// <param name="mouseEvent"></param>
-    internal bool WhenGrabbedHandleReleased (MouseEventArgs mouseEvent)
+    /// <param name="mouse"></param>
+    internal void WhenGrabbedHandleReleased (Mouse mouse)
     {
-        if (App is { } && App.Mouse.MouseGrabView == this)
+        if (App is null || App.Mouse.MouseGrabView != this)
         {
-            MouseState &= ~MouseState.Pressed;
-            MouseState &= ~MouseState.PressedOutside;
-
-            if (MouseState.HasFlag (MouseState.In))
-            {
-                mouseEvent.Flags = MouseFlags.LeftButtonPressed;
-                mouseEvent.Flags |= MouseFlags.LeftButtonClicked;
-            }
+            return;
         }
 
-        return false;//mouseEvent.Handled = true;
+        MouseState &= ~MouseState.Pressed;
+        MouseState &= ~MouseState.PressedOutside;
+
+        if (!MouseHoldRepeat && MouseState.HasFlag (MouseState.In))
+        {
+            ConvertReleasedToClicked(mouse);
+        }
     }
 
     /// <summary>
     ///     INTERNAL: For cases where the view is grabbed, this method handles the click events from the driver
     ///     (typically
-    ///     when <see cref="WantContinuousButtonPressed"/> or <see cref="HighlightStates"/> are set).
+    ///     when <see cref="MouseHoldRepeat"/> or <see cref="MouseHighlightStates"/> are set).
     /// </summary>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if processing should stop; <see langword="false"/> otherwise.</returns>
-    internal bool WhenGrabbedHandleClicked (MouseEventArgs mouseEvent)
+    internal bool WhenGrabbedHandleClicked (Mouse mouse)
     {
-        if (App is null || App.Mouse.MouseGrabView != this || !mouseEvent.IsSingleClicked)
+        if (App is null || App.Mouse.MouseGrabView != this || !mouse.IsSingleClicked)
         {
             return false;
         }
@@ -516,7 +525,7 @@ public partial class View // Mouse APIs
         MouseState &= ~MouseState.PressedOutside;
 
         // If mouse is still in bounds, return false to indicate a click should be raised.
-        return !Viewport.Contains (mouseEvent.Position);
+        return !Viewport.Contains (mouse.Position!.Value);
     }
 
     #endregion WhenGrabbed Handlers
@@ -541,7 +550,7 @@ public partial class View // Mouse APIs
     ///         are bound to <see cref="Command.Activate"/>, which raises the <see cref="Activating"/> event.
     ///     </para>
     /// </remarks>
-    protected bool RaiseCommandsBoundToButtonClickedFlags (MouseEventArgs args)
+    protected bool RaiseCommandsBoundToButtonClickedFlags (Mouse args)
     {
         // Pre-conditions
         if (!Enabled)
@@ -554,29 +563,49 @@ public partial class View // Mouse APIs
         // but the actual mouse events coming from the driver are often pressed events (LeftButtonPressed).
         // This switch expression bridges that gap by converting pressed events to clicked
         // events so they can be matched against the command bindings.
-        MouseEventArgs clickedArgs = new ();
+        ConvertPressedToClicked (args);
 
-        clickedArgs.Flags = args.IsPressed
-                                ? args.Flags switch
-                                {
-                                    MouseFlags.LeftButtonPressed => MouseFlags.LeftButtonClicked,
-                                    MouseFlags.MiddleButtonPressed => MouseFlags.MiddleButtonClicked,
-                                    MouseFlags.RightButtonPressed => MouseFlags.RightButtonClicked,
-                                    MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
-                                    _ => clickedArgs.Flags
-                                }
-                                : args.Flags;
-
-        clickedArgs.Position = args.Position;
-        clickedArgs.ScreenPosition = args.ScreenPosition;
-        clickedArgs.View = args.View;
-
-        Logging.Trace ($"Invoking commands bound to mouse: {clickedArgs.Flags}");
+        //Logging.Trace ($"Invoking commands bound to mouse: {args.Flags}");
         // By default, this will raise Activating/OnActivating - Subclasses can override this via
         // ReplaceCommand (Command.Activate ...).
-        args.Handled = InvokeCommandsBoundToMouse (clickedArgs) == true;
+        args.Handled = InvokeCommandsBoundToMouse (args) == true;
 
         return args.Handled;
+    }
+
+
+    private static void ConvertPressedToClicked (Mouse args)
+    {
+        if (!args.IsPressed)
+        {
+            return;
+        }
+
+        args.Flags = args.Flags switch
+        {
+            MouseFlags.LeftButtonPressed => MouseFlags.LeftButtonClicked,
+            MouseFlags.MiddleButtonPressed => MouseFlags.MiddleButtonClicked,
+            MouseFlags.RightButtonPressed => MouseFlags.RightButtonClicked,
+            MouseFlags.Button4Pressed => MouseFlags.Button4Clicked,
+            _ => args.Flags
+        };
+    }
+
+    private static void ConvertReleasedToClicked (Mouse args)
+    {
+        if (!args.IsReleased)
+        {
+            return;
+        }
+
+        args.Flags = args.Flags switch
+        {
+            MouseFlags.LeftButtonReleased => MouseFlags.LeftButtonClicked,
+            MouseFlags.MiddleButtonReleased => MouseFlags.MiddleButtonClicked,
+            MouseFlags.RightButtonReleased => MouseFlags.RightButtonClicked,
+            MouseFlags.Button4Released => MouseFlags.Button4Clicked,
+            _ => args.Flags
+        };
     }
 
     /// <summary>
@@ -595,7 +624,7 @@ public partial class View // Mouse APIs
     ///         any commands bound to the mouse flags via <see cref="MouseBindings"/>.
     ///     </para>
     /// </remarks>
-    protected bool RaiseCommandsBoundToWheelFlags (MouseEventArgs args)
+    protected bool RaiseCommandsBoundToWheelFlags (Mouse args)
     {
         // Pre-conditions
         if (!Enabled)
@@ -622,7 +651,7 @@ public partial class View // Mouse APIs
     ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    protected bool? InvokeCommandsBoundToMouse (MouseEventArgs mouseEventArgs)
+    protected bool? InvokeCommandsBoundToMouse (Mouse mouseEventArgs)
     {
         if (!MouseBindings.TryGet (mouseEventArgs.Flags, out MouseBinding binding))
         {
@@ -681,11 +710,11 @@ public partial class View // Mouse APIs
     ///     </para>
     ///     <para>
     ///         <see cref="MouseState.PressedOutside"/> means the View will be highlighted when the mouse was pressed
-    ///         inside it and then moved outside of it, unless <see cref="WantContinuousButtonPressed"/> is set to
+    ///         inside it and then moved outside of it, unless <see cref="MouseHoldRepeat"/> is set to
     ///         <see langword="true"/>, in which case the flag has no effect.
     ///     </para>
     /// </remarks>
-    public MouseState HighlightStates { get; set; }
+    public MouseState MouseHighlightStates { get; set; }
 
     /// <summary>
     ///     INTERNAL Raises the <see cref="MouseStateChanged"/> event.

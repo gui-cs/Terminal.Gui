@@ -1288,7 +1288,7 @@ public class Slider<T> : View, IOrientation
     private Point? _moveRenderPosition;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
         //                    That will make OptionFocused Event more relevant.
@@ -1296,21 +1296,21 @@ public class Slider<T> : View, IOrientation
         //       adds too much friction to UI.
         // TODO(jmperricone): Make Range Type work with mouse.
 
-        if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
-              || mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-              || mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)
-              || mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)))
+        if (!(mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+              || mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed)
+              || mouse.Flags.HasFlag (MouseFlags.PositionReport)
+              || mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased)))
         {
             return false;
         }
 
         SetFocus ();
 
-        if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (!_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
+            if (mouse.Flags.HasFlag (MouseFlags.PositionReport))
             {
-                _dragPosition = mouseEvent.Position;
+                _dragPosition = mouse.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
                 App?.Mouse.GrabMouse (this);
             }
@@ -1321,11 +1321,11 @@ public class Slider<T> : View, IOrientation
         }
 
         if (_dragPosition.HasValue
-            && mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)
-            && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+            && mouse.Flags.HasFlag (MouseFlags.PositionReport)
+            && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             // Continue Drag
-            _dragPosition = mouseEvent.Position;
+            _dragPosition = mouse.Position;
             _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
 
             var success = false;
@@ -1334,11 +1334,11 @@ public class Slider<T> : View, IOrientation
             // how far has user dragged from original location?
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouse.Position!.Value.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouse.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
 
             if (!_config._allowEmpty && success)
@@ -1354,8 +1354,8 @@ public class Slider<T> : View, IOrientation
             return true;
         }
 
-        if ((_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if ((_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+            || mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             // End Drag
             App?.Mouse.UngrabMouse ();
@@ -1368,11 +1368,11 @@ public class Slider<T> : View, IOrientation
 
             if (Orientation == Orientation.Horizontal)
             {
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouse.Position!.Value.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
             else
             {
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouse.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
 
             if (success)
@@ -1385,11 +1385,11 @@ public class Slider<T> : View, IOrientation
 
             SetNeedsDraw ();
 
-            mouseEvent.Handled = true;
+            mouse.Handled = true;
 
         }
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
 
         Point ClampMovePosition (Point position)
         {

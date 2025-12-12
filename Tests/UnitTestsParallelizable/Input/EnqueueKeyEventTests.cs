@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using Xunit.Abstractions;
 
-namespace DriverTests;
+namespace DriverTests.Keyboard;
 
 /// <summary>
 ///     Parallelizable unit tests for IInput.EnqueueKeyDownEvent and InputProcessor.EnqueueKeyDownEvent.

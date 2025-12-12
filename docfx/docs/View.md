@@ -340,7 +340,7 @@ view.AddCommand (Command.Accept, () =>
 view.KeyBindings.Add (Key.Enter, Command.Accept);
 
 // Bind a mouse action to the command
-view.MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
+view.MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
 ```
 
 ### Input
@@ -502,10 +502,10 @@ var container = new View
     Height = Dim.Fill()
 };
 
-var button1 = new Button { Text = "OK", X = 2, Y = 2 };
-var button2 = new Button { Text = "Cancel", X = Pos.Right(button1) + 2, Y = 2 };
+var LeftButton = new Button { Text = "OK", X = 2, Y = 2 };
+var MiddleButton = new Button { Text = "Cancel", X = Pos.Right(LeftButton) + 2, Y = 2 };
 
-container.Add(button1, button2);
+container.Add(LeftButton, MiddleButton);
 ```
 
 ### Using Adornments

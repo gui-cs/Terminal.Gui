@@ -1,14 +1,12 @@
 ﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Interface for main loop class that will process the queued input.
-///     Is responsible for <see cref="ProcessQueue"/> and translating into common Terminal.Gui
-///     events and data models.
+///     Processes queued input on the main loop thread, translating driver-specific input
+///     into Terminal.Gui events and data models.
 /// </summary>
 public interface IInputProcessor
 {
-    /// <summary>Event raised when a terminal sequence read from input is not recognized and therefore ignored.</summary>
-    public event EventHandler<string>? AnsiSequenceSwallowed;
+    #region Configuration and Core Processing
 
     /// <summary>
     ///     Gets the name of the driver associated with this input processor.
@@ -16,83 +14,116 @@ public interface IInputProcessor
     string? DriverName { get; init; }
 
     /// <summary>
-    ///     Drains the input queue, processing all available keystrokes. To be called on the main loop thread.
+    ///     Drains the input queue, processing all available input. Must be called on the main loop thread.
     /// </summary>
     void ProcessQueue ();
 
     /// <summary>
-    ///     Gets the response parser currently configured on this input processor.
+    ///     Gets the ANSI response parser for handling escape sequences.
     /// </summary>
-    /// <returns></returns>
-    public IAnsiResponseParser GetParser ();
+    /// <returns>The configured ANSI response parser instance.</returns>
+    IAnsiResponseParser GetParser ();
 
     /// <summary>
-    ///     Handles surrogate pairs in the input stream.
+    ///     Validates and processes Unicode surrogate pairs in the input stream.
     /// </summary>
-    /// <param name="key">The key from input.</param>
-    /// <param name="result">Get the surrogate pair or the key.</param>
-    /// <returns>
-    ///     <see langword="true"/> if the result is a valid surrogate pair or a valid key, otherwise
-    ///     <see langword="false"/>.
-    /// </returns>
+    /// <param name="key">The key to validate.</param>
+    /// <param name="result">The validated key or completed surrogate pair.</param>
+    /// <returns><see langword="true"/> if the result is valid; <see langword="false"/> if more input is needed.</returns>
     bool IsValidInput (Key key, out Key result);
 
+    #endregion
+
+    #region Keyboard Events
+
     /// <summary>
-    ///     Called when a key down event has been dequeued. Raises the <see cref="KeyDown"/> event. This is a precursor to
-    ///     <see cref="RaiseKeyUpEvent"/>.
+    ///     Raises the <see cref="KeyDown"/> event after a key down event is dequeued.
     /// </summary>
     /// <param name="key">The key event data.</param>
     void RaiseKeyDownEvent (Key key);
 
-    /// <summary>Event raised when a key down event has been dequeued. This is a precursor to <see cref="KeyUp"/>.</summary>
+    /// <summary>
+    ///     Event raised when a key down event is dequeued. Precursor to <see cref="KeyUp"/>.
+    /// </summary>
     event EventHandler<Key>? KeyDown;
 
     /// <summary>
-    ///     Adds a key up event to the input queue. For unit tests.
+    ///     Enqueues a key down event. For unit tests.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="key">The key to enqueue.</param>
     void EnqueueKeyDownEvent (Key key);
 
     /// <summary>
-    ///     Called when a key up event has been dequeued. Raises the <see cref="KeyUp"/> event.
+    ///     Raises the <see cref="KeyUp"/> event after a key up event is dequeued.
     /// </summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will call this method after <see cref="RaiseKeyDownEvent"/>
-    ///     processing
-    ///     is complete.
+    ///     Drivers that don't support key release will call this immediately after <see cref="RaiseKeyDownEvent"/>.
     /// </remarks>
     /// <param name="key">The key event data.</param>
     void RaiseKeyUpEvent (Key key);
 
-    /// <summary>Event raised when a key up event has been dequeued.</summary>
+    /// <summary>
+    ///     Event raised when a key up event is dequeued.
+    /// </summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is
-    ///     complete.
+    ///     Drivers that don't support key release fire this immediately after <see cref="KeyDown"/>.
     /// </remarks>
     event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Adds a key up event to the input queue. For unit tests.
+    ///     Enqueues a key up event. For unit tests.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="key">The key to enqueue.</param>
     void EnqueueKeyUpEvent (Key key);
 
+    #endregion
+
+    #region Mouse Events
+
     /// <summary>
-    ///     Called when a mouse event has been dequeued. Raises the <see cref="MouseEvent"/> event.
+    ///     Raises the <see cref="MouseEventParsed"/> event after a mouse event is parsed from the driver.
     /// </summary>
-    /// <param name="mouseEventArgs">The mouse event data.</param>
-    void RaiseMouseEvent (MouseEventArgs mouseEventArgs);
-
-    /// <summary>Event raised when a mouse event has been dequeued.</summary>
-    event EventHandler<MouseEventArgs>? MouseEvent;
+    /// <param name="mouse">The parsed mouse event data.</param>
+    void RaiseMouseEventParsed (Mouse mouse);
 
     /// <summary>
-    ///     Adds a mouse input event to the input queue. For unit tests.
+    ///     Event raised when a mouse event is parsed from the driver. For debugging and unit tests.
+    /// </summary>
+    event EventHandler<Mouse>? MouseEventParsed;
+
+    /// <summary>
+    ///     Raises the <see cref="SyntheticMouseEvent"/> event for generated click/double-click/triple-click events.
+    /// </summary>
+    /// <remarks>
+    ///     Called by <see cref="ProcessQueue"/> after processing raw mouse input through <see cref="MouseInterpreter"/>
+    ///     to generate higher-level click events based on timing and position.
+    /// </remarks>
+    /// <param name="mouse">The synthetic mouse event data.</param>
+    void RaiseSyntheticMouseEvent (Mouse mouse);
+
+    /// <summary>
+    ///     Event raised when synthetic mouse events (clicks, double-clicks, triple-clicks) are generated.
+    /// </summary>
+    event EventHandler<Mouse>? SyntheticMouseEvent;
+
+    /// <summary>
+    ///     Enqueues a mouse event. For unit tests.
     /// </summary>
     /// <param name="app">
-    ///     The application instance to use. Used to use Invoke to raise the mouse
-    ///     event in the case where this method is not called on the main thread.
+    ///     Application instance for cross-thread marshalling. When called from non-main thread,
+    ///     uses <see cref="IApplication.Invoke(Action)"/> to raise events on the main thread.
     /// </param>
-    /// <param name="mouseEvent"></param>
-    void EnqueueMouseEvent (IApplication? app,  MouseEventArgs mouseEvent);
+    /// <param name="mouse">The mouse event to enqueue.</param>
+    void EnqueueMouseEvent (IApplication? app, Mouse mouse);
+
+    #endregion
+
+    #region ANSI Sequence Handling
+
+    /// <summary>
+    ///     Event raised when an unrecognized ANSI escape sequence is ignored.
+    /// </summary>
+    event EventHandler<string>? AnsiSequenceSwallowed;
+
+    #endregion
 }

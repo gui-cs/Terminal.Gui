@@ -324,7 +324,7 @@ public interface IDriver : IDisposable
     #region Input Events
 
     /// <summary>Event fired when a mouse event occurs.</summary>
-    event EventHandler<MouseEventArgs>? MouseEvent;
+    event EventHandler<Mouse>? MouseEvent;
 
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
     event EventHandler<Key>? KeyDown;

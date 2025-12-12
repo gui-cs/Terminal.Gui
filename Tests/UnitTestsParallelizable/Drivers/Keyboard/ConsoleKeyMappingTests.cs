@@ -1,4 +1,4 @@
-namespace DriverTests;
+namespace DriverTests.Keyboard;
 
 public class ConsoleKeyMappingTests
 {

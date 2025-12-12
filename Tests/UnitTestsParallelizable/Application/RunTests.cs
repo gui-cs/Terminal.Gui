@@ -212,12 +212,12 @@ public class RunTests
         // Don't use visuals to test as style of border can change over time.
         Assert.Equal (new (0, 0), w.Frame.Location);
 
-        app.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed });
+        app.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.LeftButtonPressed });
         Assert.Equal (w.Border, app.Mouse.MouseGrabView);
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
         Assert.Equal (new (1, 1), w.Frame.Location);
 
         app.End (rs!);

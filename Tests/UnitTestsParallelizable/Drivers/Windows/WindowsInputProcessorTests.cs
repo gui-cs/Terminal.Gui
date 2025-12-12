@@ -5,7 +5,7 @@ using EventFlags = Terminal.Gui.Drivers.WindowsConsole.EventFlags;
 using ControlKeyState = Terminal.Gui.Drivers.WindowsConsole.ControlKeyState;
 using MouseEventRecord = Terminal.Gui.Drivers.WindowsConsole.MouseEventRecord;
 
-namespace DriverTests;
+namespace DriverTests.Windows;
 
 public class WindowsInputProcessorTests
 {
@@ -109,23 +109,23 @@ public class WindowsInputProcessorTests
 
         var processor = new WindowsInputProcessor (queue);
 
-        List<MouseEventArgs> mouseEvents = [];
+        List<Terminal.Gui.Input.Mouse> mouseEvents = [];
 
-        processor.MouseEvent += (s, e) => { mouseEvents.Add (e); };
+        processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
         Assert.Empty (mouseEvents);
 
         processor.ProcessQueue ();
 
-        MouseEventArgs s = Assert.Single (mouseEvents);
-        Assert.Equal (MouseFlags.ReportMousePosition, s.Flags);
+        Terminal.Gui.Input.Mouse s = Assert.Single (mouseEvents);
+        Assert.Equal (MouseFlags.PositionReport, s.Flags);
         Assert.Equal (s.ScreenPosition, new (32, 31));
     }
 
     [Theory]
-    [InlineData (ButtonState.Button1Pressed, MouseFlags.Button1Pressed)]
-    [InlineData (ButtonState.Button2Pressed, MouseFlags.Button2Pressed)]
-    [InlineData (ButtonState.Button3Pressed, MouseFlags.Button3Pressed)]
+    [InlineData (ButtonState.Button1Pressed, MouseFlags.LeftButtonPressed)]
+    [InlineData (ButtonState.Button2Pressed, MouseFlags.MiddleButtonPressed)]
+    [InlineData (ButtonState.Button3Pressed, MouseFlags.RightButtonPressed)]
     [InlineData (ButtonState.Button4Pressed, MouseFlags.Button4Pressed)]
     internal void Test_ProcessQueue_Mouse_Pressed (ButtonState state, MouseFlags expectedFlag)
     {
@@ -146,16 +146,16 @@ public class WindowsInputProcessorTests
 
         var processor = new WindowsInputProcessor (queue);
 
-        List<MouseEventArgs> mouseEvents = [];
+        List<Terminal.Gui.Input.Mouse> mouseEvents = [];
 
-        processor.MouseEvent += (s, e) => { mouseEvents.Add (e); };
+        processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
         Assert.Empty (mouseEvents);
 
         processor.ProcessQueue ();
 
-        MouseEventArgs s = Assert.Single (mouseEvents);
-        Assert.Equal (s.Flags, MouseFlags.ReportMousePosition | expectedFlag);
+        Terminal.Gui.Input.Mouse s = Assert.Single (mouseEvents);
+        Assert.Equal (s.Flags, MouseFlags.PositionReport | expectedFlag);
         Assert.Equal (s.ScreenPosition, new (32, 31));
     }
 
@@ -181,15 +181,15 @@ public class WindowsInputProcessorTests
 
         var processor = new WindowsInputProcessor (queue);
 
-        List<MouseEventArgs> mouseEvents = [];
+        List<Terminal.Gui.Input.Mouse> mouseEvents = [];
 
-        processor.MouseEvent += (s, e) => { mouseEvents.Add (e); };
+        processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
         Assert.Empty (mouseEvents);
 
         processor.ProcessQueue ();
 
-        MouseEventArgs s = Assert.Single (mouseEvents);
+        Terminal.Gui.Input.Mouse s = Assert.Single (mouseEvents);
         Assert.Equal (s.Flags, expectedFlag);
         Assert.Equal (s.ScreenPosition, new (32, 31));
     }
@@ -200,8 +200,8 @@ public class WindowsInputProcessorTests
         [
             new []
             {
-                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button1Pressed),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button1Released),
+                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.LeftButtonPressed),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.LeftButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -214,8 +214,8 @@ public class WindowsInputProcessorTests
                               ButtonState.Button2Pressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button2Pressed | MouseFlags.ReportMousePosition),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button2Released),
+                              MouseFlags.MiddleButtonPressed | MouseFlags.PositionReport),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.MiddleButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -228,8 +228,8 @@ public class WindowsInputProcessorTests
                               ButtonState.Button3Pressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button3Released),
+                              MouseFlags.RightButtonPressed | MouseFlags.PositionReport),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.RightButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -242,9 +242,9 @@ public class WindowsInputProcessorTests
                               ButtonState.Button4Pressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button4Pressed | MouseFlags.ReportMousePosition),
+                              MouseFlags.Button4Pressed | MouseFlags.PositionReport),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button4Released),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.MouseMoved, ControlKeyState.NoControlKeyPressed, MouseFlags.ReportMousePosition)
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.MouseMoved, ControlKeyState.NoControlKeyPressed, MouseFlags.PositionReport)
             }
         ];
 
@@ -256,8 +256,8 @@ public class WindowsInputProcessorTests
                               ButtonState.RightmostButtonPressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button3Released),
+                              MouseFlags.RightButtonPressed | MouseFlags.PositionReport),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.RightButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -271,13 +271,13 @@ public class WindowsInputProcessorTests
                               ButtonState.Button1Pressed | ButtonState.Button2Pressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button1Pressed | MouseFlags.Button2Pressed | MouseFlags.ReportMousePosition),
+                              MouseFlags.LeftButtonPressed | MouseFlags.MiddleButtonPressed | MouseFlags.PositionReport),
                 Tuple.Create (
                               ButtonState.Button1Pressed,
                               EventFlags.NoEvent,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button1Pressed | MouseFlags.Button2Released),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button1Released),
+                              MouseFlags.LeftButtonPressed | MouseFlags.MiddleButtonReleased),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.LeftButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -290,13 +290,13 @@ public class WindowsInputProcessorTests
                               ButtonState.Button3Pressed | ButtonState.Button4Pressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button3Pressed | MouseFlags.Button4Pressed | MouseFlags.ReportMousePosition),
+                              MouseFlags.RightButtonPressed | MouseFlags.Button4Pressed | MouseFlags.PositionReport),
                 Tuple.Create (
                               ButtonState.Button3Pressed,
                               EventFlags.NoEvent,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button3Pressed | MouseFlags.Button4Released),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button3Released),
+                              MouseFlags.RightButtonPressed | MouseFlags.Button4Released),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.RightButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -310,12 +310,12 @@ public class WindowsInputProcessorTests
                               ButtonState.Button1Pressed | ButtonState.Button2Pressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button1Pressed | MouseFlags.Button2Pressed | MouseFlags.ReportMousePosition),
+                              MouseFlags.LeftButtonPressed | MouseFlags.MiddleButtonPressed | MouseFlags.PositionReport),
                 Tuple.Create (
                               ButtonState.NoButtonPressed,
                               EventFlags.NoEvent,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button1Released | MouseFlags.Button2Released),
+                              MouseFlags.LeftButtonReleased | MouseFlags.MiddleButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -329,22 +329,22 @@ public class WindowsInputProcessorTests
                               ButtonState.Button3Pressed | ButtonState.RightmostButtonPressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+                              MouseFlags.RightButtonPressed | MouseFlags.PositionReport),
 
                 // Can swap between without raising the released
                 Tuple.Create (
                               ButtonState.Button3Pressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+                              MouseFlags.RightButtonPressed | MouseFlags.PositionReport),
                 Tuple.Create (
                               ButtonState.RightmostButtonPressed,
                               EventFlags.MouseMoved,
                               ControlKeyState.NoControlKeyPressed,
-                              MouseFlags.Button3Pressed | MouseFlags.ReportMousePosition),
+                              MouseFlags.RightButtonPressed | MouseFlags.PositionReport),
 
                 // Now with neither we get released
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.Button3Released),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.RightButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NoControlKeyPressed, MouseFlags.None)
             }
         ];
@@ -354,13 +354,13 @@ public class WindowsInputProcessorTests
         [
             new []
             {
-                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.LeftAltPressed, MouseFlags.Button1Pressed | MouseFlags.ButtonAlt),
+                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.LeftAltPressed, MouseFlags.LeftButtonPressed | MouseFlags.Alt),
                 Tuple.Create (
                               ButtonState.NoButtonPressed,
                               EventFlags.NoEvent,
                               ControlKeyState.LeftAltPressed,
-                              MouseFlags.Button1Released | MouseFlags.ButtonAlt),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.LeftAltPressed, MouseFlags.None | MouseFlags.ButtonAlt)
+                              MouseFlags.LeftButtonReleased | MouseFlags.Alt),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.LeftAltPressed, MouseFlags.None | MouseFlags.Alt)
             }
         ];
 
@@ -372,13 +372,13 @@ public class WindowsInputProcessorTests
                               ButtonState.Button1Pressed,
                               EventFlags.NoEvent,
                               ControlKeyState.RightAltPressed,
-                              MouseFlags.Button1Pressed | MouseFlags.ButtonAlt),
+                              MouseFlags.LeftButtonPressed | MouseFlags.Alt),
                 Tuple.Create (
                               ButtonState.NoButtonPressed,
                               EventFlags.NoEvent,
                               ControlKeyState.RightAltPressed,
-                              MouseFlags.Button1Released | MouseFlags.ButtonAlt),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.RightAltPressed, MouseFlags.None | MouseFlags.ButtonAlt)
+                              MouseFlags.LeftButtonReleased | MouseFlags.Alt),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.RightAltPressed, MouseFlags.None | MouseFlags.Alt)
             }
         ];
 
@@ -390,13 +390,13 @@ public class WindowsInputProcessorTests
                               ButtonState.Button1Pressed,
                               EventFlags.NoEvent,
                               ControlKeyState.LeftControlPressed,
-                              MouseFlags.Button1Pressed | MouseFlags.ButtonCtrl),
+                              MouseFlags.LeftButtonPressed | MouseFlags.Ctrl),
                 Tuple.Create (
                               ButtonState.NoButtonPressed,
                               EventFlags.NoEvent,
                               ControlKeyState.LeftControlPressed,
-                              MouseFlags.Button1Released | MouseFlags.ButtonCtrl),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.LeftControlPressed, MouseFlags.None | MouseFlags.ButtonCtrl)
+                              MouseFlags.LeftButtonReleased | MouseFlags.Ctrl),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.LeftControlPressed, MouseFlags.None | MouseFlags.Ctrl)
             }
         ];
 
@@ -408,13 +408,13 @@ public class WindowsInputProcessorTests
                               ButtonState.Button1Pressed,
                               EventFlags.NoEvent,
                               ControlKeyState.RightControlPressed,
-                              MouseFlags.Button1Pressed | MouseFlags.ButtonCtrl),
+                              MouseFlags.LeftButtonPressed | MouseFlags.Ctrl),
                 Tuple.Create (
                               ButtonState.NoButtonPressed,
                               EventFlags.NoEvent,
                               ControlKeyState.RightControlPressed,
-                              MouseFlags.Button1Released | MouseFlags.ButtonCtrl),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.RightControlPressed, MouseFlags.None | MouseFlags.ButtonCtrl)
+                              MouseFlags.LeftButtonReleased | MouseFlags.Ctrl),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.RightControlPressed, MouseFlags.None | MouseFlags.Ctrl)
             }
         ];
 
@@ -422,13 +422,13 @@ public class WindowsInputProcessorTests
         [
             new []
             {
-                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.ShiftPressed, MouseFlags.Button1Pressed | MouseFlags.ButtonShift),
+                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.ShiftPressed, MouseFlags.LeftButtonPressed | MouseFlags.Shift),
                 Tuple.Create (
                               ButtonState.NoButtonPressed,
                               EventFlags.NoEvent,
                               ControlKeyState.ShiftPressed,
-                              MouseFlags.Button1Released | MouseFlags.ButtonShift),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.ShiftPressed, MouseFlags.None | MouseFlags.ButtonShift)
+                              MouseFlags.LeftButtonReleased | MouseFlags.Shift),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.ShiftPressed, MouseFlags.None | MouseFlags.Shift)
             }
         ];
 
@@ -437,8 +437,8 @@ public class WindowsInputProcessorTests
         [
             new []
             {
-                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.CapslockOn, MouseFlags.Button1Pressed),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.CapslockOn, MouseFlags.Button1Released),
+                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.CapslockOn, MouseFlags.LeftButtonPressed),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.CapslockOn, MouseFlags.LeftButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.CapslockOn, MouseFlags.None)
             }
         ];
@@ -447,8 +447,8 @@ public class WindowsInputProcessorTests
         [
             new []
             {
-                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.EnhancedKey, MouseFlags.Button1Pressed),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.EnhancedKey, MouseFlags.Button1Released),
+                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.EnhancedKey, MouseFlags.LeftButtonPressed),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.EnhancedKey, MouseFlags.LeftButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.EnhancedKey, MouseFlags.None)
             }
         ];
@@ -457,8 +457,8 @@ public class WindowsInputProcessorTests
         [
             new []
             {
-                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.NumlockOn, MouseFlags.Button1Pressed),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NumlockOn, MouseFlags.Button1Released),
+                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.NumlockOn, MouseFlags.LeftButtonPressed),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NumlockOn, MouseFlags.LeftButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.NumlockOn, MouseFlags.None)
             }
         ];
@@ -467,8 +467,8 @@ public class WindowsInputProcessorTests
         [
             new []
             {
-                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.ScrolllockOn, MouseFlags.Button1Pressed),
-                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.ScrolllockOn, MouseFlags.Button1Released),
+                Tuple.Create (ButtonState.Button1Pressed, EventFlags.NoEvent, ControlKeyState.ScrolllockOn, MouseFlags.LeftButtonPressed),
+                Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.ScrolllockOn, MouseFlags.LeftButtonReleased),
                 Tuple.Create (ButtonState.NoButtonPressed, EventFlags.NoEvent, ControlKeyState.ScrolllockOn, MouseFlags.None)
             }
         ];
@@ -483,7 +483,7 @@ public class WindowsInputProcessorTests
         foreach (Tuple<ButtonState, EventFlags, ControlKeyState, MouseFlags> pair in inputOutputPairs)
         {
             var mockEvent = new MouseEventRecord { ButtonState = pair.Item1, EventFlags = pair.Item2, ControlKeyState = pair.Item3 };
-            MouseEventArgs result = processor.ToMouseEvent (mockEvent);
+            Terminal.Gui.Input.Mouse result = processor.ToMouseEvent (mockEvent);
 
             Assert.Equal (pair.Item4, result.Flags);
         }

@@ -2,7 +2,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace DriverTests;
+namespace DriverTests.Fake;
 
 /// <summary>
 ///     Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.

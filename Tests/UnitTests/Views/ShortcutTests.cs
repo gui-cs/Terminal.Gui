@@ -41,7 +41,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (x, 0),
-                                      Flags = MouseFlags.Button1Clicked
+                                      Flags = MouseFlags.LeftButtonClicked
                                   });
 
         Assert.Equal (expectedAccepted, accepted);
@@ -101,7 +101,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
-                                      Flags = MouseFlags.Button1Clicked
+                                      Flags = MouseFlags.LeftButtonClicked
                                   });
 
         Assert.Equal (expectedShortcutAccepted, shortcutAcceptCount);
@@ -158,7 +158,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
-                                      Flags = MouseFlags.Button1Clicked
+                                      Flags = MouseFlags.LeftButtonClicked
                                   });
 
         Assert.Equal (expectedAccept, accepted);
@@ -233,7 +233,7 @@ public class ShortcutTests
                                   new ()
                                   {
                                       ScreenPosition = new (mouseX, 0),
-                                      Flags = MouseFlags.Button1Clicked
+                                      Flags = MouseFlags.LeftButtonClicked
                                   });
 
         Assert.Equal (expectedAccepted, accepted);

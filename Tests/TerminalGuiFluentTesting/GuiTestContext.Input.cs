@@ -18,8 +18,9 @@ public partial class GuiTestContext
     {
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.Button3Clicked,
-            ScreenPosition = new (screenX, screenY)
+            Flags = MouseFlags.RightButtonClicked,
+            ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
         });
     }
 
@@ -35,8 +36,9 @@ public partial class GuiTestContext
     {
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked,
+            Flags = MouseFlags.LeftButtonClicked,
             ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
         });
     }
 
@@ -51,20 +53,27 @@ public partial class GuiTestContext
     {
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked,
+            Flags = MouseFlags.LeftButtonClicked
         }, evaluator);
     }
 
-    private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    /// <summary>
+    /// Enqueues a mouse event to the current driver's input processor.
+    /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// </summary>
+    /// <param name="mouse"></param>
+    /// <returns></returns>
+    private GuiTestContext EnqueueMouseEvent (Mouse mouse)
     {
             // Enqueue the mouse event
         WaitIteration ((app) =>
         {
             if (app.Driver is { })
             {
-                mouseEvent.Position = mouseEvent.ScreenPosition;
+                mouse.Timestamp = DateTime.Now;
+                mouse.Position = mouse.ScreenPosition;
 
-                app.Driver.GetInputProcessor ().EnqueueMouseEvent (app, mouseEvent);
+                app.Driver.GetInputProcessor ().EnqueueMouseEvent (app, mouse);
             }
             else
             {
@@ -77,7 +86,7 @@ public partial class GuiTestContext
     }
 
 
-    private GuiTestContext EnqueueMouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
+    private GuiTestContext EnqueueMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 
@@ -86,10 +95,10 @@ public partial class GuiTestContext
                                                 TView v = Find (evaluator);
                                                 screen = v.ViewportToScreen (new Point (0, 0));
                                             });
-        mouseEvent.ScreenPosition = screen;
-        mouseEvent.Position = new Point (0, 0);
+        mouse.ScreenPosition = screen;
+        mouse.Position = screen;
 
-        EnqueueMouseEvent (mouseEvent);
+        EnqueueMouseEvent (mouse);
 
         return ctx;
     }
@@ -128,9 +137,9 @@ public partial class GuiTestContext
 
     //            int netButton = btn switch
     //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.LeftButtonPressed => 0,
+    //                WindowsConsole.ButtonState.MiddleButtonPressed => 1,
+    //                WindowsConsole.ButtonState.RightButtonPressed => 2,
     //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
     //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
     //            };
@@ -146,9 +155,9 @@ public partial class GuiTestContext
 
     //            int unixButton = btn switch
     //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.LeftButtonPressed => 0,
+    //                WindowsConsole.ButtonState.MiddleButtonPressed => 1,
+    //                WindowsConsole.ButtonState.RightButtonPressed => 2,
     //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
     //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
     //            };
@@ -164,9 +173,9 @@ public partial class GuiTestContext
 
     //            int fakeButton = btn switch
     //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
+    //                WindowsConsole.ButtonState.LeftButtonPressed => 0,
+    //                WindowsConsole.ButtonState.MiddleButtonPressed => 1,
+    //                WindowsConsole.ButtonState.RightButtonPressed => 2,
     //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
     //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
     //            };

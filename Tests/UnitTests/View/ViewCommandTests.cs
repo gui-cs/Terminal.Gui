@@ -56,7 +56,7 @@ public class ViewCommandTests
                                      new()
                                      {
                                          ScreenPosition = btn2Frame.Location,
-                                         Flags = MouseFlags.Button1Clicked
+                                         Flags = MouseFlags.LeftButtonClicked
                                      });
 
         // Button A should have been accepted because B didn't cancel and A IsDefault
@@ -69,7 +69,7 @@ public class ViewCommandTests
                                      new()
                                      {
                                          ScreenPosition = btn2Frame.Location,
-                                         Flags = MouseFlags.Button1Clicked
+                                         Flags = MouseFlags.LeftButtonClicked
                                      });
 
         // Button A (IsDefault) should NOT have been accepted because B canceled
@@ -132,21 +132,21 @@ public class ViewCommandTests
                                      new()
                                      {
                                          ScreenPosition = btnFrame.Location,
-                                         Flags = MouseFlags.Button1Pressed
+                                         Flags = MouseFlags.LeftButtonPressed
                                      });
 
         Application.RaiseMouseEvent (
                                      new()
                                      {
                                          ScreenPosition = btnFrame.Location,
-                                         Flags = MouseFlags.Button1Released
+                                         Flags = MouseFlags.LeftButtonReleased
                                      });
 
         Application.RaiseMouseEvent (
                                      new()
                                      {
                                          ScreenPosition = btnFrame.Location,
-                                         Flags = MouseFlags.Button1Clicked
+                                         Flags = MouseFlags.LeftButtonClicked
                                      });
 
         Assert.Equal (1, btnAcceptedCount);

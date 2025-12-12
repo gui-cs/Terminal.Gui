@@ -18,11 +18,11 @@ namespace Terminal.Gui.ViewBase;
 ///         or the event is cancelled.
 ///     </para>
 ///     <para>
-///         This is typically used by views that set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/>,
+///         This is typically used by views that set <see cref="View.MouseHoldRepeat"/> to <see langword="true"/>,
 ///         enabling behaviors like auto-scrolling or button repeat.
 ///     </para>
 /// </remarks>
-internal class MouseHeldDown : IMouseHeldDown
+internal sealed class MouseHeldDown : IMouseHeldDown
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="MouseHeldDown"/> class.
@@ -49,9 +49,9 @@ internal class MouseHeldDown : IMouseHeldDown
     /// <summary>
     /// The most recent mouse event arguments associated with the mouse held down action.
     /// </summary>
-    private MouseEventArgs? _mouseEvent = null;
+    private Mouse? _mouseEvent = null;
 
-    public void Start (MouseEventArgs mouseEvent)
+    public void Start (Mouse mouse)
     {
         if (_isDown)
         {
@@ -60,12 +60,13 @@ internal class MouseHeldDown : IMouseHeldDown
 
         _mouseEvent = new ()
         {
-                        Flags = mouseEvent.Flags,
-                        Position = mouseEvent.Position,
-                        ScreenPosition = mouseEvent.ScreenPosition,
-                        View = mouseEvent.View
+            Timestamp = mouse.Timestamp,
+            Flags = mouse.Flags,
+            Position = mouse.Position,
+            ScreenPosition = mouse.ScreenPosition,
+            View = mouse.View
         };
-        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View!.Id}: {_mouseEvent.Flags}");
+        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 
         _isDown = true;
         _mouseGrabber?.GrabMouse (_mouseGrabView);
@@ -82,7 +83,7 @@ internal class MouseHeldDown : IMouseHeldDown
 
             return;
         }
-        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View!.Id}: {_mouseEvent.Flags}");
+        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 
         _mouseEvent = null;
         _smoothTimeout.Reset ();
@@ -110,27 +111,15 @@ internal class MouseHeldDown : IMouseHeldDown
         }
     }
 
-    public event EventHandler<CancelEventArgs<MouseEventArgs>>? MouseIsHeldDownTick;
-
-    /// <summary>
-    ///     Called when a mouse held down tick occurs. Override to customize the tick behavior.
-    /// </summary>
-    /// <param name="eventArgs">The event arguments. Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop the mouse held down operation.</param>
-    /// <returns><see langword="true"/> if the event was cancelled; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnMouseIsHeldDownTick (CancelEventArgs<MouseEventArgs> eventArgs) { return false; }
+    public event EventHandler<CancelEventArgs<Mouse>>? MouseIsHeldDownTick;
 
     private bool RaiseMouseIsHeldDownTick ()
     {
-        MouseEventArgs currentMouseEventArgs = _mouseEvent ?? new MouseEventArgs ();
-        MouseEventArgs newMouseEventArgs = _mouseEvent ?? new MouseEventArgs();
-        CancelEventArgs<MouseEventArgs> args = new (currentValue: ref currentMouseEventArgs, newValue: ref newMouseEventArgs);
+        Mouse currentMouseEventArgs = _mouseEvent ?? new Mouse ();
+        Mouse newMouseEventArgs = _mouseEvent ?? new Mouse ();
+        CancelEventArgs<Mouse> args = new (currentValue: ref currentMouseEventArgs, newValue: ref newMouseEventArgs);
 
-        args.Cancel = OnMouseIsHeldDownTick (args) || args.Cancel;
-
-        if (!args.Cancel && MouseIsHeldDownTick is { })
-        {
-            MouseIsHeldDownTick?.Invoke (this, args);
-        }
+        MouseIsHeldDownTick?.Invoke (this, args);
 
         // User event cancelled the mouse held down status so
         // stop the currently running operation.

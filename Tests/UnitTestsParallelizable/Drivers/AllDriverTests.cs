@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace DriverTests;
 
-public class DriverTests (ITestOutputHelper output) : FakeDriverBase
+public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Theory]
     [InlineData ("", true)]

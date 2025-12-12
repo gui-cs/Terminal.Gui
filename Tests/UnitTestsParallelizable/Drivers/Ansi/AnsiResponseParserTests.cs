@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using Xunit.Abstractions;
 
-namespace DriverTests;
+namespace DriverTests.Ansi;
 
 // BUGBUG: These tests use TInputRecord of `int`, but that's not a realistic type for keyboard input.
 public class AnsiResponseParserTests (ITestOutputHelper output)
@@ -487,7 +487,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         parser.HandleMouse = true;
         string? foundDar = null;
-        List<MouseEventArgs> mouseEventArgs = new ();
+        List<Terminal.Gui.Input.Mouse> mouseEventArgs = new ();
 
         parser.Mouse += (s, e) => mouseEventArgs.Add (e);
         parser.ExpectResponse ("c", dar => foundDar = dar, null, false);
@@ -503,12 +503,12 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         Assert.True (mouseEventArgs [0].IsPressed);
 
         // Mouse positions in ANSI are 1 based so actual Terminal.Gui Screen positions are x-1,y-1
-        Assert.Equal (11, mouseEventArgs [0].Position.X);
-        Assert.Equal (31, mouseEventArgs [0].Position.Y);
+        Assert.Equal (11, mouseEventArgs [0].ScreenPosition.X);
+        Assert.Equal (31, mouseEventArgs [0].ScreenPosition.Y);
 
         Assert.True (mouseEventArgs [1].IsReleased);
-        Assert.Equal (24, mouseEventArgs [1].Position.X);
-        Assert.Equal (49, mouseEventArgs [1].Position.Y);
+        Assert.Equal (24, mouseEventArgs [1].ScreenPosition.X);
+        Assert.Equal (49, mouseEventArgs [1].ScreenPosition.Y);
     }
 
     [Fact]

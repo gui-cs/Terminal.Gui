@@ -150,11 +150,11 @@ public class TextValidateField : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            int c = _provider!.Cursor (mouseEvent.Position.X - GetMargins (Viewport.Width).left);
+            int c = _provider!.Cursor (mouse.Position!.Value.X - GetMargins (Viewport.Width).left);
 
             if (_provider.Fixed == false && TextAlignment == Alignment.End && Text.Length > 0)
             {

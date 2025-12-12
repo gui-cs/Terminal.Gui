@@ -33,7 +33,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (fv.HasFocus);
 
         tf.NewMouseEvent (
-                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
+                          new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked }
                          );
 
         Assert.Null (tf.SelectedText);
@@ -46,7 +46,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.CanFocus = true;
 
         tf.NewMouseEvent (
-                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
+                          new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked }
                          );
 
         Assert.Equal ("some ", tf.SelectedText);
@@ -58,7 +58,7 @@ public class TextFieldTests (ITestOutputHelper output)
         fv.CanFocus = false;
 
         tf.NewMouseEvent (
-                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
+                          new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked }
                          );
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
@@ -505,7 +505,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         Assert.True (
                      tf.NewMouseEvent (
-                                       new () { Position = new (7, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                       new () { Position = new (7, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }
                                       )
                     );
         Assert.Equal ("Misérables ", tf.SelectedText);
@@ -923,36 +923,36 @@ public class TextFieldTests (ITestOutputHelper output)
         top.Add (tf);
         Application.Begin (top);
 
-        var mouseEvent = new MouseEventArgs { Flags = MouseFlags.Button1Clicked, View = tf };
+        var mouse = new Mouse { Flags = MouseFlags.LeftButtonClicked, View = tf };
 
-        Application.RaiseMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouse);
         Assert.Equal (1, clickCounter);
 
         // Get a fresh instance that represents a right click.
         // Should be ignored because of SuppressRightClick callback
-        mouseEvent = new () { Flags = MouseFlags.Button3Clicked, View = tf };
-        Application.RaiseMouseEvent (mouseEvent);
+        mouse = new () { Flags = MouseFlags.RightButtonClicked, View = tf };
+        Application.RaiseMouseEvent (mouse);
         Assert.Equal (1, clickCounter);
 
         Application.MouseEvent -= HandleRightClick;
 
         // Get a fresh instance that represents a right click.
         // Should no longer be ignored as the callback was removed
-        mouseEvent = new () { Flags = MouseFlags.Button3Clicked, View = tf };
+        mouse = new () { Flags = MouseFlags.RightButtonClicked, View = tf };
 
         // In #3183 OnMouseClicked is no longer called before MouseEvent().
         // This call causes the context menu to pop, and MouseEvent() returns true.
         // Thus, the clickCounter is NOT incremented.
         // Which is correct, because the user did NOT click with the left mouse button.
-        Application.RaiseMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouse);
         Assert.Equal (1, clickCounter);
         top.Dispose ();
 
         return;
 
-        void HandleRightClick (object sender, MouseEventArgs arg)
+        void HandleRightClick (object sender, Mouse arg)
         {
-            if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (arg.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 arg.Handled = true;
             }
