@@ -100,7 +100,13 @@ internal class ShadowView : View
 
                 if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
                 {
-                    AddStr (ScreenContents [r, c].Grapheme);
+                    string grapheme = ScreenContents [r, c].Grapheme;
+                    AddStr (grapheme);
+
+                    if (grapheme.GetColumns () > 1)
+                    {
+                        c++;
+                    }
                 }
             }
         }
@@ -125,16 +131,23 @@ internal class ShadowView : View
         Rectangle screen = ViewportToScreen (Viewport);
 
         // Fill in the rest of the rectangle
-        for (int c = Math.Max (0, screen.X); c < screen.X + screen.Width; c++)
+        for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
         {
-            for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
+            for (int c = Math.Max (0, screen.X); c < screen.X + screen.Width; c++)
             {
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new (c, r)));
 
-                if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
+                if (ScreenContents is { } && screen.X < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0)
+                    && c < ScreenContents.GetLength (1) && r < ScreenContents.GetLength (0))
                 {
-                    AddStr (ScreenContents [r, c].Grapheme);
+                    string grapheme = ScreenContents [r, c].Grapheme;
+                    AddStr (grapheme);
+
+                    if (grapheme.GetColumns () > 1)
+                    {
+                        c++;
+                    }
                 }
             }
         }
