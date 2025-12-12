@@ -5,13 +5,13 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class AnsiKeyboardParser
 {
-    private readonly List<AnsiKeyboardParserPattern> _patterns = new ()
-    {
+    private readonly List<AnsiKeyboardParserPattern> _patterns =
+    [
         new Ss3Pattern (),
         new CsiKeyPattern (),
-        new CsiCursorPattern(),
+        new CsiCursorPattern (),
         new EscAsAltPattern { IsLastMinute = true }
-    };
+    ];
 
     /// <summary>
     ///     Looks for any pattern that matches the <paramref name="input"/> and returns
