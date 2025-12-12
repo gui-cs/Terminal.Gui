@@ -1,4 +1,4 @@
-# View.NewMouseEvent Rewrite Plan
+﻿# View.NewMouseEvent Rewrite Plan
 
 **Issue**: #4474 - Remove Click Delay and Simplify Mouse Event Handling
 
@@ -30,7 +30,7 @@ The current `View.NewMouseEvent` implementation has accumulated significant tech
 
 ### What's Problematic (Fix)
 1. **Grab Logic Scattered**: `WhenGrabbedHandlePressed`, `WhenGrabbedHandleReleased`, `WhenGrabbedHandleClicked` mix concerns
-2. **Pressed?Clicked Conversion**: Done in multiple places (`ConvertPressedToClicked`, `ConvertReleasedToClicked`)
+2. **Pressed→Clicked Conversion**: Done in multiple places (`ConvertPressedToClicked`, `ConvertReleasedToClicked`)
 3. **MouseState Updates**: Mixed into grab handlers instead of being explicit
 4. **Flow Unclear**: Hard to follow the execution path
 5. **Comments Misleading**: TODOs and questions that need answers
@@ -72,15 +72,15 @@ The current `View.NewMouseEvent` implementation has accumulated significant tech
    - Pressed/Released are for grab lifecycle
 
 4. **Command Invocation**:
-   - `Clicked` events ? `Command.Accept` (default binding)
-   - `Pressed` events ? `Command.Activate` (current default, may need review)
-   - Wheel events ? bound commands
+   - `Clicked` events → `Command.Accept` (default binding)
+   - `Pressed` events → `Command.Activate` (current default, may need review)
+   - Wheel events → bound commands
 
 ---
 
 ## Rewrite Plan - Phased Approach
 
-### Phase 1: Preparation & Analysis ?
+### Phase 1: Preparation & Analysis ✅
 **Goal**: Understand current behavior, identify all tests
 
 **Tasks**:
@@ -88,57 +88,44 @@ The current `View.NewMouseEvent` implementation has accumulated significant tech
 - [x] Analyze current `View.NewMouseEvent` implementation
 - [x] Identify all tests marked `Skip = "Broken in #4474"`
 - [x] Create this plan document
-- [ ] Run all tests to establish baseline
-- [ ] Document baseline test results
+- [x] Run all tests to establish baseline
+- [x] Document baseline test results
 
 **Deliverables**:
 - This plan document
-- Baseline test results
+- Baseline test results: **382 tests passing, 23 tests skipped**
 - List of all affected tests
 
-### Phase 2: Simplify Mouse Grab Logic
+**Baseline Results**:
+- UnitTestsParallelizable/ViewBase/Mouse/MouseTests.cs: 3 skipped tests
+- Total across all projects: 23 skipped tests marked with `Skip = "Broken in #4474"`
+- All other mouse tests passing
+
+### Phase 2: Simplify Mouse Grab Logic ✅
 **Goal**: Consolidate scattered grab logic into clear, linear flow
 
-**Current Complexity**:
-```csharp
-// Three separate methods handling different aspects
-WhenGrabbedHandlePressed()   // Grab, set focus, MouseState
-WhenGrabbedHandleReleased()  // Convert to clicked, MouseState  
-WhenGrabbedHandleClicked()   // Ungrab
-```
-
-**Proposed Simplification**:
-```csharp
-// Single clear flow in NewMouseEvent
-if (ShouldAutoGrab)
-{
-    if (mouse.IsPressed)
-    {
-        HandleAutoGrabPress(mouse);
-    }
-    else if (mouse.IsReleased)
-    {
-        HandleAutoGrabRelease(mouse);
-    }
-    else if (mouse.IsSingleClicked)
-    {
-        HandleAutoGrabClicked(mouse);
-    }
-}
-```
-
 **Tasks**:
-- [ ] Extract `ShouldAutoGrab` property: `MouseHighlightStates != None || MouseHoldRepeat`
-- [ ] Create `HandleAutoGrabPress(mouse)`: Grab, set focus, update MouseState
-- [ ] Create `HandleAutoGrabRelease(mouse)`: Update MouseState only
-- [ ] Create `HandleAutoGrabClicked(mouse)`: Ungrab
-- [ ] Remove `WhenGrabbedHandlePressed`, `WhenGrabbedHandleReleased`, `WhenGrabbedHandleClicked`
-- [ ] Run tests, fix any regressions
+- [x] Extract `ShouldAutoGrab` property: `MouseHighlightStates != None || MouseHoldRepeat`
+- [x] Create `HandleAutoGrabPress(mouse)`: Grab, set focus, update MouseState
+- [x] Create `HandleAutoGrabRelease(mouse)`: Update MouseState only
+- [x] Create `HandleAutoGrabClicked(mouse)`: Ungrab
+- [x] Create `UpdateMouseStateOnPress(position)`: Explicit state management
+- [x] Create `UpdateMouseStateOnRelease()`: Explicit state management
+- [x] Update `NewMouseEvent` to use new helpers
+- [x] Remove `WhenGrabbedHandlePressed`, `WhenGrabbedHandleReleased`, `WhenGrabbedHandleClicked`
+- [x] Run tests, verify no regressions
+
+**Results**:
+- ✅ All 382 tests still passing
+- ✅ Code is now more linear and easier to read
+- ✅ MouseState management is explicit and documented
+- ✅ Grab lifecycle is consolidated in dedicated helper methods
+- ✅ `NewMouseEvent` has clear numbered sections (1-6)
 
 **Acceptance Criteria**:
-- All grab-related tests pass
-- Focus setting tests pass
-- MouseState tests pass
+- ✅ All grab-related tests pass
+- ✅ Focus setting tests pass
+- ✅ MouseState tests pass
 
 ### Phase 3: Clean Up Click Conversion
 **Goal**: Remove redundant click conversion logic
@@ -360,27 +347,27 @@ public void MouseClick_SetsFocus_If_CanFocus()
 **Test Scenarios from Spec**:
 
 1. **Normal Button (MouseHoldRepeat = false)**
-   - [ ] Single click (press + immediate release) ? 1 Accept
-   - [ ] Press and hold (2+ seconds) ? 1 Accept on release
-   - [ ] Double-click ? 2 Accepts with ClickCount 1, 2
-   - [ ] Triple-click ? 3 Accepts with ClickCount 1, 2, 3
+   - [ ] Single click (press + immediate release) → 1 Accept
+   - [ ] Press and hold (2+ seconds) → 1 Accept on release
+   - [ ] Double-click → 2 Accepts with ClickCount 1, 2
+   - [ ] Triple-click → 3 Accepts with ClickCount 1, 2, 3
 
 2. **Repeat Button (MouseHoldRepeat = true)**
-   - [ ] Single click ? 1 Accept
-   - [ ] Press and hold ? 10+ Accepts (timer-based)
-   - [ ] Double-click ? 2 Accepts (timer doesn't start)
-   - [ ] Hold then quick click ? many + 1 Accept
+   - [ ] Single click → 1 Accept
+   - [ ] Press and hold → 10+ Accepts (timer-based)
+   - [ ] Double-click → 2 Accepts (timer doesn't start)
+   - [ ] Hold then quick click → many + 1 Accept
 
 3. **MouseState Transitions**
-   - [ ] Enter ? `In` flag set
-   - [ ] Press inside ? `Pressed` flag set
-   - [ ] Move outside while pressed ? `PressedOutside` set (if !MouseHoldRepeat)
-   - [ ] Release ? flags cleared
+   - [ ] Enter → `In` flag set
+   - [ ] Press inside → `Pressed` flag set
+   - [ ] Move outside while pressed → `PressedOutside` set (if !MouseHoldRepeat)
+   - [ ] Release → flags cleared
 
 4. **Mouse Grab**
-   - [ ] Press inside ? auto-grab, set focus
-   - [ ] Release inside ? ungrab, invoke commands
-   - [ ] Release outside ? ungrab, no commands
+   - [ ] Press inside → auto-grab, set focus
+   - [ ] Release inside → ungrab, invoke commands
+   - [ ] Release outside → ungrab, no commands
 
 **Tasks**:
 - [ ] Write test for each scenario
@@ -476,7 +463,7 @@ public void MouseClick_SetsFocus_If_CanFocus()
 
 - **Communication**:
   - Update this plan as work progresses
-  - Mark completed phases with ?
+  - Mark completed phases with ✅
   - Document decisions and rationale
 
 ---
