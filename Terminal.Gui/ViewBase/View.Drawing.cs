@@ -149,25 +149,26 @@ public partial class View // Drawing APIs
 
             ClearNeedsDraw ();
 
-            //if (this is not Adornment && SuperView is not Adornment)
-            //{
-            //    // Parent
-            //    Debug.Assert (Margin!.Parent == this);
-            //    Debug.Assert (Border!.Parent == this);
-            //    Debug.Assert (Padding!.Parent == this);
+            // The following assertions are important to ensure that the drawing state is consistent.
+            if (this is not Adornment && SuperView is not Adornment)
+            {
+                // Parent
+                Debug.Assert (Margin!.Parent == this);
+                Debug.Assert (Border!.Parent == this);
+                Debug.Assert (Padding!.Parent == this);
 
-            //    // SubViewNeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (SubViewNeedsDraw == false);
-            //    Debug.Assert (Margin!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Border!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Padding!.SubViewNeedsDraw == false);
+                // SubViewNeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (!SubViewNeedsDraw);
+                Debug.Assert (!Margin!.SubViewNeedsDraw);
+                Debug.Assert (!Border!.SubViewNeedsDraw);
+                Debug.Assert (!Padding!.SubViewNeedsDraw);
 
-            //    // NeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (NeedsDraw == false);
-            //    Debug.Assert (Margin!.NeedsDraw == false);
-            //    Debug.Assert (Border!.NeedsDraw == false);
-            //    Debug.Assert (Padding!.NeedsDraw == false);
-            //}
+                // NeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (!NeedsDraw);
+                Debug.Assert (!Margin!.NeedsDraw);
+                Debug.Assert (!Border!.NeedsDraw);
+                Debug.Assert (!Padding!.NeedsDraw);
+            }
         }
 
         // ------------------------------------
