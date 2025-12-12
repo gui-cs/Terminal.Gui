@@ -108,13 +108,6 @@ public partial class View // Drawing APIs
             DoClearViewport (context);
 
             // ------------------------------------
-            // Draw the SubViews first (order matters: SubViews, Text, Content)
-            if (SubViewNeedsDraw)
-            {
-                DoDrawSubViews (context);
-            }
-
-            // ------------------------------------
             // Draw the text
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoDrawText (context);
