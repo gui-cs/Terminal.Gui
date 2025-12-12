@@ -127,12 +127,6 @@ public abstract class OutputBase
                     Cell cell = buffer.Contents [row, col];
                     buffer.Contents [row, col].IsDirty = false;
                     AppendCellAnsi (cell, outputStringBuilder, ref redrawAttr, ref _redrawTextStyle, cols, ref col, ref outputWidth);
-
-                    if (col != lastCol)
-                    {
-                        // Was a wide grapheme and so mark clean next cell
-                        buffer.Contents [row, col].IsDirty = false;
-                    }
                 }
             }
 
