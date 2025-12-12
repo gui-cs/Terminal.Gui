@@ -77,7 +77,7 @@ public partial class View // Drawing APIs
         }
         Region? originalClip = GetClip ();
 
-        if (SuperView is null && Driver is { })
+        if (this is not Adornment && SuperView is null && Driver is { })
         {
             originalClip = new (new (Driver.Screen.Location, Driver.Screen.Size));
         }
