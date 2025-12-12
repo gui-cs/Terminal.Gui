@@ -189,8 +189,8 @@ public class OutputBaseTests
         // Column 0 was written (wide glyph)
         Assert.False (buffer.Contents! [0, 0].IsDirty);
 
-        // Column 1 was skipped by OutputBase.Write because column 0 had a wide glyph
-        // So its dirty flag remains true (it was initialized as dirty by ClearContents)
+        // Column 1 was marked as clean by OutputBase.Write when it processed the wide glyph at column 0
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/4466
         Assert.False (buffer.Contents! [0, 1].IsDirty);
 
         // Column 2 was written ('A')
