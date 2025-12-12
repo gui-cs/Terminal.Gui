@@ -102,6 +102,8 @@ public sealed class WideGlyphs : Scenario
             //BorderStyle = LineStyle.Dashed,
         };
 
+        arrangeableViewAtEven.SetScheme (new () { Normal = new (ColorName16.Black, ColorName16.Green) });
+
         // Proves it's not LineCanvas related
         arrangeableViewAtEven!.Border!.Thickness = new (1);
         arrangeableViewAtEven.Border.Add(new View () { Height = Dim.Auto(), Width = Dim.Auto(), Text = "Even" });
@@ -117,6 +119,7 @@ public sealed class WideGlyphs : Scenario
             Height = 5,
             BorderStyle = LineStyle.Dashed,
         };
+        arrangeableViewAtOdd.SetScheme (new () { Normal = new (ColorName16.Black, ColorName16.Yellow) });
         appWindow.Add (arrangeableViewAtOdd);
 
         var superView = new View
@@ -127,7 +130,9 @@ public sealed class WideGlyphs : Scenario
             Width = Dim.Auto () + 4,
             Height = Dim.Auto () + 1,
             BorderStyle = LineStyle.Single,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            ShadowStyle = ShadowStyle.Transparent,
+            ShadowWidth = 2
         };
 
         Rune codepoint = Glyphs.Apple;

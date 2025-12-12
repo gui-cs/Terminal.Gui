@@ -267,6 +267,7 @@ public class OutputBufferImpl : IOutputBuffer
             if (Col + 1 < Cols)
             {
                 Contents! [Row, Col + 1].Grapheme = Rune.ReplacementChar.ToString ();
+                Contents! [Row, Col + 1].IsDirty = true;
             }
         }
         else
@@ -356,11 +357,10 @@ public class OutputBufferImpl : IOutputBuffer
                         continue;
                     }
 
-                    Contents [r, c] = new ()
-                    {
-                        Grapheme = rune != default (Rune) ? rune.ToString () : " ",
-                        Attribute = CurrentAttribute, IsDirty = true
-                    };
+                    // It's needed to call AddStr to properly handle wide characters
+                    // to invalidate overlapped wide glyphs, etc.
+                    Move (c, r);
+                    AddStr (rune != default (Rune) ? rune.ToString () : " ");
                 }
             }
         }

@@ -95,6 +95,54 @@ public partial class View // Adornments
         }
     }
 
+    private int _shadowWidth = 1;
+
+    /// <summary>
+    ///     Gets or sets the width of the shadow.
+    /// </summary>
+    public virtual int ShadowWidth
+    {
+        get => _shadowWidth;
+        set
+        {
+            if (_shadowWidth == value)
+            {
+                return;
+            }
+
+            _shadowWidth = value;
+
+            if (Margin is { })
+            {
+                Margin.ShadowWidth = value;
+            }
+        }
+    }
+
+    private int _shadowHeight = 1;
+
+    /// <summary>
+    ///     Gets or sets the height of the shadow.
+    /// </summary>
+    public virtual int ShadowHeight
+    {
+        get => _shadowHeight;
+        set
+        {
+            if (_shadowHeight == value)
+            {
+                return;
+            }
+
+            _shadowHeight = value;
+
+            if (Margin is { })
+            {
+                Margin.ShadowHeight = value;
+            }
+        }
+    }
+
     /// <summary>
     ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
     ///     <para>

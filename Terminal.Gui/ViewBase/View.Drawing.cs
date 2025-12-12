@@ -18,7 +18,7 @@ public partial class View // Drawing APIs
         // The draw context is used to track the region drawn by each view.
         DrawContext context = new DrawContext ();
 
-        foreach (View view in viewsArray)
+        foreach (View view in viewsArray.Reverse ())
         {
             if (force)
             {
@@ -27,9 +27,6 @@ public partial class View // Drawing APIs
 
             view.Draw (context);
         }
-
-        // Draw the margins last to ensure they are drawn on top of the content.
-        Margin.DrawMargins (viewsArray);
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
@@ -80,6 +77,11 @@ public partial class View // Drawing APIs
         }
         Region? originalClip = GetClip ();
 
+        if (this is not Adornment && SuperView is null && Driver is { })
+        {
+            originalClip = new (new (Driver.Screen.Location, Driver.Screen.Size));
+        }
+
         // TODO: This can be further optimized by checking NeedsDraw below and only
         // TODO: clearing, drawing text, drawing content, etc. if it is true.
         if (NeedsDraw || SubViewNeedsDraw)
@@ -106,13 +108,6 @@ public partial class View // Drawing APIs
             DoClearViewport (context);
 
             // ------------------------------------
-            // Draw the SubViews first (order matters: SubViews, Text, Content)
-            if (SubViewNeedsDraw)
-            {
-                DoDrawSubViews (context);
-            }
-
-            // ------------------------------------
             // Draw the text
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoDrawText (context);
@@ -120,6 +115,13 @@ public partial class View // Drawing APIs
             // ------------------------------------
             // Draw the content
             DoDrawContent (context);
+
+            // ------------------------------------
+            // Draw the subviews first (order matters: SubViews, Text, Content)
+            if (SubViewNeedsDraw)
+            {
+                DoDrawSubViews (context);
+            }
 
             // ------------------------------------
             // Draw the line canvas
@@ -140,30 +142,27 @@ public partial class View // Drawing APIs
 
             ClearNeedsDraw ();
 
-            //if (this is not Adornment && SuperView is not Adornment)
-            //{
-            //    // Parent
-            //    Debug.Assert (Margin!.Parent == this);
-            //    Debug.Assert (Border!.Parent == this);
-            //    Debug.Assert (Padding!.Parent == this);
+            // The following assertions are important to ensure that the drawing state is consistent.
+            if (this is not Adornment && SuperView is not Adornment)
+            {
+                // Parent
+                Debug.Assert (Margin!.Parent == this);
+                Debug.Assert (Border!.Parent == this);
+                Debug.Assert (Padding!.Parent == this);
 
-            //    // SubViewNeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (SubViewNeedsDraw == false);
-            //    Debug.Assert (Margin!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Border!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Padding!.SubViewNeedsDraw == false);
+                // SubViewNeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (!SubViewNeedsDraw);
+                Debug.Assert (!Margin!.SubViewNeedsDraw);
+                Debug.Assert (!Border!.SubViewNeedsDraw);
+                Debug.Assert (!Padding!.SubViewNeedsDraw);
 
-            //    // NeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (NeedsDraw == false);
-            //    Debug.Assert (Margin!.NeedsDraw == false);
-            //    Debug.Assert (Border!.NeedsDraw == false);
-            //    Debug.Assert (Padding!.NeedsDraw == false);
-            //}
+                // NeedsDraw is set to false by ClearNeedsDraw.
+                Debug.Assert (!NeedsDraw);
+                Debug.Assert (!Margin!.NeedsDraw);
+                Debug.Assert (!Border!.NeedsDraw);
+                Debug.Assert (!Padding!.NeedsDraw);
+            }
         }
-
-        // ------------------------------------
-        // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
-        Margin?.CacheClip ();
 
         // ------------------------------------
         // Reset the clip to what it was when we started
@@ -183,6 +182,17 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
+        if (Margin?.SubViews is { } && Margin.Thickness != Thickness.Empty && Margin.NeedsDraw)
+        {
+            foreach (View subview in Margin.SubViews)
+            {
+                subview.SetNeedsDraw ();
+            }
+
+            Region? saved = Margin?.AddFrameToClip ();
+            Margin?.DoDrawSubViews ();
+            SetClip (saved);
+        }
         // NOTE: We do not support SubViews of Margin
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
@@ -233,19 +243,13 @@ public partial class View // Drawing APIs
             SetClip (clipAdornments);
         }
 
-        if (Margin?.NeedsLayout == true)
-        {
-            Margin.NeedsLayout = false;
-            Margin?.Thickness.Draw (Driver, FrameToScreen ());
-            Margin?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
-        }
 
         if (SubViewNeedsDraw)
         {
             // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
+            Margin?.SetNeedsDraw ();
             Border?.SetNeedsDraw ();
             Padding?.SetNeedsDraw ();
-            Margin?.SetNeedsDraw ();
         }
 
         if (OnDrawingAdornments ())
@@ -268,7 +272,10 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void DrawAdornments ()
     {
-        // We do not attempt to draw Margin. It is drawn in a separate pass.
+        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
+        {
+            Margin?.Draw ();
+        }
 
         // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
@@ -280,11 +287,6 @@ public partial class View // Drawing APIs
         if (Padding is { } && Padding.Thickness != Thickness.Empty)
         {
             Padding?.Draw ();
-        }
-
-        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
-        {
-            //Margin?.Draw ();
         }
     }
 
