@@ -388,6 +388,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                                );
         }
 
+        _popup.Visible = true;
         _popup.Move (0, 0);
 
         for (var i = 0; i < toRender.Length; i++)
