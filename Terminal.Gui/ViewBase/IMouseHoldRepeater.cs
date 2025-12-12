@@ -13,7 +13,7 @@ namespace Terminal.Gui.ViewBase;
 ///         a counter (e.g. in <see cref="NumericUpDown"/>).
 ///     </para>
 /// </summary>
-public interface IMouseHeldDown : IDisposable
+public interface IMouseHoldRepeater : IDisposable
 {
     /// <summary>
     ///     Periodically raised when the mouse is pressed down inside the view <see cref="View"/>.

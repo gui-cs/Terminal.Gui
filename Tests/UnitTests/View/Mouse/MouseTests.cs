@@ -151,11 +151,11 @@ public class MouseTests : TestsAllViews
         // Setup components for mouse held down
         TimedEvents timed = new ();
         MouseImpl grab = new ();
-        view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
+        view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
         var clickedCount = 0;
-        view.MouseHeldDown.MouseIsHeldDownTick += (_, _) => clickedCount++;
+        view.MouseHoldRepeater.MouseIsHeldDownTick += (_, _) => clickedCount++;
 
         // Mouse is currently not held down so should be no timers running
         Assert.Empty (timed.Timeouts);
@@ -211,11 +211,11 @@ public class MouseTests : TestsAllViews
         // Setup components for mouse held down
         TimedEvents timed = new ();
         MouseImpl grab = new ();
-        view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
+        view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
         var clickedCount = 0;
-        view.MouseHeldDown.MouseIsHeldDownTick += (_, _) => clickedCount++;
+        view.MouseHoldRepeater.MouseIsHeldDownTick += (_, _) => clickedCount++;
 
         Assert.Empty (timed.Timeouts);
 
@@ -267,11 +267,11 @@ public class MouseTests : TestsAllViews
         // Setup components for mouse held down
         TimedEvents timed = new ();
         MouseImpl grab = new ();
-        view.MouseHeldDown = new MouseHeldDown (view, timed, grab);
+        view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, timed, grab);
 
         // Register callback for what to do when the mouse is held down
         var clickedCount = 0;
-        view.MouseHeldDown.MouseIsHeldDownTick += (_, _) => clickedCount++;
+        view.MouseHoldRepeater.MouseIsHeldDownTick += (_, _) => clickedCount++;
 
         // Start in Viewport
         mouse.Flags = MouseFlags.LeftButtonPressed;

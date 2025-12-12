@@ -542,7 +542,7 @@ sequenceDiagram
     Note over View: View Processing Pipeline:
     View->>View: 1. Pre-conditions (enabled, visible)
     View->>View: 2. RaiseMouseEvent → MouseEvent
-    View->>View: 3. Mouse grab handling<br/>(if MouseHighlightStates or WantContinuous)
+    View->>View: 3. Mouse grab handling<br/>(if MouseHighlightStates or MouseHoldRepeat)
     View->>View: 4. Convert flags<br/>(Pressed→Clicked if needed)
     View->>Commands: 5. InvokeCommandsBoundToMouse
     Note over Commands: Default: LeftButtonClicked → Command.Activate
@@ -803,7 +803,7 @@ InvokeCommand(Command.Activate, context):
 
 ### Stage 6: Continuous Button Press (Optional)
 
-**Location:** `Terminal.Gui/ViewBase/MouseHeldDown.cs`
+**Location:** `Terminal.Gui/ViewBase/MouseHoldRepeate.cs`
 
 **Enabled When:** `View.MouseHoldRepeat == true`
 
@@ -823,11 +823,11 @@ InvokeCommand(Command.Activate, context):
 NewMouseEvent(mouse):
     if (MouseHoldRepeat)
         if (mouse.IsPressed)
-            MouseHeldDown.Start(mouse);
-            MouseHeldDown.MouseIsHeldDownTick += (s, e) => 
+            MouseHoldRepeater.Start(mouse);
+            MouseHoldRepeater.MouseIsHeldDownTick += (s, e) => 
                 RaiseCommandsBoundToButtonClickedFlags(e.NewValue);
         else
-            MouseHeldDown.Stop();
+            MouseHoldRepeater.Stop();
 ```
 
 ### Key Design Decisions & Current Limitations
@@ -959,7 +959,7 @@ MouseBindings.Add(MouseFlags.LeftButtonPressed, Command.Activate);
 // View.NewMouseEvent should have clear sections:
 // 1. Pre-conditions
 // 2. Low-level event (MouseEvent)
-// 3. GRAB HANDLING (if MouseHighlightStates or WantContinuous):
+// 3. GRAB HANDLING (if MouseHighlightStates or MouseHoldRepeat):
 //    a. On Pressed: Grab, set focus, update MouseState
 //    b. On Released: Convert to Clicked, update MouseState  
 //    c. On Clicked: Ungrab

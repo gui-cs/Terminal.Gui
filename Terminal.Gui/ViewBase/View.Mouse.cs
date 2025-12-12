@@ -283,22 +283,22 @@ public partial class View // Mouse APIs
             return false;
         }
 
-        if (MouseHeldDown is null)
+        if (MouseHoldRepeater is null)
         {
-            MouseHeldDown = new MouseHeldDown (this, App?.TimedEvents, App?.Mouse);
+            MouseHoldRepeater = new MouseHoldRepeaterImpl (this, App?.TimedEvents, App?.Mouse);
         }
 
         if (MouseHoldRepeat)
         {
             if (mouse.IsPressed)
             {
-                MouseHeldDown.MouseIsHeldDownTick += MouseHeldDownOnMouseIsHeldDownTick;
-                MouseHeldDown.Start (mouse);
+                MouseHoldRepeater.MouseIsHeldDownTick += MouseHoldRepeaterOnMouseIsHeldDownTick;
+                MouseHoldRepeater.Start (mouse);
             }
             else
             {
-                MouseHeldDown.MouseIsHeldDownTick -= MouseHeldDownOnMouseIsHeldDownTick;
-                MouseHeldDown.Stop ();
+                MouseHoldRepeater.MouseIsHeldDownTick -= MouseHoldRepeaterOnMouseIsHeldDownTick;
+                MouseHoldRepeater.Stop ();
             }
         }
 
@@ -354,7 +354,7 @@ public partial class View // Mouse APIs
     ///         pattern where the first event fires after 500ms, with subsequent events occurring every 50ms with a 0.5 acceleration factor.
     ///     </para>
     ///     <para>
-    ///         When a button press is detected, the mouse is grabbed and periodic <see cref="IMouseHeldDown.MouseIsHeldDownTick"/> events
+    ///         When a button press is detected, the mouse is grabbed and periodic <see cref="IMouseHoldRepeater.MouseIsHeldDownTick"/> events
     ///         are raised until the button is released. Each tick event triggers command execution via <see cref="RaiseCommandsBoundToButtonClickedFlags"/>,
     ///         enabling continuous actions like scrolling or button repetition.
     ///     </para>
@@ -363,7 +363,7 @@ public partial class View // Mouse APIs
     ///         controls where holding down a button should continue the action.
     ///     </para>
     /// </remarks>
-    internal IMouseHeldDown? MouseHeldDown { get; set; }
+    internal IMouseHoldRepeater? MouseHoldRepeater { get; set; }
 
     /// <summary>
     ///     Raises the <see cref="RaiseMouseEvent"/>/<see cref="MouseEvent"/> event.
@@ -382,9 +382,9 @@ public partial class View // Mouse APIs
         return mouse.Handled;
     }
 
-    private void MouseHeldDownOnMouseIsHeldDownTick (object? sender, CancelEventArgs<Mouse> e)
+    private void MouseHoldRepeaterOnMouseIsHeldDownTick (object? sender, CancelEventArgs<Mouse> e)
     {
-        Logging.Trace ($"MouseHeldDown tick - raising commands bound {e.NewValue.Flags}");
+        Logging.Trace ($"MouseHoldRepeater tick - raising commands bound {e.NewValue.Flags}");
         e.NewValue.ScreenPosition = App?.Mouse.LastMousePosition ?? e.NewValue.ScreenPosition;
         /*e.Cancel = */
         RaiseCommandsBoundToButtonClickedFlags (e.NewValue);
@@ -747,10 +747,10 @@ public partial class View // Mouse APIs
 
     private void DisposeMouse ()
     {
-        if (MouseHeldDown is { })
+        if (MouseHoldRepeater is { })
         {
-            MouseHeldDown.MouseIsHeldDownTick -= MouseHeldDownOnMouseIsHeldDownTick;
-            MouseHeldDown.Dispose ();
+            MouseHoldRepeater.MouseIsHeldDownTick -= MouseHoldRepeaterOnMouseIsHeldDownTick;
+            MouseHoldRepeater.Dispose ();
         }
 
         if (App?.Mouse.MouseGrabView == this)

@@ -24,7 +24,7 @@ namespace Terminal.Gui.Views;
 public class Button : View, IDesignable
 {
     private static ShadowStyle _defaultShadow = ShadowStyle.Opaque; // Resources/config.json overrides
-    private static MouseState _defaultHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides
+    private static MouseState _defaultMouseHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides
 
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
@@ -46,10 +46,10 @@ public class Button : View, IDesignable
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStates
+    public static MouseState DefaultMouseHighlightStates
     {
-        get => _defaultHighlightStates;
-        set => _defaultHighlightStates = value;
+        get => _defaultMouseHighlightStates;
+        set => _defaultMouseHighlightStates = value;
     }
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
@@ -86,7 +86,7 @@ public class Button : View, IDesignable
         TitleChanged += Button_TitleChanged;
 
         base.ShadowStyle = DefaultShadow;
-        MouseHighlightStates = DefaultHighlightStates;
+        MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
     private bool? HandleHotKeyCommand (ICommandContext commandContext)

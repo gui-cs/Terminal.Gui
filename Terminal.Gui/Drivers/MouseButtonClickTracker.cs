@@ -36,7 +36,6 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     private int _consecutiveClicks;
     private Point _lastPosition;
 
-    private int? _pendingClickCount;
     private Point _pendingClickPosition;
     private DateTime _pendingClickTime;
 
@@ -123,7 +122,6 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
         {
             // Reset consecutive click counter
             _consecutiveClicks = 0;
-            _pendingClickCount = null; // Clear any pending click
         }
 
         // Check if button state changed
@@ -146,12 +144,6 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
             // Track for potential next click in sequence
             _pendingClickPosition = mouse.ScreenPosition;
             _pendingClickTime = _now ();
-        }
-        else
-        {
-            // Button was released, now pressed
-            // Start of potential multi-click sequence
-            _pendingClickCount = null;
         }
 
         // Record new state

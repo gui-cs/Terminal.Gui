@@ -22,15 +22,15 @@ namespace Terminal.Gui.ViewBase;
 ///         enabling behaviors like auto-scrolling or button repeat.
 ///     </para>
 /// </remarks>
-internal sealed class MouseHeldDown : IMouseHeldDown
+internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseHeldDown"/> class.
+    ///     Initializes a new instance of the <see cref="MouseHoldRepeaterImpl"/> class.
     /// </summary>
     /// <param name="host">The view that will receive the mouse held down events.</param>
     /// <param name="timedEvents">The timed events service for scheduling periodic ticks. Can be null for testing.</param>
     /// <param name="mouseGrabber">The mouse grab handler for managing mouse capture. Can be null for testing.</param>
-    public MouseHeldDown (View host, ITimedEvents? timedEvents, IMouseGrabHandler? mouseGrabber)
+    public MouseHoldRepeaterImpl (View host, ITimedEvents? timedEvents, IMouseGrabHandler? mouseGrabber)
     {
         _mouseGrabView = host;
         _timedEvents = timedEvents;
