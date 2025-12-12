@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 
 // ReSharper disable IdentifierTypo
@@ -7,8 +8,11 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixInput : InputImpl<char>, IUnixInput
+internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 {
+    // Queue for storing injected input for testing
+    private readonly ConcurrentQueue<char> _testInput = new ();
+    
     private const int STDIN_FILENO = 0;
 
     [StructLayout (LayoutKind.Sequential)]
@@ -192,6 +196,12 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     /// <inheritdoc/>
     public override bool Peek ()
     {
+        // Check test input first
+        if (!_testInput.IsEmpty)
+        {
+            return true;
+        }
+
         if (!_terminalInitialized || _pollMap is null)
         {
             return false;
@@ -230,6 +240,12 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     /// <inheritdoc/>
     public override IEnumerable<char> Read ()
     {
+        // Return test input first if available
+        while (_testInput.TryDequeue (out char testChar))
+        {
+            yield return testChar;
+        }
+
         if (!_terminalInitialized || _pollMap is null)
         {
             yield break;
@@ -274,6 +290,12 @@ internal class UnixInput : InputImpl<char>, IUnixInput
         {
             // ignore
         }
+    }
+
+    /// <inheritdoc/>
+    public void AddInput (char input)
+    {
+        _testInput.Enqueue (input);
     }
 
     /// <inheritdoc/>

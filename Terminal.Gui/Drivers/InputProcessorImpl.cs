@@ -233,7 +233,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     }
 
     /// <inheritdoc />
-    public void EnqueueKeyDownEvent (Key key)
+    public virtual void EnqueueKeyDownEvent (Key key)
     {
         // Convert Key → TInputRecord
         TInputRecord inputRecord = KeyConverter.ToKeyInfo (key);
