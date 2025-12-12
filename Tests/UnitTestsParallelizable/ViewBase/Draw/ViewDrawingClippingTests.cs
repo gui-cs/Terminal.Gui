@@ -629,7 +629,11 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                               output,
                                               driver);
 
-
+        // After a full redraw, all cells should be clean
+        foreach (Cell cell in driver.Contents!)
+        {
+            Assert.False (cell.IsDirty);
+        }
     }
 
     [Fact]

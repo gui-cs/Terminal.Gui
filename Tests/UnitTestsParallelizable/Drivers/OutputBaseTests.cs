@@ -191,7 +191,7 @@ public class OutputBaseTests
 
         // Column 1 was skipped by OutputBase.Write because column 0 had a wide glyph
         // So its dirty flag remains true (it was initialized as dirty by ClearContents)
-        Assert.True (buffer.Contents! [0, 1].IsDirty);
+        Assert.False (buffer.Contents! [0, 1].IsDirty);
 
         // Column 2 was written ('A')
         Assert.False (buffer.Contents! [0, 2].IsDirty);
