@@ -1,4 +1,3 @@
-//#define FIXES_4466
 using System.Collections.Concurrent;
 
 namespace Terminal.Gui.Drivers;
