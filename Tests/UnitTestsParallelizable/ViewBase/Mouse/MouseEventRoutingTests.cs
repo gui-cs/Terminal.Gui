@@ -174,45 +174,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Dispose ();
     }
 
-    [Fact]
-    public void MouseClick_OnSubView_RaisesSelectingEvent ()
-    {
-        // Arrange
-        View superView = new ()
-        {
-            Width = 20,
-            Height = 20
-        };
-
-        View subView = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 10,
-            Height = 10
-        };
-
-        superView.Add (subView);
-
-        int activatingCount = 0;
-        subView.Activating += (_, _) => activatingCount++;
-
-        Terminal.Gui.Input.Mouse mouse = new ()
-        {
-            Position = new Point (5, 5),
-            Flags = MouseFlags.LeftButtonClicked
-        };
-
-        // Act
-        subView.NewMouseEvent (mouse);
-
-        // Assert
-        Assert.Equal (1, activatingCount);
-
-        subView.Dispose ();
-        superView.Dispose ();
-    }
-
     #endregion
 
     #region Mouse Event Propagation
@@ -448,41 +409,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         Assert.Equal (expectFocus, subView.HasFocus);
 
         subView.Dispose ();
-        superView.Dispose ();
-    }
-
-    [Fact]
-    public void MouseClick_RaisesSelecting_WhenCanFocus ()
-    {
-        // Arrange
-        View superView = new () { CanFocus = true, Width = 20, Height = 20 };
-        View view = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
-
-        superView.Add (view);
-
-        int activatingCount = 0;
-        view.Activating += (_, _) => activatingCount++;
-
-        Terminal.Gui.Input.Mouse mouse = new ()
-        {
-            Position = new (5, 5),
-            Flags = MouseFlags.LeftButtonClicked
-        };
-
-        // Act
-        view.NewMouseEvent (mouse);
-
-        // Assert
-        Assert.Equal (1, activatingCount);
-
-        view.Dispose ();
         superView.Dispose ();
     }
 

@@ -631,21 +631,10 @@ See the [Mouse Deep Dive](mouse.md) for complete details.
 - Mouse movement tracking
 - Viewport-relative coordinates (not screen-relative)
 
-**Highlight and Continuous Presses:**
-- [View.Highlight](~/api/Terminal.Gui.ViewBase.View.yml) - Visual feedback on hover/click
-- [View.HighlightStyle](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HighlightStyle) - Configure highlight appearance
-- [View.WantContinuousButtonPresses](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_WantContinuousButtonPresses) - Repeat [Command.Accept](~/api/Terminal.Gui.Input.Command.yml) during button hold
-
-```csharp
-// Highlight on hover
-view.Highlight += (s, e) => { /* Visual feedback */ };
-view.HighlightStyle = HighlightStyle.Hover;
-
-// Continuous button presses
-view.WantContinuousButtonPresses = true;
-```
-
----
+**Highlight and Repeat on Hold:**
+- [View.MouseHighlightStates](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHighlightStates) - Allows views to provide visual feedback on hover/click.
+- [View.MouseState](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseState) - Indicates whether the mouse is pressed, hovered, or outside.
+- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHoldRepeat) - Enables or disables whether mouse click events will be repeated when the user holds the mouse down
 
 ## Configuration and Persistence
 

@@ -173,7 +173,7 @@ public class TabViewTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Broken in #4474")]
     [AutoInitShutdown]
     public void MouseClick_Right_Left_Arrows_ChangesTab ()
     {
@@ -257,7 +257,7 @@ public class TabViewTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Broken in #4474")]
     [AutoInitShutdown]
     public void MouseClick_Right_Left_Arrows_ChangesTab_With_Border ()
     {

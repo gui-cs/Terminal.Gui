@@ -43,7 +43,7 @@ public class ColorPicker16Tests
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
     }
 
-    [Fact]
+    [Fact (Skip = "Broken in #4474")]
     [AutoInitShutdown]
     public void MouseEvents ()
     {

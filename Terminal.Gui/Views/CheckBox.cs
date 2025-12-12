@@ -14,7 +14,7 @@ public class CheckBox : View
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStates
+    public static MouseState DefaultMouseHighlightStates
     {
         get => _defaultHighlightStates;
         set => _defaultHighlightStates = value;
@@ -42,7 +42,7 @@ public class CheckBox : View
 
         TitleChanged += Checkbox_TitleChanged;
 
-        MouseHighlightStates = DefaultHighlightStates;
+        MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
     /// <inheritdoc />

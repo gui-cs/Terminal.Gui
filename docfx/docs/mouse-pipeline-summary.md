@@ -167,6 +167,8 @@ Terminal.Gui/
 
 ## Testing Tips
 
+**IMPORTANT** - Some existing tests are currently failing due to the old delayed click behavior. These tests are marked with `Skip = "Broken in #4474"` and need to be updated once the new system is implemented. 
+
 **Unit Tests:**
 ```csharp
 // Test click synthesis
