@@ -4,22 +4,9 @@ using Xunit.Abstractions;
 namespace DriverTests;
 
 /// <summary>
-///     Tests for https://github.com/gui-cs/Terminal.Gui/issues/4466
+///     Tests for https://github.com/gui-cs/Terminal.Gui/issues/4466.
 ///     These tests validate that FillRect properly handles wide characters when overlapping existing content.
-///     To test WITHOUT the fix:
-///     1. Comment out FIXES_4466 from Terminal.Gui.csproj DefineConstants
-///     2. Run these tests - they should FAIL
-///     To test WITH the fix:
-///     1. Add FIXES_4466 to Terminal.Gui.csproj DefineConstants
-///     2. Run these tests - they should PASS
-///     Without FIXES_4466:
-///     - FillRect directly sets cells without calling AddStr
-///     - Wide characters that overlap are not properly invalidated
-///     - Results in visual corruption when MessageBox borders overlap wide characters
-///     With FIXES_4466:
-///     - FillRect calls AddStr which properly handles wide character invalidation
-///     - Overlapped wide characters are replaced with replacement chars
-///     - Adjacent cells are marked dirty to ensure proper rendering
+///     Specifically, they ensure that wide characters are properly invalidated and replaced when a MessageBox border or similar UI element is drawn over them, preventing visual corruption.
 /// </summary>
 public class OutputBufferWideCharTests (ITestOutputHelper output)
 {
