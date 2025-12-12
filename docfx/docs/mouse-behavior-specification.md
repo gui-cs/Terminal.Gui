@@ -338,6 +338,8 @@ public class Mouse : HandledEventArgs
 
 ## Testing Scenarios
 
+**IMPORTANT** - Some existing tests are currently failing due to the old delayed click behavior. These tests are marked with `Skip = "Broken in #4474"` and need to be updated once the new system is implemented. 
+
 ### Test 1: Normal Button Single Click
 ```
 Expected: Accept fires once, ClickCount=1
