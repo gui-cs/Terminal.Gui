@@ -278,16 +278,19 @@ public partial class View // Mouse APIs
             return false;
         }
 
+        // LEGACY - Can be rewritten
         if (!MousePositionTracking  && mouse.Flags == MouseFlags.PositionReport)
         {
             return false;
         }
 
+        // LEGACY - Can be rewritten
         if (MouseHoldRepeater is null)
         {
             MouseHoldRepeater = new MouseHoldRepeaterImpl (this, App?.TimedEvents, App?.Mouse);
         }
 
+        // LEGACY - Can be rewritten
         if (MouseHoldRepeat)
         {
             if (mouse.IsPressed)
@@ -309,9 +312,10 @@ public partial class View // Mouse APIs
         }
 
         // Post-Conditions
-
+        // LEGACY - Can be rewritten
         if (MouseHighlightStates != MouseState.None || MouseHoldRepeat)
         {
+            // LEGACY - Can be rewritten
             if (WhenGrabbedHandlePressed (mouse))
             {
                 // If we raised a command on the grabbed view, and it handled it, we are done
@@ -319,15 +323,18 @@ public partial class View // Mouse APIs
                 return true;
             }
 
+            // LEGACY - Can be rewritten
             // This will change mouse.Flags to clicked if appropriate.
             WhenGrabbedHandleReleased (mouse);
 
+            // LEGACY - Can be rewritten
             if (WhenGrabbedHandleClicked (mouse))
             {
                 return mouse.Handled;
             }
         }
 
+        // LEGACY - Can be rewritten
         // We get here if the view did not handle the mouse event via RaiseMouseEvent, and
         // it did not handle the commands via WhenGrabbed* methods.
         if (mouse.IsSingleDoubleOrTripleClicked)
@@ -335,6 +342,7 @@ public partial class View // Mouse APIs
             return RaiseCommandsBoundToButtonClickedFlags (mouse);
         }
 
+        // LEGACY - Can be rewritten
         if (mouse.IsWheel)
         {
             return RaiseCommandsBoundToWheelFlags (mouse);
@@ -382,6 +390,7 @@ public partial class View // Mouse APIs
         return mouse.Handled;
     }
 
+    // LEGACY - Can be rewritten
     private void MouseHoldRepeaterOnMouseIsHeldDownTick (object? sender, CancelEventArgs<Mouse> e)
     {
         Logging.Trace ($"MouseHoldRepeater tick - raising commands bound {e.NewValue.Flags}");
@@ -409,6 +418,8 @@ public partial class View // Mouse APIs
     public event EventHandler<Mouse>? MouseEvent;
 
     #endregion Low Level Mouse Events
+
+    // LEGACY - Can be rewritten
 
     #region WhenGrabbed Handlers
 
