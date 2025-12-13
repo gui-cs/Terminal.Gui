@@ -23,6 +23,7 @@ public abstract class FakeDriverBase/* : IDisposable*/
         var sizeMonitor = factory.CreateSizeMonitor (output, new OutputBufferImpl ());
 
         DriverImpl driver = new (
+                                 factory,
                                  new FakeInputProcessor (null),
                                  new OutputBufferImpl (),
                                  output,

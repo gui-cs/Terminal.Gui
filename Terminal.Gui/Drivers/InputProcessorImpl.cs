@@ -38,9 +38,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// </summary>
     public CancellationTokenSource? ExternalCancellationTokenSource { get; set; }
 
-    /// <inheritdoc />
-    public string? DriverName { get; init; }
-
     #endregion
 
     #region Constructor

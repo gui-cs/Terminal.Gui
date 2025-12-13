@@ -9,7 +9,7 @@ public class SyncrhonizationContextTests
     [Fact]
     public void SynchronizationContext_CreateCopy ()
     {
-        Application.Init ("fake");
+        Application.Init (DriverRegistry.Names.FAKE);
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
 
@@ -23,10 +23,10 @@ public class SyncrhonizationContextTests
     private readonly object _lockPost = new ();
 
     [Theory]
-    [InlineData ("fake")]
-    [InlineData ("windows")]
-    [InlineData ("dotnet")]
-    [InlineData ("unix")]
+    [InlineData (DriverRegistry.Names.FAKE)]
+    [InlineData (DriverRegistry.Names.WINDOWS)]
+    [InlineData (DriverRegistry.Names.DOTNET)]
+    [InlineData (DriverRegistry.Names.UNIX)]
     public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)

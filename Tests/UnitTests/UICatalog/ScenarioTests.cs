@@ -203,7 +203,7 @@ public class ScenarioTests : TestsAllViews
         List<string> posNames = ["Percent", "AnchorEnd", "Center", "Absolute"];
         List<string> dimNames = ["Auto", "Percent", "Fill", "Absolute"];
 
-        Application.Init ("fake");
+        Application.Init (DriverRegistry.Names.FAKE);
 
         var top = new Runnable ();
 

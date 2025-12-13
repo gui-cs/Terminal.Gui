@@ -83,7 +83,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
         app.Driver!.SetScreenSize (2, 1);
         app.Driver.Force16Colors = true;
 

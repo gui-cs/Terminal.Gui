@@ -9,6 +9,13 @@ namespace Terminal.Gui.Drivers;
 public interface IComponentFactory
 {
     /// <summary>
+    ///     Gets the name of the driver this factory creates components for.
+    ///     This is the single source of truth for driver identification.
+    /// </summary>
+    /// <returns>The driver name (<see cref="DriverRegistry.Names"/>).</returns>
+    string? GetDriverName ();
+
+    /// <summary>
     ///     Create the <see cref="IOutput"/> class for the current driver implementation i.e. the class responsible for
     ///     rendering <see cref="IOutputBuffer"/> into the console.
     /// </summary>

@@ -50,7 +50,7 @@ public class MainLoopCoordinatorTests : IDisposable
     {
         // Arrange
         IApplication app = CreateApp ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         // The input thread should now be running
         Assert.NotNull (app.Driver);
@@ -80,7 +80,7 @@ public class MainLoopCoordinatorTests : IDisposable
     {
         // Arrange
         IApplication app = CreateApp ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         // Act - Call Dispose() multiple times
         Exception? exception = Record.Exception (() =>
@@ -111,7 +111,7 @@ public class MainLoopCoordinatorTests : IDisposable
         for (var i = 0; i < COUNT; i++)
         {
             apps [i] = Application.Create ();
-            apps [i].Init ("fake");
+            apps [i].Init (DriverRegistry.Names.FAKE);
         }
 
         // Act - Dispose all applications
@@ -188,7 +188,7 @@ public class MainLoopCoordinatorTests : IDisposable
         for (var i = 0; i < COUNT; i++)
         {
             apps [i] = Application.Create ();
-            apps [i].Init ("fake");
+            apps [i].Init (DriverRegistry.Names.FAKE);
         }
 
         // Let them run for a moment

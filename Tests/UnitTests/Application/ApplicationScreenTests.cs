@@ -73,7 +73,7 @@ public class ApplicationScreenTests
     {
         // Arrange
         Application.ResetState (true);
-        Application.Init ("fake");
+        Application.Init (DriverRegistry.Names.FAKE);
 
         // Act
         Application.ClearScreenNextIteration = true;

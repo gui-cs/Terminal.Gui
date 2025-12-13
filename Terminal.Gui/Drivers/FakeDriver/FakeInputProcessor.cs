@@ -41,7 +41,6 @@ public class FakeInputProcessor : InputProcessorImpl<char>
     /// <inheritdoc/>
     public FakeInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new AnsiKeyConverter ())
     {
-        DriverName = "fake";
     }
 
     /// <inheritdoc/>

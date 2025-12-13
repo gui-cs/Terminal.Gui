@@ -30,6 +30,7 @@ public class OutputBaseTests
 
         // Create DriverImpl and associate it with the FakeOutput to test Sixel output
         IDriver driver = new DriverImpl (
+                                         new FakeComponentFactory (),
                                          new FakeInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,
@@ -246,6 +247,7 @@ public class OutputBaseTests
 
         // Create DriverImpl and associate it with the FakeOutput to test Sixel output
         IDriver driver = new DriverImpl (
+                                         new FakeComponentFactory (),
                                          new FakeInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,

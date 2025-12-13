@@ -44,7 +44,7 @@ public class TimeFieldTests
     public void Copy_Paste ()
     {
         IApplication app = Application.Create();
-        app.Init("fake");
+        app.Init(DriverRegistry.Names.FAKE);
 
         try
         {

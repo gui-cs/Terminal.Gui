@@ -9,11 +9,6 @@ public interface IInputProcessor
     #region Configuration and Core Processing
 
     /// <summary>
-    ///     Gets the name of the driver associated with this input processor.
-    /// </summary>
-    string? DriverName { get; init; }
-
-    /// <summary>
     ///     Drains the input queue, processing all available input. Must be called on the main loop thread.
     /// </summary>
     void ProcessQueue ();

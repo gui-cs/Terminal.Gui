@@ -16,7 +16,7 @@ public class ScreenTests (ITestOutputHelper output)
     public void Screen_Size_Changes ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         IDriver? driver = app.Driver;
 
@@ -44,7 +44,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         var eventFired = false;
         Rectangle? newScreen = null;
@@ -78,7 +78,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         Rectangle initialScreen = app.Screen;
         Assert.Equal (new (0, 0, 80, 25), initialScreen);
@@ -95,7 +95,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         object? eventSender = null;
 
@@ -123,7 +123,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         Rectangle? capturedRectangle = null;
 
@@ -154,7 +154,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         var eventCount = 0;
         List<Size> sizes = new ();
@@ -192,7 +192,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         var eventFired = false;
 
@@ -220,7 +220,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         var eventCount = 0;
 
@@ -247,7 +247,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         using var runnable = new Runnable ();
         SessionToken? token = app.Begin (runnable);
@@ -281,7 +281,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         using var runnable1 = new Runnable ();
         SessionToken? token1 = app.Begin (runnable1);
@@ -324,7 +324,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         var eventFired = false;
 
@@ -356,7 +356,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         // Act
         Rectangle screen = app.Screen;
@@ -384,7 +384,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         // Act & Assert
         var exception = Assert.Throws<NotImplementedException> (() =>
@@ -398,7 +398,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         // Act
         Exception? exception = Record.Exception (() =>
@@ -414,7 +414,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         var eventFired = false;
 
@@ -441,7 +441,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         List<Exception> exceptions = new ();
         List<Task> tasks = new ();

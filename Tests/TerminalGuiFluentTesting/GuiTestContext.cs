@@ -270,10 +270,10 @@ public partial class GuiTestContext : IDisposable
     {
         return _driverType switch
         {
-            TestDriver.Windows => "windows",
-            TestDriver.DotNet => "dotnet",
-            TestDriver.Unix => "unix",
-            TestDriver.Fake => "fake",
+            TestDriver.Windows => DriverRegistry.Names.WINDOWS,
+            TestDriver.DotNet => DriverRegistry.Names.DOTNET,
+            TestDriver.Unix => DriverRegistry.Names.UNIX,
+            TestDriver.Fake => DriverRegistry.Names.FAKE,
             _ =>
                 throw new ArgumentOutOfRangeException ()
         };

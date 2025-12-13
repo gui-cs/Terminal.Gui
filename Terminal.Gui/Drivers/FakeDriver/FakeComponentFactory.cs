@@ -20,6 +20,9 @@ namespace Terminal.Gui.Drivers;
 /// </remarks>
 public class FakeComponentFactory : ComponentFactoryImpl<char>
 {
+    /// <inheritdoc/>
+    public override string? GetDriverName () => DriverRegistry.Names.FAKE;
+
     private readonly FakeInput? _input;
     private readonly IOutput? _output;
     private FakeSizeMonitor? _createdSizeMonitor;
@@ -45,7 +48,7 @@ public class FakeComponentFactory : ComponentFactoryImpl<char>
         {
             // Create FakeSizeMonitor - the ANSI request callback will be set up
             // by MainLoopCoordinator after the driver is fully constructed
-            _createdSizeMonitor = new FakeSizeMonitor (fakeOutput, null);
+            _createdSizeMonitor = new (fakeOutput, queueAnsiRequest: null);
             return _createdSizeMonitor;
         }
 

@@ -37,20 +37,23 @@ Method 1: Set ForceDriver using Configuration Manager
 Method 2: Pass driver name to Init
 
 ```csharp
+// Using string directly
 Application.Init(driverName: "unix");
+
+// Or using type-safe constant
+Application.Init(driverName: DriverRegistry.Names.UNIX);
 ```
 
 Method 3: Set ForceDriver on instance
 
 ```csharp
+using Terminal.Gui.Drivers;
 using (IApplication app = Application.Create())
 {
-    app.ForceDriver = "fake";
+    app.ForceDriver = DriverRegistry.Names.FAKE;
     app.Init();
 }
 ```
-
-**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
 
 ### ForceDriver as Configuration Property
 
@@ -68,18 +71,19 @@ Application.ForceDriverChanged += (sender, e) =>
 };
 
 // Change driver
-Application.ForceDriver = "fake";
+Application.ForceDriver = DriverRegistry.Names.FAKE;
 ```
 
 ### Discovering Available Drivers
 
-Use `GetDriverTypes()` to discover which drivers are available at runtime:
+Terminal.Gui provides several methods to discover available drivers at runtime through the **Driver Registry**:
 
 ```csharp
-(List<Type?> driverTypes, List<string?> driverNames) = Application.GetDriverTypes();
+// Get driver names (AOT-friendly, no reflection)
+IEnumerable<string> driverNames = Application.GetRegisteredDriverNames();
 
 Console.WriteLine("Available drivers:");
-foreach (string? name in driverNames)
+foreach (string name in driverNames)
 {
     Console.WriteLine($"  - {name}");
 }
@@ -92,18 +96,114 @@ foreach (string? name in driverNames)
 //   - fake
 ```
 
-**Note**: `GetDriverTypes()` uses reflection to discover driver implementations and is marked with `[RequiresUnreferencedCode("AOT")]` and `[Obsolete]` as part of the legacy static API.
+For more detailed information about each driver:
+
+```csharp
+// Get driver metadata
+foreach (var descriptor in Application.GetRegisteredDrivers())
+{
+    Console.WriteLine($"{descriptor.DisplayName}");
+    Console.WriteLine($"  Name: {descriptor.Name}");
+    Console.WriteLine($"  Description: {descriptor.Description}");
+    Console.WriteLine($"  Platforms: {string.Join(", ", descriptor.SupportedPlatforms)}");
+    Console.WriteLine();
+}
+
+// Output:
+// Windows Console Driver
+//   Name: windows
+//   Description: Optimized Windows Console API driver with native input handling
+//   Platforms: Win32NT, Win32S, Win32Windows
+//
+// .NET Cross-Platform Driver
+//   Name: dotnet
+//   Description: Cross-platform driver using System.Console API
+//   Platforms: Win32NT, Unix, MacOSX
+// ...
+```
+
+Validate driver names (useful for CLI argument validation):
+
+```csharp
+string userInput = args[0];
+
+if (Application.IsDriverNameValid(userInput))
+{
+    Application.Init(driverName: userInput);
+}
+else
+{
+    Console.WriteLine($"Invalid driver: {userInput}");
+    Console.WriteLine($"Valid options: {string.Join(", ", Application.GetRegisteredDriverNames())}");
+}
+```
+
+Use type-safe constants in code:
+
+```csharp
+using Terminal.Gui.Drivers;
+
+// Type-safe driver names from DriverRegistry.Names
+string driverName = DriverRegistry.Names.FAKE;  // "fake"
+app.Init(driverName);
+```
+
+**Note**: The legacy `GetDriverTypes()` method is now obsolete. Use `GetRegisteredDriverNames()` or `GetRegisteredDrivers()` instead for AOT-friendly, reflection-free driver discovery.
 
 ## Architecture
 
+### Driver Registry
+
+Terminal.Gui v2 uses a **Driver Registry** pattern for managing available drivers without reflection. The registry provides:
+
+- **Type-safe driver names** via `DriverRegistry.Names` constants
+- **Driver metadata** including display names, descriptions, and supported platforms
+- **AOT compatibility** - no reflection, fully ahead-of-time compilation friendly
+- **Extensibility** - custom drivers can be registered via `DriverRegistry.Register()`
+
+```csharp
+// Access well-known driver name constants
+string windowsDriver = DriverRegistry.Names.WINDOWS;  // "windows"
+string unixDriver = DriverRegistry.Names.UNIX;        // "unix"
+string dotnetDriver = DriverRegistry.Names.DOTNET;    // "dotnet"
+string fakeDriver = DriverRegistry.Names.FAKE;        // "fake"
+
+// Get detailed driver information
+if (DriverRegistry.TryGetDriver("windows", out var descriptor))
+{
+    Console.WriteLine($"Found: {descriptor.DisplayName}");
+    Console.WriteLine($"Description: {descriptor.Description}");
+    
+    // Check if supported on current platform
+    bool isSupported = descriptor.SupportedPlatforms.Contains(Environment.OSVersion.Platform);
+}
+
+// Get drivers supported on current platform
+foreach (var driver in DriverRegistry.GetSupportedDrivers())
+{
+    Console.WriteLine($"{driver.Name} - {driver.DisplayName}");
+}
+
+// Get the default driver for current platform
+var defaultDriver = DriverRegistry.GetDefaultDriver();
+Console.WriteLine($"Default driver: {defaultDriver.Name}");
+```
+
 ### Component Factory Pattern
 
-The v2 driver architecture uses the **Component Factory** pattern to create platform-specific components. Each driver has a corresponding factory:
+The v2 driver architecture uses the **Component Factory** pattern to create platform-specific components. Each driver has a corresponding factory that implements `IComponentFactory<T>`:
 
 - `NetComponentFactory` - Creates components for DotNetDriver
 - `WindowsComponentFactory` - Creates components for WindowsDriver  
 - `UnixComponentFactory` - Creates components for UnixDriver
 - `FakeComponentFactory` - Creates components for FakeDriver
+
+Each factory is responsible for:
+- Creating driver-specific components (`IInput<T>`, `IOutput`, `IInputProcessor`, etc.)
+- Providing the driver name via `GetDriverName()` (single source of truth for driver identity)
+- Being registered in the `DriverRegistry` with metadata
+
+The factory pattern ensures proper component creation and initialization while maintaining clean separation of concerns.
 
 ### Core Components
 
@@ -130,6 +230,10 @@ Translates raw console input into Terminal.Gui events:
 - Parses ANSI escape sequences (mouse events, special keys)
 - Generates `MouseEventArgs` for mouse input
 - Handles platform-specific key mappings
+- Uses `IKeyConverter<T>` to translate `TInputRecord` to `Key`:
+  - `AnsiKeyConverter` - For `char` input (UnixDriver, FakeDriver)
+  - `NetKeyConverter` - For `ConsoleKeyInfo` input (DotNetDriver)
+  - `WindowsKeyConverter` - For `WindowsConsole.InputRecord` input (WindowsDriver)
 
 #### IOutputBuffer
 Manages the screen buffer and drawing operations:
@@ -256,17 +360,45 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 
 ### Driver Creation and Selection
 
-The driver selection logic in `ApplicationImpl.Driver.cs` prioritizes component factory type over the driver name parameter:
+The driver selection logic in `ApplicationImpl.Driver.cs` uses the **Driver Registry** to select and instantiate drivers:
 
-1. **Component Factory Type**: If an `IComponentFactory` is already set, it determines the driver
-2. **Driver Name Parameter**: The `driverName` parameter to `Init()` is checked next
-3. **ForceDriver Property**: The `ForceDriver` configuration property is evaluated
-4. **Platform Detection**: If none of the above specify a driver, the platform is detected:
+**Selection Priority Order:**
+
+1. **Provided Component Factory**: If an `IComponentFactory` is explicitly provided to `ApplicationImpl`, it determines the driver via `factory.GetDriverName()`
+2. **Driver Name Parameter**: The `driverName` parameter passed to `Init()` is looked up in the registry
+3. **ForceDriver Configuration**: The `ForceDriver` property is checked and looked up in the registry
+4. **Platform Default**: `DriverRegistry.GetDefaultDriver()` selects based on current platform:
    - Windows (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
    - Unix/Linux/macOS → `UnixDriver`
    - Other platforms → `DotNetDriver` (fallback)
 
-This prioritization ensures flexibility while maintaining deterministic behavior.
+**Driver Creation Process:**
+
+```csharp
+// Example of how driver creation works internally
+DriverRegistry.DriverDescriptor descriptor;
+
+if (DriverRegistry.TryGetDriver(driverName, out descriptor))
+{
+    // Create factory using descriptor's factory function
+    IComponentFactory factory = descriptor.CreateFactory();
+    
+    // Factory creates all driver components
+    var coordinator = new MainLoopCoordinator<TInputRecord>(
+        timedEvents,
+        inputQueue,
+        mainLoop,
+        factory  // Factory knows its driver name via GetDriverName()
+    );
+}
+```
+
+This architecture provides:
+- **Deterministic behavior** - clear priority order for driver selection
+- **Flexibility** - multiple ways to specify a driver
+- **Type safety** - use `DriverRegistry.Names` constants instead of strings
+- **Extensibility** - custom drivers can register themselves
+- **AOT compatibility** - no reflection required
 
 ## Platform-Specific Details
 
@@ -316,6 +448,107 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 - `View.Move(col, row)` for positioning
 - `View.AddRune()` and `View.AddStr()` for drawing
 - `View.App.Screen` for screen dimensions
+
+## Extending the Driver System
+
+### Registering Custom Drivers
+
+The Driver Registry is extensible, allowing you to register custom drivers:
+
+```csharp
+// Create a custom driver descriptor
+var customDescriptor = new DriverRegistry.DriverDescriptor(
+    Name: "custom",
+    DisplayName: "Custom Terminal Driver",
+    Description: "My custom driver implementation",
+    SupportedPlatforms: new[] { PlatformID.Unix, PlatformID.Win32NT },
+    CreateFactory: () => new MyCustomComponentFactory()
+);
+
+// Register it before calling Application.Init()
+DriverRegistry.Register(customDescriptor);
+
+// Now you can use it
+Application.Init(driverName: "custom");
+```
+
+Your custom factory must implement `IComponentFactory<T>`:
+
+```csharp
+public class MyCustomComponentFactory : ComponentFactoryImpl<char>
+{
+    public override string GetDriverName() => "custom";
+    
+    public override IInput<char> CreateInput()
+    {
+        return new MyCustomInput();
+    }
+    
+    public override IInputProcessor CreateInputProcessor(ConcurrentQueue<char> inputBuffer)
+    {
+        return new MyCustomInputProcessor(inputBuffer);
+    }
+    
+    public override IOutput CreateOutput()
+    {
+        return new MyCustomOutput();
+    }
+}
+```
+
+### Driver Development Guidelines
+
+When creating custom drivers:
+
+1. **Choose the right input type** for your `TInputRecord`:
+   - `char` for character-based ANSI terminals (like UnixDriver, FakeDriver)
+   - `ConsoleKeyInfo` for .NET Console API (like DotNetDriver)
+   - `WindowsConsole.InputRecord` for Windows Console API (like WindowsDriver)
+   - Custom struct for specialized input handling
+
+2. **Implement all required components**:
+   - `IInput<T>` - Reads from your terminal/console
+   - `IOutput` - Writes to your terminal/console
+   - `IInputProcessor` - Converts `T` to Terminal.Gui `Key` and `Mouse` events
+   - `IKeyConverter<T>` - Translates your `TInputRecord` to/from `Key`
+   - `ISizeMonitor` - Detects terminal size changes (or use `SizeMonitorImpl`)
+
+3. **Implement a key converter**:
+   ```csharp
+   public class MyKeyConverter : IKeyConverter<char>
+   {
+       public Key ToKey(char input)
+       {
+           // Convert char to Key
+           ConsoleKeyInfo keyInfo = EscSeqUtils.MapChar(input);
+           return EscSeqUtils.MapKey(keyInfo);
+       }
+       
+       public char ToKeyInfo(Key key)
+       {
+           // Convert Key back to char (for test injection)
+           ConsoleKeyInfo keyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode(key.KeyCode);
+           return keyInfo.KeyChar;
+       }
+   }
+   ```
+   
+   For ANSI-based terminals, reuse `AnsiKeyConverter`. For .NET Console, reuse `NetKeyConverter`.
+
+4. **Follow the threading model**:
+   - `IInput.Run()` runs on a dedicated input thread
+   - `IInputProcessor` processes on the main UI thread
+   - Use `ConcurrentQueue<T>` for thread-safe communication
+
+5. **Handle CI/CD environments gracefully**:
+   - Detect when running without a real terminal (e.g., GitHub Actions)
+   - Provide fallback behavior (return empty input, default size, etc.)
+   - Log warnings but don't throw exceptions
+
+6. **Register with meaningful metadata**:
+   - Provide clear `DisplayName` and `Description`
+   - List actual `SupportedPlatforms`
+   - Use lowercase name consistent with built-in drivers
 
 
 ## See Also

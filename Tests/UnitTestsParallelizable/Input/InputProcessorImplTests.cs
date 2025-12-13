@@ -374,7 +374,6 @@ internal class TestInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
     public TestInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, bool useParser = false)
         : base (inputBuffer, new TestKeyConverter ())
     {
-        DriverName = "TestDriver";
         _useParser = useParser;
     }
 

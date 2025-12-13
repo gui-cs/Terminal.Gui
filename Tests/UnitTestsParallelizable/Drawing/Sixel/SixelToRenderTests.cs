@@ -197,6 +197,7 @@ public class SixelToRenderTests
 
             Mock<DriverImpl> driverMock = new (
                                                MockBehavior.Strict,
+                                               new FakeComponentFactory (),
                                                new FakeInputProcessor (null!),
                                                new OutputBufferImpl (),
                                                output,

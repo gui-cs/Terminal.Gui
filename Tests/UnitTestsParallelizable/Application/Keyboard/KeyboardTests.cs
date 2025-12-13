@@ -19,7 +19,7 @@ public class KeyboardTests
 
         Assert.Empty (app.Keyboard.KeyBindings.GetBindings ());
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         Assert.NotEmpty (app.Keyboard.KeyBindings.GetBindings ());
 

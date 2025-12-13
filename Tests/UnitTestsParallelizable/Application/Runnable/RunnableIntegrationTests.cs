@@ -466,7 +466,7 @@ public class ApplicationRunnableIntegrationTests
     private IApplication CreateAndInitApp ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         return app;
     }

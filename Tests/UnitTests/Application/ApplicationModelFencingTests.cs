@@ -14,10 +14,10 @@ public class ApplicationModelFencingTests
 
         // Create a modern instance-based application
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         // Attempting to initialize using the legacy static model should throw
-        var ex = Assert.Throws<InvalidOperationException> (() => { ApplicationImpl.Instance.Init ("fake"); });
+        var ex = Assert.Throws<InvalidOperationException> (() => { ApplicationImpl.Instance.Init (DriverRegistry.Names.FAKE); });
 
         Assert.Contains ("Cannot use legacy static Application model", ex.Message);
         Assert.Contains ("after using modern instance-based model", ex.Message);
@@ -35,13 +35,13 @@ public class ApplicationModelFencingTests
 
         // Initialize using the legacy static model
         IApplication staticInstance = ApplicationImpl.Instance;
-        staticInstance.Init ("fake");
+        staticInstance.Init (DriverRegistry.Names.FAKE);
 
         // Attempting to create and initialize with modern instance-based model should throw
         var ex = Assert.Throws<InvalidOperationException> (() =>
                                                            {
                                                                IApplication app = Application.Create ();
-                                                               app.Init ("fake");
+                                                               app.Init (DriverRegistry.Names.FAKE);
                                                            });
 
         Assert.Contains ("Cannot use modern instance-based model", ex.Message);
@@ -60,7 +60,7 @@ public class ApplicationModelFencingTests
 
         // Initialize using legacy static API
         IApplication staticInstance = ApplicationImpl.Instance;
-        staticInstance.Init ("fake");
+        staticInstance.Init (DriverRegistry.Names.FAKE);
 
         // Attempting to create a modern instance-based application should throw
         var ex = Assert.Throws<InvalidOperationException> (() =>
@@ -84,10 +84,10 @@ public class ApplicationModelFencingTests
 
         // Create a modern instance-based application
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         // Attempting to initialize using the legacy static model should throw
-        var ex = Assert.Throws<InvalidOperationException> (() => { ApplicationImpl.Instance.Init ("fake"); });
+        var ex = Assert.Throws<InvalidOperationException> (() => { ApplicationImpl.Instance.Init (DriverRegistry.Names.FAKE); });
 
         Assert.Contains ("Cannot use legacy static Application model", ex.Message);
         Assert.Contains ("after using modern instance-based model", ex.Message);

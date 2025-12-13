@@ -134,6 +134,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         if (_input != null && _output != null)
         {
             _driver = new (
+                           _componentFactory,
                            _inputProcessor,
                            _loop.OutputBuffer,
                            _output,

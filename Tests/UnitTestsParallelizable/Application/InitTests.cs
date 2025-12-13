@@ -15,10 +15,10 @@ public class InitTests (ITestOutputHelper output)
     public void Init_Unbalanced_Throws ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         Assert.Throws<InvalidOperationException> (() =>
-                                                      app.Init ("fake")
+                                                      app.Init (DriverRegistry.Names.FAKE)
                                                  );
     }
 
@@ -38,7 +38,7 @@ public class InitTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         app.Dispose ();
 
@@ -60,7 +60,7 @@ public class InitTests (ITestOutputHelper output)
 
         app.InitializedChanged += OnApplicationOnInitializedChanged;
 
-        app.Init (driverName: "fake");
+        app.Init (driverName: DriverRegistry.Names.FAKE);
         Assert.True (initialized);
         Assert.False (Dispose);
 
@@ -94,7 +94,7 @@ public class InitTests (ITestOutputHelper output)
         app.Keyboard.QuitKey = Key.Q;
         Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         Assert.Equal (Key.Q, app.Keyboard.QuitKey);
 
@@ -106,11 +106,11 @@ public class InitTests (ITestOutputHelper output)
     {
         using IApplication app = Application.Create ();
 
-        app.ForceDriver = "fake";
+        app.ForceDriver = DriverRegistry.Names.FAKE;
         // Note: Init() without params picks up driver configuration
         app.Init ();
 
-        Assert.Equal ("fake", app.Driver!.GetName ());
+        Assert.Equal (DriverRegistry.Names.FAKE, app.Driver!.GetName ());
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class InitTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
 
         // Init the app
-        app.Init (driverName: "fake");
+        app.Init (driverName: DriverRegistry.Names.FAKE);
 
         // Verify initialized
         Assert.True (app.Initialized);
@@ -133,7 +133,7 @@ public class InitTests (ITestOutputHelper output)
 
         // Create a new instance and set values
         app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.FAKE);
 
         app.StopAfterFirstIteration = true;
         app.Keyboard.PrevTabGroupKey = Key.A;

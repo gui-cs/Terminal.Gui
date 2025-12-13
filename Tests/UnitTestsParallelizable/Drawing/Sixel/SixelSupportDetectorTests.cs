@@ -110,6 +110,7 @@ public class SixelSupportDetectorTests
 
         Mock<DriverImpl> driverMock = new (
                                            MockBehavior.Strict,
+                                           new FakeComponentFactory (),
                                            new FakeInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,
@@ -177,6 +178,7 @@ public class SixelSupportDetectorTests
 
         Mock<DriverImpl> driverMock = new (
                                            MockBehavior.Strict,
+                                           new FakeComponentFactory (),
                                            new FakeInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,

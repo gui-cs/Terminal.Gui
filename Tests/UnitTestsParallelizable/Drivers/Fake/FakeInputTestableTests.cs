@@ -6,8 +6,6 @@ namespace DriverTests.Fake;
 /// <summary>
 ///     Tests for ITestableInput implementation in FakeInput.
 /// </summary>
-[Trait ("Category", "Fake")]
-[Trait ("Platform", "Fake")]
 public class FakeInputTestableTests
 {
     #region Helper Methods
