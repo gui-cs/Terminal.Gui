@@ -22,9 +22,9 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
     /// <inheritdoc/>
     public override string? GetDriverName () => DriverRegistry.Names.ANSI;
 
-    private readonly ANSIInput? _input;
+    private readonly AnsiInput? _input;
     private readonly IOutput? _output;
-    private ANSISizeMonitor? _createdSizeMonitor;
+    private AnsiSizeMonitor? _createdSizeMonitor;
 
     /// <summary>
     ///     Creates a new ANSIComponentFactory with optional output capture.
@@ -32,18 +32,18 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
     /// <param name="input"></param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
     /// <param name="sizeMonitor">Optional size monitor (if null, will create ANSISizeMonitor)</param>
-    public AnsiComponentFactory (ANSIInput? input = null, IOutput? output = null, ISizeMonitor? sizeMonitor = null)
+    public AnsiComponentFactory (AnsiInput? input = null, IOutput? output = null, ISizeMonitor? sizeMonitor = null)
     {
         _input = input;
         _output = output;
-        _createdSizeMonitor = sizeMonitor as ANSISizeMonitor;
+        _createdSizeMonitor = sizeMonitor as AnsiSizeMonitor;
     }
 
 
     /// <inheritdoc/>
     public override ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        if (consoleOutput is ANSIOutput output)
+        if (consoleOutput is AnsiOutput output)
         {
             // Create ANSISizeMonitor - the ANSI request callback will be set up
             // by MainLoopCoordinator after the driver is fully constructed
@@ -58,16 +58,16 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
     /// <inheritdoc/>
     public override IInput<char> CreateInput ()
     {
-        return _input ?? new ANSIInput ();
+        return _input ?? new AnsiInput ();
     }
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer) { return new ANSIInputProcessor (inputBuffer); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer) { return new AnsiInputProcessor (inputBuffer); }
 
     /// <inheritdoc/>
     public override IOutput CreateOutput ()
     {
-        return _output ?? new ANSIOutput ();
+        return _output ?? new AnsiOutput ();
     }
 }
 

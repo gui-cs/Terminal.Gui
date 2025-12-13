@@ -19,7 +19,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     ///     and moving items to the InputBuffer. This is needed because tests don't
     ///     start the actual input thread via Run().
     /// </summary>
-    private static void SimulateInputThread (ANSIInput ansiInput, ConcurrentQueue<char> inputBuffer)
+    private static void SimulateInputThread (AnsiInput ansiInput, ConcurrentQueue<char> inputBuffer)
     {
         // ANSIInput's Peek() checks _testInput
         while (ansiInput.Peek ())
@@ -37,7 +37,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     ///     Processes the input queue with support for keys that may be held by the ANSI parser (like Esc).
     ///     The parser holds Esc for 50ms waiting to see if it's part of an escape sequence.
     /// </summary>
-    private static void ProcessQueueWithEscapeHandling (ANSIInputProcessor processor, int maxAttempts = 3)
+    private static void ProcessQueueWithEscapeHandling (AnsiInputProcessor processor, int maxAttempts = 3)
     {
         // First attempt - process immediately
         processor.ProcessQueue ();
@@ -59,11 +59,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void EnqueueKeyDownEvent_AddsSingleKeyToQueue ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -88,11 +88,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void EnqueueKeyDownEvent_SupportsMultipleKeys ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Key [] keys = [Key.A, Key.B, Key.C, Key.Enter];
@@ -127,11 +127,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void EnqueueKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Key key = new (keyCode);
@@ -203,11 +203,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         // The ANSI/VT100 protocol has no way to distinguish between them.
 
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Key key = new (keyCode);
@@ -272,11 +272,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void EnqueueKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Key key = new (keyCode);
@@ -307,11 +307,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void EnqueueKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         var keyDownCount = 0;
@@ -338,7 +338,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         ConcurrentQueue<char> queue = new ();
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
 
         // Don't set InputImpl (or set to non-testable)
 
@@ -358,11 +358,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void InputProcessor_ProcessQueue_DrainsPendingInputRecords ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -389,11 +389,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void EnqueueKeyDownEvent_IsThreadSafe ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         ConcurrentBag<Key> receivedKeys = [];
@@ -437,11 +437,11 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void EnqueueKeyDownEvent_WithInvalidKey_DoesNotThrow ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         // Act & Assert - Empty/null key should not throw

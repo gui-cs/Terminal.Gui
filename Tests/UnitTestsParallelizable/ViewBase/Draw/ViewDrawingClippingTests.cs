@@ -601,7 +601,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                            output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        ANSIOutput? ansiOutput = driverImpl!.GetOutput () as ANSIOutput;
+        AnsiOutput? ansiOutput = driverImpl!.GetOutput () as AnsiOutput;
 
         output.WriteLine ("Driver Output After Redraw:\n" + driver.GetOutput().GetLastOutput());
 
@@ -690,7 +690,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        ANSIOutput? ansiOutput = driverImpl!.GetOutput () as ANSIOutput;
+        AnsiOutput? ansiOutput = driverImpl!.GetOutput () as AnsiOutput;
 
         output.WriteLine ("Driver Output:\n" + ansiOutput!.GetLastOutput ());
     }
@@ -754,7 +754,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        ANSIOutput? ansiOutput = driverImpl!.GetOutput () as ANSIOutput;
+        AnsiOutput? ansiOutput = driverImpl!.GetOutput () as AnsiOutput;
 
         output.WriteLine ("Driver Output:\n" + ansiOutput!.GetLastOutput ());
     }

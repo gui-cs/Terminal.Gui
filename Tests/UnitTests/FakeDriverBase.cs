@@ -16,7 +16,7 @@ public abstract class FakeDriverBase
     /// <returns>A configured IDriver instance</returns>
     protected static IDriver CreateFakeDriver (int width = 80, int height = 25)
     {
-        var output = new ANSIOutput ();
+        var output = new AnsiOutput ();
         var factory = new AnsiComponentFactory (null, output, null);
         var parser = new AnsiResponseParser ();
         var scheduler = new AnsiRequestScheduler (parser);
@@ -24,7 +24,7 @@ public abstract class FakeDriverBase
 
         DriverImpl driver = new (
                                  factory,
-                                 new ANSIInputProcessor (null),
+                                 new AnsiInputProcessor (null),
                                  new OutputBufferImpl (),
                                  output,
                                  scheduler,

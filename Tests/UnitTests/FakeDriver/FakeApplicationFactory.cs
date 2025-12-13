@@ -16,9 +16,9 @@ public class FakeApplicationFactory
     public IDisposable SetupFakeApplication ()
     {
         CancellationTokenSource hardStopTokenSource = new CancellationTokenSource ();
-        ANSIInput ansiInput = new ANSIInput ();
+        AnsiInput ansiInput = new AnsiInput ();
         ansiInput.ExternalCancellationTokenSource = hardStopTokenSource;
-        ANSIOutput output = new ();
+        AnsiOutput output = new ();
         output.SetSize (80, 25);
 
         SizeMonitorImpl sizeMonitor = new (output);

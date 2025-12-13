@@ -404,7 +404,7 @@ public class IInputOutputTests (ITestOutputHelper output)
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     using var input = new ANSIInput ();
+                                                     using var input = new AnsiInput ();
                                                      _output.WriteLine ("ANSIInput created successfully");
                                                  });
 
@@ -419,7 +419,7 @@ public class IInputOutputTests (ITestOutputHelper output)
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     using var output = new ANSIOutput ();
+                                                     using var output = new AnsiOutput ();
                                                      _output.WriteLine ("ANSIOutput created successfully");
                                                  });
 
@@ -432,7 +432,7 @@ public class IInputOutputTests (ITestOutputHelper output)
     public void ANSIOutput_GetSize_ReturnsExpectedSize ()
     {
         // Arrange
-        using var output = new ANSIOutput ();
+        using var output = new AnsiOutput ();
 
         // Act
         Size size = output.GetSize ();

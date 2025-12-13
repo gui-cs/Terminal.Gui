@@ -6,7 +6,7 @@ public class OutputBaseTests
     public void ToAnsi_SingleCell_NoAttribute_ReturnsGraphemeAndNewline ()
     {
         // Arrange
-        ANSIOutput output = new ();
+        AnsiOutput output = new ();
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
@@ -26,12 +26,12 @@ public class OutputBaseTests
     public void ToAnsi_WithAttribute_AppendsCorrectColorSequence_BasedOnIsLegacyConsole_And_Force16Colors (bool isLegacyConsole, bool force16Colors)
     {
         // Arrange
-        ANSIOutput output = new () { IsLegacyConsole = isLegacyConsole };
+        AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
 
         // Create DriverImpl and associate it with the ANSIOutput to test Sixel output
         IDriver driver = new DriverImpl (
                                          new AnsiComponentFactory (),
-                                         new ANSIInputProcessor (null!),
+                                         new AnsiInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,
                                          new (new AnsiResponseParser ()),
@@ -79,7 +79,7 @@ public class OutputBaseTests
     public void Write_WritesDirtyCellsAndClearsDirtyFlags ()
     {
         // Arrange
-        ANSIOutput output = new ();
+        AnsiOutput output = new ();
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (2, 1);
 
@@ -106,7 +106,7 @@ public class OutputBaseTests
     {
         // Arrange
         // ANSIOutput exposes this because it's in test scope
-        ANSIOutput output = new () { IsLegacyConsole = isLegacyConsole };
+        AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (3, 1);
 
@@ -163,7 +163,7 @@ public class OutputBaseTests
     {
         // Arrange
         // ANSIOutput exposes this because it's in test scope
-        ANSIOutput output = new () { IsLegacyConsole = isLegacyConsole };
+        AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (3, 1);
 
@@ -231,7 +231,7 @@ public class OutputBaseTests
     public void Write_EmitsSixelDataAndPositionsCursor (bool isLegacyConsole)
     {
         // Arrange
-        ANSIOutput output = new ();
+        AnsiOutput output = new ();
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
@@ -248,7 +248,7 @@ public class OutputBaseTests
         // Create DriverImpl and associate it with the ANSIOutput to test Sixel output
         IDriver driver = new DriverImpl (
                                          new AnsiComponentFactory (),
-                                         new ANSIInputProcessor (null!),
+                                         new AnsiInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,
                                          new (new AnsiResponseParser ()),

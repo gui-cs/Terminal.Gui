@@ -11,7 +11,7 @@ namespace Terminal.Gui.Drivers;
 ///     </para>
 ///     <list type="bullet">
 ///         <item><see cref="UnixInputProcessor"/> - Raw terminal input on Unix/Linux/macOS</item>
-///         <item><see cref="ANSIInputProcessor"/> - ANSI-based test driver</item>
+///         <item><see cref="AnsiInputProcessor"/> - ANSI-based test driver</item>
 ///     </list>
 ///     <para>
 ///         The conversion uses <see cref="ConsoleKeyInfo"/> as an intermediary format,

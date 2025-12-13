@@ -138,7 +138,7 @@ public class MainLoopCoordinatorTests : IDisposable
     public void InputLoop_Throttle_Limits_Poll_Rate ()
     {
         // Arrange - Create a ANSIInput and manually run it with throttling
-        ANSIInput input = new ANSIInput ();
+        AnsiInput input = new AnsiInput ();
         ConcurrentQueue<char> queue = new ConcurrentQueue<char> ();
         input.Initialize (queue);
 

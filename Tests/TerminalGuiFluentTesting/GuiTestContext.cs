@@ -27,7 +27,7 @@ public partial class GuiTestContext : IDisposable
     private Exception? _backgroundException;
 
     // ===== Driver & Application State =====
-    private readonly ANSIInput _ansiInput = new ();
+    private readonly AnsiInput _ansiInput = new ();
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
@@ -228,7 +228,7 @@ public partial class GuiTestContext : IDisposable
 
         IComponentFactory? cf = null;
 
-        _output = new ANSIOutput ();
+        _output = new AnsiOutput ();
 
         // Only set size if explicitly provided (width and height > 0)
         if (width > 0 && height > 0)

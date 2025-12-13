@@ -33,17 +33,17 @@ namespace Terminal.Gui.Drivers;
 ///         and true-color (24-bit RGB) output through ANSI SGR sequences.
 ///     </para>
 /// </summary>
-public class ANSIOutput : OutputBase, IOutput
+public class AnsiOutput : OutputBase, IOutput
 {
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;
     private readonly bool _terminalInitialized;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="ANSIOutput"/>.
+    ///     Initializes a new instance of <see cref="AnsiOutput"/>.
     ///     Checks if a real console is available for ANSI output and activates the alternate screen buffer.
     /// </summary>
-    public ANSIOutput ()
+    public AnsiOutput ()
     {
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);

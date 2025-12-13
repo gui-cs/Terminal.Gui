@@ -7,7 +7,7 @@ namespace Terminal.Gui.Drivers;
 /// <remarks>
 ///     <para>
 ///         Unlike platform-specific size monitors that use native APIs (e.g., SIGWINCH on Unix or
-///         console buffer events on Windows), <see cref="ANSISizeMonitor"/> uses pure ANSI escape
+///         console buffer events on Windows), <see cref="AnsiSizeMonitor"/> uses pure ANSI escape
 ///         sequences to query the terminal size, making it portable across all ANSI-compatible terminals.
 ///     </para>
 ///     <para>
@@ -20,9 +20,9 @@ namespace Terminal.Gui.Drivers;
 ///         <item>If size changed, <see cref="ISizeMonitor.SizeChanged"/> event is raised</item>
 ///     </list>
 /// </remarks>
-internal class ANSISizeMonitor : ISizeMonitor
+internal class AnsiSizeMonitor : ISizeMonitor
 {
-    private readonly ANSIOutput _output;
+    private readonly AnsiOutput _output;
     private Action<AnsiEscapeSequenceRequest>? _queueAnsiRequest;
     private Size _lastSize;
     private DateTime _lastQuery = DateTime.MinValue;
@@ -34,7 +34,7 @@ internal class ANSISizeMonitor : ISizeMonitor
     /// </summary>
     /// <param name="output">The ANSIOutput instance to query for size</param>
     /// <param name="queueAnsiRequest">Callback to queue ANSI requests (provided by driver/scheduler)</param>
-    public ANSISizeMonitor (ANSIOutput output, Action<AnsiEscapeSequenceRequest>? queueAnsiRequest = null)
+    public AnsiSizeMonitor (AnsiOutput output, Action<AnsiEscapeSequenceRequest>? queueAnsiRequest = null)
     {
         _output = output;
         _queueAnsiRequest = queueAnsiRequest;

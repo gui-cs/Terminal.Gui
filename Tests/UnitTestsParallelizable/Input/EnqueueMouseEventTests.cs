@@ -19,11 +19,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_HandlesCompleteClickSequence ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedEvents = [];
@@ -66,11 +66,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_IsThreadSafe ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         ConcurrentBag<Mouse> receivedEvents = [];
@@ -126,7 +126,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     ///     and moving items to the InputBuffer. This is needed because tests don't
     ///     start the actual input thread via Run().
     /// </summary>
-    private static void SimulateInputThread (ANSIInput ansiInput, ConcurrentQueue<char> inputBuffer)
+    private static void SimulateInputThread (AnsiInput ansiInput, ConcurrentQueue<char> inputBuffer)
     {
         // ANSIInput's Peek() checks _testInput
         while (ansiInput.Peek ())
@@ -148,11 +148,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_AddsSingleMouseEventToQueue ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedEvents = [];
@@ -183,11 +183,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_SupportsMultipleEvents ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         // Simulate the user pressing and releasing the mouse button. This should cause
@@ -239,11 +239,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_SupportsAllButtonPresses (MouseFlags flags)
     {
         // Arrange
-        var ansiInput = new ANSIInput ();
+        var ansiInput = new AnsiInput ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         Mouse mouse = new ()
@@ -274,11 +274,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_PreservesPosition (int x, int y)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Mouse mouse = new ()
@@ -316,11 +316,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_PreservesModifiers (MouseFlags modifiers)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Mouse mouse = new ()
@@ -361,11 +361,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_SupportsMouseWheel (MouseFlags wheelFlag)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Mouse mouse = new ()
@@ -392,11 +392,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_SupportsMouseMove ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedEvents = [];
@@ -434,7 +434,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         ConcurrentQueue<char> queue = new ();
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
 
         // Don't set InputImpl (or set to non-testable)
 
@@ -460,11 +460,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void InputProcessor_ProcessQueue_DrainsPendingMouseEvents ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedEvents = [];
@@ -491,11 +491,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_WithInvalidEvent_DoesNotThrow ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         // Act & Assert - Empty/default mouse event should not throw
@@ -513,11 +513,11 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void EnqueueMouseEvent_WithNegativePosition_DoesNotThrow ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         // Act & Assert - Negative positions should not throw

@@ -43,7 +43,7 @@ namespace Terminal.Gui.Drivers;
 ///         <item><see cref="WindowsInput"/> - Uses Windows Console API (<c>ReadConsoleInput</c>)</item>
 ///         <item><see cref="NetInput"/> - Uses .NET <see cref="System.Console"/> API</item>
 ///         <item><see cref="UnixInput"/> - Uses Unix terminal APIs</item>
-///         <item><see cref="ANSIInput"/> - For testing, implements <see cref="ITestableInput{TInputRecord}"/></item>
+///         <item><see cref="AnsiInput"/> - For testing, implements <see cref="ITestableInput{TInputRecord}"/></item>
 ///     </list>
 ///     <para>
 ///         <b>Testing Support:</b> See <see cref="ITestableInput{TInputRecord}"/> for programmatic input injection

@@ -79,7 +79,7 @@ namespace Terminal.Gui.Drivers;
 ///         mouse events (SGR format), and terminal responses.
 ///     </para>
 /// </remarks>
-public class ANSIInput : InputImpl<char>, ITestableInput<char>
+public class AnsiInput : InputImpl<char>, ITestableInput<char>
 {
     // Platform-specific helpers
     private readonly UnixRawModeHelper? _unixRawMode;
@@ -102,9 +102,9 @@ public class ANSIInput : InputImpl<char>, ITestableInput<char>
     /// <summary>
     ///     Creates a new ANSIInput.
     /// </summary>
-    public ANSIInput ()
+    public AnsiInput ()
     {
-        Logging.Information ($"Creating {nameof (ANSIInput)}");
+        Logging.Information ($"Creating {nameof (AnsiInput)}");
 
         try
         {

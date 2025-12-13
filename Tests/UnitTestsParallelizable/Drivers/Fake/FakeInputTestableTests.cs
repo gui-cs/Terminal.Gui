@@ -15,7 +15,7 @@ public class ANSIInputTestableTests
     ///     and moving items to the InputBuffer. This is needed because tests don't
     ///     start the actual input thread via Run().
     /// </summary>
-    private static void SimulateInputThread (ANSIInput ansiInput, ConcurrentQueue<char> inputBuffer)
+    private static void SimulateInputThread (AnsiInput ansiInput, ConcurrentQueue<char> inputBuffer)
     {
         // ANSIInput's Peek() checks _testInput first
         while (ansiInput.Peek ())
@@ -34,7 +34,7 @@ public class ANSIInputTestableTests
     ///     Processes the input queue with support for keys that may be held by the ANSI parser (like Esc).
     ///     The parser holds Esc for 50ms waiting to see if it's part of an escape sequence.
     /// </summary>
-    private static void ProcessQueueWithEscapeHandling (ANSIInputProcessor processor, int maxAttempts = 3)
+    private static void ProcessQueueWithEscapeHandling (AnsiInputProcessor processor, int maxAttempts = 3)
     {
         // First attempt - process immediately
         processor.ProcessQueue ();
@@ -54,7 +54,7 @@ public class ANSIInputTestableTests
     public void ANSIInput_ImplementsITestableInput ()
     {
         // Arrange & Act
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
 
         // Assert
         Assert.IsAssignableFrom<ITestableInput<char>> (ansiInput);
@@ -64,7 +64,7 @@ public class ANSIInputTestableTests
     public void ANSIInput_AddInput_EnqueuesCharacter ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
@@ -84,7 +84,7 @@ public class ANSIInputTestableTests
     public void ANSIInput_AddInput_SupportsMultipleCharacters ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
@@ -105,7 +105,7 @@ public class ANSIInputTestableTests
     public void ANSIInput_Peek_ReturnsTrueWhenTestInputAvailable ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
@@ -129,7 +129,7 @@ public class ANSIInputTestableTests
         // we just verify the order of test inputs
 
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
@@ -149,11 +149,11 @@ public class ANSIInputTestableTests
     public void ANSIInputProcessor_EnqueueKeyDownEvent_WorksWithTestableInput ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -177,11 +177,11 @@ public class ANSIInputTestableTests
     public void ANSIInputProcessor_EnqueueMouseEvent_GeneratesAnsiSequence ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -215,11 +215,11 @@ public class ANSIInputTestableTests
     public void ANSIInputProcessor_EnqueueMouseEvent_SupportsRelease ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -249,11 +249,11 @@ public class ANSIInputTestableTests
     public void ANSIInputProcessor_EnqueueMouseEvent_SupportsModifiers ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -303,11 +303,11 @@ public class ANSIInputTestableTests
     public void ANSIInputProcessor_EnqueueMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -340,11 +340,11 @@ public class ANSIInputTestableTests
     public void ANSIInput_EnqueueKeyDownEvent_AddsSingleKeyToQueue ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -369,11 +369,11 @@ public class ANSIInputTestableTests
     public void ANSIInput_EnqueueKeyDownEvent_SupportsMultipleKeys ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         Key [] keys = [Key.A, Key.B, Key.C, Key.Enter];
@@ -404,11 +404,11 @@ public class ANSIInputTestableTests
     public void ANSIInput_EnqueueKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
@@ -468,11 +468,11 @@ public class ANSIInputTestableTests
     public void ANSIInput_EnqueueKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
@@ -503,11 +503,11 @@ public class ANSIInputTestableTests
     public void ANSIInput_EnqueueKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new ANSIInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue);
         processor.InputImpl = ansiInput;
 
         var keyDownCount = 0;
@@ -533,11 +533,11 @@ public class ANSIInputTestableTests
     public void ANSIInput_EnqueueMouseEvent_HandlesCompleteClickSequence ()
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Terminal.Gui.Input.Mouse> receivedEvents = [];
@@ -579,11 +579,11 @@ public class ANSIInputTestableTests
     public void ANSIInput_EnqueueMouseEvent_Wheel_Events (MouseFlags wheelEvent)
     {
         // Arrange
-        ANSIInput ansiInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        ANSIInputProcessor processor = new (queue);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         List<Terminal.Gui.Input.Mouse> receivedEvents = [];
