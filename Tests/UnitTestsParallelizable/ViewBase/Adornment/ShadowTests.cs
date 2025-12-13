@@ -360,6 +360,54 @@ public class ShadowTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void Runnable_View_Overlap_Other_Runnables ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+
+        app.Driver?.SetScreenSize (10, 5);
+
+        Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "🍎".Repeat (25)! };
+        View view = new () { Width = 7, Height = 2, ShadowStyle = ShadowStyle.Opaque, Text = "| Hi |" };
+        superview.Add (view);
+
+        app.Begin (superview);
+
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              | Hi |▖ 🍎
+                                              ▝▀▀▀▀▀▘ 🍎
+                                              🍎🍎🍎🍎🍎
+                                              🍎🍎🍎🍎🍎
+                                              🍎🍎🍎🍎🍎
+                                              """,
+                                              output,
+                                              app.Driver);
+
+        Runnable modalSuperview = new () { Y = 1, Width = Dim.Fill (), Height = 4, BorderStyle = LineStyle.Single };
+        View view1 = new () { Width = 8, Height = 2, ShadowStyle = ShadowStyle.Opaque, Text = "| Hey |" };
+        modalSuperview.Add (view1);
+
+        app.Begin (modalSuperview);
+
+        Assert.True (modalSuperview.IsModal);
+
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              | Hi |▖ 🍎
+                                              ┌────────┐
+                                              │| Hey |▖│
+                                              │▝▀▀▀▀▀▀▘│
+                                              └────────┘
+                                              """,
+                                              output,
+                                              app.Driver);
+
+
+        app.Dispose();
+    }
+
+    [Fact]
     public void TransparentShadow_Draws_Transparent_At_Driver_Output ()
     {
         // Arrange
