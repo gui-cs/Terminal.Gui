@@ -22,8 +22,8 @@ namespace Terminal.Gui.Drivers;
 ///                 and matches responses from the parser.
 ///             </item>
 ///             <item>
-///                 <see cref="UnixKeyConverter"/> - Converts character input to <see cref="Key"/> events,
-///                 shared with UnixDriver for consistent behavior.
+///                 <see cref="AnsiKeyConverter"/> - Converts character input to <see cref="Key"/> events,
+///                 shared with UnixDriver for consistent ANSI-based key mapping.
 ///             </item>
 ///             <item>
 ///                 <see cref="AnsiKeyboardEncoder"/> and <see cref="AnsiMouseEncoder"/> - Convert
@@ -39,7 +39,7 @@ namespace Terminal.Gui.Drivers;
 public class FakeInputProcessor : InputProcessorImpl<char>
 {
     /// <inheritdoc/>
-    public FakeInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new UnixKeyConverter ())
+    public FakeInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new AnsiKeyConverter ())
     {
         DriverName = "fake";
     }

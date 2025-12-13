@@ -5,11 +5,13 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     <para>
+///         Pure ANSI Driver with VT Input Mode on Windows and termios raw mode on Unix/Mac.
+///     </para>
+/// </summary>
+/// <remarks>
+///     <para>
 ///         <see cref="IInput{TInputRecord}"/> implementation that uses a character stream for pure ANSI input.
 ///         Supports both test injection via <see cref="ITestableInput{TInputRecord}"/> and real console reading.
-///     </para>
-///     <para>
-///         <b>Pure ANSI Driver with VT Input Mode</b>
 ///     </para>
 ///     <para>
 ///         This driver reads raw bytes from <see cref="Console.OpenStandardInput()"/> and processes them as
@@ -76,7 +78,7 @@ namespace Terminal.Gui.Drivers;
 ///         and feeds them to <see cref="AnsiResponseParser{TInputRecord}"/> which extracts keyboard events,
 ///         mouse events (SGR format), and terminal responses.
 ///     </para>
-/// </summary>
+/// </remarks>
 public class FakeInput : InputImpl<char>, ITestableInput<char>
 {
     // Platform-specific helpers
