@@ -350,9 +350,9 @@ public partial class View // Mouse APIs
         }
 
         // 6. Command invocation
-        if (mouse.IsSingleDoubleOrTripleClicked)
+        if (mouse.IsSingleDoubleOrTripleClicked || mouse.IsPressed)
         {
-            return RaiseCommandsBoundToButtonClickedFlags (mouse);
+            return RaiseCommandsBoundToButtonFlags (mouse);
         }
 
         if (mouse.IsWheel)
@@ -375,7 +375,7 @@ public partial class View // Mouse APIs
     ///     </para>
     ///     <para>
     ///         When a button press is detected, the mouse is grabbed and periodic <see cref="IMouseHoldRepeater.MouseIsHeldDownTick"/> events
-    ///         are raised until the button is released. Each tick event triggers command execution via <see cref="RaiseCommandsBoundToButtonClickedFlags"/>,
+    ///         are raised until the button is released. Each tick event triggers command execution via <see cref="RaiseCommandsBoundToButtonFlags"/>,
     ///         enabling continuous actions like scrolling or button repetition.
     ///     </para>
     ///     <para>
@@ -408,7 +408,7 @@ public partial class View // Mouse APIs
         Logging.Trace ($"MouseHoldRepeater tick - raising commands bound {e.NewValue.Flags}");
         e.NewValue.ScreenPosition = App?.Mouse.LastMousePosition ?? e.NewValue.ScreenPosition;
         /*e.Cancel = */
-        RaiseCommandsBoundToButtonClickedFlags (e.NewValue);
+        RaiseCommandsBoundToButtonFlags (e.NewValue);
     }
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
@@ -583,7 +583,7 @@ public partial class View // Mouse APIs
     ///         are bound to <see cref="Command.Activate"/>, which raises the <see cref="Activating"/> event.
     ///     </para>
     /// </remarks>
-    protected bool RaiseCommandsBoundToButtonClickedFlags (Mouse args)
+    protected bool RaiseCommandsBoundToButtonFlags (Mouse args)
     {
         // Pre-conditions
         if (!Enabled)
@@ -596,7 +596,7 @@ public partial class View // Mouse APIs
         // but the actual mouse events coming from the driver are often pressed events (LeftButtonPressed).
         // This switch expression bridges that gap by converting pressed events to clicked
         // events so they can be matched against the command bindings.
-        ConvertPressedToClicked (args);
+        //ConvertPressedToClicked (args);
 
         //Logging.Trace ($"Invoking commands bound to mouse: {args.Flags}");
         // By default, this will raise Activating/OnActivating - Subclasses can override this via

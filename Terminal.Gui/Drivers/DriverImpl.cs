@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Drivers;
 
@@ -403,9 +404,6 @@ internal class DriverImpl : IDriver
 
     #region Input Events
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<Mouse>? MouseEvent;
-
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
     public event EventHandler<Key>? KeyDown;
 
@@ -414,6 +412,12 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public void EnqueueKeyEvent (Key key) { GetInputProcessor ().EnqueueKeyDownEvent (key); }
+
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    public event EventHandler<Mouse>? MouseEvent;
+
+    /// <inheritdoc />
+    public void EnqueueMouseEvent (Mouse mouse) { GetInputProcessor ().EnqueueMouseEvent (null, mouse); }
 
     #endregion Input Events
 

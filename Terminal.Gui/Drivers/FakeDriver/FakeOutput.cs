@@ -1,25 +1,75 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Fake console output for testing that captures what would be written to the console.
+///     <para>
+///         Pure ANSI console output for testing that captures output buffer state while optionally
+///         writing ANSI escape sequences to a real terminal.
+///     </para>
+///     <para>
+///         <b>ANSI Output Architecture:</b>
+///     </para>
+///     <list type="bullet">
+///         <item>
+///             <b>Pure ANSI</b> - All output operations use ANSI escape sequences via <see cref="EscSeqUtils"/>,
+///             making it portable across ANSI-compatible terminals (Unix, Windows Terminal, ConEmu, etc.).
+///         </item>
+///         <item>
+///             <b>Buffer Capture</b> - <see cref="GetLastBuffer"/> provides access to the last written
+///             <see cref="IOutputBuffer"/> for test verification, independent of actual console output.
+///         </item>
+///         <item>
+///             <b>Graceful Degradation</b> - Detects if console is unavailable or redirected, silently
+///             operating in buffer-only mode for CI/headless environments.
+///         </item>
+///         <item>
+///             <b>Size Management</b> - Uses <see cref="SetSize"/> for controlling terminal dimensions
+///             in tests. In real terminals, size would be queried via ANSI requests
+///             (see <see cref="EscSeqUtils.CSI_ReportWindowSizeInChars"/>) or platform APIs.
+///         </item>
+///     </list>
+///     <para>
+///         <b>Color Support:</b> Supports both 16-color (via <see cref="OutputBase.Force16Colors"/>)
+///         and true-color (24-bit RGB) output through ANSI SGR sequences.
+///     </para>
 /// </summary>
 public class FakeOutput : OutputBase, IOutput
 {
    // private readonly StringBuilder _outputStringBuilder = new ();
-    private int _cursorLeft;
-    private int _cursorTop;
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;
+    private bool _terminalInitialized;
 
     /// <summary>
-    /// 
+    ///     Initializes a new instance of <see cref="FakeOutput"/>.
+    ///     Checks if a real console is available for ANSI output.
     /// </summary>
     public FakeOutput ()
     {
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);
+
+        try
+        {
+            // Check if console is available (not redirected)
+            if (!Console.IsOutputRedirected && !Console.IsInputRedirected)
+            {
+                Stream stream = Console.OpenStandardOutput ();
+
+                if (stream.CanWrite)
+                {
+                    _terminalInitialized = true;
+                }
+            }
+        }
+        catch
+        {
+            _terminalInitialized = false;
+        }
     }
 
     /// <summary>
@@ -32,38 +82,55 @@ public class FakeOutput : OutputBase, IOutput
     //public override string GetLastOutput () => _outputStringBuilder.ToString ();
 
     /// <inheritdoc />
-    public Point GetCursorPosition ()
-    {
-        return new (_cursorLeft, _cursorTop);
-    }
-
-    /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
-
-    /// <inheritdoc />
     public void SetSize (int width, int height)
     {
         _consoleSize = new (width, height);
     }
 
     /// <inheritdoc/>
-    protected override bool SetCursorPositionImpl (int col, int row)
+    public Size GetSize ()
     {
-        _cursorLeft = col;
-        _cursorTop = row;
-
-        return true;
+        return _consoleSize;
     }
 
-    /// <inheritdoc/>
-    public Size GetSize () { return _consoleSize; }
+    /// <inheritdoc />
+    protected override void Write (StringBuilder output)
+    {
+        base.Write (output);
 
-    /// <inheritdoc/>
+        if (!_terminalInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            Console.Out.Write (output);
+        }
+        catch
+        {
+            // ignore for unit tests
+        }
+    }
+
+
+    /// <inheritdoc />
     public void Write (ReadOnlySpan<char> text)
     {
-//        _outputStringBuilder.Append (text);
-    }
+        if (!_terminalInitialized)
+        {
+            return;
+        }
 
+        try
+        {
+            Console.Out.Write (text);
+        }
+        catch
+        {
+            // ignore for unit tests
+        }
+    }
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public override void Write (IOutputBuffer buffer)
     {
@@ -71,36 +138,88 @@ public class FakeOutput : OutputBase, IOutput
         base.Write (buffer);
     }
 
-    ///// <inheritdoc/>
-    //protected override void Write (StringBuilder output)
-    //{
-    //    _outputStringBuilder.Append (output);
-    //}
+    private Point? _lastCursorPosition;
+    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
 
-    /// <inheritdoc cref="IDriver"/>
-    public override void SetCursorVisibility (CursorVisibility visibility)
+
+    /// <inheritdoc />
+    public Point GetCursorPosition ()
     {
-        // Capture but don't act on it in fake output
+        return _lastCursorPosition ?? Point.Empty;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
+    public void SetCursorPosition (int col, int row)
+    {
+        SetCursorPositionImpl (col, row);
+    }
+
+    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
+    public override void SetCursorVisibility (CursorVisibility visibility)
+    {
+        if (!_terminalInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            if (visibility != CursorVisibility.Invisible)
+            {
+                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+                {
+                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
+
+                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                }
+
+                Write (EscSeqUtils.CSI_ShowCursor);
+            }
+            else
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    /// <inheritdoc />
+    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
+    {
+        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == screenPositionX && _lastCursorPosition.Value.Y == screenPositionY)
+        {
+            return true;
+        }
+
+        _lastCursorPosition = new (screenPositionX, screenPositionY);
+
+        if (!_terminalInitialized)
+        {
+            return true;
+        }
+
+        try
+        {
+            EscSeqUtils.CSI_WriteCursorPosition (Console.Out, screenPositionY, screenPositionX);
+        }
+        catch
+        {
+            // ignore
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc />
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
         if (Force16Colors)
         {
-            if (!IsLegacyConsole)
-            {
-                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
-
-                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-            }
-            else
-            {
-                Write (output);
-                Console.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor16 ();
-                Console.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor16 ();
-            }
+            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
         }
         else
         {
@@ -117,7 +236,6 @@ public class FakeOutput : OutputBase, IOutput
                                                       attr.Background.G,
                                                       attr.Background.B
                                                      );
-
             EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
         }
     }

@@ -96,6 +96,10 @@
     "Themes": {
       "commandName": "Project",
       "commandLineArgs": "Themes"
+    },
+    "UICatalog --driver fake": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver fake -dl Trace"
     }
   }
 }

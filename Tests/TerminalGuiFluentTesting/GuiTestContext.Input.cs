@@ -34,9 +34,16 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick (int screenX, int screenY)
     {
+        EnqueueMouseEvent (new ()
+        {
+            Flags = MouseFlags.LeftButtonPressed,
+            ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
+        });
+
         return EnqueueMouseEvent (new ()
         {
-            Flags = MouseFlags.LeftButtonClicked,
+            Flags = MouseFlags.LeftButtonReleased,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
         });

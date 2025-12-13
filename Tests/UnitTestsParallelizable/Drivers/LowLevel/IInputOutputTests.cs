@@ -505,7 +505,7 @@ public class IInputOutputTests (ITestOutputHelper output)
         // Act
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     using IInput<ConsoleKeyInfo> input = factory.CreateInput ();
+                                                     using IInput<char> input = factory.CreateInput ();
                                                      _output.WriteLine ("FakeComponentFactory.CreateInput() succeeded");
                                                  });
 

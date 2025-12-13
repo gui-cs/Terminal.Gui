@@ -316,7 +316,7 @@ public class ViewCommandTests
         void ViewOnActivating (object? sender, CommandEventArgs e) { activating = true; }
     }
 
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void LeftButtonPressed_Invokes_Activate_Command ()
     {
         var view = new ViewEventTester ();

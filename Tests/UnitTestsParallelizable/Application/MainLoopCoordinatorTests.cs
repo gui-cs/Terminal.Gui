@@ -139,7 +139,7 @@ public class MainLoopCoordinatorTests : IDisposable
     {
         // Arrange - Create a FakeInput and manually run it with throttling
         FakeInput input = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ConcurrentQueue<ConsoleKeyInfo> ();
+        ConcurrentQueue<char> queue = new ConcurrentQueue<char> ();
         input.Initialize (queue);
 
         CancellationTokenSource cts = new CancellationTokenSource ();

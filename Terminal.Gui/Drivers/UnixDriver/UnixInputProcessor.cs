@@ -43,6 +43,7 @@ internal class UnixInputProcessor : InputProcessorImpl<char>
     /// <inheritdoc />
     public override void EnqueueMouseEvent (IApplication? app, Mouse mouse)
     {
+        base.EnqueueMouseEvent (app, mouse);
         // Convert Mouse to ANSI SGR format escape sequence
         string ansiSequence = AnsiMouseEncoder.Encode (mouse);
 

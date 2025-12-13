@@ -474,7 +474,7 @@ public class SelectorBaseTests
         Assert.True (selector.DoubleClickAccepts);
     }
 
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void DoubleClickAccepts_True_AcceptOnDoubleClick ()
     {
         var selector = new OptionSelector { DoubleClickAccepts = true };
@@ -485,13 +485,12 @@ public class SelectorBaseTests
         selector.Accepting += (s, e) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonClicked });
         checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal (1, acceptCount);
     }
 
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void DoubleClickAccepts_False_DoesNotAcceptOnDoubleClick ()
     {
         var selector = new OptionSelector { DoubleClickAccepts = false };
@@ -502,7 +501,6 @@ public class SelectorBaseTests
         selector.Accepting += (s, e) => acceptCount++;
 
         CheckBox checkBox = selector.SubViews.OfType<CheckBox> ().First ();
-        checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonClicked });
         checkBox.NewMouseEvent (new () { Position = Point.Empty, Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal (0, acceptCount);

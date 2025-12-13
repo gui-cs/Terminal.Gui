@@ -1,4 +1,5 @@
 #nullable disable
+using Terminal.Gui.Drivers;
 using UnitTests;
 
 namespace ViewsTests;
@@ -324,5 +325,128 @@ public class ButtonTests : FakeDriverBase
             acceptInvoked = true;
             e.Handled = true;
         }
+    }
+
+
+    [Fact]
+    public void LeftButtonPressed_Activates ()
+    {
+        Button button = new () { Text = "_Button" };
+        Assert.True (button.CanFocus);
+
+        var activatingCount = 0;
+        button.Activating += (s, e) => activatingCount++;
+
+        var acceptingCount = 0;
+        button.Accepting += (s, e) => acceptingCount++;
+
+        button.HasFocus = true;
+        Assert.True (button.HasFocus);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        Assert.Equal (2, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        button.MouseHighlightStates = MouseState.None;
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        Assert.Equal (3, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        Assert.Equal (4, activatingCount);
+        Assert.Equal (0, acceptingCount);
+    }
+
+    [Fact]
+    public void LeftButtonClicked_Accepts ()
+    {
+        Button button = new () { Text = "_Button" };
+        Assert.True (button.CanFocus);
+
+        var activatingCount = 0;
+        button.Activating += (s, e) => activatingCount++;
+
+        var acceptingCount = 0;
+        button.Accepting += (s, e) => acceptingCount++;
+
+        button.HasFocus = true;
+        Assert.True (button.HasFocus);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked});
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptingCount);
+
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (2, activatingCount);
+        Assert.Equal (2, acceptingCount);
+
+        // Disable Mouse Highlighting to test that it does not interfere with Accepting event
+        button.MouseHighlightStates = MouseState.None;
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (3, activatingCount);
+        Assert.Equal (3, acceptingCount);
+
+        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (4, activatingCount);
+        Assert.Equal (4, acceptingCount);
+    }
+
+
+    [Fact]
+    public void LeftButtonClicked_Accepts_Driver_Injection ()
+    {
+        using IApplication? app = Application.Create ();
+        app.Init ("unix");
+
+        using Runnable? runnable = new ();
+        app.Begin (runnable);
+
+        Button button = new () { Text = "_Button" };
+        runnable.Add (button);
+        runnable.Layout ();
+
+        var activatingCount = 0;
+        button.Activating += (s, e) => activatingCount++;
+
+        var acceptingCount = 0;
+        button.Accepting += (s, e) => acceptingCount++;
+
+        button.HasFocus = true;
+        Assert.True (button.HasFocus);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptingCount);
+
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonReleased });
+
+        app.Driver.GetInputProcessor().ProcessQueue ();
+
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptingCount);
+
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonReleased });
+        Assert.Equal (2, activatingCount);
+        Assert.Equal (2, acceptingCount);
+
+        // Disable Mouse Highlighting to test that it does not interfere with Accepting event
+        button.MouseHighlightStates = MouseState.None;
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonReleased });
+        Assert.Equal (3, activatingCount);
+        Assert.Equal (3, acceptingCount);
+
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Driver.EnqueueMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonReleased });
+        Assert.Equal (4, activatingCount);
+        Assert.Equal (4, acceptingCount);
     }
 }
