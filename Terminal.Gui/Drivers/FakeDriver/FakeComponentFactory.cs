@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 ///     <see cref="IComponentFactory{T}"/> implementation for fake/mock console I/O used in unit tests.
 ///     This factory creates instances that simulate console behavior without requiring a real terminal.
 /// </summary>
-public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
+public class FakeComponentFactory : ComponentFactoryImpl<char>
 {
     private readonly FakeInput? _input;
     private readonly IOutput? _output;
@@ -33,13 +33,13 @@ public class FakeComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
     }
 
     /// <inheritdoc/>
-    public override IInput<ConsoleKeyInfo> CreateInput ()
+    public override IInput<char> CreateInput ()
     {
         return _input ?? new FakeInput ();
     }
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) { return new FakeInputProcessor (inputBuffer); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer) { return new FakeInputProcessor (inputBuffer); }
 
     /// <inheritdoc/>
     public override IOutput CreateOutput ()

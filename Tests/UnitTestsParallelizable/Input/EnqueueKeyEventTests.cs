@@ -20,13 +20,13 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     ///     and moving items to the InputBuffer. This is needed because tests don't
     ///     start the actual input thread via Run().
     /// </summary>
-    private static void SimulateInputThread (FakeInput fakeInput, ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
+    private static void SimulateInputThread (FakeInput fakeInput, ConcurrentQueue<char> inputBuffer)
     {
         // FakeInput's Peek() checks _testInput
         while (fakeInput.Peek ())
         {
             // Read() drains _testInput and returns items
-            foreach (ConsoleKeyInfo item in fakeInput.Read ())
+            foreach (char item in fakeInput.Read ())
             {
                 // Manually add to InputBuffer (simulating what Run() would do)
                 inputBuffer.Enqueue (item);
@@ -61,7 +61,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -90,7 +90,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -124,7 +124,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -153,7 +153,16 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         // Act
         processor.EnqueueKeyDownEvent (key);
         SimulateInputThread (fakeInput, queue);
-        processor.ProcessQueue ();
+
+        // Alt combinations produce ESC+char sequences that require parser timeout handling
+        if (alt)
+        {
+            ProcessQueueWithEscapeHandling (processor);
+        }
+        else
+        {
+            processor.ProcessQueue ();
+        }
 
         // Assert
         Assert.NotNull (receivedKey);
@@ -179,7 +188,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -214,7 +223,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -243,7 +252,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     public void InputProcessor_EnqueueKeyDownEvent_RequiresTestableInput ()
     {
         // Arrange
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         var processor = new FakeInputProcessor (queue);
 
         // Don't set InputImpl (or set to non-testable)
@@ -265,7 +274,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -296,7 +305,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -344,7 +353,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);

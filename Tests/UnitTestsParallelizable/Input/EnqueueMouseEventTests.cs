@@ -21,7 +21,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         FakeInput fakeInput = new ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         FakeInputProcessor processor = new (queue);
@@ -35,7 +35,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                      null,
                                      new ()
                                      {
-                                         Position = new (10, 5),
+                                         ScreenPosition = new (10, 5),
                                          Flags = MouseFlags.LeftButtonPressed
                                      });
 
@@ -43,7 +43,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                      null,
                                      new ()
                                      {
-                                         Position = new (10, 5),
+                                         ScreenPosition = new (10, 5),
                                          Flags = MouseFlags.LeftButtonReleased
                                      });
 
@@ -67,7 +67,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -94,7 +94,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                     new ()
                                                                     {
                                                                         Timestamp = DateTime.Now,
-                                                                        Position = new (threadId, i),
+                                                                        ScreenPosition = new (threadId, i),
                                                                         Flags = MouseFlags.LeftButtonClicked
                                                                     });
                                    }
@@ -124,13 +124,13 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     ///     and moving items to the InputBuffer. This is needed because tests don't
     ///     start the actual input thread via Run().
     /// </summary>
-    private static void SimulateInputThread (FakeInput fakeInput, ConcurrentQueue<ConsoleKeyInfo> inputBuffer)
+    private static void SimulateInputThread (FakeInput fakeInput, ConcurrentQueue<char> inputBuffer)
     {
         // FakeInput's Peek() checks _testInput
         while (fakeInput.Peek ())
         {
             // Read() drains _testInput and returns items
-            foreach (ConsoleKeyInfo item in fakeInput.Read ())
+            foreach (char item in fakeInput.Read ())
             {
                 // Manually add to InputBuffer (simulating what Run() would do)
                 inputBuffer.Enqueue (item);
@@ -147,7 +147,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -159,7 +159,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
-            Position = new (10, 5),
+            ScreenPosition = new (10, 5),  // ANSI mouse uses screen coordinates
             Flags = MouseFlags.LeftButtonClicked
         };
 
@@ -171,7 +171,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Assert - Verify the mouse event made it through
         Assert.Single (receivedEvents);
-        Assert.Equal (mouse.Position, receivedEvents [0].Position);
+        Assert.Equal (mouse.ScreenPosition, receivedEvents [0].ScreenPosition);
         Assert.Equal (mouse.Flags, receivedEvents [0].Flags);
     }
 
@@ -180,7 +180,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -190,8 +190,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // 3 synthetic events: Pressed, Released, Clicked
         Terminal.Gui.Input.Mouse [] events =
         [
-            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.LeftButtonPressed },
-            new () { Timestamp = DateTime.Now, Position = new (10, 5), Flags = MouseFlags.LeftButtonReleased },
+            new () { Timestamp = DateTime.Now, ScreenPosition = new (10, 5), Flags = MouseFlags.LeftButtonPressed },
+            new () { Timestamp = DateTime.Now, ScreenPosition = new (10, 5), Flags = MouseFlags.LeftButtonReleased },
         ];
 
         List<Terminal.Gui.Input.Mouse> receivedParsedEvents = [];
@@ -211,17 +211,17 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Assert
         // MouseEventParsed fires for all raw events (pressed, released)
-        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.LeftButtonPressed && e.Position == new Point (10, 5));
-        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.LeftButtonReleased && e.Position == new Point (10, 5));
+        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.LeftButtonPressed && e.ScreenPosition == new Point (10, 5));
+        Assert.Contains (receivedParsedEvents, e => e.Flags == MouseFlags.LeftButtonReleased && e.ScreenPosition == new Point (10, 5));
         Assert.Equal (2, receivedParsedEvents.Count);
 
-        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonPressed && e.Position == new Point (10, 5));
-        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonReleased && e.Position == new Point (10, 5));
-        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonClicked && e.Position == new Point (10, 5));
+        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonPressed && e.ScreenPosition == new Point (10, 5));
+        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonReleased && e.ScreenPosition == new Point (10, 5));
+        Assert.Contains (receivedSyntheticEvents, e => e.Flags == MouseFlags.LeftButtonClicked && e.ScreenPosition == new Point (10, 5));
         Assert.Equal (4, receivedSyntheticEvents.Count);
 
         // Should have two LeftButtonClicked events
-        Assert.Equal (2, receivedSyntheticEvents.Count (e => e.Flags == MouseFlags.LeftButtonClicked && e.Position == new Point (10, 5)));
+        Assert.Equal (2, receivedSyntheticEvents.Count (e => e.Flags == MouseFlags.LeftButtonClicked && e.ScreenPosition == new Point (10, 5)));
     }
 
     [Theory]
@@ -235,7 +235,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -244,7 +244,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
-            Position = new (10, 5),
+            ScreenPosition = new (10, 5),
             Flags = flags
         };
 
@@ -270,7 +270,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -279,7 +279,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
-            Position = new (x, y),
+            ScreenPosition = new (x, y),
             Flags = MouseFlags.LeftButtonClicked
         };
 
@@ -293,8 +293,8 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Assert
         Assert.NotNull (receivedEvent);
-        Assert.Equal (x, receivedEvent.Position!.Value.X);
-        Assert.Equal (y, receivedEvent.Position!.Value.Y);
+        Assert.Equal (x, receivedEvent.ScreenPosition.X);
+        Assert.Equal (y, receivedEvent.ScreenPosition.Y);
     }
 
     [Theory]
@@ -309,7 +309,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -318,7 +318,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
-            Position = new (10, 5),
+            ScreenPosition = new (10, 5),
             Flags = MouseFlags.LeftButtonClicked | modifiers
         };
 
@@ -359,7 +359,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -368,7 +368,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         Terminal.Gui.Input.Mouse mouse = new ()
         {
             Timestamp = DateTime.Now,
-            Position = new (10, 5),
+            ScreenPosition = new (10, 5),
             Flags = wheelFlag
         };
 
@@ -390,7 +390,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -401,9 +401,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         Terminal.Gui.Input.Mouse [] events =
         [
-            new () { Timestamp = DateTime.Now, Position = new (0, 0), Flags = MouseFlags.PositionReport },
-            new () { Timestamp = DateTime.Now, Position = new (5, 5), Flags = MouseFlags.PositionReport },
-            new () { Timestamp = DateTime.Now, Position = new (10, 10), Flags = MouseFlags.PositionReport }
+            new () { Timestamp = DateTime.Now, ScreenPosition = new (0, 0), Flags = MouseFlags.PositionReport },
+            new () { Timestamp = DateTime.Now, ScreenPosition = new (5, 5), Flags = MouseFlags.PositionReport },
+            new () { Timestamp = DateTime.Now, ScreenPosition = new (10, 10), Flags = MouseFlags.PositionReport }
         ];
 
         // Act
@@ -417,9 +417,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
         // Assert
         Assert.Equal (3, receivedEvents.Count);
-        Assert.Equal (new (0, 0), receivedEvents [0].Position);
-        Assert.Equal (new (5, 5), receivedEvents [1].Position);
-        Assert.Equal (new (10, 10), receivedEvents [2].Position);
+        Assert.Equal (new (0, 0), receivedEvents [0].ScreenPosition);
+        Assert.Equal (new (5, 5), receivedEvents [1].ScreenPosition);
+        Assert.Equal (new (10, 10), receivedEvents [2].ScreenPosition);
     }
 
     #endregion
@@ -430,7 +430,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     public void InputProcessor_EnqueueMouseEvent_DoesNotThrow ()
     {
         // Arrange
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         var processor = new FakeInputProcessor (queue);
 
         // Don't set InputImpl (or set to non-testable)
@@ -443,7 +443,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                                   new ()
                                                                                   {
                                                                                       Timestamp = DateTime.Now,
-                                                                                      Position = new (10, 5),
+                                                                                      ScreenPosition = new (10, 5),
                                                                                       Flags = MouseFlags.LeftButtonClicked
                                                                                   });
                                                      processor.ProcessQueue ();
@@ -458,7 +458,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -468,9 +468,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Enqueue multiple events before processing
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (1, 1), Flags = MouseFlags.LeftButtonPressed });
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (2, 2), Flags = MouseFlags.PositionReport });
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, Position = new (3, 3), Flags = MouseFlags.LeftButtonReleased });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonPressed });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (2, 2), Flags = MouseFlags.PositionReport });
+        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (3, 3), Flags = MouseFlags.LeftButtonReleased });
 
         SimulateInputThread (fakeInput, queue);
         processor.ProcessQueue ();
@@ -489,7 +489,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -511,7 +511,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     {
         // Arrange
         var fakeInput = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        ConcurrentQueue<char> queue = new ();
         fakeInput.Initialize (queue);
 
         var processor = new FakeInputProcessor (queue);
@@ -525,7 +525,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                                                                   new ()
                                                                                   {
                                                                                       Timestamp = DateTime.Now,
-                                                                                      Position = new (-10, -5),
+                                                                                      ScreenPosition = new (-10, -5),
                                                                                       Flags = MouseFlags.LeftButtonClicked
                                                                                   });
                                                      SimulateInputThread (fakeInput, queue);
