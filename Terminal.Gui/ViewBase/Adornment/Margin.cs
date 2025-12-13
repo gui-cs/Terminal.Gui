@@ -90,8 +90,6 @@ public class Margin : Adornment
                 margin.ClearCachedClip ();
             }
 
-            view.ClearNeedsDraw ();
-
             foreach (View subview in view.SubViews)
             {
                 stack.Push (subview);
