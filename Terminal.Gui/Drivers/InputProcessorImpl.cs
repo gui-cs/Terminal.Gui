@@ -271,7 +271,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <inheritdoc />
     public void RaiseMouseEventParsed (Mouse mouse)
     {
-        Logging.Trace ($"{mouse}");
+        //Logging.Trace ($"{mouse}");
         MouseEventParsed?.Invoke (this, mouse);
         RaiseSyntheticMouseEvent (mouse);
     }

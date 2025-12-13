@@ -103,7 +103,7 @@ public class AnsiMouseParser
             Flags = GetFlags (buttonCode, terminator)
         };
 
-        Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
+        //Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
 
         return m;
     }
@@ -121,27 +121,6 @@ public class AnsiMouseParser
                                      2 or 10 or 14 or 18 or 22 or 26 or 30 or 34 or 42 or 46 or 50 or 54 or 58 or 62 => terminator == 'M'
                                          ? MouseFlags.RightButtonPressed
                                          : MouseFlags.RightButtonReleased,
-
-                                     //// Needed for Windows OS
-                                     //if (isButtonPressed && c == 'm'
-                                     //	&& (lastMouseEvent.ButtonState == MouseFlags.LeftButtonPressed
-                                     //	|| lastMouseEvent.ButtonState == MouseFlags.MiddleButtonPressed
-                                     //	|| lastMouseEvent.ButtonState == MouseFlags.RightButtonPressed)) {
-                                     //	switch (lastMouseEvent.ButtonState) {
-                                     //	case MouseFlags.LeftButtonPressed:
-                                     //		buttonState = MouseFlags.LeftButtonReleased;
-                                     //		break;
-                                     //	case MouseFlags.MiddleButtonPressed:
-                                     //		buttonState = MouseFlags.MiddleButtonReleased;
-                                     //		break;
-                                     //	case MouseFlags.RightButtonPressed:
-                                     //		buttonState = MouseFlags.RightButtonReleased;
-                                     //		break;
-                                     //	}
-                                     //} else {
-                                     //	buttonState = MouseFlags.PositionReport;
-                                     //}
-                                     //break;
                                      35 or 39 or 43 or 47 or 51 or 55 or 59 or 63 => MouseFlags.PositionReport,
                                      64 => MouseFlags.WheeledUp,
                                      65 => MouseFlags.WheeledDown,

@@ -17,13 +17,20 @@ public abstract class FakeDriverBase/* : IDisposable*/
     protected static IDriver CreateFakeDriver (int width = 80, int height = 25)
     {
         var output = new FakeOutput ();
+        var factory = new FakeComponentFactory (null, output, null);
+        var parser = new AnsiResponseParser ();
+        var scheduler = new AnsiRequestScheduler (parser);
+        var sizeMonitor = factory.CreateSizeMonitor (output, new OutputBufferImpl ());
 
         DriverImpl driver = new (
                                  new FakeInputProcessor (null),
                                  new OutputBufferImpl (),
                                  output,
-                                 new AnsiRequestScheduler (new AnsiResponseParser ()),
-                                 new SizeMonitorImpl (output));
+                                 scheduler,
+                                 sizeMonitor);
+
+        // Initialize the size monitor with the driver (generic pattern for all drivers)
+        sizeMonitor.Initialize (driver);
 
         driver.SetScreenSize (width, height);
 

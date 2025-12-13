@@ -140,6 +140,13 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                            _loop.AnsiRequestScheduler,
                            _loop.SizeMonitor);
 
+            // Initialize the size monitor now that the driver is fully constructed
+            // This allows size monitors to set up platform-specific mechanisms:
+            // - ANSI queries (FakeDriver)
+            // - Signal handlers (UnixDriver)
+            // - Console events (WindowsDriver)
+            _loop.SizeMonitor.Initialize(_driver);
+
             app!.Driver = _driver;
 
             _startupSemaphore.Release ();

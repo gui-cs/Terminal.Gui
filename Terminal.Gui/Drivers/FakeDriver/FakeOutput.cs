@@ -1,7 +1,4 @@
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drivers;
 
@@ -39,14 +36,13 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class FakeOutput : OutputBase, IOutput
 {
-   // private readonly StringBuilder _outputStringBuilder = new ();
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;
-    private bool _terminalInitialized;
+    private readonly bool _terminalInitialized;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="FakeOutput"/>.
-    ///     Checks if a real console is available for ANSI output.
+    ///     Checks if a real console is available for ANSI output and activates the alternate screen buffer.
     /// </summary>
     public FakeOutput ()
     {
@@ -63,6 +59,20 @@ public class FakeOutput : OutputBase, IOutput
                 if (stream.CanWrite)
                 {
                     _terminalInitialized = true;
+
+                    // Initialize terminal for ANSI output
+                    // Activate alternate screen buffer, hide cursor, enable mouse tracking
+                    Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+                    Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
+                    Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
+                    Write (EscSeqUtils.CSI_HideCursor);
+                    Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+                    // Note: Size will be queried via ANSI by FakeSizeMonitor.Initialize()
+                    // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
+                    // not the alternate screen buffer we just activated.
+                    // Start with default size; actual size will be set when ANSI response arrives.
+                    _consoleSize = new (80, 25);
                 }
             }
         }
@@ -76,24 +86,18 @@ public class FakeOutput : OutputBase, IOutput
     ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
     ///     a reference to the buffer last written with <see cref="Write(IOutputBuffer)"/>.
     /// </summary>
-    public IOutputBuffer? GetLastBuffer () => _lastBuffer;
+    public IOutputBuffer? GetLastBuffer () { return _lastBuffer; }
 
     ///// <inheritdoc cref="IOutput.GetLastOutput"/>
     //public override string GetLastOutput () => _outputStringBuilder.ToString ();
 
-    /// <inheritdoc />
-    public void SetSize (int width, int height)
-    {
-        _consoleSize = new (width, height);
-    }
+    /// <inheritdoc/>
+    public void SetSize (int width, int height) { _consoleSize = new (width, height); }
 
     /// <inheritdoc/>
-    public Size GetSize ()
-    {
-        return _consoleSize;
-    }
+    public Size GetSize () { return _consoleSize; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
         base.Write (output);
@@ -113,8 +117,7 @@ public class FakeOutput : OutputBase, IOutput
         }
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
         if (!_terminalInitialized)
@@ -131,6 +134,7 @@ public class FakeOutput : OutputBase, IOutput
             // ignore for unit tests
         }
     }
+
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public override void Write (IOutputBuffer buffer)
     {
@@ -141,18 +145,11 @@ public class FakeOutput : OutputBase, IOutput
     private Point? _lastCursorPosition;
     private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
 
+    /// <inheritdoc/>
+    public Point GetCursorPosition () { return _lastCursorPosition ?? Point.Empty; }
 
-    /// <inheritdoc />
-    public Point GetCursorPosition ()
-    {
-        return _lastCursorPosition ?? Point.Empty;
-    }
-
-    /// <inheritdoc />
-    public void SetCursorPosition (int col, int row)
-    {
-        SetCursorPositionImpl (col, row);
-    }
+    /// <inheritdoc/>
+    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
@@ -186,7 +183,7 @@ public class FakeOutput : OutputBase, IOutput
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
         if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == screenPositionX && _lastCursorPosition.Value.Y == screenPositionY)
@@ -203,7 +200,8 @@ public class FakeOutput : OutputBase, IOutput
 
         try
         {
-            EscSeqUtils.CSI_WriteCursorPosition (Console.Out, screenPositionY, screenPositionX);
+            // Convert from 0-based (Terminal.Gui) to 1-based (ANSI) coordinates
+            EscSeqUtils.CSI_WriteCursorPosition (Console.Out, screenPositionY + 1, screenPositionX + 1);
         }
         catch
         {
@@ -213,7 +211,7 @@ public class FakeOutput : OutputBase, IOutput
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
         if (Force16Colors)
@@ -240,9 +238,60 @@ public class FakeOutput : OutputBase, IOutput
         }
     }
 
+    /// <summary>
+    ///     Handles ANSI size query responses.
+    ///     Expected format: ESC [ 8 ; height ; width t
+    /// </summary>
+    /// <param name="response">The ANSI response string</param>
+    public void HandleSizeQueryResponse (string? response)
+    {
+        if (string.IsNullOrEmpty (response))
+        {
+            return;
+        }
+
+        try
+        {
+            // Parse response: ESC [ 8 ; height ; width t
+            // Example: "[8;25;80t"
+            Match match = Regex.Match (response, @"\[(\d+);(\d+);(\d+)t$");
+
+            if (match.Success && match.Groups.Count == 4)
+            {
+                // Group 1 should be "8" (the response value)
+                // Group 2 is height, Group 3 is width
+                if (int.TryParse (match.Groups [2].Value, out int height) && int.TryParse (match.Groups [3].Value, out int width))
+                {
+                    _consoleSize = new (width, height);
+
+                    //Logging.Trace ($"Terminal size from ANSI query: {width}x{height}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"Failed to parse size query response '{response}': {ex.Message}");
+        }
+    }
+
     /// <inheritdoc/>
     public void Dispose ()
     {
-        // Nothing to dispose
+        if (!_terminalInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            // Restore terminal state: disable mouse, restore buffer, show cursor
+            Write (EscSeqUtils.CSI_DisableMouseEvents);
+            Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            Write (EscSeqUtils.CSI_ShowCursor);
+        }
+        catch
+        {
+            // Ignore errors - we're shutting down
+        }
     }
 }

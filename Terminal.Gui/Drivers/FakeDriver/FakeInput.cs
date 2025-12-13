@@ -9,128 +9,79 @@ namespace Terminal.Gui.Drivers;
 ///         Supports both test injection via <see cref="ITestableInput{TInputRecord}"/> and real console reading.
 ///     </para>
 ///     <para>
-///         <b>Pure ANSI Driver with Optional Raw Mode</b>
+///         <b>Pure ANSI Driver with VT Input Mode</b>
 ///     </para>
 ///     <para>
 ///         This driver reads raw bytes from <see cref="Console.OpenStandardInput()"/> and processes them as
-///         ANSI escape sequences. It attempts to configure the terminal for proper ANSI input:
+///         ANSI escape sequences. It configures the terminal for proper ANSI input:
 ///     </para>
 ///     <list type="bullet">
 ///         <item>
-///             <b>Unix/Mac</b> - Uses termios P/Invoke to disable echo and line buffering (raw mode).
+///             <b>Unix/Mac</b> - Uses <see cref="UnixRawModeHelper"/> to disable echo and line buffering (raw mode).
 ///             This works reliably on all Unix-like systems.
 ///         </item>
 ///         <item>
-///             <b>Windows</b> - Enables Virtual Terminal Input mode via Windows Console API.
-///             <b>Important</b>: On Windows, even with VT mode, <see cref="Console.OpenStandardInput()"/>
-///             may not provide character-by-character input. Windows Console input is message-based.
-///             For reliable Windows input, use <c>WindowsInput</c> which uses <c>ReadConsoleInput</c> API.
+///             <b>Windows</b> - Uses <see cref="WindowsVTInputHelper"/> to enable Virtual Terminal Input mode.
+///             This mode converts console input to ANSI escape sequences that can be read via
+///             <see cref="Console.OpenStandardInput()"/>. Mouse events, keyboard input, etc. are all
+///             provided as VT sequences.
 ///         </item>
 ///     </list>
 ///     <para>
-///         <b>Limitations:</b>
+///         <b>How It Works on Windows:</b>
+///     </para>
+///     <para>
+///         When <c>ENABLE_VIRTUAL_TERMINAL_INPUT</c> is enabled, the Windows Console converts user input
+///         (keyboard, mouse) into Console Virtual Terminal Sequences. These sequences can then be read
+///         via <see cref="Console.OpenStandardInput()"/> just like on Unix systems. This provides a
+///         unified, cross-platform ANSI input mechanism.
+///     </para>
+///     <para>
+///         <b>Implementation Notes:</b>
 ///     </para>
 ///     <list type="bullet">
 ///         <item>
-///             <b>Windows</b> - May not work properly due to Console input architecture differences.
-///             `Console.OpenStandardInput().Read()` can block even when `Console.KeyAvailable` is true.
+///             <b>Windows</b>: Uses <c>ReadFile</c> API (via <see cref="WindowsVTInputHelper"/>) to read ANSI sequences
 ///         </item>
 ///         <item>
-///             <b>Recommended for Unit Tests Only</b> - For production, use platform-specific drivers
-///             (UnixInput, WindowsInput) which use native APIs.
+///             <b>Unix/Mac</b>: Uses <c>ReadAsync</c> with short timeouts (10-15ms) on
+///             <see cref="Console.OpenStandardInput()"/>
+///         </item>
+///         <item>
+///             <b>Windows</b>: Uses <c>GetNumberOfConsoleInputEvents</c> to reliably check for available input
+///         </item>
+///         <item>
+///             <b>Unix/Mac</b>: Always attempts read (with timeout) as stream peeking is unreliable
+///         </item>
+///         <item>
+///             Throttled by <see cref="InputImpl{TInputRecord}.Run"/> (20ms delay between polls)
+///         </item>
+///         <item>
+///             Suitable for both production use and unit testing
 ///         </item>
 ///     </list>
 ///     <para>
 ///         <b>Platform Support:</b>
-///     /// </para>
+///     </para>
 ///     <list type="bullet">
-///         <item><b>Unix/Mac</b> - Attempts to use termios for raw mode (like UnixInput)</item>
-///         <item><b>Windows</b> - Works with Virtual Terminal mode enabled</item>
+///         <item><b>Unix/Mac</b> - Uses termios for raw mode (like UnixInput)</item>
+///         <item><b>Windows</b> - Uses VT input mode for ANSI sequence reading</item>
 ///         <item><b>Unit Tests</b> - Always works via <see cref="ITestableInput{TInputRecord}"/></item>
-///     /// </para>
+///     </list>
 ///     <para>
 ///         <b>Architecture:</b>
-///     /// </para>
+///     </para>
 ///     <para>
 ///         Reads raw bytes from <see cref="Console.OpenStandardInput()"/>, converts them to UTF-8 characters,
 ///         and feeds them to <see cref="AnsiResponseParser{TInputRecord}"/> which extracts keyboard events,
 ///         mouse events (SGR format), and terminal responses.
-///     /// </para>
+///     </para>
 /// </summary>
 public class FakeInput : InputImpl<char>, ITestableInput<char>
 {
-    #region Platform-Specific Raw Mode Support (Unix/Mac)
-
-    // Termios structures and constants for Unix raw mode
-    [StructLayout (LayoutKind.Sequential)]
-    private struct Termios
-    {
-        public uint c_iflag;
-        public uint c_oflag;
-        public uint c_cflag;
-        public uint c_lflag;
-
-        [MarshalAs (UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte [] c_cc;
-
-        public uint c_ispeed;
-        public uint c_ospeed;
-    }
-
-    // Unix termios constants
-    private const int STDIN_FILENO = 0;
-    private const int TCSANOW = 0;
-    private const ulong BRKINT = 0x00000002;
-    private const ulong ICRNL = 0x00000100;
-    private const ulong INPCK = 0x00000010;
-    private const ulong ISTRIP = 0x00000020;
-    private const ulong IXON = 0x00000400;
-    private const ulong OPOST = 0x00000001;
-    private const ulong CS8 = 0x00000030;
-    private const ulong ECHO = 0x00000008;
-    private const ulong ICANON = 0x00000100;
-    private const ulong IEXTEN = 0x00008000;
-    private const ulong ISIG = 0x00000001;
-
-    // P/Invoke declarations (only available on Unix)
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int tcgetattr (int fd, out Termios termios);
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int tcsetattr (int fd, int optional_actions, ref Termios termios);
-
-    [DllImport ("libc", EntryPoint = "cfmakeraw", SetLastError = false)]
-    private static extern void cfmakeraw_ref (ref Termios termios);
-
-    private Termios _originalTermios;
-    private bool _rawModeEnabled;
-
-    #endregion
-
-    #region Platform-Specific Input (Windows)
-
-    // Windows Console API for VT input
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
-
-    [DllImport ("kernel32.dll")]
-    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
-
-    [DllImport ("kernel32.dll")]
-    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
-
-    private const int STD_INPUT_HANDLE = -10;
-    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
-    private const uint ENABLE_PROCESSED_INPUT = 0x0001;
-    private const uint ENABLE_MOUSE_INPUT = 0x0010;
-    private const uint ENABLE_QUICK_EDIT_MODE = 0x0040;
-    private const uint ENABLE_EXTENDED_FLAGS = 0x0080;
-
-    private nint _windowsInputHandle;
-    private uint _originalWindowsConsoleMode;
-    private bool _windowsVtModeEnabled;
-
-    #endregion
+    // Platform-specific helpers
+    private readonly UnixRawModeHelper? _unixRawMode;
+    private readonly WindowsVTInputHelper? _windowsVTInput;
 
     // Queue for storing injected input that will be returned by Peek/Read
     private readonly ConcurrentQueue<char> _testInput = new ();
@@ -143,7 +94,7 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
     /// </summary>
     internal int PeekCallCount => _peekCallCount;
 
-    private bool _terminalInitialized;
+    private readonly bool _terminalInitialized;
     private Stream? _inputStream;
 
     /// <summary>
@@ -160,11 +111,21 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
             {
                 Logging.Warning ("Console is redirected. Running in degraded mode.");
                 _terminalInitialized = false;
+
                 return;
             }
 
-            // Try to enable raw mode on Unix/Mac platforms
-            TryEnableRawMode ();
+            // Initialize platform-specific input helpers
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+            {
+                _windowsVTInput = new ();
+                _windowsVTInput.TryEnable ();
+            }
+            else
+            {
+                _unixRawMode = new ();
+                _unixRawMode.TryEnable ();
+            }
 
             // Get the raw input stream for ANSI sequence reading
             _inputStream = Console.OpenStandardInput ();
@@ -173,6 +134,7 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
             {
                 Logging.Warning ("Console input stream is not readable. Running in degraded mode.");
                 _terminalInitialized = false;
+
                 return;
             }
 
@@ -186,9 +148,8 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
                 // Not supported in all environments
             }
 
-            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-            Console.Out.Write (EscSeqUtils.CSI_HideCursor);
-            Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+            // NOTE: Output operations (alternate buffer, cursor visibility, mouse events)
+            // NOTE: are handled by FakeOutput, not here. FakeInput only handles input.
 
             _terminalInitialized = true;
         }
@@ -199,154 +160,44 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
         }
     }
 
-    private void TryEnableRawMode ()
-    {
-        // Windows: Enable Virtual Terminal Input mode
-        if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            TryEnableWindowsVTMode ();
-            return;
-        }
-
-        // Unix/Mac: Use termios for raw mode
-        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Linux) && 
-            !RuntimeInformation.IsOSPlatform (OSPlatform.OSX) &&
-            !RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD))
-        {
-            return;
-        }
-
-        try
-        {
-            // Get current terminal attributes
-            int result = tcgetattr (STDIN_FILENO, out _originalTermios);
-
-            if (result != 0)
-            {
-                int errno = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"tcgetattr failed (errno={errno}). Cannot enable raw mode.");
-                return;
-            }
-
-            // Create modified attributes for raw mode
-            Termios raw = _originalTermios;
-
-            try
-            {
-                // Try using cfmakeraw if available
-                cfmakeraw_ref (ref raw);
-            }
-            catch (EntryPointNotFoundException)
-            {
-                // Manually configure raw mode if cfmakeraw not available
-                raw.c_iflag &= ~((uint)BRKINT | (uint)ICRNL | (uint)INPCK | (uint)ISTRIP | (uint)IXON);
-                raw.c_oflag &= ~(uint)OPOST;
-                raw.c_cflag |= (uint)CS8;
-                raw.c_lflag &= ~((uint)ECHO | (uint)ICANON | (uint)IEXTEN | (uint)ISIG);
-            }
-
-            // Apply raw mode settings
-            result = tcsetattr (STDIN_FILENO, TCSANOW, ref raw);
-
-            if (result != 0)
-            {
-                int errno = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"tcsetattr failed (errno={errno}). Cannot enable raw mode.");
-                return;
-            }
-
-            _rawModeEnabled = true;
-            Logging.Information ("Raw mode enabled successfully.");
-        }
-        catch (DllNotFoundException)
-        {
-            // libc not available - expected on non-Unix platforms
-        }
-        catch (Exception ex)
-        {
-            Logging.Warning ($"Failed to enable raw mode: {ex.Message}");
-        }
-    }
-
-    private void TryEnableWindowsVTMode ()
-    {
-        try
-        {
-            _windowsInputHandle = GetStdHandle (STD_INPUT_HANDLE);
-
-            if (!GetConsoleMode (_windowsInputHandle, out _originalWindowsConsoleMode))
-            {
-                Logging.Warning ("Failed to get Windows console mode.");
-                return;
-            }
-
-            // Enable VT input, mouse input, and disable quick edit
-            uint newMode = _originalWindowsConsoleMode;
-            newMode |= ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
-            newMode &= ~(ENABLE_QUICK_EDIT_MODE | ENABLE_PROCESSED_INPUT);
-
-            if (!SetConsoleMode (_windowsInputHandle, newMode))
-            {
-                Logging.Warning ("Failed to set Windows VT console mode.");
-                return;
-            }
-
-            _windowsVtModeEnabled = true;
-            Logging.Information ("Windows VT input mode enabled successfully.");
-        }
-        catch (Exception ex)
-        {
-            Logging.Warning ($"Failed to enable Windows VT mode: {ex.Message}");
-        }
-    }
-
-    private void WriteRaw (string text)
-    {
-        if (!_terminalInitialized)
-        {
-            return;
-        }
-
-        try
-        {
-            Console.Out.Write (text);
-        }
-        catch
-        {
-            // ignore exceptions during write
-        }
-    }
-
     /// <inheritdoc/>
     public override bool Peek ()
     {
         // Will be called on the input thread.
         Interlocked.Increment (ref _peekCallCount);
 
-        // Check test input first
+        // Check test input first - this allows immediate test input processing
         if (!_testInput.IsEmpty)
         {
             return true;
         }
 
-        if (!_terminalInitialized || _inputStream == null)
+        if (!_terminalInitialized)
         {
             return false;
         }
 
-        // For Console.OpenStandardInput(), we can't use Peek() directly
-        // We need to check if data is available without blocking
-        // On Unix, this works; on Windows with redirected input, it may not
-        try
+        // On Windows with VT mode, use helper to check for console input events
+        if (_windowsVTInput?.IsVTModeEnabled == true)
         {
-            // Try to read with a timeout of 0 (non-blocking check)
-            // Note: This might not work on all platforms, but it's the closest to raw mode
-            return _inputStream.CanRead && Console.KeyAvailable;
-        }
-        catch
-        {
+            if (_windowsVTInput.TryGetInputEventCount (out uint numEvents))
+            {
+                bool hasEvents = numEvents > 0;
+
+                //if (hasEvents && _peekCallCount % 100 == 0)
+                //{
+                //    Logging.Trace ($"Peek: {numEvents} events available");
+                //}
+
+                return hasEvents;
+            }
+
             return false;
         }
+
+        // On Unix, we can't reliably peek the stream, so always return true
+        // and let Read() handle the timeout-based check
+        return _inputStream != null;
     }
 
     /// <inheritdoc/>
@@ -358,25 +209,59 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
             yield return input;
         }
 
-        if (!_terminalInitialized || _inputStream == null)
+        if (!_terminalInitialized)
         {
             yield break;
         }
 
-        // Read raw bytes from the input stream
-        // This gives us pure ANSI escape sequences including mouse events
-        // On Windows with VT mode, this should work properly
-        // On Unix with raw mode, this definitely works
-        byte [] buffer = new byte [256];
+        var buffer = new byte [256];
         int bytesRead;
 
-        try
+        // On Windows with VT mode, use helper to read ANSI sequences
+        if (_windowsVTInput?.IsVTModeEnabled == true)
         {
-            // Read available bytes
-            // This should not block if Peek() returned true
-            bytesRead = _inputStream.Read (buffer, 0, buffer.Length);
+            if (!_windowsVTInput.TryRead (buffer, out bytesRead))
+            {
+                yield break;
+            }
         }
-        catch
+
+        // On Unix, use the stream with timeout-based async read
+        else if (_inputStream != null)
+        {
+            try
+            {
+                // Use a very short timeout for non-blocking behavior
+                using var cts = new CancellationTokenSource (10);
+                Task<int> readTask = _inputStream.ReadAsync (buffer, 0, buffer.Length, cts.Token);
+
+                // Wait for the read with a slightly longer timeout than the cancellation token
+                if (!readTask.Wait (15))
+                {
+                    // Timeout - no data available
+                    yield break;
+                }
+
+                bytesRead = readTask.Result;
+            }
+            catch (OperationCanceledException)
+            {
+                // Timeout - no data actually available
+                yield break;
+            }
+            catch (AggregateException ex) when (ex.InnerException is OperationCanceledException)
+            {
+                // Timeout from the task
+                yield break;
+            }
+            catch (Exception ex)
+            {
+                Logging.Warning ($"Error reading input stream: {ex.Message}");
+
+                yield break;
+            }
+        }
+        else
         {
             yield break;
         }
@@ -387,7 +272,8 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
         }
 
         // Convert UTF-8 bytes to characters
-        // ANSI sequences are ASCII-compatible, but user text might be UTF-8
+        // With ENABLE_VIRTUAL_TERMINAL_INPUT, Windows provides ANSI escape sequences
+        // These are UTF-8 compatible (ANSI sequences are ASCII, user input is UTF-8)
         string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
 
         foreach (char ch in text)
@@ -396,7 +282,11 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
         }
     }
 
-    private void FlushConsoleInput ()
+    /// <summary>
+    ///     Flushes any pending input from the console buffer.
+    ///     This prevents ANSI responses from leaking into the shell after the app exits.
+    /// </summary>
+    private void FlushInput ()
     {
         if (!_terminalInitialized)
         {
@@ -405,10 +295,50 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
 
         try
         {
+            // On Unix, read with very short timeout until no more data
+            // Note: On Windows, we skip flushing because the console handles it automatically
+            // when we restore the console mode, and attempting to flush while shutting down
+            // can cause ReadFile to block indefinitely.
+            if (_inputStream != null && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                byte [] buffer = new byte [256];
+                int flushCount = 0;
+                const int MAX_FLUSH_ATTEMPTS = 10;
+
+                while (flushCount < MAX_FLUSH_ATTEMPTS)
+                {
+                    try
+                    {
+                        using CancellationTokenSource cts = new CancellationTokenSource (5); // Very short timeout
+                        Task<int> readTask = _inputStream.ReadAsync (buffer, 0, buffer.Length, cts.Token);
+
+                        if (!readTask.Wait (10) || readTask.Result == 0)
+                        {
+                            break;
+                        }
+
+                        flushCount++;
+                        Logging.Trace ($"FlushInput: Discarded {readTask.Result} bytes (attempt {flushCount})");
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break; // No more data
+                    }
+                    catch (AggregateException)
+                    {
+                        break; // No more data
+                    }
+                }
+
+                if (flushCount > 0)
+                {
+                    Logging.Information ($"FlushInput: Flushed input buffer ({flushCount} read attempts)");
+                }
+            }
         }
-        catch
+        catch (Exception ex)
         {
-            // ignore
+            Logging.Warning ($"Error flushing input: {ex.Message}");
         }
     }
 
@@ -433,38 +363,13 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
 
         try
         {
-            WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);
-            FlushConsoleInput ();
-            WriteRaw (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-            WriteRaw (EscSeqUtils.CSI_ShowCursor);
+            // Flush any pending input (Unix only - Windows handles this automatically)
+            // This prevents ANSI responses (like size queries) from leaking into the shell
+            FlushInput ();
 
-            // Restore original terminal settings if we enabled raw mode
-            if (_rawModeEnabled)
-            {
-                try
-                {
-                    tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
-                    Logging.Information ("Terminal settings restored.");
-                }
-                catch (Exception ex)
-                {
-                    Logging.Warning ($"Failed to restore terminal settings: {ex.Message}");
-                }
-            }
-
-            // Restore Windows console mode if we changed it
-            if (_windowsVtModeEnabled && _windowsInputHandle != IntPtr.Zero)
-            {
-                try
-                {
-                    SetConsoleMode (_windowsInputHandle, _originalWindowsConsoleMode);
-                    Logging.Information ("Windows console mode restored.");
-                }
-                catch (Exception ex)
-                {
-                    Logging.Warning ($"Failed to restore Windows console mode: {ex.Message}");
-                }
-            }
+            // Restore platform-specific terminal settings
+            _unixRawMode?.Dispose ();
+            _windowsVTInput?.Dispose ();
 
             // Don't dispose _inputStream - it's the standard input stream
             // Disposing it would break the console for other code

@@ -8,25 +8,25 @@ namespace Terminal.Gui.Drivers;
 ///         using pure ANSI escape sequence handling.
 ///     </para>
 ///     <para>
-///         <b>ANSI Driver Architecture:</b>
+///         ANSI Driver Architecture:
 ///     </para>
 ///     <para>
 ///         This processor integrates with Terminal.Gui's ANSI infrastructure:
 ///         <list type="bullet">
 ///             <item>
-///                 <b><see cref="AnsiResponseParser{TInputRecord}"/></b> - Automatically parses ANSI escape sequences
+///                 <see cref="AnsiResponseParser{TInputRecord}"/> - Automatically parses ANSI escape sequences
 ///                 from the input stream, extracting keyboard events, mouse events, and terminal responses.
 ///             </item>
 ///             <item>
-///                 <b><see cref="AnsiRequestScheduler"/></b> - Manages outgoing ANSI requests (via <see cref="IDriver.QueueAnsiRequest"/>)
+///                 <see cref="AnsiRequestScheduler"/> - Manages outgoing ANSI requests (via <see cref="IDriver.QueueAnsiRequest"/>)
 ///                 and matches responses from the parser.
 ///             </item>
 ///             <item>
-///                 <b><see cref="UnixKeyConverter"/></b> - Converts character input to <see cref="Key"/> events,
+///                 <see cref="UnixKeyConverter"/> - Converts character input to <see cref="Key"/> events,
 ///                 shared with UnixDriver for consistent behavior.
 ///             </item>
 ///             <item>
-///                 <b><see cref="AnsiKeyboardEncoder"/></b> and <see cref="AnsiMouseEncoder"/></b> - Convert
+///                 <see cref="AnsiKeyboardEncoder"/> and <see cref="AnsiMouseEncoder"/> - Convert
 ///                 <see cref="Key"/> and <see cref="Mouse"/> events into ANSI sequences for test injection.
 ///             </item>
 ///         </list>
