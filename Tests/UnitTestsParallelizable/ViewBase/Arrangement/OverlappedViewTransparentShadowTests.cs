@@ -380,15 +380,15 @@ public class OverlappedViewTransparentShadowTests (ITestOutputHelper output)
         // Arrange
         IApplication app = Application.Create ();
         app.Init ("fake");
-        app.Driver!.SetScreenSize (15, 8);
+        app.Driver!.SetScreenSize (5, 3);
 
         // Force 16-bit colors off to get predictable RGB output
         app.Driver.Force16Colors = false;
 
         var superView = new Runnable
         {
-            Width = 15,
-            Height = 8,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
             Text = "ABC".Repeat (40)!
         };
         superView.SetScheme (new (new Attribute (Color.White, Color.Blue)));
@@ -397,11 +397,9 @@ public class OverlappedViewTransparentShadowTests (ITestOutputHelper output)
         // Create an overlapped view with transparent shadow
         var overlappedView = new View
         {
-            X = 2,
-            Y = 2,
             Width = 4,
             Height = 2,
-            Text = "V",
+            Text = "123",
             Arrangement = ViewArrangement.Overlapped,
             ShadowStyle = ShadowStyle.Transparent
         };
@@ -421,9 +419,9 @@ public class OverlappedViewTransparentShadowTests (ITestOutputHelper output)
         string? output = app.Driver.GetOutput ().GetLastOutput ();
         _output.WriteLine (output);
 
-        // Verify the driver output contains the background text that should show through
-        Assert.NotNull (output);
-        Assert.Contains ("ABC", output);
+        DriverAssert.AssertDriverOutputIs ("""
+                                           \x1b[38;2;0;0;0m\x1b[48;2;0;128;0m123\x1b[38;2;0;0;0m\x1b[48;2;189;189;189mA\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mBC\x1b[38;2;0;0;0m\x1b[48;2;189;189;189mABC\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mABCABC
+                                           """, _output, app.Driver);
 
         // The output should contain ANSI color codes for the transparent shadow
         // which will have dimmed colors compared to the original
@@ -431,8 +429,8 @@ public class OverlappedViewTransparentShadowTests (ITestOutputHelper output)
         Assert.Contains ("\x1b[48;2;", output); // Should have RGB background color codes
 
         // Verify driver contents show the background text in shadow areas
-        int shadowX = 6; // Right edge of view (X=2 + Width=4)
-        int shadowY = 2; // Top of view
+        int shadowX = overlappedView.Frame.X + overlappedView.Frame.Width;
+        int shadowY = overlappedView.Frame.Y + overlappedView.Frame.Height;
 
         Cell shadowCell = app.Driver.Contents! [shadowY, shadowX];
         _output.WriteLine ($"\nShadow cell at [{shadowY},{shadowX}]: Grapheme='{shadowCell.Grapheme}', Attr={shadowCell.Attribute}");
