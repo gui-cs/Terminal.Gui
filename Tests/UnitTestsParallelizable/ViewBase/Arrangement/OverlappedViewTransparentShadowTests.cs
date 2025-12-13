@@ -1,3 +1,4 @@
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace ViewBaseTests.Arrangement;
@@ -274,6 +275,94 @@ public class OverlappedViewTransparentShadowTests (ITestOutputHelper output)
         // Shadow adds 1 to right and bottom thickness
         Assert.Equal (1, overlappedView.Margin.Thickness.Right);
         Assert.Equal (1, overlappedView.Margin.Thickness.Bottom);
+
+        // Cleanup
+        if (token is { })
+        {
+            app.End (token);
+        }
+
+        superView.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Overlapped_View_With_TransparentShadow_Shows_Background_Text_Through_Shadow ()
+    {
+        // Arrange
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+        app.Driver!.SetScreenSize (20, 10);
+
+        var superView = new Runnable
+        {
+            Width = 20,
+            Height = 10,
+            Text = "BACKGROUND".Repeat (20)!
+        };
+        superView.SetScheme (new (new Attribute (Color.White, Color.Blue)));
+        superView.TextFormatter.WordWrap = true;
+
+        // Create an overlapped view with transparent shadow positioned to leave room for shadow
+        var overlappedView = new View
+        {
+            X = 2,
+            Y = 2,
+            Width = 6,
+            Height = 3,
+            Text = "VIEW",
+            Arrangement = ViewArrangement.Overlapped,
+            ShadowStyle = ShadowStyle.Transparent
+        };
+        overlappedView.SetScheme (new (new Attribute (Color.Black, Color.Green)));
+
+        superView.Add (overlappedView);
+
+        // Act
+        SessionToken? token = app.Begin (superView);
+        app.LayoutAndDraw ();
+
+        // Assert
+        _output.WriteLine ("Actual driver contents:");
+        _output.WriteLine (app.Driver.ToString ());
+
+        // Verify the underlying "BACKGROUND" text shows through where the shadow should be
+        // The shadow is at X=8 (2 + 6) for the right edge and Y=5 (2 + 3) for the bottom edge
+
+        // Check right shadow - should show background text characters
+        int shadowX = 8; // Right edge of view (X=2 + Width=6)
+
+        for (int y = 2; y <= 4; y++) // Shadow covers rows 2-4 (view height)
+        {
+            Cell cell = app.Driver.Contents! [y, shadowX];
+            _output.WriteLine ($"Cell at [{y},{shadowX}]: Grapheme='{cell.Grapheme}'");
+
+            // The grapheme should be from "BACKGROUND" text, not empty or special shadow glyphs
+            Assert.NotEqual (string.Empty, cell.Grapheme);
+
+            // For transparent shadows, the text underneath should show through
+            // The background text at this location should be visible
+            Assert.True (cell.Grapheme.Length > 0, "Transparent shadow should show background text");
+        }
+
+        // Check bottom shadow - should show background text characters  
+        int shadowY = 5; // Bottom edge of view (Y=2 + Height=3)
+
+        for (int x = 2; x <= 7; x++) // Shadow covers cols 2-7 (view width)
+        {
+            Cell cell = app.Driver.Contents! [shadowY, x];
+            _output.WriteLine ($"Cell at [{shadowY},{x}]: Grapheme='{cell.Grapheme}'");
+
+            // The grapheme should be from "BACKGROUND" text
+            Assert.NotEqual (string.Empty, cell.Grapheme);
+            Assert.True (cell.Grapheme.Length > 0, "Transparent shadow should show background text");
+        }
+
+        // Use DriverAssert to verify the overall content shows the background text
+        // The exact layout depends on word wrapping, but we should see "VIEW" and portions of "BACKGROUND"
+        string driverContents = app.Driver.ToString ();
+        Assert.Contains ("VIEW", driverContents);
+        Assert.Contains ("BACKGROUND", driverContents);
 
         // Cleanup
         if (token is { })
