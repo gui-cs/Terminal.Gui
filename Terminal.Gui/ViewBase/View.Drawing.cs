@@ -199,7 +199,6 @@ public partial class View // Drawing APIs
             Margin?.DoDrawSubViews ();
             SetClip (saved);
         }
-        // NOTE: We do not support SubViews of Margin
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
         {
@@ -278,7 +277,7 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void DrawAdornments ()
     {
-        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
+        if (Margin is { } && Margin.Thickness != Thickness.Empty)
         {
             Margin?.Draw ();
         }
@@ -294,22 +293,6 @@ public partial class View // Drawing APIs
         {
             Padding?.Draw ();
         }
-    }
-
-    private void ClearFrame ()
-    {
-        if (Driver is null)
-        {
-            return;
-        }
-
-        // Get screen-relative coords
-        Rectangle toClear = FrameToScreen ();
-
-        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        Driver.FillRect (toClear);
-        SetAttribute (prev);
-        SetNeedsDraw ();
     }
 
     /// <summary>
