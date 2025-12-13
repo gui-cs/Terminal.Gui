@@ -70,18 +70,15 @@ public class Button : View, IDesignable
 
         AddCommand (Command.HotKey, HandleHotKeyCommand);
 
-        KeyBindings.Remove (Key.Space);
-        KeyBindings.Add (Key.Space, Command.HotKey);
-        KeyBindings.Remove (Key.Enter);
-        KeyBindings.Add (Key.Enter, Command.HotKey);
+        KeyBindings.ReplaceCommands (Key.Space, Command.HotKey);
+        KeyBindings.ReplaceCommands (Key.Enter, Command.HotKey);
 
         // Replace default Activate binding with HotKey for mouse clicks
-        MouseBindings.Clear ();
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.RightButtonClicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.MiddleButtonClicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
 

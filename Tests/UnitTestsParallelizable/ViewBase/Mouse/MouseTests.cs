@@ -17,8 +17,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Assert.Equal (6, testView.MouseBindings.GetBindings ().Count ());
     }
 
-    [Fact (Skip = "Broken in #4474")]
-    public void MouseClick_OnSubView_RaisesSelectingEvent ()
+    [Fact]
+    public void LeftButtonClicked_OnSubView_RaisesSelectingEvent ()
     {
         // Arrange
         View superView = new ()
@@ -37,10 +37,10 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         superView.Add (subView);
 
-        int activatingCount = 0;
-        subView.Activating += (_, _) => activatingCount++;
+        int acceptingCount = 0;
+        subView.Accepting += (_, _) => acceptingCount++;
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new Point (5, 5),
             Flags = MouseFlags.LeftButtonClicked
@@ -50,14 +50,14 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         subView.NewMouseEvent (mouse);
 
         // Assert
-        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptingCount);
 
         subView.Dispose ();
         superView.Dispose ();
     }
 
-    [Fact (Skip = "Broken in #4474")]
-    public void MouseClick_RaisesSelecting_WhenCanFocus ()
+    [Fact]
+    public void LeftButtonClicked_RaisesSelecting_WhenCanFocus ()
     {
         // Arrange
         View superView = new () { CanFocus = true, Width = 20, Height = 20 };
@@ -72,8 +72,8 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         superView.Add (view);
 
-        int activatingCount = 0;
-        view.Activating += (_, _) => activatingCount++;
+        int acceptingCount = 0;
+        view.Accepting += (_, _) => acceptingCount++;
 
         Terminal.Gui.Input.Mouse mouse = new ()
         {
@@ -85,17 +85,18 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         view.NewMouseEvent (mouse);
 
         // Assert
-        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptingCount);
 
         view.Dispose ();
         superView.Dispose ();
     }
 
-    [Theory (Skip = "Broken in #4474")]
+    // BUGUBG: This is a bogus test now. LeftButtonClicked should not set focus; Release should.
+    [Theory]
     [InlineData (false, false, false)]
     [InlineData (true, false, true)]
     [InlineData (true, true, true)]
-    public void MouseClick_SetsFocus_If_CanFocus (bool canFocus, bool setFocus, bool expectedHasFocus)
+    public void LeftButtonClicked_SetsFocus_If_CanFocus (bool canFocus, bool setFocus, bool expectedHasFocus)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
@@ -119,6 +120,35 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedHasFocus, testView.HasFocus);
     }
+
+
+    [Theory]
+    [InlineData (false, false, false)]
+    [InlineData (true, false, true)]
+    [InlineData (true, true, true)]
+    public void LeftButtonPressed_SetsFocus_If_CanFocus (bool canFocus, bool setFocus, bool expectedHasFocus)
+    {
+        var superView = new View { CanFocus = true, Height = 1, Width = 15 };
+        var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
+        var testView = new View { CanFocus = canFocus, X = 4, Width = 4, Height = 1 };
+        superView.Add (focusedView, testView);
+
+        focusedView.SetFocus ();
+
+        Assert.True (superView.HasFocus);
+        Assert.True (focusedView.HasFocus);
+        Assert.False (testView.HasFocus);
+
+        if (setFocus)
+        {
+            testView.SetFocus ();
+        }
+
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        Assert.True (superView.HasFocus);
+        Assert.Equal (expectedHasFocus, testView.HasFocus);
+    }
+
 
     [Theory]
     [InlineData (false, false, 1)]

@@ -12,7 +12,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 {
     // Queue for storing injected input for testing
     private readonly ConcurrentQueue<char> _testInput = new ();
-    
+
     private const int STDIN_FILENO = 0;
 
     [StructLayout (LayoutKind.Sequential)]
@@ -83,7 +83,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
     }
 
     [DllImport ("libc", SetLastError = true)]
-    private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+    private static extern int poll ([In][Out] Pollfd [] ufds, uint nfds, int timeout);
 
     [DllImport ("libc", SetLastError = true)]
     private static extern int read (int fd, byte [] buf, int count);

@@ -125,7 +125,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
                                            .AssertEqual (1, rightClickCount);
     }
 
-    [Theory (Skip = "Broken in #4474")]
+    [Theory ]
     [ClassData (typeof (TestDrivers))]
     public void EnqueueMouseEvent_Click_SetsFocusOnView (TestDriver d)
     {

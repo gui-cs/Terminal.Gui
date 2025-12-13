@@ -294,16 +294,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     }
 
     /// <inheritdoc />
-    public virtual void EnqueueMouseEvent (IApplication? app, Mouse mouse)
-    {
-        // Base implementation: For drivers where TInputRecord cannot represent mouse events
-        // (e.g., ConsoleKeyInfo), derived classes should override this method.
-        // See WindowsInputProcessor for an example implementation that converts MouseEventArgs
-        // to InputRecord and enqueues it.
-        Logging.Logger.LogWarning (
-                                   $"{DriverName ?? "Unknown"} driver's InputProcessor does not support EnqueueMouseEvent. " +
-                                   "Override this method to enable mouse event enqueueing for testing.");
-    }
+    public virtual void EnqueueMouseEvent (IApplication? app, Mouse mouse) { mouse.Timestamp ??= DateTime.Now; }
 
     #endregion
 
