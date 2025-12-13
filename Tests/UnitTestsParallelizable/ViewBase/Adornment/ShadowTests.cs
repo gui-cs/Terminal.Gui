@@ -405,7 +405,7 @@ public class ShadowTests (ITestOutputHelper output)
         output.WriteLine (output1);
 
         DriverAssert.AssertDriverOutputIs ("""
-                                           \x1b[38;2;0;0;0m\x1b[48;2;0;128;0m123\x1b[38;2;0;0;0m\x1b[48;2;189;189;189mA\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mBC\x1b[38;2;0;0;0m\x1b[48;2;189;189;189mABC\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mABCABC
+                                           \x1b[38;2;0;0;0m\x1b[48;2;0;128;0m123\x1b[38;2;0;0;0m\x1b[48;2;56;56;56mA\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mBC\x1b[38;2;0;0;0m\x1b[48;2;56;56;56mABC\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mABCABC
                                            """, output, app.Driver);
 
         // The output should contain ANSI color codes for the transparent shadow

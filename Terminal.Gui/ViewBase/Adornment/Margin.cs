@@ -59,7 +59,7 @@ public class Margin : Adornment
 
     internal void CacheClip ()
     {
-        if (Thickness != Thickness.Empty /*&& ShadowStyle != ShadowStyle.None*/)
+        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyle.None)
         {
             // PERFORMANCE: How expensive are these clones?
             _cachedClip = GetClip ()?.Clone ();

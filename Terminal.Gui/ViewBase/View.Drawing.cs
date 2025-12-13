@@ -28,6 +28,9 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
+        // Draw the margins last to ensure they are drawn on top of the content.
+        Margin.DrawMargins (viewsArray);
+
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
         {
@@ -169,6 +172,10 @@ public partial class View // Drawing APIs
                 Debug.Assert (!Padding!.NeedsDraw);
             }
         }
+
+        // ------------------------------------
+        // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
+        Margin?.CacheClip ();
 
         // ------------------------------------
         // Reset the clip to what it was when we started
