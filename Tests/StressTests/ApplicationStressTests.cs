@@ -37,7 +37,7 @@ public class ApplicationStressTests
     public async Task InvokeLeakTest ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         Random r = new ();
         TextField tf = new ();

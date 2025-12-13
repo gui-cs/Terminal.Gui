@@ -1,13 +1,13 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Size monitor for FakeDriver that uses ANSI escape sequences to query terminal size.
+///     Size monitor that uses ANSI escape sequences to query terminal size.
 ///     This demonstrates proper use of <see cref="AnsiResponseParser"/> for detecting terminal resize events.
 /// </summary>
 /// <remarks>
 ///     <para>
 ///         Unlike platform-specific size monitors that use native APIs (e.g., SIGWINCH on Unix or
-///         console buffer events on Windows), <see cref="FakeSizeMonitor"/> uses pure ANSI escape
+///         console buffer events on Windows), <see cref="ANSISizeMonitor"/> uses pure ANSI escape
 ///         sequences to query the terminal size, making it portable across all ANSI-compatible terminals.
 ///     </para>
 ///     <para>
@@ -20,9 +20,9 @@ namespace Terminal.Gui.Drivers;
 ///         <item>If size changed, <see cref="ISizeMonitor.SizeChanged"/> event is raised</item>
 ///     </list>
 /// </remarks>
-internal class FakeSizeMonitor : ISizeMonitor
+internal class ANSISizeMonitor : ISizeMonitor
 {
-    private readonly FakeOutput _output;
+    private readonly ANSIOutput _output;
     private Action<AnsiEscapeSequenceRequest>? _queueAnsiRequest;
     private Size _lastSize;
     private DateTime _lastQuery = DateTime.MinValue;
@@ -30,11 +30,11 @@ internal class FakeSizeMonitor : ISizeMonitor
     private bool _expectingResponse;
 
     /// <summary>
-    ///     Creates a new FakeSizeMonitor.
+    ///     Creates a new ANSISizeMonitor.
     /// </summary>
-    /// <param name="output">The FakeOutput instance to query for size</param>
+    /// <param name="output">The ANSIOutput instance to query for size</param>
     /// <param name="queueAnsiRequest">Callback to queue ANSI requests (provided by driver/scheduler)</param>
-    public FakeSizeMonitor (FakeOutput output, Action<AnsiEscapeSequenceRequest>? queueAnsiRequest = null)
+    public ANSISizeMonitor (ANSIOutput output, Action<AnsiEscapeSequenceRequest>? queueAnsiRequest = null)
     {
         _output = output;
         _queueAnsiRequest = queueAnsiRequest;
@@ -54,7 +54,7 @@ internal class FakeSizeMonitor : ISizeMonitor
         // Set up the callback to queue ANSI requests through the driver
         _queueAnsiRequest = driver.QueueAnsiRequest;
 
-        Logging.Information ("FakeSizeMonitor: Initialized with driver, sending initial size query");
+        Logging.Information ("ANSISizeMonitor: Initialized with driver, sending initial size query");
 
         // Send the initial size query - response will arrive asynchronously
         // once the input thread starts reading. We don't block here because:
@@ -133,7 +133,7 @@ internal class FakeSizeMonitor : ISizeMonitor
             return;
         }
 
-        // The response is handled by FakeOutput.HandleSizeQueryResponse
+        // The response is handled by ANSIOutput.HandleSizeQueryResponse
         // which updates the cached size. We just need to check if it changed.
         _output.HandleSizeQueryResponse (response);
 

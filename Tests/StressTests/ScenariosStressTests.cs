@@ -56,7 +56,7 @@ public class ScenariosStressTests
         Stopwatch? stopwatch = null;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
-        Application.ForceDriver = "FakeDriver";
+        Application.ForceDriver = DriverRegistry.Names.ANSI;
         scenario!.Main ();
         scenario.Dispose ();
         scenario = null;

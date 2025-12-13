@@ -11,11 +11,11 @@ public class ApplicationForceDriverTests : FakeDriverBase
         Assert.Null (Application.Driver);
         Assert.Equal (string.Empty, Application.ForceDriver);
 
-        Application.ForceDriver = DriverRegistry.Names.FAKE;
-        Assert.Equal (DriverRegistry.Names.FAKE, Application.ForceDriver);
+        Application.ForceDriver = DriverRegistry.Names.ANSI;
+        Assert.Equal (DriverRegistry.Names.ANSI, Application.ForceDriver);
 
         Application.ForceDriver = DriverRegistry.Names.DOTNET;
-        Assert.Equal (DriverRegistry.Names.FAKE, Application.ForceDriver);
+        Assert.Equal (DriverRegistry.Names.ANSI, Application.ForceDriver);
     }
 
     [Fact (Skip = "Bogus test now that config properties are handled correctly")]
@@ -27,15 +27,15 @@ public class ApplicationForceDriverTests : FakeDriverBase
         Assert.Null (Application.Driver);
         Assert.Equal (string.Empty, Application.ForceDriver);
 
-        Application.Init (driverName: DriverRegistry.Names.FAKE);
+        Application.Init (driverName: DriverRegistry.Names.ANSI);
         Assert.True (Application.Initialized);
         Assert.NotNull (Application.Driver);
-        Assert.Equal (DriverRegistry.Names.FAKE, Application.Driver.GetName ());
+        Assert.Equal (DriverRegistry.Names.ANSI, Application.Driver.GetName ());
         Assert.Equal (string.Empty, Application.ForceDriver);
 
         Assert.Throws<InvalidOperationException> (() => Application.ForceDriver = "dotnet");
 
-        Application.ForceDriver = DriverRegistry.Names.FAKE;
-        Assert.Equal (DriverRegistry.Names.FAKE, Application.ForceDriver);
+        Application.ForceDriver = DriverRegistry.Names.ANSI;
+        Assert.Equal (DriverRegistry.Names.ANSI, Application.ForceDriver);
     }
 }

@@ -16,18 +16,18 @@ public class FakeApplicationFactory
     public IDisposable SetupFakeApplication ()
     {
         CancellationTokenSource hardStopTokenSource = new CancellationTokenSource ();
-        FakeInput fakeInput = new FakeInput ();
-        fakeInput.ExternalCancellationTokenSource = hardStopTokenSource;
-        FakeOutput output = new ();
+        ANSIInput ansiInput = new ANSIInput ();
+        ansiInput.ExternalCancellationTokenSource = hardStopTokenSource;
+        ANSIOutput output = new ();
         output.SetSize (80, 25);
 
         SizeMonitorImpl sizeMonitor = new (output);
 
-        ApplicationImpl impl = new (new FakeComponentFactory (fakeInput, output, sizeMonitor));
+        ApplicationImpl impl = new (new AnsiComponentFactory (ansiInput, output, sizeMonitor));
         ApplicationImpl.SetInstance (impl);
 
-        // Initialize with a fake driver
-        impl.Init (DriverRegistry.Names.FAKE);
+        // Initialize with a ANSI driver
+        impl.Init (DriverRegistry.Names.ANSI);
 
         return new FakeApplicationLifecycle (impl, hardStopTokenSource);
     }

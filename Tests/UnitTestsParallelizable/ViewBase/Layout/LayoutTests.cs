@@ -40,7 +40,7 @@ public class LayoutTests
     public void Screen_Size_Change_Causes_Layout ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         Runnable<bool>? runnable = new ();
         app.Begin (runnable);
 

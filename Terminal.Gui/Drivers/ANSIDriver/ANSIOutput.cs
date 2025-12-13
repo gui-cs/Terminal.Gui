@@ -4,8 +4,7 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     <para>
-///         Pure ANSI console output for testing that captures output buffer state while optionally
-///         writing ANSI escape sequences to a real terminal.
+///         Pure ANSI console output.
 ///     </para>
 ///     <para>
 ///         <b>ANSI Output Architecture:</b>
@@ -34,17 +33,17 @@ namespace Terminal.Gui.Drivers;
 ///         and true-color (24-bit RGB) output through ANSI SGR sequences.
 ///     </para>
 /// </summary>
-public class FakeOutput : OutputBase, IOutput
+public class ANSIOutput : OutputBase, IOutput
 {
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;
     private readonly bool _terminalInitialized;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="FakeOutput"/>.
+    ///     Initializes a new instance of <see cref="ANSIOutput"/>.
     ///     Checks if a real console is available for ANSI output and activates the alternate screen buffer.
     /// </summary>
-    public FakeOutput ()
+    public ANSIOutput ()
     {
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);
@@ -68,7 +67,7 @@ public class FakeOutput : OutputBase, IOutput
                     Write (EscSeqUtils.CSI_HideCursor);
                     Write (EscSeqUtils.CSI_EnableMouseEvents);
 
-                    // Note: Size will be queried via ANSI by FakeSizeMonitor.Initialize()
+                    // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
                     // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
                     // not the alternate screen buffer we just activated.
                     // Start with default size; actual size will be set when ANSI response arrives.

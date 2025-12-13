@@ -90,10 +90,10 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
     {
         IDriver driver = CreateFakeDriver ();
 
-        IDriver fakeDriver = driver;
-        Assert.NotNull (fakeDriver);
+        IDriver ansiDriver = driver;
+        Assert.NotNull (ansiDriver);
 
-        fakeDriver!.SetScreenSize (100, 50);
+        ansiDriver!.SetScreenSize (100, 50);
 
         Assert.Equal (100, driver.Cols);
         Assert.Equal (50, driver.Rows);

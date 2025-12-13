@@ -13,7 +13,7 @@ Terminal.Gui provides console driver implementations optimized for different pla
 - **DotNetDriver (`dotnet`)** - A cross-platform driver that uses the .NET `System.Console` API. Works on all platforms (Windows, macOS, Linux). Best for maximum compatibility.
 - **WindowsDriver (`windows`)** - A Windows-optimized driver that uses native Windows Console APIs for enhanced performance and platform-specific features.
 - **UnixDriver (`unix`)** - A Unix/Linux/macOS-optimized driver that uses platform-specific APIs for better integration and performance.
-- **FakeDriver (`fake`)** - A mock driver designed for unit testing. Simulates console behavior without requiring a real terminal.
+- **AnsiDriver (`ansi`)** - A pure ANSI escape sequence driver for unit testing and headless environments. Simulates console behavior without requiring a real terminal.
 
 ### Automatic Driver Selection
 
@@ -30,7 +30,7 @@ Method 1: Set ForceDriver using Configuration Manager
 
 ```json
 {
-  "ForceDriver": "fake"
+  "ForceDriver": "ansi"
 }
 ```
 
@@ -50,7 +50,7 @@ Method 3: Set ForceDriver on instance
 using Terminal.Gui.Drivers;
 using (IApplication app = Application.Create())
 {
-    app.ForceDriver = DriverRegistry.Names.FAKE;
+    app.ForceDriver = DriverRegistry.Names.ANSI;
     app.Init();
 }
 ```
@@ -71,7 +71,7 @@ Application.ForceDriverChanged += (sender, e) =>
 };
 
 // Change driver
-Application.ForceDriver = DriverRegistry.Names.FAKE;
+Application.ForceDriver = DriverRegistry.Names.ANSI;
 ```
 
 ### Discovering Available Drivers
@@ -93,7 +93,7 @@ foreach (string name in driverNames)
 //   - dotnet
 //   - windows
 //   - unix
-//   - fake
+//   - ansi
 ```
 
 For more detailed information about each driver:
@@ -144,7 +144,7 @@ Use type-safe constants in code:
 using Terminal.Gui.Drivers;
 
 // Type-safe driver names from DriverRegistry.Names
-string driverName = DriverRegistry.Names.FAKE;  // "fake"
+string driverName = DriverRegistry.Names.ANSI;  // "ansi"
 app.Init(driverName);
 ```
 
@@ -166,7 +166,7 @@ Terminal.Gui v2 uses a **Driver Registry** pattern for managing available driver
 string windowsDriver = DriverRegistry.Names.WINDOWS;  // "windows"
 string unixDriver = DriverRegistry.Names.UNIX;        // "unix"
 string dotnetDriver = DriverRegistry.Names.DOTNET;    // "dotnet"
-string fakeDriver = DriverRegistry.Names.FAKE;        // "fake"
+string ansiDriver = DriverRegistry.Names.ANSI;        // "ansi"
 
 // Get detailed driver information
 if (DriverRegistry.TryGetDriver("windows", out var descriptor))
@@ -196,7 +196,7 @@ The v2 driver architecture uses the **Component Factory** pattern to create plat
 - `NetComponentFactory` - Creates components for DotNetDriver
 - `WindowsComponentFactory` - Creates components for WindowsDriver  
 - `UnixComponentFactory` - Creates components for UnixDriver
-- `FakeComponentFactory` - Creates components for FakeDriver
+- `AnsiComponentFactory` - Creates components for AnsiDriver
 
 Each factory is responsible for:
 - Creating driver-specific components (`IInput<T>`, `IOutput`, `IInputProcessor`, etc.)
@@ -211,9 +211,9 @@ Each driver is composed of specialized components, each with a single responsibi
 
 #### IInput&lt;T&gt;
 Reads raw console input events from the terminal. The generic type `T` represents the platform-specific input type:
-- `ConsoleKeyInfo` for DotNetDriver and FakeDriver
+- `ConsoleKeyInfo` for DotNetDriver
 - `WindowsConsole.InputRecord` for WindowsDriver
-- `char` for UnixDriver
+- `char` for UnixDriver and AnsiDriver
 
 Runs on a dedicated input thread to avoid blocking the UI.
 
@@ -231,9 +231,9 @@ Translates raw console input into Terminal.Gui events:
 - Generates `MouseEventArgs` for mouse input
 - Handles platform-specific key mappings
 - Uses `IKeyConverter<T>` to translate `TInputRecord` to `Key`:
-  - `AnsiKeyConverter` - For `char` input (UnixDriver, FakeDriver)
-  - `NetKeyConverter` - For `ConsoleKeyInfo` input (DotNetDriver)
-  - `WindowsKeyConverter` - For `WindowsConsole.InputRecord` input (WindowsDriver)
+- `AnsiKeyConverter` - For `char` input (UnixDriver, AnsiDriver)
+- `NetKeyConverter` - For `ConsoleKeyInfo` input (DotNetDriver)
+- `WindowsKeyConverter` - For `WindowsConsole.InputRecord` input (WindowsDriver)
 
 #### IOutputBuffer
 Manages the screen buffer and drawing operations:
@@ -436,13 +436,13 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 - Supports Unix-specific features
 - Automatically selected on Unix/Linux/macOS platforms
 
-### FakeDriver (FakeComponentFactory)
+### AnsiDriver (AnsiComponentFactory)
 
-- Simulates console behavior for unit testing
-- Uses `FakeConsole` for all operations
-- Allows injection of predefined input
-- Captures output for verification
-- Always used when `IApplication.ForceDriver` is `fake`
+- Pure ANSI escape sequence cross-platform driver
+- Uses ANSI escape sequences for keyboard, mouse input and output
+- Best for unit testing and headless environments
+- Works on all platforms with ANSI support
+- Specify with `IApplication.ForceDriver` = `"ansi"` or `DriverRegistry.Names.ANSI`
 
 **Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
 - `View.Move(col, row)` for positioning
@@ -501,10 +501,10 @@ public class MyCustomComponentFactory : ComponentFactoryImpl<char>
 When creating custom drivers:
 
 1. **Choose the right input type** for your `TInputRecord`:
-   - `char` for character-based ANSI terminals (like UnixDriver, FakeDriver)
-   - `ConsoleKeyInfo` for .NET Console API (like DotNetDriver)
-   - `WindowsConsole.InputRecord` for Windows Console API (like WindowsDriver)
-   - Custom struct for specialized input handling
+- `char` for character-based ANSI terminals (like UnixDriver, AnsiDriver)
+- `ConsoleKeyInfo` for .NET Console API (like DotNetDriver)
+- `WindowsConsole.InputRecord` for Windows Console API (like WindowsDriver)
+- Custom struct for specialized input handling
 
 2. **Implement all required components**:
    - `IInput<T>` - Reads from your terminal/console

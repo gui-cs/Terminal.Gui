@@ -3,9 +3,6 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
-/// <remarks>
-///     There are currently four implementations: UnixDriver, WindowsDriver, DotNetDriver, and FakeDriver
-/// </remarks>
 public interface IDriver : IDisposable
 {
     #region Driver Lifecycle

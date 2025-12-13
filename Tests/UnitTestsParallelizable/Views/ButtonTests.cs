@@ -404,7 +404,7 @@ public class ButtonTests : FakeDriverBase
     public void LeftButtonClicked_Accepts_Driver_Injection ()
     {
         using IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         using Runnable? runnable = new ();
         app.Begin (runnable);

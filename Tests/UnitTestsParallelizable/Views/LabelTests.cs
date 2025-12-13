@@ -302,7 +302,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
     public void With_Top_Margin_Without_Top_Border ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         Runnable<bool> runnable = new ()
         {
             Width = 10,
@@ -331,7 +331,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
     public void Without_Top_Border ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         Runnable<bool> runnable = new ()
         {
             Width = 10,

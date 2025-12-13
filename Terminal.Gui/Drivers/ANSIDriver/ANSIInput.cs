@@ -79,7 +79,7 @@ namespace Terminal.Gui.Drivers;
 ///         mouse events (SGR format), and terminal responses.
 ///     </para>
 /// </remarks>
-public class FakeInput : InputImpl<char>, ITestableInput<char>
+public class ANSIInput : InputImpl<char>, ITestableInput<char>
 {
     // Platform-specific helpers
     private readonly UnixRawModeHelper? _unixRawMode;
@@ -100,11 +100,11 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
     private Stream? _inputStream;
 
     /// <summary>
-    ///     Creates a new FakeInput.
+    ///     Creates a new ANSIInput.
     /// </summary>
-    public FakeInput ()
+    public ANSIInput ()
     {
-        Logging.Information ($"Creating {nameof (FakeInput)}");
+        Logging.Information ($"Creating {nameof (ANSIInput)}");
 
         try
         {
@@ -151,7 +151,7 @@ public class FakeInput : InputImpl<char>, ITestableInput<char>
             }
 
             // NOTE: Output operations (alternate buffer, cursor visibility, mouse events)
-            // NOTE: are handled by FakeOutput, not here. FakeInput only handles input.
+            // NOTE: are handled by ANSIOutput, not here. ANSIInput only handles input.
 
             _terminalInitialized = true;
         }

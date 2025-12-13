@@ -7074,7 +7074,7 @@ line.
         tv.Dispose ();
     }
 
-    [Fact (Skip = "v2 fake driver broke. TextView still works; disabling tests.")]
+    [Fact (Skip = "v2 ANSI driver broke. TextView still works; disabling tests.")]
     [SetupFakeApplication]
     public void CellEventArgs_WordWrap_True ()
     {

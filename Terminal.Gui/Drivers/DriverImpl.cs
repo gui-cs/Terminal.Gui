@@ -166,9 +166,9 @@ internal class DriverImpl : IDriver
     {
         string? driverName = GetName ();
 
-        // TODO: When "fake" is used for real, it can have a real clipboard.
+        // TODO: When "ansi" is used for real, it can have a real clipboard.
         // TODO: Need to figure out how to configure that.
-        if (driverName is null || driverName.Contains (DriverRegistry.Names.FAKE, StringComparison.OrdinalIgnoreCase))
+        if (driverName is null || driverName.Contains (DriverRegistry.Names.ANSI, StringComparison.OrdinalIgnoreCase))
         {
             Clipboard ??= new FakeClipboard ();
 

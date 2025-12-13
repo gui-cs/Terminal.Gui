@@ -105,13 +105,13 @@ public class SixelSupportDetectorTests
     {
         // Arrange
         var responseReceived = false;
-        var output = new FakeOutput ();
+        var output = new ANSIOutput ();
         output.IsLegacyConsole = isLegacyConsole;
 
         Mock<DriverImpl> driverMock = new (
                                            MockBehavior.Strict,
-                                           new FakeComponentFactory (),
-                                           new FakeInputProcessor (null!),
+                                           new AnsiComponentFactory (),
+                                           new ANSIInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,
                                            new AnsiRequestScheduler (new AnsiResponseParser ()),
@@ -173,13 +173,13 @@ public class SixelSupportDetectorTests
     {
         // Arrange
         var responseReceived = false;
-        var output = new FakeOutput ();
+        var output = new ANSIOutput ();
         output.IsLegacyConsole = isLegacyConsole;
 
         Mock<DriverImpl> driverMock = new (
                                            MockBehavior.Strict,
-                                           new FakeComponentFactory (),
-                                           new FakeInputProcessor (null!),
+                                           new AnsiComponentFactory (),
+                                           new ANSIInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,
                                            new AnsiRequestScheduler (new AnsiResponseParser ()),

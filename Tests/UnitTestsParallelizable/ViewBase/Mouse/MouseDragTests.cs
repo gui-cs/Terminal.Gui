@@ -14,7 +14,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -76,7 +76,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -135,7 +135,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -205,7 +205,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -264,7 +264,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -323,7 +323,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -382,7 +382,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -445,7 +445,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -504,7 +504,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -567,7 +567,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {
@@ -618,7 +618,7 @@ public class MouseDragTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         View superView = new ()
         {

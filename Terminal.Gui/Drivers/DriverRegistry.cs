@@ -20,8 +20,8 @@ public static class DriverRegistry
         /// <summary>Unix/Linux/macOS terminal driver name.</summary>
         public const string UNIX = "unix";
 
-        /// <summary>Fake/mock driver for testing name.</summary>
-        public const string FAKE = "fake";
+        /// <summary>Pure ANSI escape sequence cross-platform driver name.</summary>
+        public const string ANSI = "ansi";
     }
 
     /// <summary>
@@ -74,11 +74,11 @@ public static class DriverRegistry
 
         Register (
                   new (
-                       Names.FAKE,
+                       Names.ANSI,
                        "Pure ANSI Driver",
-                       "Uses ANSI escape sequences for keyboard/mouse input and output",
+                       "Cross-platform driver that uses ANSI escape sequences for keyboard/mouse input and output",
                        [PlatformID.Win32NT, PlatformID.Unix, PlatformID.MacOSX],
-                       () => new FakeComponentFactory ()
+                       () => new AnsiComponentFactory ()
                       ));
     }
 

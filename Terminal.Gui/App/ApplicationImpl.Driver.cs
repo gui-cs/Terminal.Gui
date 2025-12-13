@@ -78,8 +78,8 @@ internal partial class ApplicationImpl
                     Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
 
                     break;
-                case DriverRegistry.Names.FAKE:
-                    Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
+                case DriverRegistry.Names.ANSI:
+                    Coordinator = CreateSubcomponents (() => new AnsiComponentFactory ());
 
                     break;
                 default:
@@ -117,8 +117,7 @@ internal partial class ApplicationImpl
     ///         </list>
     ///     </para>
     ///     <para>
-    ///         The coordinator is created in <see cref="CreateDriver"/> based on the selected driver
-    ///         (Windows, Unix, .NET, or Fake) and is started by calling
+    ///         The coordinator is created in <see cref="CreateDriver"/> based on the selected driver.
     ///         <see cref="IMainLoopCoordinator.StartInputTaskAsync"/>.
     ///     </para>
     /// </remarks>
@@ -129,7 +128,7 @@ internal partial class ApplicationImpl
     ///     for the specified input record type.
     /// </summary>
     /// <typeparam name="TInputRecord">
-    ///     Platform-specific input type: <see cref="ConsoleKeyInfo"/> (.NET/Fake),
+    ///     Platform-specific input type: <see cref="ConsoleKeyInfo"/> (.NET),
     ///     <see cref="WindowsConsole.InputRecord"/> (Windows), or <see cref="char"/> (Unix).
     /// </typeparam>
     /// <param name="fallbackFactory">

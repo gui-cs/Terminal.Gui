@@ -596,7 +596,7 @@ When calling `Init()`, Terminal.Gui starts a dedicated input thread that continu
 using Terminal.Gui.Drivers;
 
 IApplication app = Application.Create ();
-app.Init (DriverRegistry.Names.FAKE); // Input thread starts here
+app.Init (DriverRegistry.Names.ANSI); // Input thread starts here
 
 // Input thread runs in background at ~50 polls/second (20ms throttle)
 
@@ -612,7 +612,7 @@ using Terminal.Gui.Drivers;
 public void My_Test ()
 {
     using IApplication app = Application.Create ();
-    app.Init (DriverRegistry.Names.FAKE);
+    app.Init (DriverRegistry.Names.ANSI);
     
     // Test code here
     
@@ -716,7 +716,7 @@ foreach (string name in driverNames)
 // Available driver: dotnet
 // Available driver: windows
 // Available driver: unix
-// Available driver: fake
+// Available driver: ansi
 
 // Get detailed driver information with metadata
 foreach (var descriptor in Application.GetRegisteredDrivers())
@@ -746,12 +746,12 @@ Use `DriverRegistry.Names` for compile-time type safety:
 using Terminal.Gui.Drivers;
 
 // Type-safe driver names
-string fake = DriverRegistry.Names.FAKE;      // "fake"
+string ansi = DriverRegistry.Names.ANSI;      // "ansi"
 string windows = DriverRegistry.Names.WINDOWS; // "windows"
 string unix = DriverRegistry.Names.UNIX;       // "unix"
 string dotnet = DriverRegistry.Names.DOTNET;   // "dotnet"
 
-app.Init(driverName: DriverRegistry.Names.FAKE);
+app.Init(driverName: DriverRegistry.Names.ANSI);
 ```
 
 **Note**: The legacy `GetDriverTypes()` method is now obsolete. Use `GetRegisteredDriverNames()` or `GetRegisteredDrivers()` instead for AOT-friendly, reflection-free driver discovery. See [Drivers](drivers.md) for complete Driver Registry documentation.
@@ -766,14 +766,14 @@ using Terminal.Gui.Drivers;
 // RECOMMENDED: Set on instance with type-safe constant
 using (IApplication app = Application.Create ())
 {
-    app.ForceDriver = DriverRegistry.Names.FAKE;
+    app.ForceDriver = DriverRegistry.Names.ANSI;
     app.Init ();
 }
 
 // ALTERNATIVE: Set with string
 using (IApplication app = Application.Create ())
 {
-    app.ForceDriver = "fake";
+    app.ForceDriver = "ansi";
     app.Init ();
 }
 
@@ -782,7 +782,7 @@ Application.ForceDriver = DriverRegistry.Names.DOTNET;
 Application.Init ();
 ```
 
-**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
+**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"ansi"`
 
 For complete driver documentation including the Driver Registry pattern, see [Drivers](drivers.md).
 
@@ -799,7 +799,7 @@ Application.ForceDriverChanged += (sender, e) =>
     Debug.WriteLine ($"Driver changed from '{e.OldValue}' to '{e.NewValue}'");
 };
 
-Application.ForceDriver = DriverRegistry.Names.FAKE;
+Application.ForceDriver = DriverRegistry.Names.ANSI;
 ```
 
 ## View.Driver Property
@@ -853,7 +853,7 @@ public void MyView_WorksWithRealApplication ()
 {
     using (IApplication app = Application.Create ())
     {
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         
         MyView view = new ();
         Window top = new ();
@@ -956,7 +956,7 @@ using Terminal.Gui.Drivers;
 // Application 1
 using (IApplication app1 = Application.Create ())
 {
-    app1.Init (DriverRegistry.Names.FAKE);
+    app1.Init (DriverRegistry.Names.ANSI);
     Window top1 = new () { Title = "App 1" };
     // ... configure and run top1
 }
@@ -964,7 +964,7 @@ using (IApplication app1 = Application.Create ())
 // Application 2 (different driver!)
 using (IApplication app2 = Application.Create ())
 {
-    app2.Init (DriverRegistry.Names.FAKE);
+    app2.Init (DriverRegistry.Names.ANSI);
     Window top2 = new () { Title = "App 2" };
     // ... configure and run top2
 }

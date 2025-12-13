@@ -10,7 +10,7 @@ public class ApplicationImplTests
     public void Internal_Properties_Correct ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         Assert.True (app.Initialized);
         Assert.Null (app.TopRunnableView);
@@ -118,7 +118,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ();
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         object? timeoutToken = app.AddTimeout (
                                                TimeSpan.FromMilliseconds (150),
@@ -153,7 +153,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable top = new Window
         {
@@ -201,7 +201,7 @@ public class ApplicationImplTests
         Assert.Null (app.TopRunnableView);
         Assert.Null (app.Driver);
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable top = new Window ();
         var isIsModalChanged = 0;
@@ -247,7 +247,7 @@ public class ApplicationImplTests
         Assert.Null (app.TopRunnableView);
         Assert.Null (app.Driver);
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable top = new Window ();
 
@@ -301,7 +301,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable top = new Window
         {
@@ -344,7 +344,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.AddTimeout (TimeSpan.Zero, () => IdleExit (app));
         Assert.Null (app.TopRunnableView);
@@ -363,7 +363,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         var isRunningChanging = 0;
         var isRunningChanged = 0;
@@ -389,7 +389,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         var isRunningChanging = 0;
         var isRunningChanged = 0;
@@ -436,7 +436,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         var b = new Button ();
 
         var result = false;
@@ -505,7 +505,7 @@ public class ApplicationImplTests
         Assert.Empty (v2.SessionStack!);
 
         // Init should populate instance fields
-        v2.Init (DriverRegistry.Names.FAKE);
+        v2.Init (DriverRegistry.Names.ANSI);
 
         // After Init, Driver, Navigation, and Popover should be populated
         Assert.NotNull (v2.Driver);

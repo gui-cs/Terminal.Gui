@@ -21,7 +21,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
     /// <param name="forceDriver">
-    ///     Forces the specified driver to be used when Application.Init is called. If not specified FakeDriver will be used.
+    ///     Forces the specified driver to be used when Application.Init is called. If not specified ANSI Driver will be used.
     ///     Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>

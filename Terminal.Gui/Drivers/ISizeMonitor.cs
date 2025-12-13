@@ -18,7 +18,7 @@ public interface ISizeMonitor
     ///         Implementations can use this to:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item>Queue ANSI size queries (ANSI drivers like FakeDriver)</item>
+    ///         <item>Queue ANSI size queries (ANSI drivers)</item>
     ///         <item>Set up platform-specific signal handlers (UnixDriver with SIGWINCH)</item>
     ///         <item>Register for console buffer events (WindowsDriver)</item>
     ///         <item>Query initial size asynchronously</item>

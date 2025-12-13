@@ -395,17 +395,17 @@ public class IInputOutputTests (ITestOutputHelper output)
 
     #endregion
 
-    #region Fake Driver Tests
+    #region ANSI driver Tests
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void FakeInput_Constructor_DoesNotThrow ()
+    public void ANSIInput_Constructor_DoesNotThrow ()
     {
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     using var input = new FakeInput ();
-                                                     _output.WriteLine ("FakeInput created successfully");
+                                                     using var input = new ANSIInput ();
+                                                     _output.WriteLine ("ANSIInput created successfully");
                                                  });
 
         // Assert
@@ -414,13 +414,13 @@ public class IInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void FakeOutput_Constructor_DoesNotThrow ()
+    public void ANSIOutput_Constructor_DoesNotThrow ()
     {
         // Arrange & Act
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     using var output = new FakeOutput ();
-                                                     _output.WriteLine ("FakeOutput created successfully");
+                                                     using var output = new ANSIOutput ();
+                                                     _output.WriteLine ("ANSIOutput created successfully");
                                                  });
 
         // Assert
@@ -429,14 +429,14 @@ public class IInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void FakeOutput_GetSize_ReturnsExpectedSize ()
+    public void ANSIOutput_GetSize_ReturnsExpectedSize ()
     {
         // Arrange
-        using var output = new FakeOutput ();
+        using var output = new ANSIOutput ();
 
         // Act
         Size size = output.GetSize ();
-        _output.WriteLine ($"FakeOutput.GetSize() returned: {size.Width}x{size.Height}");
+        _output.WriteLine ($"ANSIOutput.GetSize() returned: {size.Width}x{size.Height}");
 
         // Assert
         Assert.True (size.Width > 0);
@@ -497,16 +497,16 @@ public class IInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void FakeComponentFactory_CreateInput_DoesNotThrow ()
+    public void ANSIComponentFactory_CreateInput_DoesNotThrow ()
     {
         // Arrange
-        var factory = new FakeComponentFactory ();
+        var factory = new AnsiComponentFactory ();
 
         // Act
         Exception? exception = Record.Exception (() =>
                                                  {
                                                      using IInput<char> input = factory.CreateInput ();
-                                                     _output.WriteLine ("FakeComponentFactory.CreateInput() succeeded");
+                                                     _output.WriteLine ("ANSIComponentFactory.CreateInput() succeeded");
                                                  });
 
         // Assert
@@ -515,16 +515,16 @@ public class IInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void FakeComponentFactory_CreateOutput_DoesNotThrow ()
+    public void ANSIComponentFactory_CreateOutput_DoesNotThrow ()
     {
         // Arrange
-        var factory = new FakeComponentFactory ();
+        var factory = new AnsiComponentFactory ();
 
         // Act
         Exception? exception = Record.Exception (() =>
                                                  {
                                                      using IOutput output = factory.CreateOutput ();
-                                                     _output.WriteLine ("FakeComponentFactory.CreateOutput() succeeded");
+                                                     _output.WriteLine ("ANSIComponentFactory.CreateOutput() succeeded");
                                                  });
 
         // Assert

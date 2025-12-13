@@ -883,7 +883,7 @@ public class ListViewTests (ITestOutputHelper output)
     public void Clicking_On_Border_Is_Ignored ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         var selected = "";
 
@@ -959,7 +959,7 @@ public class ListViewTests (ITestOutputHelper output)
     public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (12, 12);
 
         ObservableCollection<string> source = [];
@@ -1213,7 +1213,7 @@ public class ListViewTests (ITestOutputHelper output)
     public void EnsureSelectedItemVisible_SelectedItem ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (12, 12);
 
         ObservableCollection<string> source = [];
@@ -1260,7 +1260,7 @@ Item 6",
     public void EnsureSelectedItemVisible_Top ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         IDriver? driver = app.Driver;
         driver?.SetScreenSize (8, 2);
 
@@ -1301,7 +1301,7 @@ Item 6",
     public void LeftItem_TopItem_Tests ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (12, 12);
 
         ObservableCollection<string> source = [];
@@ -1350,7 +1350,7 @@ Item 6",
     public void RowRender_Event ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         var rendered = false;
         ObservableCollection<string> source = ["one", "two", "three"];
@@ -1372,7 +1372,7 @@ Item 6",
     public void Vertical_ScrollBar_Hides_And_Shows_As_Needed ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         var lv = new ListView
         {
@@ -1413,7 +1413,7 @@ Five ",
     public void Mouse_Wheel_Scrolls ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         var lv = new ListView
         {
@@ -1476,7 +1476,7 @@ Three",
     public void Horizontal_Scroll ()
     {
         IApplication? app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
 
         var lv = new ListView
         {

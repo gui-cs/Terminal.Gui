@@ -7,12 +7,11 @@ namespace Terminal.Gui.Drivers;
 /// <remarks>
 ///     <para>
 ///         This converter processes character-based ANSI input using <see cref="EscSeqUtils"/>
-///         for escape sequence parsing. Despite being located in the FakeDriver directory,
-///         it is used by multiple drivers that receive ANSI character input:
+///         for escape sequence parsing.
 ///     </para>
 ///     <list type="bullet">
 ///         <item><see cref="UnixInputProcessor"/> - Raw terminal input on Unix/Linux/macOS</item>
-///         <item><see cref="FakeInputProcessor"/> - ANSI-based test driver</item>
+///         <item><see cref="ANSIInputProcessor"/> - ANSI-based test driver</item>
 ///     </list>
 ///     <para>
 ///         The conversion uses <see cref="ConsoleKeyInfo"/> as an intermediary format,

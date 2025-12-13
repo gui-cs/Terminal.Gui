@@ -509,7 +509,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     public void Draw_WithBorderSubView_DrawsCorrectly ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         IDriver driver = app!.Driver!;
         driver.SetScreenSize (30, 20);
 
@@ -601,7 +601,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                            output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl!.GetOutput () as FakeOutput;
+        ANSIOutput? ansiOutput = driverImpl!.GetOutput () as ANSIOutput;
 
         output.WriteLine ("Driver Output After Redraw:\n" + driver.GetOutput().GetLastOutput());
 
@@ -636,7 +636,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     public void Draw_WithBorderSubView_At_Col1_In_WideGlyph_DrawsCorrectly ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         IDriver driver = app!.Driver!;
         driver.SetScreenSize (6, 3);  // Minimal: 6 cols wide (3 for content + 2 for border + 1), 3 rows high (1 for content + 2 for border)
 
@@ -690,9 +690,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl!.GetOutput () as FakeOutput;
+        ANSIOutput? ansiOutput = driverImpl!.GetOutput () as ANSIOutput;
 
-        output.WriteLine ("Driver Output:\n" + fakeOutput!.GetLastOutput ());
+        output.WriteLine ("Driver Output:\n" + ansiOutput!.GetLastOutput ());
     }
 
 
@@ -700,7 +700,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     public void Draw_WithBorderSubView_At_Col3_In_WideGlyph_DrawsCorrectly ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.FAKE);
+        app.Init (DriverRegistry.Names.ANSI);
         IDriver driver = app!.Driver!;
         driver.SetScreenSize (6, 3);  // Screen: 6 cols wide, 3 rows high; enough for 3x3 border subview at col 3 plus content on the left
 
@@ -754,9 +754,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
-        FakeOutput? fakeOutput = driverImpl!.GetOutput () as FakeOutput;
+        ANSIOutput? ansiOutput = driverImpl!.GetOutput () as ANSIOutput;
 
-        output.WriteLine ("Driver Output:\n" + fakeOutput!.GetLastOutput ());
+        output.WriteLine ("Driver Output:\n" + ansiOutput!.GetLastOutput ());
     }
 
     [Fact]

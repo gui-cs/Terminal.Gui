@@ -4,7 +4,7 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     <para>
-///         Input processor for <see cref="FakeInput"/>, processes a <see cref="char"/> stream
+///         Input processor for <see cref="ANSIInput"/>, processes a <see cref="char"/> stream
 ///         using pure ANSI escape sequence handling.
 ///     </para>
 ///     <para>
@@ -36,10 +36,10 @@ namespace Terminal.Gui.Drivers;
 ///         <c>HandleMouse = true</c> and <c>HandleKeyboard = true</c>, enabling automatic event raising.
 ///     </para>
 /// </summary>
-public class FakeInputProcessor : InputProcessorImpl<char>
+public class ANSIInputProcessor : InputProcessorImpl<char>
 {
     /// <inheritdoc/>
-    public FakeInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new AnsiKeyConverter ())
+    public ANSIInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new AnsiKeyConverter ())
     {
     }
 
