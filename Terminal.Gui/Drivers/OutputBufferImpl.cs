@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui.Drivers;
 

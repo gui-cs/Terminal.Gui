@@ -77,9 +77,10 @@ public partial class View // Drawing APIs
         }
         Region? originalClip = GetClip ();
 
-        if (this is not Adornment && SuperView is null && Driver is { })
+        if (this is not Adornment && SuperView is null)
         {
-            originalClip = new (new (Driver.Screen.Location, Driver.Screen.Size));
+            // Not an Adornment & SuperView is null; a Root view - ensure clip is large enough
+            originalClip = new (App?.Screen ?? new Rectangle (0, 0, 2048, 2048));
         }
 
         // TODO: This can be further optimized by checking NeedsDraw below and only
@@ -117,7 +118,7 @@ public partial class View // Drawing APIs
             DoDrawContent (context);
 
             // ------------------------------------
-            // Draw the subviews first (order matters: SubViews, Text, Content)
+            // Draw the subviews first (order matters: Text, Content, then Subviews)
             if (SubViewNeedsDraw)
             {
                 DoDrawSubViews (context);
@@ -143,6 +144,11 @@ public partial class View // Drawing APIs
             ClearNeedsDraw ();
 
             // The following assertions are important to ensure that the drawing state is consistent.
+            // BUGBUG: We should have unit tests that verify these conditions after drawing and should
+            // BUGBUG: not rely solely on Debug.Assert.
+            // NOTE: These assertions fail in normal usage, particularly in complex
+            // NOTE: view hierarchies with adornments. Further investigation is needed.
+            // NOTE: Which is why @tig commented them out.
             if (this is not Adornment && SuperView is not Adornment)
             {
                 // Parent
@@ -193,7 +199,6 @@ public partial class View // Drawing APIs
             Margin?.DoDrawSubViews ();
             SetClip (saved);
         }
-        // NOTE: We do not support SubViews of Margin
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
         {
@@ -272,7 +277,7 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void DrawAdornments ()
     {
-        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
+        if (Margin is { } && Margin.Thickness != Thickness.Empty)
         {
             Margin?.Draw ();
         }
@@ -288,22 +293,6 @@ public partial class View // Drawing APIs
         {
             Padding?.Draw ();
         }
-    }
-
-    private void ClearFrame ()
-    {
-        if (Driver is null)
-        {
-            return;
-        }
-
-        // Get screen-relative coords
-        Rectangle toClear = FrameToScreen ();
-
-        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        Driver.FillRect (toClear);
-        SetAttribute (prev);
-        SetNeedsDraw ();
     }
 
     /// <summary>
