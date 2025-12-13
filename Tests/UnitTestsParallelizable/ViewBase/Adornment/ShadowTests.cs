@@ -340,4 +340,97 @@ public class ShadowTests (ITestOutputHelper output)
             }
         }
     }
+
+    [Theory]
+    [InlineData (ShadowStyle.None, 3)]
+    [InlineData (ShadowStyle.Opaque, 4)]
+    [InlineData (ShadowStyle.Transparent, 4)]
+    public void Margin_Thickness_Changes_Adjust_Correctly (ShadowStyle style, int expected)
+    {
+        var view = new View ();
+        view.Margin!.Thickness = new (3);
+        view.ShadowStyle = style;
+        Assert.Equal (new (3, 3, expected, expected), view.Margin.Thickness);
+
+        view.Margin.Thickness = new (3, 3, expected + 1, expected + 1);
+        Assert.Equal (new (3, 3, expected + 1, expected + 1), view.Margin.Thickness);
+        view.ShadowStyle = ShadowStyle.None;
+        Assert.Equal (new (3, 3, 4, 4), view.Margin.Thickness);
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void TransparentShadow_Draws_Transparent_At_Driver_Output ()
+    {
+        // Arrange
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+        app.Driver!.SetScreenSize (5, 3);
+
+        // Force 16-bit colors off to get predictable RGB output
+        app.Driver.Force16Colors = false;
+
+        var superView = new Runnable
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = "ABC".Repeat (40)!
+        };
+        superView.SetScheme (new (new Attribute (Color.White, Color.Blue)));
+        superView.TextFormatter.WordWrap = true;
+
+        // Create an overlapped view with transparent shadow
+        var overlappedView = new View
+        {
+            Width = 4,
+            Height = 2,
+            Text = "123",
+            Arrangement = ViewArrangement.Overlapped,
+            ShadowStyle = ShadowStyle.Transparent
+        };
+        overlappedView.SetScheme (new (new Attribute (Color.Black, Color.Green)));
+
+        superView.Add (overlappedView);
+
+        // Act
+        SessionToken? token = app.Begin (superView);
+        app.LayoutAndDraw ();
+        app.Driver.Refresh ();
+
+        // Assert
+        output.WriteLine ("Actual driver contents:");
+        output.WriteLine (app.Driver.ToString ());
+        output.WriteLine ("\nActual driver output:");
+        string? output1 = app.Driver.GetOutput ().GetLastOutput ();
+        output.WriteLine (output1);
+
+        DriverAssert.AssertDriverOutputIs ("""
+                                           \x1b[38;2;0;0;0m\x1b[48;2;0;128;0m123\x1b[38;2;0;0;0m\x1b[48;2;189;189;189mA\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mBC\x1b[38;2;0;0;0m\x1b[48;2;189;189;189mABC\x1b[38;2;0;0;255m\x1b[48;2;255;255;255mABCABC
+                                           """, output, app.Driver);
+
+        // The output should contain ANSI color codes for the transparent shadow
+        // which will have dimmed colors compared to the original
+        Assert.Contains ("\x1b[38;2;", output1); // Should have RGB foreground color codes
+        Assert.Contains ("\x1b[48;2;", output1); // Should have RGB background color codes
+
+        // Verify driver contents show the background text in shadow areas
+        int shadowX = overlappedView.Frame.X + overlappedView.Frame.Width;
+        int shadowY = overlappedView.Frame.Y + overlappedView.Frame.Height;
+
+        Cell shadowCell = app.Driver.Contents! [shadowY, shadowX];
+        output.WriteLine ($"\nShadow cell at [{shadowY},{shadowX}]: Grapheme='{shadowCell.Grapheme}', Attr={shadowCell.Attribute}");
+
+        // The grapheme should be from background text
+        Assert.NotEqual (string.Empty, shadowCell.Grapheme);
+        Assert.Contains (shadowCell.Grapheme, "ABC"); // Should be one of the background characters
+
+        // Cleanup
+        if (token is { })
+        {
+            app.End (token);
+        }
+
+        superView.Dispose ();
+        app.Dispose ();
+    }
 }

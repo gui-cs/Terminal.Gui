@@ -44,6 +44,7 @@ public class Margin : Adornment
     {
         if (!_isThicknessChanging)
         {
+            _originalThickness = new (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
             SetShadow (ShadowStyle);
         }
     }
@@ -154,6 +155,7 @@ public class Margin : Adornment
     private ShadowView? _bottomShadow;
     private ShadowView? _rightShadow;
     private bool _isThicknessChanging;
+    private Thickness? _originalThickness;
 
     /// <summary>
     ///     Sets whether the Margin includes a shadow effect. The shadow is drawn on the right and bottom sides of the
@@ -175,19 +177,19 @@ public class Margin : Adornment
             _bottomShadow = null;
         }
 
+        _originalThickness ??= Thickness;
+
         if (ShadowStyle != ShadowStyle.None)
         {
             // Turn off shadow
-            _isThicknessChanging = true;
-            Thickness = new (Thickness.Left, Thickness.Top, Math.Max (Thickness.Right - ShadowWidth, 0), Math.Max (Thickness.Bottom - ShadowHeight, 0));
-            _isThicknessChanging = false;
+            _originalThickness = new (Thickness.Left, Thickness.Top, Math.Max (Thickness.Right - ShadowWidth, 0), Math.Max (Thickness.Bottom - ShadowHeight, 0));
         }
 
         if (style != ShadowStyle.None)
         {
             // Turn on shadow
             _isThicknessChanging = true;
-            Thickness = new (Thickness.Left, Thickness.Top, Thickness.Right + ShadowWidth, Thickness.Bottom + ShadowHeight);
+            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right + ShadowWidth, _originalThickness.Value.Bottom + ShadowHeight);
             _isThicknessChanging = false;
         }
 
@@ -213,6 +215,12 @@ public class Margin : Adornment
                 Orientation = Orientation.Horizontal
             };
             Add (_rightShadow, _bottomShadow);
+        }
+        else if (Thickness != _originalThickness)
+        {
+            _isThicknessChanging = true;
+            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right, _originalThickness.Value.Bottom);
+            _isThicknessChanging = false;
         }
 
         return style;
