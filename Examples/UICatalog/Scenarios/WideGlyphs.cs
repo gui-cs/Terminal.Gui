@@ -31,13 +31,14 @@ public sealed class WideGlyphs : Scenario
             BorderStyle = LineStyle.Single,
             X = Pos.AnchorEnd (),
             AutoSelectViewToEdit = true,
+            AutoSelectAdornments = false,
             ShowViewIdentifier = true
         };
+        adornmentsEditor.ExpanderButton.Accepting += (sender, args) =>
+                                                             {
+                                                                 //adornmentsEditor.ExpanderButton.Collapsed = args.NewValue;
+                                                             };
         appWindow.Add (adornmentsEditor);
-
-        adornmentsEditor.AutoSelectViewToEdit = true;
-        adornmentsEditor.AutoSelectSuperView = appWindow;
-        adornmentsEditor.AutoSelectAdornments = false;
 
         ViewportSettingsEditor viewportSettingsEditor = new ()
         {
@@ -77,7 +78,7 @@ public sealed class WideGlyphs : Scenario
         // Fill the window with the pre-built codepoints array
         // For detailed documentation on the draw code flow from Application.Run to this event,
         // see WideGlyphs.DrawFlow.md in this directory
-        appWindow.DrawingContent += (s, _) =>
+        appWindow.DrawingContent += (s, e) =>
         {
             View? view = s as View;
             if (view is null || _codepoints is null)
@@ -97,6 +98,7 @@ public sealed class WideGlyphs : Scenario
                     }
                 }
             }
+            e.DrawContext?.AddDrawnRectangle (view.Viewport);
         };
 
         Line verticalLineAtEven = new ()
@@ -130,7 +132,7 @@ public sealed class WideGlyphs : Scenario
 
         // Proves it's not LineCanvas related
         arrangeableViewAtEven!.Border!.Thickness = new (1);
-        arrangeableViewAtEven.Border.Add(new View () { Height = Dim.Auto(), Width = Dim.Auto(), Text = "Even" });
+        arrangeableViewAtEven.Border.Add (new View () { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Even" });
         appWindow.Add (arrangeableViewAtEven);
 
         View arrangeableViewAtOdd = new ()
@@ -151,8 +153,8 @@ public sealed class WideGlyphs : Scenario
             CanFocus = true,
             X = 30, // on an even column to start
             Y = Pos.Center (),
-            Width = Dim.Auto () + 4,
-            Height = Dim.Auto () + 1,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             BorderStyle = LineStyle.Single,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             ShadowStyle = ShadowStyle.Transparent,

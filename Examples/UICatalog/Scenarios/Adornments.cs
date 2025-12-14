@@ -19,6 +19,7 @@ public class Adornments : Scenario
 
         var editor = new AdornmentsEditor
         {
+            BorderStyle = LineStyle.Single,
             AutoSelectViewToEdit = true,
 
             // This is for giggles, to show that the editor can be moved around.

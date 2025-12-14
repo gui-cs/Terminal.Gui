@@ -43,7 +43,7 @@ public class ExpanderButton : Button
 
         Orientation = Orientation.Vertical;
 
-        HighlightStates = Terminal.Gui.ViewBase.MouseState.None;
+        HighlightStates = MouseState.In;
 
         Initialized += ExpanderButton_Initialized;
 
@@ -120,7 +120,7 @@ public class ExpanderButton : Button
 
             if (Orientation == Orientation.Vertical)
             {
-                X = Pos.AnchorEnd ();
+                X = Pos.AnchorEnd () - 1;
                 Y = 0;
                 CollapseGlyph = new ('\u21d1'); // ⇑
                 ExpandGlyph = new ('\u21d3'); // ⇓
@@ -128,7 +128,7 @@ public class ExpanderButton : Button
             else
             {
                 X = 0;
-                Y = Pos.AnchorEnd ();
+                Y = Pos.AnchorEnd () - 1;
                 CollapseGlyph = new ('\u21d0'); // ⇐
                 ExpandGlyph = new ('\u21d2'); // ⇒
             }
