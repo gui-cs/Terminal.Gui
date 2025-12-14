@@ -67,12 +67,15 @@ public class Margin : Adornment
     }
 
     /// <summary>
-    ///     INTERNAL API - Draws the margins for the specified views. This is called by the <see cref="Application"/> on each
+    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from <see cref="View.Draw"/> on each
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
+    /// <remarks>
+    ///     Non-transparent margins are drawn as-normal in <see cref="View.DrawAdornments"/>.
+    /// </remarks>
     /// <param name="views"></param>
     /// <returns><see langword="true"/></returns>
-    internal static bool DrawMargins (IEnumerable<View> views)
+    internal static bool DrawTransparentMargins (IEnumerable<View> views)
     {
         Stack<View> stack = new (views);
 
@@ -80,7 +83,10 @@ public class Margin : Adornment
         {
             View view = stack.Pop ();
 
-            if (view.Margin is { } margin && margin.Thickness != Thickness.Empty && margin.GetCachedClip () != null)
+            if (view.Margin is { } margin
+                && margin.Thickness != Thickness.Empty
+                && margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+                && margin.GetCachedClip () != null)
             {
                 margin.SetNeedsDraw ();
                 Region? saved = view.GetClip ();
