@@ -101,16 +101,16 @@ public class ShadowTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (ShadowStyle.None, 0)]
-    [InlineData (ShadowStyle.Opaque, 1)]
-    [InlineData (ShadowStyle.Transparent, 1)]
-    public void Margin_ShadowWidth_ShadowHeight_Cannot_Be_Set_Less_Than_One (ShadowStyle style, int expectedLength)
+    [InlineData (ShadowStyle.None)]
+    [InlineData (ShadowStyle.Opaque)]
+    [InlineData (ShadowStyle.Transparent)]
+    public void Margin_ShadowWidth_ShadowHeight_Cannot_Be_Set_Less_Than_One (ShadowStyle style)
     {
         View view = new () { ShadowStyle = style, ShadowWidth = 0, ShadowHeight = -1 };
-        Assert.Equal (expectedLength, view.ShadowWidth);
-        Assert.Equal (expectedLength, view.ShadowHeight);
-        Assert.Equal (expectedLength, view.Margin!.ShadowWidth);
-        Assert.Equal (expectedLength, view.Margin.ShadowHeight);
+        Assert.Equal (1, view.ShadowWidth);
+        Assert.Equal (1, view.ShadowHeight);
+        Assert.Equal (1, view.Margin!.ShadowWidth);
+        Assert.Equal (1, view.Margin.ShadowHeight);
     }
 
     [Fact]

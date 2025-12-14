@@ -291,14 +291,14 @@ public class Margin : Adornment
     {
         result = newValue;
 
-        if (newValue < 0)
+        if (newValue < 1)
         {
-            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? 1 : originalValue;
+            result = 1;
 
             return false;
         }
 
-        if ((ShadowStyle == ShadowStyle.Opaque && newValue != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue < 1))
+        if (ShadowStyle == ShadowStyle.Opaque && newValue != 1)
         {
             result = 1;
 
