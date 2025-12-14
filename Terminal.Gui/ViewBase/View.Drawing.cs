@@ -28,7 +28,7 @@ public partial class View // Drawing APIs
             view.Draw (context);
 
             // Draw the margins last to ensure they are drawn on top of the current runnable content.
-            Margin.DrawMargins (viewsArray);
+            Margin.DrawMargins (viewsArray.Reverse ());
         }
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
