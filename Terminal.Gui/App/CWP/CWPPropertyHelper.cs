@@ -84,6 +84,7 @@ public static class CWPPropertyHelper
             }
         }
 
+        // BUGBUG: This should pass this not null; need to test
         changingEvent?.Invoke (null, args);
 
         if (args.Handled)
@@ -100,13 +101,14 @@ public static class CWPPropertyHelper
         }
 
         finalValue = args.NewValue;
-        
+
         // Do the work (set backing field, update related properties, etc.) BEFORE raising Changed events
         doWork (finalValue);
-        
+
         ValueChangedEventArgs<T> changedArgs = new (currentValue, finalValue);
         currentValue = finalValue;
         onChanged?.Invoke (changedArgs);
+        // BUGBUG: This should pass this not null; need to test
         changedEvent?.Invoke (null, changedArgs);
 
         return true;

@@ -1,8 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Diagnostics;
-using System.Linq;
-
 namespace UICatalog.Scenarios;
 
 public abstract class EditorBase : View
@@ -19,38 +15,21 @@ public abstract class EditorBase : View
             Orientation = Orientation.Vertical
         };
 
-
         TabStop = TabBehavior.TabStop;
 
         Initialized += OnInitialized;
 
         void OnInitialized (object? sender, EventArgs e)
         {
-            if (Border is { })
-            {
-                Border.Add (ExpanderButton);
+            Border?.Add (ExpanderButton);
 
-                //if (ExpanderButton.Orientation == Orientation.Vertical)
-                //{
-                //    ExpanderButton.X = Pos.AnchorEnd () - 1;
-                //    ExpanderButton.Y = 0;
-                //}
-                //else
-                //{
-                //    ExpanderButton.X = 0;
-                //    ExpanderButton.Y = Pos.AnchorEnd () - 1;
-                //}
-            }
-
-            Application.MouseEvent += ApplicationOnMouseEvent;
-            Application.Navigation!.FocusedChanged += NavigationOnFocusedChanged;
-
+            App!.Mouse.MouseEvent += ApplicationOnMouseEvent;
+            App!.Navigation!.FocusedChanged += NavigationOnFocusedChanged;
         }
 
         AddCommand (Command.Accept, () => true);
 
         SchemeName = "Dialog";
-
     }
 
     private readonly ExpanderButton? _expanderButton;
@@ -60,15 +39,16 @@ public abstract class EditorBase : View
         get => _expanderButton;
         init
         {
-            if (_expanderButton == value)
+            if (ReferenceEquals (_expanderButton, value))
             {
                 return;
             }
+
             _expanderButton = value;
         }
     }
 
-    public bool UpdatingLayoutSettings { get; private set; } = false;
+    public bool UpdatingLayoutSettings { get; private set; }
 
     private void View_LayoutComplete (object? sender, LayoutEventArgs e)
     {
@@ -78,7 +58,6 @@ public abstract class EditorBase : View
 
         UpdatingLayoutSettings = false;
     }
-
 
     private View? _viewToEdit;
 
@@ -91,7 +70,6 @@ public abstract class EditorBase : View
             {
                 return;
             }
-
 
             if (value is null && _viewToEdit is { })
             {
@@ -129,7 +107,6 @@ public abstract class EditorBase : View
     /// </summary>
     public bool AutoSelectAdornments { get; set; }
 
-
     private void NavigationOnFocusedChanged (object? sender, EventArgs e)
     {
         if (AutoSelectSuperView is null)
@@ -137,17 +114,17 @@ public abstract class EditorBase : View
             return;
         }
 
-        if (ApplicationNavigation.IsInHierarchy (this, Application.Navigation!.GetFocused ()))
+        if (ApplicationNavigation.IsInHierarchy (this, App?.Navigation?.GetFocused ()))
         {
             return;
         }
 
-        if (!ApplicationNavigation.IsInHierarchy (AutoSelectSuperView, Application.Navigation!.GetFocused ()))
+        if (!ApplicationNavigation.IsInHierarchy (AutoSelectSuperView, App?.Navigation?.GetFocused ()))
         {
             return;
         }
 
-        ViewToEdit = Application.Navigation!.GetFocused ();
+        ViewToEdit = App!.Navigation!.GetFocused ();
     }
 
     private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
@@ -178,5 +155,17 @@ public abstract class EditorBase : View
         {
             ViewToEdit = view;
         }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing && App is {})
+        {
+            App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
+        }
+
+        base.Dispose (disposing);
+
     }
 }
