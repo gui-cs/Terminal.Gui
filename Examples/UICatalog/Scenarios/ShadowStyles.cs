@@ -62,6 +62,22 @@ public class ShadowStyles : Scenario
         shadowWindow.Add (buttonInWin);
         app.Add (shadowWindow);
 
+        Window shadowWindow2 = new ()
+        {
+
+            Id = "shadowWindow2",
+            X = Pos.Right (editor) + 10,
+            Y = 10,
+            Width = Dim.Percent (30),
+            Height = Dim.Percent (30),
+            Title = "Shadow Window #2",
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
+            BorderStyle = LineStyle.Double,
+            ShadowStyle = ShadowStyle.Transparent,
+        };
+        app.Add (shadowWindow2);
+
+
         var button = new Button
         {
             Id = "button",
@@ -69,6 +85,7 @@ public class ShadowStyles : Scenario
             Y = Pos.Center (), Text = "Button",
             ShadowStyle = ShadowStyle.Opaque
         };
+        button.Accepting += ButtonOnAccepting;
 
         ColorPicker colorPicker = new ()
         {
@@ -95,5 +112,11 @@ public class ShadowStyles : Scenario
 
         Application.Shutdown ();
 
+    }
+
+    private void ButtonOnAccepting (object sender, CommandEventArgs e)
+    {
+        MessageBox.Query((sender as View).App, "Hello", "ok");
+        e.Handled = true;
     }
 }

@@ -179,6 +179,12 @@ public class OutputBufferImpl : IOutputBuffer
                 // Skip the second column of a wide character
                 // IMPORTANT: We do NOT modify column N+1's IsDirty or Attribute here.
                 // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
+                if (Clip.Contains (Col, Row))
+                {
+                    Contents [Row, Col].Attribute = CurrentAttribute;
+                }
+
+                // Advance cursor again for wide character
                 Col++;
             }
         }
