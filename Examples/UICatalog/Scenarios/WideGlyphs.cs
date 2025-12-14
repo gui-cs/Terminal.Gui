@@ -24,6 +24,30 @@ public sealed class WideGlyphs : Scenario
             BorderStyle = LineStyle.None
         };
 
+        // Add Editors
+
+        AdornmentsEditor adornmentsEditor = new ()
+        {
+            BorderStyle = LineStyle.Single,
+            X = Pos.AnchorEnd (),
+            AutoSelectViewToEdit = true,
+            ShowViewIdentifier = true
+        };
+        appWindow.Add (adornmentsEditor);
+
+        adornmentsEditor.AutoSelectViewToEdit = true;
+        adornmentsEditor.AutoSelectSuperView = appWindow;
+        adornmentsEditor.AutoSelectAdornments = false;
+
+        ViewportSettingsEditor viewportSettingsEditor = new ()
+        {
+            BorderStyle = LineStyle.Single,
+            Y = Pos.AnchorEnd (),
+            X = Pos.AnchorEnd (),
+            AutoSelectViewToEdit = true,
+        };
+        appWindow.Add (viewportSettingsEditor);
+
         // Build the array of codepoints once when subviews are laid out
         appWindow.SubViewsLaidOut += (s, _) =>
         {
@@ -99,8 +123,10 @@ public sealed class WideGlyphs : Scenario
             Y = 5,
             Width = 15,
             Height = 5,
-            //BorderStyle = LineStyle.Dashed,
+            //BorderStyle = LineStyle.Dotted
         };
+
+        arrangeableViewAtEven.SetScheme (new () { Normal = new (Color.Black, Color.Green) });
 
         // Proves it's not LineCanvas related
         arrangeableViewAtEven!.Border!.Thickness = new (1);
@@ -117,6 +143,7 @@ public sealed class WideGlyphs : Scenario
             Height = 5,
             BorderStyle = LineStyle.Dashed,
         };
+        arrangeableViewAtOdd.SetScheme (new () { Normal = new (ColorName16.Black, ColorName16.Yellow) });
         appWindow.Add (arrangeableViewAtOdd);
 
         var superView = new View
@@ -127,7 +154,9 @@ public sealed class WideGlyphs : Scenario
             Width = Dim.Auto () + 4,
             Height = Dim.Auto () + 1,
             BorderStyle = LineStyle.Single,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            ShadowStyle = ShadowStyle.Transparent,
+            ShadowWidth = 2
         };
 
         Rune codepoint = Glyphs.Apple;
