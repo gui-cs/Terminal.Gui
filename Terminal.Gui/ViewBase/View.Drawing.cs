@@ -192,7 +192,8 @@ public partial class View // Drawing APIs
                 subview.SetNeedsDraw ();
             }
 
-            // NOTE: We do not support SubViews of Margin so we do not call DoDrawSubViews on Margin.
+            // NOTE: We do not support arbitrary SubViews of Margin (only ShadowView)
+            // NOTE: so we do not call DoDrawSubViews on Margin.
         }
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
@@ -669,13 +670,6 @@ public partial class View // Drawing APIs
         {
             return;
         }
-
-        //if (this is Margin)
-        //{
-        //    Logging.Warning ("Margin does not support SubViews. Skipping DrawSubViews.");
-        //    throw new InvalidOperationException ("Margin does not support SubViews.");
-        //    return;
-        //}
 
         // Draw the SubViews in reverse Z-order to leverage clipping.
         // SubViews earlier in the collection are drawn last (on top).
