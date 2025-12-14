@@ -115,6 +115,7 @@ public partial class View // Adornments
             if (Margin is { })
             {
                 Margin.ShadowWidth = value;
+                _shadowWidth = Margin.ShadowWidth;
             }
         }
     }
@@ -139,6 +140,7 @@ public partial class View // Adornments
             if (Margin is { })
             {
                 Margin.ShadowHeight = value;
+                _shadowHeight = Margin.ShadowHeight;
             }
         }
     }

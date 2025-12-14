@@ -94,23 +94,23 @@ public class ShadowTests (ITestOutputHelper output)
     public void ShadowStyle_Opaque_Margin_ShadowWidth_ShadowHeight_Cannot_Be_Set_Different_Of_One ()
     {
         View view = new () { ShadowStyle = ShadowStyle.Opaque, ShadowWidth = 3, ShadowHeight = 4 };
-        Assert.Equal (3, view.ShadowWidth);
-        Assert.Equal (4, view.ShadowHeight);
+        Assert.Equal (1, view.ShadowWidth);
+        Assert.Equal (1, view.ShadowHeight);
         Assert.Equal (1, view.Margin!.ShadowWidth);
         Assert.Equal (1, view.Margin.ShadowHeight);
     }
 
     [Theory]
-    [InlineData (ShadowStyle.None)]
-    [InlineData (ShadowStyle.Opaque)]
-    [InlineData (ShadowStyle.Transparent)]
-    public void Margin_ShadowWidth_ShadowHeight_Cannot_Be_Set_Less_Than_One (ShadowStyle style)
+    [InlineData (ShadowStyle.None, 0)]
+    [InlineData (ShadowStyle.Opaque, 1)]
+    [InlineData (ShadowStyle.Transparent, 1)]
+    public void Margin_ShadowWidth_ShadowHeight_Cannot_Be_Set_Less_Than_One (ShadowStyle style, int expectedLength)
     {
         View view = new () { ShadowStyle = style, ShadowWidth = 0, ShadowHeight = -1 };
-        Assert.Equal (0, view.ShadowWidth);
-        Assert.Equal (-1, view.ShadowHeight);
-        Assert.Equal (1, view.Margin!.ShadowWidth);
-        Assert.Equal (1, view.Margin.ShadowHeight);
+        Assert.Equal (expectedLength, view.ShadowWidth);
+        Assert.Equal (expectedLength, view.ShadowHeight);
+        Assert.Equal (expectedLength, view.Margin!.ShadowWidth);
+        Assert.Equal (expectedLength, view.Margin.ShadowHeight);
     }
 
     [Fact]

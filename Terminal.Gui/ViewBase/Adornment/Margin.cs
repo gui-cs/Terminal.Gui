@@ -230,7 +230,7 @@ public class Margin : Adornment
         get => base.ShadowStyle;
         set
         {
-            if (value == ShadowStyle.Opaque)
+            if (value == ShadowStyle.Opaque || (value == ShadowStyle.Transparent && (ShadowWidth == 0 || ShadowHeight == 0)))
             {
                 if (ShadowWidth != 1)
                 {
@@ -247,43 +247,61 @@ public class Margin : Adornment
         }
     }
 
+    private int _shadowWidth;
+
     /// <inheritdoc/>
     public override int ShadowWidth
     {
-        get => base.ShadowWidth;
+        get => _shadowWidth;
         set
         {
-            if (ValidateShadowLength (value))
+            if (TryValidateShadowLength (_shadowWidth, value, out int result))
             {
-                base.ShadowWidth = value;
+                base.ShadowWidth = _shadowWidth = value;
                 SetShadow (ShadowStyle);
+            }
+            else
+            {
+                base.ShadowWidth = _shadowWidth = result;
             }
         }
     }
+
+    private int _shadowHeight;
 
     /// <inheritdoc/>
     public override int ShadowHeight
     {
-        get => base.ShadowHeight;
+        get => _shadowHeight;
         set
         {
-            if (ValidateShadowLength (value))
+            if (TryValidateShadowLength (_shadowHeight, value, out int result))
             {
-                base.ShadowHeight = value;
+                base.ShadowHeight = _shadowHeight = value;
                 SetShadow (ShadowStyle);
+            }
+            else
+            {
+                base.ShadowHeight = _shadowHeight = result;
             }
         }
     }
 
-    private bool ValidateShadowLength (int newValue)
+    private bool TryValidateShadowLength (int originalValue, int newValue, out int result)
     {
-        if (newValue < 1)
+        result = newValue;
+
+        if (newValue < 0)
         {
+            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? 1 : originalValue;
+
             return false;
         }
 
-        if (ShadowStyle == ShadowStyle.Opaque && newValue != 1)
+        if ((ShadowStyle == ShadowStyle.Opaque && newValue != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue < 1))
         {
+            result = 1;
+
             return false;
         }
 
