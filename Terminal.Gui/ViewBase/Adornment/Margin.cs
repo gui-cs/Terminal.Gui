@@ -1,8 +1,3 @@
-
-
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>The Margin for a <see cref="View"/>. Accessed via <see cref="View.Margin"/></summary>
@@ -21,8 +16,6 @@ namespace Terminal.Gui.ViewBase;
 /// </remarks>
 public class Margin : Adornment
 {
-    private const int SHADOW_WIDTH = 1;
-    private const int SHADOW_HEIGHT = 1;
     private const int PRESS_MOVE_HORIZONTAL = 1;
     private const int PRESS_MOVE_VERTICAL = 0;
 
@@ -35,6 +28,7 @@ public class Margin : Adornment
     public Margin (View parent) : base (parent)
     {
         SubViewLayout += Margin_LayoutStarted;
+        ThicknessChanged +=OnThicknessChanged;
 
         // Margin should not be focusable
         CanFocus = false;
@@ -44,6 +38,15 @@ public class Margin : Adornment
 
         // Margins are transparent to mouse by default
         ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+    }
+
+    private void OnThicknessChanged (object? sender, EventArgs e)
+    {
+        if (!_isThicknessChanging)
+        {
+            _originalThickness = new (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
+            SetShadow (ShadowStyle);
+        }
     }
 
     // When the Parent is drawn, we cache the clip region so we can draw the Margin after all other Views
@@ -56,7 +59,7 @@ public class Margin : Adornment
 
     internal void CacheClip ()
     {
-        if (Thickness != Thickness.Empty /*&& ShadowStyle != ShadowStyle.None*/)
+        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyle.None)
         {
             // PERFORMANCE: How expensive are these clones?
             _cachedClip = GetClip ()?.Clone ();
@@ -86,8 +89,6 @@ public class Margin : Adornment
                 view.SetClip (saved);
                 margin.ClearCachedClip ();
             }
-
-            view.ClearNeedsDraw ();
 
             foreach (View subview in view.SubViews)
             {
@@ -134,7 +135,7 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Don't clear where the shadow goes
-            screen = Rectangle.Inflate (screen, -SHADOW_WIDTH, -SHADOW_HEIGHT);
+            screen = Rectangle.Inflate (screen, -ShadowWidth, -ShadowHeight);
         }
 
         return true;
@@ -151,6 +152,8 @@ public class Margin : Adornment
     // private bool _pressed;
     private ShadowView? _bottomShadow;
     private ShadowView? _rightShadow;
+    private bool _isThicknessChanging;
+    private Thickness? _originalThickness;
 
     /// <summary>
     ///     Sets whether the Margin includes a shadow effect. The shadow is drawn on the right and bottom sides of the
@@ -172,25 +175,29 @@ public class Margin : Adornment
             _bottomShadow = null;
         }
 
+        _originalThickness ??= Thickness;
+
         if (ShadowStyle != ShadowStyle.None)
         {
             // Turn off shadow
-            Thickness = new (Thickness.Left, Thickness.Top, Thickness.Right - SHADOW_WIDTH, Thickness.Bottom - SHADOW_HEIGHT);
+            _originalThickness = new (Thickness.Left, Thickness.Top, Math.Max (Thickness.Right - ShadowWidth, 0), Math.Max (Thickness.Bottom - ShadowHeight, 0));
         }
 
         if (style != ShadowStyle.None)
         {
             // Turn on shadow
-            Thickness = new (Thickness.Left, Thickness.Top, Thickness.Right + SHADOW_WIDTH, Thickness.Bottom + SHADOW_HEIGHT);
+            _isThicknessChanging = true;
+            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right + ShadowWidth, _originalThickness.Value.Bottom + ShadowHeight);
+            _isThicknessChanging = false;
         }
 
         if (style != ShadowStyle.None)
         {
             _rightShadow = new ()
             {
-                X = Pos.AnchorEnd (SHADOW_WIDTH),
+                X = Pos.AnchorEnd (ShadowWidth),
                 Y = 0,
-                Width = SHADOW_WIDTH,
+                Width = ShadowWidth,
                 Height = Dim.Fill (),
                 ShadowStyle = style,
                 Orientation = Orientation.Vertical
@@ -199,13 +206,19 @@ public class Margin : Adornment
             _bottomShadow = new ()
             {
                 X = 0,
-                Y = Pos.AnchorEnd (SHADOW_HEIGHT),
+                Y = Pos.AnchorEnd (ShadowHeight),
                 Width = Dim.Fill (),
-                Height = SHADOW_HEIGHT,
+                Height = ShadowHeight,
                 ShadowStyle = style,
                 Orientation = Orientation.Horizontal
             };
             Add (_rightShadow, _bottomShadow);
+        }
+        else if (Thickness != _originalThickness)
+        {
+            _isThicknessChanging = true;
+            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right, _originalThickness.Value.Bottom);
+            _isThicknessChanging = false;
         }
 
         return style;
@@ -215,7 +228,84 @@ public class Margin : Adornment
     public override ShadowStyle ShadowStyle
     {
         get => base.ShadowStyle;
-        set => base.ShadowStyle = SetShadow (value);
+        set
+        {
+            if (value == ShadowStyle.Opaque || (value == ShadowStyle.Transparent && (ShadowWidth == 0 || ShadowHeight == 0)))
+            {
+                if (ShadowWidth != 1)
+                {
+                    ShadowWidth = 1;
+                }
+
+                if (ShadowHeight != 1)
+                {
+                    ShadowHeight = 1;
+                }
+            }
+
+            base.ShadowStyle = SetShadow (value);
+        }
+    }
+
+    private int _shadowWidth;
+
+    /// <inheritdoc/>
+    public override int ShadowWidth
+    {
+        get => _shadowWidth;
+        set
+        {
+            if (TryValidateShadowLength (_shadowWidth, value, out int result))
+            {
+                base.ShadowWidth = _shadowWidth = value;
+                SetShadow (ShadowStyle);
+            }
+            else
+            {
+                base.ShadowWidth = _shadowWidth = result;
+            }
+        }
+    }
+
+    private int _shadowHeight;
+
+    /// <inheritdoc/>
+    public override int ShadowHeight
+    {
+        get => _shadowHeight;
+        set
+        {
+            if (TryValidateShadowLength (_shadowHeight, value, out int result))
+            {
+                base.ShadowHeight = _shadowHeight = value;
+                SetShadow (ShadowStyle);
+            }
+            else
+            {
+                base.ShadowHeight = _shadowHeight = result;
+            }
+        }
+    }
+
+    private bool TryValidateShadowLength (int originalValue, int newValue, out int result)
+    {
+        result = newValue;
+
+        if (newValue < 0)
+        {
+            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? 1 : originalValue;
+
+            return false;
+        }
+
+        if ((ShadowStyle == ShadowStyle.Opaque && newValue != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue < 1))
+        {
+            result = 1;
+
+            return false;
+        }
+
+        return true;
     }
 
     private void OnParentOnMouseStateChanged (object? sender, EventArgs<MouseState> args)
@@ -226,7 +316,7 @@ public class Margin : Adornment
         }
 
         bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag (MouseState.Pressed);
-        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.HighlightStates.HasFlag (MouseState.PressedOutside); ;
+        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.HighlightStates.HasFlag (MouseState.PressedOutside);
 
         if (pressedOutside)
         {
@@ -238,11 +328,13 @@ public class Margin : Adornment
             // If the view is pressed and the highlight is being removed, move the shadow back.
             // Note, for visual effects reasons, we only move horizontally.
             // TODO: Add a setting or flag that lets the view move vertically as well.
+            _isThicknessChanging = true;
             Thickness = new (
                              Thickness.Left - PRESS_MOVE_HORIZONTAL,
                              Thickness.Top - PRESS_MOVE_VERTICAL,
                              Thickness.Right + PRESS_MOVE_HORIZONTAL,
                              Thickness.Bottom + PRESS_MOVE_VERTICAL);
+            _isThicknessChanging = false;
 
             if (_rightShadow is { })
             {
@@ -264,11 +356,14 @@ public class Margin : Adornment
             // If the view is not pressed, and we want highlight move the shadow
             // Note, for visual effects reasons, we only move horizontally.
             // TODO: Add a setting or flag that lets the view move vertically as well.
+            _isThicknessChanging = true;
             Thickness = new (
                              Thickness.Left + PRESS_MOVE_HORIZONTAL,
                              Thickness.Top + PRESS_MOVE_VERTICAL,
                              Thickness.Right - PRESS_MOVE_HORIZONTAL,
                              Thickness.Bottom - PRESS_MOVE_VERTICAL);
+            _isThicknessChanging = false;
+
             MouseState |= MouseState.Pressed;
 
             if (_rightShadow is { })
