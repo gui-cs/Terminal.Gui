@@ -43,7 +43,7 @@ namespace Terminal.Gui.Drivers;
 ///         <item><see cref="WindowsInput"/> - Uses Windows Console API (<c>ReadConsoleInput</c>)</item>
 ///         <item><see cref="NetInput"/> - Uses .NET <see cref="System.Console"/> API</item>
 ///         <item><see cref="UnixInput"/> - Uses Unix terminal APIs</item>
-///         <item><see cref="FakeInput"/> - For testing, implements <see cref="ITestableInput{TInputRecord}"/></item>
+///         <item><see cref="AnsiInput"/> - For testing, implements <see cref="ITestableInput{TInputRecord}"/></item>
 ///     </list>
 ///     <para>
 ///         <b>Testing Support:</b> See <see cref="ITestableInput{TInputRecord}"/> for programmatic input injection
@@ -53,7 +53,7 @@ namespace Terminal.Gui.Drivers;
 /// <typeparam name="TInputRecord">
 ///     The platform-specific input record type:
 ///     <list type="bullet">
-///         <item><see cref="ConsoleKeyInfo"/> - for .NET and Fake drivers</item>
+///         <item><see cref="ConsoleKeyInfo"/> - for .NET and ANSI drivers</item>
 ///         <item><see cref="WindowsConsole.InputRecord"/> - for Windows driver</item>
 ///         <item><see cref="char"/> - for Unix driver</item>
 ///     </list>
@@ -87,7 +87,7 @@ public interface IInput<TInputRecord> : IDisposable
     /// <example>
     ///     Test scenario with timeout:
     ///     <code>
-    ///         var input = new FakeInput();
+    ///         var input = new ANSIInput();
     ///         input.ExternalCancellationTokenSource = new CancellationTokenSource(
     ///             TimeSpan.FromSeconds(30)); // 30-second timeout
     ///         

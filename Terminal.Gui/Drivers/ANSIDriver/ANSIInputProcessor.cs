@@ -4,29 +4,29 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     <para>
-///         Input processor for <see cref="FakeInput"/>, processes a <see cref="char"/> stream
+///         Input processor for <see cref="AnsiInput"/>, processes a <see cref="char"/> stream
 ///         using pure ANSI escape sequence handling.
 ///     </para>
 ///     <para>
-///         <b>ANSI Driver Architecture:</b>
+///         ANSI Driver Architecture:
 ///     </para>
 ///     <para>
 ///         This processor integrates with Terminal.Gui's ANSI infrastructure:
 ///         <list type="bullet">
 ///             <item>
-///                 <b><see cref="AnsiResponseParser{TInputRecord}"/></b> - Automatically parses ANSI escape sequences
+///                 <see cref="AnsiResponseParser{TInputRecord}"/> - Automatically parses ANSI escape sequences
 ///                 from the input stream, extracting keyboard events, mouse events, and terminal responses.
 ///             </item>
 ///             <item>
-///                 <b><see cref="AnsiRequestScheduler"/></b> - Manages outgoing ANSI requests (via <see cref="IDriver.QueueAnsiRequest"/>)
+///                 <see cref="AnsiRequestScheduler"/> - Manages outgoing ANSI requests (via <see cref="IDriver.QueueAnsiRequest"/>)
 ///                 and matches responses from the parser.
 ///             </item>
 ///             <item>
-///                 <b><see cref="UnixKeyConverter"/></b> - Converts character input to <see cref="Key"/> events,
-///                 shared with UnixDriver for consistent behavior.
+///                 <see cref="AnsiKeyConverter"/> - Converts character input to <see cref="Key"/> events,
+///                 shared with UnixDriver for consistent ANSI-based key mapping.
 ///             </item>
 ///             <item>
-///                 <b><see cref="AnsiKeyboardEncoder"/></b> and <see cref="AnsiMouseEncoder"/></b> - Convert
+///                 <see cref="AnsiKeyboardEncoder"/> and <see cref="AnsiMouseEncoder"/> - Convert
 ///                 <see cref="Key"/> and <see cref="Mouse"/> events into ANSI sequences for test injection.
 ///             </item>
 ///         </list>
@@ -36,12 +36,11 @@ namespace Terminal.Gui.Drivers;
 ///         <c>HandleMouse = true</c> and <c>HandleKeyboard = true</c>, enabling automatic event raising.
 ///     </para>
 /// </summary>
-public class FakeInputProcessor : InputProcessorImpl<char>
+public class AnsiInputProcessor : InputProcessorImpl<char>
 {
     /// <inheritdoc/>
-    public FakeInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new UnixKeyConverter ())
+    public AnsiInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new AnsiKeyConverter ())
     {
-        DriverName = "fake";
     }
 
     /// <inheritdoc/>

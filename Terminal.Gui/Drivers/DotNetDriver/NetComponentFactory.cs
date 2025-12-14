@@ -9,6 +9,9 @@ namespace Terminal.Gui.Drivers;
 public class NetComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
 {
     /// <inheritdoc/>
+    public override string? GetDriverName () => DriverRegistry.Names.DOTNET;
+
+    /// <inheritdoc/>
     public override IInput<ConsoleKeyInfo> CreateInput () { return new NetInput (); }
 
     /// <inheritdoc/>

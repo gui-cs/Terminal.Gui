@@ -10,7 +10,6 @@ public class NetInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
     /// <inheritdoc/>
     public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter ())
     {
-        DriverName = "dotnet";
     }
 
     /// <inheritdoc/>

@@ -6,7 +6,7 @@ public class OutputBaseTests
     public void ToAnsi_SingleCell_NoAttribute_ReturnsGraphemeAndNewline ()
     {
         // Arrange
-        var output = new FakeOutput ();
+        AnsiOutput output = new ();
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
@@ -26,24 +26,26 @@ public class OutputBaseTests
     public void ToAnsi_WithAttribute_AppendsCorrectColorSequence_BasedOnIsLegacyConsole_And_Force16Colors (bool isLegacyConsole, bool force16Colors)
     {
         // Arrange
-        var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
+        AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
 
-        // Create DriverImpl and associate it with the FakeOutput to test Sixel output
+        // Create DriverImpl and associate it with the ANSIOutput to test Sixel output
         IDriver driver = new DriverImpl (
-                                         new FakeInputProcessor (null!),
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,
                                          new (new AnsiResponseParser ()),
                                          new SizeMonitorImpl (output));
 
+        // Set Force16Colors on the driver (which propagates to output)
         driver.Force16Colors = force16Colors;
 
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
         // Use a known RGB color and attribute
-        var fg = new Color (1, 2, 3);
-        var bg = new Color (4, 5, 6);
+        Color fg = new (1, 2, 3);
+        Color bg = new (4, 5, 6);
         buffer.CurrentAttribute = new (fg, bg);
         buffer.AddStr ("X");
 
@@ -69,13 +71,15 @@ public class OutputBaseTests
 
         // Grapheme and newline should always be present
         Assert.Contains ("X" + Environment.NewLine, ansi);
+
+        driver.Dispose ();
     }
 
     [Fact]
     public void Write_WritesDirtyCellsAndClearsDirtyFlags ()
     {
         // Arrange
-        var output = new FakeOutput ();
+        AnsiOutput output = new ();
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (2, 1);
 
@@ -87,7 +91,7 @@ public class OutputBaseTests
         Assert.True (buffer.Contents! [0, 1].IsDirty);
 
         // Act
-        output.Write (buffer); // calls OutputBase.Write via FakeOutput
+        output.Write (buffer); // calls OutputBase.Write via ANSIOutput
 
         // Assert: content was written to the fake output and dirty flags cleared
         Assert.Contains ("AB", output.GetLastOutput ());
@@ -101,8 +105,8 @@ public class OutputBaseTests
     public void Write_Virtual_Or_NonVirtual_Uses_WriteToConsole_And_Clears_Dirty_Flags (bool isLegacyConsole)
     {
         // Arrange
-        // FakeOutput exposes this because it's in test scope
-        var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
+        // ANSIOutput exposes this because it's in test scope
+        AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (3, 1);
 
@@ -158,8 +162,8 @@ public class OutputBaseTests
     public void Write_Virtual_Or_NonVirtual_Uses_WriteToConsole_And_Clears_Dirty_Flags_Mixed_Graphemes (bool isLegacyConsole)
     {
         // Arrange
-        // FakeOutput exposes this because it's in test scope
-        var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
+        // ANSIOutput exposes this because it's in test scope
+        AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (3, 1);
 
@@ -227,7 +231,7 @@ public class OutputBaseTests
     public void Write_EmitsSixelDataAndPositionsCursor (bool isLegacyConsole)
     {
         // Arrange
-        var output = new FakeOutput ();
+        AnsiOutput output = new ();
         IOutputBuffer buffer = output.GetLastBuffer ()!;
         buffer.SetSize (1, 1);
 
@@ -235,15 +239,16 @@ public class OutputBaseTests
         buffer.AddStr (".");
 
         // Create a Sixel to render
-        var s = new SixelToRender
+        SixelToRender s = new ()
         {
             SixelData = "SIXEL-DATA",
             ScreenPosition = new (4, 2)
         };
 
-        // Create DriverImpl and associate it with the FakeOutput to test Sixel output
+        // Create DriverImpl and associate it with the ANSIOutput to test Sixel output
         IDriver driver = new DriverImpl (
-                                         new FakeInputProcessor (null!),
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,
                                          new (new AnsiResponseParser ()),
@@ -252,7 +257,7 @@ public class OutputBaseTests
         // Add the Sixel to the driver
         driver.GetSixels ().Enqueue (s);
 
-        // FakeOutput exposes this because it's in test scope
+        // ANSIOutput exposes this because it's in test scope
         output.IsLegacyConsole = isLegacyConsole;
 
         // Act

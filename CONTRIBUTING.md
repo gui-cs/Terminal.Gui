@@ -254,7 +254,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 **`/Terminal.Gui/`** - Core library (496 C# files):
 - `App/` - Application lifecycle (`Application.cs` static class, `SessionToken`, `MainLoop`)
 - `Configuration/` - `ConfigurationManager` for settings
-- `Drivers/` - Console driver implementations (`Dotnet`, `Windows`, `Unix`, `Fake`)
+- `Drivers/` - Console driver implementations (`dotnet`, `Windows`, `Unix`, `ansi`)
 - `Drawing/` - Rendering system (attributes, colors, glyphs)
 - `Input/` - Keyboard and mouse input handling
 - `ViewBase/` - Core `View` class hierarchy and layout

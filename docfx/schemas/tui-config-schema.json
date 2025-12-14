@@ -36,15 +36,14 @@
       ],
       "enum": [
         "",
-        "fake",
         "ansi",
-        "curses",
-        "net",
+        "dotent",
+        "unix",
         "windows",
         null
       ],
       "default": "",
-      "description": "Forces the use of a specific console driver. If empty or null, Terminal.Gui will attempt to auto-detect the best driver. Options: 'fake', 'ansi', 'curses', 'net', 'windows'."
+      "description": "Forces the use of a specific console driver. If empty or null, Terminal.Gui will attempt to auto-detect the best driver. Options: 'ansi', 'unix', 'dotnet', 'windows'."
     },
     "Application.IsMouseDisabled": {
       "type": "boolean",

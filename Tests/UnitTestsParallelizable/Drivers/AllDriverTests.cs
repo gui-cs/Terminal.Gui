@@ -6,6 +6,14 @@ namespace DriverTests;
 
 public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
 {
+    /// <summary>
+    ///     Gets all registered driver names for use in Theory tests.
+    /// </summary>
+    public static IEnumerable<object []> GetAllDriverNames ()
+    {
+        return DriverRegistry.GetDriverNames ().Select (name => new object [] { name });
+    }
+
     [Theory]
     [InlineData ("", true)]
     [InlineData ("a", true)]
@@ -51,10 +59,7 @@ public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
     }
 
     [Theory]
-    [InlineData ("fake")]
-    [InlineData ("windows")]
-    [InlineData ("dotnet")]
-    [InlineData ("unix")]
+    [MemberData (nameof (GetAllDriverNames))]
     public void All_Drivers_Init_Dispose_Cross_Platform (string driverName)
     {
         IApplication? app = Application.Create ();
@@ -63,10 +68,7 @@ public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
     }
 
     [Theory]
-    [InlineData ("fake")]
-    [InlineData ("windows")]
-    [InlineData ("dotnet")]
-    [InlineData ("unix")]
+    [MemberData (nameof (GetAllDriverNames))]
     public void All_Drivers_Run_Cross_Platform (string driverName)
     {
         IApplication? app = Application.Create ();
@@ -77,10 +79,7 @@ public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
     }
 
     [Theory]
-    [InlineData ("fake")]
-    [InlineData ("windows")]
-    [InlineData ("dotnet")]
-    [InlineData ("unix")]
+    [MemberData (nameof (GetAllDriverNames))]
     public void All_Drivers_LayoutAndDraw_Cross_Platform (string driverName)
     {
         IApplication? app = Application.Create ();
@@ -95,10 +94,7 @@ public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     // Tests fix for https://github.com/gui-cs/Terminal.Gui/issues/4258
     [Theory]
-    [InlineData ("fake")]
-    [InlineData ("windows")]
-    [InlineData ("dotnet")]
-    [InlineData ("unix")]
+    [MemberData (nameof (GetAllDriverNames))]
     public void All_Drivers_When_Clipped_AddStr_Glyph_On_Second_Cell_Of_Wide_Glyph_Outputs_Correctly (string driverName)
     {
         IApplication? app = Application.Create ();

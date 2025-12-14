@@ -3,7 +3,9 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable CommentTypo
 
 namespace Terminal.Gui.Drivers;
 

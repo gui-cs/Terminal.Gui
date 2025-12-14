@@ -9,6 +9,9 @@ namespace Terminal.Gui.Drivers;
 public class WindowsComponentFactory : ComponentFactoryImpl<WindowsConsole.InputRecord>
 {
     /// <inheritdoc />
+    public override string? GetDriverName () => DriverRegistry.Names.WINDOWS;
+
+    /// <inheritdoc />
     public override IInput<WindowsConsole.InputRecord> CreateInput ()
     {
         return new WindowsInput ();

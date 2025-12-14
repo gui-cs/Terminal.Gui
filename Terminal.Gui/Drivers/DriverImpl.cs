@@ -33,12 +33,14 @@ internal class DriverImpl : IDriver
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
+    /// <param name="componentFactory">The component factory that created the driver components.</param>
     /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
     /// <param name="outputBuffer">The output buffer for managing screen state.</param>
     /// <param name="output">The output interface for rendering to the console.</param>
     /// <param name="ansiRequestScheduler">The scheduler for managing ANSI escape sequence requests.</param>
     /// <param name="sizeMonitor">The monitor for tracking terminal size changes.</param>
     public DriverImpl (
+        IComponentFactory componentFactory,
         IInputProcessor inputProcessor,
         IOutputBuffer outputBuffer,
         IOutput output,
@@ -46,6 +48,7 @@ internal class DriverImpl : IDriver
         ISizeMonitor sizeMonitor
     )
     {
+        _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
@@ -77,14 +80,14 @@ internal class DriverImpl : IDriver
     }
 
     /// <inheritdoc/>
-    public string? GetName () => GetInputProcessor ().DriverName?.ToLowerInvariant ();
+    public string? GetName () => _componentFactory.GetDriverName ();
 
     /// <inheritdoc/>
     public virtual string GetVersionInfo ()
     {
-        string type = GetInputProcessor ().DriverName ?? throw new InvalidOperationException ("Driver name is not set.");
+        string? driverName = GetName ();
 
-        return type;
+        return $"{driverName} driver";
     }
 
     /// <inheritdoc/>
@@ -142,8 +145,9 @@ internal class DriverImpl : IDriver
 
     #region Driver Components
 
-    private readonly IOutput _output;
+    private readonly IComponentFactory _componentFactory;
 
+    private readonly IOutput _output;
     public IOutput GetOutput () => _output;
 
     private readonly IInputProcessor _inputProcessor;
@@ -160,12 +164,13 @@ internal class DriverImpl : IDriver
 
     private void CreateClipboard ()
     {
-        if (GetInputProcessor ().DriverName is { } && GetInputProcessor ()!.DriverName!.Contains ("fake"))
+        string? driverName = GetName ();
+
+        // TODO: When "ansi" is used for real, it can have a real clipboard.
+        // TODO: Need to figure out how to configure that.
+        if (driverName is null || driverName.Contains (DriverRegistry.Names.ANSI, StringComparison.OrdinalIgnoreCase))
         {
-            if (Clipboard is null)
-            {
-                Clipboard = new FakeClipboard ();
-            }
+            Clipboard ??= new FakeClipboard ();
 
             return;
         }

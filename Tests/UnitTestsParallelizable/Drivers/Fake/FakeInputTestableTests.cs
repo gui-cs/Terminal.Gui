@@ -4,26 +4,24 @@ using System.Collections.Concurrent;
 namespace DriverTests.Fake;
 
 /// <summary>
-///     Tests for ITestableInput implementation in FakeInput.
+///     Tests for ITestableInput implementation in ANSIInput.
 /// </summary>
-[Trait ("Category", "Fake")]
-[Trait ("Platform", "Fake")]
-public class FakeInputTestableTests
+public class ANSIInputTestableTests
 {
     #region Helper Methods
 
     /// <summary>
-    ///     Simulates the input thread by manually draining FakeInput's internal test queue
+    ///     Simulates the input thread by manually draining ANSIInput's internal test queue
     ///     and moving items to the InputBuffer. This is needed because tests don't
     ///     start the actual input thread via Run().
     /// </summary>
-    private static void SimulateInputThread (FakeInput fakeInput, ConcurrentQueue<char> inputBuffer)
+    private static void SimulateInputThread (AnsiInput ansiInput, ConcurrentQueue<char> inputBuffer)
     {
-        // FakeInput's Peek() checks _testInput first
-        while (fakeInput.Peek ())
+        // ANSIInput's Peek() checks _testInput first
+        while (ansiInput.Peek ())
         {
             // Read() drains _testInput first and returns items
-            foreach (char item in fakeInput.Read ())
+            foreach (char item in ansiInput.Read ())
             {
                 // Manually add to InputBuffer (simulating what Run() would do)
                 inputBuffer.Enqueue (item);
@@ -36,7 +34,7 @@ public class FakeInputTestableTests
     ///     Processes the input queue with support for keys that may be held by the ANSI parser (like Esc).
     ///     The parser holds Esc for 50ms waiting to see if it's part of an escape sequence.
     /// </summary>
-    private static void ProcessQueueWithEscapeHandling (FakeInputProcessor processor, int maxAttempts = 3)
+    private static void ProcessQueueWithEscapeHandling (AnsiInputProcessor processor, int maxAttempts = 3)
     {
         // First attempt - process immediately
         processor.ProcessQueue ();
@@ -53,44 +51,44 @@ public class FakeInputTestableTests
     #endregion
 
     [Fact]
-    public void FakeInput_ImplementsITestableInput ()
+    public void ANSIInput_ImplementsITestableInput ()
     {
         // Arrange & Act
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
 
         // Assert
-        Assert.IsAssignableFrom<ITestableInput<char>> (fakeInput);
+        Assert.IsAssignableFrom<ITestableInput<char>> (ansiInput);
     }
 
     [Fact]
-    public void FakeInput_AddInput_EnqueuesCharacter ()
+    public void ANSIInput_AddInput_EnqueuesCharacter ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var testableInput = (ITestableInput<char>)fakeInput;
+        var testableInput = (ITestableInput<char>)ansiInput;
 
         // Act
         testableInput.AddInput ('a');
 
         // Assert
-        Assert.True (fakeInput.Peek ());
-        List<char> read = fakeInput.Read ().ToList ();
+        Assert.True (ansiInput.Peek ());
+        List<char> read = ansiInput.Read ().ToList ();
         Assert.Single (read);
         Assert.Equal ('a', read [0]);
     }
 
     [Fact]
-    public void FakeInput_AddInput_SupportsMultipleCharacters ()
+    public void ANSIInput_AddInput_SupportsMultipleCharacters ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        ITestableInput<char> testableInput = fakeInput;
+        ITestableInput<char> testableInput = ansiInput;
 
         // Act
         testableInput.AddInput ('a');
@@ -98,44 +96,44 @@ public class FakeInputTestableTests
         testableInput.AddInput ('c');
 
         // Assert
-        List<char> read = fakeInput.Read ().ToList ();
+        List<char> read = ansiInput.Read ().ToList ();
         Assert.Equal (3, read.Count);
         Assert.Equal (new [] { 'a', 'b', 'c' }, read);
     }
 
     [Fact]
-    public void FakeInput_Peek_ReturnsTrueWhenTestInputAvailable ()
+    public void ANSIInput_Peek_ReturnsTrueWhenTestInputAvailable ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var testableInput = (ITestableInput<char>)fakeInput;
+        var testableInput = (ITestableInput<char>)ansiInput;
 
         // Act & Assert - Initially false
-        Assert.False (fakeInput.Peek ());
+        Assert.False (ansiInput.Peek ());
 
         // Add input
         testableInput.AddInput ('x');
 
         // Assert - Now true
-        Assert.True (fakeInput.Peek ());
+        Assert.True (ansiInput.Peek ());
     }
 
     [Fact]
-    public void FakeInput_TestInput_HasPriorityOverRealInput ()
+    public void ANSIInput_TestInput_HasPriorityOverRealInput ()
     {
         // This test verifies that test input is returned before any real terminal input
         // Since we can't easily simulate real terminal input in a unit test,
         // we just verify the order of test inputs
 
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var testableInput = (ITestableInput<char>)fakeInput;
+        var testableInput = (ITestableInput<char>)ansiInput;
 
         // Act - Add inputs in specific order
         testableInput.AddInput ('1');
@@ -143,20 +141,20 @@ public class FakeInputTestableTests
         testableInput.AddInput ('3');
 
         // Assert - Should come out in FIFO order
-        List<char> read = fakeInput.Read ().ToList ();
+        List<char> read = ansiInput.Read ().ToList ();
         Assert.Equal (new [] { '1', '2', '3' }, read);
     }
 
     [Fact]
-    public void FakeInputProcessor_EnqueueKeyDownEvent_WorksWithTestableInput ()
+    public void ANSIInputProcessor_EnqueueKeyDownEvent_WorksWithTestableInput ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, k) => receivedKeys.Add (k);
@@ -165,7 +163,7 @@ public class FakeInputTestableTests
         processor.EnqueueKeyDownEvent (Key.A);
 
         // Simulate the input thread moving items from _testInput to InputBuffer
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
 
         // Process the queue
         processor.ProcessQueue ();
@@ -176,15 +174,15 @@ public class FakeInputTestableTests
     }
 
     [Fact]
-    public void FakeInputProcessor_EnqueueMouseEvent_GeneratesAnsiSequence ()
+    public void ANSIInputProcessor_EnqueueMouseEvent_GeneratesAnsiSequence ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
         processor.SyntheticMouseEvent += (_, m) => receivedMouse.Add (m);
@@ -199,7 +197,7 @@ public class FakeInputTestableTests
         processor.EnqueueMouseEvent (null, mouse);
 
         // Simulate the input thread
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
 
         // Process the queue
         processor.ProcessQueue ();
@@ -214,15 +212,15 @@ public class FakeInputTestableTests
     }
 
     [Fact]
-    public void FakeInputProcessor_EnqueueMouseEvent_SupportsRelease ()
+    public void ANSIInputProcessor_EnqueueMouseEvent_SupportsRelease ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
         processor.SyntheticMouseEvent += (_, m) => receivedMouse.Add (m);
@@ -237,7 +235,7 @@ public class FakeInputTestableTests
         processor.EnqueueMouseEvent (null, mouse);
 
         // Simulate the input thread
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
 
         processor.ProcessQueue ();
 
@@ -248,15 +246,15 @@ public class FakeInputTestableTests
     }
 
     [Fact]
-    public void FakeInputProcessor_EnqueueMouseEvent_SupportsModifiers ()
+    public void ANSIInputProcessor_EnqueueMouseEvent_SupportsModifiers ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
         processor.SyntheticMouseEvent += (_, m) =>
@@ -276,9 +274,9 @@ public class FakeInputTestableTests
 
         // Debug: check what's in the queue
         List<char> inputChars = [];
-        while (fakeInput.Peek ())
+        while (ansiInput.Peek ())
         {
-            inputChars.AddRange (fakeInput.Read ());
+            inputChars.AddRange (ansiInput.Read ());
         }
         string ansiSeq = new (inputChars.ToArray ());
 
@@ -302,15 +300,15 @@ public class FakeInputTestableTests
     [InlineData (MouseFlags.WheeledDown)]
     // Note: WheeledLeft and WheeledRight (codes 68/69) have complex ANSI encoding with Shift+Ctrl variations
     // These are tested separately in AnsiMouseParserDebugTests
-    public void FakeInputProcessor_EnqueueMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
+    public void ANSIInputProcessor_EnqueueMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
         processor.SyntheticMouseEvent += (_, m) => receivedMouse.Add (m);
@@ -325,7 +323,7 @@ public class FakeInputTestableTests
         processor.EnqueueMouseEvent (null, mouse);
 
         // Simulate the input thread
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
 
         processor.ProcessQueue ();
 
@@ -336,18 +334,18 @@ public class FakeInputTestableTests
     }
 
 
-    #region FakeInput EnqueueKeyDownEvent Tests
+    #region ANSIInput EnqueueKeyDownEvent Tests
 
     [Fact]
-    public void FakeInput_EnqueueKeyDownEvent_AddsSingleKeyToQueue ()
+    public void ANSIInput_EnqueueKeyDownEvent_AddsSingleKeyToQueue ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, k) => receivedKeys.Add (k);
@@ -358,7 +356,7 @@ public class FakeInputTestableTests
         processor.EnqueueKeyDownEvent (key);
 
         // Simulate the input thread moving items from _testInput to InputBuffer
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
 
         processor.ProcessQueue ();
 
@@ -368,15 +366,15 @@ public class FakeInputTestableTests
     }
 
     [Fact]
-    public void FakeInput_EnqueueKeyDownEvent_SupportsMultipleKeys ()
+    public void ANSIInput_EnqueueKeyDownEvent_SupportsMultipleKeys ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         Key [] keys = [Key.A, Key.B, Key.C, Key.Enter];
         List<Key> receivedKeys = [];
@@ -388,7 +386,7 @@ public class FakeInputTestableTests
             processor.EnqueueKeyDownEvent (key);
         }
 
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
         // Assert
@@ -403,15 +401,15 @@ public class FakeInputTestableTests
     [InlineData (KeyCode.A, false, false, true)] // Alt+A
     // Note: Ctrl+Shift+Alt+A is not tested because ANSI doesn't have a standard way to represent
     // Shift with Ctrl combinations (Ctrl+A is 0x01 regardless of Shift state)
-    public void FakeInput_EnqueueKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
+    public void ANSIInput_EnqueueKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
 
@@ -435,7 +433,7 @@ public class FakeInputTestableTests
 
         // Act
         processor.EnqueueKeyDownEvent (key);
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
 
         // Alt combinations start with ESC, so they need escape handling
         if (alt)
@@ -467,15 +465,15 @@ public class FakeInputTestableTests
     [InlineData (KeyCode.CursorRight)]
     [InlineData (KeyCode.F1)]
     [InlineData (KeyCode.F12)]
-    public void FakeInput_EnqueueKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
+    public void ANSIInput_EnqueueKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
         Key? receivedKey = null;
@@ -483,7 +481,7 @@ public class FakeInputTestableTests
 
         // Act
         processor.EnqueueKeyDownEvent (key);
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
 
         // Esc is special - the ANSI parser holds it waiting for potential escape sequences
         // We need to process with delay to let the parser release it after timeout
@@ -502,15 +500,15 @@ public class FakeInputTestableTests
     }
 
     [Fact]
-    public void FakeInput_EnqueueKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
+    public void ANSIInput_EnqueueKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        var processor = new FakeInputProcessor (queue);
-        processor.InputImpl = fakeInput;
+        var processor = new AnsiInputProcessor (queue);
+        processor.InputImpl = ansiInput;
 
         var keyDownCount = 0;
         var keyUpCount = 0;
@@ -519,7 +517,7 @@ public class FakeInputTestableTests
 
         // Act
         processor.EnqueueKeyDownEvent (Key.A);
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
         // Assert - FakeDriver simulates KeyUp immediately after KeyDown
@@ -532,15 +530,15 @@ public class FakeInputTestableTests
     #region Mouse Event Sequencing Tests
 
     [Fact]
-    public void FakeInput_EnqueueMouseEvent_HandlesCompleteClickSequence ()
+    public void ANSIInput_EnqueueMouseEvent_HandlesCompleteClickSequence ()
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        FakeInputProcessor processor = new (queue);
-        processor.InputImpl = fakeInput;
+        AnsiInputProcessor processor = new (queue);
+        processor.InputImpl = ansiInput;
 
         List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
@@ -562,7 +560,7 @@ public class FakeInputTestableTests
                                          Flags = MouseFlags.LeftButtonReleased
                                      });
 
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
         // Assert - Process() emits Pressed and Released immediately (clicks are deferred)
@@ -578,15 +576,15 @@ public class FakeInputTestableTests
     [InlineData (MouseFlags.WheeledDown)]
     [InlineData (MouseFlags.WheeledLeft)]
     [InlineData (MouseFlags.WheeledRight)]
-    public void FakeInput_EnqueueMouseEvent_Wheel_Events (MouseFlags wheelEvent)
+    public void ANSIInput_EnqueueMouseEvent_Wheel_Events (MouseFlags wheelEvent)
     {
         // Arrange
-        FakeInput fakeInput = new ();
+        AnsiInput ansiInput = new ();
         ConcurrentQueue<char> queue = new ();
-        fakeInput.Initialize (queue);
+        ansiInput.Initialize (queue);
 
-        FakeInputProcessor processor = new (queue);
-        processor.InputImpl = fakeInput;
+        AnsiInputProcessor processor = new (queue);
+        processor.InputImpl = ansiInput;
 
         List<Terminal.Gui.Input.Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
@@ -600,7 +598,7 @@ public class FakeInputTestableTests
                                          Flags = wheelEvent
                                      });
 
-        SimulateInputThread (fakeInput, queue);
+        SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
         // Assert

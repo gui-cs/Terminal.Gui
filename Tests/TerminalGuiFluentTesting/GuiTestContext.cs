@@ -27,7 +27,7 @@ public partial class GuiTestContext : IDisposable
     private Exception? _backgroundException;
 
     // ===== Driver & Application State =====
-    private readonly FakeInput _fakeInput = new ();
+    private readonly AnsiInput _ansiInput = new ();
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
@@ -161,7 +161,7 @@ public partial class GuiTestContext : IDisposable
                                  catch (Exception ex)
                                  {
                                      _backgroundException = ex;
-                                     _fakeInput.ExternalCancellationTokenSource!.Cancel ();
+                                     _ansiInput.ExternalCancellationTokenSource!.Cancel ();
                                  }
                                  finally
                                  {
@@ -209,7 +209,7 @@ public partial class GuiTestContext : IDisposable
 
         // ✅ Link _runCancellationTokenSource with a timeout
         // This creates a token that responds to EITHER the run cancellation OR timeout
-        _fakeInput.ExternalCancellationTokenSource =
+        _ansiInput.ExternalCancellationTokenSource =
             CancellationTokenSource.CreateLinkedTokenSource (
                                                              _runCancellationTokenSource.Token,
                                                              new CancellationTokenSource (_timeout).Token);
@@ -228,7 +228,7 @@ public partial class GuiTestContext : IDisposable
 
         IComponentFactory? cf = null;
 
-        _output = new FakeOutput ();
+        _output = new AnsiOutput ();
 
         // Only set size if explicitly provided (width and height > 0)
         if (width > 0 && height > 0)
@@ -242,22 +242,22 @@ public partial class GuiTestContext : IDisposable
         {
             case TestDriver.DotNet:
                 _sizeMonitor = new (_output);
-                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+                cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Windows:
                 _sizeMonitor = new (_output);
-                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+                cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
             case TestDriver.Unix:
                 _sizeMonitor = new (_output);
-                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+                cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
-            case TestDriver.Fake:
+            case TestDriver.ANSI:
                 _sizeMonitor = new (_output);
-                cf = new FakeComponentFactory (_fakeInput, _output, _sizeMonitor);
+                cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
         }
@@ -270,10 +270,10 @@ public partial class GuiTestContext : IDisposable
     {
         return _driverType switch
         {
-            TestDriver.Windows => "windows",
-            TestDriver.DotNet => "dotnet",
-            TestDriver.Unix => "unix",
-            TestDriver.Fake => "fake",
+            TestDriver.Windows => DriverRegistry.Names.WINDOWS,
+            TestDriver.DotNet => DriverRegistry.Names.DOTNET,
+            TestDriver.Unix => DriverRegistry.Names.UNIX,
+            TestDriver.ANSI => DriverRegistry.Names.ANSI,
             _ =>
                 throw new ArgumentOutOfRangeException ()
         };
@@ -322,7 +322,7 @@ public partial class GuiTestContext : IDisposable
     public GuiTestContext WaitIteration (Action<IApplication>? action = null)
     {
         // If application has already exited don't wait!
-        if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _fakeInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
+        if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _ansiInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
         {
             Logging.Warning ("WaitIteration called after context was stopped");
 
@@ -354,7 +354,7 @@ public partial class GuiTestContext : IDisposable
                          {
                              Logging.Warning ($"Action failed with exception: {e}");
                              _backgroundException = e;
-                             _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+                             _ansiInput.ExternalCancellationTokenSource?.Cancel ();
                          }
                      });
 
@@ -517,7 +517,7 @@ public partial class GuiTestContext : IDisposable
 
         // With linked tokens, just cancelling ExternalCancellationTokenSource
         // will cascade to stop everything
-        _fakeInput.ExternalCancellationTokenSource?.Cancel ();
+        _ansiInput.ExternalCancellationTokenSource?.Cancel ();
         WriteOutLogs (_logWriter);
         Stop ();
     }
@@ -553,7 +553,7 @@ public partial class GuiTestContext : IDisposable
     private void CleanupApplication ()
     {
         Logging.Trace ("CleanupApplication");
-        _fakeInput.ExternalCancellationTokenSource = null;
+        _ansiInput.ExternalCancellationTokenSource = null;
 
         App?.ResetState (true);
         Logging.Logger = _originalLogger!;
@@ -576,7 +576,7 @@ public partial class GuiTestContext : IDisposable
 
         lock (_cancellationLock) // NEW: Thread-safe check
         {
-            if (_fakeInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
+            if (_ansiInput.ExternalCancellationTokenSource is { IsCancellationRequested: true })
             {
                 shouldThrow = true;
                 lock (_backgroundExceptionLock)
@@ -586,12 +586,12 @@ public partial class GuiTestContext : IDisposable
             }
 
             // ✅ Dispose the linked token source
-            _fakeInput.ExternalCancellationTokenSource?.Dispose ();
+            _ansiInput.ExternalCancellationTokenSource?.Dispose ();
         }
 
         _timeoutCts?.Dispose (); // NEW: Dispose timeout CTS
         _runCancellationTokenSource?.Dispose ();
-        _fakeInput.Dispose ();
+        _ansiInput.Dispose ();
         _output?.Dispose ();
         _booting.Dispose ();
 

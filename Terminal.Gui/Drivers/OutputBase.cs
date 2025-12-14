@@ -298,12 +298,39 @@ public abstract class OutputBase
     /// <returns>A string containing ANSI escape sequences representing the buffer contents.</returns>
     public string ToAnsi (IOutputBuffer buffer)
     {
-        StringBuilder output = new ();
+        // Legacy consoles don't support ANSI escape sequences
+        // Return plain text representation instead
+        if (IsLegacyConsole)
+        {
+            StringBuilder output = new ();
+
+            for (int row = 0; row < buffer.Rows; row++)
+            {
+                for (int col = 0; col < buffer.Cols; col++)
+                {
+                    Cell cell = buffer.Contents! [row, col];
+                    string grapheme = cell.Grapheme;
+                    output.Append (grapheme);
+
+                    // Handle wide grapheme
+                    if (grapheme.GetColumns () > 1 && col + 1 < buffer.Cols)
+                    {
+                        col++; // Skip next cell for wide character
+                    }
+                }
+
+                output.AppendLine ();
+            }
+
+            return output.ToString ();
+        }
+
+        StringBuilder ansiOutput = new ();
         Attribute? lastAttr = null;
 
-        BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, output, ref lastAttr);
+        BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
 
-        return output.ToString ();
+        return ansiOutput.ToString ();
     }
 
     /// <summary>

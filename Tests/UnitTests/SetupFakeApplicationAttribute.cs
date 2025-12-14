@@ -9,7 +9,7 @@ namespace UnitTests;
 
 /// <summary>
 ///     Enables test functions annotated with the [SetupFakeDriver] attribute to set Application.Driver to new
-///     FakeDriver(). The driver is set up with 80 rows and 25 columns.
+///     ANSI driver. The driver is set up with 80 rows and 25 columns.
 /// </summary>
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class SetupFakeApplicationAttribute : BeforeAfterTestAttribute
