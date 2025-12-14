@@ -166,6 +166,5 @@ public abstract class EditorBase : View
         }
 
         base.Dispose (disposing);
-
     }
 }
