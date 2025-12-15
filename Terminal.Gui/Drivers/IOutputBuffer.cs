@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Represents the desired screen state for console rendering. This interface provides methods for building up
@@ -130,11 +129,13 @@ public interface IOutputBuffer
     int Top { get; set; }
 
     /// <summary>
-    ///     Sets the replacement characters that will be used when a wide glyph (double-width character) cannot fit in the available space.
+    ///     Sets the replacement character that will be used when a wide glyph (double-width character) cannot fit in the
+    ///     available space.
     ///     If not set, the default will be <see cref="Glyphs.WideGlyphReplacement"/>.
     /// </summary>
     /// <param name="column1ReplacementChar">
-    ///     The character used when the first column of a wide character is invalid (for example, when it is overlapped by the trailing half of a previous wide character).
+    ///     The character used when the first column of a wide character is invalid (for example, when it is overlapped by the
+    ///     trailing half of a previous wide character).
     /// </param>
     void SetWideGlyphReplacement (Rune column1ReplacementChar);
 }

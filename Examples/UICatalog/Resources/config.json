@@ -9,6 +9,7 @@
   "Themes": [
     {
       "Hot Dog Stand": {
+        "Glyphs.WideGlyphReplacement": "①",
         "Schemes": [
           {
             "Runnable": {
@@ -134,8 +135,7 @@
       }
     },
     {
-      "UI Catalog Theme": {
-        "Glyphs.ReplacementChar": " ",
+      "UI Catalog": {
         "Window.DefaultShadow": "Transparent",
         "Button.DefaultShadow": "None",
         "CheckBox.DefaultHighlightStates": "In, Pressed, PressedOutside",
