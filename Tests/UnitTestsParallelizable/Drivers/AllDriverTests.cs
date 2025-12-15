@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -100,6 +101,7 @@ public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         IDriver driver = app.Driver!;
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
         // Need to force "windows" driver to override legacy console mode for this test
         driver.IsLegacyConsole = false;
@@ -123,14 +125,14 @@ public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �┌─┐🍎
+                                              ①┌─┐🍎
                                               """,
                                               output,
                                               driver);
 
         driver.Refresh ();
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m�┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
                                            output, driver);
     }
 }

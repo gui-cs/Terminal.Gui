@@ -61,7 +61,13 @@ public interface IDriver : IDisposable
     IInputProcessor GetInputProcessor ();
 
     /// <summary>
-    ///     Gets the output handler responsible for writing to the terminal.
+    ///     Gets the <see cref="IOutputBuffer"/> containing the buffered screen contents.
+    /// </summary>
+    /// <returns></returns>
+    IOutputBuffer GetOutputBuffer ();
+
+    /// <summary>
+    ///     Gets the <see cref="IOutput"/> responsible for writing to the terminal.
     /// </summary>
     IOutput GetOutput ();
 

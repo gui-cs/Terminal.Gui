@@ -165,6 +165,8 @@ public class OutputBaseTests
         // ANSIOutput exposes this because it's in test scope
         AnsiOutput output = new () { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetWideGlyphReplacement ((Rune)'①');
+
         buffer.SetSize (3, 1);
 
         // Write '🦮' at col 0 and 'A' at col 2
@@ -213,7 +215,7 @@ public class OutputBaseTests
 
         output.Write (buffer);
 
-        Assert.Contains ("�", output.GetLastOutput ());
+        Assert.Contains ("①", output.GetLastOutput ());
         Assert.Contains ("X", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells
