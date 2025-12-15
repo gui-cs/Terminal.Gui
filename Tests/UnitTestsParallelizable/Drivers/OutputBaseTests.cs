@@ -164,7 +164,7 @@ public class OutputBaseTests
         // FakeOutput exposes this because it's in test scope
         var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
-        buffer.SetReplacementChars ((Rune)'①', (Rune)'②');
+        buffer.SetWideGlyphReplacement ((Rune)'①');
 
         buffer.SetSize (3, 1);
 

@@ -181,7 +181,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     {
         IDriver? driver = CreateFakeDriver ();
         driver.SetScreenSize (6, 3);
-        driver.GetOutputBuffer ().SetReplacementChars ((Rune)'①', (Rune)'②');
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
         driver!.Clip = new (driver.Screen);
         driver.Move (1, 0);

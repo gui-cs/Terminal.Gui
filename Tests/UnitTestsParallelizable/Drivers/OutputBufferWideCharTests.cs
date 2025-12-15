@@ -1,12 +1,12 @@
 ﻿using System.Text;
-using Xunit.Abstractions;
 
 namespace DriverTests;
 
 /// <summary>
 ///     Tests for https://github.com/gui-cs/Terminal.Gui/issues/4466.
 ///     These tests validate that FillRect properly handles wide characters when overlapping existing content.
-///     Specifically, they ensure that wide characters are properly invalidated and replaced when a MessageBox border or similar UI element is drawn over them, preventing visual corruption.
+///     Specifically, they ensure that wide characters are properly invalidated and replaced when a MessageBox border or
+///     similar UI element is drawn over them, preventing visual corruption.
 /// </summary>
 public class OutputBufferWideCharTests
 {
@@ -100,7 +100,7 @@ public class OutputBufferWideCharTests
         // With the fix: The original wide character at col 2 should be invalidated
         // because we're overwriting its second column
         Assert.True (buffer.Contents [1, 2].IsDirty, "Wide char at col 2 should be invalidated when its second column is overwritten");
-        Assert.Equal (buffer.Contents [1, 2].Grapheme, Glyphs.ReplacementChar.ToString ());
+        Assert.Equal (buffer.Contents [1, 2].Grapheme, Glyphs.WideGlyphReplacement.ToString ());
 
         Assert.Equal ("│", buffer.Contents [1, 3].Grapheme);
         Assert.True (buffer.Contents [1, 3].IsDirty);
@@ -154,7 +154,7 @@ public class OutputBufferWideCharTests
 
         // The second character "好" at col 7 had its second column overwritten
         // so it should be replaced with replacement char
-        Assert.Equal (buffer.Contents [3, 7].Grapheme, Glyphs.ReplacementChar.ToString ());
+        Assert.Equal (buffer.Contents [3, 7].Grapheme, Glyphs.WideGlyphReplacement.ToString ());
         Assert.True (buffer.Contents [3, 7].IsDirty, "Invalidated wide char should be marked dirty");
 
         // The border should be drawn at col 8
@@ -360,15 +360,12 @@ public class OutputBufferWideCharTests
     /// <summary>
     ///     Tests the edge case where a wide character's first column is outside the clip region
     ///     but the second column is inside.
-    ///     
     ///     IMPORTANT: This test documents that the code path in WriteWideGrapheme where:
     ///     - !Clip.Contains(col, row) is true (first column outside)
     ///     - Clip.Contains(col + 1, row) is true (second column inside)
-    ///     
     ///     is CURRENTLY UNREACHABLE because IsValidLocation checks Clip.Contains(col, row) and
     ///     returns false before WriteWideGrapheme is called. This test verifies the current behavior
     ///     (nothing is written when first column is outside clip).
-    ///     
     ///     If the behavior should change to write the second column with a replacement character,
     ///     the logic in IsValidLocation or AddGrapheme needs to be modified.
     /// </summary>
@@ -387,11 +384,11 @@ public class OutputBufferWideCharTests
         // Set custom replacement characters to verify they're being used
         Rune customColumn1Replacement = new ('◄');
         Rune customColumn2Replacement = new ('►');
-        buffer.SetReplacementChars (customColumn1Replacement, customColumn2Replacement);
+        buffer.SetWideGlyphReplacement (customColumn1Replacement);
 
         // Set clip region that starts at column 3 (odd column)
         // This creates a scenario where col 2 is outside clip, but col 3 is inside
-        buffer.Clip = new Region (new Rectangle (3, 1, 5, 3));
+        buffer.Clip = new (new (3, 1, 5, 3));
 
         // Clear initial contents to ensure clean state
         for (var r = 0; r < buffer.Rows; r++)
@@ -418,9 +415,10 @@ public class OutputBufferWideCharTests
         // The code path in WriteWideGrapheme that would write the replacement char
         // to column 3 is never reached
         Assert.Equal (" ", buffer.Contents [1, 3].Grapheme);
+
         Assert.False (
-                     buffer.Contents [1, 3].IsDirty,
-                     "Currently, second column is not written when first column is outside clip");
+                      buffer.Contents [1, 3].IsDirty,
+                      "Currently, second column is not written when first column is outside clip");
 
         // Verify Col has been advanced by only 1 (not by the wide character width)
         // because the grapheme was not validated/processed when IsValidLocation returned false
@@ -446,11 +444,11 @@ public class OutputBufferWideCharTests
         // Set custom replacement characters
         Rune customColumn1Replacement = new ('◄');
         Rune customColumn2Replacement = new ('►');
-        buffer.SetReplacementChars (customColumn1Replacement, customColumn2Replacement);
+        buffer.SetWideGlyphReplacement (customColumn1Replacement);
 
         // Set clip region that ends at column 6 (even column)
         // This creates a scenario where col 5 is inside, but col 6 is outside
-        buffer.Clip = new Region (new Rectangle (0, 1, 6, 3));
+        buffer.Clip = new (new (0, 1, 6, 3));
 
         // Clear initial contents
         for (var r = 0; r < buffer.Rows; r++)
@@ -505,10 +503,10 @@ public class OutputBufferWideCharTests
         // Set custom replacement characters (should NOT be used in this case)
         Rune customColumn1Replacement = new ('◄');
         Rune customColumn2Replacement = new ('►');
-        buffer.SetReplacementChars (customColumn1Replacement, customColumn2Replacement);
+        buffer.SetWideGlyphReplacement (customColumn1Replacement);
 
         // Set clip region that includes columns 2-7
-        buffer.Clip = new Region (new Rectangle (2, 1, 6, 3));
+        buffer.Clip = new (new (2, 1, 6, 3));
 
         // Clear initial contents
         for (var r = 0; r < buffer.Rows; r++)
@@ -533,8 +531,8 @@ public class OutputBufferWideCharTests
         // The wide glyph naturally renders across both columns without modifying column N+1
         // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
         Assert.False (
-                     buffer.Contents [1, 5].IsDirty,
-                     "Adjacent cell should NOT be marked dirty when writing wide char (see #4258)");
+                      buffer.Contents [1, 5].IsDirty,
+                      "Adjacent cell should NOT be marked dirty when writing wide char (see #4258)");
 
         // Verify no replacement characters were used
         Assert.NotEqual (customColumn1Replacement.ToString (), buffer.Contents [1, 4].Grapheme);

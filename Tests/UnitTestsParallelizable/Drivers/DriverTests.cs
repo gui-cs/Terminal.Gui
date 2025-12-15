@@ -105,7 +105,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         IDriver driver = app.Driver!;
-        driver.GetOutputBuffer ().SetReplacementChars ((Rune)'①', (Rune)'②');
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
         // Need to force "windows" driver to override legacy console mode for this test
         driver.IsLegacyConsole = false;

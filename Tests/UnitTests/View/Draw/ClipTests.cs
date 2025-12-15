@@ -178,7 +178,7 @@ public class ClipTests (ITestOutputHelper _output)
     public void Clipping_Wide_Runes ()
     {
         Application.Driver!.SetScreenSize (30, 1);
-        Application.Driver!.GetOutputBuffer ().SetReplacementChars ((Rune)'①', (Rune)'②');
+        Application.Driver!.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
         var top = new View
         {

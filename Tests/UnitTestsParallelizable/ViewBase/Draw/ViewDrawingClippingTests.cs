@@ -574,7 +574,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         };
 
         superView.Add (viewWithBorderAtX0, viewWithBorderAtX1, viewWithBorderAtX2);
-        driver.GetOutputBuffer ().SetReplacementChars ((Rune)'①', (Rune)'②');
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
         app.Begin (superView);
         // Begin calls LayoutAndDraw, so no need to call it again here
         // app.LayoutAndDraw();
@@ -676,7 +676,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         };
 
         superView.Add (viewWithBorder);
-        driver.GetOutputBuffer ().SetReplacementChars ((Rune)'①', (Rune)'②');
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
         app.Begin (superView);
 
         DriverAssert.AssertDriverContentsAre (
@@ -740,7 +740,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             Height = 3
         };
 
-        driver.GetOutputBuffer ().SetReplacementChars ((Rune)'①', (Rune)'②');
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
         superView.Add (viewWithBorder);
         app.Begin (superView);

@@ -65,14 +65,12 @@ public class OutputBufferImpl : IOutputBuffer
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
 
-    private Rune _column1ReplacementChar = Glyphs.ReplacementChar;
-    private Rune _column2ReplacementChar = Glyphs.ReplacementChar;
+    private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
 
     /// <inheritdoc />
-    public void SetReplacementChars (Rune column1ReplacementChar, Rune column2ReplacementChar)
+    public void SetWideGlyphReplacement (Rune column1ReplacementChar)
     {
         _column1ReplacementChar = column1ReplacementChar;
-        _column2ReplacementChar = column2ReplacementChar;
     }
 
     /// <summary>
