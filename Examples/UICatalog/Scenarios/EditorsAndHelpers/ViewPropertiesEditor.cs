@@ -20,7 +20,7 @@ public class ViewPropertiesEditor : EditorBase
             CheckedState = ViewToEdit is { } ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
-        _canFocusCheckBox.CheckedStateChanged += (s, args) =>
+        _canFocusCheckBox.CheckedStateChanged += (_, _) =>
                                                  {
                                                      if (ViewToEdit is { })
                                                      {
@@ -37,7 +37,7 @@ public class ViewPropertiesEditor : EditorBase
             CheckedState = ViewToEdit is { } ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
-        _enabledCheckBox.CheckedStateChanged += (s, args) =>
+        _enabledCheckBox.CheckedStateChanged += (_, _) =>
                                                 {
                                                     if (ViewToEdit is { })
                                                     {
@@ -55,13 +55,13 @@ public class ViewPropertiesEditor : EditorBase
             Orientation = Orientation.Horizontal
         };
 
-        _orientationOptionSelector.ValueChanged += (s, selected) =>
-                                            {
-                                                if (ViewToEdit is IOrientation orientatedView)
-                                                {
-                                                    orientatedView.Orientation = _orientationOptionSelector.Value!.Value;
-                                                }
-                                            };
+        _orientationOptionSelector.ValueChanged += (_, _) =>
+                                                   {
+                                                       if (ViewToEdit is IOrientation orientatedView)
+                                                       {
+                                                           orientatedView.Orientation = _orientationOptionSelector.Value!.Value;
+                                                       }
+                                                   };
         Add (label, _orientationOptionSelector);
 
         label = new () { X = 0, Y = Pos.Bottom (_orientationOptionSelector), Text = "Text:" };
@@ -75,7 +75,7 @@ public class ViewPropertiesEditor : EditorBase
             Text = "This is demo text"
         };
 
-        _text.ContentsChanged += (s, e) =>
+        _text.ContentsChanged += (_, _) =>
                                  {
                                      if (ViewToEdit is { })
                                      {
@@ -90,15 +90,7 @@ public class ViewPropertiesEditor : EditorBase
 
     public string DemoText
     {
-        get
-        {
-            if (_text is null)
-            {
-                return string.Empty;
-            }
-
-            return _text!.Text;
-        }
+        get => _text is null ? string.Empty : _text!.Text;
         set => _text!.Text = value;
     }
 
