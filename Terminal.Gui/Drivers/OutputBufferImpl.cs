@@ -285,18 +285,6 @@ public class OutputBufferImpl : IOutputBuffer
             // Second column is outside clip - can't fit wide char here
             Contents! [row, col].Grapheme = _column1ReplacementChar.ToString ();
         }
-        else if (!Clip.Contains (col, row))
-        {
-            // First column is outside clip but second isn't
-            // Mark second column as replacement to indicate partial overlap
-            if (col + 1 < Cols)
-            {
-                // NOTE: This is dead code and apparently never called.
-                // NOTE: See AddStr_WideChar_FirstColumnOutsideClip_SecondColumnInside_CurrentBehavior
-                Contents! [row, col + 1].Grapheme = _column2ReplacementChar.ToString ();
-                Contents! [row, col + 1].IsDirty = true;
-            }
-        }
         else
         {
             // Both columns are in bounds - write the wide character
