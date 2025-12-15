@@ -1,8 +1,5 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace UICatalog.Scenarios;
 
@@ -21,7 +18,7 @@ public class DimEditor : EditorBase
     private OptionSelector? _dimOptionSelector;
     private TextField? _valueEdit;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnViewToEditChanged ()
     {
         if (ViewToEdit is { })
@@ -39,12 +36,11 @@ public class DimEditor : EditorBase
             return;
         }
 
-        Dim? dim;
-        dim = Dimension == Dimension.Width ? ViewToEdit.Width : ViewToEdit.Height;
+        Dim dim = Dimension == Dimension.Width ? ViewToEdit.Width : ViewToEdit.Height;
 
         try
         {
-            _dimOptionSelector!.Value = _dimNames.IndexOf (_dimNames.First (s => dim!.ToString ().StartsWith (s)));
+            _dimOptionSelector!.Value = _dimNames.IndexOf (_dimNames.First (s => dim.ToString ().StartsWith (s)));
         }
         catch (InvalidOperationException e)
         {
@@ -53,31 +49,37 @@ public class DimEditor : EditorBase
         }
 
         _valueEdit!.Enabled = false;
+
         switch (dim)
         {
             case DimAbsolute absolute:
                 _valueEdit.Enabled = true;
                 _value = absolute.Size;
                 _valueEdit!.Text = _value.ToString ();
+
                 break;
             case DimFill fill:
                 var margin = fill.Margin as DimAbsolute;
                 _valueEdit.Enabled = margin is { };
                 _value = margin?.Size ?? 0;
                 _valueEdit!.Text = _value.ToString ();
+
                 break;
             case DimFunc func:
                 _valueEdit.Enabled = true;
                 _value = func.Fn (null);
                 _valueEdit!.Text = _value.ToString ();
+
                 break;
             case DimPercent percent:
                 _valueEdit.Enabled = true;
                 _value = percent.Percentage;
                 _valueEdit!.Text = _value.ToString ();
+
                 break;
             default:
-                _valueEdit!.Text = dim!.ToString ();
+                _valueEdit!.Text = dim.ToString ();
+
                 break;
         }
     }
@@ -94,6 +96,7 @@ public class DimEditor : EditorBase
         Add (label);
         _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };
         _dimOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
+
         _valueEdit = new ()
         {
             X = Pos.Right (label) + 1,
@@ -102,30 +105,30 @@ public class DimEditor : EditorBase
             Text = $"{_value}"
         };
 
-        _valueEdit.Accepting += (s, args) =>
-        {
-            try
-            {
-                _value = int.Parse (_valueEdit.Text);
-                DimChanged ();
-            }
-            catch
-            {
-                // ignored
-            }
-            args.Handled = true;
-        };
+        _valueEdit.Accepting += (_, args) =>
+                                {
+                                    try
+                                    {
+                                        _value = int.Parse (_valueEdit.Text);
+                                        DimChanged ();
+                                    }
+                                    catch
+                                    {
+                                        // ignored
+                                    }
+
+                                    args.Handled = true;
+                                };
         Add (_valueEdit);
 
         Add (_dimOptionSelector);
-
     }
 
     private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { DimChanged (); }
 
-    // These need to have same order 
-    private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent",];
-    private readonly string [] _optionLabels = ["Absolute(n)", "Auto", "Fill(n)", "Func(()=>n)", "Percent(n)",];
+    // These need to have same order
+    private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent"];
+    private readonly string [] _optionLabels = ["Absolute(n)", "Auto", "Fill(n)", "Func(()=>n)", "Percent(n)"];
 
     private void DimChanged ()
     {
@@ -136,15 +139,15 @@ public class DimEditor : EditorBase
 
         try
         {
-            Dim? dim = _dimOptionSelector!.Value switch
-            {
-                0 => Dim.Absolute (_value),
-                1 => Dim.Auto (),
-                2 => Dim.Fill (_value),
-                3 => Dim.Func (_ => _value),
-                4 => Dim.Percent (_value),
-                _ => Dimension == Dimension.Width ? ViewToEdit.Width : ViewToEdit.Height
-            };
+            Dim dim = _dimOptionSelector!.Value switch
+                       {
+                           0 => Dim.Absolute (_value),
+                           1 => Dim.Auto (),
+                           2 => Dim.Fill (_value),
+                           3 => Dim.Func (_ => _value),
+                           4 => Dim.Percent (_value),
+                           _ => Dimension == Dimension.Width ? ViewToEdit.Width : ViewToEdit.Height
+                       };
 
             if (Dimension == Dimension.Width)
             {

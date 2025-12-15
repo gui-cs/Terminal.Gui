@@ -26,8 +26,6 @@ public class AdornmentsEditor : EditorBase
     /// <inheritdoc/>
     protected override void OnViewToEditChanged ()
     {
-        //Enabled = ViewToEdit is not Adornment;
-
         if (MarginEditor is { })
         {
             MarginEditor.AdornmentToEdit = ViewToEdit?.Margin ?? null;
@@ -45,7 +43,7 @@ public class AdornmentsEditor : EditorBase
 
         if (Padding is { })
         {
-            Padding.Text = $"View: {GetIdentifyingString (ViewToEdit)}";
+            Padding.Text = GetIdentifyingString (ViewToEdit);
         }
     }
 
