@@ -23,12 +23,12 @@ public class ClipRegionTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal ("x", driver.Contents [5, 5].Grapheme);
 
         // Clear the contents
-        driver.FillRect (new Rectangle (0, 0, driver.Rows, driver.Cols), ' ');
+        driver.FillRect (new (0, 0, driver.Rows, driver.Cols), new Rune(' '));
         Assert.Equal (" ", driver.Contents [0, 0].Grapheme);
 
         // Setup the region with a single rectangle, fill screen with 'x'
-        driver.Clip = new (new Rectangle (5, 5, 5, 5));
-        driver.FillRect (new Rectangle (0, 0, driver.Rows, driver.Cols), 'x');
+        driver.Clip = new (new (5, 5, 5, 5));
+        driver.FillRect (new (0, 0, driver.Rows, driver.Cols), new Rune ('x'));
         Assert.Equal (" ", driver.Contents [0, 0].Grapheme);
         Assert.Equal (" ", driver.Contents [4, 9].Grapheme);
         Assert.Equal ("x", driver.Contents [5, 5].Grapheme);
