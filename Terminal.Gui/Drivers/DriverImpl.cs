@@ -148,7 +148,9 @@ internal class DriverImpl : IDriver
     private readonly IComponentFactory _componentFactory;
 
     /// <inheritdoc />
-    public IOutputBuffer GetOutputBuffer () => OutputBuffer;
+    public IOutputBuffer GetOutputBuffer () => _outputBuffer;
+
+    private readonly IOutput _output;
 
     public IOutput GetOutput () => _output;
 

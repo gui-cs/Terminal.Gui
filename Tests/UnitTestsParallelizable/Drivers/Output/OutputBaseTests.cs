@@ -1,4 +1,6 @@
-﻿namespace DriverTests.Output;
+﻿using System.Text;
+
+namespace DriverTests.Output;
 
 public class OutputBaseTests
 {

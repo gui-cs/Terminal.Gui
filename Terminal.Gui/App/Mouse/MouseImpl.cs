@@ -43,13 +43,13 @@ internal class MouseImpl : IMouse, IDisposable
 
 
     /// <inheritdoc/>
-    public void RaiseMouseEvent (Mouse mouse)
+    public void RaiseMouseEvent (Mouse mouseEvent)
     {
         //Debug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
         if (App?.Initialized is true)
         {
             // LastMousePosition is only set if the application is initialized.
-            LastMousePosition = mouse.ScreenPosition;
+            LastMousePosition = mouseEvent.ScreenPosition;
         }
 
         if (IsMouseDisabled)
@@ -59,9 +59,9 @@ internal class MouseImpl : IMouse, IDisposable
 
         // The position of the mouse is the same as the screen position at the application level.
         //Debug.Assert (mouse.Position == mouse.ScreenPosition);
-        mouse.Position = mouse.ScreenPosition;
+        mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouse.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
+        List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();
 
@@ -73,30 +73,30 @@ internal class MouseImpl : IMouse, IDisposable
                 throw new ObjectDisposedException (deepestViewUnderMouse.GetType ().FullName);
             }
 #endif
-            mouse.View = deepestViewUnderMouse;
+            mouseEvent.View = deepestViewUnderMouse;
         }
 
         MouseEvent?.Invoke (this, mouseEvent);
 
-        if (mouse.Handled)
+        if (mouseEvent.Handled)
         {
             return;
         }
 
         // Dismiss the Popover if the user presses mouse outside of it
-        if (mouse.IsPressed
+        if (mouseEvent.IsPressed
             && App?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
             && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
 
             // Recurse once so the event can be handled below the popover
-            RaiseMouseEvent (mouse);
+            RaiseMouseEvent (mouseEvent);
 
             return;
         }
 
-        if (HandleMouseGrab (deepestViewUnderMouse, mouse))
+        if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
         {
             return;
         }
@@ -120,27 +120,27 @@ internal class MouseImpl : IMouse, IDisposable
 
         if (deepestViewUnderMouse is Adornment adornment)
         {
-            Point frameLoc = adornment.ScreenToFrame (mouse.ScreenPosition);
+            Point frameLoc = adornment.ScreenToFrame (mouseEvent.ScreenPosition);
 
             viewMouseEvent = new ()
             {
-                Timestamp = mouse.Timestamp,
+                Timestamp = mouseEvent.Timestamp,
                 Position = frameLoc,
-                Flags = mouse.Flags,
-                ScreenPosition = mouse.ScreenPosition,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
         }
-        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size }).Contains (mouse.ScreenPosition))
+        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size }).Contains (mouseEvent.ScreenPosition))
         {
-            Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouse.ScreenPosition);
+            Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
 
             viewMouseEvent = new ()
             {
-                Timestamp = mouse.Timestamp,
+                Timestamp = mouseEvent.Timestamp,
                 Position = viewportLocation,
-                Flags = mouse.Flags,
-                ScreenPosition = mouse.ScreenPosition,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
         }
@@ -173,14 +173,14 @@ internal class MouseImpl : IMouse, IDisposable
                 break;
             }
 
-            Point boundsPoint = deepestViewUnderMouse.ScreenToViewport (mouse.ScreenPosition);
+            Point boundsPoint = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
 
             viewMouseEvent = new ()
             {
-                Timestamp = mouse.Timestamp,
+                Timestamp = mouseEvent.Timestamp,
                 Position = boundsPoint,
-                Flags = mouse.Flags,
-                ScreenPosition = mouse.ScreenPosition,
+                Flags = mouseEvent.Flags,
+                ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
         }
