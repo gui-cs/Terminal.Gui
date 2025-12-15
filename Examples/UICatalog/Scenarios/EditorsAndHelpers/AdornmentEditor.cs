@@ -51,7 +51,6 @@ public class AdornmentEditor : EditorBase
             if (IsInitialized)
             {
                 _topEdit!.Value = _adornment.Thickness.Top;
-                _topEdit!.Value = _adornment.Thickness.Top;
                 _leftEdit!.Value = _adornment.Thickness.Left;
                 _bottomEdit!.Value = _adornment.Thickness.Bottom;
                 _rightEdit!.Value = _adornment.Thickness.Right;
