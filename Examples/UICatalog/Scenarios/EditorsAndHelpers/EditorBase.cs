@@ -163,6 +163,7 @@ public abstract class EditorBase : View
         if (disposing && App is {})
         {
             App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
+            App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
         }
 
         base.Dispose (disposing);
