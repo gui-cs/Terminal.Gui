@@ -157,6 +157,8 @@ public class ListView : View, IDesignable
         // Use the form of Add that lets us pass context to the handler
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
+
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     private bool _allowsMarking;

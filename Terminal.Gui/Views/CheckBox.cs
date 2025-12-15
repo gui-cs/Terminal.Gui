@@ -8,7 +8,7 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class CheckBox : View
 {
-    private static MouseState _defaultHighlightStates = MouseState.PressedOutside | MouseState.Pressed | MouseState.In; // Resources/config.json overrides
+    private static MouseState _defaultHighlightStates = MouseState.None;// MouseState.PressedOutside | MouseState.Pressed | MouseState.In; // Resources/config.json overrides
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
@@ -39,6 +39,7 @@ public class CheckBox : View
         // - DO NOT advance state
         // The default Accept handler does that.
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
 
         TitleChanged += Checkbox_TitleChanged;
 

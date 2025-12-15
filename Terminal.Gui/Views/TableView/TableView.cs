@@ -281,6 +281,8 @@ public class TableView : View, IDesignable
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
+
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     // TODO: Update to use Key instead of KeyCode
