@@ -205,7 +205,7 @@ public class OutputBufferImpl : IOutputBuffer
     {
         if (col > 0 && Contents! [row, col - 1].Grapheme.GetColumns () > 1)
         {
-            Contents [row, col - 1].Grapheme = Rune.ReplacementChar.ToString ();
+            Contents [row, col - 1].Grapheme = Glyphs.ReplacementChar.ToString ();
             Contents [row, col - 1].IsDirty = true;
         }
     }
@@ -273,7 +273,7 @@ public class OutputBufferImpl : IOutputBuffer
         if (!Clip!.Contains (col + 1, row))
         {
             // Second column is outside clip - can't fit wide char here
-            Contents! [row, col].Grapheme = Rune.ReplacementChar.ToString ();
+            Contents! [row, col].Grapheme = Glyphs.ReplacementChar.ToString ();
         }
         else if (!Clip.Contains (col, row))
         {
@@ -281,7 +281,7 @@ public class OutputBufferImpl : IOutputBuffer
             // Mark second column as replacement to indicate partial overlap
             if (col + 1 < Cols)
             {
-                Contents! [row, col + 1].Grapheme = Rune.ReplacementChar.ToString ();
+                Contents! [row, col + 1].Grapheme = Glyphs.ReplacementChar.ToString ();
                 Contents! [row, col + 1].IsDirty = true;
             }
         }
