@@ -130,10 +130,14 @@ public interface IOutputBuffer
     int Top { get; set; }
 
     /// <summary>
-    ///     Sets the replacement chars that will be used when a wide glyph cannot fit in the available space.
+    ///     Sets the replacement characters that will be used when a wide glyph (double-width character) cannot fit in the available space.
     ///     If not set, the default will be <see cref="Glyphs.ReplacementChar"/>.
     /// </summary>
-    /// <param name="column1ReplacementChar">The character used when the 1st column is invalid.</param>
-    /// <param name="column2ReplacementChar">The character used when the 2nd column is invalid.</param>
+    /// <param name="column1ReplacementChar">
+    ///     The character used when the first column of a wide character is invalid (for example, when it is overlapped by the trailing half of a previous wide character).
+    /// </param>
+    /// <param name="column2ReplacementChar">
+    ///     The character used when the second column of a wide character would fall outside the clip boundary and cannot be rendered.
+    /// </param>
     void SetReplacementChars (Rune column1ReplacementChar, Rune column2ReplacementChar);
 }
