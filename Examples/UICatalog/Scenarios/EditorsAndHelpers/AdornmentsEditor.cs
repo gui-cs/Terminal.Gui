@@ -14,8 +14,6 @@ public class AdornmentsEditor : EditorBase
 
         TabStop = TabBehavior.TabGroup;
 
-        ExpanderButton!.Orientation = Orientation.Horizontal;
-
         Initialized += AdornmentsEditor_Initialized;
 
         SchemeName = "Dialog";
@@ -92,12 +90,17 @@ public class AdornmentsEditor : EditorBase
 
     private void AdornmentsEditor_Initialized (object? sender, EventArgs e)
     {
+        if (ExpanderButton is { })
+        {
+            ExpanderButton.Orientation = Orientation.Horizontal;
+        }
+
         MarginEditor = new ()
         {
             X = -1,
             Y = 0,
             SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Single
+            BorderStyle = BorderStyle
         };
         MarginEditor.Border!.Thickness = MarginEditor.Border!.Thickness with { Bottom = 0 };
         Add (MarginEditor);
@@ -107,7 +110,7 @@ public class AdornmentsEditor : EditorBase
             X = Pos.Left (MarginEditor),
             Y = Pos.Bottom (MarginEditor),
             SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Single
+            BorderStyle = BorderStyle
         };
         BorderEditor.Border!.Thickness = BorderEditor.Border!.Thickness with { Bottom = 0 };
         Add (BorderEditor);
@@ -117,7 +120,7 @@ public class AdornmentsEditor : EditorBase
             X = Pos.Left (BorderEditor),
             Y = Pos.Bottom (BorderEditor),
             SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Single
+            BorderStyle = BorderStyle
         };
         PaddingEditor.Border!.Thickness = PaddingEditor.Border!.Thickness with { Bottom = 0 };
         Add (PaddingEditor);

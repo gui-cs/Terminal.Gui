@@ -30,14 +30,16 @@ public abstract class EditorBase : View
             {
                 Border.Add (ExpanderButton);
 
-                if (ExpanderButton.Orientation == Orientation.Vertical)
-                {
-                    ExpanderButton.X = Pos.AnchorEnd () - 1;
-                }
-                else
-                {
-                    ExpanderButton.Y = Pos.AnchorEnd () - 1;
-                }
+                //if (ExpanderButton.Orientation == Orientation.Vertical)
+                //{
+                //    ExpanderButton.X = Pos.AnchorEnd () - 1;
+                //    ExpanderButton.Y = 0;
+                //}
+                //else
+                //{
+                //    ExpanderButton.X = 0;
+                //    ExpanderButton.Y = Pos.AnchorEnd () - 1;
+                //}
             }
 
             Application.MouseEvent += ApplicationOnMouseEvent;
