@@ -1,4 +1,7 @@
-﻿namespace DriverTests;
+﻿using System.Text;
+using Terminal.Gui.Drivers;
+
+namespace DriverTests;
 
 public class OutputBaseTests
 {
@@ -161,6 +164,8 @@ public class OutputBaseTests
         // FakeOutput exposes this because it's in test scope
         var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetReplacementChars ((Rune)'①', (Rune)'②');
+
         buffer.SetSize (3, 1);
 
         // Write '🦮' at col 0 and 'A' at col 2
@@ -209,7 +214,7 @@ public class OutputBaseTests
 
         output.Write (buffer);
 
-        Assert.Contains ("�", output.GetLastOutput ());
+        Assert.Contains ("①", output.GetLastOutput ());
         Assert.Contains ("X", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells

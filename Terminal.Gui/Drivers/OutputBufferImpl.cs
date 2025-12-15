@@ -65,6 +65,16 @@ public class OutputBufferImpl : IOutputBuffer
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
 
+    private Rune _column1ReplacementChar = Glyphs.ReplacementChar;
+    private Rune _column2ReplacementChar = Glyphs.ReplacementChar;
+
+    /// <inheritdoc />
+    public void SetReplacementChars (Rune column1ReplacementChar, Rune column2ReplacementChar)
+    {
+        _column1ReplacementChar = column1ReplacementChar;
+        _column2ReplacementChar = column2ReplacementChar;
+    }
+
     /// <summary>
     ///     Indicates which lines have been modified and need to be redrawn.
     /// </summary>
@@ -205,7 +215,7 @@ public class OutputBufferImpl : IOutputBuffer
     {
         if (col > 0 && Contents! [row, col - 1].Grapheme.GetColumns () > 1)
         {
-            Contents [row, col - 1].Grapheme = Glyphs.ReplacementChar.ToString ();
+            Contents [row, col - 1].Grapheme = _column1ReplacementChar.ToString ();
             Contents [row, col - 1].IsDirty = true;
         }
     }
@@ -273,7 +283,7 @@ public class OutputBufferImpl : IOutputBuffer
         if (!Clip!.Contains (col + 1, row))
         {
             // Second column is outside clip - can't fit wide char here
-            Contents! [row, col].Grapheme = Glyphs.ReplacementChar.ToString ();
+            Contents! [row, col].Grapheme = _column1ReplacementChar.ToString ();
         }
         else if (!Clip.Contains (col, row))
         {
@@ -281,7 +291,7 @@ public class OutputBufferImpl : IOutputBuffer
             // Mark second column as replacement to indicate partial overlap
             if (col + 1 < Cols)
             {
-                Contents! [row, col + 1].Grapheme = Glyphs.ReplacementChar.ToString ();
+                Contents! [row, col + 1].Grapheme = _column2ReplacementChar.ToString ();
                 Contents! [row, col + 1].IsDirty = true;
             }
         }

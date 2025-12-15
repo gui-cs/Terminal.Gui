@@ -178,6 +178,7 @@ public class ClipTests (ITestOutputHelper _output)
     public void Clipping_Wide_Runes ()
     {
         Application.Driver!.SetScreenSize (30, 1);
+        Application.Driver!.GetOutputBuffer ().SetReplacementChars ((Rune)'①', (Rune)'②');
 
         var top = new View
         {
@@ -231,9 +232,9 @@ public class ClipTests (ITestOutputHelper _output)
         //                            012 34 56 78 90 12 34 56 78 90 12 34 56 78
         //                            │こ れ  は 広 い  ル ー ン  ラ イ ン で  す 。
         //                            01 2345678901234 56 78 90 12 34 56 
-        //                            │� |0123456989│� ン  ラ イ ン で  す 。
+        //                            │① |0123456989│① ン  ラ イ ン で  す 。
         expectedOutput = """
-                         │�│0123456789│ ンラインです。
+                         │①│0123456789│ ンラインです。
                          """;
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, _output);

@@ -128,4 +128,12 @@ public interface IOutputBuffer
     ///     Changing this may have unexpected consequences.
     /// </summary>
     int Top { get; set; }
+
+    /// <summary>
+    ///     Sets the replacement chars that will be used when a wide glyph cannot fit in the available space.
+    ///     If not set, the default will be <see cref="Glyphs.ReplacementChar"/>.
+    /// </summary>
+    /// <param name="column1ReplacementChar">The character used when the 1st column is invalid.</param>
+    /// <param name="column2ReplacementChar">The character used when the 2nd column is invalid.</param>
+    void SetReplacementChars (Rune column1ReplacementChar, Rune column2ReplacementChar);
 }
