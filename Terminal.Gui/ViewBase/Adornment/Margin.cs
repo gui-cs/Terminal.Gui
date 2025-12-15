@@ -255,7 +255,7 @@ public class Margin : Adornment
         get => _shadowWidth;
         set
         {
-            if (TryValidateShadowLength (_shadowWidth, value, out int result))
+            if (TryValidateShadowLength (value, out int result))
             {
                 base.ShadowWidth = _shadowWidth = value;
                 SetShadow (ShadowStyle);
@@ -275,7 +275,7 @@ public class Margin : Adornment
         get => _shadowHeight;
         set
         {
-            if (TryValidateShadowLength (_shadowHeight, value, out int result))
+            if (TryValidateShadowLength (value, out int result))
             {
                 base.ShadowHeight = _shadowHeight = value;
                 SetShadow (ShadowStyle);
@@ -287,7 +287,7 @@ public class Margin : Adornment
         }
     }
 
-    private bool TryValidateShadowLength (int originalValue, int newValue, out int result)
+    private bool TryValidateShadowLength (int newValue, out int result)
     {
         result = newValue;
 
