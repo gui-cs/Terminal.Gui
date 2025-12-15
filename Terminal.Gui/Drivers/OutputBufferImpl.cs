@@ -291,6 +291,8 @@ public class OutputBufferImpl : IOutputBuffer
             // Mark second column as replacement to indicate partial overlap
             if (col + 1 < Cols)
             {
+                // NOTE: This is dead code and apparently never called.
+                // NOTE: See AddStr_WideChar_FirstColumnOutsideClip_SecondColumnInside_CurrentBehavior
                 Contents! [row, col + 1].Grapheme = _column2ReplacementChar.ToString ();
                 Contents! [row, col + 1].IsDirty = true;
             }
