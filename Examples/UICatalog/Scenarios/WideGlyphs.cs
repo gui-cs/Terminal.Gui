@@ -34,10 +34,6 @@ public sealed class WideGlyphs : Scenario
             AutoSelectAdornments = false,
             ShowViewIdentifier = true
         };
-        adornmentsEditor.ExpanderButton.Accepting += (sender, args) =>
-                                                             {
-                                                                 //adornmentsEditor.ExpanderButton.Collapsed = args.NewValue;
-                                                             };
         appWindow.Add (adornmentsEditor);
 
         ViewportSettingsEditor viewportSettingsEditor = new ()
