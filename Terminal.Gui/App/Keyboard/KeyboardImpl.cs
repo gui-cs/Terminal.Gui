@@ -160,7 +160,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         //#endif
 
         // TODO: This should match standard event patterns
-        KeyDown?.Invoke (null, key);
+        KeyDown?.Invoke (this, key);
 
         if (key.Handled)
         {
@@ -216,7 +216,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
             return true;
         }
 
-        KeyUp?.Invoke (null, key);
+        KeyUp?.Invoke (this, key);
 
         if (key.Handled)
         {

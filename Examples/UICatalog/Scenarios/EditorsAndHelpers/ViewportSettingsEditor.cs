@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System;
-
 namespace UICatalog.Scenarios;
 
 /// <summary>
@@ -60,8 +58,8 @@ public sealed class ViewportSettingsEditor : EditorBase
                                                : CheckState.UnChecked;
 
             _cbTransparentMouse!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)
-                                               ? CheckState.Checked
-                                               : CheckState.UnChecked;
+                                                    ? CheckState.Checked
+                                                    : CheckState.UnChecked;
 
             _cbVerticalScrollBar!.CheckedState = ViewToEdit.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked;
             _cbAutoShowVerticalScrollBar!.CheckedState = ViewToEdit.VerticalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked;
@@ -115,27 +113,27 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         Add (_cbAllowXGreaterThanContentWidth);
 
-        void AllowNegativeXToggle (object? sender, ResultEventArgs<CheckState> e)
+        void AllowNegativeXToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeX;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowNegativeX;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeX;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.AllowNegativeX;
             }
         }
 
-        void AllowXGreaterThanContentWidthToggle (object? sender, ResultEventArgs<CheckState> e)
+        void AllowXGreaterThanContentWidthToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowXGreaterThanContentWidth;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowXGreaterThanContentWidth;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowXGreaterThanContentWidth;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.AllowXGreaterThanContentWidth;
             }
         }
 
@@ -153,27 +151,27 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         Add (_cbAllowYGreaterThanContentHeight);
 
-        void AllowNegativeYToggle (object? sender, ResultEventArgs<CheckState> e)
+        void AllowNegativeYToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeY;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowNegativeY;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowNegativeY;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.AllowNegativeY;
             }
         }
 
-        void AllowYGreaterThanContentHeightToggle (object? sender, ResultEventArgs<CheckState> e)
+        void AllowYGreaterThanContentHeightToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowYGreaterThanContentHeight;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.AllowYGreaterThanContentHeight;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.AllowYGreaterThanContentHeight;
             }
         }
 
@@ -193,17 +191,16 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _contentSizeWidth.ValueChanging += ContentSizeWidthValueChanged;
 
-        void ContentSizeWidthValueChanged (object? sender, CancelEventArgs<int> e)
+        void ContentSizeWidthValueChanged (object? sender, CancelEventArgs<int> cea)
         {
-            if (e.NewValue < 0)
+            if (cea.NewValue < 0)
             {
-                e.Cancel = true;
+                cea.Cancel = true;
 
                 return;
             }
 
-            // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            ViewToEdit!.SetContentSize (ViewToEdit.GetContentSize () with { Width = e.NewValue });
+            ViewToEdit!.SetContentSize (ViewToEdit.GetContentSize () with { Width = cea.NewValue });
         }
 
         var labelComma = new Label
@@ -221,17 +218,16 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _contentSizeHeight.ValueChanging += ContentSizeHeightValueChanged;
 
-        void ContentSizeHeightValueChanged (object? sender, CancelEventArgs<int> e)
+        void ContentSizeHeightValueChanged (object? sender, CancelEventArgs<int> cea)
         {
-            if (e.NewValue < 0)
+            if (cea.NewValue < 0)
             {
-                e.Cancel = true;
+                cea.Cancel = true;
 
                 return;
             }
 
-            // BUGBUG: set_ContentSize is supposed to be `protected`. 
-            ViewToEdit?.SetContentSize (ViewToEdit.GetContentSize () with { Height = e.NewValue });
+            ViewToEdit?.SetContentSize (ViewToEdit.GetContentSize () with { Height = cea.NewValue });
         }
 
         _cbClearContentOnly = new ()
@@ -243,15 +239,15 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbClearContentOnly.CheckedStateChanging += ClearContentOnlyToggle;
 
-        void ClearContentOnlyToggle (object? sender, ResultEventArgs<CheckState> e)
+        void ClearContentOnlyToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClearContentOnly;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.ClearContentOnly;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.ClearContentOnly;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.ClearContentOnly;
             }
         }
 
@@ -264,15 +260,15 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbClipContentOnly.CheckedStateChanging += ClipContentOnlyToggle;
 
-        void ClipContentOnlyToggle (object? sender, ResultEventArgs<CheckState> e)
+        void ClipContentOnlyToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.ClipContentOnly;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.ClipContentOnly;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.ClipContentOnly;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.ClipContentOnly;
             }
         }
 
@@ -285,15 +281,15 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbTransparent.CheckedStateChanging += TransparentToggle;
 
-        void TransparentToggle (object? sender, ResultEventArgs<CheckState> e)
+        void TransparentToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.Transparent;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.Transparent;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.Transparent;
             }
         }
 
@@ -306,15 +302,15 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbTransparentMouse.CheckedStateChanging += TransparentMouseToggle;
 
-        void TransparentMouseToggle (object? sender, ResultEventArgs<CheckState> e)
+        void TransparentMouseToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            if (e.Result == CheckState.Checked)
+            if (rea.Result == CheckState.Checked)
             {
-                ViewToEdit!.ViewportSettings |= Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
             }
             else
             {
-                ViewToEdit!.ViewportSettings &= ~Terminal.Gui.ViewBase.ViewportSettingsFlags.TransparentMouse;
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.TransparentMouse;
             }
         }
 
@@ -327,9 +323,9 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbVerticalScrollBar.CheckedStateChanging += VerticalScrollBarToggle;
 
-        void VerticalScrollBarToggle (object? sender, ResultEventArgs<CheckState> e)
+        void VerticalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            ViewToEdit!.VerticalScrollBar.Visible = e.Result == CheckState.Checked;
+            ViewToEdit!.VerticalScrollBar.Visible = rea.Result == CheckState.Checked;
         }
 
         _cbAutoShowVerticalScrollBar = new ()
@@ -341,9 +337,9 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbAutoShowVerticalScrollBar.CheckedStateChanging += AutoShowVerticalScrollBarToggle;
 
-        void AutoShowVerticalScrollBarToggle (object? sender, ResultEventArgs<CheckState> e)
+        void AutoShowVerticalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            ViewToEdit!.VerticalScrollBar.AutoShow = e.Result == CheckState.Checked;
+            ViewToEdit!.VerticalScrollBar.AutoShow = rea.Result == CheckState.Checked;
         }
 
         _cbHorizontalScrollBar = new ()
@@ -355,9 +351,9 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbHorizontalScrollBar.CheckedStateChanging += HorizontalScrollBarToggle;
 
-        void HorizontalScrollBarToggle (object? sender, ResultEventArgs<CheckState> e)
+        void HorizontalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            ViewToEdit!.HorizontalScrollBar.Visible = e.Result == CheckState.Checked;
+            ViewToEdit!.HorizontalScrollBar.Visible = rea.Result == CheckState.Checked;
         }
 
         _cbAutoShowHorizontalScrollBar = new ()
@@ -369,9 +365,9 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _cbAutoShowHorizontalScrollBar.CheckedStateChanging += AutoShowHorizontalScrollBarToggle;
 
-        void AutoShowHorizontalScrollBarToggle (object? sender, ResultEventArgs<CheckState> e)
+        void AutoShowHorizontalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
         {
-            ViewToEdit!.HorizontalScrollBar.AutoShow = e.Result == CheckState.Checked;
+            ViewToEdit!.HorizontalScrollBar.AutoShow = rea.Result == CheckState.Checked;
         }
 
         Add (

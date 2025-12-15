@@ -89,7 +89,7 @@ public class ApplicationNavigation
 
         _focused = value;
 
-        FocusedChanged?.Invoke (null, EventArgs.Empty);
+        FocusedChanged?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>

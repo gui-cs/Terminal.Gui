@@ -86,7 +86,7 @@ internal class MouseImpl : IMouse, IDisposable
             mouseEvent.View = deepestViewUnderMouse;
         }
 
-        MouseEvent?.Invoke (null, mouseEvent);
+        MouseEvent?.Invoke (this, mouseEvent);
 
         if (mouseEvent.Handled)
         {

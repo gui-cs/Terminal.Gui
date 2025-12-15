@@ -125,7 +125,7 @@ public sealed class WideGlyphs : Scenario
             Y = 5,
             Width = 15,
             Height = 5,
-            //BorderStyle = LineStyle.Dotted
+            //BorderStyle = LineStyle.Dashed
         };
 
         arrangeableViewAtEven.SetScheme (new () { Normal = new (Color.Black, Color.Green) });
