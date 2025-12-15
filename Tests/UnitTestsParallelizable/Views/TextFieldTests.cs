@@ -534,7 +534,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         var tf = new TextField ();
 
         //📄 == \ud83d\udcc4 == \U0001F4C4
-        // � == Rune.ReplacementChar
+        // � == Glyphs.ReplacementChar
         tf.InsertText ("aA,;\ud83d\udcc4\U0001F4C4\udcc4\ud83d");
         Assert.Equal ("aA,;📄📄��", tf.Text);
     }

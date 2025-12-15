@@ -21,7 +21,7 @@ public static class StringExtensions
             return (rune, bytesConsumed);
         }
 
-        return (Rune.ReplacementChar, 1);
+        return (Glyphs.ReplacementChar, 1);
     }
 
     /// <summary>Unpacks the first UTF-8 encoding in the string and returns the rune and its width in bytes.</summary>
@@ -47,7 +47,7 @@ public static class StringExtensions
             return (rune, bytesConsumed);
         }
 
-        return (Rune.ReplacementChar, 1);
+        return (Glyphs.ReplacementChar, 1);
     }
 
     /// <summary>Gets the number of columns the string occupies in the terminal.</summary>
