@@ -77,7 +77,7 @@ public class AllViewsView : View
 
         View? previousView = null;
 
-        foreach (Type? type in allClasses)
+        foreach (Type type in allClasses)
         {
             View? view = CreateView (type);
 
@@ -118,15 +118,8 @@ public class AllViewsView : View
                     // Check if the generic parameter has constraints
                     Type [] constraints = arg.GetGenericParameterConstraints ();
 
-                    if (constraints.Length > 0)
-                    {
-                        // Use the first constraint type to satisfy the constraint
-                        typeArguments.Add (constraints [0]);
-                    }
-                    else
-                    {
-                        typeArguments.Add (typeof (object));
-                    }
+                    // Use the first constraint type to satisfy the constraint
+                    typeArguments.Add (constraints.Length > 0 ? constraints [0] : typeof (object));
                 }
             }
 
@@ -193,17 +186,17 @@ public class AllViewsView : View
             return;
         }
 
-        if (view.Width == Dim.Absolute (0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == Dim.Absolute (0) || view.Height is null)
+        if (view.Height == Dim.Absolute (0))
         {
             view.Height = MAX_VIEW_FRAME_HEIGHT - 2;
         }
 
-        if (!view.Width!.Has<DimAuto> (out _))
+        if (!view.Width.Has<DimAuto> (out _))
         {
             view.Width = Dim.Fill ();
         }
