@@ -8,7 +8,7 @@ namespace DriverTests;
 ///     These tests validate that FillRect properly handles wide characters when overlapping existing content.
 ///     Specifically, they ensure that wide characters are properly invalidated and replaced when a MessageBox border or similar UI element is drawn over them, preventing visual corruption.
 /// </summary>
-public class OutputBufferWideCharTests (ITestOutputHelper output)
+public class OutputBufferWideCharTests
 {
     /// <summary>
     ///     Tests that FillRect properly invalidates wide characters when overwriting them.
