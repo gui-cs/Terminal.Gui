@@ -574,6 +574,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         };
 
         superView.Add (viewWithBorderAtX0, viewWithBorderAtX1, viewWithBorderAtX2);
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
         app.Begin (superView);
         // Begin calls LayoutAndDraw, so no need to call it again here
         // app.LayoutAndDraw();
@@ -585,9 +586,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                                        ┆viewWithBorderAtX0┆🍎🍎🍎
                                                        └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎
                                                        🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
-                                                       �┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ 🍎🍎
-                                                       �┆viewWithBorderAtX1┆ 🍎🍎
-                                                       �└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ 🍎🍎
+                                                       ①┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ 🍎🍎
+                                                       ①┆viewWithBorderAtX1┆ 🍎🍎
+                                                       ①└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ 🍎🍎
                                                        🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
                                                        🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎
                                                        🍎┆viewWithBorderAtX2┆🍎🍎
@@ -597,7 +598,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                                        output,
                                                        driver);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┆viewWithBorderAtX0┆🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�┆viewWithBorderAtX1┆ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┆viewWithBorderAtX2┆🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┆viewWithBorderAtX0┆🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①┆viewWithBorderAtX1┆ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┆viewWithBorderAtX2┆🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
                                            output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
@@ -617,9 +618,9 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                               ┆viewWithBorderAtX0┆🍎🍎🍎
                                               └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎
                                               🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
-                                              �┌──────────────────┐ 🍎🍎
-                                              �│viewWithBorderAtX1│ 🍎🍎
-                                              �└──────────────────┘ 🍎🍎
+                                              ①┌──────────────────┐ 🍎🍎
+                                              ①│viewWithBorderAtX1│ 🍎🍎
+                                              ①└──────────────────┘ 🍎🍎
                                               🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎
                                               🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎
                                               🍎┆viewWithBorderAtX2┆🍎🍎
@@ -679,18 +680,19 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
         };
 
         superView.Add (viewWithBorder);
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
         app.Begin (superView);
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �┌─┐🍎
-                                              �│X│🍎
-                                              �└─┘🍎
+                                              ①┌─┐🍎
+                                              ①│X│🍎
+                                              ①└─┘🍎
                                               """,
                                               output,
                                               driver);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m�┌─┐🍎�│X│🍎�└─┘🍎",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①┌─┐🍎①│X│🍎①└─┘🍎",
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
@@ -742,19 +744,21 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
             Height = 3
         };
 
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
+
         superView.Add (viewWithBorder);
         app.Begin (superView);
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              🍎�┌─┐
-                                              🍎�│X│
-                                              🍎�└─┘
+                                              🍎①┌─┐
+                                              🍎①│X│
+                                              🍎①└─┘
                                               """,
                                               output,
                                               driver);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎�┌─┐🍎�│X│🍎�└─┘",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎①┌─┐🍎①│X│🍎①└─┘",
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;

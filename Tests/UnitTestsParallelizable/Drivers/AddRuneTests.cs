@@ -181,9 +181,9 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     {
         IDriver? driver = CreateFakeDriver ();
         driver.SetScreenSize (6, 3);
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
         driver!.Clip = new (driver.Screen);
-
         driver.Move (1, 0);
         driver.AddStr ("┌");
         driver.Move (2, 0);
@@ -197,14 +197,14 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �┌─┐🍎
+                                              ①┌─┐🍎
                                               """,
                                               output,
                                               driver);
 
         driver.Refresh ();
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m�┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
                                            output, driver);
     }
 }
