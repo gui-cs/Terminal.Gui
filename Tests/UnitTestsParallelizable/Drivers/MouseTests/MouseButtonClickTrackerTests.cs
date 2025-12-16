@@ -25,7 +25,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime now = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => now), TimeSpan.FromMilliseconds (500), 0);
         Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
@@ -42,7 +42,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime now = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => now), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse pressEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -62,7 +62,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse pressEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse releaseEvent1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -91,7 +91,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -127,7 +127,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -159,7 +159,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -188,7 +188,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         // Arrange
         DateTime currentTime = DateTime.Now;
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
-        MouseButtonClickTracker tracker = new (() => currentTime, threshold, 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), threshold, 0);
 
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -218,7 +218,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
         // Arrange
         DateTime currentTime = DateTime.Now;
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
-        MouseButtonClickTracker tracker = new (() => currentTime, threshold, 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), threshold, 0);
 
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -250,7 +250,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime now = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => now), TimeSpan.FromMilliseconds (500), 0);
         Mouse releaseEvent = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
@@ -267,7 +267,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
@@ -296,7 +296,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -325,7 +325,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
@@ -354,7 +354,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now), TimeSpan.FromMilliseconds (500), 0);
 
         Mouse press = new ()
         {
@@ -388,7 +388,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - First click at T+0
         Mouse press1 = new ()
@@ -435,7 +435,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - First click at T+0
         Mouse press1 = new ()
@@ -482,7 +482,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - Three clicks, each 150ms apart (total 450ms < 500ms threshold)
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime };
@@ -512,7 +512,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - Four complete click sequences within threshold
         tracker.UpdateState (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, out _);
@@ -552,7 +552,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - Six complete click sequences
         var currentMs = 0;
@@ -597,7 +597,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - First click at (10, 10)
         tracker.UpdateState (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, out _);
@@ -624,7 +624,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - First click at (10, 10)
         tracker.UpdateState (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, out _);
@@ -654,7 +654,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - First click at (10, 10)
         tracker.UpdateState (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, out _);
@@ -685,7 +685,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - First click at (10, 10)
         tracker.UpdateState (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, out _);
@@ -712,7 +712,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - First click at (10, 10)
         tracker.UpdateState (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, out _);
@@ -743,7 +743,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime now = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => now, TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => now), TimeSpan.FromMilliseconds (500), 0);
 
         // Act - Check with no clicks
         bool result1 = tracker.CheckForExpiredClicks (out int? numClicks1, out Point position1);
@@ -775,7 +775,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Act & Assert - Check At property after each state change
         tracker.UpdateState (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, out _);
@@ -794,7 +794,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseButtonClickTracker tracker = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500), 0);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500), 0);
 
         // Assert - Initial state
         Assert.False (tracker.Pressed);
@@ -826,7 +826,7 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker = new (() => currentTime, TimeSpan.FromMilliseconds (500), buttonIdx);
+        MouseButtonClickTracker tracker = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), buttonIdx);
 
         Mouse press = new () { ScreenPosition = new (10, 10), Flags = pressedFlag };
         Mouse release = new () { ScreenPosition = new (10, 10), Flags = releasedFlag };
@@ -847,8 +847,8 @@ public class MouseButtonClickTrackerTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseButtonClickTracker tracker1 = new (() => currentTime, TimeSpan.FromMilliseconds (500), 0); // Tracking Button1
-        MouseButtonClickTracker tracker2 = new (() => currentTime, TimeSpan.FromMilliseconds (500), 1); // Tracking Button2
+        MouseButtonClickTracker tracker1 = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 0); // Tracking Button1
+        MouseButtonClickTracker tracker2 = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500), 1); // Tracking Button2
 
         Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed };

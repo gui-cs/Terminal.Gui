@@ -20,7 +20,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -55,7 +55,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed };
@@ -96,7 +96,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         // Act - Double-click Button1, then double-click Button2
         List<Terminal.Gui.Input.Mouse> allEvents = [];
@@ -139,7 +139,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
@@ -158,7 +158,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
@@ -193,7 +193,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed | modifier };
         Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased | modifier };
@@ -224,7 +224,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         MouseFlags modifiedPressed = MouseFlags.LeftButtonPressed | MouseFlags.Shift;
         MouseFlags modifiedReleased = MouseFlags.LeftButtonReleased | MouseFlags.Shift;
@@ -267,7 +267,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = new (2025, 1, 1, 12, 0, 0);
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -296,7 +296,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         // Arrange
         DateTime currentTime = new (2025, 1, 1, 12, 0, 0);
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
-        MouseInterpreter interpreter = new (() => currentTime, threshold);
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), threshold);
 
         Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -327,7 +327,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
         Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
@@ -356,7 +356,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
     {
         // Arrange
         DateTime currentTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => currentTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = flags };
 

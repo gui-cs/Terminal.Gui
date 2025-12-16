@@ -142,7 +142,7 @@ public class MouseInterpreterTests
     {
         // Arrange
         DateTime mockTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => mockTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => mockTime), TimeSpan.FromMilliseconds (500));
         List<Mouse> allEvents = [];
 
         // Act - Simulate a double-click: Press, Release, Press, Release
@@ -217,7 +217,7 @@ public class MouseInterpreterTests
         DateTime mockTime = DateTime.Now;
 
         MouseInterpreter interpreter = new (
-                                            () => mockTime,
+                                            new FuncTimeProvider (() => mockTime),
                                             TimeSpan.FromMilliseconds (500)
                                            );
         List<Mouse> allEvents = [];
@@ -281,7 +281,7 @@ public class MouseInterpreterTests
     {
         // Arrange
         DateTime mockTime = DateTime.Now;
-        MouseInterpreter interpreter = new (() => mockTime, TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => mockTime), TimeSpan.FromMilliseconds (500));
         List<Mouse> allEvents = [];
 
         // Act - Simulate a double-click at the same position
@@ -328,7 +328,7 @@ public class MouseInterpreterTests
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseInterpreter interpreter = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500));
         List<Mouse> allEvents = [];
 
         // Act - Two clicks with 600ms spacing via timestamps (should be two single clicks, not a double-click)
@@ -381,7 +381,7 @@ public class MouseInterpreterTests
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseInterpreter interpreter = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500));
         List<Mouse> allEvents = [];
 
         // Act - Two clicks with 400ms spacing via timestamps (should be a double-click)
@@ -434,7 +434,7 @@ public class MouseInterpreterTests
     {
         // Arrange
         DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
-        MouseInterpreter interpreter = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500));
+        MouseInterpreter interpreter = new (new FuncTimeProvider (() => DateTime.Now.AddYears (10)), TimeSpan.FromMilliseconds (500));
         List<Mouse> allEvents = [];
 
         // Act - Single click with explicit timestamp
