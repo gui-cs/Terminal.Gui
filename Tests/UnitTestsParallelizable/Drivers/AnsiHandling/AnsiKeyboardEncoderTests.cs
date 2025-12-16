@@ -62,6 +62,108 @@ public class AnsiKeyboardEncoderTests (ITestOutputHelper output)
     }
 
     [Theory]
+    // Shift modifier (modifier = 2)
+    [InlineData (KeyCode.F1 | KeyCode.ShiftMask, "\u001B[1;2P")]   // SS3 → CSI with modifier
+    [InlineData (KeyCode.F5 | KeyCode.ShiftMask, "\u001B[15;2~")]
+    [InlineData (KeyCode.F6 | KeyCode.ShiftMask, "\u001B[17;2~")]
+    [InlineData (KeyCode.F12 | KeyCode.ShiftMask, "\u001B[24;2~")]
+    // Ctrl modifier (modifier = 5)
+    [InlineData (KeyCode.F1 | KeyCode.CtrlMask, "\u001B[1;5P")]
+    [InlineData (KeyCode.F5 | KeyCode.CtrlMask, "\u001B[15;5~")]
+    [InlineData (KeyCode.F6 | KeyCode.CtrlMask, "\u001B[17;5~")]
+    [InlineData (KeyCode.F12 | KeyCode.CtrlMask, "\u001B[24;5~")]
+    // Ctrl+Shift modifier (modifier = 6)
+    [InlineData (KeyCode.F1 | KeyCode.CtrlMask | KeyCode.ShiftMask, "\u001B[1;6P")]
+    [InlineData (KeyCode.F6 | KeyCode.CtrlMask | KeyCode.ShiftMask, "\u001B[17;6~")]
+    [InlineData (KeyCode.F12 | KeyCode.CtrlMask | KeyCode.ShiftMask, "\u001B[24;6~")]
+    // Ctrl+Alt modifier (modifier = 7)
+    [InlineData (KeyCode.F6 | KeyCode.CtrlMask | KeyCode.AltMask, "\u001B[17;7~")]
+    [InlineData (KeyCode.F12 | KeyCode.CtrlMask | KeyCode.AltMask, "\u001B[24;7~")]
+    // Ctrl+Shift+Alt modifier (modifier = 8)
+    [InlineData (KeyCode.F6 | KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask, "\u001B[17;8~")]
+    [InlineData (KeyCode.F12 | KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask, "\u001B[24;8~")]
+    public void Encode_FunctionKeysWithModifiers_ProducesCorrectSequence (KeyCode keyCode, string expectedSequence)
+    {
+        // Arrange
+        Key key = new (keyCode);
+
+        // Act
+        string result = AnsiKeyboardEncoder.Encode (key);
+
+        // Assert
+        _output.WriteLine ($"KeyCode: {keyCode} → {result.Replace ("\u001B", "ESC")}");
+        Assert.Equal (expectedSequence, result);
+    }
+
+    [Theory]
+    // Shift modifier (modifier = 2)
+    [InlineData (KeyCode.CursorUp | KeyCode.ShiftMask, "\u001B[1;2A")]
+    [InlineData (KeyCode.CursorDown | KeyCode.ShiftMask, "\u001B[1;2B")]
+    [InlineData (KeyCode.CursorRight | KeyCode.ShiftMask, "\u001B[1;2C")]
+    [InlineData (KeyCode.CursorLeft | KeyCode.ShiftMask, "\u001B[1;2D")]
+    [InlineData (KeyCode.Home | KeyCode.ShiftMask, "\u001B[1;2H")]
+    [InlineData (KeyCode.End | KeyCode.ShiftMask, "\u001B[1;2F")]
+    // Ctrl modifier (modifier = 5)
+    [InlineData (KeyCode.CursorUp | KeyCode.CtrlMask, "\u001B[1;5A")]
+    [InlineData (KeyCode.CursorDown | KeyCode.CtrlMask, "\u001B[1;5B")]
+    [InlineData (KeyCode.Home | KeyCode.CtrlMask, "\u001B[1;5H")]
+    [InlineData (KeyCode.End | KeyCode.CtrlMask, "\u001B[1;5F")]
+    // Ctrl+Shift modifier (modifier = 6)
+    [InlineData (KeyCode.CursorUp | KeyCode.CtrlMask | KeyCode.ShiftMask, "\u001B[1;6A")]
+    [InlineData (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask, "\u001B[1;6H")]
+    // Ctrl+Alt modifier (modifier = 7)
+    [InlineData (KeyCode.CursorUp | KeyCode.CtrlMask | KeyCode.AltMask, "\u001B[1;7A")]
+    [InlineData (KeyCode.Home | KeyCode.CtrlMask | KeyCode.AltMask, "\u001B[1;7H")]
+    // Ctrl+Shift+Alt modifier (modifier = 8)
+    [InlineData (KeyCode.CursorUp | KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask, "\u001B[1;8A")]
+    [InlineData (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask, "\u001B[1;8H")]
+    public void Encode_CursorKeysWithModifiers_ProducesCorrectSequence (KeyCode keyCode, string expectedSequence)
+    {
+        // Arrange
+        Key key = new (keyCode);
+
+        // Act
+        string result = AnsiKeyboardEncoder.Encode (key);
+
+        // Assert
+        _output.WriteLine ($"KeyCode: {keyCode} → {result.Replace ("\u001B", "ESC")}");
+        Assert.Equal (expectedSequence, result);
+    }
+
+    [Theory]
+    // Shift modifier (modifier = 2)
+    [InlineData (KeyCode.Insert | KeyCode.ShiftMask, "\u001B[2;2~")]
+    [InlineData (KeyCode.Delete | KeyCode.ShiftMask, "\u001B[3;2~")]
+    [InlineData (KeyCode.PageUp | KeyCode.ShiftMask, "\u001B[5;2~")]
+    [InlineData (KeyCode.PageDown | KeyCode.ShiftMask, "\u001B[6;2~")]
+    // Ctrl modifier (modifier = 5)
+    [InlineData (KeyCode.Insert | KeyCode.CtrlMask, "\u001B[2;5~")]
+    [InlineData (KeyCode.Delete | KeyCode.CtrlMask, "\u001B[3;5~")]
+    [InlineData (KeyCode.PageUp | KeyCode.CtrlMask, "\u001B[5;5~")]
+    [InlineData (KeyCode.PageDown | KeyCode.CtrlMask, "\u001B[6;5~")]
+    // Ctrl+Shift modifier (modifier = 6)
+    [InlineData (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask, "\u001B[3;6~")]
+    [InlineData (KeyCode.PageUp | KeyCode.CtrlMask | KeyCode.ShiftMask, "\u001B[5;6~")]
+    // Ctrl+Alt modifier (modifier = 7)
+    [InlineData (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, "\u001B[3;7~")]
+    [InlineData (KeyCode.PageUp | KeyCode.CtrlMask | KeyCode.AltMask, "\u001B[5;7~")]
+    // Ctrl+Shift+Alt modifier (modifier = 8)
+    [InlineData (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask, "\u001B[3;8~")]
+    [InlineData (KeyCode.PageDown | KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask, "\u001B[6;8~")]
+    public void Encode_EditingKeysWithModifiers_ProducesCorrectSequence (KeyCode keyCode, string expectedSequence)
+    {
+        // Arrange
+        Key key = new (keyCode);
+
+        // Act
+        string result = AnsiKeyboardEncoder.Encode (key);
+
+        // Assert
+        _output.WriteLine ($"KeyCode: {keyCode} → {result.Replace ("\u001B", "ESC")}");
+        Assert.Equal (expectedSequence, result);
+    }
+
+    [Theory]
     [InlineData (KeyCode.Insert, "\u001B[2~")]
     [InlineData (KeyCode.Delete, "\u001B[3~")]
     [InlineData (KeyCode.PageUp, "\u001B[5~")]
@@ -228,6 +330,54 @@ public class AnsiKeyboardEncoderTests (ITestOutputHelper output)
     [InlineData (KeyCode.Home)]
     [InlineData (KeyCode.End)]
     public void Encode_RoundTrip_MatchesParserOutput (KeyCode keyCode)
+    {
+        // Arrange
+        Key originalKey = new (keyCode);
+        AnsiKeyboardParser parser = new ();
+
+        // Act - Encode Key → ANSI
+        string ansiSequence = AnsiKeyboardEncoder.Encode (originalKey);
+        _output.WriteLine ($"{keyCode} → {ansiSequence.Replace ("\u001B", "ESC")}");
+
+        // Act - Parse ANSI → Key
+        AnsiKeyboardParserPattern? pattern = parser.IsKeyboard (ansiSequence);
+        Key? parsedKey = pattern?.GetKey (ansiSequence);
+
+        // Assert
+        Assert.NotNull (parsedKey);
+        Assert.Equal (originalKey.KeyCode, parsedKey.KeyCode);
+    }
+
+    [Theory]
+    // Function keys with Shift
+    [InlineData (KeyCode.F1 | KeyCode.ShiftMask)]
+    [InlineData (KeyCode.F6 | KeyCode.ShiftMask)]
+    [InlineData (KeyCode.F12 | KeyCode.ShiftMask)]
+    // Function keys with Ctrl
+    [InlineData (KeyCode.F1 | KeyCode.CtrlMask)]
+    [InlineData (KeyCode.F6 | KeyCode.CtrlMask)]
+    [InlineData (KeyCode.F12 | KeyCode.CtrlMask)]
+    // Function keys with Ctrl+Shift
+    [InlineData (KeyCode.F6 | KeyCode.CtrlMask | KeyCode.ShiftMask)]
+    [InlineData (KeyCode.F12 | KeyCode.CtrlMask | KeyCode.ShiftMask)]
+    // Cursor keys with Shift
+    [InlineData (KeyCode.CursorUp | KeyCode.ShiftMask)]
+    [InlineData (KeyCode.Home | KeyCode.ShiftMask)]
+    [InlineData (KeyCode.End | KeyCode.ShiftMask)]
+    // Cursor keys with Ctrl
+    [InlineData (KeyCode.CursorUp | KeyCode.CtrlMask)]
+    [InlineData (KeyCode.Home | KeyCode.CtrlMask)]
+    // Editing keys with Shift
+    [InlineData (KeyCode.Delete | KeyCode.ShiftMask)]
+    [InlineData (KeyCode.PageUp | KeyCode.ShiftMask)]
+    // Editing keys with Ctrl
+    [InlineData (KeyCode.Delete | KeyCode.CtrlMask)]
+    [InlineData (KeyCode.PageDown | KeyCode.CtrlMask)]
+    // Complex combinations
+    [InlineData (KeyCode.F6 | KeyCode.CtrlMask | KeyCode.AltMask)]
+    [InlineData (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask)]
+    [InlineData (KeyCode.CursorUp | KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask)]
+    public void Encode_RoundTripWithModifiers_MatchesParserOutput (KeyCode keyCode)
     {
         // Arrange
         Key originalKey = new (keyCode);

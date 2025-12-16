@@ -16,9 +16,16 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext RightClick (int screenX, int screenY)
     {
-        return EnqueueMouseEvent (new ()
+        InjectMouseEvent (new ()
         {
-            Flags = MouseFlags.RightButtonClicked,
+            Flags = MouseFlags.RightButtonPressed,
+            ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
+        });
+
+        return InjectMouseEvent (new ()
+        {
+            Flags = MouseFlags.RightButtonReleased,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
         });
@@ -34,14 +41,14 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick (int screenX, int screenY)
     {
-        EnqueueMouseEvent (new ()
+        InjectMouseEvent (new ()
         {
             Flags = MouseFlags.LeftButtonPressed,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
         });
 
-        return EnqueueMouseEvent (new ()
+        return InjectMouseEvent (new ()
         {
             Flags = MouseFlags.LeftButtonReleased,
             ScreenPosition = new (screenX, screenY),
@@ -58,19 +65,19 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
     {
-        return EnqueueMouseEvent (new ()
+        return InjectMouseEvent (new ()
         {
             Flags = MouseFlags.LeftButtonClicked
         }, evaluator);
     }
 
     /// <summary>
-    /// Enqueues a mouse event to the current driver's input processor.
+    /// Injects a mouse event to the current driver's input processor.
     /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
     /// </summary>
     /// <param name="mouse"></param>
     /// <returns></returns>
-    private GuiTestContext EnqueueMouseEvent (Mouse mouse)
+    private GuiTestContext InjectMouseEvent (Mouse mouse)
     {
             // Enqueue the mouse event
         WaitIteration ((app) =>
@@ -80,7 +87,7 @@ public partial class GuiTestContext
                 mouse.Timestamp = DateTime.Now;
                 mouse.Position = mouse.ScreenPosition;
 
-                app.Driver.GetInputProcessor ().EnqueueMouseEvent (app, mouse);
+                app.Driver.GetInputProcessor ().InjectMouseEvent (app, mouse);
             }
             else
             {
@@ -88,12 +95,18 @@ public partial class GuiTestContext
             }
         });
 
-        // Wait for the event to be processed (similar to EnqueueKeyEvent)
+        // Wait for the event to be processed (similar to InjectKeyEvent)
         return WaitIteration ();
     }
 
-
-    private GuiTestContext EnqueueMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
+    /// <summary>
+    /// Injects a mouse event to the current driver's input processor.
+    /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// </summary>
+    /// <param name="mouse"></param>
+    /// <param name="evaluator"></param>
+    /// <returns></returns>
+    private GuiTestContext InjectMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 
@@ -105,20 +118,20 @@ public partial class GuiTestContext
         mouse.ScreenPosition = screen;
         mouse.Position = screen;
 
-        EnqueueMouseEvent (mouse);
+        InjectMouseEvent (mouse);
 
         return ctx;
     }
-    
+
     /// <summary>
-    ///     Enqueues a key down event to the current driver's input processor.
+    ///     Injects a key down event to the current driver's input processor.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     /// <summary>
     ///     Enqueues a key down event to the current driver's input processor.
     /// </summary>
-    public GuiTestContext EnqueueKeyEvent (Key key)
+    public GuiTestContext InjectKeyEvent (Key key)
     {
         //Logging.Trace ($"Enqueuing key: {key}");
 
@@ -129,7 +142,7 @@ public partial class GuiTestContext
         if (App?.Driver is { })
         {
             App.Driver.KeyDown += DriverOnKeyDown;
-            App.Driver.EnqueueKeyEvent (key);
+            App.Driver.InjectKeyEvent (key);
             WaitUntil (() => keyReceived);
         }
 

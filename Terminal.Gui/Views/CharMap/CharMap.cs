@@ -58,6 +58,7 @@ public class CharMap : View, IDesignable
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
         MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Context);

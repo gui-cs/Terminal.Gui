@@ -230,7 +230,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     }
 
     /// <inheritdoc />
-    public virtual void EnqueueKeyDownEvent (Key key)
+    public virtual void InjectKeyDownEvent (Key key)
     {
         // Convert Key → TInputRecord
         TInputRecord inputRecord = KeyConverter.ToKeyInfo (key);
@@ -239,7 +239,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         // which runs on the input thread.
         if (InputImpl is ITestableInput<TInputRecord> testableInput)
         {
-            testableInput.AddInput (inputRecord);
+            testableInput.InjectInput (inputRecord);
         }
     }
 
@@ -250,7 +250,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public void RaiseKeyUpEvent (Key a) { KeyUp?.Invoke (this, a); }
 
     /// <inheritdoc />
-    public void EnqueueKeyUpEvent (Key key)
+    public void InjectKeyUpEvent (Key key)
     {
         // TODO: Determine if we can still support this on Windows
         throw new NotImplementedException ();
@@ -291,7 +291,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     }
 
     /// <inheritdoc />
-    public virtual void EnqueueMouseEvent (IApplication? app, Mouse mouse) { mouse.Timestamp ??= DateTime.Now; }
+    public virtual void InjectMouseEvent (IApplication? app, Mouse mouse) { mouse.Timestamp ??= DateTime.Now; }
 
     #endregion
 

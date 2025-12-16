@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
@@ -19,8 +18,7 @@ public class EventLog : ListView
         X = Pos.AnchorEnd ();
         Y = 0;
 
-        Width = Dim.Func (
-                          _ =>
+        Width = Dim.Func (_ =>
                           {
                               if (!IsInitialized)
                               {

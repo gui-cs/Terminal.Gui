@@ -147,7 +147,11 @@ internal class DriverImpl : IDriver
 
     private readonly IComponentFactory _componentFactory;
 
+    /// <inheritdoc />
+    public IOutputBuffer GetOutputBuffer () => _outputBuffer;
+
     private readonly IOutput _output;
+
     public IOutput GetOutput () => _output;
 
     private readonly IInputProcessor _inputProcessor;
@@ -416,13 +420,13 @@ internal class DriverImpl : IDriver
     public event EventHandler<Key>? KeyUp;
 
     /// <inheritdoc/>
-    public void EnqueueKeyEvent (Key key) { GetInputProcessor ().EnqueueKeyDownEvent (key); }
+    public void InjectKeyEvent (Key key) { GetInputProcessor ().InjectKeyDownEvent (key); }
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
 
     /// <inheritdoc />
-    public void EnqueueMouseEvent (Mouse mouse) { GetInputProcessor ().EnqueueMouseEvent (null, mouse); }
+    public void InjectMouseEvent (Mouse mouse) { GetInputProcessor ().InjectMouseEvent (null, mouse); }
 
     #endregion Input Events
 

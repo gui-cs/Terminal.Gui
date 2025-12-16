@@ -61,7 +61,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInput_AddInput_EnqueuesCharacter ()
+    public void ANSIInput_InjectInput_EnqueuesCharacter ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -71,7 +71,7 @@ public class ANSIInputTestableTests
         var testableInput = (ITestableInput<char>)ansiInput;
 
         // Act
-        testableInput.AddInput ('a');
+        testableInput.InjectInput ('a');
 
         // Assert
         Assert.True (ansiInput.Peek ());
@@ -81,7 +81,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInput_AddInput_SupportsMultipleCharacters ()
+    public void ANSIInput_InjectInput_SupportsMultipleCharacters ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -91,9 +91,9 @@ public class ANSIInputTestableTests
         ITestableInput<char> testableInput = ansiInput;
 
         // Act
-        testableInput.AddInput ('a');
-        testableInput.AddInput ('b');
-        testableInput.AddInput ('c');
+        testableInput.InjectInput ('a');
+        testableInput.InjectInput ('b');
+        testableInput.InjectInput ('c');
 
         // Assert
         List<char> read = ansiInput.Read ().ToList ();
@@ -115,7 +115,7 @@ public class ANSIInputTestableTests
         Assert.False (ansiInput.Peek ());
 
         // Add input
-        testableInput.AddInput ('x');
+        testableInput.InjectInput ('x');
 
         // Assert - Now true
         Assert.True (ansiInput.Peek ());
@@ -136,9 +136,9 @@ public class ANSIInputTestableTests
         var testableInput = (ITestableInput<char>)ansiInput;
 
         // Act - Add inputs in specific order
-        testableInput.AddInput ('1');
-        testableInput.AddInput ('2');
-        testableInput.AddInput ('3');
+        testableInput.InjectInput ('1');
+        testableInput.InjectInput ('2');
+        testableInput.InjectInput ('3');
 
         // Assert - Should come out in FIFO order
         List<char> read = ansiInput.Read ().ToList ();
@@ -146,7 +146,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInputProcessor_EnqueueKeyDownEvent_WorksWithTestableInput ()
+    public void ANSIInputProcessor_InjectKeyDownEvent_WorksWithTestableInput ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -160,7 +160,7 @@ public class ANSIInputTestableTests
         processor.KeyDown += (_, k) => receivedKeys.Add (k);
 
         // Act
-        processor.EnqueueKeyDownEvent (Key.A);
+        processor.InjectKeyDownEvent (Key.A);
 
         // Simulate the input thread moving items from _testInput to InputBuffer
         SimulateInputThread (ansiInput, queue);
@@ -174,7 +174,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInputProcessor_EnqueueMouseEvent_GeneratesAnsiSequence ()
+    public void ANSIInputProcessor_InjectMouseEvent_GeneratesAnsiSequence ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -194,7 +194,7 @@ public class ANSIInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Simulate the input thread
         SimulateInputThread (ansiInput, queue);
@@ -212,7 +212,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInputProcessor_EnqueueMouseEvent_SupportsRelease ()
+    public void ANSIInputProcessor_InjectMouseEvent_SupportsRelease ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -232,7 +232,7 @@ public class ANSIInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Simulate the input thread
         SimulateInputThread (ansiInput, queue);
@@ -246,7 +246,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInputProcessor_EnqueueMouseEvent_SupportsModifiers ()
+    public void ANSIInputProcessor_InjectMouseEvent_SupportsModifiers ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -270,7 +270,7 @@ public class ANSIInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Debug: check what's in the queue
         List<char> inputChars = [];
@@ -300,7 +300,7 @@ public class ANSIInputTestableTests
     [InlineData (MouseFlags.WheeledDown)]
     // Note: WheeledLeft and WheeledRight (codes 68/69) have complex ANSI encoding with Shift+Ctrl variations
     // These are tested separately in AnsiMouseParserDebugTests
-    public void ANSIInputProcessor_EnqueueMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
+    public void ANSIInputProcessor_InjectMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -320,7 +320,7 @@ public class ANSIInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Simulate the input thread
         SimulateInputThread (ansiInput, queue);
@@ -334,10 +334,10 @@ public class ANSIInputTestableTests
     }
 
 
-    #region ANSIInput EnqueueKeyDownEvent Tests
+    #region ANSIInput InjectKeyDownEvent Tests
 
     [Fact]
-    public void ANSIInput_EnqueueKeyDownEvent_AddsSingleKeyToQueue ()
+    public void ANSIInput_InjectKeyDownEvent_AddsSingleKeyToQueue ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -353,7 +353,7 @@ public class ANSIInputTestableTests
         Key key = Key.A;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
 
         // Simulate the input thread moving items from _testInput to InputBuffer
         SimulateInputThread (ansiInput, queue);
@@ -366,7 +366,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInput_EnqueueKeyDownEvent_SupportsMultipleKeys ()
+    public void ANSIInput_InjectKeyDownEvent_SupportsMultipleKeys ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -383,7 +383,7 @@ public class ANSIInputTestableTests
         // Act
         foreach (Key key in keys)
         {
-            processor.EnqueueKeyDownEvent (key);
+            processor.InjectKeyDownEvent (key);
         }
 
         SimulateInputThread (ansiInput, queue);
@@ -401,7 +401,7 @@ public class ANSIInputTestableTests
     [InlineData (KeyCode.A, false, false, true)] // Alt+A
     // Note: Ctrl+Shift+Alt+A is not tested because ANSI doesn't have a standard way to represent
     // Shift with Ctrl combinations (Ctrl+A is 0x01 regardless of Shift state)
-    public void ANSIInput_EnqueueKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
+    public void ANSIInput_InjectKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -432,7 +432,7 @@ public class ANSIInputTestableTests
         processor.KeyDown += (_, k) => receivedKey = k;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
         SimulateInputThread (ansiInput, queue);
 
         // Alt combinations start with ESC, so they need escape handling
@@ -465,7 +465,7 @@ public class ANSIInputTestableTests
     [InlineData (KeyCode.CursorRight)]
     [InlineData (KeyCode.F1)]
     [InlineData (KeyCode.F12)]
-    public void ANSIInput_EnqueueKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
+    public void ANSIInput_InjectKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -480,7 +480,7 @@ public class ANSIInputTestableTests
         processor.KeyDown += (_, k) => receivedKey = k;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
         SimulateInputThread (ansiInput, queue);
 
         // Esc is special - the ANSI parser holds it waiting for potential escape sequences
@@ -500,7 +500,7 @@ public class ANSIInputTestableTests
     }
 
     [Fact]
-    public void ANSIInput_EnqueueKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
+    public void ANSIInput_InjectKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -516,7 +516,7 @@ public class ANSIInputTestableTests
         processor.KeyUp += (_, _) => keyUpCount++;
 
         // Act
-        processor.EnqueueKeyDownEvent (Key.A);
+        processor.InjectKeyDownEvent (Key.A);
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
@@ -530,7 +530,7 @@ public class ANSIInputTestableTests
     #region Mouse Event Sequencing Tests
 
     [Fact]
-    public void ANSIInput_EnqueueMouseEvent_HandlesCompleteClickSequence ()
+    public void ANSIInput_InjectMouseEvent_HandlesCompleteClickSequence ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -544,7 +544,7 @@ public class ANSIInputTestableTests
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a complete click: press → release
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {
@@ -552,7 +552,7 @@ public class ANSIInputTestableTests
                                          Flags = MouseFlags.LeftButtonPressed
                                      });
 
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {
@@ -576,7 +576,7 @@ public class ANSIInputTestableTests
     [InlineData (MouseFlags.WheeledDown)]
     [InlineData (MouseFlags.WheeledLeft)]
     [InlineData (MouseFlags.WheeledRight)]
-    public void ANSIInput_EnqueueMouseEvent_Wheel_Events (MouseFlags wheelEvent)
+    public void ANSIInput_InjectMouseEvent_Wheel_Events (MouseFlags wheelEvent)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -590,7 +590,7 @@ public class ANSIInputTestableTests
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a wheel event
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {

@@ -49,6 +49,7 @@ public static class CWPEventHelper
             return false;
         }
 
+        // BUGBUG: This should pass this not null; need to test
         eventHandler.Invoke (null, args);
         return args.Handled;
     }

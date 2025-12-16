@@ -43,10 +43,36 @@ public static class AnsiKeyboardEncoder
 
         if (ansiSeq != null)
         {
-            // For special keys with Alt, prefix the sequence with ESC
-            if (key.IsAlt)
+            // For Alt-only on special keys, use traditional ESC prefix for better compatibility
+            // (e.g., ESC ESC[A instead of ESC[1;3A)
+            if (key.IsAlt && !key.IsShift && !key.IsCtrl)
             {
                 return $"{EscSeqUtils.KeyEsc}{ansiSeq}";
+            }
+
+            // Calculate ANSI modifier parameter (1-based, used when Shift/Ctrl are present)
+            // Modifier values: 2=Shift, 3=Alt, 4=Shift+Alt, 5=Ctrl, 6=Ctrl+Shift, 7=Ctrl+Alt, 8=Ctrl+Shift+Alt
+            int modifier = GetAnsiModifierParameter (key);
+
+            // If modifiers are present (Shift, Ctrl, or combinations)
+            if (modifier > 1)
+            {
+                // Check if the sequence uses CSI format (starts with ESC[)
+                if (ansiSeq.StartsWith (EscSeqUtils.CSI))
+                {
+                    // Insert modifier parameter into CSI sequence
+                    // Format: ESC [ <num> ; <modifier> ~ or ESC [ 1 ; <modifier> <letter>
+                    ansiSeq = InsertModifierIntoSequence (ansiSeq, modifier);
+                }
+                else
+                {
+                    // For SS3 format (ESC O) or other non-CSI sequences with modifiers,
+                    // convert to CSI format with modifier
+                    // F1-F4: ESC O P/Q/R/S ? ESC [ 1 ; <mod> P/Q/R/S
+                    ansiSeq = ConvertSS3ToCSIWithModifier (ansiSeq, modifier);
+                }
+
+                return ansiSeq;
             }
 
             return ansiSeq;
@@ -141,5 +167,90 @@ public static class AnsiKeyboardEncoder
 
                    _ => null
                };
+    }
+
+    /// <summary>
+    ///     Calculates the ANSI modifier parameter for a key.
+    /// </summary>
+    /// <param name="key">The key with modifiers.</param>
+    /// <returns>
+    ///     The modifier parameter value:
+    ///     1 = no modifiers, 2 = Shift, 3 = Alt, 4 = Shift+Alt,
+    ///     5 = Ctrl, 6 = Ctrl+Shift, 7 = Ctrl+Alt, 8 = Ctrl+Shift+Alt
+    /// </returns>
+    private static int GetAnsiModifierParameter (Key key)
+    {
+        var modifier = 1; // 1 = no modifiers
+
+        if (key.IsShift)
+        {
+            modifier += 1;
+        }
+
+        if (key.IsAlt)
+        {
+            modifier += 2;
+        }
+
+        if (key.IsCtrl)
+        {
+            modifier += 4;
+        }
+
+        return modifier;
+    }
+
+    /// <summary>
+    ///     Inserts the modifier parameter into a CSI sequence.
+    /// </summary>
+    /// <param name="sequence">The base CSI sequence (e.g., "ESC[17~" for F6).</param>
+    /// <param name="modifier">The modifier parameter (2-8).</param>
+    /// <returns>The sequence with modifier inserted (e.g., "ESC[17;2~" for Shift+F6).</returns>
+    private static string InsertModifierIntoSequence (string sequence, int modifier)
+    {
+        // CSI sequences have format: ESC [ <number> <terminator>
+        // We need to insert ;<modifier> before the terminator
+        // Examples:
+        //   ESC[17~ ? ESC[17;2~ (F6 ? Shift+F6)
+        //   ESC[A ? ESC[1;2A (Up ? Shift+Up)
+
+        int csiLength = EscSeqUtils.CSI.Length; // Length of "ESC["
+
+        // Find the terminator (last character)
+        char terminator = sequence [^1];
+
+        // Extract the numeric part (if any)
+        string numberPart = sequence.Substring (csiLength, sequence.Length - csiLength - 1);
+
+        // If there's no number, default to "1"
+        if (string.IsNullOrEmpty (numberPart) || !char.IsDigit (numberPart [0]))
+        {
+            numberPart = "1";
+        }
+
+        return $"{EscSeqUtils.CSI}{numberPart};{modifier}{terminator}";
+    }
+
+    /// <summary>
+    ///     Converts an SS3 sequence (ESC O) to CSI format (ESC [) with modifier.
+    /// </summary>
+    /// <param name="sequence">The SS3 sequence (e.g., "ESC OP" for F1).</param>
+    /// <param name="modifier">The modifier parameter (2-8).</param>
+    /// <returns>The CSI sequence with modifier (e.g., "ESC[1;2P" for Shift+F1).</returns>
+    private static string ConvertSS3ToCSIWithModifier (string sequence, int modifier)
+    {
+        // SS3 format: ESC O <letter>
+        // Convert to: ESC [ 1 ; <modifier> <letter>
+        // Example: ESC O P (F1) ? ESC [ 1 ; 2 P (Shift+F1)
+
+        if (sequence.Length >= 3 && sequence [0] == EscSeqUtils.KeyEsc && sequence [1] == 'O')
+        {
+            char letter = sequence [2];
+
+            return $"{EscSeqUtils.CSI}1;{modifier}{letter}";
+        }
+
+        // Fallback: return as-is
+        return sequence;
     }
 }

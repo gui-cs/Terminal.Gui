@@ -63,4 +63,7 @@
 		<Using Include="Terminal.Gui" />
 		<Using Include="Xunit" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Application\Keyboard\" />
+	</ItemGroup>
 </Project>

@@ -10,6 +10,6 @@ public interface ITestableInput<TInputRecord> : IInput<TInputRecord>
     /// <summary>
     ///     Adds an input record that will be returned by Peek/Read for testing.
     /// </summary>
-    void AddInput (TInputRecord input);
+    void InjectInput (TInputRecord input);
 }
 

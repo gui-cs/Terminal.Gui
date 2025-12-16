@@ -63,7 +63,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInput_AddInput_EnqueuesCharacter ()
+    public void UnixInput_InjectInput_EnqueuesCharacter ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -73,7 +73,7 @@ public class UnixInputTestableTests
         var testableInput = (ITestableInput<char>)unixInput;
 
         // Act
-        testableInput.AddInput ('a');
+        testableInput.InjectInput ('a');
 
         // Assert
         Assert.True (unixInput.Peek ());
@@ -83,7 +83,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInput_AddInput_SupportsMultipleCharacters ()
+    public void UnixInput_InjectInput_SupportsMultipleCharacters ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -93,9 +93,9 @@ public class UnixInputTestableTests
         var testableInput = (ITestableInput<char>)unixInput;
 
         // Act
-        testableInput.AddInput ('a');
-        testableInput.AddInput ('b');
-        testableInput.AddInput ('c');
+        testableInput.InjectInput ('a');
+        testableInput.InjectInput ('b');
+        testableInput.InjectInput ('c');
 
         // Assert
         List<char> read = unixInput.Read ().ToList ();
@@ -117,7 +117,7 @@ public class UnixInputTestableTests
         Assert.False (unixInput.Peek ());
 
         // Add input
-        testableInput.AddInput ('x');
+        testableInput.InjectInput ('x');
 
         // Assert - Now true
         Assert.True (unixInput.Peek ());
@@ -138,9 +138,9 @@ public class UnixInputTestableTests
         var testableInput = (ITestableInput<char>)unixInput;
 
         // Act - Add inputs in specific order
-        testableInput.AddInput ('1');
-        testableInput.AddInput ('2');
-        testableInput.AddInput ('3');
+        testableInput.InjectInput ('1');
+        testableInput.InjectInput ('2');
+        testableInput.InjectInput ('3');
 
         // Assert - Should come out in FIFO order
         List<char> read = unixInput.Read ().ToList ();
@@ -148,7 +148,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInputProcessor_EnqueueKeyDownEvent_WorksWithTestableInput ()
+    public void UnixInputProcessor_InjectKeyDownEvent_WorksWithTestableInput ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -162,7 +162,7 @@ public class UnixInputTestableTests
         processor.KeyDown += (_, k) => receivedKeys.Add (k);
 
         // Act
-        processor.EnqueueKeyDownEvent (Key.A);
+        processor.InjectKeyDownEvent (Key.A);
 
         // Simulate the input thread moving items from _testInput to InputBuffer
         SimulateInputThread (unixInput, queue);
@@ -176,7 +176,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInputProcessor_EnqueueMouseEvent_GeneratesAnsiSequence ()
+    public void UnixInputProcessor_InjectMouseEvent_GeneratesAnsiSequence ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -196,7 +196,7 @@ public class UnixInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Simulate the input thread
         SimulateInputThread (unixInput, queue);
@@ -214,7 +214,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInputProcessor_EnqueueMouseEvent_SupportsRelease ()
+    public void UnixInputProcessor_InjectMouseEvent_SupportsRelease ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -234,7 +234,7 @@ public class UnixInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Simulate the input thread
         SimulateInputThread (unixInput, queue);
@@ -248,7 +248,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInputProcessor_EnqueueMouseEvent_SupportsModifiers ()
+    public void UnixInputProcessor_InjectMouseEvent_SupportsModifiers ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -272,7 +272,7 @@ public class UnixInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Debug: check what's in the queue
         List<char> inputChars = [];
@@ -302,7 +302,7 @@ public class UnixInputTestableTests
     [InlineData (MouseFlags.WheeledDown)]
     // Note: WheeledLeft and WheeledRight (codes 68/69) have complex ANSI encoding with Shift+Ctrl variations
     // These are tested separately in AnsiMouseParserDebugTests
-    public void UnixInputProcessor_EnqueueMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
+    public void UnixInputProcessor_InjectMouseEvent_SupportsWheelEvents (MouseFlags wheelFlag)
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -322,7 +322,7 @@ public class UnixInputTestableTests
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         // Simulate the input thread
         SimulateInputThread (unixInput, queue);
@@ -336,10 +336,10 @@ public class UnixInputTestableTests
     }
 
 
-    #region UnixInput EnqueueKeyDownEvent Tests
+    #region UnixInput InjectKeyDownEvent Tests
 
     [Fact]
-    public void UnixInput_EnqueueKeyDownEvent_AddsSingleKeyToQueue ()
+    public void UnixInput_InjectKeyDownEvent_AddsSingleKeyToQueue ()
     {
         // Arrange
         var UnixInput = new UnixInput ();
@@ -355,7 +355,7 @@ public class UnixInputTestableTests
         Key key = Key.A;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
 
         // Simulate the input thread moving items from _testInput to InputBuffer
         SimulateInputThread (UnixInput, queue);
@@ -368,7 +368,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInput_EnqueueKeyDownEvent_SupportsMultipleKeys ()
+    public void UnixInput_InjectKeyDownEvent_SupportsMultipleKeys ()
     {
         // Arrange
         var UnixInput = new UnixInput ();
@@ -385,7 +385,7 @@ public class UnixInputTestableTests
         // Act
         foreach (Key key in keys)
         {
-            processor.EnqueueKeyDownEvent (key);
+            processor.InjectKeyDownEvent (key);
         }
 
         SimulateInputThread (UnixInput, queue);
@@ -403,7 +403,7 @@ public class UnixInputTestableTests
     [InlineData (KeyCode.A, false, false, true)] // Alt+A
     // Note: Ctrl+Shift+Alt+A is not tested because ANSI doesn't have a standard way to represent
     // Shift with Ctrl combinations (Ctrl+A is 0x01 regardless of Shift state)
-    public void UnixInput_EnqueueKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
+    public void UnixInput_InjectKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
     {
         // Arrange
         var UnixInput = new UnixInput ();
@@ -434,7 +434,7 @@ public class UnixInputTestableTests
         processor.KeyDown += (_, k) => receivedKey = k;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
         SimulateInputThread (UnixInput, queue);
         
         // Alt combinations start with ESC, so they need escape handling
@@ -467,7 +467,7 @@ public class UnixInputTestableTests
     [InlineData (KeyCode.CursorRight)]
     [InlineData (KeyCode.F1)]
     [InlineData (KeyCode.F12)]
-    public void UnixInput_EnqueueKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
+    public void UnixInput_InjectKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
     {
         // Arrange
         var UnixInput = new UnixInput ();
@@ -482,7 +482,7 @@ public class UnixInputTestableTests
         processor.KeyDown += (_, k) => receivedKey = k;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
         SimulateInputThread (UnixInput, queue);
 
         // Esc is special - the ANSI parser holds it waiting for potential escape sequences
@@ -502,7 +502,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInput_EnqueueKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
+    public void UnixInput_InjectKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -518,7 +518,7 @@ public class UnixInputTestableTests
         processor.KeyUp += (_, _) => keyUpCount++;
 
         // Act
-        processor.EnqueueKeyDownEvent (Key.A);
+        processor.InjectKeyDownEvent (Key.A);
         SimulateInputThread (unixInput, queue);
         processor.ProcessQueue ();
 
@@ -532,7 +532,7 @@ public class UnixInputTestableTests
     #region Mouse Event Sequencing Tests
 
     [Fact]
-    public void UnixInput_EnqueueMouseEvent_HandlesCompleteClickSequence ()
+    public void UnixInput_InjectMouseEvent_HandlesCompleteClickSequence ()
     {
         // Arrange
         UnixInput unixInput = new ();
@@ -546,7 +546,7 @@ public class UnixInputTestableTests
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a complete click: press → release
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {
@@ -554,7 +554,7 @@ public class UnixInputTestableTests
                                          Flags = MouseFlags.LeftButtonPressed
                                      });
 
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {
@@ -578,7 +578,7 @@ public class UnixInputTestableTests
     [InlineData(MouseFlags.WheeledDown)]
     [InlineData(MouseFlags.WheeledLeft)]
     [InlineData(MouseFlags.WheeledRight)]
-    public void UnixInput_EnqueueMouseEvent_Wheel_Events (MouseFlags wheelEvent)
+    public void UnixInput_InjectMouseEvent_Wheel_Events (MouseFlags wheelEvent)
     {
         // Arrange
         UnixInput unixInput = new ();
@@ -592,7 +592,7 @@ public class UnixInputTestableTests
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a wheel event
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {

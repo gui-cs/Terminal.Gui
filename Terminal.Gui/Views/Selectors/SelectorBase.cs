@@ -23,7 +23,7 @@ public abstract class SelectorBase : View, IOrientation
 
         AddCommand (Command.Accept, HandleAcceptCommand);
         //AddCommand (Command.HotKey, HandleHotKeyCommand);
-
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
         //CreateSubViews ();
     }
 

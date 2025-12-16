@@ -345,7 +345,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     }
 
     /// <inheritdoc/>
-    public void AddInput (char input)
+    public void InjectInput (char input)
     {
         //Logging.Trace ($"Enqueuing input: {input.Key}");
 

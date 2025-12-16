@@ -1,62 +1,48 @@
 ﻿using System.Collections.Concurrent;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace DriverTests.Keyboard;
 
 /// <summary>
-///     Parallelizable unit tests for IInput.EnqueueKeyDownEvent and InputProcessor.EnqueueKeyDownEvent.
+///     Parallelizable unit tests for IInput.InjectKeyDownEvent and InputProcessor.InjectKeyDownEvent.
 ///     Tests validate the entire pipeline: Key → TInputRecord → Queue → ProcessQueue → Events.
 /// </summary>
 [Trait ("Category", "Input")]
-public class EnqueueKeyEventTests (ITestOutputHelper output)
+public class InjectKeyEventTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-    #region Helper Methods
+    #region Helper Methods - Kept for backward compatibility, but now use InputTestHelpers
 
     /// <summary>
     ///     Simulates the input thread by manually draining ANSIInput's internal queue
     ///     and moving items to the InputBuffer. This is needed because tests don't
     ///     start the actual input thread via Run().
     /// </summary>
-    private static void SimulateInputThread (AnsiInput ansiInput, ConcurrentQueue<char> inputBuffer)
-    {
-        // ANSIInput's Peek() checks _testInput
-        while (ansiInput.Peek ())
-        {
-            // Read() drains _testInput and returns items
-            foreach (char item in ansiInput.Read ())
-            {
-                // Manually add to InputBuffer (simulating what Run() would do)
-                inputBuffer.Enqueue (item);
-            }
-        }
-    }
+    /// <remarks>
+    ///     This method now delegates to <see cref="InputTestHelpers.SimulateInputThread{TInputRecord}"/>.
+    /// </remarks>
+    private static void SimulateInputThread (AnsiInput ansiInput, ConcurrentQueue<char> inputBuffer) { ansiInput.SimulateInputThread (inputBuffer); }
 
     /// <summary>
     ///     Processes the input queue with support for keys that may be held by the ANSI parser (like Esc).
     ///     The parser holds Esc for 50ms waiting to see if it's part of an escape sequence.
     /// </summary>
+    /// <remarks>
+    ///     This method now delegates to <see cref="InputTestHelpers.ProcessQueueWithEscapeHandling(IInputProcessor, int)"/>.
+    /// </remarks>
     private static void ProcessQueueWithEscapeHandling (AnsiInputProcessor processor, int maxAttempts = 3)
     {
-        // First attempt - process immediately
-        processor.ProcessQueue ();
-
-        // For escape sequences, we may need to wait and process again
-        // The parser holds escape for 50ms before releasing
-        for (var attempt = 1; attempt < maxAttempts; attempt++)
-        {
-            Thread.Sleep (60); // Wait longer than the 50ms escape timeout
-            processor.ProcessQueue (); // This should release any held escape keys
-        }
+        processor.ProcessQueueWithEscapeHandling (maxAttempts);
     }
 
     #endregion
 
-    #region ANSIInput EnqueueKeyDownEvent Tests
+    #region ANSIInput InjectKeyDownEvent Tests
 
     [Fact]
-    public void EnqueueKeyDownEvent_AddsSingleKeyToQueue ()
+    public void InjectKeyDownEvent_AddsSingleKeyToQueue ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -72,7 +58,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         Key key = Key.A;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
 
         // Simulate the input thread moving items from _testInput to InputBuffer
         SimulateInputThread (ansiInput, queue);
@@ -85,7 +71,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void EnqueueKeyDownEvent_SupportsMultipleKeys ()
+    public void InjectKeyDownEvent_SupportsMultipleKeys ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -102,7 +88,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         // Act
         foreach (Key key in keys)
         {
-            processor.EnqueueKeyDownEvent (key);
+            processor.InjectKeyDownEvent (key);
         }
 
         SimulateInputThread (ansiInput, queue);
@@ -124,7 +110,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     // - Shift+Ctrl+Alt+A: Same limitation - Shift is lost when Ctrl is present
     // [InlineData (KeyCode.A, true, true, false)]  // Known limitation - Shift lost with Ctrl
     // [InlineData (KeyCode.A, true, true, true)]   // Known limitation - Shift lost with Ctrl
-    public void EnqueueKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
+    public void InjectKeyDownEvent_PreservesModifiers (KeyCode keyCode, bool shift, bool ctrl, bool alt)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -155,7 +141,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         processor.KeyDown += (_, k) => receivedKey = k;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
         SimulateInputThread (ansiInput, queue);
 
         // Alt combinations produce ESC+char sequences that require parser timeout handling
@@ -194,7 +180,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     [Theory]
     [InlineData (KeyCode.A, true, true, false)] // Shift+Ctrl+A - Shift lost
     [InlineData (KeyCode.A, true, true, true)] // Shift+Ctrl+Alt+A - Shift lost
-    public void EnqueueKeyDownEvent_KnownLimitation_ShiftLostWithCtrl (KeyCode keyCode, bool shift, bool ctrl, bool alt)
+    public void InjectKeyDownEvent_KnownLimitation_ShiftLostWithCtrl (KeyCode keyCode, bool shift, bool ctrl, bool alt)
     {
         // This test documents the known limitation that Shift cannot be preserved
         // when Ctrl is present with letter keys in ANSI encoding.
@@ -231,7 +217,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         processor.KeyDown += (_, k) => receivedKey = k;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
         SimulateInputThread (ansiInput, queue);
 
         if (alt)
@@ -268,8 +254,10 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     [InlineData (KeyCode.CursorLeft)]
     [InlineData (KeyCode.CursorRight)]
     [InlineData (KeyCode.F1)]
+    [InlineData (KeyCode.F6)]
+    [InlineData (KeyCode.F6 | KeyCode.ShiftMask)]
     [InlineData (KeyCode.F12)]
-    public void EnqueueKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
+    public void InjectKeyDownEvent_SupportsSpecialKeys (KeyCode keyCode)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -284,7 +272,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         processor.KeyDown += (_, k) => receivedKey = k;
 
         // Act
-        processor.EnqueueKeyDownEvent (key);
+        processor.InjectKeyDownEvent (key);
         SimulateInputThread (ansiInput, queue);
 
         // Esc is special - the ANSI parser holds it waiting for potential escape sequences
@@ -304,7 +292,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void EnqueueKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
+    public void InjectKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -320,7 +308,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         processor.KeyUp += (_, _) => keyUpCount++;
 
         // Act
-        processor.EnqueueKeyDownEvent (Key.A);
+        processor.InjectKeyDownEvent (Key.A);
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
@@ -334,7 +322,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     #region InputProcessor Pipeline Tests
 
     [Fact]
-    public void InputProcessor_EnqueueKeyDownEvent_RequiresTestableInput ()
+    public void InputProcessor_InjectKeyDownEvent_RequiresTestableInput ()
     {
         // Arrange
         ConcurrentQueue<char> queue = new ();
@@ -344,7 +332,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
 
         // Act & Assert - Should not throw, but also won't add to queue
         // (because InputImpl is null or not ITestableInput)
-        processor.EnqueueKeyDownEvent (Key.A);
+        processor.InjectKeyDownEvent (Key.A);
         processor.ProcessQueue ();
 
         // No events should be raised since no input was added
@@ -369,9 +357,9 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         processor.KeyDown += (_, k) => receivedKeys.Add (k);
 
         // Act - Enqueue multiple keys before processing
-        processor.EnqueueKeyDownEvent (Key.A);
-        processor.EnqueueKeyDownEvent (Key.B);
-        processor.EnqueueKeyDownEvent (Key.C);
+        processor.InjectKeyDownEvent (Key.A);
+        processor.InjectKeyDownEvent (Key.B);
+        processor.InjectKeyDownEvent (Key.C);
 
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
@@ -386,7 +374,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     #region Thread Safety Tests
 
     [Fact]
-    public void EnqueueKeyDownEvent_IsThreadSafe ()
+    public void InjectKeyDownEvent_IsThreadSafe ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -410,7 +398,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
                                {
                                    for (var i = 0; i < keysPerThread; i++)
                                    {
-                                       processor.EnqueueKeyDownEvent (Key.A);
+                                       processor.InjectKeyDownEvent (Key.A);
                                    }
                                });
             threads [t].Start ();
@@ -434,7 +422,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
     #region Error Handling Tests
 
     [Fact]
-    public void EnqueueKeyDownEvent_WithInvalidKey_DoesNotThrow ()
+    public void InjectKeyDownEvent_WithInvalidKey_DoesNotThrow ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -447,7 +435,7 @@ public class EnqueueKeyEventTests (ITestOutputHelper output)
         // Act & Assert - Empty/null key should not throw
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     processor.EnqueueKeyDownEvent (Key.Empty);
+                                                     processor.InjectKeyDownEvent (Key.Empty);
                                                      SimulateInputThread (ansiInput, queue);
                                                      processor.ProcessQueue ();
                                                  });

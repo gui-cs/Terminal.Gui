@@ -165,7 +165,7 @@ public class OptionSelectorTests
     }
 
     [Fact]
-    public void Mouse_Click_On_Activated_Does_Nothing ()
+    public void LeftButtonClicked_On_Activated_Does_Nothing ()
     {
         OptionSelector optionSelector = new OptionSelector ();
         List<string> options = ["Option1", "Option2"];
@@ -192,7 +192,7 @@ public class OptionSelectorTests
 
 
     [Fact]
-    public void Mouse_Click_On_NotActivated_Activates ()
+    public void LeftButtonPressed_On_NotActivated_Activates ()
     {
         OptionSelector optionSelector = new OptionSelector ();
         List<string> options = ["Option1", "Option2"];
@@ -208,7 +208,7 @@ public class OptionSelectorTests
         var mouse = new Mouse
         {
             Position = checkBox.Frame.Location,
-            Flags = MouseFlags.LeftButtonClicked
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         checkBox.NewMouseEvent (mouse);

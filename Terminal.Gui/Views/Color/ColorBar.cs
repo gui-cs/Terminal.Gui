@@ -1,4 +1,5 @@
 using ColorHelper;
+using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Views;
 
@@ -32,7 +33,9 @@ internal abstract class ColorBar : View, IColorBar
         KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
     }
+
 
     /// <summary>
     ///     X coordinate that the bar starts at excluding any label.
@@ -123,6 +126,7 @@ internal abstract class ColorBar : View, IColorBar
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
+
         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (mouse.Position!.Value.X >= _barStartsAt)
@@ -130,11 +134,9 @@ internal abstract class ColorBar : View, IColorBar
                 double v = MaxValue * ((double)mouse.Position!.Value.X - _barStartsAt) / (_barWidth - 1);
                 Value = Math.Clamp ((int)v, 0, MaxValue);
             }
-
-            mouse.Handled = true;
             SetFocus ();
+            // Do not mark as handled to allow Activating to be raised
         }
-
         return mouse.Handled;
     }
 
@@ -221,7 +223,7 @@ internal abstract class ColorBar : View, IColorBar
 
     private void OnValueChanged ()
     {
-        ValueChanged?.Invoke (this, new (in _value));
+       ValueChanged?.Invoke (this, new (in _value));
         SetNeedsDraw ();
     }
 
