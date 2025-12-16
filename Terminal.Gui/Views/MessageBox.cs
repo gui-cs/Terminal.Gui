@@ -17,7 +17,7 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
 ///         This enables proper modal dialog management and respects the application's lifecycle. Pass your
-///         application instance (from <see cref="Application.Create()"/>) or use the legacy
+///         application instance (from <see cref="Application.Create"/>) or use the legacy
 ///         <see cref="Application.Instance"/> if using the static Application pattern.
 ///     </para>
 ///     <para>
