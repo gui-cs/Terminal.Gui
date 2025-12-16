@@ -764,7 +764,7 @@ public class TextField : View, IDesignable
         foreach (Rune rune in toAdd.EnumerateRunes ())
         {
             // All rune can be mapped to a Key and no exception will throw here because
-            // EnumerateRunes will replace a surrogate char with the Glyphs.ReplacementChar
+            // EnumerateRunes will replace a surrogate char with the Rune.ReplacementChar
             Key key = rune.Value;
             InsertText (key, useOldCursorPos);
         }
