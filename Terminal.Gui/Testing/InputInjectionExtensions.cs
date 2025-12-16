@@ -54,7 +54,7 @@ public static class InputInjectionExtensions
     /// </summary>
     /// <param name="app">The application instance.</param>
     /// <param name="mouseEvent">The mouse event to inject.</param>
-    public static void InjectMouse (this IApplication app, MouseEventArgs mouseEvent)
+    public static void InjectMouse (this IApplication app, Mouse mouseEvent)
     {
         app.GetInputInjector ().InjectMouse (mouseEvent);
     }
