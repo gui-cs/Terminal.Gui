@@ -155,7 +155,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         unixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = unixInput;
 
         List<Key> receivedKeys = [];
@@ -183,7 +183,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         unixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = unixInput;
 
         List<Mouse> receivedMouse = [];
@@ -221,7 +221,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         unixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = unixInput;
 
         List<Mouse> receivedMouse = [];
@@ -255,7 +255,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         unixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = unixInput;
 
         List<Mouse> receivedMouse = [];
@@ -309,7 +309,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         unixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = unixInput;
 
         List<Mouse> receivedMouse = [];
@@ -346,7 +346,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         UnixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = UnixInput;
 
         List<Key> receivedKeys = [];
@@ -375,7 +375,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         UnixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = UnixInput;
 
         Key [] keys = [Key.A, Key.B, Key.C, Key.Enter];
@@ -410,7 +410,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         UnixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = UnixInput;
 
         var key = new Key (keyCode);
@@ -474,7 +474,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         UnixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = UnixInput;
 
         var key = new Key (keyCode);
@@ -509,7 +509,7 @@ public class UnixInputTestableTests
         ConcurrentQueue<char> queue = new ();
         unixInput.Initialize (queue);
 
-        var processor = new UnixInputProcessor (queue);
+        var processor = new UnixInputProcessor (queue, null);
         processor.InputImpl = unixInput;
 
         var keyDownCount = 0;

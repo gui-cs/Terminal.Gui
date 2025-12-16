@@ -243,7 +243,7 @@ public class InjectMouseEventTests (ITestOutputHelper output)
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         Mouse mouse = new ()

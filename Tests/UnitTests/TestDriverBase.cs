@@ -16,15 +16,16 @@ public abstract class TestDriverBase
     /// <returns>A configured IDriver instance</returns>
     protected static IDriver CreateTestDriver (int width = 80, int height = 25)
     {
+        var timeProvider = new SystemTimeProvider ();
         var output = new AnsiOutput ();
         var factory = new AnsiComponentFactory (null, output, null);
-        var parser = new AnsiResponseParser ();
+        var parser = new AnsiResponseParser (timeProvider);
         var scheduler = new AnsiRequestScheduler (parser);
         var sizeMonitor = factory.CreateSizeMonitor (output, new OutputBufferImpl ());
 
         DriverImpl driver = new (
                                  factory,
-                                 new AnsiInputProcessor (null),
+                                 new AnsiInputProcessor (null, timeProvider),
                                  new OutputBufferImpl (),
                                  output,
                                  scheduler,

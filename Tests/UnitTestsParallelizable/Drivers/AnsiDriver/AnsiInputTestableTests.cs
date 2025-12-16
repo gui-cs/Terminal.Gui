@@ -153,7 +153,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -181,7 +181,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -219,7 +219,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -253,7 +253,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -307,7 +307,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         List<Mouse> receivedMouse = [];
@@ -344,7 +344,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         List<Key> receivedKeys = [];
@@ -373,7 +373,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         Key [] keys = [Key.A, Key.B, Key.C, Key.Enter];
@@ -408,7 +408,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
@@ -472,7 +472,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         var key = new Key (keyCode);
@@ -507,7 +507,7 @@ public class AnsiInputTestableTests
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue);
+        var processor = new AnsiInputProcessor (queue, null);
         processor.InputImpl = ansiInput;
 
         var keyDownCount = 0;

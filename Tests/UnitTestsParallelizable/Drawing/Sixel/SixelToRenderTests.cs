@@ -201,7 +201,7 @@ public class SixelToRenderTests
                                                new AnsiInputProcessor (null!),
                                                new OutputBufferImpl (),
                                                output,
-                                               new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                               new AnsiRequestScheduler (new AnsiResponseParser (new SystemTimeProvider ())),
                                                new SizeMonitorImpl (output)
                                               );
 

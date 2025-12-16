@@ -70,7 +70,7 @@ public class WindowsInputProcessorTests
                            }
                        });
 
-        var processor = new WindowsInputProcessor (queue);
+        var processor = new WindowsInputProcessor (queue, null);
 
         List<Key> ups = [];
         List<Key> downs = [];
@@ -107,7 +107,7 @@ public class WindowsInputProcessorTests
                            }
                        });
 
-        var processor = new WindowsInputProcessor (queue);
+        var processor = new WindowsInputProcessor (queue, null);
 
         List<Terminal.Gui.Input.Mouse> mouseEvents = [];
 
@@ -144,7 +144,7 @@ public class WindowsInputProcessorTests
                            }
                        });
 
-        var processor = new WindowsInputProcessor (queue);
+        var processor = new WindowsInputProcessor (queue, null);
 
         List<Terminal.Gui.Input.Mouse> mouseEvents = [];
 
@@ -179,7 +179,7 @@ public class WindowsInputProcessorTests
                            }
                        });
 
-        var processor = new WindowsInputProcessor (queue);
+        var processor = new WindowsInputProcessor (queue, null);
 
         List<Terminal.Gui.Input.Mouse> mouseEvents = [];
 
@@ -478,7 +478,7 @@ public class WindowsInputProcessorTests
     [MemberData (nameof (MouseFlagTestData))]
     internal void MouseFlags_Should_Map_Correctly (Tuple<ButtonState, EventFlags, ControlKeyState, MouseFlags> [] inputOutputPairs)
     {
-        var processor = new WindowsInputProcessor (new ());
+        var processor = new WindowsInputProcessor (new (), null);
 
         foreach (Tuple<ButtonState, EventFlags, ControlKeyState, MouseFlags> pair in inputOutputPairs)
         {
