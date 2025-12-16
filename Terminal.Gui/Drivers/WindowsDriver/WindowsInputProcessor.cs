@@ -12,7 +12,10 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     private readonly bool [] _lastWasPressed = new bool [4];
 
     /// <inheritdoc/>
-    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ())
+    /// <param name="inputBuffer">The input buffer to process.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer, ITimeProvider? timeProvider = null)
+        : base (inputBuffer, new WindowsKeyConverter (), timeProvider)
     {
     }
 

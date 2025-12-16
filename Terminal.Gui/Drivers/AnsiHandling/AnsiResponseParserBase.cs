@@ -4,7 +4,7 @@ namespace Terminal.Gui.Drivers;
 
 /// <summary>
 /// </summary>
-internal abstract class AnsiResponseParserBase (IHeld heldContent) : IAnsiResponseParser
+internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider timeProvider) : IAnsiResponseParser
 {
     #region Fields and State Management
 
@@ -13,6 +13,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent) : IAnsiRespon
     protected object _lockExpectedResponses = new ();
     protected object _lockState = new ();
     protected readonly IHeld _heldContent = heldContent;
+    protected readonly ITimeProvider _timeProvider = timeProvider;
 
     /// <summary>
     ///     Responses we are expecting to come in (one-time expectations).
@@ -51,7 +52,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent) : IAnsiRespon
         get => _state;
         protected set
         {
-            StateChangedAt = DateTime.Now;
+            StateChangedAt = _timeProvider.Now;
             _state = value;
         }
     }
@@ -59,7 +60,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent) : IAnsiRespon
     /// <summary>
     ///     Timestamp when <see cref="State"/> was last changed. Used to detect stale escape sequences.
     /// </summary>
-    public DateTime StateChangedAt { get; private set; } = DateTime.Now;
+    public DateTime StateChangedAt { get; private set; }
 
     #endregion
 

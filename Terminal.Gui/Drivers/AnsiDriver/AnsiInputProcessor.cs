@@ -39,7 +39,10 @@ namespace Terminal.Gui.Drivers;
 public class AnsiInputProcessor : InputProcessorImpl<char>
 {
     /// <inheritdoc/>
-    public AnsiInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new AnsiKeyConverter ())
+    /// <param name="inputBuffer">The input buffer to process.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    public AnsiInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null)
+        : base (inputBuffer, new AnsiKeyConverter (), timeProvider)
     {
     }
 

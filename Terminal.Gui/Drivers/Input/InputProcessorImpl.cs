@@ -20,7 +20,9 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <summary>
     ///     ANSI response parser for handling escape sequences from the input stream.
     /// </summary>
-    internal AnsiResponseParser<TInputRecord> Parser { get; } = new ();
+    internal AnsiResponseParser<TInputRecord> Parser { get; }
+
+    private readonly MouseInterpreter _mouseInterpreter;
 
     /// <summary>
     ///     Thread-safe input queue populated by <see cref="IInput{TInputRecord}"/> on the input thread.
@@ -47,8 +49,13 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// </summary>
     /// <param name="inputBuffer">Thread-safe queue to be populated with input by <see cref="IInput{TInputRecord}"/>.</param>
     /// <param name="keyConverter">Converter for translating <typeparamref name="TInputRecord"/> to <see cref="Key"/>.</param>
-    protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter)
+    /// <param name="timeProvider">Time provider for timestamps and timing control. Defaults to SystemTimeProvider if null.</param>
+    protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter, ITimeProvider? timeProvider = null)
     {
+        ITimeProvider tp = timeProvider ?? new SystemTimeProvider ();
+        Parser = new (tp);
+        _mouseInterpreter = new (tp);
+
         InputQueue = inputBuffer;
         KeyConverter = keyConverter;
 
@@ -259,8 +266,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     #endregion
 
     #region Mouse Events
-
-    private readonly MouseInterpreter _mouseInterpreter = new ();
 
     /// <inheritdoc />
     public event EventHandler<Mouse>? MouseEventParsed;
