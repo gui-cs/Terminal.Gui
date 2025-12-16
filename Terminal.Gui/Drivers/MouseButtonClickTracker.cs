@@ -120,7 +120,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
         numClicks = null; // Default to no click
 
         // Check if threshold exceeded or position changed
-        if (elapsed > _repeatClickThreshold || !isSamePosition)
+        if (elapsed >= _repeatClickThreshold || !isSamePosition)
         {
             // Reset consecutive click counter
             _consecutiveClicks = 0;

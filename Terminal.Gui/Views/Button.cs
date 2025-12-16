@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -90,35 +90,44 @@ public class Button : View, IDesignable
     /// <inheritdoc/>
     protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<bool> args)
     {
-        base.OnMouseHoldRepeatChanged (args);
+        // Don't call base - doWork handler in property setter has already updated base Accept bindings
+        // We need to override those with HotKey bindings for Button
 
         if (args.NewValue)
         {
-            // MouseHoldRepeat enabled: Replace Clicked bindings with Released bindings
+            // MouseHoldRepeat enabled: Remove ALL Click/Release bindings, add only Released→HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
             MouseBindings.Remove (MouseFlags.MiddleButtonClicked);
             MouseBindings.Remove (MouseFlags.RightButtonClicked);
             MouseBindings.Remove (MouseFlags.Button4Clicked);
             MouseBindings.Remove (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl);
+            MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+            MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
+            MouseBindings.Remove (MouseFlags.Button4Released);
 
+            // Add Released→HotKey bindings
             MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.HotKey);
             MouseBindings.Add (MouseFlags.MiddleButtonReleased, Command.HotKey);
-            MouseBindings.Add (MouseFlags.RightButtonReleased, Command.HotKey);
             MouseBindings.Add (MouseFlags.Button4Released, Command.HotKey);
         }
         else
         {
-            // MouseHoldRepeat disabled: Restore Clicked bindings
+            // MouseHoldRepeat disabled: Remove ALL Click/Release bindings, add only Clicked→HotKey
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+            MouseBindings.Remove (MouseFlags.MiddleButtonClicked);
+            MouseBindings.Remove (MouseFlags.RightButtonClicked);
+            MouseBindings.Remove (MouseFlags.Button4Clicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
             MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
-            MouseBindings.Remove (MouseFlags.RightButtonReleased);
             MouseBindings.Remove (MouseFlags.Button4Released);
 
-            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.HotKey);
-            MouseBindings.ReplaceCommands (MouseFlags.MiddleButtonClicked, Command.HotKey);
-            MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.HotKey);
-            MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
-            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
+            // Add Clicked→HotKey bindings
+            MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.RightButtonClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
         }
     }
 

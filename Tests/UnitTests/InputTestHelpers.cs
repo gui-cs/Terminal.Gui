@@ -186,10 +186,10 @@ public static class InputTestHelpers
     public static void InjectMouseEventDirectly (this IApplication app, Mouse mouse)
     {
         IInputProcessor processor = app.Driver!.GetInputProcessor ();
-        
+
         // Set timestamp if not provided
         mouse.Timestamp ??= DateTime.Now;
-        
+
         // Directly raise the event through the processor, bypassing ANSI encoding
         processor.RaiseMouseEventParsed (mouse);
     }
