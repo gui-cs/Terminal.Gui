@@ -7,8 +7,8 @@ namespace DriverTests.AnsiHandling;
 // BUGBUG: These tests use TInputRecord of `int`, but that's not a realistic type for keyboard input.
 public class AnsiResponseParserTests (ITestOutputHelper output)
 {
-    private readonly AnsiResponseParser<int> _parser1 = new ();
-    private readonly AnsiResponseParser _parser2 = new ();
+    private readonly AnsiResponseParser<int> _parser1 = new (new SystemTimeProvider ());
+    private readonly AnsiResponseParser _parser2 = new (new SystemTimeProvider ());
 
     /// <summary>
     ///     Used for the T value in batches that are passed to the  AnsiResponseParser&lt;int&gt;  (parser1)
@@ -235,7 +235,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     {
         output.WriteLine ("Running test case:" + caseName);
 
-        var parser = new AnsiResponseParser ();
+        var parser = new AnsiResponseParser (new SystemTimeProvider ());
         string? response = null;
 
         if (terminator.HasValue)
@@ -313,7 +313,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [Fact]
     public void TestLateResponses ()
     {
-        var p = new AnsiResponseParser ();
+        var p = new AnsiResponseParser (new SystemTimeProvider ());
 
         string? responseA = null;
         string? responseB = null;
@@ -345,7 +345,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [Fact]
     public void TestPersistentResponses ()
     {
-        var p = new AnsiResponseParser ();
+        var p = new AnsiResponseParser (new SystemTimeProvider ());
 
         var m = 0;
         var M = 1;
@@ -368,7 +368,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [Fact]
     public void TestPersistentResponses_WithMetadata ()
     {
-        AnsiResponseParser<int> p = new ();
+        AnsiResponseParser<int> p = new (new SystemTimeProvider ());
 
         // ReSharper disable once NotAccessedVariable
         var m = 0;
@@ -482,7 +482,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // ANSI escape sequence for mouse up (using a generic format example)
         const string MOUSE_UP = "\u001B[<0;25;50m";
 
-        var parser = new AnsiResponseParser ();
+        var parser = new AnsiResponseParser (new SystemTimeProvider ());
 
         parser.HandleMouse = true;
         string? foundDar = null;
@@ -522,7 +522,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // ANSI escape sequence for cursor up (while shift held down)
         const string SHIFT_UP = "\u001b[1;2A";
 
-        var parser = new AnsiResponseParser ();
+        var parser = new AnsiResponseParser (new SystemTimeProvider ());
 
         parser.HandleKeyboard = true;
         string? foundDar = null;
@@ -648,7 +648,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [Theory]
     public void ParserDetects_FunctionKeys (string input, Key expectedKey)
     {
-        var parser = new AnsiResponseParser ();
+        var parser = new AnsiResponseParser (new SystemTimeProvider ());
 
         parser.HandleKeyboard = true;
         List<Key> keys = new ();

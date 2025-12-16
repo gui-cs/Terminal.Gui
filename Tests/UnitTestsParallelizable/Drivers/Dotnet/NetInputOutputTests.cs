@@ -212,7 +212,7 @@ public class NetInputOutputTests (ITestOutputHelper output)
         Exception? exception = Record.Exception (() =>
                                                  {
                                                      ConcurrentQueue<ConsoleKeyInfo> queue = new ();
-                                                     var processor = new NetInputProcessor (queue);
+                                                     var processor = new NetInputProcessor (queue, null);
                                                      _output.WriteLine ("NetInputProcessor created successfully");
                                                  });
 

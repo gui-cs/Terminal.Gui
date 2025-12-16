@@ -98,7 +98,7 @@ public class NetInputProcessorTests
         queue.Enqueue (new ('H', ConsoleKey.None, true, false, false));
         queue.Enqueue (new ('e', ConsoleKey.None, false, false, false));
 
-        var processor = new NetInputProcessor (queue);
+        var processor = new NetInputProcessor (queue, null);
 
         List<Key> ups = new ();
         List<Key> downs = new ();
