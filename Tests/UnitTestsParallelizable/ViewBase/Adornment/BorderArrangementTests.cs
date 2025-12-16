@@ -105,6 +105,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         app.Driver?.SetScreenSize (8, 7);
 
+        // Using a replacement char to make sure wide glyphs are handled correctly
+        // in the shadow area, to not confusing with a space char.
+        app.Driver?.GetOutputBuffer ().SetWideGlyphReplacement (Rune.ReplacementChar);
+
         // Don't remove this array even if it seems unused, it is used to map the attributes indexes in the DriverAssert
         // Otherwise the test won't detect issues with attributes not visibly by the naked eye
         Attribute [] attributes =
