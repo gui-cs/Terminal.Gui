@@ -40,8 +40,8 @@ public class InputInjector : IInputInjector
         }
         else // Pipeline
         {
-            // Pipeline injection - use enqueue to go through processing pipeline
-            _processor.EnqueueKeyDownEvent (key);
+            // Pipeline injection - use inject to go through processing pipeline
+            _processor.InjectKeyDownEvent (key);
 
             if (_testSource != null)
             {
@@ -58,23 +58,24 @@ public class InputInjector : IInputInjector
     }
 
     /// <inheritdoc/>
-    public void InjectMouse (MouseEventArgs mouseEvent, InputInjectionOptions? options = null)
+    public void InjectMouse (Mouse mouseEvent, InputInjectionOptions? options = null)
     {
         options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
         InputInjectionMode mode = ResolveMode (options.Mode);
 
-        // Set timestamp if not provided (MouseEventArgs doesn't have Timestamp property in current implementation)
-        // For now, we'll work with the existing system
+        // Set timestamp if not provided
+        mouseEvent.Timestamp ??= (_timeProvider ?? options.TimeProvider ?? new SystemTimeProvider ()).Now;
 
         if (mode == InputInjectionMode.Direct)
         {
             // Direct injection - bypass encoding, raise event directly
-            _processor.RaiseMouseEvent (mouseEvent);
+            _processor.RaiseMouseEventParsed (mouseEvent);
+            _processor.RaiseSyntheticMouseEvent (mouseEvent);
         }
         else // Pipeline
         {
-            // Pipeline injection - use enqueue to go through processing pipeline
-            _processor.EnqueueMouseEvent (null, mouseEvent);
+            // Pipeline injection - use inject to go through processing pipeline
+            _processor.InjectMouseEvent (null, mouseEvent);
 
             if (_testSource != null)
             {

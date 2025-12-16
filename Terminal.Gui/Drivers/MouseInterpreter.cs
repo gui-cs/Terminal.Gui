@@ -38,9 +38,9 @@ internal class MouseInterpreter
     /// <summary>
     ///     Initializes a new instance of the <see cref="MouseInterpreter"/> class.
     /// </summary>
-    /// <param name="now">
-    ///     Optional function to get the current time. If <see langword="null"/>, defaults to <c>() => DateTime.Now</c>.
-    ///     Useful for unit tests to inject controlled time values.
+    /// <param name="timeProvider">
+    ///     Optional time provider for getting the current time. If <see langword="null"/>, defaults to <see cref="SystemTimeProvider"/>.
+    ///     Useful for unit tests to inject controlled time values via <see cref="VirtualTimeProvider"/>.
     /// </param>
     /// <param name="doubleClickThreshold">
     ///     Optional threshold for multi-click detection. If <see langword="null"/>, defaults to 500 milliseconds.
@@ -48,7 +48,7 @@ internal class MouseInterpreter
     /// </param>
     /// <remarks>
     ///     Creates four <see cref="MouseButtonClickTracker"/> instances, one for each supported mouse button
-    ///     (LeftButton/Left, MiddleButton/Middle, RightButton/Right, Button4), all using the same time function and threshold.
+    ///     (LeftButton/Left, MiddleButton/Middle, RightButton/Right, Button4), all using the same time provider and threshold.
     /// </remarks>
     public MouseInterpreter (
         ITimeProvider? timeProvider = null,
@@ -60,22 +60,23 @@ internal class MouseInterpreter
 
         _mouseButtonClickTracker =
         [
-            new (Now, RepeatedClickThreshold, 0),
-            new (Now, RepeatedClickThreshold, 1),
-            new (Now, RepeatedClickThreshold, 2),
-            new (Now, RepeatedClickThreshold, 3)
+            new (TimeProvider, RepeatedClickThreshold, 0),
+            new (TimeProvider, RepeatedClickThreshold, 1),
+            new (TimeProvider, RepeatedClickThreshold, 2),
+            new (TimeProvider, RepeatedClickThreshold, 3)
         ];
     }
 
     /// <summary>
-    ///     Gets or sets the function for returning the current time.
+    ///     Gets or sets the time provider for returning the current time.
     /// </summary>
-    /// <value>A function that returns the current <see cref="DateTime"/>.</value>
+    /// <value>An <see cref="ITimeProvider"/> instance that provides the current time.</value>
     /// <remarks>
     ///     This property enables time injection for unit tests, ensuring repeatable and deterministic test behavior.
-    ///     In production, this defaults to <c>() => DateTime.Now</c>.
+    ///     In production, this defaults to <see cref="SystemTimeProvider"/> which uses <c>DateTime.Now</c>.
+    ///     For testing, use <see cref="VirtualTimeProvider"/> to control time explicitly.
     /// </remarks>
-    public Func<DateTime> Now { get; set; }
+    public ITimeProvider TimeProvider { get; set; }
 
     /// <summary>
     ///     Gets or sets the maximum time allowed between consecutive clicks for them to be counted as a multi-click
@@ -191,7 +192,7 @@ internal class MouseInterpreter
     {
         var newClick = new Mouse
         {
-            Timestamp = mouseEventArgs.Timestamp ?? Now (),
+            Timestamp = mouseEventArgs.Timestamp ?? TimeProvider.Now,
             Handled = false,
             Flags = ToClicks (button, numberOfClicks),
             ScreenPosition = mouseEventArgs.ScreenPosition,

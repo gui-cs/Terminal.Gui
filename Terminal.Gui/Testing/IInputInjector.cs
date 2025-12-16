@@ -62,7 +62,7 @@ public interface IInputInjector
     /// </summary>
     /// <param name="mouseEvent">The mouse event to inject.</param>
     /// <param name="options">Optional injection options.</param>
-    void InjectMouse (MouseEventArgs mouseEvent, InputInjectionOptions? options = null);
+    void InjectMouse (Mouse mouseEvent, InputInjectionOptions? options = null);
 
     /// <summary>
     /// Injects a sequence of input events with delays between them.
@@ -98,4 +98,4 @@ public record KeyEvent (Key Key) : InputEvent;
 /// Mouse event in a sequence.
 /// </summary>
 /// <param name="Mouse">The mouse event to inject.</param>
-public record MouseEvent (MouseEventArgs Mouse) : InputEvent;
+public record MouseEvent (Mouse Mouse) : InputEvent;

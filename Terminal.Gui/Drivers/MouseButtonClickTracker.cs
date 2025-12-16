@@ -22,7 +22,7 @@
 ///         Not to be confused with <c>NetEvents.MouseButtonState</c>.
 ///     </para>
 /// </remarks>
-/// <param name="_now">Function to get the current time, allowing for time injection in tests.</param>
+/// <param name="_timeProvider">Time provider for getting the current time, allowing for time injection in tests.</param>
 /// <param name="_repeatClickThreshold">Maximum time between clicks to count as consecutive (e.g., double-click timeout).</param>
 /// <param name="_buttonIdx">
 ///     Zero-based index of the button being tracked (0=LeftButton/Left, 1=MiddleButton/Middle,
@@ -30,7 +30,7 @@
 /// </param>
 
 // ReSharper disable InconsistentNaming
-internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatClickThreshold, int _buttonIdx)
+internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _repeatClickThreshold, int _buttonIdx)
 {
     // ReSharper enable InconsistentNaming
     private int _consecutiveClicks;
@@ -113,8 +113,8 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
         bool isPressedNow = IsPressed (_buttonIdx, mouse.Flags);
         bool isSamePosition = _lastPosition == mouse.ScreenPosition;
 
-        // Use mouse.Timestamp if available, otherwise use _now() for current time
-        DateTime currentTime = mouse.Timestamp ?? _now ();
+        // Use mouse.Timestamp if available, otherwise use _timeProvider.Now for current time
+        DateTime currentTime = mouse.Timestamp ?? _timeProvider.Now;
         TimeSpan elapsed = currentTime - At;
 
         numClicks = null; // Default to no click
@@ -195,7 +195,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     private void OverwriteState (Mouse e)
     {
         Pressed = IsPressed (_buttonIdx, e.Flags);
-        At = e.Timestamp ?? _now ();
+        At = e.Timestamp ?? _timeProvider.Now;
         _lastPosition = e.ScreenPosition;
     }
 

@@ -23,7 +23,7 @@ public record KeyboardEventRecord (Key Key) : InputEventRecord;
 /// Mouse input event record (raw, before click synthesis).
 /// </summary>
 /// <param name="MouseEvent">The mouse event data.</param>
-public record MouseEventRecord (MouseEventArgs MouseEvent) : InputEventRecord;
+public record MouseEventRecord (Mouse MouseEvent) : InputEventRecord;
 
 /// <summary>
 /// ANSI sequence event record (for ANSI driver testing).
