@@ -1,8 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace UICatalog.Scenarios;
 
 /// <summary>
@@ -63,7 +59,6 @@ public class LayoutEditor : EditorBase
             Dimension = Dimension.Height,
             X = Pos.Right (_xEditor) + 1
         };
-
 
         _widthEditor = new ()
         {
