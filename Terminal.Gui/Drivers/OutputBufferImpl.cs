@@ -185,8 +185,17 @@ public class OutputBufferImpl : IOutputBuffer
             if (printableGraphemeWidth > 1)
             {
                 // Skip the second column of a wide character
-                // IMPORTANT: We do NOT modify column N+1's IsDirty or Attribute here.
-                // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
+                // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
+                // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
+                // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
+                if (Clip.Contains (Col, Row))
+                {
+                    // IMPORTANT: We do NOT modify column N+1's IsDirty or Attribute here.
+                    // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
+                    Contents [Row, Col].Attribute = CurrentAttribute;
+                }
+
+                // Advance cursor again for wide character
                 Col++;
             }
         }
