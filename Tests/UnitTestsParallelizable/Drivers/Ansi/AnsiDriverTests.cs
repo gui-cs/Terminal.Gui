@@ -2,19 +2,19 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace DriverTests.Fake;
+namespace DriverTests.Ansi;
 
 /// <summary>
 ///     Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.
 /// </summary>
-public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
+public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 {
     private readonly ITestOutputHelper _output = output;
 
     #region Basic FakeDriver Tests
 
     [Fact]
-    public void FakeDriver_Init_Works ()
+    public void Init_Works ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -26,7 +26,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     [Fact]
 
-    public void FakeDriver_Screen_Has_Default_Size ()
+    public void Screen_Has_Default_Size ()
     {
         IDriver driver = CreateFakeDriver ();
         // Default size should be 80x25
@@ -37,7 +37,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     [Fact]
 
-    public void FakeDriver_Can_Resize ()
+    public void Can_Resize ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -60,7 +60,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     [Fact]
 
-    public void SetupFakeDriver_Initializes_Driver_With_80x25 ()
+    public void SetupInitializes_Driver_With_80x25 ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -72,7 +72,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     [Fact]
 
-    public void SetupFakeDriver_Driver_Is_IDriver ()
+    public void SetupDriver_Is_IDriver ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -86,7 +86,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     [Fact]
 
-    public void SetupFakeDriver_Can_Set_Screen_Size ()
+    public void SetupCan_Set_Screen_Size ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -105,7 +105,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
     #region Clipboard Tests
 
     [Fact]
-    public void FakeDriver_Clipboard_Works_When_Enabled ()
+    public void Clipboard_Works_When_Enabled ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -121,7 +121,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
     }
 
     [Fact]
-    public void FakeDriver_Clipboard_GetClipboarData_Works ()
+    public void Clipboard_GetClipboarData_Works ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -138,7 +138,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     [Fact]
 
-    public void FakeDriver_Can_Fill_Rectangle ()
+    public void Can_Fill_Rectangle ()
     {
         IDriver driver = CreateFakeDriver ();
 
@@ -162,7 +162,7 @@ public class FakeDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     [Fact]
 
-    public void FakeDriver_Buffer_Integrity_After_Multiple_Resizes ()
+    public void Buffer_Integrity_After_Multiple_Resizes ()
     {
         IDriver driver = CreateFakeDriver ();
 

@@ -1,4 +1,4 @@
-﻿namespace DriverTests.Ansi;
+﻿namespace DriverTests.AnsiHandling;
 
 public class AnsiMouseParserTests
 {

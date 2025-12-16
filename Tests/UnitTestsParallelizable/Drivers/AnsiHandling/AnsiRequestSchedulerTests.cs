@@ -1,6 +1,6 @@
 ﻿using Moq;
 
-namespace DriverTests.Ansi;
+namespace DriverTests.AnsiHandling;
 
 public class AnsiRequestSchedulerTests
 {

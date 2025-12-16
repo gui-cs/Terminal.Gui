@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace DriverTests.Ansi;
+namespace DriverTests.AnsiHandling;
 
 public class AnsiKeyboardParserTests
 {

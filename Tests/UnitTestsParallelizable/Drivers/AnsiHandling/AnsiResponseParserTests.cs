@@ -1,9 +1,8 @@
-﻿#nullable enable
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 using Xunit.Abstractions;
 
-namespace DriverTests.Ansi;
+namespace DriverTests.AnsiHandling;
 
 // BUGBUG: These tests use TInputRecord of `int`, but that's not a realistic type for keyboard input.
 public class AnsiResponseParserTests (ITestOutputHelper output)

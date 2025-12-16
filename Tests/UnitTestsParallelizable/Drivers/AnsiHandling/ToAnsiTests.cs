@@ -1,8 +1,6 @@
-using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
 
-namespace DriverTests.Ansi;
+namespace DriverTests.AnsiHandling;
 
 /// <summary>
 ///     Tests for the ToAnsi functionality that generates ANSI escape sequences from buffer contents.
@@ -17,6 +15,7 @@ public class ToAnsiTests : FakeDriverBase
 
         // Empty buffer should have newlines for each row
         Assert.Contains ("\n", ansi);
+
         // Should have 5 newlines (one per row)
         Assert.Equal (5, ansi.Count (c => c == '\n'));
     }
@@ -49,17 +48,18 @@ public class ToAnsiTests : FakeDriverBase
         driver.Force16Colors = force16Colors;
 
         // Set red foreground
-        driver.CurrentAttribute = new Attribute (Color.Red, Color.Black);
+        driver.CurrentAttribute = new (Color.Red, Color.Black);
         driver.AddStr ("Red");
         driver.Move (0, 1);
 
         // Set blue foreground
-        driver.CurrentAttribute = new Attribute (Color.Blue, Color.Black);
+        driver.CurrentAttribute = new (Color.Blue, Color.Black);
         driver.AddStr ("Blue");
 
         string ansi = driver.ToAnsi ();
 
         Assert.True (driver.Force16Colors == force16Colors);
+
         // Should contain ANSI color codes
         Assert.Contains (expectedRed, ansi); // Red foreground
         Assert.Contains (expectedBue, ansi); // Blue foreground
@@ -104,17 +104,17 @@ public class ToAnsiTests : FakeDriverBase
         IDriver driver = CreateFakeDriver (10, 3);
 
         // Bold text
-        driver.CurrentAttribute = new Attribute (Color.White, Color.Black, TextStyle.Bold);
+        driver.CurrentAttribute = new (Color.White, Color.Black, TextStyle.Bold);
         driver.AddStr ("Bold");
         driver.Move (0, 1);
 
         // Italic text
-        driver.CurrentAttribute = new Attribute (Color.White, Color.Black, TextStyle.Italic);
+        driver.CurrentAttribute = new (Color.White, Color.Black, TextStyle.Italic);
         driver.AddStr ("Italic");
         driver.Move (0, 2);
 
         // Underline text
-        driver.CurrentAttribute = new Attribute (Color.White, Color.Black, TextStyle.Underline);
+        driver.CurrentAttribute = new (Color.White, Color.Black, TextStyle.Underline);
         driver.AddStr ("Underline");
 
         string ansi = driver.ToAnsi ();
@@ -166,14 +166,15 @@ public class ToAnsiTests : FakeDriverBase
         driver.Force16Colors = force16Colors;
 
         driver.AddStr ("Normal");
-        driver.CurrentAttribute = new Attribute (Color.Red, Color.Black);
+        driver.CurrentAttribute = new (Color.Red, Color.Black);
         driver.AddStr ("Red");
-        driver.CurrentAttribute = new Attribute (Color.Blue, Color.Black);
+        driver.CurrentAttribute = new (Color.Blue, Color.Black);
         driver.AddStr ("Blue");
 
         string ansi = driver.ToAnsi ();
 
         Assert.True (driver.Force16Colors == force16Colors);
+
         // Should contain color changes within the line
         Assert.Contains ("Normal", ansi);
         Assert.Contains (expectedRed, ansi); // Red
@@ -187,10 +188,10 @@ public class ToAnsiTests : FakeDriverBase
         IDriver driver = CreateFakeDriver (200, 50);
 
         // Fill with some content
-        for (int row = 0; row < 50; row++)
+        for (var row = 0; row < 50; row++)
         {
             driver.Move (0, row);
-            driver.CurrentAttribute = new Attribute ((ColorName16)(row % 16), Color.Black);
+            driver.CurrentAttribute = new ((ColorName16)(row % 16), Color.Black);
             driver.AddStr ($"Row {row:D2} content");
         }
 
@@ -211,9 +212,10 @@ public class ToAnsiTests : FakeDriverBase
 
         // Use RGB colors (when not forcing 16 colors)
         driver.Force16Colors = false;
+
         try
         {
-            driver.CurrentAttribute = new Attribute (new Color (255, 0, 0), new Color (0, 255, 0));
+            driver.CurrentAttribute = new (new Color (255, 0), new Color (0, 255));
             driver.AddStr ("RGB");
 
             string ansi = driver.ToAnsi ();
@@ -235,7 +237,7 @@ public class ToAnsiTests : FakeDriverBase
 
         // Force 16 colors
         driver.Force16Colors = true;
-        driver.CurrentAttribute = new Attribute (Color.Red, Color.Blue);
+        driver.CurrentAttribute = new (Color.Red, Color.Blue);
         driver.AddStr ("16Color");
 
         string ansi = driver.ToAnsi ();
@@ -248,7 +250,14 @@ public class ToAnsiTests : FakeDriverBase
 
     [Theory]
     [InlineData (true, "\u001b[31m", "\u001b[32m", "\u001b[34m", "\u001b[33m", "\u001b[35m", "\u001b[36m")]
-    [InlineData (false, "\u001b[38;2;255;0;0m", "\u001b[38;2;0;128;0m", "\u001b[38;2;0;0;255", "\u001b[38;2;255;255;0m", "\u001b[38;2;255;0;255m", "\u001b[38;2;0;255;255m")]
+    [InlineData (
+                    false,
+                    "\u001b[38;2;255;0;0m",
+                    "\u001b[38;2;0;128;0m",
+                    "\u001b[38;2;0;0;255",
+                    "\u001b[38;2;255;255;0m",
+                    "\u001b[38;2;255;0;255m",
+                    "\u001b[38;2;0;255;255m")]
     public void ToAnsi_Multiple_Attributes_Per_Line (
         bool force16Colors,
         string expectedRed,
@@ -268,15 +277,15 @@ public class ToAnsiTests : FakeDriverBase
         foreach (string colorName in colors)
         {
             Color fg = colorName switch
-            {
-                "Red" => Color.Red,
-                "Green" => Color.Green,
-                "Blue" => Color.Blue,
-                "Yellow" => Color.Yellow,
-                "Magenta" => Color.Magenta,
-                "Cyan" => Color.Cyan,
-                _ => Color.White
-            };
+                       {
+                           "Red" => Color.Red,
+                           "Green" => Color.Green,
+                           "Blue" => Color.Blue,
+                           "Yellow" => Color.Yellow,
+                           "Magenta" => Color.Magenta,
+                           "Cyan" => Color.Cyan,
+                           _ => Color.White
+                       };
 
             driver.CurrentAttribute = new (fg, Color.Black);
             driver.AddStr (colorName);
@@ -285,6 +294,7 @@ public class ToAnsiTests : FakeDriverBase
         string ansi = driver.ToAnsi ();
 
         Assert.True (driver.Force16Colors == force16Colors);
+
         // Should contain multiple color codes
         Assert.Contains (expectedRed, ansi); // Red
         Assert.Contains (expectedGreen, ansi); // Green
@@ -358,13 +368,13 @@ public class ToAnsiTests : FakeDriverBase
         IDriver driver = CreateFakeDriver (width, height);
 
         // Fill every cell with different content and colors
-        for (int row = 0; row < height; row++)
+        for (var row = 0; row < height; row++)
         {
-            for (int col = 0; col < width; col++)
+            for (var col = 0; col < width; col++)
             {
                 driver.Move (col, row);
-                driver.CurrentAttribute = new Attribute ((ColorName16)((row + col) % 16), Color.Black);
-                driver.AddRune ((char)('A' + ((row + col) % 26)));
+                driver.CurrentAttribute = new ((ColorName16)((row + col) % 16), Color.Black);
+                driver.AddRune ((char)('A' + (row + col) % 26));
             }
         }
 
