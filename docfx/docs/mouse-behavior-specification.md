@@ -1,11 +1,5 @@
 ﻿# Terminal.Gui Mouse Behavior - Complete Specification
 
-## Based on UICatalog Buttons.cs Analysis
-
-This document specifies the complete mouse behavior for Terminal.Gui, based on actual UICatalog examples and the AppKit-inspired design.
-
----
-
 ## Executive Summary
 
 **Key Design Principles:**
@@ -16,9 +10,7 @@ This document specifies the complete mouse behavior for Terminal.Gui, based on a
 4. **MouseState** provides visual feedback, independent of command execution
 5. **One event per physical action** - no duplicate event emission
 
----
-
-## The Three Button Types (from UICatalog Buttons.cs)
+## The Three Button Types
 
 ### 1. Normal Button (Default)
 ```csharp
@@ -62,7 +54,7 @@ var noHighlight = new Button
 
 ---
 
-## Complete Behavior Matrix
+## Behavior Matrix
 
 ### Normal Button (MouseHoldRepeat = false)
 
@@ -79,19 +71,23 @@ var noHighlight = new Button
 
 ### Repeat Button (MouseHoldRepeat = true)
 
-| User Action | MouseState | Accept Count | ClickCount Values | Notes |
-|-------------|------------|--------------|-------------------|-------|
-| **Single click** (press + immediate release) | Press: `Pressed`<br/>Release: `Unpressed` | **1** | Release: `1` | Too fast for timer to start |
-| **Press and hold** (2+ seconds) | Pressed → stays → Unpressed | **10+** | All: `1` | Timer fires ~500ms initial, then ~50ms intervals (via `SmoothAcceleratingTimeout`) |
-| **Double-click** (2 quick clicks) | Press→Unpress→Press→Unpress | **2** | Release(1): `1`<br/>Release(2): `2` | Two releases = two Accepts (timer doesn't start) |
-| **Triple-click** | 3 press/release cycles | **3** | Release(1-3): `1,2,3` | Three releases = three Accepts |
-| **Hold then quick click** | Hold: many timer fires<br/>Quick click: one release | **10+ then +1** | Hold: `1` (repeated)<br/>Click: `1` or `2` | Mixed repetition + click |
+**Key Principle:** MouseHoldRepeat buttons respond to **Press and Release events only**. Click/DoubleClick/TripleClick synthesized events are **ignored**. Each Press/Release cycle fires exactly one Accept (plus timer-generated Accepts during holds).
 
-**Key Point:** Timer fires Accept repeatedly with ClickCount=1. Quick releases also fire Accept with appropriate ClickCount.
+| User Action | MouseState | Accept Count | Notes |
+|-------------|------------|--------------|-------|
+| **Single click** (press + immediate release) | Press: `Pressed`<br/>Release: `Unpressed` | **1** | Too fast for timer to start; one Accept on release |
+| **Press and hold** (2+ seconds) | Pressed → stays → Unpressed | **10+** | Timer fires ~500ms initial, then ~50ms intervals (via `SmoothAcceleratingTimeout`), plus 1 final Accept on release |
+| **Double-click** (2 quick clicks) | Press→Release→Press→Release | **2** | Two Press/Release cycles = two Accepts (Click/DoubleClick events ignored) |
+| **Triple-click** | 3 press/release cycles | **3** | Three Press/Release cycles = three Accepts (Click/DoubleClick/TripleClick events ignored) |
+| **Hold then quick click** | Hold: many timer fires<br/>Quick click: one release | **10+ then +1** | Hold generates many Accepts via timer, quick click adds one more |
+
+**Implementation Rule:** When `MouseHoldRepeat = true`, `View.NewMouseEvent` must ignore `IsSingleDoubleOrTripleClicked` events and only invoke commands on **Press** (to start timer) and **Release** (to fire final Accept and stop timer). This ensures every click fires Accept once, regardless of multi-click detection.
+
+**Key Point:** Timer and multi-click are **independent** concepts. Timer repeats during continuous hold. Multi-click (double/triple) is detected but **ignored** when MouseHoldRepeat is true—only the Press/Release events matter.
 
 ---
 
-## Mouse Event Flow (Complete Pipeline)
+## Mouse Event Flow (Pipeline)
 
 ### Stage 1: ANSI Input → AnsiMouseParser
 ```
@@ -168,8 +164,6 @@ Released → Stop timer, MouseState &= ~Pressed, Ungrab
          → Invoke commands bound to Released
 ```
 
----
-
 ## Default MouseBindings
 
 ### View Base Class (All Views)
@@ -228,8 +222,6 @@ protected override bool OnAccepting(CommandEventArgs args)
 }
 ```
 
----
-
 ## MouseState vs ClickCount vs Commands
 
 ### Three Independent Concerns
@@ -261,8 +253,6 @@ Release → MouseState &= ~Pressed (button looks normal)
         → MouseFlags = LeftButtonClicked (event type)
 ```
 
----
-
 ## MouseHoldRepeat Deep Dive
 
 ### Timer Behavior
@@ -280,61 +270,39 @@ Release → Stop Timer → Ungrab → Fire Accept once more (from release)
 
 ### ClickCount Interaction
 
+**IMPORTANT:** When `MouseHoldRepeat = true`, Views must use **Press/Release events only**. Click/DoubleClick/TripleClick synthesized events are ignored to ensure consistent behavior.
+
 **Hold for 2+ seconds:**
 ```
-Press(ClickCount=1) → Timer starts
-Timer fires 10+ times → All with ClickCount=1 (same press sequence)
-Release(ClickCount=1) → Timer stops, final Accept
+Press → Timer starts
+Timer fires 10+ times → Accept fires repeatedly
+Release → Timer stops, one final Accept
+Total: 10+ Accepts (all from timer + release)
 ```
 
 **Double-click quickly:**
 ```
-Press(ClickCount=1) → Timer starts but...
-Release(ClickCount=1) → Timer stops (< 500ms, never fired), Accept
-Press(ClickCount=2) → Timer starts but...
-Release(ClickCount=2) → Timer stops, Accept
-Total: 2 Accepts (one per release, timer never fired)
+Press #1 → Timer starts but...
+Release #1 → Timer stops (< 500ms, never fired), one Accept
+Press #2 → Timer starts but...
+Release #2 → Timer stops, one Accept
+Total: 2 Accepts (one per Press/Release cycle)
+ClickCount is tracked but Click/DoubleClick events are IGNORED
 ```
 
-**Key Insight:** Timer and multi-click are **independent**. Timer repeats with ClickCount=1 until release. Quick clicks don't trigger timer but still track ClickCount.
-
----
-
-## Implementation Checklist
-
-### MouseInterpreter Changes
-- [x] Track ClickCount on all events (Pressed, Released, Clicked, etc.)
-- [x] Emit Clicked/DoubleClicked/TripleClicked based on ClickCount
-- [x] Immediate emission (no 500ms delay) - ALREADY FIXED
-- [ ] Add `Mouse.ClickCount` property
-
-### Mouse Class Changes
-```csharp
-public class Mouse : HandledEventArgs
-{
-    // ... existing properties ...
-    
-    /// <summary>
-    /// Number of consecutive clicks at this position (1 = single, 2 = double, 3 = triple).
-    /// Tracked on all mouse events (Pressed, Released, Clicked, etc.).
-    /// Applications can check this in OnMouseEvent or command handlers to distinguish
-    /// single vs double-click intent.
-    /// </summary>
-    public int ClickCount { get; set; } = 1;
-}
+**Triple-click quickly:**
+```
+Press #1 → Timer starts but...
+Release #1 → Timer stops (< 500ms, never fired), one Accept
+Press #2 → Timer starts but...
+Release #2 → Timer stops, one Accept
+Press #3 → Timer starts but...
+Release #3 → Timer stops, one Accept
+Total: 3 Accepts (one per Press/Release cycle)
+ClickCount is tracked but Click/DoubleClick/TripleClick events are IGNORED
 ```
 
-### View.Mouse Changes
-- [ ] No changes needed - default bindings work with new system
-- [ ] Documentation updates to explain ClickCount usage
-- [ ] Example handlers showing ClickCount checking
-
-### MouseHeldDown (Continuous Press)
-- [ ] No changes needed - timer already works correctly
-- [ ] Timer fires Accept with ClickCount=1
-- [ ] Quick releases bypass timer, fire Accept with appropriate ClickCount
-
----
+**Key Insight:** When `MouseHoldRepeat = true`, only Press/Release events matter. Click/DoubleClick/TripleClick are synthesized but **must be ignored** by the View's event handling logic. Each Press/Release cycle fires exactly one Accept (plus any timer-generated Accepts during the hold).
 
 ## Testing Scenarios
 
@@ -342,41 +310,51 @@ public class Mouse : HandledEventArgs
 
 ### Test 1: Normal Button Single Click
 ```
-Expected: Accept fires once, ClickCount=1
+Expected: Accept fires once
 Action: Press at (10,10), release at (10,10) within 100ms
 Result: acceptCount increments by 1
+Uses: LeftButtonClicked event binding
 ```
 
 ### Test 2: Normal Button Double Click
 ```
-Expected: Accept fires twice, ClickCount=1 then ClickCount=2
+Expected: Accept fires twice
 Action: Click, wait 200ms, click again (both at same position)
 Result: acceptCount increments by 2
-Binding: First fires LeftButtonClicked, second fires LeftButtonDoubleClicked
+Uses: First fires LeftButtonClicked, second fires LeftButtonDoubleClicked (both must have bindings)
 ```
 
 ### Test 3: Repeat Button Hold
 ```
-Expected: Accept fires 10+ times, all ClickCount=1
+Expected: Accept fires 10+ times
 Action: Press, hold for 2 seconds, release
 Result: acceptCount increments by 10+ (timer + final release)
+Uses: Press/Release events only (timer fires on Press, stops on Release)
 ```
 
 ### Test 4: Repeat Button Double Click (Quick)
 ```
-Expected: Accept fires twice, ClickCount=1 then ClickCount=2
-Action: Click-release, immediately click-release (< 500ms total)
-Result: acceptCount increments by 2 (timer never starts)
+Expected: Accept fires twice (one per Press/Release cycle)
+Action: Press-release, immediately press-release (< 500ms total)
+Result: acceptCount increments by 2
+Uses: Press/Release events only (Click/DoubleClick events are IGNORED)
+Implementation: View.NewMouseEvent must NOT invoke commands on IsSingleDoubleOrTripleClicked when MouseHoldRepeat=true
 ```
 
-### Test 5: No Highlight Button
+### Test 5: Repeat Button Triple Click
+```
+Expected: Accept fires three times (one per Press/Release cycle)
+Action: Three quick press-release cycles
+Result: acceptCount increments by 3
+Uses: Press/Release events only (Click/DoubleClick/TripleClick events are IGNORED)
+```
+
+### Test 6: No Highlight Button
 ```
 Expected: Same counts as normal button, no visual state changes
 Action: Any click pattern
 Result: MouseState never includes Pressed, but Accept fires correctly
 ```
-
----
 
 ## Migration Guide
 
@@ -425,14 +403,6 @@ button.Accepting += (s, e) => { DoNormalThing(); e.Handled = true; };
 button.Toggling += (s, e) => { DoDoubleClickThing(); e.Handled = true; };
 ```
 
-### For View Implementers
-
-**No changes needed** - the new system is backwards compatible!
-
-Existing bindings and handlers work exactly the same. ClickCount is **additional metadata** available if needed.
-
----
-
 ## FAQ
 
 **Q: Why emit both Clicked and DoubleClicked for a double-click?**  
@@ -456,17 +426,3 @@ MouseBindings.Add(MouseFlags.LeftButtonDoubleClicked, Command.Toggle);
 
 **Q: Does MouseState.Pressed relate to ClickCount?**  
 A: No. MouseState is visual state (button looks pressed). ClickCount is semantic (which click in a sequence). They're independent.
-
----
-
-## Summary
-
-✅ **ClickCount on every event** - AppKit-style metadata  
-✅ **Flag type changes** - Clicked → DoubleClicked → TripleClicked  
-✅ **Immediate emission** - no 500ms delay (already fixed)  
-✅ **MouseHoldRepeat** - timer-based, independent of ClickCount  
-✅ **MouseState** - visual feedback, independent of commands  
-✅ **Backward compatible** - existing code works unchanged  
-✅ **Flexible** - apps can use flags OR check ClickCount  
-
-**The design is clean, complete, and ready to implement!**

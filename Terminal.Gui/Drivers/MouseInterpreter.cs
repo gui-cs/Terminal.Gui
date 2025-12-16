@@ -191,7 +191,7 @@ internal class MouseInterpreter
     {
         var newClick = new Mouse
         {
-            Timestamp = Now (),
+            Timestamp = mouseEventArgs.Timestamp ?? Now (),
             Handled = false,
             Flags = ToClicks (button, numberOfClicks),
             ScreenPosition = mouseEventArgs.ScreenPosition,

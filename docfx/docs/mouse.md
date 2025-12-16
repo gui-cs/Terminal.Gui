@@ -50,11 +50,14 @@ Tenets higher in the list have precedence over tenets lower in the list.
 |-----------------------------------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------------|------------------|
 | Simple single click (press + release inside)  | Pressed on **LeftButtonPressed** → stays until **LeftButtonReleased** (anywhere) | **Exactly 1** on release inside the button                                           | Never                           | Universal UI contract |
 | Hold mouse (MouseHoldRepeat = **false** – default) | Pressed immediately → stays until release                 | **Exactly 1** on release inside                                                       | Never                           | Normal push-button |
-| Hold mouse (MouseHoldRepeat = **true**) | Same visual behavior                                      | Starts repeating after ~300 ms, then ~30–60 ms **only while cursor remains inside**    | Never                           | Scrollbar arrow / spin button behavior |
+| Hold mouse (MouseHoldRepeat = **true**) | Same visual behavior                                      | Starts repeating after ~300 ms, then ~30–60 ms **only while cursor remains inside**, plus **1 final Accept on release inside**    | Never                           | Scrollbar arrow / spin button behavior |
 | Drag outside while holding → release outside  | Visual pressed cleared on any **LeftButtonReleased**        | **None** (canceled)                                                                   | Never                           | Standard click cancellation |
 | **Double-click** (MouseHoldRepeat = **false**) | Normal press → release → press → release cycle          | **Exactly 2** (one per release inside)                                               | Never                           | Required – users double-click buttons constantly |
-| **Double-click** (MouseHoldRepeat = **true**) | Same visual cycle                                         | **Exactly 2** (repeating only applies to continuous hold, not discrete clicks)       | Never                           | Repeating ≠ double-click |
-| Triple-click or faster multi-click            | Same rule                                                 | One `Accept` per release inside → 3 Accepts on triple-click                          | Never                           | No coalescing for normal buttons |
+| **Double-click** (MouseHoldRepeat = **true**) | Same visual cycle                                         | **Exactly 2** (one per release inside) – Click/DoubleClick/TripleClick events are ignored; only Press/Release matter       | Never                           | MouseHoldRepeat uses Press/Release only |
+| Triple-click or faster multi-click (MouseHoldRepeat = **false**)            | Same rule                                                 | One `Accept` per release inside → 3 Accepts on triple-click                          | Never                           | No coalescing for normal buttons |
+| Triple-click or faster multi-click (MouseHoldRepeat = **true**)            | Same rule                                                 | **Exactly 3** (one per release inside) – Click/DoubleClick/TripleClick events are ignored; only Press/Release matter                          | Never                           | MouseHoldRepeat uses Press/Release only |
+
+**Key Point for MouseHoldRepeat:** When `MouseHoldRepeat = true`, the View's behavior is based entirely on **Press and Release events**, not on Click/DoubleClick/TripleClick synthesized events. Each Press starts the timer (which fires Accept repeatedly), and each Release stops the timer and fires one final Accept (if released inside). This ensures that rapid clicking (double-click, triple-click, etc.) fires Accept once per click, matching user expectations for repeat buttons like scrollbar arrows.
 
 This behavior matches Qt QPushButton, GTK Button, Win32 BUTTON, WPF Button, NSButton, Flutter ElevatedButton, Android Button, etc. – all established since the 1990s.
 
@@ -552,7 +555,7 @@ sequenceDiagram
 
 ### Stage 1: Terminal Input (ANSI Escape Sequences)
 
-**Input Format:** SGR Extended Mouse Mode (`ESC[<button;x;yM/m`)
+**Input Format:** SGR Extended Mouse Mode (`ESC[&lt;button;x;yM/m`)
 
 **Example User Action:** Single click at column 10, row 5
 
@@ -1014,7 +1017,7 @@ Add to each stage in pipeline docs:
 - **Purpose:** What problem does this stage solve?
 - **Input:** What does it receive?
 - **Output:** What does it emit?
-- **State:** What state does it maintain?
+- **State:** What does it maintain?
 - **Decisions:** What choices does it make?
 
 **Example for MouseInterpreter:**

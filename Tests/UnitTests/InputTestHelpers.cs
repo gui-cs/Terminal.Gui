@@ -171,4 +171,26 @@ public static class InputTestHelpers
         input.SimulateInputThread (inputBuffer);
         processor.ProcessQueue ();
     }
+
+    /// <summary>
+    ///     Injects a mouse event directly to the processor, bypassing ANSI encoding/decoding.
+    ///     This preserves timestamps and other properties that ANSI encoding cannot carry.
+    /// </summary>
+    /// <param name="app">The application instance</param>
+    /// <param name="mouse">The mouse event to inject</param>
+    /// <remarks>
+    ///     Use this method when you need to test timestamp-based behavior or other properties
+    ///     that don't survive ANSI encoding. For testing the full ANSI pipeline, use
+    ///     <see cref="InjectAndProcessMouse(IApplication, Mouse)"/> instead.
+    /// </remarks>
+    public static void InjectMouseEventDirectly (this IApplication app, Mouse mouse)
+    {
+        IInputProcessor processor = app.Driver!.GetInputProcessor ();
+        
+        // Set timestamp if not provided
+        mouse.Timestamp ??= DateTime.Now;
+        
+        // Directly raise the event through the processor, bypassing ANSI encoding
+        processor.RaiseMouseEventParsed (mouse);
+    }
 }

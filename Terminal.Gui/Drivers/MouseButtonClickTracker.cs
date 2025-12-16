@@ -113,7 +113,9 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
         bool isPressedNow = IsPressed (_buttonIdx, mouse.Flags);
         bool isSamePosition = _lastPosition == mouse.ScreenPosition;
 
-        TimeSpan elapsed = _now () - At;
+        // Use mouse.Timestamp if available, otherwise use _now() for current time
+        DateTime currentTime = mouse.Timestamp ?? _now ();
+        TimeSpan elapsed = currentTime - At;
 
         numClicks = null; // Default to no click
 
@@ -143,7 +145,7 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
 
             // Track for potential next click in sequence
             _pendingClickPosition = mouse.ScreenPosition;
-            _pendingClickTime = _now ();
+            _pendingClickTime = currentTime;
         }
 
         // Record new state
@@ -188,11 +190,12 @@ internal class MouseButtonClickTracker (Func<DateTime> _now, TimeSpan _repeatCli
     /// <param name="e">The mouse event containing the new state to record.</param>
     /// <remarks>
     ///     Updates <see cref="Pressed"/>, <see cref="At"/>, and the last known position to match the current event.
+    ///     Uses the mouse event's <see cref="Mouse.Timestamp"/> when available, otherwise falls back to the now function.
     /// </remarks>
     private void OverwriteState (Mouse e)
     {
         Pressed = IsPressed (_buttonIdx, e.Flags);
-        At = _now ();
+        At = e.Timestamp ?? _now ();
         _lastPosition = e.ScreenPosition;
     }
 

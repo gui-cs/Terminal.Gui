@@ -747,5 +747,104 @@ public class ApplicationMouseTests
         Assert.False (mouseEventRaised, "Mouse event should not be raised when mouse is disabled");
     }
 
+    /// <summary>
+    ///     Tests that timestamp-based spacing through the processor pipeline (bypassing ANSI encoding)
+    ///     correctly prevents double-click detection when clicks are spaced >500ms apart.
+    /// </summary>
+    [Fact]
+    public void InjectMouseEventDirectly_WithTimestamps_PreventsDoubleClickWhenSpaced ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10
+        };
+        runnable.Add (view);
+        runnable.Layout ();
+
+        List<MouseFlags> receivedFlags = [];
+        view.MouseEvent += (s, e) => { receivedFlags.Add (e.Flags); };
+
+        // Act - Two clicks with 600ms spacing via timestamps (should be two single clicks, not a double-click)
+        // Use InjectMouseEventDirectly to bypass ANSI encoding which cannot preserve timestamps
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        
+        // First click at T+0
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime });
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) });
+
+        // Second click at T+600 (more than 500ms threshold)
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) });
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (700) });
+
+        // Assert - Should receive two LeftButtonClicked events (not a double-click)
+        List<MouseFlags> clickEvents = receivedFlags.Where (f => f.HasFlag (MouseFlags.LeftButtonClicked) 
+                                                                 || f.HasFlag (MouseFlags.LeftButtonDoubleClicked) 
+                                                                 || f.HasFlag (MouseFlags.LeftButtonTripleClicked)).ToList ();
+
+        // Should get exactly 2 single-click events (timestamp spacing prevents double-click)
+        Assert.Equal (2, clickEvents.Count);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [0]);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [1]); // Second single click, not double
+    }
+
+    /// <summary>
+    ///     Tests that timestamp-based spacing through the processor pipeline (bypassing ANSI encoding)
+    ///     allows double-click detection when clicks are within the 500ms threshold.
+    /// </summary>
+    [Fact]
+    public void InjectMouseEventDirectly_WithTimestamps_AllowsDoubleClickWhenClose ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10
+        };
+        runnable.Add (view);
+        runnable.Layout ();
+
+        List<MouseFlags> receivedFlags = [];
+        view.MouseEvent += (s, e) => { receivedFlags.Add (e.Flags); };
+
+        // Act - Two clicks with 300ms spacing via timestamps (should be a double-click)
+        // Use InjectMouseEventDirectly to bypass ANSI encoding which cannot preserve timestamps
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        
+        // First click at T+0
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime });
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) });
+
+        // Second click at T+300 (within 500ms threshold)
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) });
+        app.InjectMouseEventDirectly (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) });
+
+        // Assert - Should receive single-click followed by double-click
+        List<MouseFlags> clickEvents = receivedFlags.Where (f => f.HasFlag (MouseFlags.LeftButtonClicked) 
+                                                                 || f.HasFlag (MouseFlags.LeftButtonDoubleClicked) 
+                                                                 || f.HasFlag (MouseFlags.LeftButtonTripleClicked)).ToList ();
+
+        // Should get single-click followed by double-click (timestamp spacing allows multi-click)
+        Assert.Equal (2, clickEvents.Count);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [0]);
+        Assert.Equal (MouseFlags.LeftButtonDoubleClicked, clickEvents [1]);
+    }
     #endregion
 }

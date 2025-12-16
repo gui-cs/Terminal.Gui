@@ -1,4 +1,5 @@
 ﻿// ReSharper disable AccessToModifiedClosure
+
 #nullable disable
 namespace DriverTests.MouseTests;
 
@@ -6,16 +7,16 @@ public class MouseInterpreterTests
 {
     [Theory]
     [MemberData (nameof (SequenceTests))]
-    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<Terminal.Gui.Input.Mouse> events, params MouseFlags? [] expected)
+    public void TestMouseEventSequences_InterpretedOnlyAsFlag (List<Mouse> events, params MouseFlags? [] expected)
     {
         // Arrange: Mock dependencies and set up the interpreter
         MouseInterpreter interpreter = new ();
 
         // Collect all results from processing the event sequence
-        List<Terminal.Gui.Input.Mouse> allResults = [];
+        List<Mouse> allResults = [];
 
         // Act
-        foreach (Terminal.Gui.Input.Mouse mouse in events)
+        foreach (Mouse mouse in events)
         {
             allResults.AddRange (interpreter.Process (mouse));
         }
@@ -27,7 +28,7 @@ public class MouseInterpreterTests
         }
 
         // Also verify all original input events were passed through
-        foreach (Terminal.Gui.Input.Mouse inputEvent in events)
+        foreach (Mouse inputEvent in events)
         {
             Assert.Contains (allResults, e => e.Flags == inputEvent.Flags);
         }
@@ -37,7 +38,7 @@ public class MouseInterpreterTests
     {
         yield return
         [
-            new List<Terminal.Gui.Input.Mouse>
+            new List<Mouse>
             {
                 new () { Flags = MouseFlags.LeftButtonPressed },
                 new ()
@@ -47,7 +48,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<Terminal.Gui.Input.Mouse>
+            new List<Mouse>
             {
                 new () { Flags = MouseFlags.LeftButtonPressed },
                 new (),
@@ -59,7 +60,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<Terminal.Gui.Input.Mouse>
+            new List<Mouse>
             {
                 new () { Flags = MouseFlags.LeftButtonPressed },
                 new (),
@@ -73,7 +74,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<Terminal.Gui.Input.Mouse>
+            new List<Mouse>
             {
                 new () { Flags = MouseFlags.MiddleButtonPressed },
                 new (),
@@ -87,7 +88,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<Terminal.Gui.Input.Mouse>
+            new List<Mouse>
             {
                 new () { Flags = MouseFlags.RightButtonPressed },
                 new (),
@@ -101,7 +102,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<Terminal.Gui.Input.Mouse>
+            new List<Mouse>
             {
                 new () { Flags = MouseFlags.Button4Pressed },
                 new (),
@@ -115,7 +116,7 @@ public class MouseInterpreterTests
 
         yield return
         [
-            new List<Terminal.Gui.Input.Mouse>
+            new List<Mouse>
             {
                 new () { Flags = MouseFlags.LeftButtonPressed, Position = new (10, 11) },
                 new () { Position = new (10, 11) },
@@ -142,7 +143,7 @@ public class MouseInterpreterTests
         // Arrange
         DateTime mockTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => mockTime, TimeSpan.FromMilliseconds (500));
-        List<Terminal.Gui.Input.Mouse> allEvents = [];
+        List<Mouse> allEvents = [];
 
         // Act - Simulate a double-click: Press, Release, Press, Release
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
@@ -151,11 +152,11 @@ public class MouseInterpreterTests
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
 
         // Assert - Extract only the synthetic click events (not pressed/released)
-        List<Terminal.Gui.Input.Mouse> clickEvents = allEvents
-                                                     .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
-                                                     .ToList ();
+        List<Mouse> clickEvents = allEvents
+                                  .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
+                                  .ToList ();
 
         // With immediate emission, we get BOTH Clicked and DoubleClicked
         Assert.Equal (2, clickEvents.Count);
@@ -163,7 +164,7 @@ public class MouseInterpreterTests
         Assert.Equal (MouseFlags.LeftButtonDoubleClicked, clickEvents [1].Flags);
 
         // CheckForExpiredClicks should now return nothing (clicks emitted immediately)
-        List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
+        List<Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
         Assert.Empty (expiredClickEvents);
     }
 
@@ -179,7 +180,7 @@ public class MouseInterpreterTests
     {
         // Arrange
         MouseInterpreter interpreter = new ();
-        List<Terminal.Gui.Input.Mouse> allEvents = [];
+        List<Mouse> allEvents = [];
 
         // Act - Simulate a triple-click: Press, Release, Press, Release, Press, Release
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
@@ -190,11 +191,11 @@ public class MouseInterpreterTests
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
 
         // Assert - Extract only the synthetic click events
-        List<Terminal.Gui.Input.Mouse> clickEvents = allEvents
-                                                     .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
-                                                                  || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
-                                                     .ToList ();
+        List<Mouse> clickEvents = allEvents
+                                  .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
+                                  .ToList ();
 
         // With immediate emission, we get ALL THREE click events
         Assert.Equal (3, clickEvents.Count);
@@ -219,21 +220,21 @@ public class MouseInterpreterTests
                                             () => mockTime,
                                             TimeSpan.FromMilliseconds (500)
                                            );
-        List<Terminal.Gui.Input.Mouse> allEvents = [];
+        List<Mouse> allEvents = [];
 
         // Act - Simulate a single click
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10) }));
 
         // Assert - With immediate emission, click event should be emitted right away
-        List<Terminal.Gui.Input.Mouse> immediateClickEvents = allEvents.Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)).ToList ();
+        List<Mouse> immediateClickEvents = allEvents.Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)).ToList ();
 
         // NEW (correct) behavior: immediateClickEvents.Count == 1
         Assert.Single (immediateClickEvents);
         Assert.Equal (MouseFlags.LeftButtonClicked, immediateClickEvents [0].Flags);
 
         // CheckForExpiredClicks should return nothing (clicks already emitted)
-        List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
+        List<Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
         Assert.Empty (expiredClickEvents);
     }
 
@@ -249,7 +250,7 @@ public class MouseInterpreterTests
     {
         // Arrange
         MouseInterpreter interpreter = new ();
-        List<Terminal.Gui.Input.Mouse> allEvents = [];
+        List<Mouse> allEvents = [];
 
         // Act - Simulate a double-click
         allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10) }));
@@ -281,7 +282,7 @@ public class MouseInterpreterTests
         // Arrange
         DateTime mockTime = DateTime.Now;
         MouseInterpreter interpreter = new (() => mockTime, TimeSpan.FromMilliseconds (500));
-        List<Terminal.Gui.Input.Mouse> allEvents = [];
+        List<Mouse> allEvents = [];
 
         // Act - Simulate a double-click at the same position
         Point pos = new (10, 10);
@@ -292,7 +293,9 @@ public class MouseInterpreterTests
 
         // Get the index of each event type
         List<int> pressedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.LeftButtonPressed).Select (x => x.i).ToList ();
-        List<int> releasedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.LeftButtonReleased).Select (x => x.i).ToList ();
+
+        List<int> releasedIndices =
+            allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.LeftButtonReleased).Select (x => x.i).ToList ();
         List<int> clickedIndices = allEvents.Select ((e, i) => new { e, i }).Where (x => x.e.Flags == MouseFlags.LeftButtonClicked).Select (x => x.i).ToList ();
 
         List<int> doubleClickedIndices = allEvents.Select ((e, i) => new { e, i })
@@ -313,7 +316,142 @@ public class MouseInterpreterTests
         Assert.Equal (5, doubleClickedIndices [0]);
 
         // CheckForExpiredClicks should return nothing (clicks already emitted)
-        List<Terminal.Gui.Input.Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
+        List<Mouse> expiredClickEvents = interpreter.CheckForExpiredClicks ().ToList ();
         Assert.Empty (expiredClickEvents);
+    }
+
+    /// <summary>
+    ///     Tests that timestamp-based spacing prevents double-click detection when clicks are >500ms apart.
+    /// </summary>
+    [Fact]
+    public void TimestampBasedSpacing_PreventsDoubleClick ()
+    {
+        // Arrange
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        MouseInterpreter interpreter = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500));
+        List<Mouse> allEvents = [];
+
+        // Act - Two clicks with 600ms spacing via timestamps (should be two single clicks, not a double-click)
+        // First click at T+0
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10), Timestamp = baseTime }));
+
+        allEvents.AddRange (
+                            interpreter.Process (
+                                                 new ()
+                                                 {
+                                                     Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10),
+                                                     Timestamp = baseTime.AddMilliseconds (50)
+                                                 }));
+
+        // Second click at T+600 (more than 500ms threshold)
+        allEvents.AddRange (
+                            interpreter.Process (
+                                                 new ()
+                                                 {
+                                                     Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10),
+                                                     Timestamp = baseTime.AddMilliseconds (600)
+                                                 }));
+
+        allEvents.AddRange (
+                            interpreter.Process (
+                                                 new ()
+                                                 {
+                                                     Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10),
+                                                     Timestamp = baseTime.AddMilliseconds (650)
+                                                 }));
+
+        // Assert - Extract only the synthetic click events
+        List<Mouse> clickEvents = allEvents
+                                  .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
+                                  .ToList ();
+
+        // Should get TWO single-click events (not a double-click) because timestamps show >500ms gap
+        Assert.Equal (2, clickEvents.Count);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [1].Flags); // Second single click, not double
+    }
+
+    /// <summary>
+    ///     Tests that timestamp-based spacing allows double-click detection when clicks are within 500ms.
+    /// </summary>
+    [Fact]
+    public void TimestampBasedSpacing_AllowsDoubleClick ()
+    {
+        // Arrange
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        MouseInterpreter interpreter = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500));
+        List<Mouse> allEvents = [];
+
+        // Act - Two clicks with 400ms spacing via timestamps (should be a double-click)
+        // First click at T+0
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10), Timestamp = baseTime }));
+
+        allEvents.AddRange (
+                            interpreter.Process (
+                                                 new ()
+                                                 {
+                                                     Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10),
+                                                     Timestamp = baseTime.AddMilliseconds (50)
+                                                 }));
+
+        // Second click at T+400 (within 500ms threshold)
+        allEvents.AddRange (
+                            interpreter.Process (
+                                                 new ()
+                                                 {
+                                                     Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10),
+                                                     Timestamp = baseTime.AddMilliseconds (400)
+                                                 }));
+
+        allEvents.AddRange (
+                            interpreter.Process (
+                                                 new ()
+                                                 {
+                                                     Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10),
+                                                     Timestamp = baseTime.AddMilliseconds (450)
+                                                 }));
+
+        // Assert - Extract only the synthetic click events
+        List<Mouse> clickEvents = allEvents
+                                  .Where (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+                                               || e.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
+                                  .ToList ();
+
+        // Should get single-click followed by double-click because timestamps show <500ms gap
+        Assert.Equal (2, clickEvents.Count);
+        Assert.Equal (MouseFlags.LeftButtonClicked, clickEvents [0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonDoubleClicked, clickEvents [1].Flags);
+    }
+
+    /// <summary>
+    ///     Tests that synthesized click events preserve timestamps from their source events.
+    /// </summary>
+    [Fact]
+    public void SynthesizedClickEvents_PreserveTimestamps ()
+    {
+        // Arrange
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        MouseInterpreter interpreter = new (() => DateTime.Now.AddYears (10), TimeSpan.FromMilliseconds (500));
+        List<Mouse> allEvents = [];
+
+        // Act - Single click with explicit timestamp
+        allEvents.AddRange (interpreter.Process (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 10), Timestamp = baseTime }));
+
+        allEvents.AddRange (
+                            interpreter.Process (
+                                                 new ()
+                                                 {
+                                                     Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new (10, 10),
+                                                     Timestamp = baseTime.AddMilliseconds (100)
+                                                 }));
+
+        // Assert - Extract the synthetic click event
+        Mouse clickEvent = allEvents.First (e => e.Flags == MouseFlags.LeftButtonClicked);
+
+        // The synthesized click event should have the timestamp from the release event
+        Assert.Equal (baseTime.AddMilliseconds (100), clickEvent.Timestamp);
     }
 }

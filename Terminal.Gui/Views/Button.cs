@@ -74,6 +74,7 @@ public class Button : View, IDesignable
         KeyBindings.ReplaceCommands (Key.Enter, Command.HotKey);
 
         // Replace default Activate binding with HotKey for mouse clicks
+        // These are managed dynamically when MouseHoldRepeat changes
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.HotKey);
         MouseBindings.ReplaceCommands (MouseFlags.MiddleButtonClicked, Command.HotKey);
         MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.HotKey);
@@ -86,16 +87,53 @@ public class Button : View, IDesignable
         MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
+    /// <inheritdoc/>
+    protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<bool> args)
+    {
+        base.OnMouseHoldRepeatChanged (args);
+
+        if (args.NewValue)
+        {
+            // MouseHoldRepeat enabled: Replace Clicked bindings with Released bindings
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+            MouseBindings.Remove (MouseFlags.MiddleButtonClicked);
+            MouseBindings.Remove (MouseFlags.RightButtonClicked);
+            MouseBindings.Remove (MouseFlags.Button4Clicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl);
+
+            MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.HotKey);
+            MouseBindings.Add (MouseFlags.MiddleButtonReleased, Command.HotKey);
+            MouseBindings.Add (MouseFlags.RightButtonReleased, Command.HotKey);
+            MouseBindings.Add (MouseFlags.Button4Released, Command.HotKey);
+        }
+        else
+        {
+            // MouseHoldRepeat disabled: Restore Clicked bindings
+            MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+            MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
+            MouseBindings.Remove (MouseFlags.RightButtonReleased);
+            MouseBindings.Remove (MouseFlags.Button4Released);
+
+            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.HotKey);
+            MouseBindings.ReplaceCommands (MouseFlags.MiddleButtonClicked, Command.HotKey);
+            MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.HotKey);
+            MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
+            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
+        }
+    }
+
     private bool? HandleHotKeyCommand (ICommandContext commandContext)
     {
         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-        if (RaiseActivating (commandContext) is true)
+        bool? handled = RaiseActivating (commandContext);
+
+        if (handled == true)
         {
             return true;
         }
 
-        bool? handled = RaiseAccepting (commandContext);
+        handled = RaiseAccepting (commandContext);
 
         if (handled == true)
         {
