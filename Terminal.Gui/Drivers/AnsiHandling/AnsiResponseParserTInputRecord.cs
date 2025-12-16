@@ -8,7 +8,7 @@ namespace Terminal.Gui.Drivers;
 ///     This parser variant maintains the association between characters and their metadata throughout
 ///     the parsing process, useful when the driver needs to preserve platform-specific input information.
 /// </remarks>
-internal class AnsiResponseParser<TInputRecord> () : AnsiResponseParserBase (new GenericHeld<TInputRecord> ())
+internal class AnsiResponseParser<TInputRecord> (ITimeProvider timeProvider) : AnsiResponseParserBase (new GenericHeld<TInputRecord> (), timeProvider)
 {
     /// <summary>
     ///     Delegate for handling unexpected but complete ANSI escape sequences.
