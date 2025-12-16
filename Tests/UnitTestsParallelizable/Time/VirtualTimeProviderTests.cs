@@ -1,5 +1,6 @@
-namespace 
-    TimeTests;
+using ITimer = Terminal.Gui.ITimer;
+
+namespace TimeTests;
 
 public class VirtualTimeProviderTests
 {

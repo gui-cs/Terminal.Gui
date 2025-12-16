@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace DriverTests;
+namespace DriverTests.Output;
 
 /// <summary>
 ///     Tests for https://github.com/gui-cs/Terminal.Gui/issues/4466.

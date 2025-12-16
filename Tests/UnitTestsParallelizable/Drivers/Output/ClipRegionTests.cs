@@ -5,14 +5,14 @@ using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 
-public class ClipRegionTests (ITestOutputHelper output) : FakeDriverBase
+public class ClipRegionTests (ITestOutputHelper output) : TestDriverBase
 {
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void AddRune_Is_Clipped ()
     {
-        IDriver? driver = CreateFakeDriver ();
+        IDriver? driver = CreateTestDriver ();
 
         driver.Move (0, 0);
         driver.AddRune ('x');
@@ -39,7 +39,7 @@ public class ClipRegionTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Clip_Set_To_Empty_AllInvalid ()
     {
-        IDriver? driver = CreateFakeDriver ();
+        IDriver? driver = CreateTestDriver ();
 
         // Define a clip rectangle
         driver.Clip = new (Rectangle.Empty);
@@ -60,7 +60,7 @@ public class ClipRegionTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void IsValidLocation ()
     {
-        IDriver? driver = CreateFakeDriver ();
+        IDriver? driver = CreateTestDriver ();
         driver.Rows = 10;
         driver.Cols = 10;
 

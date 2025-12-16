@@ -123,7 +123,7 @@ public class ShadowTests (ITestOutputHelper output)
     public void ShadowStyle_Transparent_Handles_Wide_Glyphs_Correctly ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (6, 5);
         app.Driver?.GetOutputBuffer ().SetWideGlyphReplacement (Rune.ReplacementChar);
@@ -175,7 +175,7 @@ public class ShadowTests (ITestOutputHelper output)
     public void ShadowStyle_Opaque_Change_Thickness_On_Mouse_Pressed_Released ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (10, 4);
 
@@ -219,7 +219,7 @@ public class ShadowTests (ITestOutputHelper output)
     public void ShadowStyle_Transparent_Never_Throws_Navigating_Outside_Bounds ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (6, 5);
 
@@ -347,7 +347,7 @@ public class ShadowTests (ITestOutputHelper output)
     public void Runnable_View_Overlap_Other_Runnables ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (10, 5);
 

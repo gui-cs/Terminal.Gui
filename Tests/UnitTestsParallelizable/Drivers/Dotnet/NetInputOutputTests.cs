@@ -1,20 +1,17 @@
 #nullable enable
 using System.Collections.Concurrent;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
-namespace DriverTests;
+namespace DriverTests.DotnetDriver;
 
 /// <summary>
-///     Low-level tests for IInput and IOutput implementations across all drivers.
+///     Low-level tests for NetInput and NetOutput implementations.
 ///     These tests are designed to fail with good error messages when run in environments
 ///     without a real terminal (like GitHub Actions).
 /// </summary>
-public class IInputOutputTests (ITestOutputHelper output)
+public class NetInputOutputTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
-
-    #region DotNet Driver Tests
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
@@ -229,224 +226,6 @@ public class IInputOutputTests (ITestOutputHelper output)
         Assert.Null (exception);
     }
 
-    #endregion
-
-    #region Unix Driver Tests
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    [Trait ("Platform", "Unix")]
-    public void UnixInput_Constructor_DoesNotThrow_WhenNoTerminalAvailable ()
-    {
-        // Arrange & Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     try
-                                                     {
-                                                         using var input = new UnixInput ();
-                                                         _output.WriteLine ("UnixInput created successfully");
-                                                     }
-                                                     catch (Exception ex)
-                                                     {
-                                                         _output.WriteLine ($"Expected failure on non-terminal: {ex.Message}");
-
-                                                         throw new XunitException (
-                                                                                   $"UnixInput failed in non-terminal environment: {ex.Message}\nThis is expected in GitHub Actions. The driver should detect this and handle gracefully.");
-                                                     }
-                                                 });
-
-        // Assert
-        if (exception != null && !(exception is XunitException))
-        {
-            _output.WriteLine ($"FAILED: UnixInput constructor threw: {exception.GetType ().Name}: {exception.Message}");
-            _output.WriteLine ($"Stack trace: {exception.StackTrace}");
-        }
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    [Trait ("Platform", "Unix")]
-    public void UnixOutput_Constructor_DoesNotThrow_WhenNoTerminalAvailable ()
-    {
-        if (OperatingSystem.IsWindows ())
-        {
-            _output.WriteLine ("Skipping Unix test on Windows");
-
-            return;
-        }
-
-        // Arrange & Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     using var output = new UnixOutput ();
-                                                     _output.WriteLine ("UnixOutput created successfully");
-                                                 });
-
-        // Assert
-        if (exception != null)
-        {
-            _output.WriteLine ($"FAILED: UnixOutput constructor threw: {exception.GetType ().Name}: {exception.Message}");
-            _output.WriteLine ($"Stack trace: {exception.StackTrace}");
-        }
-
-        Assert.Null (exception);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    [Trait ("Platform", "Unix")]
-    public void UnixOutput_GetSize_ReturnsDefaultSize_WhenNoTerminalAvailable ()
-    {
-        if (OperatingSystem.IsWindows ())
-        {
-            _output.WriteLine ("Skipping Unix test on Windows");
-
-            return;
-        }
-
-        // Arrange
-        using var output = new UnixOutput ();
-
-        // Act
-        Size size = default;
-
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     size = output.GetSize ();
-                                                     _output.WriteLine ($"UnixOutput.GetSize() returned: {size.Width}x{size.Height}");
-                                                 });
-
-        // Assert
-        Assert.Null (exception);
-        Assert.Equal (80, size.Width);
-        Assert.Equal (25, size.Height);
-    }
-
-    #endregion
-
-    #region Windows Driver Tests
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    [Trait ("Platform", "Windows")]
-    public void WindowsInput_Constructor_DoesNotThrow_WhenNoTerminalAvailable ()
-    {
-        if (!OperatingSystem.IsWindows ())
-        {
-            _output.WriteLine ("Skipping Windows test on non-Windows");
-
-            return;
-        }
-
-        // Arrange & Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     using var input = new WindowsInput ();
-                                                     _output.WriteLine ("WindowsInput created successfully");
-                                                 });
-
-        // Assert
-        if (exception != null)
-        {
-            _output.WriteLine ($"FAILED: WindowsInput constructor threw: {exception.GetType ().Name}: {exception.Message}");
-            _output.WriteLine ($"Stack trace: {exception.StackTrace}");
-        }
-
-        Assert.Null (exception);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    [Trait ("Platform", "Windows")]
-    public void WindowsOutput_Constructor_DoesNotThrow_WhenNoTerminalAvailable ()
-    {
-        if (!OperatingSystem.IsWindows ())
-        {
-            _output.WriteLine ("Skipping Windows test on non-Windows");
-
-            return;
-        }
-
-        // Arrange & Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     try
-                                                     {
-                                                         using var output = new WindowsOutput ();
-                                                         _output.WriteLine ("WindowsOutput created successfully");
-                                                     }
-                                                     catch (Exception ex)
-                                                     {
-                                                         _output.WriteLine ($"WindowsOutput threw during construction: {ex.GetType ().Name}: {ex.Message}");
-
-                                                         throw;
-                                                     }
-                                                 });
-
-        // Assert
-        if (exception != null)
-        {
-            _output.WriteLine ($"FAILED: WindowsOutput constructor threw: {exception.GetType ().Name}: {exception.Message}");
-            _output.WriteLine ($"Stack trace: {exception.StackTrace}");
-        }
-
-        Assert.Null (exception);
-    }
-
-    #endregion
-
-    #region ANSI driver Tests
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void ANSIInput_Constructor_DoesNotThrow ()
-    {
-        // Arrange & Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     using var input = new AnsiInput ();
-                                                     _output.WriteLine ("ANSIInput created successfully");
-                                                 });
-
-        // Assert
-        Assert.Null (exception);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void ANSIOutput_Constructor_DoesNotThrow ()
-    {
-        // Arrange & Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     using var output = new AnsiOutput ();
-                                                     _output.WriteLine ("ANSIOutput created successfully");
-                                                 });
-
-        // Assert
-        Assert.Null (exception);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void ANSIOutput_GetSize_ReturnsExpectedSize ()
-    {
-        // Arrange
-        using var output = new AnsiOutput ();
-
-        // Act
-        Size size = output.GetSize ();
-        _output.WriteLine ($"ANSIOutput.GetSize() returned: {size.Width}x{size.Height}");
-
-        // Assert
-        Assert.True (size.Width > 0);
-        Assert.True (size.Height > 0);
-    }
-
-    #endregion
-
-    #region Component Factory Tests
-
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
     public void NetComponentFactory_CreateInput_DoesNotThrow ()
@@ -494,42 +273,4 @@ public class IInputOutputTests (ITestOutputHelper output)
 
         Assert.Null (exception);
     }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void ANSIComponentFactory_CreateInput_DoesNotThrow ()
-    {
-        // Arrange
-        var factory = new AnsiComponentFactory ();
-
-        // Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     using IInput<char> input = factory.CreateInput ();
-                                                     _output.WriteLine ("ANSIComponentFactory.CreateInput() succeeded");
-                                                 });
-
-        // Assert
-        Assert.Null (exception);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void ANSIComponentFactory_CreateOutput_DoesNotThrow ()
-    {
-        // Arrange
-        var factory = new AnsiComponentFactory ();
-
-        // Act
-        Exception? exception = Record.Exception (() =>
-                                                 {
-                                                     using IOutput output = factory.CreateOutput ();
-                                                     _output.WriteLine ("ANSIComponentFactory.CreateOutput() succeeded");
-                                                 });
-
-        // Assert
-        Assert.Null (exception);
-    }
-
-    #endregion
 }

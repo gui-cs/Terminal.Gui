@@ -5,12 +5,12 @@ namespace DriverTests.AnsiHandling;
 /// <summary>
 ///     Tests for the ToAnsi functionality that generates ANSI escape sequences from buffer contents.
 /// </summary>
-public class ToAnsiTests : FakeDriverBase
+public class ToAnsiTests : TestDriverBase
 {
     [Fact]
     public void ToAnsi_Empty_Buffer ()
     {
-        IDriver driver = CreateFakeDriver (10, 5);
+        IDriver driver = CreateTestDriver (10, 5);
         string ansi = driver.ToAnsi ();
 
         // Empty buffer should have newlines for each row
@@ -23,7 +23,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_Simple_Text ()
     {
-        IDriver driver = CreateFakeDriver (10, 3);
+        IDriver driver = CreateTestDriver (10, 3);
         driver.AddStr ("Hello");
         driver.Move (0, 1);
         driver.AddStr ("World");
@@ -44,7 +44,7 @@ public class ToAnsiTests : FakeDriverBase
     [InlineData (false, "\u001b[38;2;255;0;0m", "\u001b[38;2;0;0;255")]
     public void ToAnsi_With_Colors (bool force16Colors, string expectedRed, string expectedBue)
     {
-        IDriver driver = CreateFakeDriver (10, 2);
+        IDriver driver = CreateTestDriver (10, 2);
         driver.Force16Colors = force16Colors;
 
         // Set red foreground
@@ -72,7 +72,7 @@ public class ToAnsiTests : FakeDriverBase
     [InlineData (true, "\u001b[41m")]
     public void ToAnsi_With_Background_Colors (bool force16Colors, string expected)
     {
-        IDriver driver = CreateFakeDriver (10, 2);
+        IDriver driver = CreateTestDriver (10, 2);
         driver.Force16Colors = force16Colors;
 
         // Set background color
@@ -101,7 +101,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_With_Text_Styles ()
     {
-        IDriver driver = CreateFakeDriver (10, 3);
+        IDriver driver = CreateTestDriver (10, 3);
 
         // Bold text
         driver.CurrentAttribute = new (Color.White, Color.Black, TextStyle.Bold);
@@ -128,7 +128,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_With_Wide_Characters ()
     {
-        IDriver driver = CreateFakeDriver (10, 2);
+        IDriver driver = CreateTestDriver (10, 2);
 
         // Add a wide character (Chinese character)
         driver.AddStr ("??");
@@ -144,7 +144,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_With_Unicode_Characters ()
     {
-        IDriver driver = CreateFakeDriver (10, 2);
+        IDriver driver = CreateTestDriver (10, 2);
 
         // Add various Unicode characters
         driver.AddStr ("???"); // Greek letters
@@ -162,7 +162,7 @@ public class ToAnsiTests : FakeDriverBase
     [InlineData (false, "\u001b[38;2;", "\u001b[48;2;")]
     public void ToAnsi_Attribute_Changes_Within_Line (bool force16Colors, string expectedRed, string expectedBlue)
     {
-        IDriver driver = CreateFakeDriver (20, 1);
+        IDriver driver = CreateTestDriver (20, 1);
         driver.Force16Colors = force16Colors;
 
         driver.AddStr ("Normal");
@@ -185,7 +185,7 @@ public class ToAnsiTests : FakeDriverBase
     public void ToAnsi_Large_Buffer ()
     {
         // Test with a larger buffer to stress performance
-        IDriver driver = CreateFakeDriver (200, 50);
+        IDriver driver = CreateTestDriver (200, 50);
 
         // Fill with some content
         for (var row = 0; row < 50; row++)
@@ -208,7 +208,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_RGB_Colors ()
     {
-        IDriver driver = CreateFakeDriver (10, 1);
+        IDriver driver = CreateTestDriver (10, 1);
 
         // Use RGB colors (when not forcing 16 colors)
         driver.Force16Colors = false;
@@ -233,7 +233,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_Force16Colors ()
     {
-        IDriver driver = CreateFakeDriver (10, 1);
+        IDriver driver = CreateTestDriver (10, 1);
 
         // Force 16 colors
         driver.Force16Colors = true;
@@ -268,7 +268,7 @@ public class ToAnsiTests : FakeDriverBase
         string expectedCyan
     )
     {
-        IDriver driver = CreateFakeDriver (50, 1);
+        IDriver driver = CreateTestDriver (50, 1);
         driver.Force16Colors = force16Colors;
 
         // Create a line with many attribute changes
@@ -307,7 +307,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_Special_Characters ()
     {
-        IDriver driver = CreateFakeDriver (20, 1);
+        IDriver driver = CreateTestDriver (20, 1);
 
         // Test backslash character
         driver.AddStr ("Backslash:");
@@ -323,7 +323,7 @@ public class ToAnsiTests : FakeDriverBase
     public void ToAnsi_Buffer_Boundary_Conditions ()
     {
         // Test with minimum buffer size
-        IDriver driver = CreateFakeDriver (1, 1);
+        IDriver driver = CreateTestDriver (1, 1);
         driver.AddStr ("X");
 
         string ansi = driver.ToAnsi ();
@@ -332,7 +332,7 @@ public class ToAnsiTests : FakeDriverBase
         Assert.Contains ("\n", ansi);
 
         // Test with very wide buffer
-        driver = CreateFakeDriver (1000, 1);
+        driver = CreateTestDriver (1000, 1);
         driver.AddStr ("Wide");
 
         ansi = driver.ToAnsi ();
@@ -344,7 +344,7 @@ public class ToAnsiTests : FakeDriverBase
     [Fact]
     public void ToAnsi_Empty_Lines ()
     {
-        IDriver driver = CreateFakeDriver (10, 3);
+        IDriver driver = CreateTestDriver (10, 3);
 
         // Only write to first and third lines
         driver.AddStr ("First");
@@ -365,7 +365,7 @@ public class ToAnsiTests : FakeDriverBase
         // Create a large buffer and fill it completely
         const int width = 200;
         const int height = 100;
-        IDriver driver = CreateFakeDriver (width, height);
+        IDriver driver = CreateTestDriver (width, height);
 
         // Fill every cell with different content and colors
         for (var row = 0; row < height; row++)

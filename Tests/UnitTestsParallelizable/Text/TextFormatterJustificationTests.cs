@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace TextTests;
 
-public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDriverBase
+public class TextFormatterJustificationTests (ITestOutputHelper output) : TestDriverBase
 {
     [Theory]
 
@@ -3411,7 +3411,7 @@ public class TextFormatterJustificationTests (ITestOutputHelper output) : FakeDr
 0******")]
     public void Draw_Text_Justification (string text, Alignment horizontalTextAlignment, Alignment alignment, TextDirection textDirection, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {

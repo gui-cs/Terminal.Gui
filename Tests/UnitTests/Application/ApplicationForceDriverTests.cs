@@ -2,7 +2,7 @@
 
 namespace UnitTests.ApplicationTests;
 
-public class ApplicationForceDriverTests : FakeDriverBase
+public class ApplicationForceDriverTests : TestDriverBase
 {
     [Fact (Skip = "Bogus test now that config properties are handled correctly")]
     public void ForceDriver_Does_Not_Changes_If_It_Has_Valid_Value ()
@@ -21,7 +21,7 @@ public class ApplicationForceDriverTests : FakeDriverBase
     [Fact (Skip = "Bogus test now that config properties are handled correctly")]
     public void ForceDriver_Throws_If_Initialized_Changed_To_Another_Value ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         Assert.False (Application.Initialized);
         Assert.Null (Application.Driver);

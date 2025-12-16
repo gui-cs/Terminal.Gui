@@ -110,7 +110,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
+            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == DriverRegistry.Names.ANSI)
             {
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();

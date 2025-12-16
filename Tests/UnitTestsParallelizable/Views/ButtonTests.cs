@@ -7,7 +7,7 @@ namespace ViewsTests;
 ///     Pure unit tests for <see cref="Button"/> that don't require Application static dependencies.
 ///     These tests can run in parallel without interference.
 /// </summary>
-public class ButtonTests : FakeDriverBase
+public class ButtonTests : TestDriverBase
 {
     [Fact]
     public void Text_Mirrors_Title ()

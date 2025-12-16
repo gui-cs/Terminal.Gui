@@ -4,7 +4,7 @@ namespace UnitTests;
 ///     Enables tests to create an instance of the ANSI driver configured for testing purposes.
 /// </summary>
 [Collection ("Global Test Setup")]
-public abstract class FakeDriverBase
+public abstract class TestDriverBase
 {
     /// <summary>
     ///     Creates a new ANSI driver instance with the specified buffer size.
@@ -14,7 +14,7 @@ public abstract class FakeDriverBase
     /// <param name="width">Width of the driver buffer</param>
     /// <param name="height">Height of the driver buffer</param>
     /// <returns>A configured IDriver instance</returns>
-    protected static IDriver CreateFakeDriver (int width = 80, int height = 25)
+    protected static IDriver CreateTestDriver (int width = 80, int height = 25)
     {
         var output = new AnsiOutput ();
         var factory = new AnsiComponentFactory (null, output, null);

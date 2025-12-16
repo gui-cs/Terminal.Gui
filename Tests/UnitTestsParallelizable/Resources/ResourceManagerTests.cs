@@ -8,7 +8,7 @@ using UnitTests;
 
 namespace ResourcesTests;
 
-public class ResourceManagerTests : FakeDriverBase
+public class ResourceManagerTests : TestDriverBase
 {
     private const string EXISTENT_CULTURE = "pt-PT";
     private const string NO_EXISTENT_CULTURE = "de-DE";

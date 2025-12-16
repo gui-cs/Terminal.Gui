@@ -1,6 +1,6 @@
 using Xunit.Abstractions;
 
-namespace DriverTests.Unix;
+namespace DriverTests.AnsiHandling;
 
 /// <summary>
 ///     Debug tests to understand ANSI mouse button code mapping.

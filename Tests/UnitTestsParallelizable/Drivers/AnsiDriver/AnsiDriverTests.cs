@@ -5,18 +5,18 @@ using Xunit.Abstractions;
 namespace DriverTests.Ansi;
 
 /// <summary>
-///     Tests for the FakeDriver to ensure it works properly with the modern component factory architecture.
+///     Tests for the AnsiDriver to ensure it works properly with the modern component factory architecture.
 /// </summary>
-public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
+public class AnsiDriverTests (ITestOutputHelper output) : TestDriverBase
 {
     private readonly ITestOutputHelper _output = output;
 
-    #region Basic FakeDriver Tests
+    #region Basic AnsiDriver Tests
 
     [Fact]
     public void Init_Works ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         Assert.IsAssignableFrom<IDriver> (driver);
 
@@ -28,7 +28,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void Screen_Has_Default_Size ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         // Default size should be 80x25
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
         Assert.Equal (80, driver.Cols);
@@ -39,7 +39,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void Can_Resize ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         // Start with default size
         Assert.Equal (80, driver.Cols);
@@ -56,13 +56,13 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     #endregion
 
-    #region CreateFakeDriver Tests
+    #region CreateTestDriver Tests
 
     [Fact]
 
     public void SetupInitializes_Driver_With_80x25 ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         Assert.NotNull (driver);
         Assert.Equal (new (0, 0, 80, 25), driver.Screen);
@@ -74,7 +74,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void SetupDriver_Is_IDriver ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         Assert.NotNull (driver);
 
@@ -88,7 +88,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void SetupCan_Set_Screen_Size ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         IDriver ansiDriver = driver;
         Assert.NotNull (ansiDriver);
@@ -107,7 +107,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Clipboard_Works_When_Enabled ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         Assert.NotNull (driver.Clipboard);
         Assert.True (driver.Clipboard.IsSupported);
@@ -123,7 +123,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Clipboard_GetClipboarData_Works ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         Assert.NotNull (driver.Clipboard);
 
@@ -140,7 +140,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void Can_Fill_Rectangle ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         // Verify driver is initialized with buffers
         Assert.NotNull (driver);
@@ -164,7 +164,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void Buffer_Integrity_After_Multiple_Resizes ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         // Start with default size
         Assert.Equal (80, driver.Cols);
@@ -208,7 +208,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void ScreenChanged_Event_Fires_On_SetScreenSize ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var screenChangedFired = false;
         Size? newSize = null;
@@ -233,7 +233,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void FakeResize_Triggers_ScreenChanged_And_Updates_Application_Screen ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var screenChangedFired = false;
         Size? eventSize = null;
@@ -263,7 +263,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : FakeDriverBase
 
     public void SizeChanged_Event_Still_Fires_For_Compatibility ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var sizeChangedFired = false;
 

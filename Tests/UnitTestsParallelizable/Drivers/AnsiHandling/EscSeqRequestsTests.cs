@@ -2,7 +2,7 @@
 
 namespace DriverTests.AnsiHandling;
 
-public class EscSeqRequestsTests : FakeDriverBase
+public class EscSeqRequestsTests : TestDriverBase
 {
     [Fact]
     public void Add_Tests ()

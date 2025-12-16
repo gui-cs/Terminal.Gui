@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
+public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Cancel_TextChanging_ThenBackspace ()
@@ -560,7 +560,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var tf = new TextField { Width = 3, Text = "ắ" };
         tf.Driver = driver;
@@ -611,7 +611,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Adjust_First ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
         tf.Driver = driver;
@@ -636,7 +636,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void PositionCursor_Treat_Zero_Width_As_One_Column ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextField tf = new () { Width = 10, Text = "\u001B[" };
         tf.Driver = driver;

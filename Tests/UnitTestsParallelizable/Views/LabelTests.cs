@@ -8,7 +8,7 @@ namespace ViewsTests;
 /// Pure unit tests for <see cref="Label"/> that don't require Application.Driver or Application context.
 /// These tests can run in parallel without interference.
 /// </summary>
-public class LabelTests (ITestOutputHelper output) : FakeDriverBase
+public class LabelTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Text_Mirrors_Title ()

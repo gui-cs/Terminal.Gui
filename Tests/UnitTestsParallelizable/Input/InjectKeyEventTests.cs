@@ -312,7 +312,7 @@ public class InjectKeyEventTests (ITestOutputHelper output)
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
-        // Assert - FakeDriver simulates KeyUp immediately after KeyDown
+        // Assert - AnsiDriver simulates KeyUp immediately after KeyDown
         Assert.Equal (1, keyDownCount);
         Assert.Equal (1, keyUpCount);
     }

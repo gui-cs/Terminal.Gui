@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace DriverTests;
 
-public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
+public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
 {
     /// <summary>
     ///     Gets all registered driver names for use in Theory tests.
@@ -21,7 +21,7 @@ public class AllDriverTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("👩‍❤️‍💋‍👨", false)]
     public void IsValidLocation (string text, bool positive)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (10, 10);
 
         // positive

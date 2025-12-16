@@ -11,7 +11,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Layout_Does_Not_Draw (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
@@ -49,7 +49,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Center_Properly (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 
@@ -246,7 +246,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     //        designable.EnableForDesign ();
     //    }
 
-    //    var driver = CreateFakeDriver ();
+    //    var driver = CreateTestDriver ();
     //    driver.AttributeSet += (_, args) =>
     //                           {
     //                               if (args != view.GetAttributeForRole (VisualRole.Disabled) && args.Style != TextStyle.Faint)

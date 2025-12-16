@@ -5,12 +5,12 @@ using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 
-public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
+public class AddRuneTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void AddRune ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         driver.Rows = 25;
         driver.Cols = 80;
@@ -23,7 +23,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddRune_Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var expected = "ắ";
 
@@ -56,7 +56,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddRune_InvalidLocation_DoesNothing ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         driver.Move (driver.Cols, driver.Rows);
         driver.AddRune ('a');
@@ -75,7 +75,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddRune_MovesToNextColumn ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         driver.AddRune ('a');
         Assert.Equal ("a", driver.Contents? [0, 0].Grapheme);
@@ -116,7 +116,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddRune_MovesToNextColumn_Wide ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         // 🍕 Slice of Pizza "\U0001F355"
         OperationStatus operationStatus = Rune.DecodeFromUtf16 ("\U0001F355", out Rune rune, out int charsConsumed);
@@ -135,7 +135,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddStr_Glyph_On_Second_Cell_Of_Wide_Glyph_Outputs_Correctly ()
     {
-        IDriver? driver = CreateFakeDriver ();
+        IDriver? driver = CreateTestDriver ();
         driver.SetScreenSize (6, 3);
         driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
@@ -171,7 +171,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         // When a wide glyph is added and the second column is within the clip region,
         // the attribute for column N+1 should be set to match the current attribute.
         // See: OutputBufferImpl.cs line 194
-        using IDriver driver = CreateFakeDriver ();
+        using IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (4, 2);
 
         // Set a specific attribute for the wide glyph
@@ -199,7 +199,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     {
         // This test verifies that when a wide glyph's second column is outside the clip,
         // the attribute for column N+1 is NOT modified
-        using IDriver driver = CreateFakeDriver ();
+        using IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (4, 2);
 
         // Set initial attribute for the entire contents
@@ -236,7 +236,7 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         // This mimics what happens when TransparentShadow redraws a wide glyph from ScreenContents
         // WITHOUT line 194, column N+1's attribute doesn't get set, causing wrong colors in output
         // See: OutputBufferImpl.cs line ~196 (Contents [Row, Col].Attribute = CurrentAttribute;)
-        using IDriver driver = CreateFakeDriver ();
+        using IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (3, 1);
         driver.Force16Colors = true;
 
