@@ -135,4 +135,40 @@ public static class InputTestHelpers
             processor.ProcessQueue ();
         }
     }
+
+    /// <summary>
+    ///     Injects a mouse event and processes the input queue, simulating what happens during a main loop iteration.
+    /// </summary>
+    /// <param name="app">The application instance</param>
+    /// <param name="mouse">The mouse event to inject</param>
+    public static void InjectAndProcessMouse (this IApplication app, Mouse mouse)
+    {
+        app.Driver!.InjectMouseEvent (mouse);
+
+        // Simulate the input thread moving items from _testInput to InputBuffer
+        app.SimulateInputThread ();
+
+        // Process the queue
+        app.Driver.GetInputProcessor ().ProcessQueue ();
+    }
+
+    /// <summary>
+    ///     Injects a mouse event and processes the input queue for a specific processor and input implementation.
+    /// </summary>
+    /// <typeparam name="TInputRecord">The input record type</typeparam>
+    /// <param name="processor">The input processor</param>
+    /// <param name="input">The input implementation (must extend InputImpl)</param>
+    /// <param name="inputBuffer">The input buffer</param>
+    /// <param name="mouse">The mouse event to inject</param>
+    public static void InjectAndProcessMouse<TInputRecord> (
+        this IInputProcessor processor,
+        InputImpl<TInputRecord> input,
+        ConcurrentQueue<TInputRecord> inputBuffer,
+        Mouse mouse
+    )
+    {
+        processor.InjectMouseEvent (null, mouse);
+        input.SimulateInputThread (inputBuffer);
+        processor.ProcessQueue ();
+    }
 }
