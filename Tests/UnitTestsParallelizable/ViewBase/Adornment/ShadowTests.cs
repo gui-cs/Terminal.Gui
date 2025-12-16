@@ -86,8 +86,7 @@ public class ShadowTests (ITestOutputHelper output)
     {
         View view = new () { ShadowStyle = style };
 
-        Assert.Equal (1, view.Margin!.ShadowWidth);
-        Assert.Equal (1, view.Margin!.ShadowHeight);
+        Assert.Equal (new (1, 1), view.Margin!.ShadowSize);
     }
 
     [Theory]
@@ -96,32 +95,27 @@ public class ShadowTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.Transparent, 1)]
     public void Margin_ShadowWidth_ShadowHeight_Cannot_Be_Set_Less_Than_One (ShadowStyle style, int expectedLength)
     {
-        View view = new () { ShadowStyle = style};
-        view.Margin!.ShadowWidth = 0;
-        view.Margin!.ShadowHeight = -1;
-        Assert.Equal (expectedLength, view.Margin!.ShadowWidth);
-        Assert.Equal (expectedLength, view.Margin.ShadowHeight);
+        View view = new () { ShadowStyle = style };
+        view.Margin!.ShadowSize = new (-1, -1);
+        Assert.Equal (expectedLength, view.Margin!.ShadowSize.Width);
+        Assert.Equal (expectedLength, view.Margin!.ShadowSize.Height);
     }
 
     [Fact]
     public void Changing_ShadowStyle_Correctly_Set_ShadowWidth_ShadowHeight_Thickness ()
     {
-        View view = new () { ShadowStyle = ShadowStyle.Transparent};
-        view.Margin!.ShadowWidth = 2;
-        view.Margin!.ShadowHeight = 2;
+        View view = new () { ShadowStyle = ShadowStyle.Transparent };
+        view.Margin!.ShadowSize = new (2, 2);
 
-        Assert.Equal (2, view.Margin!.ShadowWidth);
-        Assert.Equal (2, view.Margin.ShadowHeight);
+        Assert.Equal (new (2, 2), view.Margin!.ShadowSize);
         Assert.Equal (new (0, 0, 2, 2), view.Margin.Thickness);
 
         view.ShadowStyle = ShadowStyle.None;
-        Assert.Equal (2, view.Margin!.ShadowWidth);
-        Assert.Equal (2, view.Margin.ShadowHeight);
+        Assert.Equal (new (2, 2), view.Margin!.ShadowSize);
         Assert.Equal (new (0, 0, 0, 0), view.Margin.Thickness);
 
         view.ShadowStyle = ShadowStyle.Opaque;
-        Assert.Equal (1, view.Margin!.ShadowWidth);
-        Assert.Equal (1, view.Margin.ShadowHeight);
+        Assert.Equal (new (1, 1), view.Margin!.ShadowSize);
         Assert.Equal (new (0, 0, 1, 1), view.Margin.Thickness);
     }
 
@@ -145,7 +139,7 @@ public class ShadowTests (ITestOutputHelper output)
                          """;
 
         View view = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single, ShadowStyle = ShadowStyle.Transparent };
-        view.Margin!.ShadowWidth = 2;
+        view.Margin!.ShadowSize = view.Margin!.ShadowSize with { Width = 2 };
         superview.Add (view);
 
         app.Begin (superview);
@@ -161,8 +155,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
 
-        view.Margin!.ShadowWidth = 1;
-        view.Margin!.ShadowHeight = 2;
+        view.Margin!.ShadowSize = new (1, 2);
 
         app.LayoutAndDraw ();
 
@@ -187,7 +180,7 @@ public class ShadowTests (ITestOutputHelper output)
         app.Driver?.SetScreenSize (10, 4);
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
-        View view = new () { Width = 7, Height = 2, ShadowStyle = ShadowStyle.Opaque, Text = "| Hi |", HighlightStates = MouseState.Pressed};
+        View view = new () { Width = 7, Height = 2, ShadowStyle = ShadowStyle.Opaque, Text = "| Hi |", HighlightStates = MouseState.Pressed };
         superview.Add (view);
 
         app.Begin (superview);
@@ -200,7 +193,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
 
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.Button1Pressed});
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.Button1Pressed });
         app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -245,7 +238,7 @@ public class ShadowTests (ITestOutputHelper output)
             Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single, ShadowStyle = ShadowStyle.Transparent,
             Arrangement = ViewArrangement.Movable, CanFocus = true
         };
-        view.Margin!.ShadowWidth = 2;
+        view.Margin!.ShadowSize = view.Margin!.ShadowSize with { Width = 2 };
         superview.Add (view);
 
         app.Begin (superview);
@@ -395,7 +388,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               app.Driver);
 
 
-        app.Dispose();
+        app.Dispose ();
     }
 
     [Fact]
