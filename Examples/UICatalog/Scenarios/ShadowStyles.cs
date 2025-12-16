@@ -94,12 +94,12 @@ public class ShadowStyles : Scenario
             Id = "colorPicker16",
             X = Pos.Center (),
             Y = Pos.AnchorEnd (),
-            Width = Dim.Percent(80),
+            Width = Dim.Percent (80),
         };
         colorPicker.ColorChanged += (sender, args) =>
                                     {
                                         var normal = app.GetScheme ().Normal;
-                                        app.SetScheme (app.GetScheme() with {Normal = new Attribute(normal.Foreground, args.Result)});
+                                        app.SetScheme (app.GetScheme () with { Normal = new Attribute (normal.Foreground, args.Result) });
                                     };
         app.Add (button, colorPicker);
 
@@ -116,7 +116,7 @@ public class ShadowStyles : Scenario
 
     private void ButtonOnAccepting (object sender, CommandEventArgs e)
     {
-        MessageBox.Query((sender as View).App, "Hello", "ok");
+        MessageBox.Query ((sender as View)?.App, "Hello", "You pushed the button!");
         e.Handled = true;
     }
 }

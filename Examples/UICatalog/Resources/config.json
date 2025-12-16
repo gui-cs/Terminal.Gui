@@ -135,6 +135,7 @@
     },
     {
       "UI Catalog Theme": {
+        "Glyphs.ReplacementChar": " ",
         "Window.DefaultShadow": "Transparent",
         "Button.DefaultShadow": "None",
         "CheckBox.DefaultHighlightStates": "In, Pressed, PressedOutside",

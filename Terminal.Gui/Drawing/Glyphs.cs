@@ -26,6 +26,10 @@ public class Glyphs
     // IMPORTANT: Configuration Manager test SaveDefaults uses this class to generate the default config file
     // IMPORTANT: in ./UnitTests/bin/Debug/netX.0/config.json
 
+    /// <summary>Unicode replacement character; overrides `Rune.ReplacementChar`. Defaults to ' ' (Space).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Rune ReplacementChar { get; set; } = (Rune)' ';
+
     /// <summary>File icon.  Defaults to ☰ (Trigram For Heaven)</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune File { get; set; } = (Rune)'☰';

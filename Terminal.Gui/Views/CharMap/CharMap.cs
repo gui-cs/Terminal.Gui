@@ -760,7 +760,7 @@ public class CharMap : View, IDesignable
             {
                 case UnicodeCategory.OtherNotAssigned:
                     SetAttributeForRole (VisualRole.Highlight);
-                    AddStr (Rune.ReplacementChar.ToString ());
+                    AddStr (Glyphs.ReplacementChar.ToString ());
                     SetAttributeForRole (VisualRole.Normal);
 
                     break;

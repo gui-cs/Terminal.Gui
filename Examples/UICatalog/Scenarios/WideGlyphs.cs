@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System.Text;
 
@@ -94,28 +94,15 @@ public sealed class WideGlyphs : Scenario
                     Rune codepoint = _codepoints [r, c];
                     if (codepoint != default (Rune))
                     {
-                        view.AddRune (c, r, codepoint);
+                        view.Move (c, r);
+                        Attribute attr = view.GetAttributeForRole (VisualRole.Normal);
+                        view.SetAttribute (attr with { Background = attr.Background + (r * 5) });
+                        view.AddRune (codepoint);
                     }
                 }
             }
             e.DrawContext?.AddDrawnRectangle (view.Viewport);
         };
-
-        Line verticalLineAtEven = new ()
-        {
-            X = 10,
-            Orientation = Orientation.Vertical,
-            Length = Dim.Fill ()
-        };
-        appWindow.Add (verticalLineAtEven);
-
-        Line verticalLineAtOdd = new ()
-        {
-            X = 25,
-            Orientation = Orientation.Vertical,
-            Length = Dim.Fill ()
-        };
-        appWindow.Add (verticalLineAtOdd);
 
         View arrangeableViewAtEven = new ()
         {
@@ -125,7 +112,7 @@ public sealed class WideGlyphs : Scenario
             Y = 5,
             Width = 15,
             Height = 5,
-            //BorderStyle = LineStyle.Dotted
+            //BorderStyle = LineStyle.Dashed
         };
 
         arrangeableViewAtEven.SetScheme (new () { Normal = new (Color.Black, Color.Green) });
@@ -135,8 +122,9 @@ public sealed class WideGlyphs : Scenario
         arrangeableViewAtEven.Border.Add (new View () { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Even" });
         appWindow.Add (arrangeableViewAtEven);
 
-        View arrangeableViewAtOdd = new ()
+        Button arrangeableViewAtOdd = new ()
         {
+            Title = $"你 {Glyphs.Apple}",
             CanFocus = true,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             X = 31,
@@ -144,8 +132,12 @@ public sealed class WideGlyphs : Scenario
             Width = 15,
             Height = 5,
             BorderStyle = LineStyle.Dashed,
+            SchemeName = "error"
         };
-        arrangeableViewAtOdd.SetScheme (new () { Normal = new (ColorName16.Black, ColorName16.Yellow) });
+        arrangeableViewAtOdd.Accepting += (sender, args) =>
+                                          {
+                                              MessageBox.Query ((sender as View)?.App, "Button Pressed", "You Pressed it!");
+                                          };
         appWindow.Add (arrangeableViewAtOdd);
 
         var superView = new View

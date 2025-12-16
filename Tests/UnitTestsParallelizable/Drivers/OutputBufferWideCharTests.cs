@@ -100,7 +100,7 @@ public class OutputBufferWideCharTests (ITestOutputHelper output)
         // With the fix: The original wide character at col 2 should be invalidated
         // because we're overwriting its second column
         Assert.True (buffer.Contents [1, 2].IsDirty, "Wide char at col 2 should be invalidated when its second column is overwritten");
-        Assert.Equal (buffer.Contents [1, 2].Grapheme, Rune.ReplacementChar.ToString ());
+        Assert.Equal (buffer.Contents [1, 2].Grapheme, Glyphs.ReplacementChar.ToString ());
 
         Assert.Equal ("│", buffer.Contents [1, 3].Grapheme);
         Assert.True (buffer.Contents [1, 3].IsDirty);
@@ -154,7 +154,7 @@ public class OutputBufferWideCharTests (ITestOutputHelper output)
 
         // The second character "好" at col 7 had its second column overwritten
         // so it should be replaced with replacement char
-        Assert.Equal (buffer.Contents [3, 7].Grapheme, Rune.ReplacementChar.ToString ());
+        Assert.Equal (buffer.Contents [3, 7].Grapheme, Glyphs.ReplacementChar.ToString ());
         Assert.True (buffer.Contents [3, 7].IsDirty, "Invalidated wide char should be marked dirty");
 
         // The border should be drawn at col 8
