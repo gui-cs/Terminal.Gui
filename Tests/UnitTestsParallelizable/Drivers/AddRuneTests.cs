@@ -50,25 +50,6 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal (expected, driver.Contents [0, 0].Grapheme);
         Assert.Equal (" ", driver.Contents [0, 1].Grapheme);
 
-        //		var s = "a\u0301\u0300\u0306";
-
-        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
-        //ắ", output);
-
-        //		tf.Text = "\u1eaf";
-        //		Application.Refresh ();
-        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
-        //ắ", output);
-
-        //		tf.Text = "\u0103\u0301";
-        //		Application.Refresh ();
-        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
-        //ắ", output);
-
-        //		tf.Text = "\u0061\u0306\u0301";
-        //		Application.Refresh ();
-        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
-        //ắ", output);
         driver.Dispose ();
     }
 
@@ -148,31 +129,6 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal (0, driver.Row);
         Assert.Equal (2, driver.Col);
 
-        //driver.AddRune ('b');
-        //Assert.Equal ((Text)'b', driver.Contents [0, 1].Text);
-        //Assert.Equal (0, driver.Row);
-        //Assert.Equal (2, driver.Col);
-
-        //// Move to the last column of the first row
-        //var lastCol = driver.Cols - 1;
-        //driver.Move (lastCol, 0);
-        //Assert.Equal (0, driver.Row);
-        //Assert.Equal (lastCol, driver.Col);
-
-        //// Add a rune to the last column of the first row; should increment the row or col even though it's now invalid
-        //driver.AddRune ('c');
-        //Assert.Equal ((Text)'c', driver.Contents [0, lastCol].Text);
-        //Assert.Equal (lastCol + 1, driver.Col);
-
-        //// Add a rune; should succeed but do nothing as it's outside of Contents
-        //driver.AddRune ('d');
-        //Assert.Equal (lastCol + 2, driver.Col);
-        //for (var col = 0; col < driver.Cols; col++) {
-        //	for (var row = 0; row < driver.Rows; row++) {
-        //		Assert.NotEqual ((Text)'d', driver.Contents [row, col].Text);
-        //	}
-        //}
-
         driver.Dispose ();
     }
 
@@ -181,9 +137,9 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
     {
         IDriver? driver = CreateFakeDriver ();
         driver.SetScreenSize (6, 3);
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
-        driver!.Clip = new (driver.Screen);
-
+        driver.Clip = new (driver.Screen);
         driver.Move (1, 0);
         driver.AddStr ("┌");
         driver.Move (2, 0);
@@ -197,14 +153,135 @@ public class AddRuneTests (ITestOutputHelper output) : FakeDriverBase
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �┌─┐🍎
+                                              ①┌─┐🍎
                                               """,
                                               output,
                                               driver);
 
         driver.Refresh ();
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m�┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
                                            output, driver);
+    }
+
+    [Fact]
+    public void AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip ()
+    {
+        // This test verifies the fix for issue #4258
+        // When a wide glyph is added and the second column is within the clip region,
+        // the attribute for column N+1 should be set to match the current attribute.
+        // See: OutputBufferImpl.cs line 194
+        using IDriver driver = CreateFakeDriver ();
+        driver.SetScreenSize (4, 2);
+
+        // Set a specific attribute for the wide glyph
+        Attribute wideGlyphAttr = new (Color.BrightRed, Color.BrightYellow);
+        driver.CurrentAttribute = wideGlyphAttr;
+
+        // Add a wide glyph at position (0, 0)
+        driver.Move (0, 0);
+        driver.AddStr ("🍎");
+
+        // Verify the wide glyph is in column 0
+        Assert.Equal ("🍎", driver.Contents! [0, 0].Grapheme);
+        Assert.Equal (wideGlyphAttr, driver.Contents [0, 0].Attribute);
+
+        // Verify column 1 (the second column of the wide glyph) has the correct attribute set
+        // This is the fix: column N+1 should have CurrentAttribute set (line 194 in OutputBufferImpl.cs)
+        Assert.Equal (wideGlyphAttr, driver.Contents [0, 1].Attribute);
+
+        // Verify cursor moved to column 2
+        Assert.Equal (2, driver.Col);
+    }
+
+    [Fact]
+    public void AddStr_WideGlyph_Second_Column_Attribute_Not_Set_When_Outside_Clip ()
+    {
+        // This test verifies that when a wide glyph's second column is outside the clip,
+        // the attribute for column N+1 is NOT modified
+        using IDriver driver = CreateFakeDriver ();
+        driver.SetScreenSize (4, 2);
+
+        // Set initial attribute for the entire contents
+        Attribute initialAttr = new (Color.White, Color.Black);
+        driver.CurrentAttribute = initialAttr;
+        driver.Move (0, 0);
+        driver.AddStr ("    ");
+        driver.Move (0, 1);
+        driver.AddStr ("    ");
+
+        // Create a clip that excludes column 1
+        driver.Clip = new (new Rectangle (0, 0, 1, 2));
+
+        // Set a different attribute for the wide glyph
+        Attribute wideGlyphAttr = new (Color.BrightRed, Color.BrightYellow);
+        driver.CurrentAttribute = wideGlyphAttr;
+
+        // Try to add a wide glyph at position (0, 0)
+        // Column 0 is in clip, but column 1 is NOT
+        driver.Move (0, 0);
+        driver.AddStr ("🍎");
+
+        // Verify column 0 has the replacement character (can't fit wide glyph)
+        Assert.NotEqual ("🍎", driver.Contents! [0, 0].Grapheme);
+
+        // Verify column 1 still has the original attribute (NOT modified)
+        Assert.Equal (initialAttr, driver.Contents [0, 1].Attribute);
+    }
+
+    [Fact]
+    public void AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly ()
+    {
+        // This test verifies the fix for issue #4258 by checking the actual driver output
+        // This mimics what happens when TransparentShadow redraws a wide glyph from ScreenContents
+        // WITHOUT line 194, column N+1's attribute doesn't get set, causing wrong colors in output
+        // See: OutputBufferImpl.cs line ~196 (Contents [Row, Col].Attribute = CurrentAttribute;)
+        using IDriver driver = CreateFakeDriver ();
+        driver.SetScreenSize (3, 1);
+        driver.Force16Colors = true;
+
+        // Step 1: Draw initial content - a wide glyph at column 1 with white-on-black
+        driver.CurrentAttribute = new Attribute (Color.White, Color.Black);
+        driver.Move (1, 0);
+        driver.AddStr ("🍎X");  // Wide glyph at columns 1-2, 'X' at column 3 doesn't exist (off-screen)
+
+        // At this point:
+        // - Column 0: space (default) with white-on-black
+        // - Column 1: 🍎 with white-on-black
+        // - Column 2: (part of 🍎) with white-on-black (from initial ClearContents)
+
+        // Step 2: Now redraw the SAME wide glyph at column 1 but with a DIFFERENT attribute (red-on-yellow)
+        // This simulates what transparent shadow does - it redraws what's underneath with a dimmed attribute
+        driver.CurrentAttribute = new Attribute (Color.BrightRed, Color.BrightYellow);
+        driver.Move (1, 0);
+        driver.AddStr ("🍎");
+
+        // Verify internal state
+        Assert.Equal ("🍎", driver.Contents! [0, 1].Grapheme);
+        Assert.Equal (new Attribute (Color.BrightRed, Color.BrightYellow), driver.Contents [0, 1].Attribute);
+
+        // THIS is the critical assertion - column 2's attribute MUST be red-on-yellow
+        // WITHOUT line 194: column 2 retains white-on-black
+        // WITH line 194: column 2 gets red-on-yellow
+        Assert.Equal (new Attribute (Color.BrightRed, Color.BrightYellow), driver.Contents [0, 2].Attribute);
+
+        driver.Refresh ();
+
+        // Expected output:
+        // Column 0: space with white-on-black
+        // Columns 1-2: 🍎 with red-on-yellow (both columns must have same attribute!)
+        //
+        // WITHOUT line 196, the output would be:
+        // \x1b[97m\x1b[40m  (white-on-black for column 0)
+        // \x1b[91m\x1b[103m🍎 (red-on-yellow starts at column 1)
+        // \x1b[97m\x1b[40m (WRONG! Attribute changes mid-glyph because column 2 still has white-on-black)
+        //
+        // WITH line 196, the output is:
+        // \x1b[97m\x1b[40m  (white-on-black for column 0)
+        // \x1b[91m\x1b[103m🍎 (red-on-yellow for both columns 1 and 2)
+        DriverAssert.AssertDriverOutputIs (
+            "\x1b[97m\x1b[40m \x1b[91m\x1b[103m🍎",
+            output,
+            driver);
     }
 }

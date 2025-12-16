@@ -108,6 +108,7 @@ public class ViewportSettings : Scenario
 
         var adornmentsEditor = new AdornmentsEditor
         {
+            BorderStyle = LineStyle.Single,
             X = Pos.AnchorEnd (),
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true
@@ -224,6 +225,7 @@ public class ViewportSettings : Scenario
         view.Initialized += (s, e) =>
                                               {
                                                   viewportSettingsEditor.ViewToEdit = view;
+                                                  adornmentsEditor.ViewToEdit = view;
                                               };
         view.SetFocus ();
         Application.Run (app);

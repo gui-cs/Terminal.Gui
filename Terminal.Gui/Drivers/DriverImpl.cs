@@ -146,6 +146,9 @@ internal class DriverImpl : IDriver
 
     private readonly IOutput _output;
 
+    /// <inheritdoc />
+    public IOutputBuffer GetOutputBuffer () => OutputBuffer;
+
     public IOutput GetOutput () => _output;
 
     private readonly IInputProcessor _inputProcessor;
@@ -329,9 +332,6 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public void FillRect (Rectangle rect, Rune rune = default) { OutputBuffer.FillRect (rect, rune); }
-
-    /// <inheritdoc/>
-    public void FillRect (Rectangle rect, char c) { OutputBuffer.FillRect (rect, c); }
 
     /// <inheritdoc/>
     public Attribute SetAttribute (Attribute newAttribute)

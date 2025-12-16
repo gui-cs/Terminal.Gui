@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using System;
-
 namespace UICatalog.Scenarios;
 
 public class MarginEditor : AdornmentEditor
@@ -34,7 +32,7 @@ public class MarginEditor : AdornmentEditor
         _optionsShadow = new ()
         {
             X = 0,
-            Y = Pos.Bottom (SubViews.ElementAt(SubViews.Count-1)),
+            Y = Pos.Bottom (SubViews.ElementAt (SubViews.Count - 1)),
 
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",
@@ -51,14 +49,14 @@ public class MarginEditor : AdornmentEditor
 
         Add (_optionsShadow);
 
-        _flagSelectorTransparent = new FlagSelector<ViewportSettingsFlags> ()
+        _flagSelectorTransparent = new FlagSelector<ViewportSettingsFlags>
         {
             X = 0,
             Y = Pos.Bottom (_optionsShadow),
 
             SuperViewRendersLineCanvas = true,
             Title = "_ViewportSettings",
-            BorderStyle = LineStyle.Single,
+            BorderStyle = LineStyle.Single
         };
         _flagSelectorTransparent.Values = [(int)ViewportSettingsFlags.Transparent, (int)ViewportSettingsFlags.TransparentMouse];
         _flagSelectorTransparent.Labels = ["Transparent", "TransparentMouse"];
@@ -71,11 +69,6 @@ public class MarginEditor : AdornmentEditor
             _flagSelectorTransparent.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
 
-        _flagSelectorTransparent.ValueChanged += (_, args) =>
-                                                 {
-                                                     ((Margin)AdornmentToEdit!).ViewportSettings = (ViewportSettingsFlags)args.Value!;
-                                                 };
-
-
+        _flagSelectorTransparent.ValueChanged += (_, args) => { ((Margin)AdornmentToEdit!).ViewportSettings = (ViewportSettingsFlags)args.Value!; };
     }
 }
