@@ -1,8 +1,8 @@
-﻿#nullable enable
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
+// TODO: Change to internal to prevent app usage
 /// <summary>
 ///     The root object for a Theme. A Theme is a set of settings that are applied to the running
 ///     <see cref="Application"/> as a group.
@@ -13,9 +13,9 @@ namespace Terminal.Gui;
 /// <example>
 ///     <code>
 /// 	"Default": {
-/// 		"ColorSchemes": [
+/// 		"Schemes": [
 /// 		{
-/// 		"TopLevel": {
+/// 		"Runnable": {
 /// 		"Normal": {
 /// 			"Foreground": "BrightGreen",
 /// 			"Background": "Black"
@@ -44,4 +44,7 @@ namespace Terminal.Gui;
 /// </example>
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
 public class ThemeScope : Scope<ThemeScope>
-{ }
+{
+}
+
+

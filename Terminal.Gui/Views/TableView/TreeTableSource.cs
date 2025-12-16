@@ -1,10 +1,12 @@
-namespace Terminal.Gui;
+
+#nullable disable
+namespace Terminal.Gui.Views;
 
 /// <summary>An <see cref="ITableSource"/> with expandable rows.</summary>
 /// <typeparam name="T"></typeparam>
 public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class
 {
-    private readonly Dictionary<string, Func<T, object>> _lamdas;
+    private readonly Dictionary<string, Func<T, object>> _lambdas;
     private readonly TableView _tableView;
     private readonly TreeView<T> _tree;
 
@@ -40,33 +42,33 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         _tableView = table;
         _tree = tree;
         _tableView.KeyDown += Table_KeyPress;
-        _tableView.MouseClick += Table_MouseClick;
+        _tableView.Activating += Table_Activating;
 
         List<string> colList = subsequentColumns.Keys.ToList ();
         colList.Insert (0, firstColumnName);
 
         ColumnNames = colList.ToArray ();
 
-        _lamdas = subsequentColumns;
+        _lambdas = subsequentColumns;
     }
 
     /// <inheritdoc/>
     public void Dispose ()
     {
         _tableView.KeyDown -= Table_KeyPress;
-        _tableView.MouseClick -= Table_MouseClick;
+        _tableView.Activating -= Table_Activating;
         _tree.Dispose ();
     }
 
     /// <inheritdoc/>
     public object this [int row, int col] =>
-        col == 0 ? GetColumnZeroRepresentationFromTree (row) : _lamdas [ColumnNames [col]] (RowToObject (row));
+        col == 0 ? GetColumnZeroRepresentationFromTree (row) : _lambdas [ColumnNames [col]] (RowToObject (row));
 
     /// <inheritdoc/>
     public int Rows => _tree.BuildLineMap ().Count;
 
     /// <inheritdoc/>
-    public int Columns => _lamdas.Count + 1;
+    public int Columns => _lambdas.Count + 1;
 
     /// <inheritdoc/>
     public string [] ColumnNames { get; }
@@ -86,14 +88,14 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     {
         Branch<T> branch = RowToBranch (row);
 
-        // Everything on line before the expansion run and branch text
-        Rune [] prefix = branch.GetLinePrefix (Application.Driver).ToArray ();
-        Rune expansion = branch.GetExpandableSymbol (Application.Driver);
+        // Everything on the line before the expansion run and branch text
+        string [] prefix = branch.GetLinePrefix ().ToArray ();
+        string expansion = branch.GetExpandableSymbol ();
         string lineBody = _tree.AspectGetter (branch.Model) ?? "";
 
         var sb = new StringBuilder ();
 
-        foreach (Rune p in prefix)
+        foreach (string p in prefix)
         {
             sb.Append (p);
         }
@@ -162,13 +164,20 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         if (e.Handled)
         {
             _tree.InvalidateLineMap ();
-            _tableView.SetNeedsDisplay ();
+            _tableView.SetNeedsDraw ();
         }
     }
 
-    private void Table_MouseClick (object sender, MouseEventEventArgs e)
+#nullable enable
+    private void Table_Activating (object? sender, CommandEventArgs e)
     {
-        Point? hit = _tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? headerIfAny, out int? offsetX);
+        // Only handle mouse clicks, not keyboard selections
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        {
+            return;
+        }
+
+        Point? hit = _tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? headerIfAny, out int? offsetX);
 
         if (hit is null || headerIfAny is { } || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)
         {
@@ -177,7 +186,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
         Branch<T> branch = RowToBranch (hit.Value.Y);
 
-        if (branch.IsHitOnExpandableSymbol (Application.Driver, offsetX.Value))
+        if (branch.IsHitOnExpandableSymbol (offsetX.Value))
         {
             T m = branch.Model;
 
@@ -197,7 +206,8 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         if (e.Handled)
         {
             _tree.InvalidateLineMap ();
-            _tableView.SetNeedsDisplay ();
+            _tableView.SetNeedsDraw ();
         }
     }
+#nullable restore
 }

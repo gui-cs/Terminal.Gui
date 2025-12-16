@@ -1,173 +1,126 @@
 # Terminal.Gui Project
 
-All files required to build the **Terminal.Gui** library (and NuGet package).
+**Terminal.Gui** is a cross-platform UI toolkit for creating console-based graphical user interfaces in .NET. This repository contains all files required to build the **Terminal.Gui** library and NuGet package, enabling developers to create rich terminal applications with ease.
+
+## Project Overview
+
+**Terminal.Gui** provides a comprehensive framework for building interactive console applications with support for keyboard and mouse input, customizable views, and a robust event system. It is designed to work across Windows, macOS, and Linux, leveraging platform-specific console capabilities where available.
 
 ## Project Folder Structure
 
-- `\` - The root folder contains the source code for the library.
-	- `Terminal.Gui.sln` - The Visual Studio solution
-	- `Application.cs` - A `static` class that provides the base 'application driver'. Given it defines a **Terminal.Gui** application it is both logically and literally (because `static`) a singleton. It has direct dependencies on `MainLoop`, `Events.cs` `NetDriver`, `CursesDriver`, `WindowsDriver`, `Responder`, `View`, and `TopLevel` (and nothing else).
-	- `MainLoop.cs` - Defines `IMainLoopDriver` and implements the `MainLoop` class.
-	- A few supporting class files
+This directory contains the core **Terminal.Gui** library source code. For a detailed repository structure, see [CONTRIBUTING.md - Repository Structure](../CONTRIBUTING.md#repository-structure).
 
-- `ConsoleDrivers\`
-	- `ConsoleDriver.cs` - Definition for the Console Driver API.
-	- Source files for the three `ConsoleDriver`-based drivers: .NET: `NetDriver`, Unix & Mac: `UnixDriver`, and Windows: `WindowsDriver`.
+## Getting Started
 
-- `Configuration\` - Classes related the `ConfigurationManager`.
+For instructions on how to start using **Terminal.Gui**, refer to the [Getting Started Guide](https://gui-cs.github.io/Terminal.Gui/docs/getting-started.html) in our documentation.
 
-- `Clipboard\` - Classes related to clipboard access.
+## Documentation
 
-- `Input\` - Classes relating to keyboard and mouse input. Includes `Responder`, which is the base class for `View`
-	- `Events.cs` - Defines keyboard and mouse-related structs & classes. 
-	- `Responder` - Base class for the windowing class hierarchy. Implements support for keyboard & mouse input.
-	- etc...
+Comprehensive documentation is available at [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui).
 
-- `Text\` - Classes related to text processing
+For information on generating and updating the API documentation locally, refer to the [DocFX README](../docfx/README.md).
 
-- `Drawing\` - Classes related to drawing 
+## Versioning
 
-- `View\` - The `View` class heirarchy, not including any sub-classes
-	- `View.cs` - Derived from `Responder`, the base class for non-modal visual elements such as controls.
-	- `Layout\`	
-		- `PosDim.cs` - Implements *Computed Layout* system. These classes have deep dependencies on `View`.
-
-- `Views\` - Sub-classes of `View` 
-	- `Toplevel` - Derived from `View`, the base class for modal visual elements such as top-level windows and dialogs. Supports the concept of `MenuBar` and `StatusBar`.
-	- `Window` - Derived from `TopLevel`; implements Toplevel views with a visible frame and Title.
-	- `Dialog` -
-	- etc...
-
-- `Types/` - A folder (not namespace) containing implementations of `Point`, `Rect`, and `Size` which are ancient versions of the modern `System.Drawing.Point`, `System.Drawing.Size`, and `System.Drawning.Rectangle`.
-
-## Version numbers
-
-Version info for Terminal.Gui is managed by [gitversion](https://gitversion.net).
-
-Install `gitversion`:
+Version information for Terminal.Gui is managed by [gitversion](https://gitversion.net). To install `gitversion`:
 
 ```powershell
 dotnet tool install --global GitVersion.Tool
 dotnet-gitversion
 ```
 
-The project version (the nuget package and in `Terminal.Gui.dll`) is determined from the latest `git tag`. 
+The project version (used in the NuGet package and `Terminal.Gui.dll`) is determined from the latest `git tag`. The format of version numbers is `major.minor.patch.build.height` and follows [Semantic Versioning](https://semver.org/) rules.
 
-The format of version numbers is `vmajor.minor.patch.build.height` and follows the [Semantic Versioning](https://semver.org/) rules.
-
-To define a new version (e.g. with a higher `major`, `minor`, `patch`, or `build` value) tag a commit using `git tag`:
+To define a new version, tag a commit using `git tag`:
 
 ```powershell
-git tag v1.3.4-beta.5 -a -m "Release v1.3.4 Beta 5"
+git tag v2.1.0-beta.1 -a -m "Release v2.1.0 Beta 1"
 dotnet-gitversion /updateprojectfiles
 dotnet build -c Release
 ```
 
-**DO NOT COMMIT AFTER USING `/updateprojectfiles`!**
-
-Doing so will update the `.csproj` files in your branch with version info, which we do not want.
+**DO NOT COMMIT AFTER USING `/updateprojectfiles`!** Doing so will update the `.csproj` files in your branch with version info, which we do not want.
 
 ## Publishing a Release of Terminal.Gui
 
-First, use the [Semantic Versioning](https://semver.org/) rules.to determine the new verison number. 
+To release a new version, follow these steps based on [Semantic Versioning](https://semver.org/) rules:
 
-Given a version number MAJOR.MINOR.PATCH, increment the:
+- **MAJOR** version for incompatible API changes.
+- **MINOR** version for backwards-compatible functionality additions.
+- **PATCH** version for backwards-compatible bug fixes.
 
-* MAJOR version when you make incompatible API changes
-* MINOR version when you add functionality in a backwards compatible manner
-* PATCH version when you make backwards compatible bug fixes
+### Steps for Release:
 
-Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+1. **Verify the `v2_develop` branch is ready for release**:
+	- Ensure all changes are committed and pushed to the `v2_develop` branch.
+	- Ensure your local `v2_develop` branch is up-to-date with `upstream/v2_develop`.
 
-To release a new version (e.g. with a higher `major`, `minor`, or `patch` value) tag a commit using `git tag` and then push that tag directly to the `main` branch on `github.com/gui-cs/Terminal.Gui` (`upstream`).
+2. **Create a pull request for the release in the `v2_develop` branch**:
+	- Title the PR as "Release vX.Y.Z".
+	```powershell
+	git checkout v2_develop
+	git pull upstream v2_develop
+	git checkout -b vX_Y_Z
+	git add .
+	git commit -m "Release vX.Y.Z"
+	git push
+	```
+	- Go to the link printed by `git push` and fill out the Pull Request.
 
-The `tag` must be of the form `v<major>.<minor>.<patch>`, e.g. `v2.3.4`.
+3. **On github.com, verify the build action worked on your fork, then merge the PR**.
 
-`patch` can indicate pre-release or not (e.g. `pre`, `beta`, `rc`, etc...). 
+4. **Pull the merged `v2_develop` from `upstream`**:
+	```powershell
+	git checkout v2_develop
+	git pull upstream v2_develop
+	```
 
-### 1) Verify the `develop` branch is ready for release
+5. **Merge `v2_develop` into `v2_release`**:
+	```powershell
+	git checkout v2_release
+	git pull upstream v2_release
+	git merge v2_develop
+	```
+	- Fix any merge errors.
 
-* Ensure everything is committed and pushed to the `develop` branch
-* Ensure your local `develop` branch is up-to-date with `upstream/develop`
+6. **Create a new annotated tag for the release on `v2_release`**:
+	```powershell
+	git tag vX.Y.Z -a -m "Release vX.Y.Z"
+	```
 
-### 2) Create a pull request for the release in the `develop` branch
+7. **Push the new tag to `v2_release` on `upstream`**:
+	```powershell
+	git push --atomic upstream v2_release vX.Y.Z
+	```
 
-The PR title should be of the form "Release v2.3.4"
+8. **Monitor Github Actions to ensure the NuGet publishing worked**:
+	- Check [GitHub Actions](https://github.com/gui-cs/Terminal.Gui/actions).
 
-```powershell
-git checkout develop
-git pull upstream develop
-git checkout -b v2_3_4
-git add .
-git commit -m "Release v2.3.4"
-git push
-```
+9. **Check NuGet to see the new package version (wait a few minutes)**:
+	- Visit [NuGet Package](https://www.nuget.org/packages/Terminal.Gui).
 
-Go to the link printed by `git push` and fill out the Pull Request.
+10. **Add a new Release in Github**:
+	- Go to [GitHub Releases](https://github.com/gui-cs/Terminal.Gui/releases) and generate release notes with the list of PRs since the last release.
 
-### 3) On github.com, verify the build action worked on your fork, then merge the PR
+11. **Update the `v2_develop` branch with the new version**:
+	```powershell
+	git checkout v2_develop
+	git pull upstream v2_develop
+	git merge v2_release
+	git push upstream v2_develop
+	```
 
-### 4) Pull the merged `develop` from `upstream`
+## NuGet
 
-```powershell
-git checkout develop
-git pull upstream develop
-```
-
-### 5) Merge `develop` into `main`
-
-```powershell
-git checkout main
-git pull upstream main
-git merge develop
-```
-
-Fix any merge errors.
-
-### 6) Create a new annotated tag for the release on `main`
-
-```powershell
-git tag v2.3.4 -a -m "Release v2.3.4"
-```       
-
-### 7) Push the new tag to `main` on `upstream`
-
-```powershell
-git push --atomic upstream main v2.3.4
-```       
-
-*See https://stackoverflow.com/a/3745250/297526*
-
-### 8) Monitor Github Actions to ensure the Nuget publishing worked.
-
-https://github.com/gui-cs/Terminal.Gui/actions
-
-### 9) Check Nuget to see the new package version (wait a few minutes) 
-https://www.nuget.org/packages/Terminal.Gui
-
-### 10) Add a new Release in Github: https://github.com/gui-cs/Terminal.Gui/releases
-
-Generate release notes with the list of PRs since the last release.
-
-### 11) Update the `develop` branch with the new version
-
-```powershell
-git checkout develop
-git pull upstream develop
-git merge main
-git push upstream develop
-```
-
-## Nuget
-
-https://www.nuget.org/packages/Terminal.Gui
-
-When a new version tag is defined and merged into `main`, a Nuget package will be generated by a Github Action.
-
-If the version is pre-release (includes a hyphen, e.g. `1.3.4-beta.5`) the Nuget package will be tagged as pre-release.
-
-Miguel & Tig can hide defunct/old Nuget packages.
+The official NuGet package for Terminal.Gui is available at [https://www.nuget.org/packages/Terminal.Gui](https://www.nuget.org/packages/Terminal.Gui). When a new version tag is defined and merged into `v2_release`, a NuGet package is automatically generated by a GitHub Action. Pre-release versions (e.g., `2.0.0-beta.5`) are tagged as pre-release on NuGet.
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/gui-cs/Terminal.Gui/blob/master/CONTRIBUTING.md).
+We welcome contributions from the community. For complete contribution guidelines, including:
+- Build and test instructions
+- Coding conventions and style rules
+- Testing requirements and patterns
+- Pull request guidelines
+- CI/CD workflows
+
+Please refer to [CONTRIBUTING.md](../CONTRIBUTING.md) in the repository root.

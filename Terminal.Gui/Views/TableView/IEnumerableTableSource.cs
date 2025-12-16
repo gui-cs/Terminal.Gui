@@ -1,4 +1,5 @@
-namespace Terminal.Gui;
+#nullable disable
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Interface for all <see cref="ITableSource"/> which present an object per row (of type <typeparamref name="T"/>

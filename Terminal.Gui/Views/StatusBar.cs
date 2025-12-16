@@ -1,243 +1,180 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of
-///     <see cref="StatusItem"/>s. The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu
+///     A status bar is a <see cref="View"/> that snaps to the bottom of the Viewport displaying set of
+///     <see cref="Shortcut"/>s. The <see cref="StatusBar"/> should be context-sensitive. This means, if the main menu
 ///     and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog
 ///     to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a
 ///     new instance of a status bar.
 /// </summary>
-public class StatusBar : View
+public class StatusBar : Bar, IDesignable
 {
-    private static Rune _shortcutDelimiter = (Rune)'=';
+    private static LineStyle _defaultSeparatorLineStyle = LineStyle.Single; // Resources/config.json overrides
 
-    private StatusItem [] _items = [];
+    /// <inheritdoc/>
+    public StatusBar () : this ([]) { }
 
-    /// <summary>Initializes a new instance of the <see cref="StatusBar"/> class.</summary>
-    public StatusBar () : this (new StatusItem [] { }) { }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of
-    ///     <see cref="StatusItem"/> s. The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or
-    ///     <see cref="View.SuperView"/> (if not null).
-    /// </summary>
-    /// <param name="items">A list of status bar items.</param>
-    public StatusBar (StatusItem [] items)
+    /// <inheritdoc/>
+    public StatusBar (IEnumerable<Shortcut> shortcuts) : base (shortcuts)
     {
-        if (items is { })
-        {
-            Items = items;
-        }
-
-        CanFocus = false;
-        ColorScheme = Colors.ColorSchemes ["Menu"];
-        X = 0;
+        TabStop = TabBehavior.NoStop;
+        Orientation = Orientation.Horizontal;
         Y = Pos.AnchorEnd ();
         Width = Dim.Fill ();
-        Height = 1; // BUGBUG: Views should avoid setting Height as doing so implies Frame.Size == GetContentSize ().
+        Height = Dim.Auto (DimAutoStyle.Content, 1);
 
-        AddCommand (Command.Accept, ctx => InvokeItem ((StatusItem)ctx.KeyBinding?.Context));
+        if (Border is { })
+        {
+            Border.LineStyle = DefaultSeparatorLineStyle;
+        }
+
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
+
+        ConfigurationManager.Applied += OnConfigurationManagerApplied;
+        SuperViewChanged += OnSuperViewChanged;
     }
 
-    /// <summary>The items that compose the <see cref="StatusBar"/></summary>
-    public StatusItem [] Items
+    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
     {
-        get => _items;
-        set
+        if (SuperView is null)
         {
-            foreach (StatusItem item in _items)
-            {
-                KeyBindings.Remove (item.Shortcut);
-            }
-
-            _items = value;
-
-            foreach (StatusItem item in _items.Where (i => i.Shortcut != Key.Empty))
-            {
-                KeyBinding keyBinding = new (new [] { Command.Accept }, KeyBindingScope.HotKey, item);
-                KeyBindings.Add (item.Shortcut, keyBinding);
-            }
+            // BUGBUG: This is a hack for avoiding a race condition in ConfigurationManager.Apply
+            // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
+            // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
+            // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
+            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+        }
+    }
+    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    {
+        if (Border is { })
+        {
+            Border.LineStyle = DefaultSeparatorLineStyle;
         }
     }
 
-    /// <summary>Gets or sets shortcut delimiter separator. The default is "-".</summary>
-    public static Rune ShortcutDelimiter
+    /// <summary>
+    ///     Gets or sets the default Line Style for the separators between the shortcuts of the StatusBar.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultSeparatorLineStyle
     {
-        get => _shortcutDelimiter;
-        set
+        get => _defaultSeparatorLineStyle;
+        set => _defaultSeparatorLineStyle = value;
+    }
+
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs args)
+    {
+        for (int index = 0; index < SubViews.Count; index++)
         {
-            if (_shortcutDelimiter != value)
+            View barItem = SubViews.ElementAt (index);
+
+            barItem.BorderStyle = BorderStyle;
+
+            if (barItem.Border is { })
             {
-                _shortcutDelimiter = value == default (Rune) ? (Rune)'=' : value;
+                barItem.Border!.Thickness = index == SubViews.Count - 1 ? new Thickness (0, 0, 0, 0) : new Thickness (0, 0, 1, 0);
             }
+
+            if (barItem is Shortcut shortcut)
+            {
+                shortcut.Orientation = Orientation.Horizontal;
+            }
+        }
+        base.OnSubViewLayout (args);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSubViewAdded (View subView)
+    {
+        subView.CanFocus = false;
+
+        if (subView is Shortcut shortcut)
+        {
+            // TODO: not happy about using AlignmentModes for this. Too implied.
+            // TODO: instead, add a property (a style enum?) to Shortcut to control this
+            shortcut.AlignmentModes = AlignmentModes.EndToStart;
         }
     }
 
-    /// <summary>Inserts a <see cref="StatusItem"/> in the specified index of <see cref="Items"/>.</summary>
-    /// <param name="index">The zero-based index at which item should be inserted.</param>
-    /// <param name="item">The item to insert.</param>
-    public void AddItemAt (int index, StatusItem item)
+    /// <inheritdoc />
+    bool IDesignable.EnableForDesign ()
     {
-        List<StatusItem> itemsList = new (Items);
-        itemsList.Insert (index, item);
-        Items = itemsList.ToArray ();
-        SetNeedsDisplay ();
-    }
-
-    ///<inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent me)
-    {
-        if (me.Flags != MouseFlags.Button1Clicked)
+        var shortcut = new Shortcut
         {
-            return false;
-        }
+            Text = "Quit",
+            Title = "Q_uit",
+            Key = Key.Z.WithCtrl,
+        };
 
-        var pos = 1;
+        Add (shortcut);
 
-        for (var i = 0; i < Items.Length; i++)
+        shortcut = new Shortcut
         {
-            if (me.Position.X >= pos && me.Position.X < pos + GetItemTitleLength (Items [i].Title))
+            Text = "Help Text",
+            Title = "Help",
+            Key = Key.F1,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Title = "_Show/Hide",
+            Key = Key.F10,
+            CommandView = new CheckBox
             {
-                StatusItem item = Items [i];
+                CanFocus = false,
+                Text = "_Show/Hide"
+            },
+        };
 
-                if (item.IsEnabled ())
-                {
-                    Run (item.Action);
-                }
+        Add (shortcut);
 
-                break;
-            }
+        var button1 = new Button
+        {
+            Text = "I'll Hide",
+            // Visible = false
+        };
+        button1.Accepting += OnButtonClicked;
+        Add (button1);
 
-            pos += GetItemTitleLength (Items [i].Title) + 3;
-        }
+#pragma warning disable TGUI001
+        shortcut.Accepting += (_, e) =>
+                              {
+                                  button1.Visible = !button1.Visible;
+                                  button1.Enabled = button1.Visible;
+                                  e.Handled = false;
+                              };
+#pragma warning restore TGUI001
+
+        Add (new Label
+        {
+            HotKeySpecifier = new Rune ('_'),
+            Text = "Fo_cusLabel",
+            CanFocus = true
+        });
+
+        var button2 = new Button
+        {
+            Text = "Or me!",
+        };
+        button2.Accepting += (s, e) => App?.RequestStop ();
+
+        Add (button2);
 
         return true;
+
+        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App, "Hi", $"You clicked {sender}"); }
     }
 
-    ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
     {
-        Move (0, 0);
-        Driver.SetAttribute (GetNormalColor ());
+        base.Dispose (disposing);
 
-        for (var i = 0; i < Frame.Width; i++)
-        {
-            Driver.AddRune ((Rune)' ');
-        }
-
-        Move (1, 0);
-        Attribute scheme = GetNormalColor ();
-        Driver.SetAttribute (scheme);
-
-        for (var i = 0; i < Items.Length; i++)
-        {
-            string title = Items [i].Title;
-            Driver.SetAttribute (DetermineColorSchemeFor (Items [i]));
-
-            for (var n = 0; n < Items [i].Title.GetRuneCount (); n++)
-            {
-                if (title [n] == '~')
-                {
-                    if (Items [i].IsEnabled ())
-                    {
-                        scheme = ToggleScheme (scheme);
-                    }
-
-                    continue;
-                }
-
-                Driver.AddRune ((Rune)title [n]);
-            }
-
-            if (i + 1 < Items.Length)
-            {
-                Driver.AddRune ((Rune)' ');
-                Driver.AddRune (Glyphs.VLine);
-                Driver.AddRune ((Rune)' ');
-            }
-        }
-    }
-
-    /// <summary>Removes a <see cref="StatusItem"/> at specified index of <see cref="Items"/>.</summary>
-    /// <param name="index">The zero-based index of the item to remove.</param>
-    /// <returns>The <see cref="StatusItem"/> removed.</returns>
-    public StatusItem RemoveItem (int index)
-    {
-        List<StatusItem> itemsList = new (Items);
-        StatusItem item = itemsList [index];
-        itemsList.RemoveAt (index);
-        Items = itemsList.ToArray ();
-        SetNeedsDisplay ();
-
-        return item;
-    }
-
-    private Attribute DetermineColorSchemeFor (StatusItem item)
-    {
-        if (item is { })
-        {
-            if (item.IsEnabled ())
-            {
-                return GetNormalColor ();
-            }
-
-            return ColorScheme.Disabled;
-        }
-
-        return GetNormalColor ();
-    }
-
-    private int GetItemTitleLength (string title)
-    {
-        var len = 0;
-
-        foreach (char ch in title)
-        {
-            if (ch == '~')
-            {
-                continue;
-            }
-
-            len++;
-        }
-
-        return len;
-    }
-
-    private bool? InvokeItem (StatusItem itemToInvoke)
-    {
-        if (itemToInvoke is { Action: { } })
-        {
-            itemToInvoke.Action.Invoke ();
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private void Run (Action action)
-    {
-        if (action is null)
-        {
-            return;
-        }
-
-        Application.MainLoop.AddIdle (
-                                      () =>
-                                      {
-                                          action ();
-
-                                          return false;
-                                      }
-                                     );
-    }
-
-    private Attribute ToggleScheme (Attribute scheme)
-    {
-        Attribute result = scheme == ColorScheme.Normal ? ColorScheme.HotNormal : ColorScheme.Normal;
-        Driver.SetAttribute (result);
-
-        return result;
+        SuperViewChanged -= OnSuperViewChanged;
+        ConfigurationManager.Applied -= OnConfigurationManagerApplied;
     }
 }

@@ -1,13 +1,14 @@
-﻿using System.Globalization;
+﻿
+using System.Globalization;
 using Wcwidth;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Text;
 
 /// <summary>Extends <see cref="System.Text.Rune"/> to support TUI text manipulation.</summary>
 public static class RuneExtensions
 {
     /// <summary>Maximum Unicode code point.</summary>
-    public static int MaxUnicodeCodePoint = 0x10FFFF;
+    public static readonly int MaxUnicodeCodePoint = 0x10FFFF;
 
     /// <summary>Reports if the provided array of bytes can be encoded as UTF-8.</summary>
     /// <param name="buffer">The byte array to probe.</param>
@@ -32,11 +33,24 @@ public static class RuneExtensions
     /// <param name="rune">The rune to decode.</param>
     /// <param name="chars">The chars if the rune is a surrogate pair. Null otherwise.</param>
     /// <returns><see langword="true"/> if the rune is a valid surrogate pair; <see langword="false"/> otherwise.</returns>
-    public static bool DecodeSurrogatePair (this Rune rune, out char [] chars)
+    public static bool DecodeSurrogatePair (this Rune rune, out char []? chars)
     {
-        if (rune.IsSurrogatePair ())
+        bool isSingleUtf16CodeUnit = rune.IsBmp;
+
+        if (isSingleUtf16CodeUnit)
         {
-            chars = rune.ToString ().ToCharArray ();
+            chars = null;
+
+            return false;
+        }
+
+        const int MAX_CHARS_PER_RUNE = 2;
+        Span<char> charBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+
+        if (charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]))
+        {
+            chars = charBuffer [..charsWritten].ToArray ();
 
             return true;
         }
@@ -55,21 +69,27 @@ public static class RuneExtensions
     /// <returns>he number of bytes written into the destination buffer.</returns>
     public static int Encode (this Rune rune, byte [] dest, int start = 0, int count = -1)
     {
-        byte [] bytes = Encoding.UTF8.GetBytes (rune.ToString ());
-        var length = 0;
+        const int MAX_UTF8_BYTES_PER_RUNE = 4;
+        Span<byte> bytes = stackalloc byte [MAX_UTF8_BYTES_PER_RUNE];
+        int writtenBytes = rune.EncodeToUtf8 (bytes);
 
-        for (var i = 0; i < (count == -1 ? bytes.Length : count); i++)
+        int bytesToCopy = count == -1
+                              ? writtenBytes
+                              : Math.Min (count, writtenBytes);
+        var bytesWritten = 0;
+
+        for (var i = 0; i < bytesToCopy; i++)
         {
-            if (bytes [i] == 0)
+            if (bytes [i] == '\0')
             {
                 break;
             }
 
             dest [start + i] = bytes [i];
-            length++;
+            bytesWritten++;
         }
 
-        return length;
+        return bytesWritten;
     }
 
     /// <summary>Attempts to encode (as UTF-16) a surrogate pair.</summary>
@@ -92,7 +112,14 @@ public static class RuneExtensions
     }
 
     /// <summary>Gets the number of columns the rune occupies in the terminal.</summary>
-    /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
+    /// <remarks>
+    ///     <para>
+    ///         Implemented via a port of <a href="https://man7.org/linux/man-pages/man3/wcwidth.3.html">wcwidth</a>.
+    ///     </para>
+    ///     <para>
+    ///         This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.
+    ///     </para>
+    /// </remarks>
     /// <param name="rune">The rune to measure.</param>
     /// <returns>
     ///     The number of columns required to fit the rune, 0 if the argument is the null character, or -1 if the value is
@@ -105,18 +132,28 @@ public static class RuneExtensions
     /// <param name="rune">The rune to probe.</param>
     /// <param name="encoding">The encoding used; the default is UTF8.</param>
     /// <returns>The number of bytes required.</returns>
-    public static int GetEncodingLength (this Rune rune, Encoding encoding = null)
+    public static int GetEncodingLength (this Rune rune, Encoding? encoding = null)
     {
         encoding ??= Encoding.UTF8;
-        byte [] bytes = encoding.GetBytes (rune.ToString ().ToCharArray ());
-        var offset = 0;
 
-        if (bytes [^1] == 0)
+        const int MAX_CHARS_PER_RUNE = 2;
+
+        // Get characters with UTF16 to keep that part independent of selected encoding.
+        Span<char> charBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+        Span<char> chars = charBuffer [..charsWritten];
+
+        int maxEncodedLength = encoding.GetMaxByteCount (charsWritten);
+        Span<byte> byteBuffer = stackalloc byte [maxEncodedLength];
+        int bytesEncoded = encoding.GetBytes (chars, byteBuffer);
+        ReadOnlySpan<byte> encodedBytes = byteBuffer [..bytesEncoded];
+
+        if (encodedBytes [^1] == '\0')
         {
-            offset++;
+            return encodedBytes.Length - 1;
         }
 
-        return bytes.Length - offset;
+        return encodedBytes.Length;
     }
 
     /// <summary>Returns <see langword="true"/> if the rune is a combining character.</summary>
@@ -127,7 +164,7 @@ public static class RuneExtensions
     {
         UnicodeCategory category = Rune.GetUnicodeCategory (rune);
 
-        return Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark
+        return category == UnicodeCategory.NonSpacingMark
                || category == UnicodeCategory.SpacingCombiningMark
                || category == UnicodeCategory.EnclosingMark;
     }
@@ -136,7 +173,21 @@ public static class RuneExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune">The rune to probe.</param>
     /// <returns><see langword="true"/> if the rune is a surrogate code point; <see langword="false"/> otherwise.</returns>
-    public static bool IsSurrogatePair (this Rune rune) { return char.IsSurrogatePair (rune.ToString (), 0); }
+    public static bool IsSurrogatePair (this Rune rune)
+    {
+        bool isSingleUtf16CodeUnit = rune.IsBmp;
+
+        if (isSingleUtf16CodeUnit)
+        {
+            return false;
+        }
+
+        const int MAX_CHARS_PER_RUNE = 2;
+        Span<char> charBuffer = stackalloc char [MAX_CHARS_PER_RUNE];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+
+        return charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]);
+    }
 
     /// <summary>
     ///     Ensures the rune is not a control character and can be displayed by translating characters below 0x20 to
@@ -145,5 +196,5 @@ public static class RuneExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune"></param>
     /// <returns></returns>
-    public static Rune MakePrintable (this Rune rune) { return Rune.IsControl (rune) ? new Rune (rune.Value + 0x2400) : rune; }
+    public static Rune MakePrintable (this Rune rune) { return Rune.IsControl (rune) ? new (rune.Value + 0x2400) : rune; }
 }

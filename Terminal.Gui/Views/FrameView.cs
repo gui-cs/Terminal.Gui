@@ -1,41 +1,47 @@
-﻿using System.Text.Json.Serialization;
+namespace Terminal.Gui.Views;
 
-namespace Terminal.Gui;
+// TODO: FrameView is mis-named, really. It's far more about it being a TabGroup than a frame. 
 
 /// <summary>
-///     The FrameView is a container View with a border around it. 
+///     A non-overlapped container for other views with a border and optional title.
 /// </summary>
+/// <remarks>
+///     <para>
+///         FrameView has <see cref="View.BorderStyle"/> set to <see cref="float"/> and
+///         inherits it's scheme from the <see cref="View.SuperView"/>.
+///     </para>
+///     <para>
+///         
+///     </para>
+/// </remarks>
+/// <seealso cref="Window"/>
 public class FrameView : View
 {
+    private static LineStyle _defaultBorderStyle = LineStyle.Rounded; // Resources/config.json overrides
+
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Gui.FrameView"/> class.
+    ///     Initializes a new instance of the <see cref="FrameView"/> class.
     ///     layout.
     /// </summary>
     public FrameView ()
     {
-        Border.Thickness = new Thickness (1);
-        Border.LineStyle = DefaultBorderStyle;
-
-        //Border.ColorScheme = ColorScheme;
-        Border.Data = "Border";
-        MouseClick += FrameView_MouseClick;
+        CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
+        BorderStyle = DefaultBorderStyle;
     }
-
-    private void FrameView_MouseClick (object sender, MouseEventEventArgs e)
-    {
-        e.Handled = InvokeCommand (Command.HotKey) == true;
-    }
-
 
     /// <summary>
-    ///     The default <see cref="LineStyle"/> for <see cref="FrameView"/>'s border. The default is
-    ///     <see cref="LineStyle.Single"/>.
+    ///     Defines the default border styling for <see cref="FrameView"/>. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     /// <remarks>
     ///     This property can be set in a Theme to change the default <see cref="LineStyle"/> for all
     ///     <see cref="FrameView"/>s.
     /// </remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle
+    {
+        get => _defaultBorderStyle;
+        set => _defaultBorderStyle = value;
+    }
 }

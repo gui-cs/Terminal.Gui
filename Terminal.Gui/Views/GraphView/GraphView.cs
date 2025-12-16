@@ -1,16 +1,17 @@
-﻿#nullable enable
-namespace Terminal.Gui;
 
-/// <summary>View for rendering graphs (bar, scatter, etc...).</summary>
-public class GraphView : View
+
+namespace Terminal.Gui.Views;
+
+/// <summary>Displays graphs (bar, scatter, etc...) with flexible labels, scaling, and scrolling</summary>
+public class GraphView : View, IDesignable
 {
     /// <summary>Creates a new graph with a 1 to 1 graph space with absolute layout.</summary>
     public GraphView ()
     {
         CanFocus = true;
 
-        AxisX = new HorizontalAxis ();
-        AxisY = new VerticalAxis ();
+        AxisX = new ();
+        AxisY = new ();
 
         // Things this view knows how to do
         AddCommand (
@@ -188,20 +189,20 @@ public class GraphView : View
     /// </returns>
     public Point GraphSpaceToScreen (PointF location)
     {
-        return new Point (
-                          (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
+        return new (
+                    (int)((location.X - ScrollOffset.X) / CellSize.X) + (int)MarginLeft,
 
-                          // screen coordinates are top down while graph coordinates are bottom up
-                          Viewport.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
-                         );
+                    // screen coordinates are top down while graph coordinates are bottom up
+                    Viewport.Height - 1 - (int)MarginBottom - (int)((location.Y - ScrollOffset.Y) / CellSize.Y)
+                   );
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (CellSize.X == 0 || CellSize.Y == 0)
         {
-            throw new Exception ($"{nameof (CellSize)} cannot be 0");
+            throw new ($"{nameof (CellSize)} cannot be 0");
         }
 
         SetDriverColorToGraphColor ();
@@ -212,13 +213,13 @@ public class GraphView : View
         for (var i = 0; i < Viewport.Height; i++)
         {
             Move (0, i);
-            Driver.AddStr (new string (' ', Viewport.Width));
+            AddStr (new (' ', Viewport.Width));
         }
 
         // If there is no data do not display a graph
         if (!Series.Any () && !Annotations.Any ())
         {
-            return;
+            return true;
         }
 
         // The drawable area of the graph (anything that isn't in the margins)
@@ -228,7 +229,7 @@ public class GraphView : View
         // if the margins take up the full draw bounds don't render
         if (graphScreenWidth < 0 || graphScreenHeight < 0)
         {
-            return;
+            return true;
         }
 
         // Draw 'before' annotations
@@ -275,6 +276,8 @@ public class GraphView : View
         {
             a.Render (this);
         }
+
+        return true;
     }
 
     /// <summary>Scrolls the graph down 1 page.</summary>
@@ -289,14 +292,14 @@ public class GraphView : View
     /// </summary>
     public void Reset ()
     {
-        ScrollOffset = new PointF (0, 0);
-        CellSize = new PointF (1, 1);
+        ScrollOffset = new (0, 0);
+        CellSize = new (1, 1);
         AxisX.Reset ();
         AxisY.Reset ();
         Series.Clear ();
         Annotations.Clear ();
         GraphColor = null;
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>Returns the section of the graph that is represented by the given screen position.</summary>
@@ -337,12 +340,55 @@ public class GraphView : View
                             ScrollOffset.Y + offsetY
                            );
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>
-    ///     Sets the color attribute of <see cref="Application.Driver"/> to the <see cref="GraphColor"/> (if defined) or
-    ///     <see cref="ColorScheme"/> otherwise.
+    ///     Sets the color attribute of <see cref="IApplication.Driver"/> to the <see cref="GraphColor"/> (if defined) or
+    ///     <see cref="Scheme"/> otherwise.
     /// </summary>
-    public void SetDriverColorToGraphColor () { Driver.SetAttribute (GraphColor ?? GetNormalColor ()); }
+    public void SetDriverColorToGraphColor () { SetAttribute (GraphColor ?? GetAttributeForRole (VisualRole.Normal)); }
+
+    bool IDesignable.EnableForDesign ()
+    {
+        Title = "Sine Wave";
+
+        var points = new ScatterSeries ();
+        var line = new PathAnnotation ();
+
+        // Draw line first so it does not draw over top of points or axis labels
+        line.BeforeSeries = true;
+
+        // Generate line graph with 2,000 points
+        for (float x = -500; x < 500; x += 0.5f)
+        {
+            points.Points.Add (new (x, (float)Math.Sin (x)));
+            line.Points.Add (new (x, (float)Math.Sin (x)));
+        }
+
+        Series.Add (points);
+        Annotations.Add (line);
+
+        // How much graph space each cell of the console depicts
+        CellSize = new (0.1f, 0.1f);
+
+        // leave space for axis labels
+        MarginBottom = 2;
+        MarginLeft = 3;
+
+        // One axis tick/label per
+        AxisX.Increment = 0.5f;
+        AxisX.ShowLabelsEvery = 2;
+        AxisX.Text = "X →";
+        AxisX.LabelGetter = v => v.Value.ToString ("N2");
+
+        AxisY.Increment = 0.2f;
+        AxisY.ShowLabelsEvery = 2;
+        AxisY.Text = "↑Y";
+        AxisY.LabelGetter = v => v.Value.ToString ("N2");
+
+        ScrollOffset = new (-2.5f, -1);
+
+        return true;
+    }
 }

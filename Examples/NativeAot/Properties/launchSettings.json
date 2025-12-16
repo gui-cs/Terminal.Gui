@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "NativeAot": {
+      "commandName": "Project"
+    },
+    "WSL : NativeAot": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet NativeAot.dll",
+      "distributionName": ""
+    }
+  }
+}

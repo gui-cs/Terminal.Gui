@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is
@@ -13,42 +15,36 @@
 ///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
 ///     user, set <see cref="View.Enabled"/>.
 /// </remarks>
-public class WizardStep : FrameView
+public class WizardStep : View
 {
-    ///// <summary>
-    ///// The title of the <see cref="WizardStep"/>. 
-    ///// </summary>
-    ///// <remarks>The Title is only displayed when the <see cref="Wizard"/> is used as a modal pop-up (see <see cref="Wizard.Modal"/>.</remarks>
-    //public new string Title {
-    //	// BUGBUG: v2 - No need for this as View now has Title w/ notifications.
-    //	get => title;
-    //	set {
-    //		if (!OnTitleChanging (title, value)) {
-    //			var old = title;
-    //			title = value;
-    //			OnTitleChanged (old, title);
-    //		}
-    //		base.Title = value;
-    //		SetNeedsDisplay ();
-    //	}
-    //}
-
-    //private string title = string.Empty;
-
     // The contentView works like the ContentView in FrameView.
-    private readonly View _contentView = new () { Id = "WizardContentView" };
-    private readonly TextView _helpTextView = new ();
+    private readonly View _contentView = new ()
+    {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
+        Id = "WizardStep._contentView"
+    };
+    private readonly TextView _helpTextView = new ()
+    {
+        CanFocus = true,
+        TabStop = TabBehavior.TabStop,
+        ReadOnly = true,
+        WordWrap = true,
+        AllowsTab = false,
+        Id = "WizardStep._helpTextView"
+    };
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
     public WizardStep ()
     {
+        TabStop = TabBehavior.TabStop;
+        CanFocus = true;
         BorderStyle = LineStyle.None;
+
         base.Add (_contentView);
 
-        _helpTextView.ReadOnly = true;
-        _helpTextView.WordWrap = true;
         base.Add (_helpTextView);
 
         // BUGBUG: v2 - Disabling scrolling for now
@@ -59,7 +55,7 @@ public class WizardStep : FrameView
         //	if (helpTextView.TopRow != scrollBar.Position) {
         //		scrollBar.Position = helpTextView.TopRow;
         //	}
-        //	helpTextView.SetNeedsDisplay ();
+        //	helpTextView.SetNeedsDraw ();
         //};
 
         //scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
@@ -67,7 +63,7 @@ public class WizardStep : FrameView
         //	if (helpTextView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
         //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
         //	}
-        //	helpTextView.SetNeedsDisplay ();
+        //	helpTextView.SetNeedsDraw ();
         //};
 
         //scrollBar.VisibleChanged += (s,e) => {
@@ -93,7 +89,7 @@ public class WizardStep : FrameView
         //		scrollBar.OtherScrollBarView.Size = helpTextView.Maxlength;
         //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
         //	}
-        //	scrollBar.LayoutSubviews ();
+        //	scrollBar.LayoutSubViews ();
         //	scrollBar.Refresh ();
         //};
         //base.Add (scrollBar);
@@ -116,7 +112,7 @@ public class WizardStep : FrameView
         {
             _helpTextView.Text = value;
             ShowHide ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -126,29 +122,26 @@ public class WizardStep : FrameView
 
     /// <summary>Add the specified <see cref="View"/> to the <see cref="WizardStep"/>.</summary>
     /// <param name="view"><see cref="View"/> to add to this container</param>
-    public override void Add (View view)
+    public override View Add (View? view)
     {
         _contentView.Add (view);
 
-        if (view.CanFocus)
+        if (view!.CanFocus)
         {
             CanFocus = true;
         }
 
         ShowHide ();
+
+        return view;
     }
 
     /// <summary>Removes a <see cref="View"/> from <see cref="WizardStep"/>.</summary>
     /// <remarks></remarks>
-    public override void Remove (View view)
+    public override View? Remove (View? view)
     {
-        if (view is null)
-        {
-            return;
-        }
-
-        SetNeedsDisplay ();
-        View container = view?.SuperView;
+        SetNeedsDraw ();
+        View? container = view?.SuperView;
 
         if (container == this)
         {
@@ -159,30 +152,34 @@ public class WizardStep : FrameView
             container?.Remove (view);
         }
 
-        if (_contentView.InternalSubviews.Count < 1)
+        if (_contentView.InternalSubViews.Count < 1)
         {
             CanFocus = false;
         }
 
         ShowHide ();
+
+        return view;
     }
 
     /// <summary>Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.</summary>
     /// <remarks></remarks>
-    public override void RemoveAll ()
+    public override IReadOnlyCollection<View> RemoveAll ()
     {
-        _contentView.RemoveAll ();
+        IReadOnlyCollection<View> removed = _contentView.RemoveAll ();
         ShowHide ();
+
+        return removed;
     }
 
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>
     internal void ShowHide ()
     {
         _contentView.Height = Dim.Fill ();
-        _helpTextView.Height = Dim.Fill ();
+        _helpTextView.Height = Dim.Height(_contentView);
         _helpTextView.Width = Dim.Fill ();
 
-        if (_contentView.InternalSubviews?.Count > 0)
+        if (_contentView.InternalSubViews?.Count > 0)
         {
             if (_helpTextView.Text.Length > 0)
             {
@@ -205,7 +202,7 @@ public class WizardStep : FrameView
             // Error - no pane shown
         }
 
-        _contentView.Visible = _contentView.InternalSubviews?.Count > 0;
+        _contentView.Visible = _contentView.InternalSubViews?.Count > 0;
         _helpTextView.Visible = _helpTextView.Text.Length > 0;
     }
 } // end of WizardStep class

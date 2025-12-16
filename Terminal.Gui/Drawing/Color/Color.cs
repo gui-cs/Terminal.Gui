@@ -1,0 +1,412 @@
+using System.Collections.Frozen;
+using System.Globalization;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
+using ColorHelper;
+using ColorConverter = ColorHelper.ColorConverter;
+
+namespace Terminal.Gui.Drawing;
+
+/// <summary>
+///     Represents a 24-bit color encoded in ARGB32 format.
+///     <para>
+///         The RGB components define the color identity (what color it is), while the alpha channel defines
+///         rendering intent (how transparent it should be when drawn).
+///     </para>
+/// </summary>
+/// <remarks>
+///     <para>
+///         When matching colors to standard color names (e.g., via <see cref="ColorStrings.GetColorName"/>),
+///         the alpha channel is ignored. This means colors with the same RGB values but different alpha values
+///         will resolve to the same color name. This design supports transparency features while maintaining
+///         semantic color identity.
+///     </para>
+///     <para>
+///         While Terminal.Gui does not currently support alpha blending during rendering, the alpha channel
+///         is used to indicate rendering intent:
+///         <list type="bullet">
+///             <item><description>Alpha = 0: Fully transparent (don't render)</description></item>
+///             <item><description>Alpha = 255: Fully opaque (normal rendering)</description></item>
+///             <item><description>Other values: Reserved for future alpha blending support</description></item>
+///         </list>
+///     </para>
+/// </remarks>
+/// <seealso cref="Attribute"/>
+/// <seealso cref="ColorExtensions"/>
+/// <seealso cref="ColorName16"/>
+[JsonConverter (typeof (ColorJsonConverter))]
+[StructLayout (LayoutKind.Explicit)]
+public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
+                                              IUtf8SpanFormattable, IMinMaxValue<Color>
+{
+    /// <summary>The value of the alpha channel component</summary>
+    /// <remarks>
+    ///     <para>
+    ///         The alpha channel represents rendering intent (transparency) rather than color identity.
+    ///         Terminal.Gui does not currently perform alpha blending, but uses this value to determine
+    ///         whether to render the color at all (alpha = 0 means don't render).
+    ///     </para>
+    ///     <para>
+    ///         When matching colors to standard color names, the alpha channel is ignored. For example,
+    ///         <c>new Color(255, 0, 0, 255)</c> and <c>new Color(255, 0, 0, 128)</c> will both be
+    ///         identified as "Red".
+    ///     </para>
+    /// </remarks>
+    [JsonIgnore]
+    [field: FieldOffset (3)]
+    public readonly byte A;
+
+    /// <summary>The value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.</summary>
+    /// <remarks>
+    ///     The alpha channel in the ARGB value represents rendering intent (transparency), not color identity.
+    ///     When matching to standard color names, only the RGB components are considered.
+    /// </remarks>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly uint Argb;
+
+    /// <summary>The value of the blue color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly byte B;
+
+    /// <summary>The value of the green color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (1)]
+    public readonly byte G;
+
+    /// <summary>The value of the red color component.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (2)]
+    public readonly byte R;
+
+    /// <summary>The value of this <see cref="Color"/> encoded as a signed 32-bit integer in ARGB32 format.</summary>
+    [JsonIgnore]
+    [field: FieldOffset (0)]
+    public readonly int Rgba;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Color"/> <see langword="struct"/> using the supplied component
+    ///     values.
+    /// </summary>
+    /// <param name="red">The red 8-bits.</param>
+    /// <param name="green">The green 8-bits.</param>
+    /// <param name="blue">The blue 8-bits.</param>
+    /// <param name="alpha">Optional; defaults to 0xFF. The Alpha channel is not supported by Terminal.Gui.</param>
+    /// <remarks>Alpha channel is not currently supported by Terminal.Gui.</remarks>
+    /// <exception cref="OverflowException">If the value of any parameter is greater than <see cref="byte.MaxValue"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">If the value of any parameter is negative.</exception>
+    public Color (int red = 0, int green = 0, int blue = 0, int alpha = byte.MaxValue)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative (red, nameof (red));
+        ArgumentOutOfRangeException.ThrowIfNegative (green, nameof (green));
+        ArgumentOutOfRangeException.ThrowIfNegative (blue, nameof (blue));
+        ArgumentOutOfRangeException.ThrowIfNegative (alpha, nameof (alpha));
+
+        A = Convert.ToByte (alpha);
+        R = Convert.ToByte (red);
+        G = Convert.ToByte (green);
+        B = Convert.ToByte (blue);
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Color"/> class with an encoded signed 32-bit color value in
+    ///     ARGB32 format.
+    /// </summary>
+    /// <param name="rgba">The encoded 32-bit color value (see <see cref="Rgba"/>).</param>
+    /// <remarks>
+    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
+    ///     rendering.
+    /// </remarks>
+    public Color (int rgba) { Rgba = rgba; }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Color"/> class with an encoded unsigned 32-bit color value in
+    ///     ARGB32 format.
+    /// </summary>
+    /// <param name="argb">The encoded unsigned 32-bit color value (see <see cref="Argb"/>).</param>
+    /// <remarks>
+    ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
+    ///     rendering.
+    /// </remarks>
+    public Color (uint argb) { Argb = argb; }
+
+    /// <summary>Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.</summary>
+    /// <param name="colorName">The 16-color value.</param>
+    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap! [colorName]; }
+
+
+    /// <summary>Initializes a new instance of the <see cref="Color"/> color from a value in the <see cref="StandardColor"/> enum.</summary>
+    /// <param name="colorName">The 16-color value.</param>
+    public Color (in StandardColor colorName) : this (StandardColors.GetArgb (colorName)) { }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Color"/> color from string. See
+    ///     <see cref="TryParse(string, out Color?)"/> for details.
+    /// </summary>
+    /// <param name="colorString"></param>
+    /// <exception cref="ArgumentNullException">If <paramref name="colorString"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">
+    ///     If <paramref name="colorString"/> is an empty string or consists of only whitespace
+    ///     characters.
+    /// </exception>
+    /// <exception cref="ColorParseException">If thrown by <see cref="Parse(string?,System.IFormatProvider?)"/></exception>
+    public Color (string colorString)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace (colorString, nameof (colorString));
+        this = Parse (colorString, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>Initializes a new instance of the <see cref="Color"/> with all channels set to 0.</summary>
+    public Color () { Argb = 0u; }
+
+    /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    public static Dictionary<ColorName16, string> Colors16
+    {
+        get =>
+
+            // Transform _colorToNameMap into a Dictionary<ColorNames,string>
+            ColorExtensions.ColorToName16Map!.ToDictionary (static kvp => kvp.Value, static kvp => kvp.Key.ToString ("g"));
+        set
+        {
+            // Transform Dictionary<ColorNames,string> into _colorToNameMap
+            ColorExtensions.ColorToName16Map = value.ToFrozenDictionary (GetColorToNameMapKey, GetColorToNameMapValue);
+
+            return;
+
+            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) { return new (kvp.Value); }
+
+            static ColorName16 GetColorToNameMapValue (KeyValuePair<ColorName16, string> kvp)
+            {
+                return Enum.TryParse (kvp.Key.ToString (), true, out ColorName16 colorName)
+                           ? colorName
+                           : throw new ArgumentException ($"Invalid color name: {kvp.Key}");
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="Color"/> using a legacy 16-color <see cref="ColorName16"/> value. <see langword="get"/> will
+    ///     return the closest 16 color match to the true color when no exact value is found.
+    /// </summary>
+    /// <remarks>
+    ///     Get returns the <see cref="GetClosestNamedColor16(Color)"/> of the closest 24-bit color value. Set sets the RGB
+    ///     value using a hard-coded map.
+    /// </remarks>
+    public AnsiColorCode GetAnsiColorCode () { return ColorExtensions.ColorName16ToAnsiColorMap [GetClosestNamedColor16 ()]; }
+
+    /// <summary>
+    ///     Gets the <see cref="Color"/> using a legacy 16-color <see cref="ColorName16"/> value. <see langword="get"/>
+    ///     will return the closest 16 color match to the true color when no exact value is found.
+    /// </summary>
+    /// <remarks>
+    ///     Get returns the <see cref="GetClosestNamedColor16(Color)"/> of the closest 24-bit color value. Set
+    ///     sets the RGB
+    ///     value using a hard-coded map.
+    /// </remarks>
+    public ColorName16 GetClosestNamedColor16 () { return GetClosestNamedColor16 (this); }
+
+    /// <summary>
+    ///     Determines if the closest named <see cref="Color"/> to <see langword="this"/> is the provided
+    ///     <paramref name="namedColor"/>.
+    /// </summary>
+    /// <param name="namedColor">
+    ///     The <see cref="GetClosestNamedColor16(Color)"/> to check if this <see cref="Color"/> is closer
+    ///     to than any other configured named color.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if the closest named color is the provided value. <br/> <see langword="false"/> if any
+    ///     other named color is closer to this <see cref="Color"/> than <paramref name="namedColor"/>.
+    /// </returns>
+    /// <remarks>
+    ///     If <see langword="this"/> is equidistant from two named colors, the result of this method is not guaranteed to
+    ///     be determinate.
+    /// </remarks>
+    [Pure]
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public bool IsClosestToNamedColor16 (in ColorName16 namedColor) { return GetClosestNamedColor16 () == namedColor; }
+
+    /// <summary>Gets the "closest" named color to this <see cref="Color"/> value.</summary>
+    /// <param name="inputColor"></param>
+    /// <remarks>
+    ///     Distance is defined here as the Euclidean distance between each color interpreted as a <see cref="Vector3"/>.
+    /// </remarks>
+    /// <returns></returns>
+    [SkipLocalsInit]
+    internal static ColorName16 GetClosestNamedColor16 (Color inputColor)
+    {
+        return ColorExtensions.ColorToName16Map!.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
+    }
+
+    [SkipLocalsInit]
+    private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
+
+    /// <summary>
+    ///     Returns a color with the same hue and saturation as this color, but with a significantly different lightness,
+    ///     making it suitable for use as a highlight or contrast color in UI elements.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method brightens the color if it is dark, or darkens it if it is light, ensuring the result is visually
+    ///         distinct
+    ///         from the original. The algorithm works in HSL color space and adjusts the lightness channel:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>If the color is dark (lightness &lt; 0.5), the lightness is increased (brightened).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>If the color is light (lightness &gt;= 0.5), the lightness is decreased (darkened).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the adjustment resulted in a color too close to the original, a larger adjustment is
+    ///                     made.
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///         This ensures the returned color is always visually distinct and suitable for highlighting or selection states.
+    ///     </para>
+    ///     <para>
+    ///         The returned color will always have the same hue and saturation as the original, but a different lightness.
+    ///     </para>
+    /// </remarks>
+    /// <param name="brightenAmount">The percent amount to brighten the color by. The default is <c>20%</c>.</param>
+    /// <returns>
+    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a contrasting lightness.
+    /// </returns>
+    /// <example>
+    ///     <code>
+    /// var baseColor = new Color(100, 100, 100);
+    /// var highlight = baseColor.GetHighlightColor();
+    /// // highlight will be a lighter or darker version of baseColor, depending on its original lightness.
+    /// </code>
+    /// </example>
+    public Color GetBrighterColor (double brightenAmount = 0.2)
+    {
+        HSL? hsl = ColorConverter.RgbToHsl (new (R, G, B));
+
+        double lNorm = hsl.L / 255.0;
+
+        double newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + brightenAmount) : Math.Max (0.0, lNorm - brightenAmount);
+
+        if (Math.Abs (newL - lNorm) < 0.1)
+        {
+            newL = lNorm < 0.5 ? Math.Min (1.0, lNorm + 2 * brightenAmount) : Math.Max (0.0, lNorm - 2 * brightenAmount);
+        }
+
+        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
+        RGB? rgb = ColorConverter.HslToRgb (newHsl);
+
+        return new (rgb.R, rgb.G, rgb.B);
+    }
+
+    /// <summary>
+    ///     Returns a color with the same hue and saturation as this color, but with a significantly lower lightness,
+    ///     making it suitable for use as a shadow or background contrast color in UI elements.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method darkens the color by reducing its lightness in HSL color space:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>If the color is already very dark, returns <see cref="ColorName16.DarkGray"/>.</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Otherwise, reduces the lightness by a fixed amount (default 30%).</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the adjustment resulted in a color too close to the original, a larger adjustment is
+    ///                     made.
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///         This ensures the returned color is always visually distinct and suitable for shadowing or de-emphasis.
+    ///     </para>
+    /// </remarks>
+    /// <param name="dimAmount">The percent amount to dim the color by. The default is <c>20%</c>.</param>
+    /// <returns>
+    ///     A <see cref="Color"/> instance with the same hue and saturation as this color, but with a much lower lightness.
+    /// </returns>
+    public Color GetDimColor (double dimAmount = 0.2)
+    {
+        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
+
+        double lNorm = hsl.L / 255.0;
+        double newL = Math.Max (0.0, lNorm - dimAmount);
+
+        // If the color is already very dark, return a standard dark gray for visibility
+        if (lNorm <= 0.1)
+        {
+            return new (ColorName16.DarkGray);
+        }
+
+        // If the new lightness is too close to the original, force a bigger change
+        if (Math.Abs (newL - lNorm) < 0.1)
+        {
+            newL = Math.Max (0.0, lNorm - 2 * dimAmount);
+        }
+
+        var newHsl = new HSL (hsl.H, hsl.S, (byte)(newL * 255));
+        RGB rgb = ColorConverter.HslToRgb (newHsl);
+
+        return new (rgb.R, rgb.G, rgb.B);
+    }
+
+    #region Legacy Color Names
+
+    // ReSharper disable InconsistentNaming
+
+    /// <summary>The black color.</summary>
+    public const ColorName16 Black = ColorName16.Black;
+
+    /// <summary>The blue color.</summary>
+    public const ColorName16 Blue = ColorName16.Blue;
+
+    /// <summary>The green color.</summary>
+    public const ColorName16 Green = ColorName16.Green;
+
+    /// <summary>The cyan color.</summary>
+    public const ColorName16 Cyan = ColorName16.Cyan;
+
+    /// <summary>The red color.</summary>
+    public const ColorName16 Red = ColorName16.Red;
+
+    /// <summary>The magenta color.</summary>
+    public const ColorName16 Magenta = ColorName16.Magenta;
+
+    /// <summary>The yellow color.</summary>
+    public const ColorName16 Yellow = ColorName16.Yellow;
+
+    /// <summary>The gray color.</summary>
+    public const ColorName16 Gray = ColorName16.Gray;
+
+    /// <summary>The dark gray color.</summary>
+    public const ColorName16 DarkGray = ColorName16.DarkGray;
+
+    /// <summary>The bright bBlue color.</summary>
+    public const ColorName16 BrightBlue = ColorName16.BrightBlue;
+
+    /// <summary>The bright green color.</summary>
+    public const ColorName16 BrightGreen = ColorName16.BrightGreen;
+
+    /// <summary>The bright cyan color.</summary>
+    public const ColorName16 BrightCyan = ColorName16.BrightCyan;
+
+    /// <summary>The bright red color.</summary>
+    public const ColorName16 BrightRed = ColorName16.BrightRed;
+
+    /// <summary>The bright magenta color.</summary>
+    public const ColorName16 BrightMagenta = ColorName16.BrightMagenta;
+
+    /// <summary>The bright yellow color.</summary>
+    public const ColorName16 BrightYellow = ColorName16.BrightYellow;
+
+    /// <summary>The White color.</summary>
+    public const ColorName16 White = ColorName16.White;
+
+    #endregion
+}

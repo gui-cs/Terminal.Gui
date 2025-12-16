@@ -1,17 +1,19 @@
-﻿//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
 // Windows Terminal supports Unicode and Emoji characters, but by default
 // conhost shells (e.g., PowerShell and cmd.exe) do not. See
 // <https://spectreconsole.net/best-practices>.
 //------------------------------------------------------------------------------
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
-/// <summary>A <see cref="View"/> which displays (by default) a spinning line character.</summary>
+/// <summary>Displays a spinning glyph or combinations of glyphs to indicate progress or activity</summary>
 /// <remarks>
-///     By default animation only occurs when you call <see cref="SpinnerView.AdvanceAnimation()"/>. Use
-///     <see cref="AutoSpin"/> to make the automate calls to <see cref="SpinnerView.AdvanceAnimation()"/>.
+///     By default, animation only occurs when you call <see cref="SpinnerView.AdvanceAnimation(bool)"/>. Use
+///     <see cref="AutoSpin"/> to make the automate calls to <see cref="SpinnerView.AdvanceAnimation(bool)"/>.
 /// </remarks>
-public class SpinnerView : View
+public class SpinnerView : View, IDesignable
 {
     private const int DEFAULT_DELAY = 130;
     private static readonly SpinnerStyle DEFAULT_STYLE = new SpinnerStyle.Line ();
@@ -23,7 +25,7 @@ public class SpinnerView : View
     private DateTime _lastRender = DateTime.MinValue;
     private string [] _sequence = DEFAULT_STYLE.Sequence;
     private SpinnerStyle _style = DEFAULT_STYLE;
-    private object _timeout;
+    private object? _timeout;
 
     /// <summary>Creates a new instance of the <see cref="SpinnerView"/> class.</summary>
     public SpinnerView ()
@@ -87,7 +89,7 @@ public class SpinnerView : View
     /// <summary>Gets or sets the number of milliseconds to wait between characters in the animation.</summary>
     /// <remarks>
     ///     This is the maximum speed the spinner will rotate at.  You still need to call
-    ///     <see cref="SpinnerView.AdvanceAnimation()"/> or <see cref="SpinnerView.AutoSpin"/> to advance/start animation.
+    ///     <see cref="SpinnerView.AdvanceAnimation(bool)"/> or <see cref="SpinnerView.AutoSpin"/> to advance/start animation.
     /// </remarks>
     public int SpinDelay
     {
@@ -112,12 +114,12 @@ public class SpinnerView : View
     ///     Advances the animation frame and notifies main loop that repainting needs to happen. Repeated calls are
     ///     ignored based on <see cref="SpinDelay"/>.
     /// </summary>
-    /// <remarks>Ensure this method is called on the main UI thread e.g. via <see cref="Application.Invoke"/></remarks>
-    public void AdvanceAnimation ()
+    /// <remarks>Ensure this method is called on the main UI thread e.g. via <see cref="IApplication.Invoke(Action)"/></remarks>
+    public void AdvanceAnimation (bool setNeedsDraw = true)
     {
         if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelay))
         {
-            if (Sequence is { } && Sequence.Length > 1)
+            if (Sequence is { Length: > 1 })
             {
                 var d = 1;
 
@@ -132,14 +134,7 @@ public class SpinnerView : View
                 {
                     if (SpinBounce)
                     {
-                        if (SpinReverse)
-                        {
-                            _bounceReverse = false;
-                        }
-                        else
-                        {
-                            _bounceReverse = true;
-                        }
+                        _bounceReverse = !SpinReverse;
 
                         _currentIdx = Sequence.Length - 1;
                     }
@@ -153,14 +148,7 @@ public class SpinnerView : View
                 {
                     if (SpinBounce)
                     {
-                        if (SpinReverse)
-                        {
-                            _bounceReverse = true;
-                        }
-                        else
-                        {
-                            _bounceReverse = false;
-                        }
+                        _bounceReverse = SpinReverse;
 
                         _currentIdx = 1;
                     }
@@ -169,14 +157,38 @@ public class SpinnerView : View
                         _currentIdx = Sequence.Length - 1;
                     }
                 }
-
-                Text = "" + Sequence [_currentIdx]; //.EnumerateRunes;
             }
 
             _lastRender = DateTime.Now;
         }
 
-        SetNeedsDisplay ();
+        if (setNeedsDraw)
+        {
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnClearingViewport () { return true; }
+
+    /// <inheritdoc/>
+    protected override bool OnDrawingContent (DrawContext? context)
+    {
+        Render ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Renders the current frame of the spinner.
+    /// </summary>
+    public void Render ()
+    {
+        if (Sequence is { Length: > 0 } && _currentIdx < Sequence.Length)
+        {
+            Move (Viewport.X, Viewport.Y);
+            AddStr (Sequence [_currentIdx]);
+        }
     }
 
     /// <inheritdoc/>
@@ -189,16 +201,17 @@ public class SpinnerView : View
 
     private void AddAutoSpinTimeout ()
     {
-        if (_timeout is { })
+        // Only add timeout if we are initialized and not already spinning
+        if (App is { } && (_timeout is { } || !App.Initialized))
         {
             return;
         }
 
-        _timeout = Application.AddTimeout (
+        _timeout = App?.AddTimeout (
                                            TimeSpan.FromMilliseconds (SpinDelay),
                                            () =>
                                            {
-                                               Application.Invoke (AdvanceAnimation);
+                                               App.Invoke ((_) => AdvanceAnimation ());
 
                                                return true;
                                            }
@@ -212,7 +225,7 @@ public class SpinnerView : View
             return false;
         }
 
-        if (_sequence is { } && _sequence.Length > 0)
+        if (_sequence is { Length: > 0 })
         {
             foreach (string frame in _sequence)
             {
@@ -235,7 +248,7 @@ public class SpinnerView : View
     {
         var max = 0;
 
-        if (_sequence is { } && _sequence.Length > 0)
+        if (_sequence is { Length: > 0 })
         {
             foreach (string frame in _sequence)
             {
@@ -253,7 +266,7 @@ public class SpinnerView : View
     {
         if (_timeout is { })
         {
-            Application.RemoveTimeout (_timeout);
+            App?.RemoveTimeout (_timeout);
             _timeout = null;
         }
     }
@@ -270,7 +283,7 @@ public class SpinnerView : View
 
     private void SetSequence (string [] frames)
     {
-        if (frames is { } && frames.Length > 0)
+        if (frames is { Length: > 0 })
         {
             _style = new SpinnerStyle.Custom ();
             _sequence = frames;
@@ -278,7 +291,7 @@ public class SpinnerView : View
         }
     }
 
-    private void SetStyle (SpinnerStyle style)
+    private void SetStyle (SpinnerStyle? style)
     {
         if (style is { })
         {
@@ -288,5 +301,14 @@ public class SpinnerView : View
             _bounce = style.SpinBounce;
             Width = GetSpinnerWidth ();
         }
+    }
+
+    bool IDesignable.EnableForDesign ()
+    {
+        Style = new SpinnerStyle.Points ();
+        SpinReverse = true;
+        AutoSpin = true;
+
+        return true;
     }
 }

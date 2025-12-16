@@ -1,0 +1,14 @@
+name: Check for Duplicate UnitTests
+on:
+  push:
+    branches: [ v2_release, v2_develop ]
+  pull_request:
+    branches: [ v2_release, v2_develop ]
+  workflow_dispatch:
+jobs:
+  check-duplicates:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run Duplicate Test Check
+      run: pwsh -File ./Scripts/FindDuplicateTestMethodsInSameFileName.ps1 -solutionPath "$PWD"

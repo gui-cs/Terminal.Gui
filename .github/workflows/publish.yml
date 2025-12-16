@@ -1,8 +1,8 @@
-name: Publish Terminal.Gui
+name: Publish Terminal.Gui to Nuget
 
 on:
   push:
-    branches: [ main, develop, v2_release, v2_develop ]
+    branches: [ v2_release, v2_develop ]
     tags:
       - v*
     paths-ignore:
@@ -14,40 +14,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout ${{ github.ref_name }}
+      uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # fetch-depth is needed for GitVersion
+        fetch-depth: 0 # fetch-depth is needed for GitVersion https://github.com/GitTools/actions/blob/main/docs/cloning.md
 
-    - name: Install GitVersion 
-      uses: gittools/actions/gitversion/setup@v0
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v3.1.11
       with:
-          versionSpec: '5.x'
-          includePrerelease: true
+        versionSpec: '6.0.x'
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0
+      uses: gittools/actions/gitversion/execute@v3.1.11
       with:
         useConfigFile: true
-        #additionalArguments: /b develop
+        updateAssemblyInfo: true
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0
+        dotnet-version: 8.x
         dotnet-quality: 'ga'
-        
-    - name: Install dependencies
-      run: dotnet restore
 
-    - name: Build Release
-      run: |
-        dotnet-gitversion /updateprojectfiles
-        dotnet build ./Analyzers/Terminal.Gui.Analyzers.Internal --no-incremental --nologo --force --configuration Release
-        dotnet build --no-incremental --nologo --force --configuration Release
+    - name: Build Release Terminal.Gui
+      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
 
-    - name: Pack
-      run: dotnet pack -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+    - name: Pack Release Terminal.Gui ${{ steps.gitversion.outputs.SemVer }} for Nuget
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
 
     # - name: Test to generate Code Coverage Report
     #   run: |
@@ -71,5 +65,5 @@ jobs:
     #     echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
     #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
         
-    - name: Publish to NuGet.org
+    - name: Publish Terminal.Gui.${{ steps.gitversion.outputs.SemVer }} to NuGet.org
       run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} 

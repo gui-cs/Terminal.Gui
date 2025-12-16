@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+#nullable disable
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> and
@@ -14,7 +16,7 @@ public class ColumnStyle
     public Func<object, Alignment> AlignmentGetter;
 
     /// <summary>
-    ///     Defines a delegate for returning a custom color scheme per cell based on cell values. Return null for the
+    ///     Defines a delegate for returning a custom scheme per cell based on cell values. Return null for the
     ///     default
     /// </summary>
     public CellColorGetterDelegate ColorGetter;

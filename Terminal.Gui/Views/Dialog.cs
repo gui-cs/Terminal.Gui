@@ -1,58 +1,25 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains
-///     one or more <see cref="Button"/>s. It defaults to the <c>Colors.ColorSchemes ["Dialog"]</c> color scheme and has a
-///     1 cell padding around the edges.
+///     Supports a simple API for adding <see cref="Button"/>s
+///     across the bottom. By default, the <see cref="Dialog"/> is centered and used the <see cref="Schemes.Dialog"/>
+///     scheme.
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
-///     <see cref="Application.Run(Toplevel, Func{Exception, bool}, ConsoleDriver)"/>. This will execute the dialog until
-///     it terminates via the
-///     [ESC] or [CTRL-Q] key, or when one of the views or buttons added to the dialog calls
-///     <see cref="Application.RequestStop"/>.
+///     <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will execute the dialog until
+///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
+///     or when one of the views or buttons added to the dialog calls
+///     <see cref="IApplication.RequestStop()"/>.
 /// </remarks>
 public class Dialog : Window
 {
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
-
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    [JsonConverter (typeof (JsonStringEnumConverter))]
-    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
-
-    /// <summary>
-    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 25;
-
-    /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 25;
-
-    // TODO: Reenable once border/borderframe design is settled
-    /// <summary>
-    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-
-    //[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
-    //public static Border DefaultBorder { get; set; } = new Border () {
-    //	LineStyle = LineStyle.Single,
-    //};
-    private readonly List<Button> _buttons = new ();
+    private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
+    private static Alignment _defaultButtonAlignment = Alignment.End; // Resources/config.json overrides
+    private static AlignmentModes _defaultButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems; // Resources/config.json overrides
+    private static int _defaultMinimumHeight = 80; // Resources/config.json overrides
+    private static int _defaultMinimumWidth = 80; // Resources/config.json overrides
+    private static ShadowStyle _defaultShadow = ShadowStyle.Transparent; // Resources/config.json overrides
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
@@ -60,60 +27,44 @@ public class Dialog : Window
     /// <remarks>
     ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
     ///     set
-    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of the screen dimensions.
+    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="IApplication.TopRunnableView"/>, if
+    ///     there is one. Otherwise,
+    ///     it will be bound by the screen dimensions.
     /// </remarks>
     public Dialog ()
     {
-        Arrangement = ViewArrangement.Movable;
+        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
+        base.ShadowStyle = DefaultShadow;
+        BorderStyle = DefaultBorderStyle;
+
         X = Pos.Center ();
         Y = Pos.Center ();
+        Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
+        Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
 
-        Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
-        Height = Dim.Auto (DimAutoStyle.Content, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
-        ColorScheme = Colors.ColorSchemes ["Dialog"];
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
-        Modal = true;
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
-
-        AddCommand (
-                    Command.QuitToplevel,
-                    () =>
-                    {
-                        Canceled = true;
-                        RequestStop ();
-
-                        return true;
-                    });
-        KeyBindings.Add (Key.Esc, Command.QuitToplevel);
     }
+
+    private readonly List<Button> _buttons = [];
 
     private bool _canceled;
 
-    /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    /// <remarks>The default value is <see langword="true"/>.</remarks>
-    public bool Canceled
+    /// <summary>
+    ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
+    ///     <see cref="Dialog"/>
+    /// </summary>
+    /// <param name="button">Button to add.</param>
+    public void AddButton (Button button)
     {
-        get
-        {
-#if DEBUG_IDISPOSABLE
-            if (WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
-            return _canceled;
-        }
-        set
-        {
-#if DEBUG_IDISPOSABLE
-            if (WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
-            _canceled = value;
-        }
+        // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
+        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
+        button.Y = Pos.AnchorEnd ();
+
+        _buttons.Add (button);
+        Add (button);
     }
 
     // TODO: Update button.X = Pos.Justify when alignment changes
@@ -131,11 +82,6 @@ public class Dialog : Window
         get => _buttons.ToArray ();
         init
         {
-            if (value is null)
-            {
-                return;
-            }
-
             foreach (Button b in value)
             {
                 AddButton (b);
@@ -143,30 +89,112 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>
-    ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
-    ///     <see cref="Dialog"/>
-    /// </summary>
-    /// <param name="button">Button to add.</param>
-    public void AddButton (Button button)
+    /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
+    /// <remarks>The default value is <see langword="true"/>.</remarks>
+    public bool Canceled
     {
-        if (button is null)
+        get { return _canceled; }
+        set
         {
-            return;
+#if DEBUG_IDISPOSABLE
+            if (EnableDebugIDisposableAsserts && WasDisposed)
+            {
+                throw new ObjectDisposedException (GetType ().FullName);
+            }
+#endif
+            _canceled = value;
+        }
+    }
+
+    /// <summary>
+    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static LineStyle DefaultBorderStyle
+    {
+        get => _defaultBorderStyle;
+        set => _defaultBorderStyle = value;
+    }
+
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment
+    {
+        get => _defaultButtonAlignment;
+        set => _defaultButtonAlignment = value;
+    }
+
+    /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static AlignmentModes DefaultButtonAlignmentModes
+    {
+        get => _defaultButtonAlignmentModes;
+        set => _defaultButtonAlignmentModes = value;
+    }
+
+    /// <summary>
+    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumHeight
+    {
+        get => _defaultMinimumHeight;
+        set => _defaultMinimumHeight = value;
+    }
+
+    /// <summary>
+    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumWidth
+    {
+        get => _defaultMinimumWidth;
+        set => _defaultMinimumWidth = value;
+    }
+
+    /// <summary>
+    ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static ShadowStyle DefaultShadow
+    {
+        get => _defaultShadow;
+        set => _defaultShadow = value;
+    }
+
+
+    // Dialogs are Modal and Focus is indicated by their Border. The following code ensures the
+    // Text of the dialog (e.g. for a MessageBox) is always drawn using the Normal Attribute.
+    private bool _drawingText;
+
+    /// <inheritdoc/>
+    protected override bool OnDrawingText ()
+    {
+        _drawingText = true;
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnDrewText ()
+    {
+        _drawingText = false;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        if (_drawingText && role is VisualRole.Focus && Border?.Thickness != Thickness.Empty)
+        {
+            currentAttribute = GetScheme ().Normal;
+            return true;
         }
 
-        // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
-        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
-        button.Y = Pos.AnchorEnd ();
-
-        _buttons.Add (button);
-        Add (button);
-
-        SetNeedsDisplay ();
-
-        if (IsInitialized)
-        {
-            LayoutSubviews ();
-        }
+        return false;
     }
 }

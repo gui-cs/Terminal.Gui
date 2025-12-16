@@ -1,81 +1,186 @@
-﻿#nullable enable
-using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
 ///     scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.
+///     <para>
+///         When constructed, the dictionary will be populated with uninitialized configuration properties for the
+///         scope (<see cref="ConfigProperty.HasValue"/> will be <see langword="false"/>).
+///     </para>
 /// </summary>
-public class Scope<T> : Dictionary<string, ConfigProperty>
-{ //, IScope<Scope<T>> {
-    /// <summary>Crates a new instance.</summary>
-    public Scope () : base (StringComparer.InvariantCultureIgnoreCase)
+public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
+{
+    /// <summary>
+    ///     Creates a new instance. The dictionary will be populated with uninitialized (<see cref="ConfigProperty.HasValue"/>
+    ///     will be <see langword="false"/>).
+    /// </summary>
+    [RequiresUnreferencedCode (
+                                  "Uses cached configuration properties filtered by type T. This is AOT-safe as long as T is one of the known scope types (SettingsScope, ThemeScope, AppSettingsScope).")]
+    public Scope () : base (StringComparer.InvariantCultureIgnoreCase) { }
+
+    /// <summary>
+    ///     INTERNAL: Adds a new ConfigProperty given a <paramref name="value"/>. Determines the correct PropertyInfo etc... by
+    ///     retrieving the
+    ///     hard coded value for <paramref name="name"/>.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    internal void AddValue (string name, object? value)
     {
-        foreach (KeyValuePair<string, ConfigProperty> p in GetScopeProperties ())
+        ConfigProperty? configProperty = GetHardCodedProperty (name);
+
+        if (configProperty is null)
         {
-            Add (p.Key, new ConfigProperty { PropertyInfo = p.Value.PropertyInfo, PropertyValue = null });
+            throw new InvalidOperationException ($@"{name} is not a hard coded property.");
+        }
+
+        TryAdd (name, ConfigProperty.CreateCopy (configProperty));
+        this [name].PropertyValue = configProperty.PropertyValue;
+    }
+
+    internal ConfigProperty? GetHardCodedProperty (string name)
+    {
+        ConfigProperty? configProperty = ConfigurationManager.GetHardCodedConfigPropertiesByScope (typeof (T).Name)!
+                                                             .FirstOrDefault (hardCodedKeyValuePair => hardCodedKeyValuePair.Key == name)
+                                                             .Value;
+
+        if (configProperty is null)
+        {
+            return null;
+        }
+
+        var copy = ConfigProperty.CreateCopy (configProperty);
+        copy.PropertyValue = configProperty.PropertyValue;
+
+        return copy;
+    }
+
+    internal ConfigProperty GetUninitializedProperty (string name)
+    {
+        ConfigProperty? configProperty = ConfigurationManager.GetUninitializedConfigPropertiesByScope (typeof (T).Name)!
+                                                             .FirstOrDefault (hardCodedKeyValuePair => hardCodedKeyValuePair.Key == name)
+                                                             .Value;
+
+        if (configProperty is null)
+        {
+            throw new InvalidOperationException ($@"{name} is not a ConfigProperty.");
+        }
+
+        var copy = ConfigProperty.CreateCopy (configProperty);
+        copy.PropertyValue = configProperty.PropertyValue;
+
+        return copy;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Updates the values of the properties of this scope to their corresponding static
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties.
+    /// </summary>
+    [RequiresDynamicCode ("Uses reflection to retrieve property values")]
+    internal void UpdateToCurrentValues ()
+    {
+        foreach (KeyValuePair<string, ConfigProperty> validProperties in this.Where (cp => cp.Value.PropertyInfo is { }))
+        {
+            validProperties.Value.UpdateToCurrentValue ();
         }
     }
 
-    /// <summary>Retrieves the values of the properties of this scope from their corresponding static properties.</summary>
-    public void RetrieveValues ()
+    /// <summary>
+    ///     INTERNAL: Updates the values of all properties of this scope to their corresponding hard-coded original values.
+    /// </summary>
+    internal void LoadHardCodedDefaults ()
     {
-        foreach (KeyValuePair<string, ConfigProperty> p in this.Where (cp => cp.Value.PropertyInfo is { }))
+        foreach (KeyValuePair<string, ConfigProperty> hardCodedKeyValuePair in ConfigurationManager.GetHardCodedConfigPropertiesByScope (typeof (T).Name)!)
         {
-            p.Value.RetrieveValue ();
+            var copy = ConfigProperty.CreateCopy (hardCodedKeyValuePair.Value);
+            TryAdd (hardCodedKeyValuePair.Key, copy);
+            this [hardCodedKeyValuePair.Key].PropertyValue = hardCodedKeyValuePair.Value.PropertyValue;
         }
     }
 
-    /// <summary>Updates this instance from the specified source scope.</summary>
-    /// <param name="source"></param>
+    /// <summary>
+    ///     INTERNAL: Updates this scope with the values in <paramref name="scope"/> using a deep clone.
+    /// </summary>
+    /// <param name="scope"></param>
     /// <returns>The updated scope (this).</returns>
-    public Scope<T>? Update (Scope<T> source)
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
+    internal Scope<T>? UpdateFrom (Scope<T> scope)
     {
-        foreach (KeyValuePair<string, ConfigProperty> prop in source)
+        foreach (KeyValuePair<string, ConfigProperty> prop in scope)
         {
-            if (ContainsKey (prop.Key))
+            if (!prop.Value.HasValue)
             {
-                this [prop.Key].PropertyValue = this [prop.Key].UpdateValueFrom (prop.Value.PropertyValue!);
+                continue;
             }
-            else
+
+            if (!ContainsKey (prop.Key))
             {
-                this [prop.Key].PropertyValue = prop.Value.PropertyValue;
+                if (!prop.Value.HasValue)
+                {
+                    continue;
+                }
+
+                // Add an empty (HasValue = false) property to this scope
+                var copy = ConfigProperty.CreateCopy (prop.Value);
+                copy.PropertyValue = prop.Value.PropertyValue;
+                TryAdd (prop.Key, copy);
             }
+
+            // Update the property value
+            this [prop.Key].UpdateFrom (prop.Value.PropertyValue);
         }
 
         return this;
     }
 
-    /// <summary>Applies the values of the properties of this scope to their corresponding static properties.</summary>
-    /// <returns></returns>
-    internal virtual bool Apply ()
+    /// <summary>
+    ///     INTERNAL: Applies the values of the properties of this scope to their corresponding
+    ///     <see cref="ConfigurationPropertyAttribute"/> properties.
+    /// </summary>
+    /// <returns><see langword="true"/> if one or more property value was applied; <see langword="false"/> otherwise.</returns>
+    [RequiresDynamicCode ("Uses reflection to get and set property values")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepClone<T>(T)")]
+    internal bool Apply ()
     {
+        if (!ConfigurationManager.IsEnabled)
+        {
+            Logging.Warning ("Apply called when CM is not Enabled. This should only be done from unit tests where side-effects are managed.");
+        }
+
         var set = false;
 
-        foreach (KeyValuePair<string, ConfigProperty> p in this.Where (
-                                                                       t => t.Value != null
-                                                                            && t.Value.PropertyValue != null
-                                                                      ))
+        foreach (KeyValuePair<string, ConfigProperty> propWithValue in this.Where (t => t.Value.HasValue))
         {
-            if (p.Value.Apply ())
+            if (propWithValue.Value.PropertyInfo != null)
             {
+                object? currentValue = propWithValue.Value.PropertyInfo.GetValue (null);
+                object? newValue = null;
+
+                // QUESTION: Should we avoid setting if currentValue == newValue?
+
+                if (propWithValue.Value.PropertyValue is Scope<T> scopeSource && currentValue is Scope<T> scopeDest)
+                {
+                    newValue = scopeDest.UpdateFrom (scopeSource);
+                }
+                else
+                {
+                    // Use DeepCloner to create a deep copy of the property value
+                    newValue = DeepCloner.DeepClone (propWithValue.Value.PropertyValue);
+                }
+
+                // Logging.Debug($"{propWithValue.Key}: {currentValue} -> {newValue}");
+                Debug.Assert (!propWithValue.Value.Immutable);
+                propWithValue.Value.PropertyInfo.SetValue (null, newValue);
+
                 set = true;
             }
         }
 
         return set;
-    }
-
-    private IEnumerable<KeyValuePair<string, ConfigProperty>> GetScopeProperties ()
-    {
-        return _allConfigProperties!.Where (
-                                            cp =>
-                                                (cp.Value.PropertyInfo?.GetCustomAttribute (
-                                                                                            typeof (SerializableConfigurationProperty)
-                                                                                           )
-                                                     as SerializableConfigurationProperty)?.Scope
-                                                == GetType ()
-                                           );
     }
 }

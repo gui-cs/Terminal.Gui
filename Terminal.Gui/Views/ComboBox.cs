@@ -1,3 +1,4 @@
+#nullable disable
 ﻿//
 // ComboBox.cs: ComboBox control
 //
@@ -8,10 +9,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>Provides a drop-down list of items the user can select from.</summary>
-public class ComboBox : View
+public class ComboBox : View, IDesignable
 {
     private readonly ComboListView _listview;
     private readonly int _minimumHeight = 2;
@@ -27,38 +28,44 @@ public class ComboBox : View
     /// <summary>Public constructor</summary>
     public ComboBox ()
     {
-        _search = new TextField ();
-        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = false };
+        CanFocus = true;
+        _search = new TextField () { CanFocus = true, TabStop = TabBehavior.NoStop };
+
+        _listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = TabBehavior.NoStop };
 
         _search.TextChanged += Search_Changed;
-        _search.Accept += Search_Accept;
 
         _listview.Y = Pos.Bottom (_search);
-        _listview.OpenSelectedItem += (sender, a) => Selected ();
+        _listview.OpenSelectedItem += (sender, a) => SelectText ();
+        _listview.Accepting += (sender, args) =>
+                              {
+                                  // This prevents Accepted from bubbling up to the combobox
+                                  args.Handled = true;
 
+                                  // But OpenSelectedItem won't be fired because of that. So do it here.
+                                  SelectText ();
+                              };
+        _listview.SelectedItemChanged += (sender, e) =>
+                                         {
+                                             if (e.Item >= 0 && !HideDropdownListOnClick && _searchSet.Count > 0)
+                                             {
+                                                 SetValue (_searchSet [e.Item.Value]);
+                                             }
+                                         };
         Add (_search, _listview);
 
         // BUGBUG: This should not be needed; LayoutComplete will handle
         Initialized += (s, e) => ProcessLayout ();
 
         // On resize
-        LayoutComplete += (sender, a) => ProcessLayout ();
-        ;
+        SubViewsLaidOut += (sender, a) => ProcessLayout ();
 
-        _listview.SelectedItemChanged += (sender, e) =>
-                                         {
-                                             if (!HideDropdownListOnClick && _searchSet.Count > 0)
-                                             {
-                                                 SetValue (_searchSet [_listview.SelectedItem]);
-                                             }
-                                         };
-
-        Added += (s, e) =>
+        SuperViewChanged += (s, e) =>
                  {
                      // Determine if this view is hosted inside a dialog and is the only control
                      for (View view = SuperView; view != null; view = view.SuperView)
                      {
-                         if (view is Dialog && SuperView is { } && SuperView.Subviews.Count == 1 && SuperView.Subviews [0] == this)
+                         if (view is Dialog && SuperView is { } && SuperView.SubViews.Count == 1 && SuperView.SubViews.ElementAt (0) == this)
                          {
                              _autoHide = false;
 
@@ -67,47 +74,48 @@ public class ComboBox : View
                      }
 
                      SetNeedsLayout ();
-                     SetNeedsDisplay ();
-                     Search_Changed (this, new StateEventArgs<string> (string.Empty, Text));
+                     SetNeedsDraw ();
+                     ShowHideList (Text);
                  };
 
         // Things this view knows how to do
-        AddCommand (Command.Accept, () => ActivateSelected ());
-        AddCommand (Command.ToggleExpandCollapse, () => ExpandCollapse ());
+        AddCommand (Command.Accept, (ctx) =>
+                                    {
+                                        if (ctx?.Source == _search)
+                                        {
+                                            return null;
+                                        }
+                                        return ActivateSelected (ctx);
+                                    });
+        AddCommand (Command.Toggle, () => ExpandCollapse ());
         AddCommand (Command.Expand, () => Expand ());
         AddCommand (Command.Collapse, () => Collapse ());
-        AddCommand (Command.LineDown, () => MoveDown ());
-        AddCommand (Command.LineUp, () => MoveUp ());
+        AddCommand (Command.Down, MoveDown);
+        AddCommand (Command.Up, MoveUp);
         AddCommand (Command.PageDown, () => PageDown ());
         AddCommand (Command.PageUp, () => PageUp ());
-        AddCommand (Command.TopHome, () => MoveHome ());
-        AddCommand (Command.BottomEnd, () => MoveEnd ());
+        AddCommand (Command.Start, () => MoveHome ());
+        AddCommand (Command.End, () => MoveEnd ());
         AddCommand (Command.Cancel, () => CancelSelected ());
         AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
         // Default keybindings for this view
-        KeyBindings.Add (Key.Enter, Command.Accept);
-        KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
-        KeyBindings.Add (Key.CursorDown, Command.LineDown);
-        KeyBindings.Add (Key.CursorUp, Command.LineUp);
+        KeyBindings.Add (Key.F4, Command.Toggle);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.Home, Command.TopHome);
-        KeyBindings.Add (Key.End, Command.BottomEnd);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (Key.Esc, Command.Cancel);
         KeyBindings.Add (Key.U.WithCtrl, Command.UnixEmulation);
     }
 
-    /// <inheritdoc/>
-    public new ColorScheme ColorScheme
+    /// <inheritdoc />
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme> args)
     {
-        get => base.ColorScheme;
-        set
-        {
-            _listview.ColorScheme = value;
-            base.ColorScheme = value;
-            SetNeedsDisplay ();
-        }
+        _listview.SetScheme (args.NewValue);
+        return base.OnSettingScheme (args);
     }
 
     /// <summary>Gets or sets if the drop-down list can be hide with a button click event.</summary>
@@ -117,25 +125,22 @@ public class ComboBox : View
         set => _hideDropdownListOnClick = _listview.HideDropdownListOnClick = value;
     }
 
-    /// <summary>Gets the drop down list state, expanded or collapsed.</summary>
+    /// <summary>Gets the drop-down list state, expanded or collapsed.</summary>
     public bool IsShow { get; private set; }
 
-    /// <summary>If set to true its not allow any changes in the text.</summary>
+    /// <summary>If set to true, no changes to the text will be allowed.</summary>
     public bool ReadOnly
     {
         get => _search.ReadOnly;
-        set
-        {
-            _search.ReadOnly = value;
+        set => _search.ReadOnly = value;
 
-            if (_search.ReadOnly)
-            {
-                if (_search.ColorScheme is { })
-                {
-                    _search.ColorScheme = new ColorScheme (_search.ColorScheme) { Normal = _search.ColorScheme.Focus };
-                }
-            }
-        }
+        //if (_search.ReadOnly)
+        //{
+        //    if (_search.Scheme is { })
+        //    {
+        //        _search.Scheme = new Scheme (_search.Scheme) { Normal = _search.Scheme.Focus };
+        //    }
+        //}
     }
 
     /// <summary>Current search text</summary>
@@ -183,17 +188,15 @@ public class ComboBox : View
             _source = value;
 
             // Only need to refresh list if its been added to a container view
-            if (SuperView is { } && SuperView.Subviews.Contains (this))
+            if (SuperView is { } && SuperView.SubViews.Contains (this))
             {
-                SelectedItem = -1;
-                _search.Text = string.Empty;
-                Search_Changed (this, new StateEventArgs<string> (string.Empty, _search.Text)); 
-                SetNeedsDisplay ();
+                Text = string.Empty;
+                SetNeedsDraw ();
             }
         }
     }
 
-    /// <summary>The currently selected list item</summary>
+    /// <summary>The text of the currently selected list item</summary>
     public new string Text
     {
         get => _text;
@@ -201,7 +204,7 @@ public class ComboBox : View
     }
 
     /// <summary>
-    ///     Collapses the drop down list.  Returns true if the state chagned or false if it was already collapsed and no
+    ///     Collapses the drop-down list.  Returns true if the state changed or false if it was already collapsed and no
     ///     action was taken
     /// </summary>
     public virtual bool Collapse ()
@@ -221,7 +224,7 @@ public class ComboBox : View
     public event EventHandler Collapsed;
 
     /// <summary>
-    ///     Expands the drop down list.  Returns true if the state chagned or false if it was already expanded and no
+    ///     Expands the drop-down list.  Returns true if the state changed or false if it was already expanded and no
     ///     action was taken
     /// </summary>
     public virtual bool Expand ()
@@ -243,7 +246,7 @@ public class ComboBox : View
     public event EventHandler Expanded;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent  (MouseEvent me)
+    protected override bool OnMouseEvent (MouseEventArgs me)
     {
         if (me.Position.X == Viewport.Right - 1
             && me.Position.Y == Viewport.Top
@@ -284,58 +287,55 @@ public class ComboBox : View
     public virtual void OnCollapsed () { Collapsed?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent (DrawContext context)
     {
-        base.OnDrawContent (viewport);
 
         if (!_autoHide)
         {
-            return;
+            return true;
         }
 
-        Driver.SetAttribute (ColorScheme.Focus);
-        Move (Viewport.Right - 1, 0);
-        Driver.AddRune (Glyphs.DownArrow);
+        SetAttributeForRole (Enabled ? VisualRole.Focus : VisualRole.Disabled);
+        AddRune (Viewport.Right - 1, 0, Glyphs.DownArrow);
+
+        return true;
     }
 
-    /// <inheritdoc/>
-    public override bool OnEnter (View view)
-    {
-        if (!_search.HasFocus && !_listview.HasFocus)
-        {
-            _search.SetFocus ();
-        }
-
-        _search.CursorPosition = _search.Text.GetRuneCount ();
-
-        return base.OnEnter (view);
-    }
 
     /// <summary>Virtual method which invokes the <see cref="Expanded"/> event.</summary>
     public virtual void OnExpanded () { Expanded?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override bool OnLeave (View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
     {
-        if (_source?.Count > 0
-            && _selectedItem > -1
-            && _selectedItem < _source.Count - 1
-            && _text != _source.ToList () [_selectedItem].ToString ())
+        if (newHasFocus)
         {
-            SetValue (_source.ToList () [_selectedItem].ToString ());
+            if (!_search.HasFocus && !_listview.HasFocus)
+            {
+                _search.SetFocus ();
+            }
+            _search.CursorPosition = _search.Text.GetRuneCount ();
         }
+        else
+        {
+            if (_source?.Count > 0
+              && _selectedItem > -1
+              && _selectedItem < _source.Count - 1
+              && _text != _source.ToList () [_selectedItem].ToString ())
+            {
+                SetValue (_source.ToList () [_selectedItem].ToString ());
+            }
 
-        if (_autoHide && IsShow && view != this && view != _search && view != _listview)
-        {
-            IsShow = false;
-            HideList ();
+            if (_autoHide && IsShow && view != this && view != _search && view != _listview)
+            {
+                IsShow = false;
+                HideList ();
+            }
+            else if (_listview.TabStop?.HasFlag (TabBehavior.TabStop) ?? false)
+            {
+                _listview.TabStop = TabBehavior.NoStop;
+            }
         }
-        else if (_listview.TabStop)
-        {
-            _listview.TabStop = false;
-        }
-
-        return base.OnLeave (view);
     }
 
     /// <summary>Invokes the OnOpenSelectedItem event if it is defined.</summary>
@@ -385,13 +385,16 @@ public class ComboBox : View
         }
     }
 
-    private bool ActivateSelected ()
+    private bool ActivateSelected (ICommandContext commandContext)
     {
         if (HasItems ())
         {
-            Selected ();
+            if (SelectText ())
+            {
+                return false;
+            }
 
-            return true;
+            return RaiseAccepting (commandContext) == true;
         }
 
         return false;
@@ -399,7 +402,7 @@ public class ComboBox : View
 
     /// <summary>Internal height of dynamic search list</summary>
     /// <returns></returns>
-    private int CalculatetHeight ()
+    private int CalculateHeight ()
     {
         if (!IsInitialized || Viewport.Height == 0)
         {
@@ -415,7 +418,10 @@ public class ComboBox : View
 
     private bool CancelSelected ()
     {
-        _search.SetFocus ();
+        if (HasFocus)
+        {
+            _search.SetFocus ();
+        }
 
         if (ReadOnly || HideDropdownListOnClick)
         {
@@ -423,12 +429,12 @@ public class ComboBox : View
 
             if (SelectedItem > -1 && _listview.Source?.Count > 0)
             {
-                _search.Text = _text = _listview.Source.ToList () [SelectedItem].ToString ();
+                Text = _listview.Source.ToList () [SelectedItem]?.ToString ();
             }
         }
         else if (!ReadOnly)
         {
-            _search.Text = _text = "";
+            Text = string.Empty;
             _selectedItem = _lastSelectedItem;
             OnSelectedChanged ();
         }
@@ -455,8 +461,11 @@ public class ComboBox : View
 
     private void FocusSelectedItem ()
     {
-        _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
-        _listview.TabStop = true;
+        if (_listview.Source?.Count > 0)
+        {
+            _listview.SelectedItem = SelectedItem > -1 ? SelectedItem : 0;
+        }
+        _listview.TabStop = TabBehavior.TabStop;
         _listview.SetFocus ();
         OnExpanded ();
     }
@@ -491,11 +500,13 @@ public class ComboBox : View
         }
 
         Reset (true);
-        _listview.Clear ();
-        _listview.TabStop = false;
-        SuperView?.SendSubviewToBack (this);
+        _listview.ClearViewport (null);
+        _listview.TabStop = TabBehavior.NoStop;
+        SuperView?.MoveSubViewToStart (this);
+
+        // BUGBUG: SetNeedsDraw takes Viewport relative coordinates, not Screen
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
-        SuperView?.SetNeedsDisplay (rect);
+        SuperView?.SetNeedsDraw (rect);
         OnCollapsed ();
     }
 
@@ -506,12 +517,12 @@ public class ComboBox : View
             // jump to list
             if (_searchSet?.Count > 0)
             {
-                _listview.TabStop = true;
+                _listview.TabStop = TabBehavior.TabStop;
                 _listview.SetFocus ();
 
-                if (_listview.SelectedItem > -1)
+                if (_listview.SelectedItem is { })
                 {
-                    SetValue (_searchSet [_listview.SelectedItem]);
+                    SetValue (_searchSet [_listview.SelectedItem.Value]);
                 }
                 else
                 {
@@ -520,8 +531,7 @@ public class ComboBox : View
             }
             else
             {
-                _listview.TabStop = false;
-                SuperView?.FocusNext ();
+                return false;
             }
 
             return true;
@@ -564,10 +574,10 @@ public class ComboBox : View
     {
         if (HasItems ())
         {
-            _listview.MoveUp ();
+            return _listview.MoveUp ();
         }
 
-        return true;
+        return false;
     }
 
     private bool? MoveUpList ()
@@ -618,7 +628,7 @@ public class ComboBox : View
             || (_autoHide && Viewport.Width > 0 && _search.Frame.Width != Viewport.Width - 1))
         {
             _search.Width = _listview.Width = _autoHide ? Viewport.Width - 1 : Viewport.Width;
-            _listview.Height = CalculatetHeight ();
+            _listview.Height = CalculateHeight ();
             _search.SetRelativeLayout (GetContentSize ());
             _listview.SetRelativeLayout (GetContentSize ());
         }
@@ -635,9 +645,9 @@ public class ComboBox : View
         ResetSearchSet ();
 
         _listview.SetSource (_searchSet);
-        _listview.Height = CalculatetHeight ();
+        _listview.Height = CalculateHeight ();
 
-        if (Subviews.Count > 0 && HasFocus)
+        if (SubViews.Count > 0 && HasFocus)
         {
             _search.SetFocus ();
         }
@@ -645,7 +655,9 @@ public class ComboBox : View
 
     private void ResetSearchSet (bool noCopy = false)
     {
+        _listview.SuspendCollectionChangedEvent ();
         _searchSet.Clear ();
+        _listview.ResumeSuspendCollectionChangedEvent ();
 
         if (_autoHide || noCopy)
         {
@@ -655,10 +667,7 @@ public class ComboBox : View
         SetSearchSet ();
     }
 
-    // Tell TextField to handle Accept Command (Enter)
-    void Search_Accept (object sender, CancelEventArgs e) { e.Cancel = true; }
-
-    private void Search_Changed (object sender, StateEventArgs<string> e)
+    private void Search_Changed (object sender, EventArgs e)
     {
         if (_source is null)
         {
@@ -666,13 +675,18 @@ public class ComboBox : View
             return;
         }
 
-        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue))
+        ShowHideList (Text);
+    }
+
+    private void ShowHideList (string oldText)
+    {
+        if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (oldText))
         {
             ResetSearchSet ();
         }
-        else if (_search.Text != e.OldValue)
+        else if (_search.Text != oldText)
         {
-            if (_search.Text.Length < e.OldValue.Length)
+            if (_search.Text.Length < oldText.Length)
             {
                 _selectedItem = -1;
             }
@@ -682,6 +696,8 @@ public class ComboBox : View
 
             if (!string.IsNullOrEmpty (_search.Text))
             {
+                _listview.SuspendCollectionChangedEvent ();
+
                 foreach (object item in _source.ToList ())
                 {
                     // Iterate to preserver object type and force deep copy
@@ -694,6 +710,8 @@ public class ComboBox : View
                         _searchSet.Add (item);
                     }
                 }
+
+                _listview.ResumeSuspendCollectionChangedEvent ();
             }
         }
 
@@ -708,27 +726,29 @@ public class ComboBox : View
         }
     }
 
-    private void Selected ()
+    private bool SelectText ()
     {
         IsShow = false;
-        _listview.TabStop = false;
+        _listview.TabStop = TabBehavior.NoStop;
 
-        if (_listview.Source.Count == 0 || (_searchSet?.Count ?? 0) == 0)
+        if (_listview.Source!.Count == 0 || (_searchSet?.Count ?? 0) == 0)
         {
             _text = "";
             HideList ();
             IsShow = false;
 
-            return;
+            return false;
         }
 
-        SetValue (_listview.SelectedItem > -1 ? _searchSet [_listview.SelectedItem] : _text);
+        SetValue (_listview.SelectedItem is { } ? _searchSet [_listview.SelectedItem.Value] : _text);
         _search.CursorPosition = _search.Text.GetColumns ();
-        Search_Changed (this, new StateEventArgs<string> (_search.Text, _search.Text));
+        ShowHideList (Text);
         OnOpenSelectedItem ();
         Reset (true);
         HideList ();
         IsShow = false;
+
+        return true;
     }
 
     private void SetSearchSet ()
@@ -738,18 +758,30 @@ public class ComboBox : View
             return;
         }
 
+        // PERF: At the request of @dodexahedron in the comment https://github.com/gui-cs/Terminal.Gui/pull/3552#discussion_r1648112410.
+        _listview.SuspendCollectionChangedEvent ();
+
         // force deep copy
         foreach (object item in Source.ToList ())
         {
             _searchSet.Add (item);
         }
+
+        _listview.ResumeSuspendCollectionChangedEvent ();
     }
 
-    private void SetSearchText (string value) { _search.Text = _text = value; }
+    // Sets the search text field Text as well as our own Text property
+    private void SetSearchText (string value)
+    {
+        _search.Text = value;
+        _text = value;
+    }
 
     private void SetValue (object text, bool isFromSelectedItem = false)
     {
+        // TOOD: The fact we have to suspend events to change the text makes this feel very hacky.
         _search.TextChanged -= Search_Changed;
+        // Note we set _text, to avoid set_Text from setting _search.Text again
         _text = _search.Text = text.ToString ();
         _search.CursorPosition = 0;
         _search.TextChanged += Search_Changed;
@@ -765,10 +797,13 @@ public class ComboBox : View
     /// Consider making public
     private void ShowList ()
     {
+        _listview.SuspendCollectionChangedEvent ();
         _listview.SetSource (_searchSet);
-        _listview.Clear (); 
-        _listview.Height = CalculatetHeight ();
-        SuperView?.BringSubviewToFront (this);
+        _listview.ResumeSuspendCollectionChangedEvent ();
+
+        _listview.ClearViewport (null);
+        _listview.Height = CalculateHeight ();
+        SuperView?.MoveSubViewToStart (this);
     }
 
     private bool UnixEmulation ()
@@ -799,13 +834,15 @@ public class ComboBox : View
             set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
         }
 
-        protected internal override bool OnMouseEvent  (MouseEvent me)
+        protected override bool OnMouseEvent (MouseEventArgs me)
         {
-            var res = false;
             bool isMousePositionValid = IsMousePositionValid (me);
+
+            var res = false;
 
             if (isMousePositionValid)
             {
+                // We're derived from ListView and it overrides OnMouseEvent, so we need to call it
                 res = base.OnMouseEvent (me);
             }
 
@@ -833,7 +870,7 @@ public class ComboBox : View
                 if (isMousePositionValid)
                 {
                     _highlighted = Math.Min (TopItem + me.Position.Y, Source.Count);
-                    SetNeedsDisplay ();
+                    SetNeedsDraw ();
                 }
 
                 _isFocusing = false;
@@ -844,10 +881,10 @@ public class ComboBox : View
             return res;
         }
 
-        public override void OnDrawContent (Rectangle viewport)
+        protected override bool OnDrawingContent (DrawContext context)
         {
-            Attribute current = ColorScheme.Focus;
-            Driver.SetAttribute (current);
+            Attribute current = GetAttributeForRole (VisualRole.Focus);
+            SetAttribute (current);
             Move (0, 0);
             Rectangle f = Frame;
             int item = TopItem;
@@ -864,20 +901,20 @@ public class ComboBox : View
 
                 if (isHighlighted || (isSelected && !_hideDropdownListOnClick))
                 {
-                    newcolor = focused ? ColorScheme.Focus : ColorScheme.HotNormal;
+                    newcolor = focused ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.HotNormal);
                 }
                 else if (isSelected && _hideDropdownListOnClick)
                 {
-                    newcolor = focused ? ColorScheme.HotFocus : ColorScheme.HotNormal;
+                    newcolor = focused ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
                 }
                 else
                 {
-                    newcolor = focused ? GetNormalColor () : GetNormalColor ();
+                    newcolor = GetAttributeForRole (VisualRole.Normal);
                 }
 
                 if (newcolor != current)
                 {
-                    Driver.SetAttribute (newcolor);
+                    SetAttribute (newcolor);
                     current = newcolor;
                 }
 
@@ -887,7 +924,7 @@ public class ComboBox : View
                 {
                     for (var c = 0; c < f.Width; c++)
                     {
-                        Driver.AddRune ((Rune)' ');
+                        AddRune (0, row, (Rune)' ');
                     }
                 }
                 else
@@ -898,57 +935,61 @@ public class ComboBox : View
                     if (rowEventArgs.RowAttribute is { } && current != rowEventArgs.RowAttribute)
                     {
                         current = (Attribute)rowEventArgs.RowAttribute;
-                        Driver.SetAttribute (current);
+                        SetAttribute (current);
                     }
 
                     if (AllowsMarking)
                     {
-                        Driver.AddRune (
-                                        Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.Checked : Glyphs.Selected :
-                                        AllowsMultipleSelection ? Glyphs.UnChecked : Glyphs.UnSelected
+                        AddRune (
+                                        Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                                        AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                        );
-                        Driver.AddRune ((Rune)' ');
+                        AddRune ((Rune)' ');
                     }
 
-                    Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
+                    Source.Render (this, isSelected, item, col, row, f.Width - col, start);
                 }
             }
+
+            return true;
         }
 
-        public override bool OnEnter (View view)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedView)
         {
-            if (_hideDropdownListOnClick)
+            if (newHasFocus)
             {
-                _isFocusing = true;
-                _highlighted = _container.SelectedItem;
-                Application.GrabMouse (this);
+                if (_hideDropdownListOnClick)
+                {
+                    _isFocusing = true;
+                    _highlighted = _container.SelectedItem;
+                    Application.Mouse.GrabMouse (this);
+                }
             }
-
-            return base.OnEnter (view);
-        }
-
-        public override bool OnLeave (View view)
-        {
-            if (_hideDropdownListOnClick)
+            else
             {
-                _isFocusing = false;
-                _highlighted = _container.SelectedItem;
-                Application.UngrabMouse ();
+                if (_hideDropdownListOnClick)
+                {
+                    _isFocusing = false;
+                    _highlighted = _container.SelectedItem;
+                    Application.Mouse.UngrabMouse ();
+                }
             }
-
-            return base.OnLeave (view);
         }
 
         public override bool OnSelectedChanged ()
         {
             bool res = base.OnSelectedChanged ();
 
-            _highlighted = SelectedItem;
+            if (SelectedItem is null)
+            {
+                return res;
+            }
+            _highlighted = SelectedItem.Value;
 
             return res;
         }
 
-        private bool IsMousePositionValid (MouseEvent me)
+        private bool IsMousePositionValid (MouseEventArgs me)
         {
             if (me.Position.X >= 0 && me.Position.X < Frame.Width && me.Position.Y >= 0 && me.Position.Y < Frame.Height)
             {
@@ -963,10 +1004,20 @@ public class ComboBox : View
             _container = container
                          ?? throw new ArgumentNullException (
                                                              nameof (container),
-                                                             "ComboBox container cannot be null."
+                                                             @"ComboBox container cannot be null."
                                                             );
             HideDropdownListOnClick = hideDropdownListOnClick;
-            AddCommand (Command.LineUp, () => _container.MoveUpList ());
+            AddCommand (Command.Up, () => _container.MoveUpList ());
         }
+    }
+
+    /// <inheritdoc />
+    public bool EnableForDesign ()
+    {
+        var source = new ObservableCollection<string> (["Combo Item 1", "Combo Item two", "Combo Item Quattro", "Last Combo Item"]);
+        SetSource (source);
+        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: source.Count + 1);
+
+        return true;
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+#nullable disable
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Defines rendering options that affect how the table is displayed.
@@ -10,7 +11,7 @@ public class TableStyle
     public bool AlwaysShowHeaders { get; set; } = false;
 
     /// <summary>
-    ///     Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering vertical
+    ///     Gets or sets a flag indicating whether to force <see cref="Scheme.Normal"/> use when rendering vertical
     ///     cell lines (even when <see cref="TableView.FullRowSelect"/> is on).
     /// </summary>
     public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
@@ -29,7 +30,7 @@ public class TableStyle
 
     /// <summary>
     ///     True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>. This gives
-    ///     the appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show this
+    ///     the appearance of a cursor for when the <see cref="IDriver"/> doesn't otherwise show this
     /// </summary>
     public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 

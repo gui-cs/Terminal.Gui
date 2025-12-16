@@ -1,0 +1,118 @@
+﻿// This is a test application for a self-contained single file.
+
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
+
+namespace SelfContained;
+
+public static class Program
+{
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IDriver)")]
+    private static void Main (string [] args)
+    {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
+        IApplication app = Application.Create ();
+        app.Init ();
+
+        #region The code in this region is not intended for use in a self-contained single-file. It's just here to make sure there is no functionality break with localization in Terminal.Gui using single-file
+
+        if (Equals (Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures?.Count == 0)
+        {
+            // Only happens if the project has <InvariantGlobalization>true</InvariantGlobalization>
+            Debug.Assert (Application.SupportedCultures.Count == 0);
+        }
+        else
+        {
+            Debug.Assert (Application.SupportedCultures?.Count > 0);
+            Debug.Assert (Equals (CultureInfo.CurrentCulture, Thread.CurrentThread.CurrentUICulture));
+        }
+
+        #endregion
+
+        using ExampleWindow exampleWindow = new ();
+        string? userName = app.Run (exampleWindow) as string;
+
+
+        // Shutdown the application in order to free resources and clean up the terminal
+        app.Dispose ();
+
+        // To see this output on the screen it must be done after shutdown,
+        // which restores the previous screen.
+        Console.WriteLine ($@"Username: {userName}");
+    }
+}
+
+// Defines a top-level window with border and title
+public class ExampleWindow : Runnable<string>
+{
+    public ExampleWindow ()
+    {
+        BorderStyle = LineStyle.Single;
+        Title = $"Example App ({Application.QuitKey} to quit)";
+
+        // Create input components and labels
+        var usernameLabel = new Label { Text = "Username:" };
+
+        var userNameText = new TextField
+        {
+            // Position text field adjacent to the label
+            X = Pos.Right (usernameLabel) + 1,
+
+            // Fill remaining horizontal space
+            Width = Dim.Fill ()
+        };
+
+        var passwordLabel = new Label
+        {
+            Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1
+        };
+
+        var passwordText = new TextField
+        {
+            Secret = true,
+
+            // align with the text box above
+            X = Pos.Left (userNameText),
+            Y = Pos.Top (passwordLabel),
+            Width = Dim.Fill ()
+        };
+
+        // Create login button
+        var btnLogin = new Button
+        {
+            Text = "Login",
+            Y = Pos.Bottom (passwordLabel) + 1,
+
+            // center the login button horizontally
+            X = Pos.Center (),
+            IsDefault = true
+        };
+
+        // When login button is clicked display a message popup
+        btnLogin.Accepting += (s, e) =>
+                           {
+                               if (userNameText.Text == "admin" && passwordText.Text == "password")
+                               {
+                                   MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
+                                   Result = userNameText.Text;
+                                   App?.RequestStop ();
+                               }
+                               else
+                               {
+                                   MessageBox.ErrorQuery (App, "Logging In", "Incorrect username or password", "Ok");
+                               }
+                               // When Accepting is handled, set e.Handled to true to prevent further processing.
+                               e.Handled = true;
+                           };
+
+        // Add the views to the Window
+        Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
+    }
+}

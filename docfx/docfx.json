@@ -26,30 +26,36 @@
     }
   ],
   "build": {
+    "xref": [
+      "https://learn.microsoft.com/en-us/dotnet/.xrefmap.json"
+    ],
     "template": [
       "default",
-      "templates/modern"
-      // ,
-      // "templates/singulinkfx"
+      "_exported_templates/modern"
     ],
     "output": "_site",
     "content": [
       {
         "files": [
-          "**/*.{md,yml}"
+          "**/*.{md,yml}",
+          "schemas/**.json"
         ],
         "exclude": [
-          "_site/**"
+          "_site/**",
+          "includes/**",
+          "apispec/**"
         ]
       }
     ],
     "resource": [
       {
         "files": [
-          "images/**"
+          "images/**",
+          "schemas/**.json"
         ]
       }
     ],
+    "overwrite": "apispec/*.md",
     "globalMetadata": {
       "_appName": "Terminal.Gui v2",
       "_appTitle": "Terminal.Gui v2",

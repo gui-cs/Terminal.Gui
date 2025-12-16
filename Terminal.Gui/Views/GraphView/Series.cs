@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Terminal.Gui;
-#nullable enable
+namespace Terminal.Gui.Views;
 /// <summary>Describes a series of data that can be rendered into a <see cref="GraphView"/>></summary>
 public interface ISeries
 {
@@ -33,7 +32,7 @@ public class ScatterSeries : ISeries
     {
         if (Fill.Color.HasValue)
         {
-            Application.Driver.SetAttribute (Fill.Color.Value);
+            graph.SetAttribute (Fill.Color.Value);
         }
 
         foreach (PointF p in Points.Where (p => graphBounds.Contains (p)))
@@ -51,7 +50,7 @@ public class MultiBarSeries : ISeries
 
     /// <summary>Creates a new series of clustered bars.</summary>
     /// <param name="numberOfBarsPerCategory">Each category has this many bars</param>
-    /// <param name="barsEvery">How far appart to put each category (in graph space)</param>
+    /// <param name="barsEvery">How far apart to put each category (in graph space)</param>
     /// <param name="spacing">
     ///     How much spacing between bars in a category (should be less than <paramref name="barsEvery"/>/
     ///     <paramref name="numberOfBarsPerCategory"/>)
@@ -97,7 +96,7 @@ public class MultiBarSeries : ISeries
 
     /// <summary>
     ///     Sub collections.  Each series contains the bars for a different category.  Thus SubSeries[0].Bars[0] is the
-    ///     first bar on the axis and SubSeries[1].Bars[0] is the second etc
+    ///     first bar on the axis and SubSeries[1].Bars[0] is the second etc.
     /// </summary>
     public IReadOnlyCollection<BarSeries> SubSeries => new ReadOnlyCollection<BarSeries> (subSeries);
 
@@ -191,7 +190,7 @@ public class BarSeries : ISeries
             {
                 screenStart.X = graph.AxisY.GetAxisXPosition (graph);
 
-                // dont draw bar off the right of the control
+                // don't draw bar off the right of the control
                 screenEnd.X = Math.Min (graph.Viewport.Width - 1, screenEnd.X);
 
                 // if bar is off the screen
@@ -205,7 +204,7 @@ public class BarSeries : ISeries
                 // Start the axis
                 screenStart.Y = graph.AxisX.GetAxisYPosition (graph);
 
-                // dont draw bar up above top of control
+                // don't draw bar up above top of control
                 screenEnd.Y = Math.Max (0, screenEnd.Y);
 
                 // if bar is off the screen
@@ -261,7 +260,7 @@ public class BarSeries : ISeries
 
         if (adjusted.Color.HasValue)
         {
-            Application.Driver.SetAttribute (adjusted.Color.Value);
+            graph.SetAttribute (adjusted.Color.Value);
         }
 
         graph.DrawLine (start, end, adjusted.Rune);

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+#nullable disable
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>Describes two points in graph space and a line between them</summary>
 public class LineF

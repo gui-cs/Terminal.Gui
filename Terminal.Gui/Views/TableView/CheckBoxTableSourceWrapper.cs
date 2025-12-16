@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+#nullable disable
+﻿
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ITableSource"/> for a <see cref="TableView"/> which adds a checkbox column as an additional column
@@ -26,33 +28,33 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         Wrapping = toWrap;
         this.tableView = tableView;
 
-        tableView.KeyBindings.Add (Key.Space, Command.Select);
+        tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
 
-        tableView.MouseClick += TableView_MouseClick;
+        tableView.Activating += TableView_Activating;
         tableView.CellToggled += TableView_CellToggled;
     }
 
     /// <summary>
-    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="GlyphDefinitions.Checked"/>
+    ///     Gets or sets the character to use for checked entries. Defaults to <see cref="Glyphs.CheckStateChecked"/>
     /// </summary>
-    public Rune CheckedRune { get; set; } = Glyphs.Checked;
+    public Rune CheckedRune { get; set; } = Glyphs.CheckStateChecked;
 
     /// <summary>
     ///     Gets or sets the character to use for checked entry when <see cref="UseRadioButtons"/> is true. Defaults to
-    ///     <see cref="GlyphDefinitions.Selected"/>
+    ///     <see cref="Glyphs.Selected"/>
     /// </summary>
     public Rune RadioCheckedRune { get; set; } = Glyphs.Selected;
 
     /// <summary>
     ///     Gets or sets the character to use for unchecked entries when <see cref="UseRadioButtons"/> is true. Defaults
-    ///     to <see cref="GlyphDefinitions.UnSelected"/>
+    ///     to <see cref="Glyphs.UnSelected"/>
     /// </summary>
     public Rune RadioUnCheckedRune { get; set; } = Glyphs.UnSelected;
 
     /// <summary>
-    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="GlyphDefinitions.UnChecked"/>
+    ///     Gets or sets the character to use for UnChecked entries. Defaults to <see cref="Glyphs.CheckStateUnChecked"/>
     /// </summary>
-    public Rune UnCheckedRune { get; set; } = Glyphs.UnChecked;
+    public Rune UnCheckedRune { get; set; } = Glyphs.CheckStateUnChecked;
 
     /// <summary>Gets or sets whether to only allow a single row to be toggled at once (Radio button).</summary>
     public bool UseRadioButtons { get; set; }
@@ -147,18 +149,25 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         }
 
         e.Cancel = true;
-        tableView.SetNeedsDisplay ();
+        tableView.SetNeedsDraw ();
     }
 
-    private void TableView_MouseClick (object sender, MouseEventEventArgs e)
+#nullable enable
+    private void TableView_Activating (object? sender, CommandEventArgs e)
     {
-        // we only care about clicks (not movements)
-        if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        // Only handle mouse clicks, not keyboard selections
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
         {
             return;
         }
 
-        Point? hit = tableView.ScreenToCell (e.MouseEvent.Position.X, e.MouseEvent.Position.Y, out int? headerIfAny);
+        // we only care about clicks (not movements)
+        if (!mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+        {
+            return;
+        }
+
+        Point? hit = tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? headerIfAny);
 
         if (headerIfAny.HasValue && headerIfAny.Value == 0)
         {
@@ -171,7 +180,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             // otherwise it ticks all rows
             ToggleAllRows ();
             e.Handled = true;
-            tableView.SetNeedsDisplay ();
+            tableView.SetNeedsDraw ();
         }
         else if (hit.HasValue && hit.Value.X == 0)
         {
@@ -186,7 +195,8 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             }
 
             e.Handled = true;
-            tableView.SetNeedsDisplay ();
+            tableView.SetNeedsDraw ();
         }
     }
+#nullable restore
 }

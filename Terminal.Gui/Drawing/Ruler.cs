@@ -1,10 +1,11 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Draws a ruler on the screen.</summary>
 /// <remarks>
 ///     <para></para>
 /// </remarks>
-public class Ruler
+internal class Ruler
 {
     /// <summary>Gets or sets the foreground and background color to use.</summary>
     public Attribute Attribute { get; set; } = new ();
@@ -19,10 +20,13 @@ public class Ruler
     private string _vTemplate { get; } = "-123456789";
 
     /// <summary>Draws the <see cref="Ruler"/>.</summary>
+    /// <param name="driver">Optional Driver. If not provided, driver will be used.</param>
     /// <param name="location">The location to start drawing the ruler, in screen-relative coordinates.</param>
     /// <param name="start">The start value of the ruler.</param>
-    public void Draw (Point location, int start = 0)
+    public void Draw (IDriver? driver, Point location, int start = 0)
     {
+        ArgumentNullException.ThrowIfNull (driver);
+
         if (start < 0)
         {
             throw new ArgumentException ("start must be greater than or equal to 0");
@@ -36,22 +40,22 @@ public class Ruler
         if (Orientation == Orientation.Horizontal)
         {
             string hrule =
-                _hTemplate.Repeat ((int)Math.Ceiling (Length + 2 / (double)_hTemplate.Length)) [start..(Length + start)];
+                _hTemplate.Repeat ((int)Math.Ceiling (Length + 2 / (double)_hTemplate.Length))! [start..(Length + start)];
 
             // Top
-            Application.Driver.Move (location.X, location.Y);
-            Application.Driver.AddStr (hrule);
+            driver?.Move (location.X, location.Y);
+            driver?.AddStr (hrule);
         }
         else
         {
             string vrule =
-                _vTemplate.Repeat ((int)Math.Ceiling ((Length + 2) / (double)_vTemplate.Length))
+                _vTemplate.Repeat ((int)Math.Ceiling ((Length + 2) / (double)_vTemplate.Length))!
                     [start..(Length + start)];
 
             for (int r = location.Y; r < location.Y + Length; r++)
             {
-                Application.Driver.Move (location.X, r);
-                Application.Driver.AddRune ((Rune)vrule [r - location.Y]);
+                driver?.Move (location.X, r);
+                driver?.AddRune ((Rune)vrule [r - location.Y]);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+#nullable disable
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="EventArgs"/> for <see cref="WizardStep"/> transition events.</summary>
 public class WizardButtonEventArgs : EventArgs

@@ -1,178 +1,216 @@
-namespace Terminal.Gui;
+
+
+using System.Diagnostics;
+
+namespace Terminal.Gui.Views;
 
 /// <summary>
-///     <see cref="MenuBarItem"/> is a menu item on  <see cref="MenuBar"/>. MenuBarItems do not support
-///     <see cref="MenuItem.Shortcut"/>.
+///     A <see cref="Shortcut"/>-derived object to be used as items in a <see cref="MenuBar"/>.
+///     MenuBarItems hold a <see cref="PopoverMenu"/> instead of a <see cref="SubMenu"/>.
 /// </summary>
 public class MenuBarItem : MenuItem
 {
-    /// <summary>Initializes a new <see cref="MenuBarItem"/> as a <see cref="MenuItem"/>.</summary>
-    /// <param name="title">Title for the menu item.</param>
-    /// <param name="help">Help text to display. Will be displayed next to the Title surrounded by parentheses.</param>
-    /// <param name="action">Action to invoke when the menu item is activated.</param>
-    /// <param name="canExecute">Function to determine if the action can currently be executed.</param>
-    /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
-    public MenuBarItem (
-        string title,
-        string help,
-        Action action,
-        Func<bool> canExecute = null,
-        MenuItem parent = null
-    ) : base (title, help, action, canExecute, parent)
-    {
-        SetInitialProperties (title, null, null, true);
-    }
-
-    /// <summary>Initializes a new <see cref="MenuBarItem"/>.</summary>
-    /// <param name="title">Title for the menu item.</param>
-    /// <param name="children">The items in the current menu.</param>
-    /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
-    public MenuBarItem (string title, MenuItem [] children, MenuItem parent = null) { SetInitialProperties (title, children, parent); }
-
-    /// <summary>Initializes a new <see cref="MenuBarItem"/> with separate list of items.</summary>
-    /// <param name="title">Title for the menu item.</param>
-    /// <param name="children">The list of items in the current menu.</param>
-    /// <param name="parent">The parent <see cref="MenuItem"/> of this if any.</param>
-    public MenuBarItem (string title, List<MenuItem []> children, MenuItem parent = null) { SetInitialProperties (title, children, parent); }
-
-    /// <summary>Initializes a new <see cref="MenuBarItem"/>.</summary>
-    /// <param name="children">The items in the current menu.</param>
-    public MenuBarItem (MenuItem [] children) : this ("", children) { }
-
-    /// <summary>Initializes a new <see cref="MenuBarItem"/>.</summary>
-    public MenuBarItem () : this ([]) { }
+    /// <summary>
+    ///     Creates a new instance of <see cref="MenuBarItem"/>.
+    /// </summary>
+    public MenuBarItem () : base (null, Command.NotBound) { }
 
     /// <summary>
-    ///     Gets or sets an array of <see cref="MenuItem"/> objects that are the children of this
-    ///     <see cref="MenuBarItem"/>
+    ///     Creates a new instance of <see cref="MenuBarItem"/>. Each MenuBarItem typically has a <see cref="PopoverMenu"/>
+    ///     that is
+    ///     shown when the item is selected.
     /// </summary>
-    /// <value>The children.</value>
-    public MenuItem [] Children { get; set; }
-
-    internal bool IsTopLevel => Parent is null && (Children is null || Children.Length == 0) && Action != null;
-
-    /// <summary>Get the index of a child <see cref="MenuItem"/>.</summary>
-    /// <param name="children"></param>
-    /// <returns>Returns a greater than -1 if the <see cref="MenuItem"/> is a child.</returns>
-    public int GetChildrenIndex (MenuItem children)
+    /// <remarks>
+    /// </remarks>
+    /// <param name="targetView">
+    ///     The View that <paramref name="command"/> will be invoked on when user does something that causes the MenuBarItems's
+    ///     Accept event to be raised.
+    /// </param>
+    /// <param name="command">
+    ///     The Command to invoke on <paramref name="targetView"/>. The Key <paramref name="targetView"/>
+    ///     has bound to <paramref name="command"/> will be used as <see cref="Key"/>
+    /// </param>
+    /// <param name="commandText">The text to display for the command.</param>
+    /// <param name="popoverMenu">The Popover Menu that will be displayed when this item is selected.</param>
+    public MenuBarItem (View? targetView, Command command, string? commandText, PopoverMenu? popoverMenu = null)
+        : base (
+                targetView,
+                command,
+                commandText)
     {
-        var i = 0;
+        TargetView = targetView;
+        Command = command;
+        PopoverMenu = popoverMenu;
+    }
 
-        if (Children is null)
-        {
-            return -1;
-        }
+    /// <summary>
+    ///     Creates a new instance of <see cref="MenuBarItem"/> with the specified <paramref name="popoverMenu"/>. This is a
+    ///     helper for the most common MenuBar use-cases.
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <param name="commandText">The text to display for the command.</param>
+    /// <param name="popoverMenu">The Popover Menu that will be displayed when this item is selected.</param>
+    public MenuBarItem (string commandText, PopoverMenu? popoverMenu = null)
+        : this (
+                null,
+                Command.NotBound,
+                commandText,
+                popoverMenu)
+    { }
 
-        foreach (MenuItem child in Children)
+    /// <summary>
+    ///     Creates a new instance of <see cref="MenuBarItem"/> with the <paramref name="menuItems"/> automatcialy added to a
+    ///     <see cref="PopoverMenu"/>.
+    ///     This is a helper for the most common MenuBar use-cases.
+    /// </summary>
+    /// <remarks>
+    /// </remarks>
+    /// <param name="commandText">The text to display for the command.</param>
+    /// <param name="menuItems">
+    ///     The menu items that will be added to the Popover Menu that will be displayed when this item is
+    ///     selected.
+    /// </param>
+    public MenuBarItem (string commandText, IEnumerable<View> menuItems)
+        : this (
+                null,
+                Command.NotBound,
+                commandText,
+                new (menuItems) { Title = $"PopoverMenu for {commandText}" })
+    { }
+
+    /// <summary>
+    ///     Do not use this property. MenuBarItem does not support SubMenu. Use <see cref="PopoverMenu"/> instead.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    public new Menu? SubMenu
+    {
+        get => null;
+        set => throw new InvalidOperationException ("MenuBarItem does not support SubMenu. Use PopoverMenu instead.");
+    }
+
+    private PopoverMenu? _popoverMenu;
+
+    /// <summary>
+    ///     The Popover Menu that will be displayed when this item is selected.
+    /// </summary>
+    public PopoverMenu? PopoverMenu
+    {
+        get => _popoverMenu;
+        set
         {
-            if (child == children)
+            if (_popoverMenu == value)
             {
-                return i;
+                return;
             }
 
-            i++;
-        }
+            if (_popoverMenu is { })
+            {
+                _popoverMenu.VisibleChanged -= OnPopoverVisibleChanged;
+                _popoverMenu.Accepted -= OnPopoverMenuOnAccepted;
+            }
 
-        return -1;
-    }
+            _popoverMenu = value;
 
-    /// <summary>Check if a <see cref="MenuItem"/> is a submenu of this MenuBar.</summary>
-    /// <param name="menuItem"></param>
-    /// <returns>Returns <c>true</c> if it is a submenu. <c>false</c> otherwise.</returns>
-    public bool IsSubMenuOf (MenuItem menuItem)
-    {
-        return Children.Any (child => child == menuItem && child.Parent == menuItem.Parent);
-    }
+            if (_popoverMenu is { })
+            {
+                _popoverMenu.App = App;
 
-    /// <summary>Check if a <see cref="MenuItem"/> is a <see cref="MenuBarItem"/>.</summary>
-    /// <param name="menuItem"></param>
-    /// <returns>Returns a <see cref="MenuBarItem"/> or null otherwise.</returns>
-    public MenuBarItem SubMenu (MenuItem menuItem) { return menuItem as MenuBarItem; }
+                PopoverMenuOpen = _popoverMenu.Visible;
+                _popoverMenu.VisibleChanged += OnPopoverVisibleChanged;
+                _popoverMenu.Accepted += OnPopoverMenuOnAccepted;
+            }
 
-    internal void AddShortcutKeyBindings (MenuBar menuBar)
-    {
-        if (Children is null)
-        {
             return;
-        }
 
-        foreach (MenuItem menuItem in Children.Where (m => m is { }))
-        {
-            // For MenuBar only add shortcuts for submenus
-
-            if (menuItem.Shortcut != KeyCode.Null)
+            void OnPopoverVisibleChanged (object? sender, EventArgs args)
             {
-                KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
-                menuBar.KeyBindings.Add (menuItem.Shortcut, keyBinding);
+                // Logging.Debug ($"OnPopoverVisibleChanged - {Title} - Visible = {_popoverMenu?.Visible} ");
+                PopoverMenuOpen = _popoverMenu?.Visible ?? false;
             }
 
-            SubMenu (menuItem)?.AddShortcutKeyBindings (menuBar);
-        }
-    }
-
-    private void SetInitialProperties (string title, object children, MenuItem parent = null, bool isTopLevel = false)
-    {
-        if (!isTopLevel && children is null)
-        {
-            throw new ArgumentNullException (
-                                             nameof (children),
-                                             @"The parameter cannot be null. Use an empty array instead."
-                                            );
-        }
-
-        SetTitle (title ?? "");
-
-        if (parent is { })
-        {
-            Parent = parent;
-        }
-
-        switch (children)
-        {
-            case List<MenuItem []> childrenList:
+            void OnPopoverMenuOnAccepted (object? sender, CommandEventArgs args)
             {
-                MenuItem [] newChildren = [];
-
-                foreach (MenuItem [] grandChild in childrenList)
-                {
-                    foreach (MenuItem child in grandChild)
-                    {
-                        SetParent (grandChild);
-                        Array.Resize (ref newChildren, newChildren.Length + 1);
-                        newChildren [^1] = child;
-                    }
-                }
-
-                Children = newChildren;
-
-                break;
-            }
-            case MenuItem [] items:
-                SetParent (items);
-                Children = items;
-
-                break;
-            default:
-                Children = null;
-
-                break;
-        }
-    }
-
-    private void SetParent (MenuItem [] children)
-    {
-        foreach (MenuItem child in children)
-        {
-            if (child is { Parent: null })
-            {
-                child.Parent = this;
+                // Logging.Debug ($"OnPopoverMenuOnAccepted - {Title} - {args.Context?.Source?.Title} - {args.Context?.Command}");
+                RaiseAccepted (args.Context);
             }
         }
     }
 
-    private void SetTitle (string title)
+    private bool _popoverMenuOpen;
+
+    /// <summary>
+    ///     Gets or sets whether the MenuBarItem is active. This is used to determine if the MenuBarItem should be
+    /// </summary>
+    public bool PopoverMenuOpen
     {
-        title ??= string.Empty;
-        Title = title;
+        get => _popoverMenuOpen;
+        set
+        {
+            if (_popoverMenuOpen == value)
+            {
+                return;
+            }
+            _popoverMenuOpen = value;
+
+            RaisePopoverMenuOpenChanged();
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void RaisePopoverMenuOpenChanged ()
+    {
+        OnPopoverMenuOpenChanged();
+        PopoverMenuOpenChanged?.Invoke (this, new EventArgs<bool> (PopoverMenuOpen));
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    protected virtual void OnPopoverMenuOpenChanged () {}
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public event EventHandler<EventArgs<bool>>? PopoverMenuOpenChanged;
+
+    /// <inheritdoc />
+    protected override bool OnKeyDownNotHandled (Key key)
+    {
+        Logging.Trace ($"{key}");
+
+        if (PopoverMenu is { Visible: true } && HotKeyBindings.TryGet (key, out _))
+        {
+            // If the user presses the hotkey for a menu item that is already open,
+            // it should close the menu item (Test: MenuBarItem_HotKey_DeActivates)
+            if (SuperView is MenuBar { } menuBar)
+            {
+                menuBar.HideActiveItem ();
+            }
+
+
+            return true;
+        }
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
+    {
+        // Logging.Debug ($"CanFocus = {CanFocus}, HasFocus = {HasFocus}");
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            PopoverMenu?.Dispose ();
+            PopoverMenu = null;
+        }
+
+        base.Dispose (disposing);
     }
 }

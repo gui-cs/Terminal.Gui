@@ -1,6 +1,7 @@
+#nullable disable
 ﻿using System.Data;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ITableSource"/> implementation that wraps a <see cref="System.Data.DataTable"/>.  This class is
@@ -25,5 +26,5 @@ public class DataTableSource : ITableSource
     public int Columns => DataTable.Columns.Count;
 
     /// <inheritdoc/>
-    public string [] ColumnNames => DataTable.Columns.Cast<DataColumn> ().Select (c => c.ColumnName).ToArray ();
+    public string [] ColumnNames => DataTable.Columns.Cast<DataColumn> ().Select (c => c.Caption).ToArray ();
 }

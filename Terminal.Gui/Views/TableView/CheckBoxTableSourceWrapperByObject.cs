@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+#nullable disable
+﻿namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Implementation of <see cref="CheckBoxTableSourceWrapperBase"/> which records toggled rows by a property on row

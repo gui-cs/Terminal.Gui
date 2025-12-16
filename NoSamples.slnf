@@ -1,0 +1,13 @@
+{
+  "solution": {
+    "path": "Terminal.sln",
+    "projects": [
+      "Terminal.Gui\\Terminal.Gui.csproj",
+      "Examples\\UICatalog\\UICatalog.csproj",
+      "Tests\\UnitTests\\UnitTests.csproj",
+      "Tests\\UnitTestsParallelizable\\UnitTests.Parallelizable.csproj",
+      "Tests\\IntegrationTests\\IntegrationTests.csproj",
+      "Tests\\StressTests\\StressTests.csproj"
+       ]
+  }
+}

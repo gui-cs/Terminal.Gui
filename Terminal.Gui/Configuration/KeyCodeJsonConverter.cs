@@ -1,12 +1,15 @@
-﻿using System.Text.Json;
+﻿#nullable disable
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Configuration;
 
 internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
 {
     public override KeyCode Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        string propertyName = string.Empty;
+
         if (reader.TokenType == JsonTokenType.StartObject)
         {
             var key = KeyCode.Null;
@@ -28,10 +31,10 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
 
                 if (reader.TokenType == JsonTokenType.PropertyName)
                 {
-                    string propertyName = reader.GetString ();
+                    propertyName = reader.GetString ();
                     reader.Read ();
 
-                    switch (propertyName.ToLowerInvariant ())
+                    switch (propertyName!.ToLowerInvariant ())
                     {
                         case "key":
                             if (reader.TokenType == JsonTokenType.String)
@@ -42,7 +45,7 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
                                 }
 
                                 // The enum uses "D0..D9" for the number keys
-                                if (Enum.TryParse (reader.GetString ().TrimStart ('D', 'd'), false, out key))
+                                if (Enum.TryParse (reader.GetString ()!.TrimStart ('D', 'd'), false, out key))
                                 {
                                     break;
                                 }
@@ -50,7 +53,7 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
                                 if (key == KeyCode.Null)
                                 {
                                     throw new JsonException (
-                                                             $"The value \"{reader.GetString ()}\" is not a valid Key."
+                                                             $"{propertyName}: \"{reader.GetString ()}\" is not a valid Key."
                                                             );
                                 }
                             }
@@ -62,11 +65,11 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
                                 }
                                 catch (InvalidOperationException ioe)
                                 {
-                                    throw new JsonException ($"Error parsing Key value: {ioe.Message}", ioe);
+                                    throw new JsonException ($"{propertyName}: Error parsing Key value: {ioe.Message}", ioe);
                                 }
                                 catch (FormatException ioe)
                                 {
-                                    throw new JsonException ($"Error parsing Key value: {ioe.Message}", ioe);
+                                    throw new JsonException ($"{propertyName}: Error parsing Key value: {ioe.Message}", ioe);
                                 }
                             }
 
@@ -90,21 +93,21 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
                                     }
                                     catch (KeyNotFoundException e)
                                     {
-                                        throw new JsonException ($"The value \"{mod}\" is not a valid modifier.", e);
+                                        throw new JsonException ($"{propertyName}: \"{mod}\" is not a valid modifier.", e);
                                     }
                                 }
                             }
                             else
                             {
                                 throw new JsonException (
-                                                         $"Expected an array of modifiers, but got \"{reader.TokenType}\"."
+                                                         $"{propertyName}: Expected an array of modifiers, but got \"{reader.TokenType}\"."
                                                         );
                             }
 
                             break;
 
                         default:
-                            throw new JsonException ($"Unexpected Key property \"{propertyName}\".");
+                            throw new JsonException ($"{propertyName}: Unexpected Key property.");
                     }
                 }
             }
@@ -117,7 +120,7 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
             return key;
         }
 
-        throw new JsonException ($"Unexpected StartObject token when parsing Key: {reader.TokenType}.");
+        throw new JsonException ($"{propertyName}: Unexpected StartObject token when parsing Key: {reader.TokenType}.");
     }
 
     public override void Write (Utf8JsonWriter writer, KeyCode value, JsonSerializerOptions options)
@@ -126,14 +129,7 @@ internal class KeyCodeJsonConverter : JsonConverter<KeyCode>
 
         var keyName = (value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask).ToString ();
 
-        if (keyName is { })
-        {
-            writer.WriteString ("Key", keyName);
-        }
-        else
-        {
-            writer.WriteNumber ("Key", (uint)(value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask));
-        }
+        writer.WriteString ("Key", keyName);
 
         Dictionary<string, KeyCode> modifierDict = new ()
         {

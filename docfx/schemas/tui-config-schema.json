@@ -1,296 +1,632 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "The JSON schema for the Terminal.Gui Configuration Manager (https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json).",
+  "title": "Terminal.Gui Configuration",
+  "description": "Configuration settings for Terminal.Gui applications. This schema defines settings for the application behavior, appearance, themes, key bindings, and component-specific options.",
   "type": "object",
   "properties": {
-    "Application.HeightAsBuffer": {
-      "description": "See HeightAsBuffer API documentation.",
-      "type": "boolean"
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "The URI of the schema that this configuration file adheres to. Optional but recommended for validation."
     },
-    "Application.AlternateForwardKey": {
-      "description": "Alternative key for navigating forwards through views. SCtrl+Tab is the primary key.",
-      "$ref": "#/definitions/Key"
+    "ConfigurationManager.ThrowOnJsonErrors": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, JSON parsing errors encountered during configuration loading will throw exceptions. If false, errors are typically logged, and default values may be used."
     },
-    "Application.AlternateBackwardKey": {
-      "description": "Alternative key for navigating backwards through views. Shift+Ctrl+Tab is the primary key.",
-      "$ref": "#/definitions/Key"
+    "Key.Separator": {
+      "type": "string",
+      "default": "+",
+      "description": "The character used to separate modifiers and keys in key string representations (e.g., 'Ctrl+Q')."
     },
-    "Application.QuitKey": {
-      "description": "The key to quit the application. Ctrl+Q is the default.",
-      "$ref": "#/definitions/Key"
+    "Application.ArrangeKey": {
+      "type": "string",
+      "default": "Ctrl+F5",
+      "description": "The key combination used to trigger an arrange or layout command, often for tiling or re-organizing windows."
+    },
+    "Application.Force16Colors": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, forces the console driver to output only the basic 16 ANSI colors, even if the terminal supports more (e.g., 256 colors or TrueColor)."
+    },
+    "Application.ForceDriver": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "",
+        "fake",
+        "ansi",
+        "curses",
+        "net",
+        "windows",
+        null
+      ],
+      "default": "",
+      "description": "Forces the use of a specific console driver. If empty or null, Terminal.Gui will attempt to auto-detect the best driver. Options: 'fake', 'ansi', 'curses', 'net', 'windows'."
     },
     "Application.IsMouseDisabled": {
-      "description": "Disable or enable the mouse. The mouse is enabled by default.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": false,
+      "description": "Disables or enables mouse support for the application. If true, mouse events will be ignored."
     },
-    "Application.UseSystemConsole": {
-      "description": "If true, forces the use of the System.Console-based (aka NetDriver) driver. The default is false.",
-      "type": "boolean"
+    "Application.NextTabGroupKey": {
+      "type": "string",
+      "default": "F6",
+      "description": "The key combination to navigate to the next logical group of controls or container (e.g., 'F6', 'Ctrl+PageDown')."
     },
-    "Theme": {
-      "description": "The currently selected theme. The default is 'Default'.",
-      "type": "string"
+    "Application.NextTabKey": {
+      "type": "string",
+      "default": "Tab",
+      "description": "The key combination to navigate to the next focusable view or tab stop (e.g., 'Tab')."
     },
-    "Themes": {
-      "description": "An array of Theme objects. Each Theme specifies a set of settings for an application. Set Theme to the name of the active theme.",
-      "type": "array",
+    "Application.PrevTabGroupKey": {
+      "type": "string",
+      "default": "Shift+F6",
+      "description": "The key combination to navigate to the previous logical group of controls or container (e.g., 'Shift+F6', 'Ctrl+PageUp')."
+    },
+    "Application.PrevTabKey": {
+      "type": "string",
+      "default": "Shift+Tab",
+      "description": "The key combination to navigate to the previous focusable view or tab stop (e.g., 'Shift+Tab')."
+    },
+    "Application.QuitKey": {
+      "type": "string",
+      "default": "Esc",
+      "description": "The primary key combination used to request the application to quit (e.g., 'Esc', 'Ctrl+Q')."
+    },
+    "Application.AlternateForwardKey": {
+      "type": "string",
+      "description": "An alternative key combination for forward navigation or cycling through elements, often used in specific contexts (e.g., 'Ctrl+CursorRight')."
+    },
+    "Application.AlternateBackwardKey": {
+      "type": "string",
+      "description": "An alternative key combination for backward navigation or cycling through elements (e.g., 'Ctrl+CursorLeft')."
+    },
+    "Application.ShortCutKey": {
+      "type": "string",
+      "description": "The key used to activate shortcuts or hotkeys within views (e.g., 'AltMask', 'F9'). Typically used for menu shortcuts."
+    },
+    "PopoverMenu.DefaultKey": {
+      "type": "string",
+      "default": "Shift+F10",
+      "description": "Default key to open the context menu (PopoverMenu)."
+    },
+    "FileDialog.MaxSearchResults": {
+      "type": "integer",
+      "default": 10000,
+      "description": "Maximum number of search results to display in the FileDialog."
+    },
+    "FileDialogStyle.DefaultUseColors": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the FileDialog should use colors by default to differentiate file/directory types."
+    },
+    "FileDialogStyle.DefaultUseUnicodeCharacters": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the FileDialog should use Unicode characters for icons by default."
+    },
+    "Colors16": {
+      "type": "object",
+      "description": "Defines the 3-byte/6-character hexadecimal string values for the 16 legacy ANSI color names (ColorName16). These definitions can be overridden by the user to customize the base 16 color palette.",
       "properties": {
-        "Themes": {
-          "$ref": "#/definitions/Theme"
+        "Black": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Black (typically #000000)."
+        },
+        "Blue": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Blue (typically #000080, a dark blue like Navy)."
+        },
+        "Green": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Green (typically #008000, a dark green)."
+        },
+        "Cyan": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Cyan (typically #008080, a dark cyan like Teal)."
+        },
+        "Red": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Red (typically #800000, a dark red like Maroon)."
+        },
+        "Magenta": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Magenta (typically #800080, a dark magenta like Purple)."
+        },
+        "Yellow": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Yellow (typically #808000, a dark yellow like Olive)."
+        },
+        "Gray": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.Gray (typically #C0C0C0, a light gray like Silver)."
+        },
+        "DarkGray": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.DarkGray (typically #808080, a medium gray)."
+        },
+        "BrightBlue": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightBlue (typically #0000FF)."
+        },
+        "BrightGreen": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightGreen (typically #00FF00, like Lime)."
+        },
+        "BrightCyan": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightCyan (typically #00FFFF, like Aqua)."
+        },
+        "BrightRed": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightRed (typically #FF0000)."
+        },
+        "BrightMagenta": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightMagenta (typically #FF00FF, like Fuchsia)."
+        },
+        "BrightYellow": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.BrightYellow (typically #FFFF00)."
+        },
+        "White": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "description": "Hex string for ColorName16.White (typically #FFFFFF)."
         }
       },
-      "additionalProperties": {
-        "$ref": "#/definitions/ColorScheme"
+      "additionalProperties": false
+    },
+    "Theme": {
+      "type": "string",
+      "default": "Default",
+      "description": "The name of the theme to be applied at application startup. This name must match one of the theme names defined in the 'Themes' array."
+    },
+    "Themes": {
+      "type": "array",
+      "description": "A list of theme definitions. Each theme provides a distinct look and feel for the application.",
+      "items": {
+        "type": "object",
+        "description": "A single theme definition. The object should have exactly one property, where the key is the unique name of the theme (e.g., 'Default', 'Dark'), and the value contains the theme's settings.",
+        "maxProperties": 1,
+        "minProperties": 1,
+        "patternProperties": {
+          "^[\\w\\s&\\(\\)-]+$": {
+            "$ref": "#/definitions/themeSettings"
+          }
+        },
+        "additionalProperties": false
       }
     }
   },
+  "additionalProperties": true,
   "definitions": {
-    "Theme": {
-      "description": "A Theme is a collection of settings that are named.",
-      "type": "object",
-      "properties": {
-        "ColorSchemes": {
-          "description": "The ColorSchemes defined for this Theme.",
-          "$ref": "#/definitions/ColorSchemes"
+    "Color": {
+      "description": "One of the standard color names (parsed case-insensitively; (e.g. 'BrightBlue'), an rgb(r,g,b) tuple, or a hex color string in the format #RRGGBB.",
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "string",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "AliceBlue",
+            "AmberPhosphor",
+            "AntiqueWhite",
+            "Aqua",
+            "Aquamarine",
+            "Azure",
+            "Beige",
+            "Bisque",
+            "Black",
+            "BlanchedAlmond",
+            "Blue",
+            "BlueViolet",
+            "BrightBlue",
+            "BrightCyan",
+            "BrightGreen",
+            "BrightMagenta",
+            "BrightRed",
+            "BrightYellow",
+            "Brown",
+            "BurlyWood",
+            "CadetBlue",
+            "Charcoal",
+            "CornflowerBlue",
+            "Cornsilk",
+            "Crimson",
+            "Cyan",
+            "DarkBlue",
+            "DarkCyan",
+            "DarkGoldenrod",
+            "DarkGray",
+            "DarkGreen",
+            "DarkGrey",
+            "DarkKhaki",
+            "DarkMagenta",
+            "DarkOliveGreen",
+            "DarkOrange",
+            "DarkOrchid",
+            "DarkRed",
+            "DarkSalmon",
+            "DarkSeaGreen",
+            "DarkSlateBlue",
+            "DarkSlateGray",
+            "DarkSlateGrey",
+            "DarkTurquoise",
+            "DarkViolet",
+            "DeepPink",
+            "DeepSkyBlue",
+            "DimGray",
+            "DimGrey",
+            "DodgerBlue",
+            "Ebony",
+            "FireBrick",
+            "FloralWhite",
+            "FluorescentOrange",
+            "ForestGreen",
+            "Fuchsia",
+            "Gainsboro",
+            "GhostWhite",
+            "Gold",
+            "Goldenrod",
+            "Gray",
+            "Green",
+            "GreenPhosphor",
+            "GreenYellow",
+            "Grey",
+            "GuppieGreen",
+            "HoneyDew",
+            "HotPink",
+            "IndianRed",
+            "Indigo",
+            "Ivory",
+            "Jet",
+            "Khaki",
+            "Lavender",
+            "LavenderBlush",
+            "LawnGreen",
+            "LemonChiffon",
+            "LightBlue",
+            "LightCoral",
+            "LightCyan",
+            "LightGoldenrodYellow",
+            "LightGray",
+            "LightGreen",
+            "LightGrey",
+            "LightPink",
+            "LightSalmon",
+            "LightSeaGreen",
+            "LightSkyBlue",
+            "LightSlateGray",
+            "LightSlateGrey",
+            "LightSteelBlue",
+            "LightYellow",
+            "Lime",
+            "LimeGreen",
+            "Linen",
+            "Magenta",
+            "Maroon",
+            "MediumAquaMarine",
+            "MediumBlue",
+            "MediumOrchid",
+            "MediumPurple",
+            "MediumSeaGreen",
+            "MediumSlateBlue",
+            "MediumSpringGreen",
+            "MediumTurquoise",
+            "MediumVioletRed",
+            "MidnightBlue",
+            "MintCream",
+            "MistyRose",
+            "Moccasin",
+            "NavajoWhite",
+            "Navy",
+            "OldLace",
+            "Olive",
+            "OliveDrab",
+            "Onyx",
+            "Orange",
+            "OrangeRed",
+            "Orchid",
+            "OuterSpace",
+            "PaleGoldenRod",
+            "PaleGreen",
+            "PaleTurquoise",
+            "PaleVioletRed",
+            "PapayaWhip",
+            "PeachPuff",
+            "Peru",
+            "Pink",
+            "Plum",
+            "PowderBlue",
+            "Purple",
+            "RaisinBlack",
+            "RebeccaPurple",
+            "Red",
+            "RosyBrown",
+            "RoyalBlue",
+            "SaddleBrown",
+            "Salmon",
+            "SandyBrown",
+            "SeaGreen",
+            "SeaShell",
+            "Sienna",
+            "Silver",
+            "SkyBlue",
+            "SlateBlue",
+            "SlateGray",
+            "SlateGrey",
+            "Snow",
+            "SpringGreen",
+            "SteelBlue",
+            "Tan",
+            "Teal",
+            "Thistle",
+            "Tomato",
+            "Turquoise",
+            "Violet",
+            "Wheat",
+            "White",
+            "WhiteSmoke",
+            "Yellow",
+            "YellowGreen"
+          ]
+        },
+        {
+          "type": "string",
+          "pattern": "^rgb\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*\\)$"
+        },
+        {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
         }
-      }
+      ]
     },
-    "ColorSchemes": {
-      "description": "A list of ColorSchemes. Each ColorScheme specifies a set of Attributes (Foreground & Background).",
-      "type": "array",
-      "properties": {
-        "TopLevel": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Base": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Dialog": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Menu": {
-          "$ref": "#/definitions/ColorScheme"
-        },
-        "Error": {
-          "$ref": "#/definitions/ColorScheme"
-        }
-      },
-      "additionalProperties": {
-        "$ref": "#/definitions/ColorScheme"
-      }
-    },
-    "ColorScheme": {
-      "description": "A Terminal.Gui ColorScheme. Specifies the Foreground & Background colors for modes of an Terminal.Gui app.",
+    "attribute": {
       "type": "object",
-      "properties": {
-        "Normal": {
-          "description": "The foreground and background color for text when the view is not focused, hot, or disabled.",
-          "$ref": "#/definitions/Attribute"
-        },
-        "Focus": {
-          "description": "The foreground and background color for text when the view has focus.",
-          "$ref": "#/definitions/Attribute"
-        },
-        "HotNormal": {
-          "description": "The foreground and background color for text when the view is highlighted (hot).",
-          "$ref": "#/definitions/Attribute"
-        },
-        "HotFocus": {
-          "description": "The foreground and background color for text when the view is highlighted (hot) and has focus.",
-          "$ref": "#/definitions/Attribute"
-        },
-        "Disabled": {
-          "description": "The foreground and background color for text when the view disabled.",
-          "$ref": "#/definitions/Attribute"
-        }
-      }
-    },
-    "Attribute": {
-      "description": "A Terminal.Gui color attribute. Specifies the Foreground & Background colors for Terminal.Gui output.",
-      "type": "object",
+      "description": "Defines the foreground color, background color, and style for a specific UI element state.",
       "properties": {
         "Foreground": {
           "$ref": "#/definitions/Color"
         },
         "Background": {
           "$ref": "#/definitions/Color"
+        },
+        "Style": {
+          "type": "string",
+          "default": "None",
+          "description": "Text style. Parsed case-insensitively by the application. Can be a single style or a comma-separated list of the following valid flags: None, Bold, Italic, Underline, Faint, Blink, Reverse, Strikethrough (e.g., 'Bold,Italic').",
+          "pattern": "^(None|Bold|Italic|Underline|Faint|Blink|Reverse|Strikethrough)(\\s*,\\s*(None|Bold|Italic|Underline|Faint|Blink|Reverse|Strikethrough))*$"
         }
       },
       "required": [
         "Foreground",
         "Background"
-      ]
+      ],
+      "additionalProperties": false
     },
-    "Color": {
-      "description": "One be either one of 16 standard color names or an rgb(r,g,b) tuple.",
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "type": "string",
-      "properties": {
-        "color": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Black",
-                "Blue",
-                "Green",
-                "Cyan",
-                "Red",
-                "Magenta",
-                "Brown",
-                "Gray",
-                "DarkGray",
-                "BrightBlue",
-                "BrightGreen",
-                "BrightCyan",
-                "BrightRed",
-                "BrightMagenta",
-                "BrightYellow",
-                "White"
-              ]
-            },
-            {
-              "type": "string",
-              "pattern": "^rgb\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*\\)$"
-            }
-          ]
-        }
-      }
-    },
-    "Key": {
-      "description": "A key pressed on the keyboard.",
+    "scheme": {
       "type": "object",
+      "description": "A collection of attributes defining the appearance of UI elements in different states (normal, focused, etc.).",
       "properties": {
-        "Key": {
-          "description": "A key name (e.g. A, b, 1, 2, Enter, Esc, F5, etc.) or an integer value (e.g. 65, 66, 67, etc.).",
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Null",
-                "Backspace",
-                "Tab",
-                "Enter",
-                "Clear",
-                "Esc",
-                "Space",
-                "D0",
-                "D1",
-                "D2",
-                "D3",
-                "D4",
-                "D5",
-                "D6",
-                "D7",
-                "D8",
-                "D9",
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "a",
-                "b",
-                "c",
-                "d",
-                "e",
-                "f",
-                "g",
-                "h",
-                "i",
-                "j",
-                "k",
-                "l",
-                "m",
-                "n",
-                "o",
-                "p",
-                "q",
-                "r",
-                "s",
-                "t",
-                "u",
-                "v",
-                "w",
-                "x",
-                "y",
-                "z",
-                "A",
-                "B",
-                "C",
-                "D",
-                "E",
-                "F",
-                "G",
-                "H",
-                "I",
-                "J",
-                "K",
-                "L",
-                "M",
-                "N",
-                "O",
-                "P",
-                "Q",
-                "R",
-                "S",
-                "T",
-                "U",
-                "V",
-                "W",
-                "X",
-                "Y",
-                "Z",
-                "F1",
-                "F2",
-                "F3",
-                "F4",
-                "F5",
-                "F6",
-                "F7",
-                "F8",
-                "F9",
-                "F10",
-                "F11",
-                "F12",
-                "Insert",
-                "Delete",
-                "Home",
-                "End",
-                "PageUp",
-                "PageDown",
-                "Up",
-                "Down",
-                "Left",
-                "Right"
-              ]
-            },
-            {
-              "type": "integer"
-            }
-          ]
+        "Normal": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance in the normal, non-focused state."
         },
-        "Modifiers": {
-          "description": "A keyboard modifier (e.g. Ctrl, Alt, or Shift).",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "Ctrl",
-              "Alt",
-              "Shift"
-            ]
-          }
+        "Focus": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance when the element has input focus."
+        },
+        "HotNormal": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a 'hot' element (e.g., mouse hover) that is not focused."
+        },
+        "HotFocus": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a 'hot' element that also has input focus."
+        },
+        "Disabled": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance when the element is disabled."
+        },
+        "Active": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance when the element is active."
+        },
+        "HotActive": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a 'hot' element that is also active."
+        },
+        "Highlight": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a highlighted element."
+        },
+        "Editable": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for an editable element."
+        },
+        "ReadOnly": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for a read-only element."
         }
       },
       "required": [
-        "Key"
-      ]
+        "Normal"
+      ],
+      "additionalProperties": false
+    },
+    "themeSettings": {
+      "type": "object",
+      "description": "Contains all settings for a specific theme, including default styles for various UI elements, glyphs, and color schemes.",
+      "properties": {
+        "BasedOn": {
+          "type": "string",
+          "description": "The name of another theme that this theme inherits settings from. Settings in the current theme will override those from the base theme."
+        },
+        "Dialog.DefaultButtonAlignment": {
+          "type": "string",
+          "enum": [
+            "Start",
+            "End",
+            "Center",
+            "Fill"
+          ],
+          "description": "Default horizontal alignment for buttons within Dialog views."
+        },
+        "Dialog.DefaultButtonAlignmentModes": {
+          "type": "string",
+          "enum": [
+            "None",
+            "AddSpaceBetweenItems",
+            "AddSpaceAroundItems"
+          ],
+          "description": "Specifies how extra space is distributed between buttons in Dialog views when alignment is 'Start', 'End', or 'Center'."
+        },
+        "Dialog.DefaultBorderStyle": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
+          "description": "Default border style for Dialog views."
+        },
+        "Dialog.DefaultShadow": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Transparent",
+            "Opaque"
+          ],
+          "description": "Default shadow style for Dialog views, rendered behind the dialog."
+        },
+        "FrameView.DefaultBorderStyle": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
+          "description": "Default border style for FrameView controls."
+        },
+        "Window.DefaultBorderStyle": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
+          "description": "Default border style for Window views."
+        },
+        "MessageBox.DefaultButtonAlignment": {
+          "type": "string",
+          "enum": [
+            "Start",
+            "End",
+            "Center",
+            "Fill"
+          ],
+          "description": "Default horizontal alignment for buttons within MessageBox views."
+        },
+        "MessageBox.DefaultBorderStyle": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
+          "description": "Default border style for MessageBox views."
+        },
+        "Button.DefaultShadow": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Transparent",
+            "Opaque"
+          ],
+          "description": "Default shadow style for Button controls, often used for 3D effect."
+        },
+        "Menu.DefaultBorderStyle": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
+          "description": "Default border style for the newer Menu control and its sub-menus."
+        },
+        "MenuBar.DefaultBorderStyle": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy",
+            "Rounded"
+          ],
+          "description": "Default border style for the MenuBar control."
+        },
+        "StatusBar.DefaultSeparatorLineStyle": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Single",
+            "Double",
+            "Heavy"
+          ],
+          "description": "Default style for separator lines in the StatusBar."
+        },
+        "Schemes": {
+          "type": "array",
+          "description": "A list of scheme definitions for this theme. Each item in the array is an object containing one or more named schemes (e.g., 'Runnable', 'Base', 'Menu').",
+          "items": {
+            "type": "object",
+            "description": "An object where each key is a scheme name (e.g., 'Base', 'Error') and its value is the scheme definition.",
+            "patternProperties": {
+              "^[A-Za-z][A-Za-z0-9_]*$": {
+                "$ref": "#/definitions/scheme"
+              }
+            },
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        }
+      },
+      "patternProperties": {
+        "^Glyphs\\.[A-Za-z0-9]+$": {
+          "type": "string",
+          "description": "A specific glyph character used by the theme for drawing UI elements like borders, arrows, indicators, etc. (e.g., 'Glyphs.LeftArrow', 'Glyphs.HLine'). The string value is the character to be used."
+        }
+      },
+      "additionalProperties": true
     }
   }
 }

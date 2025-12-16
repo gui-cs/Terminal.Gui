@@ -1,41 +1,35 @@
-﻿#nullable enable
-namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.Input;
+
+#pragma warning disable CS1574, CS0419 // XML comment has cref attribute that could not be resolved
 /// <summary>
-///     Provides context for a <see cref="Command"/> that is being invoked.
-/// </summary
-/// <remarks>
-///     <para>
-///         To define a <see cref="Command"/> that is invoked with context,
-///         use <see cref="View.AddCommand(Command,Func{CommandContext,Nullable{bool}})"/>
-///     </para>
-/// </remarks>
-public record struct CommandContext
+///     Provides context for a <see cref="Command"/> invocation.
+/// </summary>
+/// <seealso cref="View.InvokeCommand"/>.
+#pragma warning restore CS1574, CS0419 // XML comment has cref attribute that could not be resolved
+public record struct CommandContext<TBinding> : ICommandContext
 {
     /// <summary>
-    ///     Initializes a new instance of <see cref="CommandContext"/> with the specified <see cref="Command"/>,
+    ///     Initializes a new instance with the specified <see cref="Command"/>,
     /// </summary>
     /// <param name="command"></param>
-    /// <param name="key"></param>
-    /// <param name="keyBinding"></param>
-    public CommandContext (Command command, Key? key, KeyBinding? keyBinding = null)
+    /// <param name="source"></param>
+    /// <param name="binding"></param>
+    public CommandContext (Command command, View? source, TBinding? binding)
     {
         Command = command;
-        Key = key;
-        KeyBinding = keyBinding;
+        Binding = binding;
+        Source = source;
     }
 
-    /// <summary>
-    ///     The <see cref="Command"/> that is being invoked.
-    /// </summary>
+    /// <inheritdoc />
     public Command Command { get; set; }
 
-    /// <summary>
-    ///     The <see cref="Key"/> that is being invoked. This is the key that was pressed to invoke the <see cref="Command"/>.
-    /// </summary>
-    public Key? Key { get; set; }
+    /// <inheritdoc />
+    public View? Source { get; set; }
 
     /// <summary>
-    /// The KeyBinding that was used to invoke the <see cref="Command"/>, if any.
+    /// The keyboard or mouse minding that was used to invoke the <see cref="Command"/>, if any.
     /// </summary>
-    public KeyBinding? KeyBinding { get; set; }
+    public TBinding? Binding { get; set; }
 }
