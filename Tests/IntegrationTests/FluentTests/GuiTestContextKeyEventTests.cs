@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 namespace IntegrationTests.FluentTests;
 
 /// <summary>
-///     Integration tests for GuiTestContext keyboard event handling (EnqueueKeyEvent).
+///     Integration tests for GuiTestContext keyboard event handling (InjectKeyEvent).
 /// </summary>
 public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 {
@@ -25,13 +25,13 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void QuitKey_ViaEnqueueKey_Stops (TestDriver d)
+    public void QuitKey_ViaInjectKey_Stops (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
         Assert.True (context.App?.TopRunnable!.IsRunning);
 
         IRunnable? top = context.App?.TopRunnable;
-        context.EnqueueKeyEvent (Application.QuitKey);
+        context.InjectKeyEvent (Application.QuitKey);
         context.App?.Dispose ();
 
         Assert.False (top!.IsRunning);
@@ -39,7 +39,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_AfterResizeConsole_StillWorks (TestDriver d)
+    public void InjectKey_AfterResizeConsole_StillWorks (TestDriver d)
     {
         var keyReceived = false;
         var view = new View { CanFocus = true };
@@ -49,14 +49,14 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
                                            .ResizeConsole (50, 20)
-                                           .EnqueueKeyEvent (Key.A);
+                                           .InjectKeyEvent (Key.A);
 
         Assert.True (keyReceived);
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_Backspace_DeletesCharacter (TestDriver d)
+    public void InjectKey_Backspace_DeletesCharacter (TestDriver d)
     {
         var textField = new TextField { Text = "TEST", Width = 20 };
 
@@ -64,15 +64,15 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
                                            .Add (textField)
                                            .Focus (textField)
                                            .Then ((_) => textField.CursorPosition = textField.Text.Length)
-                                           .EnqueueKeyEvent (Key.Backspace)
-                                           .EnqueueKeyEvent (Key.Backspace);
+                                           .InjectKeyEvent (Key.Backspace)
+                                           .InjectKeyEvent (Key.Backspace);
 
         Assert.Equal ("TE", textField.Text);
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_ChainedWithOtherOperations_WorksCorrectly (TestDriver d)
+    public void InjectKey_ChainedWithOtherOperations_WorksCorrectly (TestDriver d)
     {
         var textField = new TextField { Width = 20 };
         var clickedCount = 0;
@@ -83,20 +83,20 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
                                            .Add (textField)
                                            .Add (button)
                                            .Then ((_) => textField.SetFocus ())
-                                           .EnqueueKeyEvent (Key.T.WithShift)
-                                           .EnqueueKeyEvent (Key.E)
-                                           .EnqueueKeyEvent (Key.S)
-                                           .EnqueueKeyEvent (Key.T)
+                                           .InjectKeyEvent (Key.T.WithShift)
+                                           .InjectKeyEvent (Key.E)
+                                           .InjectKeyEvent (Key.S)
+                                           .InjectKeyEvent (Key.T)
                                            .AssertEqual ("Test", textField.Text)
-                                           .EnqueueKeyEvent (Key.Tab)
+                                           .InjectKeyEvent (Key.Tab)
                                            .Then ((_) => Assert.True (button.HasFocus))
-                                           .EnqueueKeyEvent (Key.Enter)
+                                           .InjectKeyEvent (Key.Enter)
                                            .AssertEqual (1, clickedCount);
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_EnqueuesKeyAndProcessesIt (TestDriver d)
+    public void InjectKey_EnqueuesKeyAndProcessesIt (TestDriver d)
     {
         var keyReceived = false;
         var receivedKey = Key.Empty;
@@ -112,7 +112,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
-                                           .EnqueueKeyEvent (Key.A);
+                                           .InjectKeyEvent (Key.A);
 
         Assert.True (keyReceived, "Key was not received by the view");
         Assert.Equal (Key.A, receivedKey);
@@ -120,7 +120,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_FunctionKeys_ProcessesCorrectly (TestDriver d)
+    public void InjectKey_FunctionKeys_ProcessesCorrectly (TestDriver d)
     {
         List<Key> keysReceived = [];
 
@@ -130,9 +130,9 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
-                                           .EnqueueKeyEvent (Key.F1)
-                                           .EnqueueKeyEvent (Key.F5)
-                                           .EnqueueKeyEvent (Key.F12);
+                                           .InjectKeyEvent (Key.F1)
+                                           .InjectKeyEvent (Key.F5)
+                                           .InjectKeyEvent (Key.F12);
 
         Assert.Equal (3, keysReceived.Count);
         Assert.Equal (Key.F1, keysReceived [0]);
@@ -142,7 +142,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_MultipleKeys_ProcessesInOrder (TestDriver d)
+    public void InjectKey_MultipleKeys_ProcessesInOrder (TestDriver d)
     {
         List<Key> keysReceived = [];
 
@@ -152,9 +152,9 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
-                                           .EnqueueKeyEvent (Key.A)
-                                           .EnqueueKeyEvent (Key.B)
-                                           .EnqueueKeyEvent (Key.C);
+                                           .InjectKeyEvent (Key.A)
+                                           .InjectKeyEvent (Key.B)
+                                           .InjectKeyEvent (Key.C);
 
         Assert.Equal (3, keysReceived.Count);
         Assert.Equal (Key.A, keysReceived [0]);
@@ -164,7 +164,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_NavigationKeys_ChangeFocus (TestDriver d)
+    public void InjectKey_NavigationKeys_ChangeFocus (TestDriver d)
     {
         var view1 = new View { Id = "view1", CanFocus = true };
         var view2 = new View { Id = "view2", CanFocus = true };
@@ -175,35 +175,35 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
                                            .Then ((_) => view1.SetFocus ())
                                            .AssertTrue (view1.HasFocus)
                                            .AssertFalse (view2.HasFocus)
-                                           .EnqueueKeyEvent (Key.Tab)
+                                           .InjectKeyEvent (Key.Tab)
                                            .AssertFalse (view1.HasFocus)
                                            .AssertTrue (view2.HasFocus)
-                                           .EnqueueKeyEvent (Key.Tab.WithShift)
+                                           .InjectKeyEvent (Key.Tab.WithShift)
                                            .AssertTrue (view1.HasFocus)
                                            .AssertFalse (view2.HasFocus);
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_NumericKeys_ProcessesCorrectly (TestDriver d)
+    public void InjectKey_NumericKeys_ProcessesCorrectly (TestDriver d)
     {
         var textField = new TextField { Width = 20 };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
                                            .Then ((_) => textField.SetFocus ())
-                                           .EnqueueKeyEvent (Key.D1)
-                                           .EnqueueKeyEvent (Key.D2)
-                                           .EnqueueKeyEvent (Key.D3)
-                                           .EnqueueKeyEvent (Key.D4)
-                                           .EnqueueKeyEvent (Key.D5);
+                                           .InjectKeyEvent (Key.D1)
+                                           .InjectKeyEvent (Key.D2)
+                                           .InjectKeyEvent (Key.D3)
+                                           .InjectKeyEvent (Key.D4)
+                                           .InjectKeyEvent (Key.D5);
 
         Assert.Equal ("12345", textField.Text);
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_RapidSequence_ProcessesAllKeys (TestDriver d)
+    public void InjectKey_RapidSequence_ProcessesAllKeys (TestDriver d)
     {
         List<Key> keysReceived = [];
         var view = new View { CanFocus = true };
@@ -216,7 +216,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         // Send 10 keys rapidly
         for (var i = 0; i < 10; i++)
         {
-            context.EnqueueKeyEvent ((Key)(Key.A.KeyCode + (uint)i));
+            context.InjectKeyEvent ((Key)(Key.A.KeyCode + (uint)i));
         }
 
         Assert.Equal (10, keysReceived.Count);
@@ -229,7 +229,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_SpecialKeys_ProcessesCorrectly (TestDriver d)
+    public void InjectKey_SpecialKeys_ProcessesCorrectly (TestDriver d)
     {
         List<Key> keysReceived = [];
 
@@ -239,11 +239,11 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
-                                           .EnqueueKeyEvent (Key.Enter)
-                                           .EnqueueKeyEvent (Key.Tab)
-                                           .EnqueueKeyEvent (Key.CursorUp)
-                                           .EnqueueKeyEvent (Key.CursorDown)
-                                           .EnqueueKeyEvent (Key.Esc);
+                                           .InjectKeyEvent (Key.Enter)
+                                           .InjectKeyEvent (Key.Tab)
+                                           .InjectKeyEvent (Key.CursorUp)
+                                           .InjectKeyEvent (Key.CursorDown)
+                                           .InjectKeyEvent (Key.Esc);
 
         Assert.Equal (5, keysReceived.Count);
         Assert.Equal (Key.Enter, keysReceived [0]);
@@ -255,7 +255,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_WithListView_NavigatesItems (TestDriver d)
+    public void InjectKey_WithListView_NavigatesItems (TestDriver d)
     {
         var listView = new ListView
         {
@@ -269,17 +269,17 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
                                            .Add (listView)
                                            .Then ((_) => listView.SetFocus ())
                                            .AssertEqual (0, listView.SelectedItem)
-                                           .EnqueueKeyEvent (Key.CursorDown)
+                                           .InjectKeyEvent (Key.CursorDown)
                                            .AssertEqual (1, listView.SelectedItem)
-                                           .EnqueueKeyEvent (Key.CursorDown)
+                                           .InjectKeyEvent (Key.CursorDown)
                                            .AssertEqual (2, listView.SelectedItem)
-                                           .EnqueueKeyEvent (Key.CursorUp)
+                                           .InjectKeyEvent (Key.CursorUp)
                                            .AssertEqual (1, listView.SelectedItem);
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_WithModifiers_ProcessesCorrectly (TestDriver d)
+    public void InjectKey_WithModifiers_ProcessesCorrectly (TestDriver d)
     {
         var keyReceived = false;
         var receivedKey = Key.Empty;
@@ -295,7 +295,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
-                                           .EnqueueKeyEvent (Key.A.WithCtrl);
+                                           .InjectKeyEvent (Key.A.WithCtrl);
 
         Assert.True (keyReceived);
         Assert.Equal (Key.A.WithCtrl, receivedKey);
@@ -304,17 +304,17 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueKey_WithTextField_UpdatesText (TestDriver d)
+    public void InjectKey_WithTextField_UpdatesText (TestDriver d)
     {
         var textField = new TextField { Width = 20 };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (textField)
-                                           .EnqueueKeyEvent (Key.H.WithShift)
-                                           .EnqueueKeyEvent (Key.E)
-                                           .EnqueueKeyEvent (Key.L)
-                                           .EnqueueKeyEvent (Key.L)
-                                           .EnqueueKeyEvent (Key.O);
+                                           .InjectKeyEvent (Key.H.WithShift)
+                                           .InjectKeyEvent (Key.E)
+                                           .InjectKeyEvent (Key.L)
+                                           .InjectKeyEvent (Key.L)
+                                           .InjectKeyEvent (Key.O);
 
         //Assert.Equal ("Hello", textField.Text);
     }

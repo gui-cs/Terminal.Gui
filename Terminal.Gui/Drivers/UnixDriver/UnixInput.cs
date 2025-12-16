@@ -195,7 +195,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
     }
 
     /// <inheritdoc/>
-    public void AddInput (char input) { _testInput.Enqueue (input); }
+    public void InjectInput (char input) { _testInput.Enqueue (input); }
 
     /// <inheritdoc/>
     public override void Dispose ()

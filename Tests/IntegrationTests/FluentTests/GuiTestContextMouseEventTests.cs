@@ -14,7 +14,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_Click_RaisesAccepting (TestDriver d)
+    public void InjectMouseEvent_Click_RaisesAccepting (TestDriver d)
     {
         var clickedCount = 0;
         var button = new Button
@@ -33,7 +33,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_Click_TView_RaisesAccepting (TestDriver d)
+    public void InjectMouseEvent_Click_TView_RaisesAccepting (TestDriver d)
     {
         var clickedCount = 0;
         var button = new Button
@@ -52,7 +52,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_Click_OnView_RaisesMouseEvent (TestDriver d)
+    public void InjectMouseEvent_Click_OnView_RaisesMouseEvent (TestDriver d)
     {
         var mouseReceived = false;
         Point receivedPosition = Point.Empty;
@@ -79,7 +79,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_MultipleClicks_ProcessesInOrder (TestDriver d)
+    public void InjectMouseEvent_MultipleClicks_ProcessesInOrder (TestDriver d)
     {
         var clickCount = 0;
         var button = new Button
@@ -100,7 +100,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_RightClick_RaisesCorrectEvent (TestDriver d)
+    public void InjectMouseEvent_RightClick_RaisesCorrectEvent (TestDriver d)
     {
         var rightClickCount = 0;
         var view = new View
@@ -127,7 +127,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory ]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_Click_SetsFocusOnView (TestDriver d)
+    public void InjectMouseEvent_Click_SetsFocusOnView (TestDriver d)
     {
         var view1 = new View
         {
@@ -161,7 +161,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_ChainedWithKeyboard_WorksCorrectly (TestDriver d)
+    public void InjectMouseEvent_ChainedWithKeyboard_WorksCorrectly (TestDriver d)
     {
         var clickCount = 0;
 
@@ -178,13 +178,13 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
                                            .LeftClick (6, 6) // Click button to focus it
                                            .AssertEqual (1, clickCount)
                                            .AssertTrue (button.HasFocus)
-                                           .EnqueueKeyEvent (Key.Enter) // Press Enter
+                                           .InjectKeyEvent (Key.Enter) // Press Enter
                                            .AssertEqual (2, clickCount); // Should trigger button again
     }
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_Click_OnTextField_SetsCaretPosition (TestDriver d)
+    public void InjectMouseEvent_Click_OnTextField_SetsCaretPosition (TestDriver d)
     {
         var textField = new TextField
         {
@@ -202,7 +202,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_RapidClicks_AllProcessed (TestDriver d)
+    public void InjectMouseEvent_RapidClicks_AllProcessed (TestDriver d)
     {
         var clickCount = 0;
         var view = new View
@@ -229,7 +229,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_Click_OutsideView_DoesNotRaiseEvent (TestDriver d)
+    public void InjectMouseEvent_Click_OutsideView_DoesNotRaiseEvent (TestDriver d)
     {
         var clickCount = 0;
         var view = new View
@@ -250,7 +250,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_ClickOnDisabledView_DoesNotTrigger (TestDriver d)
+    public void InjectMouseEvent_ClickOnDisabledView_DoesNotTrigger (TestDriver d)
     {
         var clickCount = 0;
         var button = new Button
@@ -270,7 +270,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_AfterResize_StillWorks (TestDriver d)
+    public void InjectMouseEvent_AfterResize_StillWorks (TestDriver d)
     {
         var clickCount = 0;
         var button = new Button
@@ -290,7 +290,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory (Skip = "Broken in #4474")]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_WithCheckBox_TogglesState (TestDriver d)
+    public void InjectMouseEvent_WithCheckBox_TogglesState (TestDriver d)
     {
         var checkBox = new CheckBox
         {
@@ -310,7 +310,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
     [Theory]
     [ClassData (typeof (TestDrivers))]
-    public void EnqueueMouseEvent_WithListView_SelectsItem (TestDriver d)
+    public void InjectMouseEvent_WithListView_SelectsItem (TestDriver d)
     {
         var listView = new ListView
         {

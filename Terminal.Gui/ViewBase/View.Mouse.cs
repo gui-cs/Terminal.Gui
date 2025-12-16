@@ -456,15 +456,13 @@ public partial class View // Mouse APIs
                 // Set the focus, but don't invoke Accept
                 SetFocus ();
             }
-
-            // This prevents raising commands the first time the mouse is pressed
-            mouse.Handled = true;
         }
 
         // Update MouseState based on position
         UpdateMouseStateOnPress (mouse.Position);
 
-        return mouse.Handled;
+        // Allow command invocation to proceed
+        return false;
     }
 
     /// <summary>

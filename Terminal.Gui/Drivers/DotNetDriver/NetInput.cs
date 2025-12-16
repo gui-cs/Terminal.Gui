@@ -85,7 +85,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     }
 
     /// <inheritdoc />
-    public void AddInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
+    public void InjectInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
 
     /// <inheritdoc/>
     public override bool Peek ()

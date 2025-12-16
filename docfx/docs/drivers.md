@@ -347,7 +347,8 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 
 #### Input Events
 - `KeyDown`, `KeyUp`, `MouseEvent` - Input events
-- `EnqueueKeyEvent()` - Test support
+- `InjectKeyEvent()` - Test support
+- `InjectMouseEvent()` - Test support
 
 #### ANSI Escape Sequences
 - `QueueAnsiRequest()` - ANSI request handling

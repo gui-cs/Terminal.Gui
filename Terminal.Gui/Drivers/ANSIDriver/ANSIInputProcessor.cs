@@ -53,7 +53,7 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
     }
 
     /// <inheritdoc />
-    public override void EnqueueKeyDownEvent (Key key)
+    public override void InjectKeyDownEvent (Key key)
     {
         // Convert Key → ANSI sequence (if needed) or char
         string sequence = AnsiKeyboardEncoder.Encode (key);
@@ -66,14 +66,14 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
 
         foreach (char ch in sequence)
         {
-            testableInput.AddInput (ch);
+            testableInput.InjectInput (ch);
         }
     }
 
     /// <inheritdoc />
-    public override void EnqueueMouseEvent (IApplication? app, Mouse mouse)
+    public override void InjectMouseEvent (IApplication? app, Mouse mouse)
     {
-        base.EnqueueMouseEvent (app, mouse);
+        base.InjectMouseEvent (app, mouse);
         // Convert Mouse to ANSI SGR format escape sequence
         string ansiSequence = AnsiMouseEncoder.Encode (mouse);
 
@@ -85,7 +85,7 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
 
         foreach (char ch in ansiSequence)
         {
-            testableInput.AddInput (ch);
+            testableInput.InjectInput (ch);
         }
     }
 }

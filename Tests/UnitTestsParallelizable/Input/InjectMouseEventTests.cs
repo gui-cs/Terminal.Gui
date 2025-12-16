@@ -4,19 +4,19 @@ using Xunit.Abstractions;
 namespace DriverTests.MouseTests;
 
 /// <summary>
-///     Parallelizable unit tests for IInputProcessor.EnqueueMouseEvent.
+///     Parallelizable unit tests for IInputProcessor.InjectMouseEvent.
 ///     Tests validate the entire pipeline: MouseEventArgs → TInputRecord → Queue → ProcessQueue → Events.
 ///     fully implemented in InputProcessorImpl (base class). Only WindowsInputProcessor has a working implementation.
 /// </summary>
 [Trait ("Category", "Input")]
-public class EnqueueMouseEventTests (ITestOutputHelper output)
+public class InjectMouseEventTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
     #region Mouse Event Sequencing Tests
 
     [Fact]
-    public void EnqueueMouseEvent_HandlesCompleteClickSequence ()
+    public void InjectMouseEvent_HandlesCompleteClickSequence ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -30,7 +30,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a complete click: press → release
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {
@@ -38,7 +38,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                          Flags = MouseFlags.LeftButtonPressed
                                      });
 
-        processor.EnqueueMouseEvent (
+        processor.InjectMouseEvent (
                                      null,
                                      new ()
                                      {
@@ -63,7 +63,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     #region Thread Safety Tests
 
     [Fact (Skip = "Thread safety test has race conditions - needs investigation")]
-    public void EnqueueMouseEvent_IsThreadSafe ()
+    public void InjectMouseEvent_IsThreadSafe ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -89,7 +89,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
                                {
                                    for (var i = 0; i < EVENTS_PER_THREAD; i++)
                                    {
-                                       processor.EnqueueMouseEvent (
+                                       processor.InjectMouseEvent (
                                                                     null,
                                                                     new ()
                                                                     {
@@ -142,10 +142,10 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
 
     #endregion
 
-    #region EnqueueMouseEvent Tests
+    #region InjectMouseEvent Tests
 
     [Fact]
-    public void EnqueueMouseEvent_AddsSingleMouseEventToQueue ()
+    public void InjectMouseEvent_AddsSingleMouseEventToQueue ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -168,7 +168,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         };
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
 
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
@@ -180,7 +180,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     }
 
     [Fact (Skip = "Skip for now")]
-    public void EnqueueMouseEvent_SupportsMultipleEvents ()
+    public void InjectMouseEvent_SupportsMultipleEvents ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -201,16 +201,16 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         List<Mouse> receivedParsedEvents = [];
         List<Mouse> receivedSyntheticEvents = [];
 
-        // ANSIInputProcessor.EnqueueMouseEvent calls RaiseMouseEventParsed directly (bypasses queue)
+        // ANSIInputProcessor.InjectMouseEvent calls RaiseMouseEventParsed directly (bypasses queue)
         processor.MouseEventParsed += (_, e) => receivedParsedEvents.Add (e);
         processor.SyntheticMouseEvent += (_, e) => receivedSyntheticEvents.Add (e);
 
         // Act
-        // Note: ANSIInputProcessor.EnqueueMouseEvent bypasses the queue and calls RaiseMouseEventParsed directly
+        // Note: ANSIInputProcessor.InjectMouseEvent bypasses the queue and calls RaiseMouseEventParsed directly
         // This means SimulateInputThread and ProcessQueue are not needed for this test
         foreach (Mouse mouse in events)
         {
-            processor.EnqueueMouseEvent (null, mouse);
+            processor.InjectMouseEvent (null, mouse);
         }
 
         // Assert
@@ -236,7 +236,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     // Note: Button4 is not part of the standard ANSI SGR mouse protocol (only 3 buttons: left, middle, right)
     // Note: Double/Triple clicks are synthetic events generated by the processor
     // and cannot be encoded in ANSI. Test the Press events that generate them.
-    public void EnqueueMouseEvent_SupportsAllButtonPresses (MouseFlags flags)
+    public void InjectMouseEvent_SupportsAllButtonPresses (MouseFlags flags)
     {
         // Arrange
         var ansiInput = new AnsiInput ();
@@ -257,7 +257,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
@@ -271,7 +271,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     [InlineData (10, 5)]
     [InlineData (79, 24)] // Near screen edge (assuming 80x25)
     [InlineData (100, 100)] // Beyond typical screen
-    public void EnqueueMouseEvent_PreservesPosition (int x, int y)
+    public void InjectMouseEvent_PreservesPosition (int x, int y)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -292,7 +292,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
@@ -313,7 +313,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     // [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)] // Known limitation 
     // [InlineData (MouseFlags.Shift | MouseFlags.Alt)] // Known limitation
     // [InlineData (MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)] // Known limitation
-    public void EnqueueMouseEvent_PreservesModifiers (MouseFlags modifiers)
+    public void InjectMouseEvent_PreservesModifiers (MouseFlags modifiers)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -334,7 +334,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
@@ -358,7 +358,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     [InlineData (MouseFlags.WheeledDown)]
     [InlineData (MouseFlags.WheeledLeft)]
     [InlineData (MouseFlags.WheeledRight)]
-    public void EnqueueMouseEvent_SupportsMouseWheel (MouseFlags wheelFlag)
+    public void InjectMouseEvent_SupportsMouseWheel (MouseFlags wheelFlag)
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -379,7 +379,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvent = e;
 
         // Act
-        processor.EnqueueMouseEvent (null, mouse);
+        processor.InjectMouseEvent (null, mouse);
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
@@ -389,7 +389,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void EnqueueMouseEvent_SupportsMouseMove ()
+    public void InjectMouseEvent_SupportsMouseMove ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -412,7 +412,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act
         foreach (Mouse mouse in events)
         {
-            processor.EnqueueMouseEvent (null, mouse);
+            processor.InjectMouseEvent (null, mouse);
         }
 
         SimulateInputThread (ansiInput, queue);
@@ -430,7 +430,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     #region InputProcessor Pipeline Tests
 
     [Fact]
-    public void InputProcessor_EnqueueMouseEvent_DoesNotThrow ()
+    public void InputProcessor_InjectMouseEvent_DoesNotThrow ()
     {
         // Arrange
         ConcurrentQueue<char> queue = new ();
@@ -441,7 +441,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act & Assert - Should not throw even if not implemented
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     processor.EnqueueMouseEvent (
+                                                     processor.InjectMouseEvent (
                                                                                   null,
                                                                                   new ()
                                                                                   {
@@ -471,9 +471,9 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Enqueue multiple events before processing
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonPressed });
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (2, 2), Flags = MouseFlags.PositionReport });
-        processor.EnqueueMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (3, 3), Flags = MouseFlags.LeftButtonReleased });
+        processor.InjectMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonPressed });
+        processor.InjectMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (2, 2), Flags = MouseFlags.PositionReport });
+        processor.InjectMouseEvent (null, new () { Timestamp = DateTime.Now, ScreenPosition = new (3, 3), Flags = MouseFlags.LeftButtonReleased });
 
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
@@ -488,7 +488,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     #region Error Handling Tests
 
     [Fact]
-    public void EnqueueMouseEvent_WithInvalidEvent_DoesNotThrow ()
+    public void InjectMouseEvent_WithInvalidEvent_DoesNotThrow ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -501,7 +501,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act & Assert - Empty/default mouse event should not throw
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     processor.EnqueueMouseEvent (null, new ());
+                                                     processor.InjectMouseEvent (null, new ());
                                                      SimulateInputThread (ansiInput, queue);
                                                      processor.ProcessQueue ();
                                                  });
@@ -510,7 +510,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void EnqueueMouseEvent_WithNegativePosition_DoesNotThrow ()
+    public void InjectMouseEvent_WithNegativePosition_DoesNotThrow ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -523,7 +523,7 @@ public class EnqueueMouseEventTests (ITestOutputHelper output)
         // Act & Assert - Negative positions should not throw
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     processor.EnqueueMouseEvent (
+                                                     processor.InjectMouseEvent (
                                                                                   null,
                                                                                   new ()
                                                                                   {

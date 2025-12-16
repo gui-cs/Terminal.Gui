@@ -156,7 +156,7 @@ public interface IInput<TInputRecord> : IDisposable
     ///     </code>
     ///     <para>
     ///         <b>Testing:</b> For <see cref="ITestableInput{TInputRecord}"/> implementations,
-    ///         test input injected via <see cref="ITestableInput{TInputRecord}.AddInput"/>
+    ///         test input injected via <see cref="ITestableInput{TInputRecord}.InjectInput"/>
     ///         flows through the same <c>Peek/Read</c> pipeline.
     ///     </para>
     /// </remarks>

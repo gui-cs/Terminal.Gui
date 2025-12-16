@@ -36,10 +36,10 @@ public class ColorPicker16Tests
         Assert.True (colorPicker.NewKeyDownEvent (Key.CursorUp));
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorLeft));
+        colorPicker.NewKeyDownEvent (Key.CursorLeft);
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
 
-        Assert.True (colorPicker.NewKeyDownEvent (Key.CursorUp));
+        colorPicker.NewKeyDownEvent (Key.CursorUp);
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
     }
 

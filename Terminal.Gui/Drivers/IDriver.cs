@@ -330,19 +330,19 @@ public interface IDriver : IDisposable
     event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Enqueues a key input event to the driver. For unit tests.
+    ///     Injects a key input event to the driver. For unit tests.
     /// </summary>
     /// <param name="key"></param>
-    void EnqueueKeyEvent (Key key);
+    void InjectKeyEvent (Key key);
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<Mouse>? MouseEvent;
 
     /// <summary>
-    ///     Enqueues a mouse event. For unit tests.
+    ///     Injects a mouse event. For unit tests.
     /// </summary>
     /// <param name="mouse">The mouse event to enqueue.</param>
-    void EnqueueMouseEvent (Mouse mouse);
+    void InjectMouseEvent (Mouse mouse);
 
     #endregion Input Events
 

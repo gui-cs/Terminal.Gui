@@ -43,10 +43,10 @@ public interface IInputProcessor
     event EventHandler<Key>? KeyDown;
 
     /// <summary>
-    ///     Enqueues a key down event. For unit tests.
+    ///     Injects a key down event. For unit tests.
     /// </summary>
     /// <param name="key">The key to enqueue.</param>
-    void EnqueueKeyDownEvent (Key key);
+    void InjectKeyDownEvent (Key key);
 
     /// <summary>
     ///     Raises the <see cref="KeyUp"/> event after a key up event is dequeued.
@@ -66,10 +66,10 @@ public interface IInputProcessor
     event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Enqueues a key up event. For unit tests.
+    ///     Injects a key up event. For unit tests.
     /// </summary>
     /// <param name="key">The key to enqueue.</param>
-    void EnqueueKeyUpEvent (Key key);
+    void InjectKeyUpEvent (Key key);
 
     #endregion
 
@@ -109,7 +109,7 @@ public interface IInputProcessor
     ///     uses <see cref="IApplication.Invoke(Action)"/> to raise events on the main thread.
     /// </param>
     /// <param name="mouse">The mouse event to enqueue.</param>
-    void EnqueueMouseEvent (IApplication? app, Mouse mouse);
+    void InjectMouseEvent (IApplication? app, Mouse mouse);
 
     #endregion
 
