@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -14,6 +15,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
         app.Init ("fake");
 
         app.Driver?.SetScreenSize (6, 5);
+
+        // Using a replacement char to make sure wide glyphs are handled correctly
+        // in the shadow area, to not confusing with a space char.
+        app.Driver?.GetOutputBuffer ().SetWideGlyphReplacement (Rune.ReplacementChar);
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
