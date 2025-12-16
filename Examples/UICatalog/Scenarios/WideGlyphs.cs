@@ -146,8 +146,9 @@ public sealed class WideGlyphs : Scenario
             BorderStyle = LineStyle.Single,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             ShadowStyle = ShadowStyle.Transparent,
-            ShadowWidth = 2
         };
+        superView.Margin.ShadowWidth = 2;
+
 
         Rune codepoint = Glyphs.Apple;
 

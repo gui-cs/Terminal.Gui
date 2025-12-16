@@ -255,40 +255,44 @@ public class Margin : Adornment
 
     private int _shadowWidth;
 
-    /// <inheritdoc/>
-    public override int ShadowWidth
+    /// <summary>
+    ///     Gets or sets the width of the shadow effect.
+    /// </summary>
+    public int ShadowWidth
     {
         get => _shadowWidth;
         set
         {
             if (TryValidateShadowLength (_shadowWidth, value, out int result))
             {
-                base.ShadowWidth = _shadowWidth = value;
+                _shadowWidth = value;
                 SetShadow (ShadowStyle);
             }
             else
             {
-                base.ShadowWidth = _shadowWidth = result;
+                _shadowWidth = result;
             }
         }
     }
 
     private int _shadowHeight;
 
-    /// <inheritdoc/>
-    public override int ShadowHeight
+    /// <summary>
+    ///     Gets or sets the width of the shadow effect.
+    /// </summary>
+    public int ShadowHeight
     {
         get => _shadowHeight;
         set
         {
             if (TryValidateShadowLength (_shadowHeight, value, out int result))
             {
-                base.ShadowHeight = _shadowHeight = value;
+                _shadowHeight = value;
                 SetShadow (ShadowStyle);
             }
             else
             {
-                base.ShadowHeight = _shadowHeight = result;
+                _shadowHeight = result;
             }
         }
     }

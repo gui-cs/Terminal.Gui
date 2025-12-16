@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -14,6 +15,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         app.Init ("fake");
 
         app.Driver?.SetScreenSize (6, 5);
+        app.Driver?.GetOutputBuffer ().SetWideGlyphReplacement (Rune.ReplacementChar);
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -99,6 +101,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
         app.Init ("fake");
 
         app.Driver?.SetScreenSize (8, 7);
+        app.Driver?.GetOutputBuffer ().SetWideGlyphReplacement (Rune.ReplacementChar);
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
