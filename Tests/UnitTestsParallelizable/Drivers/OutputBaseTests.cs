@@ -1,4 +1,7 @@
-﻿namespace DriverTests;
+﻿using System.Text;
+using Terminal.Gui.Drivers;
+
+namespace DriverTests;
 
 public class OutputBaseTests
 {
@@ -161,6 +164,8 @@ public class OutputBaseTests
         // FakeOutput exposes this because it's in test scope
         var output = new FakeOutput { IsLegacyConsole = isLegacyConsole };
         IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetWideGlyphReplacement ((Rune)'①');
+
         buffer.SetSize (3, 1);
 
         // Write '🦮' at col 0 and 'A' at col 2
@@ -189,9 +194,9 @@ public class OutputBaseTests
         // Column 0 was written (wide glyph)
         Assert.False (buffer.Contents! [0, 0].IsDirty);
 
-        // Column 1 was skipped by OutputBase.Write because column 0 had a wide glyph
-        // So its dirty flag remains true (it was initialized as dirty by ClearContents)
-        Assert.True (buffer.Contents! [0, 1].IsDirty);
+        // Column 1 was marked as clean by OutputBase.Write when it processed the wide glyph at column 0
+        // See: https://github.com/gui-cs/Terminal.Gui/issues/4466
+        Assert.False (buffer.Contents! [0, 1].IsDirty);
 
         // Column 2 was written ('A')
         Assert.False (buffer.Contents! [0, 2].IsDirty);
@@ -209,7 +214,7 @@ public class OutputBaseTests
 
         output.Write (buffer);
 
-        Assert.Contains ("�", output.GetLastOutput ());
+        Assert.Contains ("①", output.GetLastOutput ());
         Assert.Contains ("X", output.GetLastOutput ());
 
         // Dirty flags cleared for the written cells

@@ -64,7 +64,13 @@ public interface IDriver : IDisposable
     IInputProcessor GetInputProcessor ();
 
     /// <summary>
-    ///     Gets the output handler responsible for writing to the terminal.
+    ///     Gets the <see cref="IOutputBuffer"/> containing the buffered screen contents.
+    /// </summary>
+    /// <returns></returns>
+    IOutputBuffer GetOutputBuffer ();
+
+    /// <summary>
+    ///     Gets the <see cref="IOutput"/> responsible for writing to the terminal.
     /// </summary>
     IOutput GetOutput ();
 
@@ -256,14 +262,6 @@ public interface IDriver : IDisposable
     /// <param name="rect">The Screen-relative rectangle.</param>
     /// <param name="rune">The Rune used to fill the rectangle</param>
     void FillRect (Rectangle rect, Rune rune = default);
-
-    /// <summary>
-    ///     Fills the specified rectangle with the specified <see langword="char"/>. This method is a convenience method
-    ///     that calls <see cref="IDriver.FillRect(System.Drawing.Rectangle,System.Text.Rune)"/>.
-    /// </summary>
-    /// <param name="rect"></param>
-    /// <param name="c"></param>
-    void FillRect (Rectangle rect, char c);
 
     /// <summary>Selects the specified attribute as the attribute to use for future calls to AddRune and AddString.</summary>
     /// <remarks>Implementations should call <c>base.SetAttribute(c)</c>.</remarks>
