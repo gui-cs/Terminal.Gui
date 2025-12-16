@@ -5,7 +5,7 @@ public class VirtualTimeProviderTests
     [Fact]
     public void VirtualTimeProvider_StartsAtInitialTime ()
     {
-        // CoPilot - Test that virtual time provider starts at the expected initial time
+        // Copilot - Test that virtual time provider starts at the expected initial time
         VirtualTimeProvider timeProvider = new ();
         DateTime expectedStart = new (2025, 1, 1, 0, 0, 0);
 
@@ -15,7 +15,7 @@ public class VirtualTimeProviderTests
     [Fact]
     public void VirtualTimeProvider_AdvanceTime_UpdatesNow ()
     {
-        // CoPilot - Test that advancing time updates the Now property
+        // Copilot - Test that advancing time updates the Now property
         VirtualTimeProvider timeProvider = new ();
         DateTime startTime = timeProvider.Now;
 
@@ -27,7 +27,7 @@ public class VirtualTimeProviderTests
     [Fact]
     public void VirtualTimeProvider_SetTime_UpdatesNow ()
     {
-        // CoPilot - Test that setting time explicitly works
+        // Copilot - Test that setting time explicitly works
         VirtualTimeProvider timeProvider = new ();
         DateTime newTime = new (2025, 6, 15, 12, 30, 45);
 
@@ -39,7 +39,7 @@ public class VirtualTimeProviderTests
     [Fact]
     public void VirtualTimeProvider_MultipleAdvances_Accumulate ()
     {
-        // CoPilot - Test that multiple time advances accumulate correctly
+        // Copilot - Test that multiple time advances accumulate correctly
         VirtualTimeProvider timeProvider = new ();
         DateTime startTime = timeProvider.Now;
 
@@ -53,7 +53,7 @@ public class VirtualTimeProviderTests
     [Fact]
     public async Task VirtualTimeProvider_Delay_CompletesAfterAdvance ()
     {
-        // CoPilot - Test that delays complete when time is advanced past their completion time
+        // Copilot - Test that delays complete when time is advanced past their completion time
         VirtualTimeProvider timeProvider = new ();
 
         Task delayTask = timeProvider.Delay (TimeSpan.FromSeconds (5));
@@ -72,7 +72,7 @@ public class VirtualTimeProviderTests
     [Fact]
     public void VirtualTimer_FiresWhenTimeAdvances ()
     {
-        // CoPilot - Test that timers fire when virtual time advances past trigger point
+        // Copilot - Test that timers fire when virtual time advances past trigger point
         VirtualTimeProvider timeProvider = new ();
         var callbackCount = 0;
 
@@ -100,7 +100,7 @@ public class VirtualTimeProviderTests
     [Fact]
     public void VirtualTimer_StopPreventsCallbacks ()
     {
-        // CoPilot - Test that stopping a timer prevents further callbacks
+        // Copilot - Test that stopping a timer prevents further callbacks
         VirtualTimeProvider timeProvider = new ();
         var callbackCount = 0;
 
