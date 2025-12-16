@@ -16,10 +16,18 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext RightClick (int screenX, int screenY)
     {
-        return EnqueueMouseEvent (new ()
+        InjectMouseEvent (new ()
         {
-            Flags = MouseFlags.Button3Clicked,
-            ScreenPosition = new (screenX, screenY)
+            Flags = MouseFlags.RightButtonPressed,
+            ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
+        });
+
+        return InjectMouseEvent (new ()
+        {
+            Flags = MouseFlags.RightButtonReleased,
+            ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
         });
     }
 
@@ -33,10 +41,18 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick (int screenX, int screenY)
     {
-        return EnqueueMouseEvent (new ()
+        InjectMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked,
+            Flags = MouseFlags.LeftButtonPressed,
             ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
+        });
+
+        return InjectMouseEvent (new ()
+        {
+            Flags = MouseFlags.LeftButtonReleased,
+            ScreenPosition = new (screenX, screenY),
+            Position = new (screenX, screenY)
         });
     }
 
@@ -49,22 +65,29 @@ public partial class GuiTestContext
     /// <returns></returns>
     public GuiTestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
     {
-        return EnqueueMouseEvent (new ()
+        return InjectMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked,
+            Flags = MouseFlags.LeftButtonClicked
         }, evaluator);
     }
 
-    private GuiTestContext EnqueueMouseEvent (MouseEventArgs mouseEvent)
+    /// <summary>
+    /// Injects a mouse event to the current driver's input processor.
+    /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// </summary>
+    /// <param name="mouse"></param>
+    /// <returns></returns>
+    private GuiTestContext InjectMouseEvent (Mouse mouse)
     {
             // Enqueue the mouse event
         WaitIteration ((app) =>
         {
             if (app.Driver is { })
             {
-                mouseEvent.Position = mouseEvent.ScreenPosition;
+                mouse.Timestamp = DateTime.Now;
+                mouse.Position = mouse.ScreenPosition;
 
-                app.Driver.GetInputProcessor ().EnqueueMouseEvent (app, mouseEvent);
+                app.Driver.GetInputProcessor ().InjectMouseEvent (app, mouse);
             }
             else
             {
@@ -72,12 +95,18 @@ public partial class GuiTestContext
             }
         });
 
-        // Wait for the event to be processed (similar to EnqueueKeyEvent)
+        // Wait for the event to be processed (similar to InjectKeyEvent)
         return WaitIteration ();
     }
 
-
-    private GuiTestContext EnqueueMouseEvent<TView> (MouseEventArgs mouseEvent, Func<TView, bool> evaluator) where TView : View
+    /// <summary>
+    /// Injects a mouse event to the current driver's input processor.
+    /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// </summary>
+    /// <param name="mouse"></param>
+    /// <param name="evaluator"></param>
+    /// <returns></returns>
+    private GuiTestContext InjectMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 
@@ -86,112 +115,23 @@ public partial class GuiTestContext
                                                 TView v = Find (evaluator);
                                                 screen = v.ViewportToScreen (new Point (0, 0));
                                             });
-        mouseEvent.ScreenPosition = screen;
-        mouseEvent.Position = new Point (0, 0);
+        mouse.ScreenPosition = screen;
+        mouse.Position = screen;
 
-        EnqueueMouseEvent (mouseEvent);
+        InjectMouseEvent (mouse);
 
         return ctx;
     }
 
-    //private GuiTestContext Click (WindowsConsole.ButtonState btn, int screenX, int screenY)
-    //{
-    //    switch (_driverType)
-    //    {
-    //        case TestDriver.Windows:
-
-    //            _winInput!.InputQueue!.Enqueue (
-    //                                             new ()
-    //                                             {
-    //                                                 EventType = WindowsConsole.EventType.Mouse,
-    //                                                 MouseEvent = new ()
-    //                                                 {
-    //                                                     ButtonState = btn,
-    //                                                     MousePosition = new ((short)screenX, (short)screenY)
-    //                                                 }
-    //                                             });
-
-    //            _winInput.InputQueue.Enqueue (
-    //                                           new ()
-    //                                           {
-    //                                               EventType = WindowsConsole.EventType.Mouse,
-    //                                               MouseEvent = new ()
-    //                                               {
-    //                                                   ButtonState = WindowsConsole.ButtonState.NoButtonPressed,
-    //                                                   MousePosition = new ((short)screenX, (short)screenY)
-    //                                               }
-    //                                           });
-
-    //            return WaitUntil (() => _winInput.InputQueue.IsEmpty);
-
-    //        case TestDriver.DotNet:
-
-    //            int netButton = btn switch
-    //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
-    //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-    //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
-    //            };
-
-    //            foreach (ConsoleKeyInfo k in NetSequences.Click (netButton, screenX, screenY))
-    //            {
-    //                SendNetKey (k, false);
-    //            }
-
-    //            return WaitIteration ();
-
-    //        case TestDriver.Unix:
-
-    //            int unixButton = btn switch
-    //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
-    //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-    //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
-    //            };
-
-    //            foreach (ConsoleKeyInfo k in NetSequences.Click (unixButton, screenX, screenY))
-    //            {
-    //                SendUnixKey (k.KeyChar, false);
-    //            }
-
-    //            return WaitIteration ();
-
-    //        case TestDriver.Fake:
-
-    //            int fakeButton = btn switch
-    //            {
-    //                WindowsConsole.ButtonState.Button1Pressed => 0,
-    //                WindowsConsole.ButtonState.Button2Pressed => 1,
-    //                WindowsConsole.ButtonState.Button3Pressed => 2,
-    //                WindowsConsole.ButtonState.RightmostButtonPressed => 2,
-    //                _ => throw new ArgumentOutOfRangeException (nameof (btn))
-    //            };
-
-    //            foreach (ConsoleKeyInfo k in NetSequences.Click (fakeButton, screenX, screenY))
-    //            {
-    //                SendFakeKey (k, false);
-    //            }
-
-    //            return WaitIteration ();
-
-    //        default:
-    //            throw new ArgumentOutOfRangeException ();
-    //    }
-    //}
-
     /// <summary>
-    ///     Enqueues a key down event to the current driver's input processor.
+    ///     Injects a key down event to the current driver's input processor.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     /// <summary>
     ///     Enqueues a key down event to the current driver's input processor.
     /// </summary>
-    public GuiTestContext EnqueueKeyEvent (Key key)
+    public GuiTestContext InjectKeyEvent (Key key)
     {
         //Logging.Trace ($"Enqueuing key: {key}");
 
@@ -202,7 +142,7 @@ public partial class GuiTestContext
         if (App?.Driver is { })
         {
             App.Driver.KeyDown += DriverOnKeyDown;
-            App.Driver.EnqueueKeyEvent (key);
+            App.Driver.InjectKeyEvent (key);
             WaitUntil (() => keyReceived);
         }
 

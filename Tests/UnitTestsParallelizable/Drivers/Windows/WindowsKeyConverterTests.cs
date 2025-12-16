@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace DriverTests;
+namespace DriverTests.Windows;
 
 [Collection ("Global Test Setup")]
 [Trait ("Platform", "Windows")]

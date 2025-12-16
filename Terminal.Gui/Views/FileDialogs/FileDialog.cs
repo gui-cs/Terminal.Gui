@@ -1049,32 +1049,32 @@ public class FileDialog : Dialog, IDesignable
     private void OnTableViewActivating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
         {
             return;
         }
 
-        Point? clickedCell = _tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? clickedCol);
+        Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
-            if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+            if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
             }
-            else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
+            else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 // right click in a header
-                ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
+                ShowHeaderContextMenu (clickedCol.Value, mouse);
             }
         }
         else
         {
-            if (clickedCell is { } && mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 // right click in rest of table
-                ShowCellContextMenu (clickedCell, mouseArgs);
+                ShowCellContextMenu (clickedCell, mouse);
             }
         }
     }
@@ -1223,7 +1223,7 @@ public class FileDialog : Dialog, IDesignable
 
     private FileSystemInfoStats RowToStats (int rowIndex) { return State?.Children [rowIndex]!; }
 
-    private void ShowCellContextMenu (Point? clickedCell, MouseEventArgs e)
+    private void ShowCellContextMenu (Point? clickedCell, Mouse e)
     {
         if (clickedCell is null)
         {
@@ -1246,7 +1246,7 @@ public class FileDialog : Dialog, IDesignable
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, Mouse e)
     {
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 

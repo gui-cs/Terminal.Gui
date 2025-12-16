@@ -58,9 +58,10 @@ public class CharMap : View, IDesignable
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Context);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
@@ -852,7 +853,7 @@ public class CharMap : View, IDesignable
         if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
             // If the mouse is clicked on the headers, map it to the first glyph of the row/col
-            position = mouseCommandContext.Binding.MouseEventArgs.Position;
+            position = mouseCommandContext.Binding.MouseEventArgs.Position!.Value;
 
             if (position.Y == 0)
             {
@@ -904,7 +905,7 @@ public class CharMap : View, IDesignable
                 SetFocus ();
             }
 
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out int cp))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out int cp))
             {
                 return false;
             }
@@ -923,7 +924,7 @@ public class CharMap : View, IDesignable
 
         if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out newCodePoint))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out newCodePoint))
             {
                 return false;
             }

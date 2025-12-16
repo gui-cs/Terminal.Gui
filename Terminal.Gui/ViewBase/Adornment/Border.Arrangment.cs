@@ -406,9 +406,9 @@ public partial class Border
         HotKeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
+    private void ApplicationOnMouseEvent (object? sender, Mouse e)
     {
-        if (e.Flags != MouseFlags.Button1Clicked)
+        if (e.Flags != MouseFlags.LeftButtonClicked)
         {
             return;
         }
@@ -478,10 +478,10 @@ public partial class Border
     private Point _startGrabPoint;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
-        if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (!_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             Parent!.SetFocus ();
 
@@ -492,7 +492,7 @@ public partial class Border
 
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
-            if (Contains (new (mouseEvent.Position.X + Parent.Frame.X + Frame.X, mouseEvent.Position.Y + Parent.Frame.Y + Frame.Y)))
+            if (Contains (new (mouse.Position!.Value.X + Parent.Frame.X + Frame.X, mouse.Position!.Value.Y + Parent.Frame.Y + Frame.Y)))
             {
                 if (Arranging != ViewArrangement.Fixed)
                 {
@@ -500,8 +500,8 @@ public partial class Border
                 }
 
                 // Set the start grab point to the Frame coords
-                _startGrabPoint = new (mouseEvent.Position.X + Frame.X, mouseEvent.Position.Y + Frame.Y);
-                _dragPosition = mouseEvent.Position;
+                _startGrabPoint = new (mouse.Position!.Value.X + Frame.X, mouse.Position!.Value.Y + Frame.Y);
+                _dragPosition = mouse.Position;
                 App?.Mouse.GrabMouse (this);
 
                 // Determine the mode based on where the click occurred
@@ -515,16 +515,16 @@ public partial class Border
             return true;
         }
 
-        if (mouseEvent.Flags is (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) && App?.Mouse.MouseGrabView == this)
+        if (mouse.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport) && App?.Mouse.MouseGrabView == this)
         {
             if (_dragPosition.HasValue)
             {
-                HandleDragOperation (mouseEvent);
+                HandleDragOperation (mouse);
                 return true;
             }
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue)
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased) && _dragPosition.HasValue)
         {
             _dragPosition = null;
             App?.Mouse.UngrabMouse ();
@@ -651,7 +651,7 @@ public partial class Border
     /// <summary>
     /// Handles drag operations for moving and resizing
     /// </summary>
-    internal void HandleDragOperation (MouseEventArgs mouseEvent)
+    internal void HandleDragOperation (Mouse mouse)
     {
         if (Parent!.SuperView is null)
         {
@@ -663,10 +663,10 @@ public partial class Border
             Parent.SuperView.SetNeedsDraw ();
         }
 
-        _dragPosition = mouseEvent.Position;
+        _dragPosition = mouse.Position;
 
-        Point parentLoc = Parent!.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
-                          ?? mouseEvent.ScreenPosition;
+        Point parentLoc = Parent!.SuperView?.ScreenToViewport (new (mouse.ScreenPosition.X, mouse.ScreenPosition.Y))
+                          ?? mouse.ScreenPosition;
 
         int minHeight = Thickness.Vertical + Parent!.Margin!.Thickness.Bottom;
         int minWidth = Thickness.Horizontal + Parent!.Margin!.Thickness.Right;
@@ -771,7 +771,7 @@ public partial class Border
     /// </summary>
     /// <remarks>
     ///     During an Arrange Mode drag (<see cref="_dragPosition"/> has a value), Border owns the mouse grab and
-    ///     must receive all mouse events until Button1Released. If another view (e.g., scrollbar, slider) were allowed
+    ///     must receive all mouse events until LeftButtonReleased. If another view (e.g., scrollbar, slider) were allowed
     ///     to grab the mouse, the drag would freeze, leaving Border in an inconsistent state with no cleanup.
     ///     Canceling follows the CWP pattern, ensuring Border maintains exclusive mouse control until it explicitly
     ///     releases via <see cref="IMouseGrabHandler.UngrabMouse"/> in <see cref="OnMouseEvent"/>.

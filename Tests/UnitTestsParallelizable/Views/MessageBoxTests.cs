@@ -12,7 +12,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void KeyBindings_Enter_Causes_Focused_Button_Click_No_Accept ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -68,7 +68,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void KeyBindings_Esc_Closes ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -115,7 +115,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void KeyBindings_Space_Causes_Focused_Button_Click_No_Accept ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -180,7 +180,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Location_And_Size_Correct (string message, bool wrapMessage, bool hasButton, int expectedX, int expectedY, int expectedW, int expectedH)
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -224,7 +224,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Message_With_Spaces_WrapMessage_False ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -308,7 +308,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Message_With_Spaces_WrapMessage_True ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -408,7 +408,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Size_Not_Default_Message (int height, int width, string message)
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -450,7 +450,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Size_Not_Default_Message_Button (int height, int width, string message)
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -487,7 +487,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Size_Not_Default_No_Message (int height, int width)
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -520,7 +520,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void UICatalog_AboutBox ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {
@@ -599,7 +599,7 @@ public class MessageBoxTests (ITestOutputHelper output)
     public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         try
         {

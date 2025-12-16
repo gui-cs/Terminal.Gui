@@ -56,7 +56,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
 
     [Theory]
     [CombinatorialData]
-    public void MouseClick_SetsFocus_OnNextSubView (bool hasHotKey)
+    public void LeftButtonPressed_SetsFocus_OnNextSubView (bool hasHotKey)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
@@ -72,7 +72,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
         Assert.False (label.HasFocus);
         Assert.False (nextSubView.HasFocus);
 
-        label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.False (label.HasFocus);
         Assert.Equal (hasHotKey, nextSubView.HasFocus);
     }
@@ -193,7 +193,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
     }
 
     [Fact]
-    public void CanFocus_False_MouseClick_SetsFocus_Next ()
+    public void CanFocus_False_LeftButtonPressed_SetsFocus_Next ()
     {
         View otherView = new () { X = 0, Y = 0, Width = 1, Height = 1, Id = "otherView", CanFocus = true };
         Label label = new () { X = 0, Y = 1, Text = "_label" };
@@ -209,7 +209,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
         otherView.SetFocus ();
 
         // click on label
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.Button1Clicked });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = label.Frame.Location, Flags = MouseFlags.LeftButtonPressed });
         Assert.False (label.HasFocus);
         Assert.True (nextView.HasFocus);
     }
@@ -247,10 +247,8 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
         Assert.False (view.HasFocus);
     }
 
-
-
     [Fact]
-    public void CanFocus_True_MouseClick_Focuses ()
+    public void CanFocus_True_LeftButtonPressed_Focuses ()
     {
         Label label = new ()
         {
@@ -289,12 +287,12 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
         Assert.True (otherView.HasFocus);
 
         // label can focus, so clicking on it set focus
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.True (label.HasFocus);
         Assert.False (otherView.HasFocus);
 
         // click on view
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.Button1Clicked });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 1), Flags = MouseFlags.LeftButtonPressed });
         Assert.False (label.HasFocus);
         Assert.True (otherView.HasFocus);
     }
@@ -304,7 +302,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
     public void With_Top_Margin_Without_Top_Border ()
     {
         IApplication app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
         Runnable<bool> runnable = new ()
         {
             Width = 10,
@@ -333,7 +331,7 @@ public class LabelTests (ITestOutputHelper output) : FakeDriverBase
     public void Without_Top_Border ()
     {
         IApplication app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
         Runnable<bool> runnable = new ()
         {
             Width = 10,

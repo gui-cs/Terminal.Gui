@@ -126,25 +126,25 @@ public partial class View // Command APIs
     /// </returns>
     protected bool? RaiseAccepting (ICommandContext? ctx)
     {
-        Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
+        //Logging.Debug ($"{Title} ({ctx?.Source?.Title})");
         CommandEventArgs args = new () { Context = ctx };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
-        Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
+        //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling OnAccepting...");
         args.Handled = OnAccepting (args) || args.Handled;
 
         if (!args.Handled && Accepting is { })
         {
             // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
+            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Raising Accepting...");
             Accepting?.Invoke (this, args);
         }
 
         // If Accepting was handled, raise Accepted (non-cancelable event)
         if (args.Handled)
         {
-            Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling RaiseAccepted");
+            //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Calling RaiseAccepted");
             RaiseAccepted (ctx);
         }
 

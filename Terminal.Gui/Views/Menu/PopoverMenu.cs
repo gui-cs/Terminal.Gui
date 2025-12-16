@@ -153,9 +153,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <summary>
     ///     The mouse flags that will cause the popover menu to be visible. The default is
-    ///     <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
+    ///     <see cref="MouseFlags.RightButtonClicked"/> which is typically the right mouse button.
     /// </summary>
-    public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
+    public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
 
     /// <summary>
     ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the

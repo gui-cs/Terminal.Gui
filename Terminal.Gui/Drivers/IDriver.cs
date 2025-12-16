@@ -3,9 +3,6 @@ using System.Collections.Concurrent;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>Base interface for Terminal.Gui Driver implementations.</summary>
-/// <remarks>
-///     There are currently four implementations: UnixDriver, WindowsDriver, DotNetDriver, and FakeDriver
-/// </remarks>
 public interface IDriver : IDisposable
 {
     #region Driver Lifecycle
@@ -321,9 +318,6 @@ public interface IDriver : IDisposable
 
     #region Input Events
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    event EventHandler<MouseEventArgs>? MouseEvent;
-
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
     event EventHandler<Key>? KeyDown;
 
@@ -336,10 +330,19 @@ public interface IDriver : IDisposable
     event EventHandler<Key>? KeyUp;
 
     /// <summary>
-    ///     Enqueues a key input event to the driver. For unit tests.
+    ///     Injects a key input event to the driver. For unit tests.
     /// </summary>
     /// <param name="key"></param>
-    void EnqueueKeyEvent (Key key);
+    void InjectKeyEvent (Key key);
+
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    event EventHandler<Mouse>? MouseEvent;
+
+    /// <summary>
+    ///     Injects a mouse event. For unit tests.
+    /// </summary>
+    /// <param name="mouse">The mouse event to enqueue.</param>
+    void InjectMouseEvent (Mouse mouse);
 
     #endregion Input Events
 

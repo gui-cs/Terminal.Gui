@@ -282,20 +282,18 @@ internal partial class ApplicationImpl
 
         // === 6. Reset input systems ===
         // Dispose keyboard and mouse to unsubscribe from events
+        // Mouse and Keyboard will be lazy-initialized on next access
         if (_keyboard is IDisposable keyboardDisposable)
         {
             keyboardDisposable.Dispose ();
         }
+        _keyboard = null;
 
         if (_mouse is IDisposable mouseDisposable)
         {
             mouseDisposable.Dispose ();
         }
-
-        // Mouse and Keyboard will be lazy-initialized on next access
         _mouse = null;
-        _keyboard = null;
-        Mouse.ResetState ();
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;

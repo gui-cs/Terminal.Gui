@@ -23,7 +23,7 @@ public abstract class SelectorBase : View, IOrientation
 
         AddCommand (Command.Accept, HandleAcceptCommand);
         //AddCommand (Command.HotKey, HandleHotKeyCommand);
-
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
         //CreateSubViews ();
     }
 
@@ -60,7 +60,7 @@ public abstract class SelectorBase : View, IOrientation
     {
         if (!DoubleClickAccepts
             && ctx is CommandContext<MouseBinding> mouseCommandContext
-            && mouseCommandContext.Binding.MouseEventArgs!.Flags.HasFlag (MouseFlags.Button1DoubleClicked))
+            && mouseCommandContext.Binding.MouseEventArgs!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
             return false;
         }
@@ -327,7 +327,7 @@ public abstract class SelectorBase : View, IOrientation
             Title = label,
             Id = label,
             Data = value,
-            HighlightStates = MouseState.In,
+            MouseHighlightStates = MouseState.In,
         };
 
         return checkbox;

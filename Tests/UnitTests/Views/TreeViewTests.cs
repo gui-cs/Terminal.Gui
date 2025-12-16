@@ -435,7 +435,7 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.False (called);
 
         // double click triggers activation
-        tree.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.True (called);
         Assert.Same (f, activated);
@@ -448,7 +448,7 @@ public class TreeViewTests (ITestOutputHelper output)
     {
         TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        tree.ObjectActivationButton = MouseFlags.Button2Clicked;
+        tree.ObjectActivationButton = MouseFlags.MiddleButtonClicked;
         tree.ExpandAll ();
 
         object activated = null;
@@ -464,12 +464,12 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.False (called);
 
         // double click does nothing because we changed button binding to right click
-        tree.NewMouseEvent (new MouseEventArgs { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new Mouse { Position = new (0, 1), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Null (activated);
         Assert.False (called);
 
-        tree.NewMouseEvent (new MouseEventArgs { Position = new (0, 1), Flags = MouseFlags.Button2Clicked });
+        tree.NewMouseEvent (new Mouse { Position = new (0, 1), Flags = MouseFlags.MiddleButtonClicked });
 
         Assert.True (called);
         Assert.Same (car1, activated);
@@ -503,7 +503,7 @@ public class TreeViewTests (ITestOutputHelper output)
 
 
         // double click does nothing because we changed button to null
-        tree.NewMouseEvent (new MouseEventArgs { Flags = MouseFlags.Button1DoubleClicked });
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.False (called);
         Assert.Null (activated);

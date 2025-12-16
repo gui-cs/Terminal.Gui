@@ -120,16 +120,15 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 **⚠️ CRITICAL - These rules MUST be followed in ALL new or modified code:**
 
-- **Do NOT add formatting tools** - Use existing `.editorconfig` and `Terminal.sln.DotSettings`
+**AI or AI Agent Written or Modified Code MUST Follow these instructions**
+
+- Use existing `.editorconfig` and `Terminal.sln.DotSettings` to determine code style and formatting.
 - Format code with:
   1. ReSharper/Rider (`Ctrl-E-C`)
   2. JetBrains CleanupCode CLI tool (free)
   3. Visual Studio (`Ctrl-K-D`) as fallback
-- **Only format files you modify**
-- Follow `.editorconfig` settings (e.g., braces on new lines, spaces after keywords)
-- 4-space indentation
-- No trailing whitespace
-- File-scoped namespaces
+- Only format files you modify
+- Follow `.editorconfig` settings
 - **ALWAYS use explicit types** - Never use `var` except for built-in simple types (`int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`)
   ```csharp
   // ✅ CORRECT - Explicit types
@@ -144,7 +143,6 @@ Welcome! This guide provides everything you need to know to contribute effective
   var args = new MouseEventArgs { Position = new Point(5, 5) };
   var views = new List<View?>();
   ```
-
 - **ALWAYS use target-typed `new ()`** - Use `new ()` instead of `new TypeName()` when the type is already declared
   ```csharp
   // ✅ CORRECT - Target-typed new
@@ -155,8 +153,21 @@ Welcome! This guide provides everything you need to know to contribute effective
   View view = new View() { Width = 10 };
   MouseEventArgs args = new MouseEventArgs();
   ```
+- **ALWAYS** use collection initializers if possible:
+  ```csharp
+  // ✅ CORRECT - Collection initializer
+  List<View> views = [
+      new Button("OK"),
+      new Button("Cancel")
+  ];
+  
+  // ❌ WRONG - Adding items separately
+  List<View> views = new ();
+  views.Add(new Button("OK"));
+  views.Add(new Button("Cancel"));
+  ```
 
-**⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, and samples.**
+**⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, documentation, and samples.**
 
 ## Testing Requirements
 
@@ -173,6 +184,8 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 ### Test Patterns
 
+- **AI Created Tests MUST follow these patterns exactly.**
+- **Add comment indicating the test was AI generated** - e.g., `// CoPilot - ChatGPT v4`
 - **Make tests granular** - Each test should cover smallest area possible
 - Follow existing test patterns in respective test projects
 - **Avoid adding new tests to the `UnitTests` Project** - Make them parallelizable and add them to `UnitTests.Parallelizable`
@@ -241,7 +254,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 **`/Terminal.Gui/`** - Core library (496 C# files):
 - `App/` - Application lifecycle (`Application.cs` static class, `SessionToken`, `MainLoop`)
 - `Configuration/` - `ConfigurationManager` for settings
-- `Drivers/` - Console driver implementations (`Dotnet`, `Windows`, `Unix`, `Fake`)
+- `Drivers/` - Console driver implementations (`dotnet`, `Windows`, `Unix`, `ansi`)
 - `Drawing/` - Rendering system (attributes, colors, glyphs)
 - `Input/` - Keyboard and mouse input handling
 - `ViewBase/` - Core `View` class hierarchy and layout

@@ -19,10 +19,10 @@ public enum VK : ushort
     MBUTTON = 0x04,
 
     /// <summary>X1 mouse button.</summary>
-    XBUTTON1 = 0x05,
+    XLeftButton = 0x05,
 
     /// <summary>X2 mouse button.</summary>
-    XBUTTON2 = 0x06,
+    XMiddleButton = 0x06,
 
     /// <summary>BACKSPACE key.</summary>
     BACK = 0x08,

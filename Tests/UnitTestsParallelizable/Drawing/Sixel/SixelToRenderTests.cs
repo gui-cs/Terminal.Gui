@@ -192,12 +192,13 @@ public class SixelToRenderTests
 
         try
         {
-            var output = new FakeOutput ();
+            var output = new AnsiOutput ();
             output.IsLegacyConsole = isLegacyConsole;
 
             Mock<DriverImpl> driverMock = new (
                                                MockBehavior.Strict,
-                                               new FakeInputProcessor (null!),
+                                               new AnsiComponentFactory (),
+                                               new AnsiInputProcessor (null!),
                                                new OutputBufferImpl (),
                                                output,
                                                new AnsiRequestScheduler (new AnsiResponseParser ()),

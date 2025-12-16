@@ -1,7 +1,7 @@
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace ApplicationTests.Mouse;
+namespace ApplicationTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable tests for mouse event routing and coordinate transformation.
@@ -40,14 +40,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (screenX, screenY),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         if (shouldReceive)
@@ -98,14 +98,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (viewRelativeX, viewRelativeY),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         if (shouldReceive)
@@ -155,59 +155,20 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         // Click at position (2, 2) relative to subView (which is at 5,5 relative to superView)
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new Point (2, 2), // Relative to subView
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        subView.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouse);
 
         // Assert
         Assert.True (subViewEventReceived);
         Assert.NotNull (subViewReceivedPosition);
         Assert.Equal (2, subViewReceivedPosition.Value.X);
         Assert.Equal (2, subViewReceivedPosition.Value.Y);
-
-        subView.Dispose ();
-        superView.Dispose ();
-    }
-
-    [Fact]
-    public void MouseClick_OnSubView_RaisesSelectingEvent ()
-    {
-        // Arrange
-        View superView = new ()
-        {
-            Width = 20,
-            Height = 20
-        };
-
-        View subView = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 10,
-            Height = 10
-        };
-
-        superView.Add (subView);
-
-        int activatingCount = 0;
-        subView.Activating += (_, _) => activatingCount++;
-
-        MouseEventArgs mouseEvent = new ()
-        {
-            Position = new Point (5, 5),
-            Flags = MouseFlags.Button1Clicked
-        };
-
-        // Act
-        subView.NewMouseEvent (mouseEvent);
-
-        // Assert
-        Assert.Equal (1, activatingCount);
 
         subView.Dispose ();
         superView.Dispose ();
@@ -233,14 +194,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, e) => { clickHandlerCalled = !e.IsSingleDoubleOrTripleClicked; ; };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        bool? result = view.NewMouseEvent (mouseEvent);
+        bool? result = view.NewMouseEvent (mouse);
 
         // Assert
         Assert.True (result.HasValue && result.Value); // Event was handled
@@ -263,14 +224,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             // Don't set Handled = true
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.True (eventHandlerCalled);
@@ -283,9 +244,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     #region Mouse Button Events
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, 1, 0)]
-    [InlineData (MouseFlags.Button1Released, 0, 1)]
-    [InlineData (MouseFlags.Button1Clicked, 0, 0)]
+    [InlineData (MouseFlags.LeftButtonPressed, 1, 0)]
+    [InlineData (MouseFlags.LeftButtonReleased, 0, 1)]
+    [InlineData (MouseFlags.LeftButtonClicked, 0, 0)]
     public void View_MouseButtonEvents_RaiseCorrectHandlers (MouseFlags flags, int expectedPressed, int expectedReleased)
     {
         // Arrange
@@ -295,25 +256,25 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, args) =>
         {
-            if (args.Flags.HasFlag (MouseFlags.Button1Pressed))
+            if (args.Flags.HasFlag (MouseFlags.LeftButtonPressed))
             {
                 pressedCount++;
             }
 
-            if (args.Flags.HasFlag (MouseFlags.Button1Released))
+            if (args.Flags.HasFlag (MouseFlags.LeftButtonReleased))
             {
                 releasedCount++;
             }
         };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = flags
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (expectedPressed, pressedCount);
@@ -323,9 +284,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Clicked)]
+    [InlineData (MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonClicked)]
+    [InlineData (MouseFlags.RightButtonClicked)]
     [InlineData (MouseFlags.Button4Clicked)]
     public void View_AllMouseButtons_TriggerClickEvent (MouseFlags clickFlag)
     {
@@ -335,14 +296,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, a) => clickCount += a.IsSingleDoubleOrTripleClicked ? 1 : 0;
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = clickFlag
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (1, clickCount);
@@ -368,14 +329,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool eventCalled = false;
         view.MouseEvent += (_, _) => { eventCalled = true; };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.False (eventCalled);
@@ -397,14 +358,14 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool selectingCalled = false;
         view.Activating += (_, _) => { selectingCalled = true; };
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        view.NewMouseEvent (mouseEvent);
+        view.NewMouseEvent (mouse);
 
         // Assert
         Assert.False (selectingCalled);
@@ -435,54 +396,19 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
         superView.SetFocus (); // Give superView focus first
 
-        MouseEventArgs mouseEvent = new ()
+        Terminal.Gui.Input.Mouse mouse = new ()
         {
             Position = new (2, 2),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        subView.NewMouseEvent (mouseEvent);
+        subView.NewMouseEvent (mouse);
 
         // Assert
         Assert.Equal (expectFocus, subView.HasFocus);
 
         subView.Dispose ();
-        superView.Dispose ();
-    }
-
-    [Fact]
-    public void MouseClick_RaisesSelecting_WhenCanFocus ()
-    {
-        // Arrange
-        View superView = new () { CanFocus = true, Width = 20, Height = 20 };
-        View view = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
-
-        superView.Add (view);
-
-        int activatingCount = 0;
-        view.Activating += (_, _) => activatingCount++;
-
-        MouseEventArgs mouseEvent = new ()
-        {
-            Position = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
-        };
-
-        // Act
-        view.NewMouseEvent (mouseEvent);
-
-        // Assert
-        Assert.Equal (1, activatingCount);
-
-        view.Dispose ();
         superView.Dispose ();
     }
 

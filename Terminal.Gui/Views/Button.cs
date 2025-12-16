@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="IsDefault"/>.
 ///     </para>
 ///     <para>
-///         Set <see cref="View.WantContinuousButtonPressed"/> to <see langword="true"/> to have the
+///         Set <see cref="View.MouseHoldRepeat"/> to <see langword="true"/> to have the
 ///         <see cref="View.Accepting"/> event
 ///         invoked repeatedly while the button is pressed.
 ///     </para>
@@ -24,7 +24,7 @@ namespace Terminal.Gui.Views;
 public class Button : View, IDesignable
 {
     private static ShadowStyle _defaultShadow = ShadowStyle.Opaque; // Resources/config.json overrides
-    private static MouseState _defaultHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides
+    private static MouseState _defaultMouseHighlightStates = MouseState.In | MouseState.Pressed | MouseState.PressedOutside; // Resources/config.json overrides
 
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
@@ -46,10 +46,10 @@ public class Button : View, IDesignable
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStates
+    public static MouseState DefaultMouseHighlightStates
     {
-        get => _defaultHighlightStates;
-        set => _defaultHighlightStates = value;
+        get => _defaultMouseHighlightStates;
+        set => _defaultMouseHighlightStates = value;
     }
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
@@ -70,27 +70,64 @@ public class Button : View, IDesignable
 
         AddCommand (Command.HotKey, HandleHotKeyCommand);
 
-        KeyBindings.Remove (Key.Space);
-        KeyBindings.Add (Key.Space, Command.HotKey);
-        KeyBindings.Remove (Key.Enter);
-        KeyBindings.Add (Key.Enter, Command.HotKey);
+        KeyBindings.ReplaceCommands (Key.Space, Command.HotKey);
+        KeyBindings.ReplaceCommands (Key.Enter, Command.HotKey);
 
         // Replace default Activate binding with HotKey for mouse clicks
-        MouseBindings.Clear ();
-        MouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.Button3Clicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
-        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.HotKey);
+        // These are managed dynamically when MouseHoldRepeat changes
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.MiddleButtonClicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
 
         TitleChanged += Button_TitleChanged;
 
         base.ShadowStyle = DefaultShadow;
-        HighlightStates = DefaultHighlightStates;
+        MouseHighlightStates = DefaultMouseHighlightStates;
+    }
 
-        if (MouseHeldDown != null)
+    /// <inheritdoc/>
+    protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<bool> args)
+    {
+        // Don't call base - doWork handler in property setter has already updated base Accept bindings
+        // We need to override those with HotKey bindings for Button
+
+        if (args.NewValue)
         {
-            MouseHeldDown.MouseIsHeldDownTick += (_,_) => RaiseAccepting (null);
+            // MouseHoldRepeat enabled: Remove ALL Click/Release bindings, add only Released→HotKey
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+            MouseBindings.Remove (MouseFlags.MiddleButtonClicked);
+            MouseBindings.Remove (MouseFlags.RightButtonClicked);
+            MouseBindings.Remove (MouseFlags.Button4Clicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl);
+            MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+            MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
+            MouseBindings.Remove (MouseFlags.Button4Released);
+
+            // Add Released→HotKey bindings
+            MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.HotKey);
+            MouseBindings.Add (MouseFlags.MiddleButtonReleased, Command.HotKey);
+            MouseBindings.Add (MouseFlags.Button4Released, Command.HotKey);
+        }
+        else
+        {
+            // MouseHoldRepeat disabled: Remove ALL Click/Release bindings, add only Clicked→HotKey
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+            MouseBindings.Remove (MouseFlags.MiddleButtonClicked);
+            MouseBindings.Remove (MouseFlags.RightButtonClicked);
+            MouseBindings.Remove (MouseFlags.Button4Clicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl);
+            MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+            MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
+            MouseBindings.Remove (MouseFlags.Button4Released);
+
+            // Add Clicked→HotKey bindings
+            MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.RightButtonClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
         }
     }
 
@@ -98,12 +135,14 @@ public class Button : View, IDesignable
     {
         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-        if (RaiseActivating (commandContext) is true)
+        bool? handled = RaiseActivating (commandContext);
+
+        if (handled == true)
         {
             return true;
         }
 
-        bool? handled = RaiseAccepting (commandContext);
+        handled = RaiseAccepting (commandContext);
 
         if (handled == true)
         {

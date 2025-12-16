@@ -16,8 +16,9 @@ public record struct MouseBinding : IInputBinding
     {
         Commands = commands;
 
-        MouseEventArgs = new MouseEventArgs()
+        MouseEventArgs = new ()
         {
+            Timestamp = DateTime.Now,
             Flags = mouseFlags
         };
     }
@@ -26,7 +27,7 @@ public record struct MouseBinding : IInputBinding
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this mouse binding will invoke.</param>
     /// <param name="args">The mouse event that triggered this binding.</param>
-    public MouseBinding (Command [] commands, MouseEventArgs args)
+    public MouseBinding (Command [] commands, Mouse args)
     {
         Commands = commands;
         MouseEventArgs = args;
@@ -41,5 +42,5 @@ public record struct MouseBinding : IInputBinding
     /// <summary>
     ///     The mouse event arguments.
     /// </summary>
-    public MouseEventArgs? MouseEventArgs { get; set; }
+    public Mouse? MouseEventArgs { get; set; }
 }

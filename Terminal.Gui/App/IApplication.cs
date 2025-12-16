@@ -28,7 +28,7 @@ public interface IApplication : IDisposable
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <param name="driverName">
-    ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
+    ///     The short name (<see cref="DriverRegistry.Names"/>) of the
     ///     <see cref="IDriver"/> to use. If not specified the default driver for the platform will be used.
     /// </param>
     /// <returns>This instance for fluent API chaining.</returns>
@@ -450,7 +450,7 @@ public interface IApplication : IDisposable
     IClipboard? Clipboard { get; }
 
     /// <summary>
-    ///     Forces the use of the specified driver (one of "fake", "dotnet", "windows", or "unix"). If not
+    ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
     string ForceDriver { get; set; }

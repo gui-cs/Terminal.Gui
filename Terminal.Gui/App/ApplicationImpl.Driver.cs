@@ -14,61 +14,77 @@ internal partial class ApplicationImpl
     ///     Creates the appropriate <see cref="IDriver"/> based on platform and driverName.
     /// </summary>
     /// <param name="driverName"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    /// <exception cref="InvalidOperationException"></exception>
     private void CreateDriver (string? driverName)
     {
-        PlatformID p = Environment.OSVersion.Platform;
+        // If component factory already provided, use it
+        if (_componentFactory != null)
+        {
+            _driverName = _componentFactory.GetDriverName ();
+            Logging.Information ($"Using provided component factory: {_driverName}");
 
-        // Check component factory type first - this takes precedence over driverName
-        bool factoryIsWindows = _componentFactory is IComponentFactory<WindowsConsole.InputRecord>;
-        bool factoryIsDotNet = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-        bool factoryIsUnix = _componentFactory is IComponentFactory<char>;
-        bool factoryIsFake = _componentFactory is IComponentFactory<ConsoleKeyInfo>;
-
-        // Then check driverName
-        bool nameIsWindows = driverName?.Contains ("windows", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsDotNet = driverName?.Contains ("dotnet", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsUnix = driverName?.Contains ("unix", StringComparison.OrdinalIgnoreCase) ?? false;
-        bool nameIsFake = driverName?.Contains ("fake", StringComparison.OrdinalIgnoreCase) ?? false;
-
-        // Decide which driver to use - component factory type takes priority
-        if (factoryIsFake || (!factoryIsWindows && !factoryIsDotNet && !factoryIsUnix && nameIsFake))
-        {
-            Coordinator = CreateSubcomponents (() => new FakeComponentFactory ());
-            _driverName = "fake";
-        }
-        else if (factoryIsWindows || (!factoryIsDotNet && !factoryIsUnix && nameIsWindows))
-        {
-            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
-            _driverName = "windows";
-        }
-        else if (factoryIsDotNet || (!factoryIsWindows && !factoryIsUnix && nameIsDotNet))
-        {
-            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
-            _driverName = "dotnet";
-        }
-        else if (factoryIsUnix || (!factoryIsWindows && !factoryIsDotNet && nameIsUnix))
-        {
-            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-            _driverName = "unix";
-        }
-        else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
-        {
-            Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
-            _driverName = "windows";
-        }
-        else if (p == PlatformID.Unix)
-        {
-            Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-            _driverName = "unix";
+            // Determine the input type and create subcomponents
+            if (_componentFactory is IComponentFactory<WindowsConsole.InputRecord> windowsFactory)
+            {
+                Coordinator = CreateSubcomponents (() => windowsFactory);
+            }
+            else if (_componentFactory is IComponentFactory<ConsoleKeyInfo> netFactory)
+            {
+                Coordinator = CreateSubcomponents (() => netFactory);
+            }
+            else if (_componentFactory is IComponentFactory<char> unixFactory)
+            {
+                Coordinator = CreateSubcomponents (() => unixFactory);
+            }
+            else
+            {
+                throw new InvalidOperationException ($"Unknown component factory type: {_componentFactory.GetType ().Name}");
+            }
         }
         else
         {
-            Logging.Information($"Falling back to dotnet driver.");
-            Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
-            _driverName = "dotnet";
+            // Determine which driver to use
+            if (!string.IsNullOrEmpty (driverName) && DriverRegistry.TryGetDriver (driverName, out DriverRegistry.DriverDescriptor? descriptor))
+            {
+                // Use explicitly specified driver name
+                _driverName = descriptor!.Name;
+                Logging.Information ($"Using driver specified by parameter: {descriptor.Name} ({descriptor.DisplayName})");
+            }
+            else if (!string.IsNullOrEmpty (ForceDriver) && DriverRegistry.TryGetDriver (ForceDriver, out descriptor))
+            {
+                // Use ForceDriver configuration property
+                _driverName = descriptor!.Name;
+                Logging.Information ($"Using driver from ForceDriver configuration: {descriptor.Name} ({descriptor.DisplayName})");
+            }
+            else
+            {
+                // Use platform default
+                descriptor = DriverRegistry.GetDefaultDriver ();
+                _driverName = descriptor.Name;
+                Logging.Information ($"Using platform default driver: {descriptor.Name} ({descriptor.DisplayName})");
+            }
+
+            // Create coordinator based on driver name
+            switch (_driverName)
+            {
+                case DriverRegistry.Names.WINDOWS:
+                    Coordinator = CreateSubcomponents (() => new WindowsComponentFactory ());
+
+                    break;
+                case DriverRegistry.Names.DOTNET:
+                    Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
+
+                    break;
+                case DriverRegistry.Names.UNIX:
+                    Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
+
+                    break;
+                case DriverRegistry.Names.ANSI:
+                    Coordinator = CreateSubcomponents (() => new AnsiComponentFactory ());
+
+                    break;
+                default:
+                    throw new InvalidOperationException ($"Unknown driver name: {_driverName}");
+            }
         }
 
         Logging.Trace ($"Created Subcomponents: {Coordinator}");
@@ -77,7 +93,7 @@ internal partial class ApplicationImpl
 
         if (Driver == null)
         {
-            throw new ("Driver was null even after booting MainLoopCoordinator");
+            throw new InvalidOperationException ("Driver was null even after booting MainLoopCoordinator");
         }
 
         Driver.Force16Colors = Terminal.Gui.Drivers.Driver.Force16Colors;
@@ -101,8 +117,7 @@ internal partial class ApplicationImpl
     ///         </list>
     ///     </para>
     ///     <para>
-    ///         The coordinator is created in <see cref="CreateDriver"/> based on the selected driver
-    ///         (Windows, Unix, .NET, or Fake) and is started by calling
+    ///         The coordinator is created in <see cref="CreateDriver"/> based on the selected driver.
     ///         <see cref="IMainLoopCoordinator.StartInputTaskAsync"/>.
     ///     </para>
     /// </remarks>
@@ -113,7 +128,7 @@ internal partial class ApplicationImpl
     ///     for the specified input record type.
     /// </summary>
     /// <typeparam name="TInputRecord">
-    ///     Platform-specific input type: <see cref="ConsoleKeyInfo"/> (.NET/Fake),
+    ///     Platform-specific input type: <see cref="ConsoleKeyInfo"/> (.NET),
     ///     <see cref="WindowsConsole.InputRecord"/> (Windows), or <see cref="char"/> (Unix).
     /// </typeparam>
     /// <param name="fallbackFactory">
@@ -171,9 +186,9 @@ internal partial class ApplicationImpl
         Driver.MouseEvent -= Driver_MouseEvent;
     }
 
-    private void Driver_KeyDown (object? sender, Key e) { Keyboard?.RaiseKeyDownEvent (e); }
+    private void Driver_KeyDown (object? sender, Key e) { Keyboard.RaiseKeyDownEvent (e); }
 
-    private void Driver_KeyUp (object? sender, Key e) { Keyboard?.RaiseKeyUpEvent (e); }
+    private void Driver_KeyUp (object? sender, Key e) { Keyboard.RaiseKeyUpEvent (e); }
 
-    private void Driver_MouseEvent (object? sender, MouseEventArgs e) { Mouse?.RaiseMouseEvent (e); }
+    private void Driver_MouseEvent (object? sender, Mouse e) { Mouse.RaiseMouseEvent (e); }
 }

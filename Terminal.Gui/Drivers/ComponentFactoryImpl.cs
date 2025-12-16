@@ -8,6 +8,9 @@ namespace Terminal.Gui.Drivers;
 public abstract class ComponentFactoryImpl<TInputRecord> : IComponentFactory<TInputRecord> where TInputRecord : struct
 {
     /// <inheritdoc />
+    public abstract string? GetDriverName ();
+
+    /// <inheritdoc />
     public abstract IInput<TInputRecord> CreateInput ();
 
     /// <inheritdoc />

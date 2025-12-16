@@ -224,7 +224,7 @@ public class DatePicker : View
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,
             Text = GetBackButtonText (),
-            WantContinuousButtonPressed = true,
+            MouseHoldRepeat = true,
             NoPadding = true,
             NoDecorations = true,
             ShadowStyle = ShadowStyle.None
@@ -238,7 +238,7 @@ public class DatePicker : View
             Y = Pos.Bottom (_calendar) - 1,
             Width = 2,
             Text = GetForwardButtonText (),
-            WantContinuousButtonPressed = true,
+            MouseHoldRepeat = true,
             NoPadding = true,
             NoDecorations = true,
             ShadowStyle = ShadowStyle.None

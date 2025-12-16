@@ -60,7 +60,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        HighlightStates = MouseState.None;
+        MouseHighlightStates = MouseState.None;
         CanFocus = true;
 
         if (Border is { })
@@ -496,7 +496,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
 
-        //CommandView.HighlightStates = HighlightStates.None;
+        //CommandView.MouseHighlightStates = MouseHighlightStates.None;
         CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
@@ -565,7 +565,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.VerticalTextAlignment = Alignment.Center;
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = false;
-        HelpView.HighlightStates = MouseState.None;
+        HelpView.MouseHighlightStates = MouseState.None;
 
         HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
@@ -703,7 +703,7 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
-        KeyView.HighlightStates = MouseState.None;
+        KeyView.MouseHighlightStates = MouseState.None;
 
         KeyView.GettingAttributeForRole += (sender, args) =>
                                            {

@@ -246,11 +246,11 @@ public class ComboBox : View, IDesignable
     public event EventHandler Expanded;
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
-        if (me.Position.X == Viewport.Right - 1
-            && me.Position.Y == Viewport.Top
-            && me.Flags == MouseFlags.Button1Pressed
+        if (me.Position!.Value.X == Viewport.Right - 1
+            && me.Position!.Value.Y == Viewport.Top
+            && me.Flags == MouseFlags.LeftButtonPressed
             && _autoHide)
         {
             if (IsShow)
@@ -270,7 +270,7 @@ public class ComboBox : View, IDesignable
             return me.Handled = true;
         }
 
-        if (me.Flags == MouseFlags.Button1Pressed)
+        if (me.Flags == MouseFlags.LeftButtonPressed)
         {
             if (!_search.HasFocus)
             {
@@ -831,10 +831,10 @@ public class ComboBox : View, IDesignable
         public bool HideDropdownListOnClick
         {
             get => _hideDropdownListOnClick;
-            set => _hideDropdownListOnClick = WantContinuousButtonPressed = value;
+            set => _hideDropdownListOnClick = MouseHoldRepeat = value;
         }
 
-        protected override bool OnMouseEvent (MouseEventArgs me)
+        protected override bool OnMouseEvent (Mouse me)
         {
             bool isMousePositionValid = IsMousePositionValid (me);
 
@@ -846,7 +846,7 @@ public class ComboBox : View, IDesignable
                 res = base.OnMouseEvent (me);
             }
 
-            if (HideDropdownListOnClick && me.Flags == MouseFlags.Button1Clicked)
+            if (HideDropdownListOnClick && me.Flags == MouseFlags.LeftButtonClicked)
             {
                 if (!isMousePositionValid && !_isFocusing)
                 {
@@ -865,11 +865,11 @@ public class ComboBox : View, IDesignable
                 return true;
             }
 
-            if (me.Flags == MouseFlags.ReportMousePosition && HideDropdownListOnClick)
+            if (me.Flags == MouseFlags.PositionReport && HideDropdownListOnClick)
             {
                 if (isMousePositionValid)
                 {
-                    _highlighted = Math.Min (TopItem + me.Position.Y, Source.Count);
+                    _highlighted = Math.Min (TopItem + me.Position!.Value.Y, Source.Count);
                     SetNeedsDraw ();
                 }
 
@@ -989,9 +989,9 @@ public class ComboBox : View, IDesignable
             return res;
         }
 
-        private bool IsMousePositionValid (MouseEventArgs me)
+        private bool IsMousePositionValid (Mouse me)
         {
-            if (me.Position.X >= 0 && me.Position.X < Frame.Width && me.Position.Y >= 0 && me.Position.Y < Frame.Height)
+            if (me.Position!.Value.X >= 0 && me.Position!.Value.X < Frame.Width && me.Position!.Value.Y >= 0 && me.Position!.Value.Y < Frame.Height)
             {
                 return true;
             }

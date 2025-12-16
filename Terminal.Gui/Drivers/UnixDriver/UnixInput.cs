@@ -1,63 +1,23 @@
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable CommentTypo
 
 namespace Terminal.Gui.Drivers;
 
-internal class UnixInput : InputImpl<char>, IUnixInput
+internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 {
+    // Queue for storing injected input for testing
+    private readonly ConcurrentQueue<char> _testInput = new ();
+
+    // Platform-specific raw mode helper
+    private readonly UnixRawModeHelper _rawModeHelper = new ();
+
     private const int STDIN_FILENO = 0;
-
-    [StructLayout (LayoutKind.Sequential)]
-    private struct Termios
-    {
-        public uint c_iflag;
-        public uint c_oflag;
-        public uint c_cflag;
-        public uint c_lflag;
-
-        [MarshalAs (UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte [] c_cc;
-
-        public uint c_ispeed;
-        public uint c_ospeed;
-    }
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int tcgetattr (int fd, out Termios termios);
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int tcsetattr (int fd, int optional_actions, ref Termios termios);
-
-    // try cfmakeraw (glibc and macOS usually export it)
-    [DllImport ("libc", EntryPoint = "cfmakeraw", SetLastError = false)]
-    private static extern void cfmakeraw_ref (ref Termios termios);
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern nint strerror (int err);
-
-    private const int TCSANOW = 0;
-
-    private const ulong BRKINT = 0x00000002;
-    private const ulong ICRNL = 0x00000100;
-    private const ulong INPCK = 0x00000010;
-    private const ulong ISTRIP = 0x00000020;
-    private const ulong IXON = 0x00000400;
-
-    private const ulong OPOST = 0x00000001;
-
-    private const ulong ECHO = 0x00000008;
-    private const ulong ICANON = 0x00000100;
-    private const ulong IEXTEN = 0x00008000;
-    private const ulong ISIG = 0x00000001;
-
-    private const ulong CS8 = 0x00000030;
-
-    private Termios _original;
-    private bool _terminalInitialized;
+    private readonly bool _terminalInitialized;
 
     [StructLayout (LayoutKind.Sequential)]
     private struct Pollfd
@@ -94,7 +54,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput
 
     private const int TCIFLUSH = 0;
 
-    private Pollfd []? _pollMap;
+    private readonly Pollfd []? _pollMap;
 
     public UnixInput ()
     {
@@ -106,12 +66,18 @@ internal class UnixInput : InputImpl<char>, IUnixInput
             _pollMap [0].fd = STDIN_FILENO;
             _pollMap [0].events = (short)Condition.PollIn;
 
-            EnableRawModeAndTreatControlCAsInput ();
+            // Enable raw mode using the helper
+            _terminalInitialized = _rawModeHelper.TryEnable ();
 
             if (_terminalInitialized)
             {
                 WriteRaw (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
                 WriteRaw (EscSeqUtils.CSI_HideCursor);
+
+                // CSI_EnableMouseEvents enables
+                // Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons
+                // Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)
+                // Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)
                 WriteRaw (EscSeqUtils.CSI_EnableMouseEvents);
             }
         }
@@ -127,66 +93,15 @@ internal class UnixInput : InputImpl<char>, IUnixInput
         }
     }
 
-    private void EnableRawModeAndTreatControlCAsInput ()
-    {
-        try
-        {
-            int result = tcgetattr (STDIN_FILENO, out _original);
-
-            if (result != 0)
-            {
-                int e = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"tcgetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
-                return;
-            }
-
-            Termios raw = _original;
-
-            try
-            {
-                cfmakeraw_ref (ref raw);
-            }
-            catch (EntryPointNotFoundException)
-            {
-                raw.c_iflag &= ~((uint)BRKINT | (uint)ICRNL | (uint)INPCK | (uint)ISTRIP | (uint)IXON);
-                raw.c_oflag &= ~(uint)OPOST;
-                raw.c_cflag |= (uint)CS8;
-                raw.c_lflag &= ~((uint)ECHO | (uint)ICANON | (uint)IEXTEN | (uint)ISIG);
-            }
-
-            result = tcsetattr (STDIN_FILENO, TCSANOW, ref raw);
-
-            if (result != 0)
-            {
-                int e = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"tcsetattr failed errno={e} ({StrError (e)}). Running without TTY support.");
-                return;
-            }
-
-            _terminalInitialized = true;
-        }
-        catch (DllNotFoundException)
-        {
-            throw; // Re-throw to be caught by constructor
-        }
-    }
-
-    private string StrError (int err)
-    {
-        try
-        {
-            nint p = strerror (err);
-            return p == nint.Zero ? $"errno={err}" : Marshal.PtrToStringAnsi (p) ?? $"errno={err}";
-        }
-        catch
-        {
-            return $"errno={err}";
-        }
-    }
-
     /// <inheritdoc/>
     public override bool Peek ()
     {
+        // Check test input first
+        if (!_testInput.IsEmpty)
+        {
+            return true;
+        }
+
         if (!_terminalInitialized || _pollMap is null)
         {
             return false;
@@ -195,11 +110,13 @@ internal class UnixInput : InputImpl<char>, IUnixInput
         try
         {
             int n = poll (_pollMap, (uint)_pollMap.Length, 0);
+
             return n != 0;
         }
         catch (Exception ex)
         {
             Logging.Error ($"Error in Peek: {ex.Message}");
+
             return false;
         }
     }
@@ -225,6 +142,12 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     /// <inheritdoc/>
     public override IEnumerable<char> Read ()
     {
+        // Return test input first if available
+        while (_testInput.TryDequeue (out char testChar))
+        {
+            yield return testChar;
+        }
+
         if (!_terminalInitialized || _pollMap is null)
         {
             yield break;
@@ -272,6 +195,9 @@ internal class UnixInput : InputImpl<char>, IUnixInput
     }
 
     /// <inheritdoc/>
+    public void InjectInput (char input) { _testInput.Enqueue (input); }
+
+    /// <inheritdoc/>
     public override void Dispose ()
     {
         base.Dispose ();
@@ -288,7 +214,9 @@ internal class UnixInput : InputImpl<char>, IUnixInput
             tcflush (STDIN_FILENO, TCIFLUSH);
             WriteRaw (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
             WriteRaw (EscSeqUtils.CSI_ShowCursor);
-            tcsetattr (STDIN_FILENO, TCSANOW, ref _original);
+
+            // Restore terminal settings using the helper
+            _rawModeHelper.Dispose ();
         }
         catch
         {
