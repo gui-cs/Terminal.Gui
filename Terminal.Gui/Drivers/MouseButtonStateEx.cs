@@ -6,7 +6,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 internal class MouseButtonStateEx
 {
-    private readonly Func<DateTime> _now;
+    private readonly ITimeProvider _timeProvider;
     private readonly TimeSpan _repeatClickThreshold;
     private readonly int _buttonIdx;
     private int _consecutiveClicks;
@@ -22,9 +22,9 @@ internal class MouseButtonStateEx
     /// </summary>
     public bool Pressed { get; set; }
 
-    public MouseButtonStateEx (Func<DateTime> now, TimeSpan repeatClickThreshold, int buttonIdx)
+    public MouseButtonStateEx (ITimeProvider timeProvider, TimeSpan repeatClickThreshold, int buttonIdx)
     {
-        _now = now;
+        _timeProvider = timeProvider;
         _repeatClickThreshold = repeatClickThreshold;
         _buttonIdx = buttonIdx;
     }
@@ -34,7 +34,7 @@ internal class MouseButtonStateEx
         bool isPressedNow = IsPressed (_buttonIdx, e.Flags);
         bool isSamePosition = _lastPosition == e.Position;
 
-        TimeSpan elapsed = _now () - At;
+        TimeSpan elapsed = _timeProvider.Now - At;
 
         if (elapsed > _repeatClickThreshold || !isSamePosition)
         {
@@ -71,7 +71,7 @@ internal class MouseButtonStateEx
     private void OverwriteState (MouseEventArgs e)
     {
         Pressed = IsPressed (_buttonIdx, e.Flags);
-        At = _now ();
+        At = _timeProvider.Now;
         _lastPosition = e.Position;
     }
 

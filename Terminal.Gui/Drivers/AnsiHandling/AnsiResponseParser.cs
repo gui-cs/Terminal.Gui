@@ -32,6 +32,12 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
+    ///     Time provider for getting the current time. Use ITimeProvider in tests to
+    ///     ensure repeatable tests with virtual time.
+    /// </summary>
+    protected readonly ITimeProvider _timeProvider;
+
+    /// <summary>
     ///     Event raised when mouse events are detected - requires setting <see cref="HandleMouse"/> to true
     /// </summary>
     public event EventHandler<MouseEventArgs>? Mouse;
@@ -61,7 +67,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         get => _state;
         protected set
         {
-            StateChangedAt = DateTime.Now;
+            StateChangedAt = _timeProvider.Now;
             _state = value;
         }
     }
@@ -69,7 +75,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     /// <summary>
     ///     When <see cref="State"/> was last changed.
     /// </summary>
-    public DateTime StateChangedAt { get; private set; } = DateTime.Now;
+    public DateTime StateChangedAt { get; private set; }
 
     // These all are valid terminators on ansi responses,
     // see CSI in https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
@@ -86,7 +92,12 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
     ];
 
-    protected AnsiResponseParserBase (IHeld heldContent) { _heldContent = heldContent; }
+    protected AnsiResponseParserBase (IHeld heldContent, ITimeProvider? timeProvider = null)
+    {
+        _heldContent = heldContent;
+        _timeProvider = timeProvider ?? new SystemTimeProvider ();
+        StateChangedAt = _timeProvider.Now;
+    }
 
     protected void ResetState ()
     {

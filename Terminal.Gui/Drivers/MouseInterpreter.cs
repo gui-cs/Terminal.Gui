@@ -5,10 +5,10 @@ namespace Terminal.Gui.Drivers;
 internal class MouseInterpreter
 {
     /// <summary>
-    ///     Function for returning the current time. Use in unit tests to
-    ///     ensure repeatable tests.
+    ///     Time provider for getting the current time. Use ITimeProvider in tests to
+    ///     ensure repeatable tests with virtual time.
     /// </summary>
-    public Func<DateTime> Now { get; set; }
+    public ITimeProvider TimeProvider { get; set; }
 
     /// <summary>
     ///     How long to wait for a second, third, fourth click after the first before giving up and
@@ -19,19 +19,19 @@ internal class MouseInterpreter
     private readonly MouseButtonStateEx [] _buttonStates;
 
     public MouseInterpreter (
-        Func<DateTime>? now = null,
+        ITimeProvider? timeProvider = null,
         TimeSpan? doubleClickThreshold = null
     )
     {
-        Now = now ?? (() => DateTime.Now);
+        TimeProvider = timeProvider ?? new SystemTimeProvider ();
         RepeatedClickThreshold = doubleClickThreshold ?? TimeSpan.FromMilliseconds (500);
 
         _buttonStates = new []
         {
-            new MouseButtonStateEx (Now, RepeatedClickThreshold, 0),
-            new MouseButtonStateEx (Now, RepeatedClickThreshold, 1),
-            new MouseButtonStateEx (Now, RepeatedClickThreshold, 2),
-            new MouseButtonStateEx (Now, RepeatedClickThreshold, 3)
+            new MouseButtonStateEx (TimeProvider, RepeatedClickThreshold, 0),
+            new MouseButtonStateEx (TimeProvider, RepeatedClickThreshold, 1),
+            new MouseButtonStateEx (TimeProvider, RepeatedClickThreshold, 2),
+            new MouseButtonStateEx (TimeProvider, RepeatedClickThreshold, 3)
         };
     }
 
