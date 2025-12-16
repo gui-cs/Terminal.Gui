@@ -8,21 +8,44 @@ namespace Terminal.Gui.App;
 /// </summary>
 internal partial class ApplicationImpl : IApplication
 {
+    private readonly ITimeProvider _timeProvider;
+    private readonly bool _testMode;
+
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
     ///     events.
     /// </summary>
-    internal ApplicationImpl ()
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    /// <param name="testMode">If <see langword="true"/>, configures application for testing with TestInputSource.</param>
+    internal ApplicationImpl (ITimeProvider timeProvider, bool testMode)
     {
+        _timeProvider = timeProvider;
+        _testMode = testMode;
+
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;
     }
 
     /// <summary>
+    ///     INTERNAL: Creates a new instance of the Application backend for legacy static model.
+    ///     Uses SystemTimeProvider and production mode by default.
+    /// </summary>
+    internal ApplicationImpl () : this (new SystemTimeProvider (), testMode: false) { }
+
+    /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
+    internal ApplicationImpl (IComponentFactory componentFactory) : this ()
+    {
+        _componentFactory = componentFactory;
+    }
+
+    /// <summary>
+    ///     Gets the time provider used by this application instance.
+    /// </summary>
+    /// <returns>The <see cref="ITimeProvider"/> used for timing and timestamps.</returns>
+    public ITimeProvider GetTimeProvider () => _timeProvider;
 
     private string? _driverName;
 

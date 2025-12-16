@@ -450,6 +450,22 @@ public interface IApplication : IDisposable
     IClipboard? Clipboard { get; }
 
     /// <summary>
+    ///     Gets the time provider used by this application instance.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The time provider controls timing and timestamps throughout the application.
+    ///         For production applications, this is a <see cref="SystemTimeProvider"/> that uses <c>DateTime.Now</c>.
+    ///         For testing, this can be a <see cref="VirtualTimeProvider"/> that allows explicit control of time.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="Application.CreateForTesting"/> to create an application with a <see cref="VirtualTimeProvider"/>.
+    ///     </para>
+    /// </remarks>
+    /// <returns>The <see cref="ITimeProvider"/> used for timing and timestamps.</returns>
+    ITimeProvider GetTimeProvider ();
+
+    /// <summary>
     ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
