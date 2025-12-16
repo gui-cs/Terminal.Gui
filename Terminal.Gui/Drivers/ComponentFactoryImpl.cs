@@ -14,7 +14,7 @@ public abstract class ComponentFactoryImpl<TInputRecord> : IComponentFactory<TIn
     public abstract IInput<TInputRecord> CreateInput ();
 
     /// <inheritdoc />
-    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputBuffer);
+    public abstract IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputBuffer, ITimeProvider? timeProvider = null);
 
     /// <inheritdoc />
     public virtual ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)

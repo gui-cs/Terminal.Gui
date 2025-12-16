@@ -155,7 +155,7 @@ internal partial class ApplicationImpl
             cf = fallbackFactory ();
         }
 
-        return new MainLoopCoordinator<TInputRecord> (_timedEvents, inputQueue, loop, cf);
+        return new MainLoopCoordinator<TInputRecord> (_timedEvents, inputQueue, loop, cf, _timeProvider);
     }
 
     internal void SubscribeDriverEvents ()

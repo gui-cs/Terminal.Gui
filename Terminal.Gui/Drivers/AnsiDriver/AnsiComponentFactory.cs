@@ -62,7 +62,7 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
     }
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer) { return new AnsiInputProcessor (inputBuffer); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null) { return new AnsiInputProcessor (inputBuffer, timeProvider); }
 
     /// <inheritdoc/>
     public override IOutput CreateOutput ()

@@ -18,9 +18,9 @@ public class WindowsComponentFactory : ComponentFactoryImpl<WindowsConsole.Input
     }
 
     /// <inheritdoc />
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer)
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<WindowsConsole.InputRecord> inputBuffer, ITimeProvider? timeProvider = null)
     {
-        return new WindowsInputProcessor (inputBuffer);
+        return new WindowsInputProcessor (inputBuffer, timeProvider);
     }
 
     /// <inheritdoc />
