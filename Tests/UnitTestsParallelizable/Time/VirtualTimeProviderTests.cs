@@ -1,4 +1,5 @@
-namespace Terminal.Gui.TimeTests;
+namespace 
+    TimeTests;
 
 public class VirtualTimeProviderTests
 {
