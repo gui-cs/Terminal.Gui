@@ -3,7 +3,7 @@ using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 [Trait ("Category", "Output")]
 public class ClipTests (ITestOutputHelper _output)
@@ -52,13 +52,13 @@ public class ClipTests (ITestOutputHelper _output)
         Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
         // When we exit Draw, the view is excluded from the clip. So drawing at 0,0, is not valid and is clipped.
-        view.AddRune (0, 0, Rune.ReplacementChar);
+        view.AddRune (0, 0, Glyphs.WideGlyphReplacement);
         Assert.Equal (" ", Application.Driver?.Contents! [2, 2].Grapheme);
 
-        view.AddRune (-1, -1, Rune.ReplacementChar);
+        view.AddRune (-1, -1, Glyphs.WideGlyphReplacement);
         Assert.Equal ("P", Application.Driver?.Contents! [1, 1].Grapheme);
 
-        view.AddRune (1, 1, Rune.ReplacementChar);
+        view.AddRune (1, 1, Glyphs.WideGlyphReplacement);
         Assert.Equal ("P", Application.Driver?.Contents! [3, 3].Grapheme);
     }
 
@@ -178,6 +178,7 @@ public class ClipTests (ITestOutputHelper _output)
     public void Clipping_Wide_Runes ()
     {
         Application.Driver!.SetScreenSize (30, 1);
+        Application.Driver!.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
         var top = new View
         {
@@ -231,9 +232,9 @@ public class ClipTests (ITestOutputHelper _output)
         //                            012 34 56 78 90 12 34 56 78 90 12 34 56 78
         //                            │こ れ  は 広 い  ル ー ン  ラ イ ン で  す 。
         //                            01 2345678901234 56 78 90 12 34 56 
-        //                            │� |0123456989│� ン  ラ イ ン で  す 。
+        //                            │① |0123456989│① ン  ラ イ ン で  す 。
         expectedOutput = """
-                         │�│0123456789│ ンラインです。
+                         │①│0123456789│ ンラインです。
                          """;
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, _output);

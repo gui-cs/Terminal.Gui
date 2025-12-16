@@ -9,7 +9,7 @@ Terminal.Gui applications run on a single main thread with an event loop that pr
 Terminal.Gui follows the standard UI toolkit pattern where **all UI operations must happen on the main thread**. Attempting to modify views or their properties from background threads will result in undefined behavior and potential crashes.
 
 ### The Golden Rule
-> Always use `Application.Invoke()` (static, obsolete) or `app.Invoke()` (instance-based, recommended) to update the UI from background threads. From within a View, use `App?.Invoke()`.
+> Always use `App?.Invoke()` (from within a View) or `app.Invoke()` (with an IApplication instance) to update the UI from background threads.
 
 ## Background Operations
 
@@ -74,11 +74,8 @@ private void StartBackgroundWork()
 }
 ```
 
-**Using IApplication instance (recommended):**
+**Using IApplication instance:**
 ```csharp
-var app = Application.Create();
-app.Init();
-
 private void StartBackgroundWork(IApplication app)
 {
     Task.Run(() =>
@@ -104,11 +101,6 @@ private void StartBackgroundWork(IApplication app)
 }
 ```
 
-**Using static Application (obsolete but still works):**
-```csharp
-Application.Invoke(() => { /* ... */ });
-```
-
 ## Timers
 
 Use timers for periodic updates like clocks, status refreshes, or animations:
@@ -124,12 +116,11 @@ public class ClockView : View
         timeLabel = new Label { Text = DateTime.Now.ToString("HH:mm:ss") };
         Add(timeLabel);
         
-        // Update every second
-        // Use App?.AddTimeout() when available, or Application.AddTimeout() (obsolete)
+        // Update every second using the View's App property
         timerToken = App?.AddTimeout(
             TimeSpan.FromSeconds(1), 
             UpdateTime
-        ) ?? Application.AddTimeout(TimeSpan.FromSeconds(1), UpdateTime);
+        );
     }
     
     private bool UpdateTime()
@@ -142,7 +133,7 @@ public class ClockView : View
     {
         if (disposing && timerToken != null)
         {
-            App?.RemoveTimeout(timerToken) ?? Application.RemoveTimeout(timerToken);
+            App?.RemoveTimeout(timerToken);
         }
         base.Dispose(disposing);
     }
@@ -243,14 +234,18 @@ Task.Run(() =>
 });
 ```
 
-### ✅ Do: Use Application.Invoke()
+### ✅ Do: Use App.Invoke() or app.Invoke()
 ```csharp
 Task.Run(() =>
 {
-    Application.Invoke(() =>
+    // From within a View:
+    App?.Invoke(() =>
     {
         label.Text = "This is safe!"; // Correct!
     });
+    
+    // Or with IApplication instance:
+    // app.Invoke(() => { label.Text = "This is safe!"; });
 });
 ```
 
@@ -262,9 +257,6 @@ App?.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
 
 // Or with IApplication instance:
 app.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
-
-// Or static (obsolete but works):
-Application.AddTimeout(TimeSpan.FromSeconds(1), UpdateStatus);
 ```
 
 ### ✅ Do: Remove timers in Dispose
@@ -273,7 +265,11 @@ protected override void Dispose(bool disposing)
 {
     if (disposing && timerToken != null)
     {
-        Application.RemoveTimeout(timerToken);
+        // From within a View, use App property
+        App?.RemoveTimeout(timerToken);
+        
+        // Or with IApplication instance:
+        // app.RemoveTimeout(timerToken);
     }
     base.Dispose(disposing);
 }

@@ -8,13 +8,10 @@ public class CombiningMarks : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
-        top.DrawComplete += (s, e) =>
+        top.DrawingContent += (s, e) =>
         {
-            // Forces reset _lineColsOffset because we're dealing with direct draw
-            Application.TopRunnable!.SetNeedsDraw ();
-
             var i = -1;
             top.Move (0, ++i);
             top.AddStr ("Terminal.Gui supports all combining sequences that can be rendered as an unique grapheme.");

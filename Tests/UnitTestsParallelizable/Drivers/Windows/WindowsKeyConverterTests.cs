@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 [Collection ("Global Test Setup")]
 [Trait ("Platform", "Windows")]
@@ -269,15 +269,15 @@ public class WindowsKeyConverterTests
     #region ToKey Tests - OEM Keys
 
     [Theory]
-    [InlineData (';', ConsoleKey.Oem1, false, (KeyCode)';')]
+    //[InlineData (';', ConsoleKey.Oem1, false, (KeyCode)';')] // Keyboard layout dependent and shifted key is needed to produce ';' (Pt)
     [InlineData (':', ConsoleKey.Oem1, true, (KeyCode)':')]
-    [InlineData ('/', ConsoleKey.Oem2, false, (KeyCode)'/')]
+    //[InlineData ('/', ConsoleKey.Oem2, false, (KeyCode)'/')] // Keyboard layout dependent and shifted key is needed to produce '/' (Pt)
     [InlineData ('?', ConsoleKey.Oem2, true, (KeyCode)'?')]
     [InlineData (',', ConsoleKey.OemComma, false, (KeyCode)',')]
     [InlineData ('<', ConsoleKey.OemComma, true, (KeyCode)'<')]
     [InlineData ('.', ConsoleKey.OemPeriod, false, (KeyCode)'.')]
     [InlineData ('>', ConsoleKey.OemPeriod, true, (KeyCode)'>')]
-    [InlineData ('=', ConsoleKey.OemPlus, false, (KeyCode)'=')] // Un-shifted OemPlus is '='
+    //[InlineData ('=', ConsoleKey.OemPlus, false, (KeyCode)'=')] // Keyboard layout dependent and shifted key is needed to produce '=' (Pt)
     [InlineData ('+', ConsoleKey.OemPlus, true, (KeyCode)'+')] // Shifted OemPlus is '+'
     [InlineData ('-', ConsoleKey.OemMinus, false, (KeyCode)'-')]
     [InlineData ('_', ConsoleKey.OemMinus, true, (KeyCode)'_')] // Shifted OemMinus is '_'

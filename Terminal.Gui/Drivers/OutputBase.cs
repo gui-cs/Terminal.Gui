@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -5,7 +7,44 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
-    private CursorVisibility? _cachedCursorVisibility;
+    private bool _force16Colors;
+
+    /// <inheritdoc cref="IOutput.Force16Colors"/>
+    public bool Force16Colors
+    {
+        get => _force16Colors;
+        set
+        {
+            if (IsLegacyConsole && !value)
+            {
+                return;
+            }
+
+            _force16Colors = value;
+        }
+    }
+
+    private bool _isLegacyConsole;
+
+    /// <inheritdoc cref="IOutput.IsLegacyConsole"/>
+    public bool IsLegacyConsole
+    {
+        get => _isLegacyConsole;
+        set
+        {
+            _isLegacyConsole = value;
+
+            if (value) // If legacy console (true), force 16 colors
+            {
+                Force16Colors = true;
+            }
+        }
+    }
+
+    private readonly ConcurrentQueue<SixelToRender> _sixels = [];
+
+    /// <inheritdoc cref="IOutput.GetSixels"/>>
+    public ConcurrentQueue<SixelToRender> GetSixels () => _sixels;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
@@ -17,20 +56,27 @@ public abstract class OutputBase
     /// <param name="visibility"></param>
     public abstract void SetCursorVisibility (CursorVisibility visibility);
 
-    /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
+    StringBuilder _lastOutputStringBuilder = new ();
+
+    /// <summary>
+    ///     Writes dirty cells from the buffer to the console. Hides cursor, iterates rows/cols,
+    ///     skips clean cells, batches dirty cells into ANSI sequences, wraps URLs with OSC 8,
+    ///     then renders sixel images. Cursor visibility is managed by <c>ApplicationMainLoop.SetCursor()</c>.
+    /// </summary>
     public virtual void Write (IOutputBuffer buffer)
     {
-        var top = 0;
-        var left = 0;
+        StringBuilder outputStringBuilder = new ();
+        int top = 0;
+        int left = 0;
         int rows = buffer.Rows;
         int cols = buffer.Cols;
-        var output = new StringBuilder ();
         Attribute? redrawAttr = null;
         int lastCol = -1;
 
-        CursorVisibility? savedVisibility = _cachedCursorVisibility;
+        // Hide cursor during rendering to prevent flicker
         SetCursorVisibility (CursorVisibility.Invisible);
 
+        // Process each row
         for (int row = top; row < rows; row++)
         {
             if (!SetCursorPositionImpl (0, row))
@@ -38,20 +84,24 @@ public abstract class OutputBase
                 return;
             }
 
-            output.Clear ();
+            outputStringBuilder.Clear ();
 
+            // Process columns in row
             for (int col = left; col < cols; col++)
             {
                 lastCol = -1;
                 var outputWidth = 0;
 
+                // Batch consecutive dirty cells
                 for (; col < cols; col++)
                 {
+                    // Skip clean cells - position cursor and continue
                     if (!buffer.Contents! [row, col].IsDirty)
                     {
-                        if (output.Length > 0)
+                        if (outputStringBuilder.Length > 0)
                         {
-                            WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                            // This clears outputStringBuilder
+                            WriteToConsole (outputStringBuilder, ref lastCol, ref outputWidth);
                         }
                         else if (lastCol == -1)
                         {
@@ -63,6 +113,8 @@ public abstract class OutputBase
                             lastCol++;
                         }
 
+                        SetCursorPositionImpl (lastCol, row);
+
                         continue;
                     }
 
@@ -71,39 +123,60 @@ public abstract class OutputBase
                         lastCol = col;
                     }
 
+                    // Append dirty cell as ANSI and mark clean
                     Cell cell = buffer.Contents [row, col];
-                    AppendCellAnsi (cell, output, ref redrawAttr, ref _redrawTextStyle, cols, ref col);
-
-                    outputWidth++;
-
                     buffer.Contents [row, col].IsDirty = false;
+                    AppendCellAnsi (cell, outputStringBuilder, ref redrawAttr, ref _redrawTextStyle, cols, ref col, ref outputWidth);
+
+                    if (col != lastCol)
+                    {
+                        // Was a wide grapheme so mark clean next cell
+                        // See https://github.com/gui-cs/Terminal.Gui/issues/4466
+                        buffer.Contents [row, col].IsDirty = false;
+                    }
                 }
             }
 
-            if (output.Length > 0)
+            // Flush buffered output for row
+            if (outputStringBuilder.Length > 0)
             {
-                SetCursorPositionImpl (lastCol, row);
+                if (IsLegacyConsole)
+                {
+                    Write (outputStringBuilder);
+                }
+                else
+                {
+                    SetCursorPositionImpl (lastCol, row);
 
-                // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-                Write (processed);
+                    // Wrap URLs with OSC 8 hyperlink sequences
+                    StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
+                    Write (processed);
+                }
             }
         }
 
-        // BUGBUG: The Sixel impl depends on the legacy static Application object
-        // BUGBUG: Disabled for now
-        //foreach (SixelToRender s in  Application.Sixel)
-        //{
-        //    if (!string.IsNullOrWhiteSpace (s.SixelData))
-        //    {
-        //        SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
-        //        Console.Out.Write (s.SixelData);
-        //    }
-        //}
+        if (IsLegacyConsole)
+        {
+            return;
+        }
 
-        SetCursorVisibility (savedVisibility ?? CursorVisibility.Default);
-        _cachedCursorVisibility = savedVisibility;
+        // Render queued sixel images
+        foreach (SixelToRender s in GetSixels ())
+        {
+            if (string.IsNullOrWhiteSpace (s.SixelData))
+            {
+                continue;
+            }
+
+            SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
+            Write ((StringBuilder)new (s.SixelData));
+        }
+
+        // Cursor visibility restored by ApplicationMainLoop.SetCursor() to prevent flicker
     }
+
+    /// <inheritdoc cref="IOutput.GetLastOutput" />
+    public virtual string GetLastOutput () => _lastOutputStringBuilder.ToString ();
 
     /// <summary>
     ///     Changes the color and text style of the console to the given <paramref name="attr"/> and
@@ -129,7 +202,10 @@ public abstract class OutputBase
     ///     Output the contents of the <paramref name="output"/> to the console.
     /// </summary>
     /// <param name="output"></param>
-    protected abstract void Write (StringBuilder output);
+    protected virtual void Write (StringBuilder output)
+    {
+        _lastOutputStringBuilder.Append (output);
+    }
 
     /// <summary>
     ///     Builds ANSI escape sequences for the specified rectangular region of the buffer.
@@ -166,8 +242,9 @@ public abstract class OutputBase
                     continue;
                 }
 
-                Cell cell = buffer.Contents![row, col];
-                AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col);
+                Cell cell = buffer.Contents! [row, col];
+                int outputWidth = -1;
+                AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col, ref outputWidth);
             }
 
             // Add newline at end of row if requested
@@ -187,7 +264,8 @@ public abstract class OutputBase
     /// <param name="redrawTextStyle">The current text style for optimization.</param>
     /// <param name="maxCol">The maximum column, used for wide character handling.</param>
     /// <param name="currentCol">The current column, updated for wide characters.</param>
-    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol)
+    /// <param name="outputWidth">The current output width, updated for wide characters.</param>
+    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol, ref int outputWidth)
     {
         Attribute? attribute = cell.Attribute;
 
@@ -202,11 +280,13 @@ public abstract class OutputBase
         // Add the grapheme
         string grapheme = cell.Grapheme;
         output.Append (grapheme);
+        outputWidth++;
 
         // Handle wide grapheme
         if (grapheme.GetColumns () > 1 && currentCol + 1 < maxCol)
         {
             currentCol++; // Skip next cell for wide character
+            outputWidth++;
         }
     }
 
@@ -218,7 +298,7 @@ public abstract class OutputBase
     /// <returns>A string containing ANSI escape sequences representing the buffer contents.</returns>
     public string ToAnsi (IOutputBuffer buffer)
     {
-        var output = new StringBuilder ();
+        StringBuilder output = new ();
         Attribute? lastAttr = null;
 
         BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, output, ref lastAttr);
@@ -226,13 +306,22 @@ public abstract class OutputBase
         return output.ToString ();
     }
 
-    private void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
+    /// <summary>
+    ///     Writes buffered output to console, wrapping URLs with OSC 8 hyperlinks (non-legacy only),
+    ///     then clears the buffer and advances <paramref name="lastCol"/> by <paramref name="outputWidth"/>.
+    /// </summary>
+    private void WriteToConsole (StringBuilder output, ref int lastCol, ref int outputWidth)
     {
-        SetCursorPositionImpl (lastCol, row);
-
-        // Wrap URLs with OSC 8 hyperlink sequences using the new Osc8UrlLinker
-        StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-        Write (processed);
+        if (IsLegacyConsole)
+        {
+            Write (output);
+        }
+        else
+        {
+            // Wrap URLs with OSC 8 hyperlink sequences
+            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
+            Write (processed);
+        }
 
         output.Clear ();
         lastCol += outputWidth;

@@ -111,7 +111,7 @@ public class TabView : View
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            // Let toplevel handle it
+                                            // Let runnable handle it
                                             return false;
                                         }
                                     }
@@ -145,7 +145,7 @@ public class TabView : View
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
-                                            // Let toplevel handle it
+                                            // Let runnable handle it
                                             return false;
                                         }
                                     }
@@ -563,8 +563,8 @@ public class TabView : View
             if (maxWidth == 0)
             {
                 tab.Visible = true;
-                tab.MouseClick += Tab_MouseClick!;
-                tab.Border!.MouseClick += Tab_MouseClick!;
+                tab.Activating += Tab_Selecting!;
+                tab.Border!.Activating += Tab_Selecting!;
 
                 yield return tab;
 
@@ -594,8 +594,8 @@ public class TabView : View
 
             // there is enough space!
             tab.Visible = true;
-            tab.MouseClick += Tab_MouseClick!;
-            tab.Border!.MouseClick += Tab_MouseClick!;
+            tab.Activating += Tab_Selecting!;
+            tab.Border!.Activating += Tab_Selecting!;
 
             yield return tab;
 
@@ -636,9 +636,12 @@ public class TabView : View
         return Style.ShowTopLine ? 3 : 2;
     }
 
-    internal void Tab_MouseClick (object sender, MouseEventArgs e)
+    internal void Tab_Selecting (object? sender, CommandEventArgs e)
     {
-        e.Handled = _tabsBar.NewMouseEvent (e) == true;
+        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        {
+            e.Handled = _tabsBar.NewMouseEvent (mouseArgs) == true;
+        }
     }
 
     private void UnSetCurrentTabs ()
@@ -652,8 +655,8 @@ public class TabView : View
 
                 if (tab.Visible)
                 {
-                    tab.MouseClick -= Tab_MouseClick!;
-                    tab.Border!.MouseClick -= Tab_MouseClick!;
+                    tab.Activating -= Tab_Selecting!;
+                    tab.Border!.Activating -= Tab_Selecting!;
                     tab.Visible = false;
                 }
             }
@@ -662,8 +665,8 @@ public class TabView : View
         {
             foreach (Tab tabToRender in _tabLocations)
             {
-                tabToRender.MouseClick -= Tab_MouseClick!;
-                tabToRender.Border!.MouseClick -= Tab_MouseClick!;
+                tabToRender.Activating -= Tab_Selecting!;
+                tabToRender.Border!.Activating -= Tab_Selecting!;
                 tabToRender.Visible = false;
             }
 

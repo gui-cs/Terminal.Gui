@@ -23,9 +23,9 @@ public enum Schemes
     Dialog,
 
     /// <summary>
-    ///     The application Toplevel scheme, used for the Toplevel View.
+    ///     The scheme used for views that support <see cref="IRunnable"/>.
     /// </summary>
-    Toplevel,
+    Runnable,
 
     /// <summary>
     ///     The scheme for showing errors.

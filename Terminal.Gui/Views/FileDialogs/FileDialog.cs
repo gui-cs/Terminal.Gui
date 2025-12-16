@@ -51,7 +51,6 @@ public class FileDialog : Dialog, IDesignable
     private bool _currentSortIsAsc = true;
     private bool _disposed;
     private string? _feedback;
-    private bool _loaded;
 
     private bool _pushingState;
     private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
@@ -106,7 +105,7 @@ public class FileDialog : Dialog, IDesignable
 
                                     e.Handled = true;
 
-                                    if (Modal)
+                                    if (IsModal)
                                     {
                                         (s as View)?.App?.RequestStop ();
                                     }
@@ -195,8 +194,8 @@ public class FileDialog : Dialog, IDesignable
             Id = "_tableView"
         };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
-        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Select);
-        _tableView.MouseClick += OnTableViewMouseClick;
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Activate);
+        _tableView.Activating += OnTableViewActivating;
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -410,7 +409,7 @@ public class FileDialog : Dialog, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (!string.IsNullOrWhiteSpace (_feedback))
         {
@@ -436,18 +435,16 @@ public class FileDialog : Dialog, IDesignable
     }
 
     /// <inheritdoc/>
-    public override void OnLoaded ()
+    protected override void OnIsRunningChanged (bool newIsRunning)
     {
-        base.OnLoaded ();
+        base.OnIsRunningChanged (newIsRunning);
 
-        if (_loaded)
+        if (!newIsRunning)
         {
             return;
         }
 
         Arrangement |= ViewArrangement.Resizable;
-
-        _loaded = true;
 
         // May have been updated after instance was constructed
         _btnOk.Text = Style.OkButtonText;
@@ -877,7 +874,7 @@ public class FileDialog : Dialog, IDesignable
 
         Canceled = false;
 
-        if (Modal)
+        if (IsModal)
         {
             App?.RequestStop ();
         }
@@ -1049,29 +1046,35 @@ public class FileDialog : Dialog, IDesignable
         }
     }
 
-    private void OnTableViewMouseClick (object? sender, MouseEventArgs e)
+    private void OnTableViewActivating (object? sender, CommandEventArgs e)
     {
-        Point? clickedCell = _tableView.ScreenToCell (e.Position.X, e.Position.Y, out int? clickedCol);
+        // Only handle mouse clicks, not keyboard selections
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        {
+            return;
+        }
+
+        Point? clickedCell = _tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
-            if (e.Flags.HasFlag (MouseFlags.Button1Clicked))
+            if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
             }
-            else if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
+            else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in a header
-                ShowHeaderContextMenu (clickedCol.Value, e);
+                ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
             }
         }
         else
         {
-            if (clickedCell is { } && e.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (clickedCell is { } && mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 // right click in rest of table
-                ShowCellContextMenu (clickedCell, e);
+                ShowCellContextMenu (clickedCell, mouseArgs);
             }
         }
     }
@@ -1649,9 +1652,7 @@ public class FileDialog : Dialog, IDesignable
 
     bool IDesignable.EnableForDesign ()
     {
-        Modal = false;
-        OnLoaded ();
-
+        OnIsRunningChanged (true);
         return true;
     }
 }

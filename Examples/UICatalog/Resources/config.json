@@ -9,9 +9,10 @@
   "Themes": [
     {
       "Hot Dog Stand": {
+        "Glyphs.WideGlyphReplacement": "①",
         "Schemes": [
           {
-            "Toplevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "Black",
                 "Background": "#FFFF00"
@@ -134,7 +135,7 @@
       }
     },
     {
-      "UI Catalog Theme": {
+      "UI Catalog": {
         "Window.DefaultShadow": "Transparent",
         "Button.DefaultShadow": "None",
         "CheckBox.DefaultHighlightStates": "In, Pressed, PressedOutside",
@@ -177,7 +178,7 @@
             }
           },
           {
-            "TopLevel": {
+            "Runnable": {
               "Normal": {
                 "Foreground": "DarkGray",
                 "Background": "White"

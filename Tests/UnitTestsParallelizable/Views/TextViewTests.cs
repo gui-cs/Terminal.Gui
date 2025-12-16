@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿#nullable disable
+using System.Text;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class TextViewTests
 {
@@ -2069,7 +2070,7 @@ public class TextViewTests
             new () { Grapheme = new ("t") }
         };
         TextView tv = CreateTextView ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (tv);
         tv.Load (cells);
 
@@ -2402,6 +2403,45 @@ public class TextViewTests
 
         Assert.True (tv.NewMouseEvent (new () { Position = new (col, 0), Flags = MouseFlags.Button1DoubleClicked }));
         Assert.Equal (expectedText, tv.SelectedText);
+    }
+
+    [Fact]
+    public void ReadOnly_True_Move_Right_Moves_Until_The_End_Of_Text_More_One_Column ()
+    {
+        TextView tv = CreateTextView ();
+        tv.Text = "Hi";
+        tv.ReadOnly = true;
+
+        Assert.Equal (0, tv.CurrentColumn);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithShift));
+        Assert.Equal (1, tv.CurrentColumn);
+        Assert.Equal ("H", tv.SelectedText);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithShift));
+        Assert.Equal (2, tv.CurrentColumn);
+        Assert.Equal ("Hi", tv.SelectedText);
+    }
+
+    [Fact]
+    public void LeftColumn_Treat_Negative_Width_As_One_Column ()
+    {
+        TextView tv = new () { Width = 2, Height = 1, Text = "\u001B[" };
+
+        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (new (0, 0), tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (0, tv.LeftColumn);
+        Assert.Equal (new (1, 0), tv.CursorPosition);
+
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tv.LeftColumn);
+        Assert.Equal (new (2, 0), tv.CursorPosition);
+
+        Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (1, tv.LeftColumn);
+        Assert.Equal (new (2, 0), tv.CursorPosition);
     }
 
     private TextView CreateTextView () { return new () { Width = 30, Height = 10 }; }

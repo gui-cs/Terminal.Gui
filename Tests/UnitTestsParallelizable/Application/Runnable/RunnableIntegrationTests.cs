@@ -1,66 +1,57 @@
 #nullable enable
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.ApplicationTests;
+namespace ApplicationTests.RunnableTests;
 
 /// <summary>
 ///     Integration tests for IApplication's IRunnable support.
 ///     Tests the full lifecycle of IRunnable instances through Application methods.
 /// </summary>
-public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : IDisposable
+public class ApplicationRunnableIntegrationTests
 {
-    private readonly ITestOutputHelper _output = output;
-    private IApplication? _app;
-
-    public void Dispose ()
-    {
-        _app?.Shutdown ();
-        _app = null;
-    }
-
     [Fact]
     public void Begin_AddsRunnableToStack ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
-        int stackCountBefore = app.RunnableSessionStack?.Count ?? 0;
+        int stackCountBefore = app.SessionStack?.Count ?? 0;
 
         // Act
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.NotNull (token);
         Assert.NotNull (token.Runnable);
         Assert.Same (runnable, token.Runnable);
-        Assert.Equal (stackCountBefore + 1, app.RunnableSessionStack?.Count ?? 0);
+        Assert.Equal (stackCountBefore + 1, app.SessionStack?.Count ?? 0);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void Begin_CanBeCanceled_ByIsRunningChanging ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         CancelableRunnable runnable = new () { CancelStart = true };
 
         // Act
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert - Should not be added to stack if canceled
         Assert.False (runnable.IsRunning);
 
-        // Token is still created but runnable not added to stack
-        Assert.NotNull (token);
+        // Token not created
+        Assert.Null (token);
     }
 
     [Fact]
     public void Begin_RaisesIsModalChangedEvent ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
         var isModalChangedRaised = false;
         bool? receivedValue = null;
@@ -72,50 +63,21 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                    };
 
         // Act
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (isModalChangedRaised);
         Assert.True (receivedValue);
 
         // Cleanup
-        app.End (token);
-    }
-
-    [Fact]
-    public void Begin_RaisesIsModalChangingEvent ()
-    {
-        // Arrange
-        IApplication app = GetApp ();
-        Runnable<int> runnable = new ();
-        var isModalChangingRaised = false;
-        bool? oldValue = null;
-        bool? newValue = null;
-
-        runnable.IsModalChanging += (s, e) =>
-                                    {
-                                        isModalChangingRaised = true;
-                                        oldValue = e.CurrentValue;
-                                        newValue = e.NewValue;
-                                    };
-
-        // Act
-        RunnableSessionToken token = app.Begin (runnable);
-
-        // Assert
-        Assert.True (isModalChangingRaised);
-        Assert.False (oldValue);
-        Assert.True (newValue);
-
-        // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void Begin_RaisesIsRunningChangedEvent ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
         var isRunningChangedRaised = false;
         bool? receivedValue = null;
@@ -127,21 +89,21 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                      };
 
         // Act
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (isRunningChangedRaised);
         Assert.True (receivedValue);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void Begin_RaisesIsRunningChangingEvent ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
         var isRunningChangingRaised = false;
         bool? oldValue = null;
@@ -155,7 +117,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                       };
 
         // Act
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (isRunningChangingRaised);
@@ -163,48 +125,48 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.True (newValue);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void Begin_SetsIsModalToTrue ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
 
         // Act
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (runnable.IsModal);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void Begin_SetsIsRunningToTrue ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
 
         // Act
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Assert
         Assert.True (runnable.IsRunning);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void Begin_ThrowsOnNullRunnable ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
 
         // Act & Assert
         Assert.Throws<ArgumentNullException> (() => app.Begin ((IRunnable)null!));
@@ -214,44 +176,44 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void End_CanBeCanceled_ByIsRunningChanging ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         CancelableRunnable runnable = new () { CancelStop = true };
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
         runnable.CancelStop = true; // Enable cancellation
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert - Should still be running if canceled
         Assert.True (runnable.IsRunning);
 
         // Force end by disabling cancellation
         runnable.CancelStop = false;
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void End_ClearsTokenRunnable ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
-        Assert.Null (token.Runnable);
+        Assert.Null (token!.Runnable);
     }
 
     [Fact]
     public void End_RaisesIsRunningChangedEvent ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
         var isRunningChangedRaised = false;
         bool? receivedValue = null;
 
@@ -262,7 +224,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                      };
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.True (isRunningChangedRaised);
@@ -273,9 +235,9 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void End_RaisesIsRunningChangingEvent ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
         var isRunningChangingRaised = false;
         bool? oldValue = null;
         bool? newValue = null;
@@ -288,7 +250,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
                                       };
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.True (isRunningChangingRaised);
@@ -300,28 +262,28 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void End_RemovesRunnableFromStack ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
-        int stackCountBefore = app.RunnableSessionStack?.Count ?? 0;
+        SessionToken? token = app.Begin (runnable);
+        int stackCountBefore = app.SessionStack?.Count ?? 0;
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
-        Assert.Equal (stackCountBefore - 1, app.RunnableSessionStack?.Count ?? 0);
+        Assert.Equal (stackCountBefore - 1, app.SessionStack?.Count ?? 0);
     }
 
     [Fact]
     public void End_SetsIsModalToFalse ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.False (runnable.IsModal);
@@ -331,12 +293,12 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void End_SetsIsRunningToFalse ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
-        app.End (token);
+        app.End (token!);
 
         // Assert
         Assert.False (runnable.IsRunning);
@@ -346,17 +308,33 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void End_ThrowsOnNullToken ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException> (() => app.End ((RunnableSessionToken)null!));
+        Assert.Throws<ArgumentNullException> (() => app.End ((SessionToken)null!));
+    }
+
+    [Fact]
+    public void End_ClearsMouseGrabView ()
+    {
+        // Arrange
+        IApplication app = CreateAndInitApp ();
+
+        Runnable<int> runnable = new ();
+        SessionToken? token = app.Begin (runnable);
+        app.Mouse.GrabMouse (runnable);
+        app.End (token!);
+
+        Assert.Null (app.Mouse.MouseGrabView);
+
+        runnable.Dispose ();
+        app.Dispose ();
     }
 
     [Fact]
     public void MultipleRunnables_IndependentResults ()
     {
         // Arrange
-        IApplication app = GetApp ();
         Runnable<int> runnable1 = new ();
         Runnable<string> runnable2 = new ();
 
@@ -373,13 +351,13 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void NestedBegin_MaintainsStackOrder ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable1 = new () { Id = "1" };
         Runnable<int> runnable2 = new () { Id = "2" };
 
         // Act
-        RunnableSessionToken token1 = app.Begin (runnable1);
-        RunnableSessionToken token2 = app.Begin (runnable2);
+        SessionToken token1 = app.Begin (runnable1)!;
+        SessionToken token2 = app.Begin (runnable2)!;
 
         // Assert - runnable2 should be on top
         Assert.True (runnable2.IsModal);
@@ -396,11 +374,11 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void NestedEnd_RestoresPreviousModal ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         Runnable<int> runnable1 = new () { Id = "1" };
         Runnable<int> runnable2 = new () { Id = "2" };
-        RunnableSessionToken token1 = app.Begin (runnable1);
-        RunnableSessionToken token2 = app.Begin (runnable2);
+        SessionToken token1 = app.Begin (runnable1)!;
+        SessionToken token2 = app.Begin (runnable2)!;
 
         // Act - End the top runnable
         app.End (token2);
@@ -419,9 +397,9 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
     public void RequestStop_WithIRunnable_WorksCorrectly ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         StoppableRunnable runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
         app.RequestStop (runnable);
@@ -431,16 +409,16 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.NotNull (runnable);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact]
     public void RequestStop_WithNull_UsesTopRunnable ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         StoppableRunnable runnable = new ();
-        RunnableSessionToken token = app.Begin (runnable);
+        SessionToken? token = app.Begin (runnable);
 
         // Act
         app.RequestStop ((IRunnable?)null);
@@ -449,14 +427,14 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.NotNull (runnable);
 
         // Cleanup
-        app.End (token);
+        app.End (token!);
     }
 
     [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
     public void RunGeneric_CreatesAndReturnsRunnable ()
     {
         // Arrange
-        IApplication app = GetApp ();
+        IApplication app = CreateAndInitApp ();
         app.StopAfterFirstIteration = true;
 
         // Act - With fluent API, Run<T>() returns IApplication for chaining
@@ -467,7 +445,7 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.Same (app, result); // Fluent API returns this
 
         // Note: Run blocks until stopped, but StopAfterFirstIteration makes it return immediately
-        // The runnable is automatically disposed by Shutdown()
+        // The runnable is automatically disposed by Dispose()
     }
 
     [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
@@ -482,18 +460,15 @@ public class ApplicationRunnableIntegrationTests (ITestOutputHelper output) : ID
         Assert.Throws<NotInitializedException> (() => app.Run<TestRunnable> ());
 
         // Cleanup
-        app.Shutdown ();
+        app.Dispose ();
     }
 
-    private IApplication GetApp ()
+    private IApplication CreateAndInitApp ()
     {
-        if (_app is null)
-        {
-            _app = Application.Create ();
-            _app.Init ("fake");
-        }
+        IApplication app = Application.Create ();
+        app.Init ("fake");
 
-        return _app;
+        return app;
     }
 
     /// <summary>

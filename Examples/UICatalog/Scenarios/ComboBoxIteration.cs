@@ -25,7 +25,7 @@ public class ComboBoxIteration : Scenario
 
         var lbComboBox = new Label
         {
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             X = Pos.Right (lbListView) + 1,
             Width = Dim.Percent (40)
         };

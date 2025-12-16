@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Text.Json;
 
-namespace UnitTests_Parallelizable.ConfigurationTests;
+namespace ConfigurationTests;
 
 public class ScopeJsonConverterTests
 {

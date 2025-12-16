@@ -1,8 +1,8 @@
 ﻿using Xunit.Abstractions;
 
-//using static Terminal.Gui.ViewTests.MenuTests;
+//using static Terminal.Gui.ViewBaseTests.MenuTests;
 
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 public class MenuTests ()
 {

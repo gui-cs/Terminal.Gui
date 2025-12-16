@@ -1,4 +1,4 @@
-namespace UnitTests_Parallelizable.InputTests;
+namespace InputTests;
 
 /// <summary>
 ///     Tests to verify that InputBindings (KeyBindings and MouseBindings) are thread-safe

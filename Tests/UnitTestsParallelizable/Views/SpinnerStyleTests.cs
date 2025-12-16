@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace UnitTests_Parallelizable.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 ///     Parallelizable tests for <see cref="SpinnerStyle"/> and its concrete implementations.

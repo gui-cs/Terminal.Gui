@@ -30,12 +30,12 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Assert.Equal ("f", tf.Text);
 
         // Still has focus though
-        Assert.Same (tf, Application.TopRunnable.Focused);
+        Assert.Same (tf, Application.TopRunnableView.Focused);
 
         // But can tab away
         Application.RaiseKeyDownEvent ('\t');
-        Assert.NotSame (tf, Application.TopRunnable.Focused);
-        Application.TopRunnable.Dispose ();
+        Assert.NotSame (tf, Application.TopRunnableView.Focused);
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("fi", tf.Text);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Theory]
@@ -107,7 +107,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("f", output);
         Assert.Equal ("f ", tf.Text);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("fx", output);
         Assert.Equal ("fx", tf.Text);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.Draw ();
         DriverAssert.AssertDriverContentsAre ("my FISH", output);
         Assert.Equal ("my FISH", tf.Text);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     [Fact]
@@ -231,12 +231,12 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Assert.Equal ("fish", tf.Text);
 
         // Tab should autcomplete but not move focus
-        Assert.Same (tf, Application.TopRunnable.Focused);
+        Assert.Same (tf, Application.TopRunnableView.Focused);
 
         // Second tab should move focus (nothing to autocomplete)
         Application.RaiseKeyDownEvent ('\t');
-        Assert.NotSame (tf, Application.TopRunnable.Focused);
-        Application.TopRunnable.Dispose ();
+        Assert.NotSame (tf, Application.TopRunnableView.Focused);
+        Application.TopRunnableView.Dispose ();
     }
 
     [Theory]
@@ -256,7 +256,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.PositionCursor ();
         DriverAssert.AssertDriverContentsAre (expectRender, output);
         Assert.Equal ("f", tf.Text);
-        Application.TopRunnable.Dispose ();
+        Application.TopRunnableView.Dispose ();
     }
 
     private TextField GetTextFieldsInView ()
@@ -264,7 +264,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         var tf = new TextField { Width = 10 };
         var tf2 = new TextField { Y = 1, Width = 10 };
 
-        Toplevel top = new ();
+        Runnable top = new ();
         top.Add (tf);
         top.Add (tf2);
 

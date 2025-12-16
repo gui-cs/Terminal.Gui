@@ -45,7 +45,7 @@ public class CharMap : View, IDesignable
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
 
         AddCommand (Command.Accept, HandleAcceptCommand);
-        AddCommand (Command.Select, HandleSelectCommand);
+        AddCommand (Command.Activate, HandleSelectCommand);
         AddCommand (Command.Context, HandleContextCommand);
 
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -281,12 +281,12 @@ public class CharMap : View, IDesignable
         }
     }
 
-    private void CopyCodePoint () { App?.Clipboard?.SetClipboardData($"U+{SelectedCodePoint:x5}"); }
-    private void CopyGlyph () { App?.Clipboard?.SetClipboardData($"{new Rune (SelectedCodePoint)}"); }
+    private void CopyCodePoint () { App?.Clipboard?.SetClipboardData ($"U+{SelectedCodePoint:x5}"); }
+    private void CopyGlyph () { App?.Clipboard?.SetClipboardData ($"{new Rune (SelectedCodePoint)}"); }
 
     private bool? Move (ICommandContext? commandContext, int cpOffset)
     {
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }
@@ -375,8 +375,13 @@ public class CharMap : View, IDesignable
         waitIndicator.Add (errorLabel);
         waitIndicator.Add (spinner);
 
-        waitIndicator.Ready += async (s, a) =>
+        waitIndicator.IsModalChanged += async (s, a) =>
                                {
+                                   if (!a.Value)
+                                   {
+                                       return;
+                                   }
+
                                    try
                                    {
                                        decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
@@ -575,7 +580,7 @@ public class CharMap : View, IDesignable
     private static int RowLabelWidth => $"U+{MAX_CODE_POINT:x5}".Length + 1;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Viewport.Height == 0 || Viewport.Width == 0)
         {
@@ -860,7 +865,7 @@ public class CharMap : View, IDesignable
             }
         }
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }

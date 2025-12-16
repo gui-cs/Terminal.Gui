@@ -66,7 +66,7 @@ public class TestsAllViews : FakeDriverBase
             {
                 // Check if this type parameter has constraints that object can't satisfy
                 Type [] constraints = arg.GetGenericParameterConstraints ();
-                
+
                 // If there's a View constraint, use View instead of object
                 if (constraints.Any (c => c == typeof (View) || c.IsSubclassOf (typeof (View))))
                 {
@@ -189,7 +189,7 @@ public class TestsAllViews : FakeDriverBase
         }
         else if (paramType.Name == "View")
         {
-            var top = new Toplevel ();
+            var top = new Runnable ();
             var view = new View ();
             top.Add (view);
             pTypes.Add (view);

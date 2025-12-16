@@ -7,29 +7,29 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class FakeOutput : OutputBase, IOutput
 {
-    private readonly StringBuilder _output = new ();
+   // private readonly StringBuilder _outputStringBuilder = new ();
     private int _cursorLeft;
     private int _cursorTop;
     private Size _consoleSize = new (80, 25);
+    private IOutputBuffer? _lastBuffer;
 
     /// <summary>
     /// 
     /// </summary>
     public FakeOutput ()
     {
-        LastBuffer = new OutputBufferImpl ();
-        LastBuffer.SetSize (80, 25);
+        _lastBuffer = new OutputBufferImpl ();
+        _lastBuffer.SetSize (80, 25);
     }
 
     /// <summary>
-    ///     Gets or sets the last output buffer written.
+    ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
+    ///     a reference to the buffer last written with <see cref="Write(IOutputBuffer)"/>.
     /// </summary>
-    public IOutputBuffer? LastBuffer { get; set; }
+    public IOutputBuffer? GetLastBuffer () => _lastBuffer;
 
-    /// <summary>
-    ///     Gets the captured output as a string.
-    /// </summary>
-    public string Output => _output.ToString ();
+    ///// <inheritdoc cref="IOutput.GetLastOutput"/>
+    //public override string GetLastOutput () => _outputStringBuilder.ToString ();
 
     /// <inheritdoc />
     public Point GetCursorPosition ()
@@ -61,15 +61,21 @@ public class FakeOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
-        _output.Append (text);
+//        _outputStringBuilder.Append (text);
     }
 
-    /// <inheritdoc cref="IDriver"/>
+    /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public override void Write (IOutputBuffer buffer)
     {
-        LastBuffer = buffer;
+        _lastBuffer = buffer;
         base.Write (buffer);
     }
+
+    ///// <inheritdoc/>
+    //protected override void Write (StringBuilder output)
+    //{
+    //    _outputStringBuilder.Append (output);
+    //}
 
     /// <inheritdoc cref="IDriver"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
@@ -78,18 +84,23 @@ public class FakeOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
-    public void Dispose ()
-    {
-        // Nothing to dispose
-    }
-
-    /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        if (Application.Force16Colors)
+        if (Force16Colors)
         {
-            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
-            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+            if (!IsLegacyConsole)
+            {
+                output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+                output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+
+                EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            }
+            else
+            {
+                Write (output);
+                Console.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor16 ();
+                Console.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor16 ();
+            }
         }
         else
         {
@@ -106,14 +117,14 @@ public class FakeOutput : OutputBase, IOutput
                                                       attr.Background.G,
                                                       attr.Background.B
                                                      );
-        }
 
-        EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+            EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+        }
     }
 
     /// <inheritdoc/>
-    protected override void Write (StringBuilder output)
+    public void Dispose ()
     {
-        _output.Append (output);
+        // Nothing to dispose
     }
 }

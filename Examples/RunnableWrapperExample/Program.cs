@@ -83,7 +83,7 @@ if (formRunnable.Result is { } formData)
 
 formRunnable.Dispose ();
 
-app.Shutdown ();
+app.Dispose ();
 
 // Helper method to create a custom form
 View CreateCustomForm ()

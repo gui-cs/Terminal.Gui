@@ -23,14 +23,11 @@ public class TextEffectsScenario : Scenario
             Title = "Text Effects Scenario"
         };
 
-        w.Loaded += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
+        w.IsModalChanged += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
 
-        w.SizeChanging += (s, e) =>
+        w.ViewportChanged += (s, e) =>
                           {
-                              if (e.Size.HasValue)
-                              {
-                                  SetupGradientLineCanvas (w, e.Size.Value);
-                              }
+                              SetupGradientLineCanvas (w, e.NewViewport.Size);
                           };
 
         w.SetScheme (new ()
@@ -112,7 +109,7 @@ internal class GradientsView : View
     private const int LABEL_HEIGHT = 1;
     private const int GRADIENT_WITH_LABEL_HEIGHT = GRADIENT_HEIGHT + LABEL_HEIGHT + 1; // +1 for spacing
 
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         DrawTopLineGradient (Viewport);
 

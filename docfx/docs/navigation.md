@@ -7,7 +7,7 @@ This document covers Terminal.Gui's navigation system, which determines:
 - What are the visual cues that help the user know what keystrokes will change the focus?
 - What are the visual cues that help the user know what keystrokes will cause action in elements of the application that don't currently have focus?
 - What is the order in which UI elements are traversed when using keyboard navigation?
-- What are the default actions for standard key/mouse input (e.g. Hotkey, `Space`, `Enter`, `MouseClick`)?
+- What are the default actions for standard key/mouse input (e.g. Hotkey, `Space`, `Enter`, or a mouse click)?
 
 ## See Also
 
@@ -183,7 +183,7 @@ This method is called from the `Command` handlers bound to the application-scope
 
 **Note:** When accessing from within a View, use `App?.Current` instead of `Application.TopRunnable` (which is obsolete).
 
-This method replaces about a dozen functions in v1 (scattered across `Application` and `Toplevel`).
+This method replaces about a dozen functions in v1 (scattered across `Application` and `Runnable`).
 
 ### Application Navigation Examples
 
@@ -442,7 +442,7 @@ view.HasFocusChanged += (sender, e) =>
 
 The following table summarizes how built-in views respond to various input methods:
 
-| View | States | Static | Default | HotKeys | Select Cmd | Accept Cmd | HotKey Cmd | Click Focus | DblClick | RightClick | GrabMouse |
+| View | States | Static | Default | HotKeys | Activate Cmd | Accept Cmd | HotKey Cmd | Click Focus | DblClick | RightClick | GrabMouse |
 |------|--------|--------|---------|---------|------------|------------|------------|-------------|----------|------------|-----------|
 | **View** | 1 | Yes | No | 1 | OnSelect | OnAccept | Focus | Focus | - | - | No |
 | **Label** | 1 | Yes | No | 1 | OnSelect | OnAccept | FocusNext | Focus | - | FocusNext | No |
@@ -460,7 +460,7 @@ The following table summarizes how built-in views respond to various input metho
 - **Static**: Whether the view is primarily for display (non-interactive)
 - **Default**: Whether the view can be a default button (activated by Enter)
 - **HotKeys**: Number of hotkeys the view typically supports
-- **Select Cmd**: What happens when Command.Select is invoked
+- **Activate Cmd**: What happens when Command.Activate is invoked
 - **Accept Cmd**: What happens when Command.Accept is invoked
 - **HotKey Cmd**: What happens when the view's hotkey is pressed
 - **Click Focus**: Behavior when clicked (if CanFocus=true)
@@ -560,7 +560,7 @@ foreach (var view in container.Subviews)
 
 // Provide keyboard alternatives to mouse actions
 view.KeyBindings.Add(Key.F10, Command.Context); // Right-click equivalent
-view.KeyBindings.Add(Key.Space, Command.Select); // Click equivalent
+view.KeyBindings.Add(Key.Space, Command.Activate); // Click equivalent
 ```
 
 For more information on accessibility standards, see:

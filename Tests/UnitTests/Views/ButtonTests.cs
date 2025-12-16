@@ -127,7 +127,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Contains (Command.HotKey, btn.GetSupportedCommands ());
         Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (btn);
         Application.Begin (top);
 
@@ -173,7 +173,7 @@ public class ButtonTests (ITestOutputHelper output)
         var clicked = false;
         var btn = new Button { Text = "_Test" };
         btn.Accepting += (s, e) => clicked = true;
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (btn);
         Application.Begin (top);
 
@@ -208,8 +208,8 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.True (clicked);
         clicked = false;
 
-        // Toplevel does not handle Enter, so it should get passed on to button
-        Assert.False (Application.TopRunnable.NewKeyDownEvent (Key.Enter));
+        // Runnable does not handle Enter, so it should get passed on to button
+        Assert.False (Application.TopRunnableView.NewKeyDownEvent (Key.Enter));
         Assert.True (clicked);
         clicked = false;
 
@@ -243,14 +243,14 @@ public class ButtonTests (ITestOutputHelper output)
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         Assert.False (btn.IsInitialized);
 
         Application.Begin (top);
         Application.Driver?.SetScreenSize (30, 5);
-
+        Application.LayoutAndDraw();
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{Glyphs.LeftBracket} {btn.Text} {Glyphs.RightBracket}", btn.TextFormatter.Text);
@@ -285,9 +285,9 @@ public class ButtonTests (ITestOutputHelper output)
             WantContinuousButtonPressed = true
         };
 
-        var selectingCount = 0;
+        var activatingCount = 0;
 
-        button.Selecting += (s, e) => selectingCount++;
+        button.Activating += (s, e) => activatingCount++;
         var acceptedCount = 0;
 
         button.Accepting += (s, e) =>
@@ -299,19 +299,19 @@ public class ButtonTests (ITestOutputHelper output)
         me = new ();
         me.Flags = pressed;
         button.NewMouseEvent (me);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptedCount);
 
         me = new ();
         me.Flags = released;
         button.NewMouseEvent (me);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptedCount);
 
         me = new ();
         me.Flags = clicked;
         button.NewMouseEvent (me);
-        Assert.Equal (1, selectingCount);
+        Assert.Equal (1, activatingCount);
         Assert.Equal (1, acceptedCount);
 
         button.Dispose ();
@@ -341,23 +341,23 @@ public class ButtonTests (ITestOutputHelper output)
                                 e.Handled = true;
                             };
 
-        var selectingCount = 0;
+        var activatingCount = 0;
 
-        button.Selecting += (s, e) =>
+        button.Activating += (s, e) =>
                             {
-                                selectingCount++;
+                                activatingCount++;
                                 e.Handled = true;
                             };
 
         me.Flags = pressed;
         button.NewMouseEvent (me);
         Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
 
         me.Flags = released;
         button.NewMouseEvent (me);
         Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, selectingCount);
+        Assert.Equal (0, activatingCount);
 
         button.Dispose ();
     }

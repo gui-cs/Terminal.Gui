@@ -102,12 +102,13 @@ public class ViewportSettings : Scenario
             Title = GetQuitKeyAndName (),
 
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-            SchemeName = "Toplevel",
+            SchemeName = "Runnable",
             BorderStyle = LineStyle.None
         };
 
         var adornmentsEditor = new AdornmentsEditor
         {
+            BorderStyle = LineStyle.Single,
             X = Pos.AnchorEnd (),
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true
@@ -224,6 +225,7 @@ public class ViewportSettings : Scenario
         view.Initialized += (s, e) =>
                                               {
                                                   viewportSettingsEditor.ViewToEdit = view;
+                                                  adornmentsEditor.ViewToEdit = view;
                                               };
         view.SetFocus ();
         Application.Run (app);

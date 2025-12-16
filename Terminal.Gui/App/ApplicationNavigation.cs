@@ -89,7 +89,7 @@ public class ApplicationNavigation
 
         _focused = value;
 
-        FocusedChanged?.Invoke (null, EventArgs.Empty);
+        FocusedChanged?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -113,6 +113,6 @@ public class ApplicationNavigation
         {
             return visiblePopover.AdvanceFocus (direction, behavior);
         }
-        return App?.TopRunnable is { } && App.TopRunnable.AdvanceFocus (direction, behavior);
+        return App?.TopRunnableView is { } && App.TopRunnableView.AdvanceFocus (direction, behavior);
     }
 }

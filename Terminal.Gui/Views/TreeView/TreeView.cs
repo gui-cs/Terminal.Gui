@@ -291,7 +291,7 @@ public class TreeView<T> : View, ITreeView where T : class
                     }
                    );
 
-        AddCommand (Command.Select, ActivateSelectedObjectIfAny);
+        AddCommand (Command.Activate, ActivateSelectedObjectIfAny);
         AddCommand (Command.Accept, ActivateSelectedObjectIfAny);
 
         // Default keybindings for this view
@@ -317,7 +317,7 @@ public class TreeView<T> : View, ITreeView where T : class
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
 
         KeyBindings.Remove (ObjectActivationKey);
-        KeyBindings.Add (ObjectActivationKey, Command.Select);
+        KeyBindings.Add (ObjectActivationKey, Command.Activate);
     }
 
     /// <summary>
@@ -1148,7 +1148,7 @@ public class TreeView<T> : View, ITreeView where T : class
     public event EventHandler<ObjectActivatedEventArgs<T>> ObjectActivated;
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext context)
     {
         if (roots is null)
         {

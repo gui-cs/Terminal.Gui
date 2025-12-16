@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace Terminal.Gui.App;
 
-public partial class ApplicationImpl
+internal partial class ApplicationImpl
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public int? MainThreadId { get; set; }
 
     /// <inheritdoc/>
@@ -88,7 +87,7 @@ public partial class ApplicationImpl
         _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
 
         CreateDriver (_driverName);
-        Screen = Driver!.Screen;
+
         Initialized = true;
 
         RaiseInitializedChanged (this, new (true));
@@ -97,23 +96,75 @@ public partial class ApplicationImpl
         SynchronizationContext.SetSynchronizationContext (new ());
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
+        _result = null;
+
         return this;
     }
 
-    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
-    public object? Shutdown ()
-    {
-        // Extract result from framework-owned runnable before disposal
-        object? result = null;
-        IRunnable? runnableToDispose = FrameworkOwnedRunnable;
+    #region IDisposable Implementation
 
-        if (runnableToDispose is { })
+    private bool _disposed;
+
+    /// <summary>
+    ///     Disposes the application instance and releases all resources.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method implements the <see cref="IDisposable"/> pattern and performs the same cleanup
+    ///         as <see cref="IDisposable.Dispose"/>, but without returning a result.
+    ///     </para>
+    ///     <para>
+    ///         After calling <see cref="Dispose()"/>, use <see cref="GetResult"/> or <see cref="IApplication.GetResult{T}"/>
+    ///         to retrieve the result from the last run session.
+    ///     </para>
+    /// </remarks>
+    public void Dispose ()
+    {
+        Dispose (true);
+        GC.SuppressFinalize (this);
+    }
+
+    /// <summary>
+    ///     Disposes the application instance and releases all resources.
+    /// </summary>
+    /// <param name="disposing">
+    ///     <see langword="true"/> if called from <see cref="Dispose()"/>;
+    ///     <see langword="false"/> if called from finalizer.
+    /// </param>
+    protected virtual void Dispose (bool disposing)
+    {
+        if (_disposed)
         {
-            // Extract the result using reflection to get the Result property value
-            PropertyInfo? resultProperty = runnableToDispose.GetType ().GetProperty ("Result");
-            result = resultProperty?.GetValue (runnableToDispose);
+            return;
         }
 
+        if (disposing)
+        {
+            // Dispose managed resources
+            DisposeCore ();
+        }
+
+        // For the singleton instance (legacy Application.Init/Shutdown pattern),
+        // we need to allow re-initialization after disposal. This enables:
+        // Application.Init() -> Application.Shutdown() -> Application.Init()
+        // For modern instance-based usage, this doesn't matter as new instances are created.
+        if (this == _instance)
+        {
+            // Reset disposed flag to allow re-initialization
+            _disposed = false;
+        }
+        else
+        {
+            // For instance-based usage, mark as disposed
+            _disposed = true;
+        }
+    }
+
+    /// <summary>
+    ///     Core disposal logic - same as Shutdown() but without returning result.
+    /// </summary>
+    private void DisposeCore ()
+    {
         // Stop the coordinator if running
         Coordinator?.Stop ();
 
@@ -135,17 +186,6 @@ public partial class ApplicationImpl
         }
 #endif
 
-        // Dispose the framework-owned runnable if it exists
-        if (runnableToDispose is { })
-        {
-            if (runnableToDispose is IDisposable disposable)
-            {
-                disposable.Dispose ();
-            }
-
-            FrameworkOwnedRunnable = null;
-        }
-
         // Clean up all application state (including sync context)
         // ResetState handles the case where Initialized is false
         ResetState ();
@@ -162,9 +202,25 @@ public partial class ApplicationImpl
 
         // Clear the event to prevent memory leaks
         InitializedChanged = null;
+    }
+
+    #endregion IDisposable Implementation
+
+    /// <summary>Shutdown an application initialized with <see cref="Init"/>.</summary>
+    [Obsolete ("Use Dispose() or a using statement instead. This method will be removed in a future version.")]
+    public object? Shutdown ()
+    {
+        // Shutdown is now just a wrapper around Dispose that returns the result
+        object? result = GetResult ();
+        Dispose ();
 
         return result;
     }
+
+    private object? _result;
+
+    /// <inheritdoc/>
+    public object? GetResult () => _result;
 
     /// <inheritdoc/>
     public void ResetState (bool ignoreDisposed = false)
@@ -176,10 +232,13 @@ public partial class ApplicationImpl
         // === 0. Stop all timers ===
         TimedEvents?.StopAll ();
 
-        // === 1. Stop all running toplevels ===
-        foreach (Toplevel t in SessionStack)
+        // === 1. Stop all running runnables ===
+        foreach (SessionToken token in SessionStack!.Reverse ())
         {
-            t.Running = false;
+            if (token.Runnable is { })
+            {
+                End (token);
+            }
         }
 
         // === 2. Close and dispose popover ===
@@ -194,40 +253,25 @@ public partial class ApplicationImpl
         Popover?.Dispose ();
         Popover = null;
 
-        // === 3. Clean up toplevels ===
-        SessionStack.Clear ();
-        RunnableSessionStack?.Clear ();
+        // === 3. Clean up runnables ===
+        SessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the TopRunnable. It's up to caller dispose it
-        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnable is { })
+        if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnableView is { })
         {
-            Debug.Assert (TopRunnable.WasDisposed, $"Title = {TopRunnable.Title}, Id = {TopRunnable.Id}");
-
-            // If End wasn't called _CachedSessionTokenToplevel may be null
-            if (CachedSessionTokenToplevel is { })
-            {
-                Debug.Assert (CachedSessionTokenToplevel.WasDisposed);
-                Debug.Assert (CachedSessionTokenToplevel == TopRunnable);
-            }
+            Debug.Assert (TopRunnableView.WasDisposed, $"Title = {TopRunnableView.Title}, Id = {TopRunnableView.Id}");
         }
 #endif
-
-        TopRunnable = null;
-        CachedSessionTokenToplevel = null;
 
         // === 4. Clean up driver ===
         if (Driver is { })
         {
             UnsubscribeDriverEvents ();
-            Driver?.End ();
+            Driver.Dispose ();
             Driver = null;
         }
-
-        // Reset screen
-        ResetScreen ();
-        _screen = null;
 
         // === 5. Clear run state ===
         Iteration = null;
@@ -256,23 +300,11 @@ public partial class ApplicationImpl
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;
 
-        //Navigation = null;
-
         // === 8. Reset initialization state ===
         Initialized = false;
         MainThreadId = null;
 
-        // === 9. Clear graphics ===
-        Sixel.Clear ();
-
-        // === 10. Reset ForceDriver ===
-        // Note: ForceDriver and Force16Colors are reset
-        // If they need to persist across Init/Shutdown cycles
-        // then the user of the library should manage that state
-        Force16Colors = false;
-        ForceDriver = string.Empty;
-
-        // === 11. Reset synchronization context ===
+        // === 9. Reset synchronization context ===
         // IMPORTANT: Always reset sync context, even if not initialized
         // This ensures cleanup works correctly even if Shutdown is called without Init
         // Reset synchronization context to allow the user to run async/await,
@@ -281,7 +313,7 @@ public partial class ApplicationImpl
         // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
 
-        // === 12. Unsubscribe from Application static property change events ===
+        // === 10. Unsubscribe from Application static property change events ===
         UnsubscribeApplicationEvents ();
     }
 
@@ -320,9 +352,6 @@ public partial class ApplicationImpl
     }
 #endif
 
-    // Event handlers for Application static property changes
-    private void OnForce16ColorsChanged (object? sender, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
-
     private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
 
     /// <summary>
@@ -330,7 +359,6 @@ public partial class ApplicationImpl
     /// </summary>
     private void UnsubscribeApplicationEvents ()
     {
-        Application.Force16ColorsChanged -= OnForce16ColorsChanged;
         Application.ForceDriverChanged -= OnForceDriverChanged;
     }
 }

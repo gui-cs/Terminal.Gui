@@ -81,10 +81,10 @@ public class Wizards : Scenario
         void Win_Loaded (object sender, EventArgs args)
         {
             frame.Height = widthEdit.Frame.Height + heightEdit.Frame.Height + titleEdit.Frame.Height + 2;
-            win.Loaded -= Win_Loaded;
+            win.IsModalChanged -= Win_Loaded;
         }
 
-        win.Loaded += Win_Loaded;
+        win.IsModalChanged += Win_Loaded;
 
         label = new ()
         {

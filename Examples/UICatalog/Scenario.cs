@@ -219,11 +219,11 @@ public class Scenario : IDisposable
         }
     }
 
-    // BUGBUG: This is incompatible with modals. This should be using the new equivalent of Toplevel.Ready 
+    // BUGBUG: This is incompatible with modals. This should be using the new equivalent of Runnable.Ready 
     // BUGBUG: which will be IsRunningChanged with newIsRunning == true
     private void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
     {
-        SubscribeAllSubViews (Application.TopRunnable!);
+        SubscribeAllSubViews (Application.TopRunnableView!);
 
         _demoKeys = GetDemoKeyStrokes ();
 

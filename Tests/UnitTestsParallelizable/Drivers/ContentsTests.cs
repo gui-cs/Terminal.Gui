@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -17,7 +17,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
         driver.AddStr (combined);
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
         driver.Move (500, 500);
         Assert.Equal (500, driver.Col);
         Assert.Equal (500, driver.Row);
-        driver.End ();
+        driver.Dispose ();
     }
 
     // TODO: Add these unit tests

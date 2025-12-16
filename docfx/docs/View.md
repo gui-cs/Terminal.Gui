@@ -127,7 +127,7 @@ See the [Command Deep Dive](command.md).
 
 - [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Declares commands the View supports
 - [View.InvokeCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Invokes a command
-- [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Select, HotKey, etc.)
+- [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
 
 ### Input Handling
 
@@ -148,7 +148,7 @@ See the [Mouse Deep Dive](mouse.md).
 - [View.WantContinuousButtonPresses](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_WantContinuousButtonPresses) - Enables continuous button press events
 - [View.Highlight](~/api/Terminal.Gui.ViewBase.View.yml) - Event for visual feedback on mouse hover/click
 - [View.HighlightStyle](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HighlightStyle) - Visual style when highlighted
-- Events: `MouseEnter`, `MouseLeave`, `MouseClick`, `MouseEvent`
+- Events: `MouseEnter`, `MouseLeave`, `MouseEvent`
 
 ### Layout and Arrangement
 
@@ -228,8 +228,8 @@ Events:
 - `HasFocusChanged` - After focus changes
 - `Accepting` - When Command.Accept is invoked (typically Enter key)
 - `Accepted` - After Command.Accept completes
-- `Selecting` - When Command.Select is invoked (typically Space or mouse click)
-- `Selected` - After Command.Select completes
+- `Activating` - When Command.Activate is invoked (typically Space or mouse click)
+- `Activated` - After Command.Activate completes
 
 ### Scrolling
 
@@ -271,7 +271,7 @@ View view = new ()
 
 ### 2. Initialization
 
-When a View is added to a SuperView or when [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Toplevel_System_Func_System_Exception_System_Boolean__) is called:
+When a View is added to a SuperView or when [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Runnable_System_Func_System_Exception_System_Boolean__) is called:
 
 1. [BeginInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_BeginInit) is called
 2. [EndInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_EndInit) is called
@@ -340,7 +340,7 @@ view.AddCommand (Command.Accept, () =>
 view.KeyBindings.Add (Key.Enter, Command.Accept);
 
 // Bind a mouse action to the command
-view.MouseBindings.Add (MouseFlags.Button1Clicked, Command.Select);
+view.MouseBindings.Add (MouseFlags.Button1Clicked, Command.Activate);
 ```
 
 ### Input
@@ -368,7 +368,6 @@ The mouse subsystem processes mouse events through:
 3. [View.MouseEnter](~/api/Terminal.Gui.ViewBase.View.yml) / [View.MouseLeave](~/api/Terminal.Gui.ViewBase.View.yml) events
 4. [View.MouseBindings](~/api/Terminal.Gui.ViewBase.View.yml) - Converts mouse actions to commands
 5. Command handlers
-6. [View.MouseClick](~/api/Terminal.Gui.ViewBase.View.yml) event (high-level)
 
 ### Layout
 
@@ -566,7 +565,7 @@ Views can implement [IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) to run as 
 
 The **IRunnable** pattern provides:
 
-- **Interface-Based**: Implement `IRunnable<TResult>` instead of inheriting from `Toplevel`
+- **Interface-Based**: Implement `IRunnable<TResult>` instead of inheriting from `Runnable`
 - **Type-Safe Results**: Generic `TResult` parameter for compile-time type safety
 - **Fluent API**: Chain `Init()`, `Run()`, and `Shutdown()` for concise code
 - **Automatic Disposal**: Framework manages lifecycle of created runnables
@@ -611,7 +610,7 @@ Color? result = Application.Create()
 
 if (result is { })
 {
-    Console.WriteLine($"Selected: {result}");
+    Console.WriteLine($"Activated: {result}");
 }
 ```
 
@@ -674,14 +673,13 @@ protected override bool OnIsRunningChanging(bool oldIsRunning, bool newIsRunning
 
 - **`IsRunningChanging`** - Cancellable event before added/removed from stack
 - **`IsRunningChanged`** - Non-cancellable event after stack change
-- **`IsModalChanging`** - Cancellable event before becoming/leaving top of stack
 - **`IsModalChanged`** - Non-cancellable event after modal state change
 
 ---
 
 ## Modal Views (Legacy)
 
-Views can run modally (exclusively capturing all input until closed). See [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) for the legacy pattern.
+Views can run modally (exclusively capturing all input until closed). See [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) for the legacy pattern.
 
 **Note:** New code should use `IRunnable<TResult>` pattern (see above) for better type safety and lifecycle management.
 
@@ -708,7 +706,7 @@ dialog.Dispose();
 
 ### Modal View Types (Legacy)
 
-- **[Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml)** - Base class for modal views, can fill entire screen
+- **[Runnable](~/api/Terminal.Gui.Views.Runnable.yml)** - Base class for modal views, can fill entire screen
 - **[Window](~/api/Terminal.Gui.Views.Window.yml)** - Overlapped container with border and title
 - **[Dialog](~/api/Terminal.Gui.Views.Dialog.yml)** - Modal Window, centered with button support
 - **[Wizard](~/api/Terminal.Gui.Views.Wizard.yml)** - Multi-step modal dialog

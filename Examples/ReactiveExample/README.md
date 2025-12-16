@@ -7,10 +7,14 @@ This is a sample app that shows how to use `System.Reactive` and `ReactiveUI` wi
 In order to use reactive extensions scheduling, copy-paste the `TerminalScheduler.cs` file into your project, and add the following lines to the composition root of your `Terminal.Gui` application:
 
 ```cs
-Application.Init ();
-RxApp.MainThreadScheduler = TerminalScheduler.Default;
+ConfigurationManager.Enable (ConfigLocations.All);
+using IApplication app = Application.Create ();
+app.Init ();
+RxApp.MainThreadScheduler = new TerminalScheduler (app);
 RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;
-Application.Run (new RootView (new RootViewModel ()));
+var loginView = new LoginView (new ());
+app.Run (loginView);
+loginView.Dispose ();
 ```
 
 From now on, you can use `.ObserveOn(RxApp.MainThreadScheduler)` to return to the main loop from a background thread. This is useful when you have a `IObservable<TValue>` updated from a background thread, and you wish to update the UI with `TValue`s received from that observable.
@@ -43,6 +47,6 @@ If you combine `OneWay` and `OneWayToSource` data bindings, you get `TwoWay` dat
 // 'clearButton' is 'Button'
 clearButton
 	.Events ()
-	.Clicked
+	.Accepting
 	.InvokeCommand (ViewModel, x => x.Clear);
 ```

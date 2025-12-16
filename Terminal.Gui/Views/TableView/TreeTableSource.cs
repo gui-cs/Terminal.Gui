@@ -42,7 +42,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         _tableView = table;
         _tree = tree;
         _tableView.KeyDown += Table_KeyPress;
-        _tableView.MouseClick += Table_MouseClick;
+        _tableView.Activating += Table_Activating;
 
         List<string> colList = subsequentColumns.Keys.ToList ();
         colList.Insert (0, firstColumnName);
@@ -56,7 +56,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     public void Dispose ()
     {
         _tableView.KeyDown -= Table_KeyPress;
-        _tableView.MouseClick -= Table_MouseClick;
+        _tableView.Activating -= Table_Activating;
         _tree.Dispose ();
     }
 
@@ -168,9 +168,16 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         }
     }
 
-    private void Table_MouseClick (object sender, MouseEventArgs e)
+#nullable enable
+    private void Table_Activating (object? sender, CommandEventArgs e)
     {
-        Point? hit = _tableView.ScreenToCell (e.Position.X, e.Position.Y, out int? headerIfAny, out int? offsetX);
+        // Only handle mouse clicks, not keyboard selections
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        {
+            return;
+        }
+
+        Point? hit = _tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? headerIfAny, out int? offsetX);
 
         if (hit is null || headerIfAny is { } || !IsInTreeColumn (hit.Value.X, false) || offsetX is null)
         {
@@ -202,4 +209,5 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             _tableView.SetNeedsDraw ();
         }
     }
+#nullable restore
 }

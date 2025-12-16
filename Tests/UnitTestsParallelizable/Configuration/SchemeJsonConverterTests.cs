@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace UnitTests_Parallelizable.ConfigurationTests;
+namespace ConfigurationTests;
 
 public class SchemeJsonConverterTests
 {
@@ -78,7 +78,7 @@ public class SchemeJsonConverterTests
         };
 
         string json = JsonSerializer.Serialize (expected, ConfigurationManager.SerializerContext.Options);
-        Scheme actual = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options);
+        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options);
 
         Assert.NotNull (actual);
 

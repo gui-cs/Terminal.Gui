@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -43,14 +42,11 @@ public class ExpanderButton : Button
 
         Orientation = Orientation.Vertical;
 
-        HighlightStates = Terminal.Gui.ViewBase.MouseState.None;
+        HighlightStates = MouseState.In;
 
         Initialized += ExpanderButton_Initialized;
 
-        EnabledChanged += (sender, args) =>
-                          {
-                              ShowHide ();
-                          };
+        EnabledChanged += (_, _) => { ShowHide (); };
     }
 
     private void ShowHide ()
@@ -85,7 +81,7 @@ public class ExpanderButton : Button
 
         if (SuperView is Border { } border)
         {
-            border.ThicknessChanged += (o, args) => ShowHide ();
+            border.ThicknessChanged += (_, _) => ShowHide ();
         }
     }
 
@@ -111,7 +107,7 @@ public class ExpanderButton : Button
     /// <returns>True of the event was cancelled.</returns>
     protected virtual bool OnOrientationChanging (Orientation newOrientation)
     {
-        CancelEventArgs<Orientation> args = new CancelEventArgs<Orientation> (in _orientation, ref newOrientation);
+        CancelEventArgs<Orientation> args = new (in _orientation, ref newOrientation);
         OrientationChanging?.Invoke (this, args);
 
         if (!args.Cancel)
@@ -120,7 +116,7 @@ public class ExpanderButton : Button
 
             if (Orientation == Orientation.Vertical)
             {
-                X = Pos.AnchorEnd ();
+                X = Pos.AnchorEnd () - 1;
                 Y = 0;
                 CollapseGlyph = new ('\u21d1'); // ⇑
                 ExpandGlyph = new ('\u21d3'); // ⇓
@@ -128,7 +124,7 @@ public class ExpanderButton : Button
             else
             {
                 X = 0;
-                Y = Pos.AnchorEnd ();
+                Y = Pos.AnchorEnd () - 1;
                 CollapseGlyph = new ('\u21d0'); // ⇐
                 ExpandGlyph = new ('\u21d2'); // ⇒
             }
@@ -222,12 +218,12 @@ public class ExpanderButton : Button
             // Collapse
             if (Orientation == Orientation.Vertical)
             {
-                _previousDim = superView!.Height!;
+                _previousDim = superView.Height;
                 superView.Height = 1;
             }
             else
             {
-                _previousDim = superView!.Width!;
+                _previousDim = superView.Width;
                 superView.Width = 1;
             }
         }

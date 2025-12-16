@@ -98,14 +98,14 @@ public class ListViewWithSelection : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList)
         };
-        _eventListView.SchemeName = "TopLevel";
+        _eventListView.SchemeName = "Runnable";
         _appWindow.Add (_eventListView);
 
         _listView.SelectedItemChanged += (s, a) => LogEvent (s as View, a, "SelectedItemChanged");
         _listView.OpenSelectedItem += (s, a) => LogEvent (s as View, a, "OpenSelectedItem");
         _listView.CollectionChanged += (s, a) => LogEvent (s as View, a, "CollectionChanged");
         _listView.Accepting += (s, a) => LogEvent (s as View, a, "Accept");
-        _listView.Selecting += (s, a) => LogEvent (s as View, a, "Select");
+        _listView.Activating += (s, a) => LogEvent (s as View, a, "Activate");
         _listView.VerticalScrollBar.AutoShow = true;
         _listView.HorizontalScrollBar.AutoShow = true;
 

@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class EnabledTests
 {
@@ -14,7 +14,7 @@ public class EnabledTests
         button.Accepting += (s, e) => wasClicked = !wasClicked;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (button);
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (win);
 
         var iterations = 0;

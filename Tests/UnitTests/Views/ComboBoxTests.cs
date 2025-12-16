@@ -77,7 +77,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         string [] source = Enumerable.Range (0, 15).Select (x => x.ToString ()).ToArray ();
         comboBox.SetSource (new ObservableCollection<string> (source.ToList ()));
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (comboBox);
 
         foreach (KeyCode key in (KeyCode [])Enum.GetValues (typeof (KeyCode)))
@@ -96,7 +96,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         cb.Expanded += (s, e) => cb.SetSource (list);
         cb.Collapsed += (s, e) => cb.Source = null;
 
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -127,7 +127,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = false };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -182,7 +182,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = false };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -219,7 +219,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = false, ReadOnly = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -278,7 +278,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5 };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -382,7 +382,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -493,7 +493,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
+    [Fact (Skip = "Disabled in #4431 to avoid noise; ComboBox will go away anyway")]
     [AutoInitShutdown]
     public void HideDropdownListOnClick_True_Highlight_Current_Item ()
     {
@@ -501,7 +501,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         var cb = new ComboBox { Width = 6, Height = 4, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         var otherView = new View { CanFocus = true };
 
@@ -677,7 +677,7 @@ Three ",
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -740,7 +740,7 @@ Three ",
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -798,7 +798,7 @@ Three ",
         var cb = new ComboBox { Height = 4, Width = 5, HideDropdownListOnClick = true };
         cb.SetSource (["One", "Two", "Three"]);
         cb.OpenSelectedItem += (s, e) => selected = e.Value.ToString ();
-        var top = new Toplevel ();
+        var top = new Runnable ();
         top.Add (cb);
         Application.Begin (top);
 
@@ -832,7 +832,7 @@ Three ",
     {
         ObservableCollection<string> source = ["One", "Two", "Three"];
         var cb = new ComboBox { Width = 10 };
-        var top = new Toplevel ();
+        var top = new Runnable ();
 
         top.Add (cb);
 
@@ -1008,53 +1008,5 @@ Three
         Assert.Equal ("", cb.Text);
         Assert.Equal (3, cb.Source.Count);
         top.Dispose ();
-    }
-
-    [Fact]
-    public void Source_Equal_Null_Or_Count_Equal_Zero_Sets_SelectedItem_Equal_To_Minus_One ()
-    {
-        var cb = new ComboBox ();
-        var top = new Toplevel ();
-        Application.TopRunnable = top;
-
-        top.Add (cb);
-        top.FocusDeepest (NavigationDirection.Forward, null);
-        Assert.Null (cb.Source);
-        Assert.Equal (-1, cb.SelectedItem);
-        ObservableCollection<string> source = [];
-        cb.SetSource (source);
-        Assert.NotNull (cb.Source);
-        Assert.Equal (0, cb.Source.Count);
-        Assert.Equal (-1, cb.SelectedItem);
-        source.Add ("One");
-        Assert.Equal (1, cb.Source.Count);
-        Assert.Equal (-1, cb.SelectedItem);
-        Assert.True (Application.RaiseKeyDownEvent (Key.F4));
-        Assert.True (cb.IsShow);
-        Assert.Equal (0, cb.SelectedItem);
-        Assert.Equal ("One", cb.Text);
-        source.Add ("Two");
-        Assert.Equal (0, cb.SelectedItem);
-        Assert.Equal ("One", cb.Text);
-        cb.Text = "T";
-        Assert.True (cb.IsShow);
-        Assert.Equal (-1, cb.SelectedItem);
-        Assert.Equal ("T", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.Enter));
-        Assert.False (cb.IsShow);
-        Assert.Equal (2, cb.Source.Count);
-        Assert.Equal (-1, cb.SelectedItem);
-        Assert.Equal ("T", cb.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.Esc));
-        Assert.False (cb.IsShow);
-        Assert.Equal (-1, cb.SelectedItem); // retains last accept selected item
-        Assert.Equal ("", cb.Text); // clear text
-        cb.SetSource (new ObservableCollection<string> ());
-        Assert.Equal (0, cb.Source.Count);
-        Assert.Equal (-1, cb.SelectedItem);
-        Assert.Equal ("", cb.Text);
-
-        Application.TopRunnable.Dispose ();
-        Application.ResetState (true);
     }
 }

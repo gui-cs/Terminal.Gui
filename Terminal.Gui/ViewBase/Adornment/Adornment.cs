@@ -88,7 +88,7 @@ public class Adornment : View, IDesignable
     protected override IApplication? GetApp () => Parent?.App;
 
     /// <inheritdoc />
-    protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver();
+    protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver ();
 
     // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
     private Scheme? _scheme;
@@ -187,7 +187,7 @@ public class Adornment : View, IDesignable
             Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
         }
 
-        NeedsDraw = true;
+        SetNeedsDraw ();
 
         return true;
     }

@@ -20,14 +20,8 @@ internal class MouseImpl : IMouse, IDisposable
         Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
     }
 
-    private IApplication? _app;
-
     /// <inheritdoc/>
-    public IApplication? App
-    {
-        get => _app;
-        set => _app = value;
-    }
+    public IApplication? App { get; set; }
 
     /// <inheritdoc/>
     public Point? LastMousePosition { get; set; }
@@ -77,7 +71,7 @@ internal class MouseImpl : IMouse, IDisposable
         //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        List<View?>? currentViewsUnderMouse = App?.TopRunnable?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
+        List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();
 
@@ -92,7 +86,7 @@ internal class MouseImpl : IMouse, IDisposable
             mouseEvent.View = deepestViewUnderMouse;
         }
 
-        MouseEvent?.Invoke (null, mouseEvent);
+        MouseEvent?.Invoke (this, mouseEvent);
 
         if (mouseEvent.Handled)
         {
@@ -126,7 +120,7 @@ internal class MouseImpl : IMouse, IDisposable
 
         // if the mouse is outside the Application.TopRunnable or Popover hierarchy, we don't want to
         // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (App?.TopRunnable, deepestViewUnderMouse, true) && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
+        if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true) && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }
@@ -248,7 +242,7 @@ internal class MouseImpl : IMouse, IDisposable
                 continue;
             }
 
-            CancelEventArgs eventArgs = new System.ComponentModel.CancelEventArgs ();
+            CancelEventArgs eventArgs = new CancelEventArgs ();
             bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
             if (cancelled is true || eventArgs.Cancel)
@@ -272,8 +266,14 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public void GrabMouse (View? view)
     {
-        if (view is null || RaiseGrabbingMouseEvent (view))
+        if (RaiseGrabbingMouseEvent (view))
         {
+            return;
+        }
+
+        if (view is null)
+        {
+            UngrabMouse();
             return;
         }
 
@@ -290,13 +290,6 @@ internal class MouseImpl : IMouse, IDisposable
         {
             return;
         }
-
-#if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts)
-        {
-            ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
-        }
-#endif
 
         if (!RaiseUnGrabbingMouseEvent (MouseGrabView))
         {

@@ -60,7 +60,7 @@ public class ConfigurationEditor : Scenario
 
         win.Add (_tabView, statusBar);
 
-        win.Loaded += (s, a) =>
+        win.IsModalChanged += (s, a) =>
                       {
                           Open ();
                       };
@@ -75,7 +75,7 @@ public class ConfigurationEditor : Scenario
 
         void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
         {
-            Application.TopRunnable?.SetNeedsDraw ();
+            Application.TopRunnableView?.SetNeedsDraw ();
         }
     }
     public void Save ()

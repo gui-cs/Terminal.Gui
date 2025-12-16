@@ -1,4 +1,4 @@
-namespace UnitTests.ViewTests;
+namespace UnitTests.ViewBaseTests;
 
 public class ViewCommandTests
 {
@@ -46,9 +46,8 @@ public class ViewCommandTests
 
         w.LayoutSubViews ();
 
-        Application.TopRunnable = w;
-        Application.SessionStack.Push (w);
-        Assert.Same (Application.TopRunnable, w);
+        Application.Begin (w);
+        Assert.Same (Application.TopRunnableView, w);
 
         // Click button 2
         Rectangle btn2Frame = btnB.FrameToScreen ();
@@ -81,7 +80,7 @@ public class ViewCommandTests
     }
 
     // See: https://github.com/gui-cs/Terminal.Gui/issues/3905
-    [Fact]// (Skip = "Failing as part of ##4270. Disabling temporarily.")]
+    [Fact]
     [SetupFakeApplication]
     public void Button_CanFocus_False_Raises_Accepted_Correctly ()
     {
@@ -121,9 +120,8 @@ public class ViewCommandTests
 
         w.Add (btn);
 
-        Application.TopRunnable = w;
-        Application.SessionStack.Push (w);
-        Assert.Same (Application.TopRunnable, w);
+        Application.Begin (w);
+        Assert.Same (Application.TopRunnableView, w);
 
         w.LayoutSubViews ();
 
@@ -154,6 +152,10 @@ public class ViewCommandTests
         Assert.Equal (1, btnAcceptedCount);
         Assert.Equal (0, wAcceptedCount);
 
+        // The above grabbed the mouse. Need to ungrab.
+        Application.Mouse.UngrabMouse ();
+
+        w.Dispose ();
         Application.ResetState (true);
     }
 }

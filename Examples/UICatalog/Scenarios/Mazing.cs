@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Games")]
 public class Mazing : Scenario
 {
-    private Toplevel? _top;
+    private Window? _top;
     private MazeGenerator? _m;
 
     private List<Point>? _potions;
@@ -33,17 +33,17 @@ public class Mazing : Scenario
         _top.KeyBindings.Add (Key.CursorDown, Command.Down);
 
         // Changing the key-bindings of a View is not allowed, however,
-        // by default, Toplevel doesn't bind any of our movement keys, so
+        // by default, Runnable doesn't bind any of our movement keys, so
         // we can take advantage of the CommandNotBound event to handle them
         // 
-        // An alternative implementation would be to create a TopLevel subclass that
+        // An alternative implementation would be to create a Runnable subclass that
         // calls AddCommand/KeyBindings.Add in the constructor. See the Snake game scenario
         // for an example.
         _top.CommandNotBound += TopCommandNotBound;
 
         _top.DrawingContent += (s, _) =>
                                {
-                                   if (s is not Toplevel top)
+                                   if (s is not Runnable top)
                                    {
                                        return;
                                    }
@@ -171,7 +171,7 @@ public class Mazing : Scenario
                 if (_m.PlayerHp <= 0)
                 {
                     _message = "You died!";
-                    Application.TopRunnable!.SetNeedsDraw (); // trigger redraw
+                    Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
                     _dead = true;
 
                     return; // Stop further action if dead
@@ -190,7 +190,7 @@ public class Mazing : Scenario
                 _message = string.Empty;
             }
 
-            Application.TopRunnable!.SetNeedsDraw (); // trigger redraw
+            Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
         }
 
         // Optional win condition:
@@ -200,7 +200,7 @@ public class Mazing : Scenario
             _m = new (); // Generate a new maze
             _m.PlayerHp = hp;
             GenerateNpcs ();
-            Application.TopRunnable!.SetNeedsDraw (); // trigger redraw
+            Application.TopRunnableView!.SetNeedsDraw (); // trigger redraw
         }
     }
 }

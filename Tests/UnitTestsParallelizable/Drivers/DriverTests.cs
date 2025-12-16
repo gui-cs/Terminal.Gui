@@ -1,8 +1,9 @@
 ﻿#nullable enable
+using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests_Parallelizable.DriverTests;
+namespace DriverTests;
 
 public class DriverTests (ITestOutputHelper output) : FakeDriverBase
 {
@@ -47,7 +48,7 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         Assert.False (driver.IsValidLocation (text, driver.Cols, driver.Rows - 1));
         Assert.False (driver.IsValidLocation (text, driver.Cols, driver.Rows));
 
-        driver.End ();
+        driver.Dispose ();
     }
 
     [Theory]
@@ -55,11 +56,11 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("windows")]
     [InlineData ("dotnet")]
     [InlineData ("unix")]
-    public void All_Drivers_Init_Shutdown_Cross_Platform (string driverName)
+    public void All_Drivers_Init_Dispose_Cross_Platform (string driverName)
     {
         IApplication? app = Application.Create ();
         app.Init (driverName);
-        app.Shutdown ();
+        app.Dispose ();
     }
 
     [Theory]
@@ -72,8 +73,8 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
-        app.Run ().Dispose ();
-        app.Shutdown ();
+        app.Run<Runnable<bool>> ();
+        app.Dispose ();
     }
 
     [Theory]
@@ -86,15 +87,61 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         IApplication? app = Application.Create ();
         app.Init (driverName);
         app.StopAfterFirstIteration = true;
-        app.Run<TestTop> ().Dispose ();
+        app.Run<TestTop> ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (driverName!, output, app.Driver);
 
-        app.Shutdown ();
+        app.Dispose ();
+    }
+
+    // Tests fix for https://github.com/gui-cs/Terminal.Gui/issues/4258
+    [Theory]
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void All_Drivers_When_Clipped_AddStr_Glyph_On_Second_Cell_Of_Wide_Glyph_Outputs_Correctly (string driverName)
+    {
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        IDriver driver = app.Driver!;
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
+
+        // Need to force "windows" driver to override legacy console mode for this test
+        driver.IsLegacyConsole = false;
+        driver.Force16Colors = false;
+
+        driver.SetScreenSize (6, 3);
+
+        driver!.Clip = new (driver.Screen);
+
+        driver.Move (1, 0);
+        driver.AddStr ("┌");
+        driver.Move (2, 0);
+        driver.AddStr ("─");
+        driver.Move (3, 0);
+        driver.AddStr ("┐");
+        driver.Clip.Exclude (new Region (new (1, 0, 3, 1)));
+
+        driver.Move (0, 0);
+        driver.AddStr ("🍎🍎🍎🍎");
+
+
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              ①┌─┐🍎
+                                              """,
+                                              output,
+                                              driver);
+
+        driver.Refresh ();
+
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+                                           output, driver);
     }
 }
 
-public class TestTop : Toplevel
+public class TestTop : Runnable
 {
     /// <inheritdoc/>
     public override void BeginInit ()

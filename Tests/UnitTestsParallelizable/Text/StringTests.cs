@@ -1,4 +1,4 @@
-﻿namespace UnitTests_Parallelizable.TextTests;
+﻿namespace TextTests;
 
 #nullable enable
 
@@ -77,6 +77,7 @@ public class StringTests
     [InlineData ("ힰ", 0, 1, 0)]    // U+D7B0 ힰ Hangul Jungseong O-Yeo
     [InlineData ("ᄀힰ", 2, 1, 2)]  // ᄀ U+1100 HANGUL CHOSEONG KIYEOK (consonant) with U+D7B0 ힰ Hangul Jungseong O-Yeo
     //[InlineData ("षि", 2, 1, 2)] // U+0937 ष DEVANAGARI LETTER SSA with U+093F ि COMBINING DEVANAGARI VOWEL SIGN I
+    [InlineData ("🇵🇹", 2, 1, 2)] // 🇵 U+1F1F5 — REGIONAL INDICATOR SYMBOL LETTER P with 🇹 U+1F1F9 — REGIONAL INDICATOR SYMBOL LETTER T (flag of Portugal)
     public void TestGetColumns_MultiRune_WideBMP_Graphemes (string str, int expectedRunesWidth, int expectedGraphemesCount, int expectedWidth)
     {
         Assert.Equal (expectedRunesWidth, str.EnumerateRunes ().Sum (r => r.GetColumns ()));
@@ -165,6 +166,7 @@ public class StringTests
         yield return [new [] { "👩‍", "🧒" }, "👩‍🧒"]; // Grapheme sequence
         yield return [new [] { "α", "β", "γ" }, "αβγ"]; // Unicode letters
         yield return [new [] { "A", null, "B" }, "AB"]; // Null ignored by string.Concat
+        yield return [new [] { "🇵", "🇹" }, "🇵🇹"]; // Grapheme sequence
     }
 
     [Theory]

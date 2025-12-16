@@ -143,7 +143,7 @@ public class Mouse : Scenario
 
         cbHighlightOnPressed.CheckedState = demo.HighlightStates.HasFlag (MouseState.Pressed) ? CheckState.Checked : CheckState.UnChecked;
 
-        cbHighlightOnPressed.CheckedStateChanging += (s, e) =>
+        cbHighlightOnPressed.CheckedStateChanging += (_, e) =>
                                                      {
                                                          if (e.Result == CheckState.Checked)
                                                          {
@@ -181,7 +181,7 @@ public class Mouse : Scenario
 
         cbHighlightOnPressedOutside.CheckedState = demo.HighlightStates.HasFlag (MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
 
-        cbHighlightOnPressedOutside.CheckedStateChanging += (s, e) =>
+        cbHighlightOnPressedOutside.CheckedStateChanging += (_, e) =>
                                                             {
                                                                 if (e.Result == CheckState.Checked)
                                                                 {
@@ -217,7 +217,7 @@ public class Mouse : Scenario
                                                                 }
                                                             };
 
-        cbWantContinuousPresses.CheckedStateChanging += (s, e) =>
+        cbWantContinuousPresses.CheckedStateChanging += (_, _) =>
                                                         {
                                                             demo.WantContinuousButtonPressed = !demo.WantContinuousButtonPressed;
 
@@ -247,12 +247,12 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = 50,
             Height = Dim.Fill (),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (appLogList)
         };
         win.Add (label, appLog);
 
-        Application.MouseEvent += (sender, a) =>
+        Application.MouseEvent += (_, a) =>
                                   {
                                       int i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
 
@@ -270,7 +270,7 @@ public class Mouse : Scenario
             X = Pos.Right (appLog) + 1,
             Y = Pos.Top (label)
         };
-        ObservableCollection<string> winLogList = new ();
+        ObservableCollection<string> winLogList = [];
 
         var winLog = new ListView
         {
@@ -278,12 +278,12 @@ public class Mouse : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            SchemeName = "TopLevel",
+            SchemeName = "Runnable",
             Source = new ListWrapper<string> (winLogList)
         };
         win.Add (label, winLog);
 
-        clearButton.Accepting += (s, e) =>
+        clearButton.Accepting += (_, _) =>
                                  {
                                      appLogList.Clear ();
                                      appLog.SetSource (appLogList);
@@ -291,7 +291,7 @@ public class Mouse : Scenario
                                      winLog.SetSource (winLogList);
                                  };
 
-        win.MouseEvent += (sender, a) =>
+        win.MouseEvent += (_, a) =>
                           {
                               int i = filterSlider.Options.FindIndex (o => o.Data == a.Flags);
 
@@ -300,12 +300,6 @@ public class Mouse : Scenario
                                   winLogList.Add ($"MouseEvent: ({a.Position}) - {a.Flags} {count++}");
                                   winLog.MoveDown ();
                               }
-                          };
-
-        win.MouseClick += (sender, a) =>
-                          {
-                              winLogList.Add ($"MouseClick: ({a.Position}) - {a.Flags} {count++}");
-                              winLog.MoveDown ();
                           };
 
         Application.Run (win);
@@ -322,8 +316,8 @@ public class Mouse : Scenario
 
             Initialized += OnInitialized;
 
-            MouseLeave += (s, e) => { Text = "Leave"; };
-            MouseEnter += (s, e) => { Text = "Enter"; };
+            MouseLeave += (_, _) => { Text = "Leave"; };
+            MouseEnter += (_, _) => { Text = "Enter"; };
 
             return;
 

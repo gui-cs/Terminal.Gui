@@ -1,4 +1,4 @@
-namespace UnitTests_Parallelizable.FileServicesTests;
+namespace FileServicesTests;
 
 public class FileSystemColorProviderTests
 {

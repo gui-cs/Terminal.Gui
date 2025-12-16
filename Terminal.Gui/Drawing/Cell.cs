@@ -27,7 +27,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, st
         readonly get => _grapheme;
         set
         {
-            if (GraphemeHelper.GetGraphemes(value).ToArray().Length > 1)
+            if (GraphemeHelper.GetGraphemeCount (value) > 1)
             {
                 throw new InvalidOperationException ($"Only a single {nameof (Grapheme)} cluster is allowed per Cell.");
             }

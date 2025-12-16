@@ -239,6 +239,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             Logging.Warning ($"{view} cannot be Removed. It has not been added to {this}.");
         }
 
+        if (App?.Mouse.MouseGrabView == view)
+        {
+            App.Mouse.UngrabMouse ();
+        }
+
         Rectangle touched = view.Frame;
 
         bool hadFocus = view.HasFocus;
@@ -367,7 +372,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <returns>The superview view.</returns>
     internal View? GetTopSuperView (View? view = null, View? superview = null)
     {
-        View? top = superview ?? App?.TopRunnable;
+        View? top = superview ?? App?.TopRunnableView;
 
         for (View? v = view?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
         {

@@ -70,7 +70,7 @@ public class ColorPicker16 : View
     /// <returns></returns>
     private bool MoveDown (ICommandContext? commandContext)
     {
-        if (RaiseSelecting (commandContext) == true)
+        if (RaiseActivating (commandContext) == true)
         {
             return true;
         }
@@ -86,7 +86,7 @@ public class ColorPicker16 : View
     /// <returns></returns>
     private bool MoveLeft (ICommandContext? commandContext)
     {
-        if (RaiseSelecting (commandContext) == true)
+        if (RaiseActivating (commandContext) == true)
         {
             return true;
         }
@@ -103,7 +103,7 @@ public class ColorPicker16 : View
     /// <returns></returns>
     private bool MoveRight (ICommandContext? commandContext)
     {
-        if (RaiseSelecting (commandContext) == true)
+        if (RaiseActivating (commandContext) == true)
         {
             return true;
         }
@@ -119,7 +119,7 @@ public class ColorPicker16 : View
     /// <returns></returns>
     private bool MoveUp (ICommandContext? commandContext)
     {
-        if (RaiseSelecting (commandContext) == true)
+        if (RaiseActivating (commandContext) == true)
         {
             return true;
         }
@@ -132,7 +132,7 @@ public class ColorPicker16 : View
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         SetAttribute (HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal));
         var colorIndex = 0;
@@ -195,7 +195,7 @@ public class ColorPicker16 : View
         AddCommand (Command.Up, (ctx) => MoveUp (ctx));
         AddCommand (Command.Down, (ctx) => MoveDown (ctx));
 
-        AddCommand (Command.Select, (ctx) =>
+        AddCommand (Command.Activate, (ctx) =>
                                     {
                                         var set = false;
 

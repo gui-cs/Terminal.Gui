@@ -1121,6 +1121,7 @@ public class TextView : View, IDesignable
     public void PromptForColors ()
     {
         if (!ColorPicker.Prompt (
+                                 App!,
                                  "Colors",
                                  GetSelectedCellAttribute (),
                                  out Attribute newAttribute
@@ -1780,7 +1781,7 @@ public class TextView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         _isDrawing = true;
 
@@ -3653,7 +3654,7 @@ public class TextView : View, IDesignable
     {
         List<Cell> currentLine = GetCurrentLine ();
 
-        if ((ReadOnly ? CurrentColumn + 1 : CurrentColumn) < currentLine.Count)
+        if (CurrentColumn < currentLine.Count)
         {
             CurrentColumn++;
         }

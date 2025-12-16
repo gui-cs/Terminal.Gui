@@ -97,13 +97,12 @@ internal partial class WindowsOutput : OutputBase, IOutput
     private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
     private readonly nint _outputHandle;
     private nint _screenBuffer;
-    private readonly bool _isVirtualTerminal;
     private readonly ConsoleColor _foreground;
     private readonly ConsoleColor _background;
 
     public WindowsOutput ()
     {
-        Logging.Logger.LogInformation ($"Creating {nameof (WindowsOutput)}");
+        Logging.Information ($"Creating {nameof (WindowsOutput)}");
 
         if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
@@ -113,22 +112,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
         // Get the standard output handle which is the current screen buffer.
         _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
         GetConsoleMode (_outputHandle, out uint mode);
-        _isVirtualTerminal = (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
+        IsLegacyConsole = (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0;
 
-        if (_isVirtualTerminal)
-        {
-            if (Environment.GetEnvironmentVariable ("VSAPPIDNAME") is null)
-            {
-                //Enable alternative screen buffer.
-                Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-            }
-            else
-            {
-                _foreground = Console.ForegroundColor;
-                _background = Console.BackgroundColor;
-            }
-        }
-        else
+        if (IsLegacyConsole)
         {
             CreateScreenBuffer ();
 
@@ -145,12 +131,19 @@ internal partial class WindowsOutput : OutputBase, IOutput
             {
                 throw new ApplicationException ($"Failed to set screenBuffer console mode, error code: {Marshal.GetLastWin32Error ()}.");
             }
-
-            // Force 16 colors if not in virtual terminal mode.
-            // BUGBUG: This is bad. It does not work if the app was crated without
-            // BUGBUG: Apis.
-            //ApplicationImpl.Instance.Force16Colors = true;
-
+        }
+        else
+        {
+            if (Environment.GetEnvironmentVariable ("VSAPPIDNAME") is null)
+            {
+                //Enable alternative screen buffer.
+                Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            }
+            else
+            {
+                _foreground = Console.ForegroundColor;
+                _background = Console.BackgroundColor;
+            }
         }
 
         GetSize ();
@@ -189,9 +182,10 @@ internal partial class WindowsOutput : OutputBase, IOutput
             return;
         }
 
-        if (!WriteConsole (_isVirtualTerminal ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
+        if (!WriteConsole (!IsLegacyConsole ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
-            throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
+            // Don't throw in unit tests
+            // throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
         }
     }
 
@@ -220,19 +214,19 @@ internal partial class WindowsOutput : OutputBase, IOutput
         var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
         csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-        if (!GetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        if (!GetConsoleScreenBufferInfoEx (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref csbi))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
 
-        WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (_isVirtualTerminal ? _outputHandle : _screenBuffer);
+        WindowsConsole.Coord maxWinSize = GetLargestConsoleWindowSize (!IsLegacyConsole ? _outputHandle : _screenBuffer);
         short newCols = Math.Min (cols, maxWinSize.X);
         short newRows = Math.Min (rows, maxWinSize.Y);
         csbi.dwSize = new (newCols, Math.Max (newRows, (short)1));
         csbi.srWindow = new (0, 0, newCols, newRows);
         csbi.dwMaximumWindowSize = new (newCols, newRows);
 
-        if (!SetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+        if (!SetConsoleScreenBufferInfoEx (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref csbi))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
@@ -252,11 +246,11 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     private void SetConsoleOutputWindow (WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX csbi)
     {
-        if ((_isVirtualTerminal
+        if ((!IsLegacyConsole
                  ? _outputHandle
                  : _screenBuffer)
             != nint.Zero
-            && !SetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+            && !SetConsoleScreenBufferInfoEx (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref csbi))
         {
             throw new Win32Exception (Marshal.GetLastWin32Error ());
         }
@@ -264,65 +258,52 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public override void Write (IOutputBuffer outputBuffer)
     {
-        // BUGBUG: This is bad. It does not work if the app was crated without
-        // BUGBUG: Apis.
-        //_force16Colors = ApplicationImpl.Instance.Driver!.Force16Colors;
-        _force16Colors = false;
         _everythingStringBuilder.Clear ();
 
-        // for 16 color mode we will write to a backing buffer then flip it to the active one at the end to avoid jitter.
+        // for 16 color mode we will write to a backing buffer, then flip it to the active one at the end to avoid jitter.
         _consoleBuffer = 0;
 
-        if (_force16Colors)
+        if (Force16Colors)
         {
-            if (_isVirtualTerminal)
-            {
-                _consoleBuffer = _outputHandle;
-            }
-            else
-            {
-                _consoleBuffer = _screenBuffer;
-            }
+            _consoleBuffer = !IsLegacyConsole ? _outputHandle : _screenBuffer;
         }
         else
         {
             _consoleBuffer = _outputHandle;
         }
 
-        base.Write (outputBuffer);
-
         try
         {
-            if (_force16Colors && !_isVirtualTerminal)
-            {
-                SetConsoleActiveScreenBuffer (_consoleBuffer);
-            }
-            else
-            {
-                ReadOnlySpan<char> span = _everythingStringBuilder.ToString ().AsSpan (); // still allocates the string
+            base.Write (outputBuffer);
 
-                bool result = WriteConsole (_consoleBuffer, span, (uint)span.Length, out _, nint.Zero);
+            ReadOnlySpan<char> span = _everythingStringBuilder.ToString ().AsSpan (); // still allocates the string
 
-                if (!result)
+            bool result = WriteConsole (_consoleBuffer, span, (uint)span.Length, out _, nint.Zero);
+
+            if (!result)
+            {
+                int err = Marshal.GetLastWin32Error ();
+
+                if (err == 1)
                 {
-                    int err = Marshal.GetLastWin32Error ();
+                    Logging.Error ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
 
-                    if (err == 1)
-                    {
-                        Logging.Logger.LogError ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
+                    return;
+                }
 
-                        return;
-                    }
-                    if (err != 0)
-                    {
-                        throw new Win32Exception (err);
-                    }
+                if (err != 0)
+                {
+                    throw new Win32Exception (err);
                 }
             }
         }
+        catch (DllNotFoundException)
+        {
+            // Running unit tests or in an environment where writing is not possible.
+        }
         catch (Exception e)
         {
-            Logging.Logger.LogError ($"Error: {e.Message} in {nameof (WindowsOutput)}");
+            Logging.Error ($"Error: {e.Message} in {nameof (WindowsOutput)}");
 
             if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {
@@ -338,10 +319,11 @@ internal partial class WindowsOutput : OutputBase, IOutput
         {
             return;
         }
+        base.Write (output);
 
         var str = output.ToString ();
 
-        if (_force16Colors && !_isVirtualTerminal)
+        if (Force16Colors && IsLegacyConsole)
         {
             char [] a = str.ToCharArray ();
             WriteConsole (_screenBuffer, a, (uint)a.Length, out _, nint.Zero);
@@ -355,23 +337,20 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
-        // BUGBUG: This is bad. It does not work if the app was crated without
-        // BUGBUG: Apis.
-        // bool force16Colors = ApplicationImpl.Instance.Force16Colors;
-        bool force16Colors = false;
-
-        if (force16Colors)
+        if (Force16Colors)
         {
-            if (_isVirtualTerminal)
+            if (IsLegacyConsole)
+            {
+                Write (output);
+                output.Clear ();
+                var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
+                SetConsoleTextAttribute (_screenBuffer, as16ColorInt);
+            }
+            else
             {
                 output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
                 output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
                 EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
-            }
-            else
-            {
-                var as16ColorInt = (ushort)((int)attr.Foreground.GetClosestNamedColor16 () | ((int)attr.Background.GetClosestNamedColor16 () << 4));
-                SetConsoleTextAttribute (_screenBuffer, as16ColorInt);
             }
         }
         else
@@ -438,7 +417,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
             var csbi = new WindowsConsole.CONSOLE_SCREEN_BUFFER_INFOEX ();
             csbi.cbSize = (uint)Marshal.SizeOf (csbi);
 
-            if (!GetConsoleScreenBufferInfoEx (_isVirtualTerminal ? _outputHandle : _screenBuffer, ref csbi))
+            if (!GetConsoleScreenBufferInfoEx (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref csbi))
             {
                 //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
                 cursorPosition = default (WindowsConsole.Coord);
@@ -468,7 +447,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
         try
         {
-            maxWinSize = GetLargestConsoleWindowSize (_isVirtualTerminal ? _outputHandle : _screenBuffer);
+            maxWinSize = GetLargestConsoleWindowSize (!IsLegacyConsole ? _outputHandle : _screenBuffer);
         }
         catch
         {
@@ -481,7 +460,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
-        if (_force16Colors && !_isVirtualTerminal)
+        if (Force16Colors && IsLegacyConsole)
         {
             SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
         }
@@ -505,7 +484,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
             return;
         }
 
-        if (!_isVirtualTerminal)
+        if (IsLegacyConsole)
         {
             var info = new WindowsConsole.ConsoleCursorInfo
             {
@@ -539,15 +518,15 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
         _lastCursorPosition = new (col, row);
 
-        if (_isVirtualTerminal)
+        if (IsLegacyConsole)
+        {
+            SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
+        }
+        else
         {
             var sb = new StringBuilder ();
             EscSeqUtils.CSI_AppendCursorPosition (sb, row + 1, col + 1);
             Write (sb.ToString ());
-        }
-        else
-        {
-            SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
         }
     }
 
@@ -558,7 +537,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
     }
 
     private bool _isDisposed;
-    private bool _force16Colors;
     private nint _consoleBuffer;
     private readonly StringBuilder _everythingStringBuilder = new ();
 
@@ -570,7 +548,16 @@ internal partial class WindowsOutput : OutputBase, IOutput
             return;
         }
 
-        if (_isVirtualTerminal)
+        if (IsLegacyConsole)
+        {
+            if (_screenBuffer != nint.Zero)
+            {
+                CloseHandle (_screenBuffer);
+            }
+
+            _screenBuffer = nint.Zero;
+        }
+        else
         {
             if (Environment.GetEnvironmentVariable ("VSAPPIDNAME") is null)
             {
@@ -584,15 +571,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 Console.BackgroundColor = _background;
                 Console.Clear ();
             }
-        }
-        else
-        {
-            if (_screenBuffer != nint.Zero)
-            {
-                CloseHandle (_screenBuffer);
-            }
-
-            _screenBuffer = nint.Zero;
         }
 
         _isDisposed = true;

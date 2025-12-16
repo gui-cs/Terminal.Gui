@@ -57,7 +57,7 @@ public class HexView : View, IDesignable
         _leftSideHasFocus = true;
         _firstNibble = true;
 
-        AddCommand (Command.Select, HandleMouseClick);
+        AddCommand (Command.Activate, HandleMouseClick);
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.Down, () => MoveDown (BytesPerLine));
@@ -100,9 +100,9 @@ public class HexView : View, IDesignable
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
 
-        // The Select handler deals with both single and double clicks
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Select);
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Select);
+        // The Activate handler deals with both single and double clicks
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 
@@ -363,7 +363,7 @@ public class HexView : View, IDesignable
             return false;
         }
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }
@@ -431,7 +431,7 @@ public class HexView : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent ()
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Source is null)
         {

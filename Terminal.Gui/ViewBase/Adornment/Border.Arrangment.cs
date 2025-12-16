@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
@@ -657,7 +656,7 @@ public partial class Border
         if (Parent!.SuperView is null)
         {
             // Redraw the entire app window.
-            App?.TopRunnable?.SetNeedsDraw ();
+            App?.TopRunnableView?.SetNeedsDraw ();
         }
         else
         {
@@ -766,15 +765,18 @@ public partial class Border
         }
     }
 
+    /// <summary>
+    ///     Cancels <see cref="IMouseGrabHandler.GrabbingMouse"/> events during an active drag to prevent other views from
+    ///     stealing the mouse grab mid-operation.
+    /// </summary>
+    /// <remarks>
+    ///     During an Arrange Mode drag (<see cref="_dragPosition"/> has a value), Border owns the mouse grab and
+    ///     must receive all mouse events until Button1Released. If another view (e.g., scrollbar, slider) were allowed
+    ///     to grab the mouse, the drag would freeze, leaving Border in an inconsistent state with no cleanup.
+    ///     Canceling follows the CWP pattern, ensuring Border maintains exclusive mouse control until it explicitly
+    ///     releases via <see cref="IMouseGrabHandler.UngrabMouse"/> in <see cref="OnMouseEvent"/>.
+    /// </remarks>
     private void Application_GrabbingMouse (object? sender, GrabMouseEventArgs e)
-    {
-        if (App?.Mouse.MouseGrabView == this && _dragPosition.HasValue)
-        {
-            e.Cancel = true;
-        }
-    }
-
-    private void Application_UnGrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
         if (App?.Mouse.MouseGrabView == this && _dragPosition.HasValue)
         {
@@ -784,15 +786,12 @@ public partial class Border
 
     #endregion Mouse Support
 
-
-
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         if (App is { })
         {
             App.Mouse.GrabbingMouse -= Application_GrabbingMouse;
-            App.Mouse.UnGrabbingMouse -= Application_UnGrabbingMouse;
         }
 
         _dragPosition = null;
