@@ -28,7 +28,7 @@ public class Margin : Adornment
     public Margin (View parent) : base (parent)
     {
         SubViewLayout += Margin_LayoutStarted;
-        ThicknessChanged +=OnThicknessChanged;
+        ThicknessChanged += OnThicknessChanged;
 
         // Margin should not be focusable
         CanFocus = false;
@@ -67,12 +67,15 @@ public class Margin : Adornment
     }
 
     /// <summary>
-    ///     INTERNAL API - Draws the margins for the specified views. This is called by the <see cref="Application"/> on each
+    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from <see cref="View.Draw"/> on each
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
+    /// <remarks>
+    ///     Non-transparent margins are drawn as-normal in <see cref="View.DrawAdornments"/>.
+    /// </remarks>
     /// <param name="views"></param>
     /// <returns><see langword="true"/></returns>
-    internal static bool DrawMargins (IEnumerable<View> views)
+    internal static bool DrawTransparentMargins (IEnumerable<View> views)
     {
         Stack<View> stack = new (views);
 
@@ -80,7 +83,10 @@ public class Margin : Adornment
         {
             View view = stack.Pop ();
 
-            if (view.Margin is { } margin && margin.Thickness != Thickness.Empty && margin.GetCachedClip () != null)
+            if (view.Margin is { } margin
+                && margin.Thickness != Thickness.Empty
+                && margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+                && margin.GetCachedClip () != null)
             {
                 margin.SetNeedsDraw ();
                 Region? saved = view.GetClip ();
@@ -135,7 +141,7 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Don't clear where the shadow goes
-            screen = Rectangle.Inflate (screen, -ShadowWidth, -ShadowHeight);
+            screen = Rectangle.Inflate (screen, -ShadowSize.Width, -ShadowSize.Height);
         }
 
         return true;
@@ -180,14 +186,14 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Turn off shadow
-            _originalThickness = new (Thickness.Left, Thickness.Top, Math.Max (Thickness.Right - ShadowWidth, 0), Math.Max (Thickness.Bottom - ShadowHeight, 0));
+            _originalThickness = new (Thickness.Left, Thickness.Top, Math.Max (Thickness.Right - ShadowSize.Width, 0), Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
         }
 
         if (style != ShadowStyle.None)
         {
             // Turn on shadow
             _isThicknessChanging = true;
-            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right + ShadowWidth, _originalThickness.Value.Bottom + ShadowHeight);
+            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right + ShadowSize.Width, _originalThickness.Value.Bottom + ShadowSize.Height);
             _isThicknessChanging = false;
         }
 
@@ -195,9 +201,9 @@ public class Margin : Adornment
         {
             _rightShadow = new ()
             {
-                X = Pos.AnchorEnd (ShadowWidth),
+                X = Pos.AnchorEnd (ShadowSize.Width),
                 Y = 0,
-                Width = ShadowWidth,
+                Width = ShadowSize.Width,
                 Height = Dim.Fill (),
                 ShadowStyle = style,
                 Orientation = Orientation.Vertical
@@ -206,9 +212,9 @@ public class Margin : Adornment
             _bottomShadow = new ()
             {
                 X = 0,
-                Y = Pos.AnchorEnd (ShadowHeight),
+                Y = Pos.AnchorEnd (ShadowSize.Height),
                 Width = Dim.Fill (),
-                Height = ShadowHeight,
+                Height = ShadowSize.Height,
                 ShadowStyle = style,
                 Orientation = Orientation.Horizontal
             };
@@ -230,16 +236,16 @@ public class Margin : Adornment
         get => base.ShadowStyle;
         set
         {
-            if (value == ShadowStyle.Opaque || (value == ShadowStyle.Transparent && (ShadowWidth == 0 || ShadowHeight == 0)))
+            if (value == ShadowStyle.Opaque || (value == ShadowStyle.Transparent && (ShadowSize.Width == 0 || ShadowSize.Height == 0)))
             {
-                if (ShadowWidth != 1)
+                if (ShadowSize.Width != 1)
                 {
-                    ShadowWidth = 1;
+                    ShadowSize = ShadowSize with { Width = 1 };
                 }
 
-                if (ShadowHeight != 1)
+                if (ShadowSize.Height != 1)
                 {
-                    ShadowHeight = 1;
+                    ShadowSize = ShadowSize with { Height = 1 };
                 }
             }
 
@@ -247,65 +253,71 @@ public class Margin : Adornment
         }
     }
 
-    private int _shadowWidth;
+    private Size _shadowSize;
 
-    /// <inheritdoc/>
-    public override int ShadowWidth
+    /// <summary>
+    ///     Gets or sets the size of the shadow effect.
+    /// </summary>
+    public Size ShadowSize
     {
-        get => _shadowWidth;
+        get => _shadowSize;
         set
         {
-            if (TryValidateShadowLength (value, out int result))
+            if (TryValidateShadowSize (_shadowSize, value, out Size result))
             {
-                base.ShadowWidth = _shadowWidth = value;
+                _shadowSize = value;
                 SetShadow (ShadowStyle);
             }
             else
             {
-                base.ShadowWidth = _shadowWidth = result;
+                _shadowSize = result;
             }
         }
     }
 
-    private int _shadowHeight;
-
-    /// <inheritdoc/>
-    public override int ShadowHeight
-    {
-        get => _shadowHeight;
-        set
-        {
-            if (TryValidateShadowLength (value, out int result))
-            {
-                base.ShadowHeight = _shadowHeight = value;
-                SetShadow (ShadowStyle);
-            }
-            else
-            {
-                base.ShadowHeight = _shadowHeight = result;
-            }
-        }
-    }
-
-    private bool TryValidateShadowLength (int newValue, out int result)
+    private bool TryValidateShadowSize (Size originalValue, in Size newValue, out Size result)
     {
         result = newValue;
 
-        if (newValue < 1)
-        {
-            result = 1;
+        bool wasValid = true;
 
+        if (newValue.Width < 0)
+        {
+            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? result with { Width = 1 } : originalValue;
+
+            wasValid = false;
+        }
+
+
+        if (newValue.Height < 0)
+        {
+            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? result with { Height = 1 } : originalValue;
+
+            wasValid = false;
+        }
+
+        if (!wasValid)
+        {
             return false;
         }
 
-        if (ShadowStyle == ShadowStyle.Opaque && newValue != 1)
-        {
-            result = 1;
+        bool wasUpdated = false;
 
-            return false;
+        if ((ShadowStyle == ShadowStyle.Opaque && newValue.Width != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue.Width < 1))
+        {
+            result = result with { Width = 1 };
+
+            wasUpdated = true;
         }
 
-        return true;
+        if ((ShadowStyle == ShadowStyle.Opaque && newValue.Height != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue.Height < 1))
+        {
+            result = result with { Height = 1 };
+
+            wasUpdated = true;
+        }
+
+        return !wasUpdated;
     }
 
     private void OnParentOnMouseStateChanged (object? sender, EventArgs<MouseState> args)

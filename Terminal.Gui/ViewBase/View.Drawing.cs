@@ -26,10 +26,10 @@ public partial class View // Drawing APIs
             }
 
             view.Draw (context);
-
-            // Draw the margins last to ensure they are drawn on top of the current runnable content.
-            Margin.DrawMargins (viewsArray.Reverse ());
         }
+
+        // Draw Transparent margins last to ensure they are drawn on top of the content.
+        Margin.DrawTransparentMargins (viewsArray);
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
@@ -195,16 +195,17 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
-        if (Margin?.SubViews is { } && Margin.Thickness != Thickness.Empty && Margin.NeedsDraw)
+        // Only SetNeedsDraw on Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
+        // via Margin.DrawTransparentMargins.
+        if (Margin is { NeedsDraw: true } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
             foreach (View subview in Margin.SubViews)
             {
                 subview.SetNeedsDraw ();
             }
 
-            Region? saved = Margin?.AddFrameToClip ();
-            Margin?.DoDrawSubViews ();
-            SetClip (saved);
+            // NOTE: We do not support arbitrary SubViews of Margin (only ShadowView)
+            // NOTE: so we do not call DoDrawSubViews on Margin.
         }
 
         if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
@@ -284,7 +285,9 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void DrawAdornments ()
     {
-        if (Margin is { } && Margin.Thickness != Thickness.Empty)
+        // Only draw Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
+        // via Margin.DrawTransparentMargins.
+        if (Margin is { } && !Margin.ViewportSettings.HasFlag(ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
             Margin?.Draw ();
         }
