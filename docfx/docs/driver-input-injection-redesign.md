@@ -1,6 +1,136 @@
-# Driver Input Injection - Redesign Specification
+﻿# Driver Input Injection - Redesign Specification
 
-This document proposes a redesigned architecture for input injection in Terminal.Gui, addressing the pain points identified in [driver-input-injection.md](driver-input-injection.md).
+> **🎯 AI Agent Prompt**: This document is self-contained specification for redesigning Terminal.Gui's input injection architecture. It includes context, rationale, design decisions, code samples, and implementation guidance needed to execute the redesign without additional research.
+
+## Context for AI Agents
+
+### What You're Working On
+
+You are redesigning the **input injection system** used for testing Terminal.Gui applications. The current system (documented in [driver-input-injection.md](driver-input-injection.md)) has several pain points:
+
+1. **3-step injection process** - Tests must manually inject → simulate input thread → process queue
+2. **Real-time delays** - Escape sequence processing requires 60ms `Thread.Sleep` calls
+3. **Non-deterministic timing** - Uses `DateTime.Now` throughout, causing flaky tests
+4. **Complex synchronization** - Integration tests need elaborate coordination between threads
+5. **Dual injection paths** - Direct injection (preserves timestamps) vs Pipeline injection (tests encoding)
+
+### Your Goal
+
+Create a new architecture that:
+- ✅ **Single-call injection** - `app.InjectKey(Key.A)` does everything
+- ✅ **Virtual time** - Tests control time explicitly, no real delays
+- ✅ **Deterministic** - Same input sequence produces same results every time
+- ✅ **Preserves ANSI testing** - Can still test full encoding/parsing pipeline when needed
+- ✅ **Simpler for test authors** - Cleaner API, fewer concepts to understand
+
+### Key Constraints
+
+1. **Follow Terminal.Gui coding standards** (see CONTRIBUTING.md):
+   - **NO `var`** except for built-in types (`int`, `string`, `bool`, etc.)
+   - **USE target-typed `new ()`** when type is already declared
+   - **USE collection initializers** `[]` syntax when possible
+   - **Explicit types everywhere** for clarity
+   
+2. **No backward compatibility required** - This is a clean redesign
+3. **All drivers support testing** - No fake/mock drivers needed
+4. **ANSI driver is preferred for tests** - Cross-platform, full encoding/parsing
+
+## Current State (Problems to Solve)
+
+### Problem 1: Three-Step Injection Dance
+
+**Current pattern** (from `InputTestHelpers.cs`):
+```csharp
+// Step 1: Inject into test queue
+app.Driver.InjectKeyEvent(Key.A);
+
+// Step 2: Move from test queue to input buffer (simulates input thread)
+app.SimulateInputThread();
+
+// Step 3: Process input buffer and raise events
+app.Driver.GetInputProcessor().ProcessQueue();
+```
+
+**Why this is bad:**
+- Easy to forget steps
+- Exposes internal implementation details
+- Different from production flow
+- Verbose and error-prone
+
+### Problem 2: Real-Time Delays for Escape Sequences
+
+**Current pattern** (from `InputTestHelpers.ProcessQueueWithEscapeHandling`):
+```csharp
+processor.ProcessQueue();  // First attempt
+Thread.Sleep(60);          // Wait for 50ms escape timeout
+processor.ProcessQueue();  // Process again to release held Esc key
+```
+
+**Why this is bad:**
+- Tests take longer (60ms × number of Esc keys)
+- Uses real time, can't be controlled
+- Brittle - timing sensitive
+
+### Problem 3: Non-Deterministic Timestamps
+
+**Current code** (from `MouseButtonClickTracker.cs`):
+```csharp
+public void UpdateState (Mouse mouse, out int? numClicks)
+{
+    DateTime currentTime = mouse.Timestamp ?? DateTime.Now;  // ⚠️ Can't control this!
+    TimeSpan elapsed = currentTime - At;
+    
+    if (elapsed >= _repeatClickThreshold || !isSamePosition)
+    {
+        _consecutiveClicks = 0;
+    }
+    // ...
+}
+```
+
+**Why this is bad:**
+- Can't test timing-dependent behavior reliably
+- Different results on fast vs slow machines
+- Race conditions in tests
+
+### Problem 4: Dual Injection Paths
+
+**Current approach:**
+```csharp
+// Path A: Direct injection (preserves timestamps, bypasses encoding)
+app.InjectMouseEventDirectly(new Mouse { 
+    Timestamp = baseTime.AddMilliseconds(600) 
+});
+
+// Path B: Pipeline injection (tests encoding, loses timestamps)
+app.Driver.InjectMouseEvent(new Mouse { Position = new (5, 5) });
+app.SimulateInputThread();
+app.Driver.GetInputProcessor().ProcessQueue();
+```
+
+**Why this is bad:**
+- Two different APIs for same goal
+- Can't test full pipeline with precise timing
+- Confusing for test authors
+
+## Available Drivers (Important Context)
+
+Terminal.Gui has **four production drivers** (no fake/mock drivers):
+
+| Driver | Constant | Use Case |
+|--------|----------|----------|
+| Windows | `DriverRegistry.Names.WINDOWS` | Windows Console API |
+| Unix | `DriverRegistry.Names.UNIX` | Unix/Linux/macOS terminal |
+| Dotnet | `DriverRegistry.Names.DOTNET` | .NET System.Console cross-platform |
+| ANSI | `DriverRegistry.Names.ANSI` | **Pure ANSI escape sequences** |
+
+**ANSI driver is preferred for tests** because:
+- ✅ Cross-platform (works on all OSes)
+- ✅ Full ANSI encoding/parsing pipeline to test
+- ✅ Lightweight and fast
+- ✅ Test infrastructure (`FakeDriverBase.CreateFakeDriver()`) uses it
+
+**There is NO separate "FakeDriver" or "TestDriver"** - just use ANSI driver for tests.
 
 ## Goals
 
@@ -9,13 +139,11 @@ This document proposes a redesigned architecture for input injection in Terminal
 3. **Deterministic testing** - Eliminate real-time delays and race conditions
 4. **Preserve ANSI testing** - Still support full encoding/decoding pipeline testing when needed
 5. **Better API** - Cleaner, more intuitive interface for test authors
-6. **Maintain compatibility** - Keep external app hooks possible (low priority, but don't preclude it)
 
 ## Non-Goals
 
-- External application injection as a primary use case (support it if possible, but don't design around it)
-- Backward compatibility with current `ITestableInput`/`InputTestHelpers` (this is a redesign)
-- Supporting production drivers (Windows/Unix/Net) with testability interfaces (keep test drivers separate)
+- External application injection as a primary use case
+- Backward compatibility with current `ITestableInput`/`InputTestHelpers` (clean break)
 
 ## Core Design Principles
 
@@ -39,12 +167,12 @@ public interface ITimeProvider
     /// <summary>
     /// Creates a delay. In tests, this can be instant or controlled.
     /// </summary>
-    Task Delay(TimeSpan duration, CancellationToken cancellationToken = default);
+    Task Delay (TimeSpan duration, CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Creates a timer. In tests, this can be controlled.
     /// </summary>
-    ITimer CreateTimer(TimeSpan interval, Action callback);
+    ITimer CreateTimer (TimeSpan interval, Action callback);
 }
 
 /// <summary>
@@ -52,13 +180,16 @@ public interface ITimeProvider
 /// </summary>
 public class SystemTimeProvider : ITimeProvider
 {
+    /// <inheritdoc/>
     public DateTime Now => DateTime.Now;
     
-    public Task Delay(TimeSpan duration, CancellationToken ct) 
-        => Task.Delay(duration, ct);
+    /// <inheritdoc/>
+    public Task Delay (TimeSpan duration, CancellationToken ct) 
+        => Task.Delay (duration, ct);
     
-    public ITimer CreateTimer(TimeSpan interval, Action callback)
-        => new SystemTimer(interval, callback);
+    /// <inheritdoc/>
+    public ITimer CreateTimer (TimeSpan interval, Action callback)
+        => new SystemTimer (interval, callback);
 }
 
 /// <summary>
@@ -66,52 +197,57 @@ public class SystemTimeProvider : ITimeProvider
 /// </summary>
 public class VirtualTimeProvider : ITimeProvider
 {
-    private DateTime _currentTime = new(2025, 1, 1, 0, 0, 0);
-    private readonly List<VirtualTimer> _timers = new();
-    private readonly List<VirtualDelay> _delays = new();
+    private DateTime _currentTime = new (2025, 1, 1, 0, 0, 0);
+    private readonly List<VirtualTimer> _timers = [];
+    private readonly List<VirtualDelay> _delays = [];
     
+    /// <inheritdoc/>
     public DateTime Now => _currentTime;
     
     /// <summary>
     /// Advance virtual time by the specified duration.
     /// This triggers any timers/delays that should fire.
     /// </summary>
-    public void Advance(TimeSpan duration)
+    public void Advance (TimeSpan duration)
     {
         _currentTime += duration;
         
         // Fire any timers that should trigger
-        foreach (var timer in _timers.Where(t => t.NextTrigger <= _currentTime))
+        foreach (VirtualTimer timer in _timers.Where (t => t.NextTrigger <= _currentTime))
         {
-            timer.Trigger();
+            timer.Trigger ();
         }
         
         // Complete any delays that should finish
-        foreach (var delay in _delays.Where(d => d.CompletionTime <= _currentTime))
+        foreach (VirtualDelay delay in _delays.Where (d => d.CompletionTime <= _currentTime))
         {
-            delay.Complete();
+            delay.Complete ();
         }
     }
     
     /// <summary>
     /// Set virtual time to a specific value.
     /// </summary>
-    public void SetTime(DateTime time)
+    public void SetTime (DateTime time)
     {
         _currentTime = time;
     }
     
-    public Task Delay(TimeSpan duration, CancellationToken ct)
+    /// <inheritdoc/>
+    public Task Delay (TimeSpan duration, CancellationToken ct)
     {
-        var delay = new VirtualDelay(_currentTime + duration, ct);
-        _delays.Add(delay);
+        VirtualDelay delay = new (_currentTime + duration, ct);
+        _delays.Add (delay);
+
         return delay.Task;
     }
     
-    public ITimer CreateTimer(TimeSpan interval, Action callback)
+    /// <inheritdoc/>
+    public ITimer CreateTimer (TimeSpan interval, Action callback)
     {
-        var timer = new VirtualTimer(_currentTime, interval, callback);
-        _timers.Add(timer);
+        VirtualTimer timer = new (_currentTime, interval, callback);
+        _timers.Add (timer);
+
         return timer;
     }
 }
@@ -124,12 +260,12 @@ public class MouseButtonClickTracker
 {
     private readonly ITimeProvider _timeProvider;
     
-    public MouseButtonClickTracker(ITimeProvider timeProvider, ...)
+    public MouseButtonClickTracker (ITimeProvider timeProvider, ...)
     {
         _timeProvider = timeProvider;
     }
     
-    public void UpdateState(Mouse mouse, out int? numClicks)
+    public void UpdateState (Mouse mouse, out int? numClicks)
     {
         // Use virtual time instead of DateTime.Now
         DateTime currentTime = mouse.Timestamp ?? _timeProvider.Now;
@@ -149,7 +285,7 @@ public class AnsiResponseParser<TInputRecord>
 {
     private readonly ITimeProvider _timeProvider;
     
-    public bool IsEscapeSequenceStale()
+    public bool IsEscapeSequenceStale ()
     {
         return State == AnsiResponseParserState.ExpectingEscapeSequence 
             && _timeProvider.Now - StateChangedAt > EscapeTimeout;
@@ -160,51 +296,51 @@ public class AnsiResponseParser<TInputRecord>
 **Test usage:**
 ```csharp
 [Fact]
-public void DoubleClick_WithinThreshold_DetectsDoubleClick()
+public void DoubleClick_WithinThreshold_DetectsDoubleClick ()
 {
-    // Create app with virtual time
-    var timeProvider = new VirtualTimeProvider();
-    timeProvider.SetTime(new DateTime(2025, 1, 1, 12, 0, 0));
+    // CoPilot - Create app with virtual time
+    VirtualTimeProvider timeProvider = new ();
+    timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
     
-    using var app = Application.Create(timeProvider);
-    app.Init(DriverRegistry.Names.Fake);
+    using IApplication app = Application.Create (timeProvider);
+    app.Init (DriverRegistry.Names.ANSI);
     
     // Inject events with controlled timing
-    app.InjectMouseEvent(new() { 
+    app.InjectMouseEvent (new () { 
         Flags = MouseFlags.LeftButtonPressed,
-        Position = new(5, 5)
+        Position = new (5, 5)
     });
     
-    timeProvider.Advance(TimeSpan.FromMilliseconds(50));
+    timeProvider.Advance (TimeSpan.FromMilliseconds (50));
     
-    app.InjectMouseEvent(new() { 
+    app.InjectMouseEvent (new () { 
         Flags = MouseFlags.LeftButtonReleased,
-        Position = new(5, 5)
+        Position = new (5, 5)
     });
     
     // Second click 300ms later (within 500ms threshold)
-    timeProvider.Advance(TimeSpan.FromMilliseconds(300));
+    timeProvider.Advance (TimeSpan.FromMilliseconds (300));
     
-    app.InjectMouseEvent(new() { 
+    app.InjectMouseEvent (new () { 
         Flags = MouseFlags.LeftButtonPressed,
-        Position = new(5, 5)
+        Position = new (5, 5)
     });
     
-    timeProvider.Advance(TimeSpan.FromMilliseconds(50));
+    timeProvider.Advance (TimeSpan.FromMilliseconds (50));
     
-    app.InjectMouseEvent(new() { 
+    app.InjectMouseEvent (new () { 
         Flags = MouseFlags.LeftButtonReleased,
-        Position = new(5, 5)
+        Position = new (5, 5)
     });
     
     // Assert double-click detected
-    Assert.Contains(receivedEvents, e => e.Flags.HasFlag(MouseFlags.LeftButtonDoubleClicked));
+    Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked));
 }
 ```
 
 ### 2. Unified Input Injection API
 
-**Problem:** Current system requires 3 steps (inject ? simulate thread ? process queue) with different paths for testing full pipeline vs. testing with timestamps.
+**Problem:** Current system requires 3 steps (inject → simulate thread → process queue) with different paths for testing full pipeline vs. testing with timestamps.
 
 **Solution:** Single injection API that handles everything, with mode control for testing strategy.
 
@@ -227,7 +363,7 @@ public enum InputInjectionMode
     Pipeline,
     
     /// <summary>
-    /// Automatic mode - uses Direct for test drivers, Pipeline for ANSI drivers.
+    /// Automatic mode - uses Direct for simple test scenarios, Pipeline for full driver testing.
     /// Recommended default for most tests.
     /// </summary>
     Auto
@@ -262,22 +398,22 @@ public interface IInputInjector
     /// <summary>
     /// Inject a keyboard event. Handles encoding, queueing, and processing automatically.
     /// </summary>
-    void InjectKey(Key key, InputInjectionOptions? options = null);
+    void InjectKey (Key key, InputInjectionOptions? options = null);
     
     /// <summary>
     /// Inject a mouse event. Handles encoding, queueing, and processing automatically.
     /// </summary>
-    void InjectMouse(Mouse mouse, InputInjectionOptions? options = null);
+    void InjectMouse (Mouse mouse, InputInjectionOptions? options = null);
     
     /// <summary>
     /// Inject a sequence of input events with delays between them.
     /// </summary>
-    void InjectSequence(IEnumerable<InputEvent> events, InputInjectionOptions? options = null);
+    void InjectSequence (IEnumerable<InputEvent> events, InputInjectionOptions? options = null);
     
     /// <summary>
     /// Force processing of the input queue (usually automatic).
     /// </summary>
-    void ProcessQueue();
+    void ProcessQueue ();
 }
 
 /// <summary>
@@ -285,22 +421,28 @@ public interface IInputInjector
 /// </summary>
 public abstract record InputEvent
 {
+    /// <summary>
+    /// Optional delay before processing this event.
+    /// </summary>
     public TimeSpan? Delay { get; init; }
 }
 
 /// <summary>
 /// Keyboard event in a sequence.
 /// </summary>
-public record KeyEvent(Key Key) : InputEvent;
+public record KeyEvent (Key Key) : InputEvent;
 
 /// <summary>
 /// Mouse event in a sequence.
 /// </summary>
-public record MouseEvent(Mouse Mouse) : InputEvent;
+public record MouseEvent (Mouse Mouse) : InputEvent;
 ```
 
 **Implementation:**
 ```csharp
+/// <summary>
+/// Implementation of IInputInjector for testing.
+/// </summary>
 public class InputInjector : IInputInjector
 {
     private readonly IApplication _app;
@@ -308,41 +450,43 @@ public class InputInjector : IInputInjector
     private readonly IInputProcessor _processor;
     private readonly ITimeProvider _timeProvider;
     
-    public InputInjector(IApplication app, ITimeProvider timeProvider)
+    public InputInjector (IApplication app, ITimeProvider timeProvider)
     {
         _app = app;
-        _driver = app.Driver ?? throw new InvalidOperationException("Driver not initialized");
-        _processor = _driver.GetInputProcessor();
+        _driver = app.Driver ?? throw new InvalidOperationException ("Driver not initialized");
+        _processor = _driver.GetInputProcessor ();
         _timeProvider = timeProvider;
     }
     
-    public void InjectKey(Key key, InputInjectionOptions? options = null)
+    /// <inheritdoc/>
+    public void InjectKey (Key key, InputInjectionOptions? options = null)
     {
         options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
-        var mode = ResolveMode(options.Mode);
+        InputInjectionMode mode = ResolveMode (options.Mode);
         
         if (mode == InputInjectionMode.Direct)
         {
             // Direct injection - bypass encoding, raise event directly
-            _processor.RaiseKeyDownEvent(key);
-            _processor.RaiseKeyUpEvent(key);
+            _processor.RaiseKeyDownEvent (key);
+            _processor.RaiseKeyUpEvent (key);
         }
         else // Pipeline
         {
-            // Pipeline injection - encode ? queue ? parse ? event
-            _processor.InjectKeyDownEvent(key);
+            // Pipeline injection - encode → queue → parse → event
+            _processor.InjectKeyDownEvent (key);
         }
         
         if (options.AutoProcess)
         {
-            ProcessQueue();
+            ProcessQueue ();
         }
     }
     
-    public void InjectMouse(Mouse mouse, InputInjectionOptions? options = null)
+    /// <inheritdoc/>
+    public void InjectMouse (Mouse mouse, InputInjectionOptions? options = null)
     {
         options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
-        var mode = ResolveMode(options.Mode);
+        InputInjectionMode mode = ResolveMode (options.Mode);
         
         // Set timestamp if not provided
         mouse.Timestamp ??= (options.TimeProvider ?? _timeProvider).Now;
@@ -350,119 +494,131 @@ public class InputInjector : IInputInjector
         if (mode == InputInjectionMode.Direct)
         {
             // Direct injection - bypass encoding, preserve timestamp
-            _processor.RaiseMouseEventParsed(mouse);
-            _processor.RaiseSyntheticMouseEvent(mouse);
+            _processor.RaiseMouseEventParsed (mouse);
+            _processor.RaiseSyntheticMouseEvent (mouse);
         }
         else // Pipeline
         {
-            // Pipeline injection - encode ? queue ? parse ? event
+            // Pipeline injection - encode → queue → parse → event
             // Note: Encoding may lose timestamp information
-            _processor.InjectMouseEvent(_app, mouse);
+            _processor.InjectMouseEvent (_app, mouse);
         }
         
         if (options.AutoProcess)
         {
-            ProcessQueue();
+            ProcessQueue ();
         }
     }
     
-    public void InjectSequence(IEnumerable<InputEvent> events, InputInjectionOptions? options = null)
+    /// <inheritdoc/>
+    public void InjectSequence (IEnumerable<InputEvent> events, InputInjectionOptions? options = null)
     {
-        options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
+        options ??= new InputInjectionOptions { Time Provider = _timeProvider };
         
-        foreach (var evt in events)
+        foreach (InputEvent evt in events)
         {
             // Advance time if delay specified
             if (evt.Delay.HasValue && options.TimeProvider is VirtualTimeProvider vtp)
             {
-                vtp.Advance(evt.Delay.Value);
+                vtp.Advance (evt.Delay.Value);
             }
             
             switch (evt)
             {
                 case KeyEvent ke:
-                    InjectKey(ke.Key, options with { AutoProcess = false });
+                    InjectKey (ke.Key, options with { AutoProcess = false });
+
                     break;
                 case MouseEvent me:
-                    InjectMouse(me.Mouse, options with { AutoProcess = false });
+                    InjectMouse (me.Mouse, options with { AutoProcess = false });
+
                     break;
             }
         }
         
         if (options.AutoProcess)
         {
-            ProcessQueue();
+            ProcessQueue ();
         }
     }
     
-    public void ProcessQueue()
+    /// <inheritdoc/>
+    public void ProcessQueue ()
     {
-        _processor.ProcessQueue();
+        _processor.ProcessQueue ();
         
         // If using virtual time and parser has stale escape sequences, advance time and process again
         if (_timeProvider is VirtualTimeProvider vtp)
         {
-            var parser = _processor.GetParser();
-            if (parser.State is AnsiResponseParserState.ExpectingEscapeSequence)
+            IAnsiResponseParser? parser = _processor.GetParser ();
+
+            if (parser?.State is AnsiResponseParserState.ExpectingEscapeSequence)
             {
-                vtp.Advance(TimeSpan.FromMilliseconds(60)); // Past 50ms escape timeout
-                _processor.ProcessQueue();
+                vtp.Advance (TimeSpan.FromMilliseconds (60)); // Past 50ms escape timeout
+                _processor.ProcessQueue ();
             }
         }
     }
     
-    private InputInjectionMode ResolveMode(InputInjectionMode mode)
+    private InputInjectionMode ResolveMode (InputInjectionMode mode)
     {
         if (mode != InputInjectionMode.Auto)
+        {
             return mode;
+        }
         
-        // Auto mode: Use Direct for FakeDriver, Pipeline for ANSI drivers
-        return _driver is FakeDriver ? InputInjectionMode.Direct : InputInjectionMode.Pipeline;
+        // Auto mode: Default to Direct for faster, simpler tests.
+        // Use Pipeline explicitly when you need to test encoding/parsing.
+        return InputInjectionMode.Direct;
     }
 }
 ```
 
 **Extension methods for convenience:**
 ```csharp
+/// <summary>
+/// Extension methods for input injection.
+/// </summary>
 public static class InputInjectionExtensions
 {
+    private static readonly ConditionalWeakTable<IApplication, IInputInjector> _injectorCache = new ();
+    
     /// <summary>
     /// Get or create the input injector for this application.
     /// </summary>
-    public static IInputInjector GetInputInjector(this IApplication app)
+    public static IInputInjector GetInputInjector (this IApplication app)
     {
-        // Cache injector as application metadata
-        if (app.Metadata.TryGetValue("InputInjector", out var cached))
-            return (IInputInjector)cached;
-        
-        var timeProvider = app.GetTimeProvider();
-        var injector = new InputInjector(app, timeProvider);
-        app.Metadata["InputInjector"] = injector;
-        return injector;
+        // Cache injector per application instance
+        return _injectorCache.GetValue (app, _ => 
+        {
+            ITimeProvider timeProvider = app.GetTimeProvider ();
+
+            return new InputInjector (app, timeProvider);
+        });
     }
     
     /// <summary>
     /// Inject a key event (convenience method).
     /// </summary>
-    public static void InjectKey(this IApplication app, Key key)
+    public static void InjectKey (this IApplication app, Key key)
     {
-        app.GetInputInjector().InjectKey(key);
+        app.GetInputInjector ().InjectKey (key);
     }
     
     /// <summary>
     /// Inject a mouse event (convenience method).
     /// </summary>
-    public static void InjectMouse(this IApplication app, Mouse mouse)
+    public static void InjectMouse (this IApplication app, Mouse mouse)
     {
-        app.GetInputInjector().InjectMouse(mouse);
+        app.GetInputInjector ().InjectMouse (mouse);
     }
     
     /// <summary>
     /// Inject a sequence of events (convenience method).
     /// </summary>
-    public static void InjectSequence(this IApplication app, params InputEvent[] events)
+    public static void InjectSequence (this IApplication app, params InputEvent [] events)
     {
-        app.GetInputInjector().InjectSequence(events);
+        app.GetInputInjector ().InjectSequence (events);
     }
 }
 ```
@@ -470,81 +626,83 @@ public static class InputInjectionExtensions
 **Test usage - simplified:**
 ```csharp
 [Fact]
-public void Button_ClickWithMouse_RaisesAccepting()
+public void Button_ClickWithMouse_RaisesAccepting ()
 {
-    // Create app with virtual time
-    var time = new VirtualTimeProvider();
-    using var app = Application.Create(time);
-    app.Init(DriverRegistry.Names.Fake);
+    // CoPilot - Create app with virtual time
+    VirtualTimeProvider time = new ();
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI); // Use ANSI driver for testing
     
-    var button = new Button { Text = "Click Me" };
-    var acceptingCalled = false;
+    Button button = new () { Text = "Click Me" };
+    bool acceptingCalled = false;
     button.Accepting += (s, e) => acceptingCalled = true;
     
     // Single call - injection + processing handled automatically
-    app.InjectMouse(new() {
+    app.InjectMouse (new () {
         Flags = MouseFlags.LeftButtonPressed,
-        Position = new(5, 5)
+        Position = new (5, 5)
     });
     
-    app.InjectMouse(new() {
+    app.InjectMouse (new () {
         Flags = MouseFlags.LeftButtonReleased,
-        Position = new(5, 5)
+        Position = new (5, 5)
     });
     
-    Assert.True(acceptingCalled);
+    Assert.True (acceptingCalled);
 }
 
 [Fact]
-public void TextField_TypeText_UpdatesContent()
+public void TextField_TypeText_UpdatesContent ()
 {
-    var time = new VirtualTimeProvider();
-    using var app = Application.Create(time);
-    app.Init(DriverRegistry.Names.Fake);
+    // CoPilot
+    VirtualTimeProvider time = new ();
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI);
     
-    var textField = new TextField();
+    TextField textField = new ();
     
     // Inject sequence with automatic processing
-    app.InjectSequence(
-        new KeyEvent(Key.H),
-        new KeyEvent(Key.E),
-        new KeyEvent(Key.L),
-        new KeyEvent(Key.L),
-        new KeyEvent(Key.O)
+    app.InjectSequence (
+        new KeyEvent (Key.H),
+        new KeyEvent (Key.E),
+        new KeyEvent (Key.L),
+        new KeyEvent (Key.L),
+        new KeyEvent (Key.O)
     );
     
-    Assert.Equal("HELLO", textField.Text);
+    Assert.Equal ("HELLO", textField.Text);
 }
 
 [Fact]
-public void DoubleClick_TestPipelineEncoding()
+public void DoubleClick_TestPipelineEncoding ()
 {
-    var time = new VirtualTimeProvider();
-    using var app = Application.Create(time);
-    app.Init(DriverRegistry.Names.ANSI); // ANSI driver for pipeline testing
+    // CoPilot - Test ANSI encoding/decoding
+    VirtualTimeProvider time = new ();
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI); // ANSI driver for pipeline testing
     
     // Force pipeline mode to test ANSI encoding/decoding
-    var options = new InputInjectionOptions 
+    InputInjectionOptions options = new () 
     { 
         Mode = InputInjectionMode.Pipeline,
         TimeProvider = time 
     };
     
-    // Events go through full ANSI encoding ? parsing ? event pipeline
-    app.InjectMouse(new() { 
+    // Events go through full ANSI encoding → parsing → event pipeline
+    app.InjectMouse (new () { 
         Flags = MouseFlags.LeftButtonPressed,
-        Position = new(5, 5)
+        Position = new (5, 5)
     }, options);
     
-    time.Advance(TimeSpan.FromMilliseconds(50));
+    time.Advance (TimeSpan.FromMilliseconds (50));
     
-    app.InjectMouse(new() { 
+    app.InjectMouse (new () { 
         Flags = MouseFlags.LeftButtonReleased,
-        Position = new(5, 5)
+        Position = new (5, 5)
     }, options);
     
     // Verify ANSI encoding worked correctly
-    Assert.Contains(receivedEvents, e => e.Flags.HasFlag(MouseFlags.LeftButtonClicked));
+    Assert.Contains (receivedEvents, e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
 }
 ```
 
@@ -575,18 +733,18 @@ public interface IInputSource
     /// Read all available input synchronously.
     /// Called by InputProcessor on the main loop thread.
     /// </summary>
-    IEnumerable<InputRecord> ReadAvailable();
+    IEnumerable<InputRecord> ReadAvailable ();
     
     /// <summary>
     /// Start background input reading (for production implementations).
     /// Test implementations typically don't need this.
     /// </summary>
-    void Start(CancellationToken cancellationToken);
+    void Start (CancellationToken cancellationToken);
     
     /// <summary>
     /// Stop background input reading.
     /// </summary>
-    void Stop();
+    void Stop ();
 }
 
 /// <summary>
@@ -594,63 +752,73 @@ public interface IInputSource
 /// </summary>
 public abstract record InputRecord
 {
+    /// <summary>
+    /// When this input occurred.
+    /// </summary>
     public DateTime Timestamp { get; init; }
 }
 
 /// <summary>
 /// Keyboard input record.
 /// </summary>
-public record KeyboardRecord(Key Key) : InputRecord;
+public record KeyboardRecord (Key Key) : InputRecord;
 
 /// <summary>
 /// Mouse input record (raw, before click synthesis).
 /// </summary>
-public record MouseRecord(Mouse Mouse) : InputRecord;
+public record MouseRecord (Mouse Mouse) : InputRecord;
 
 /// <summary>
 /// ANSI sequence record (for ANSI driver testing).
 /// </summary>
-public record AnsiRecord(string Sequence) : InputRecord;
+public record AnsiRecord (string Sequence) : InputRecord;
 
 /// <summary>
 /// Test input source - provides pre-programmed input.
 /// </summary>
 public class TestInputSource : IInputSource
 {
-    private readonly Queue<InputRecord> _inputQueue = new();
+    private readonly Queue<InputRecord> _inputQueue = new ();
     
+    /// <inheritdoc/>
     public ITimeProvider TimeProvider { get; }
     
-    public TestInputSource(ITimeProvider timeProvider)
+    public TestInputSource (ITimeProvider timeProvider)
     {
         TimeProvider = timeProvider;
     }
     
+    /// <inheritdoc/>
     public bool IsAvailable => _inputQueue.Count > 0;
     
-    public IEnumerable<InputRecord> ReadAvailable()
+    /// <inheritdoc/>
+    public IEnumerable<InputRecord> ReadAvailable ()
     {
         while (_inputQueue.Count > 0)
         {
-            yield return _inputQueue.Dequeue();
+            yield return _inputQueue.Dequeue ();
         }
     }
     
     /// <summary>
     /// Add input to the queue. Called by InputInjector.
     /// </summary>
-    public void Enqueue(InputRecord record)
+    public void Enqueue (InputRecord record)
     {
         // Set timestamp if not already set
         if (record.Timestamp == default)
         {
             record = record with { Timestamp = TimeProvider.Now };
         }
-        _inputQueue.Enqueue(record);
+
+        _inputQueue.Enqueue (record);
     }
     
-    public void Start(CancellationToken cancellationToken) { /* No-op for test */ }
-    public void Stop() { /* No-op for test */ }
+    /// <inheritdoc/>
+    public void Start (CancellationToken cancellationToken) { /* No-op for test */ }
+
+    /// <inheritdoc/>
+    public void Stop () { /* No-op for test */ }
 }
 
 /// <summary>
@@ -660,42 +828,47 @@ public abstract class ConsoleInputSource : IInputSource
 {
     private Task? _readTask;
     private CancellationTokenSource? _cancellationTokenSource;
-    protected readonly ConcurrentQueue<InputRecord> InputBuffer = new();
+    protected readonly ConcurrentQueue<InputRecord> InputBuffer = new ();
     
+    /// <inheritdoc/>
     public ITimeProvider TimeProvider { get; }
     
-    protected ConsoleInputSource(ITimeProvider timeProvider)
+    protected ConsoleInputSource (ITimeProvider timeProvider)
     {
         TimeProvider = timeProvider;
     }
     
+    /// <inheritdoc/>
     public bool IsAvailable => !InputBuffer.IsEmpty;
     
-    public IEnumerable<InputRecord> ReadAvailable()
+    /// <inheritdoc/>
+    public IEnumerable<InputRecord> ReadAvailable ()
     {
-        while (InputBuffer.TryDequeue(out var record))
+        while (InputBuffer.TryDequeue (out InputRecord? record))
         {
             yield return record;
         }
     }
     
-    public void Start(CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    public void Start (CancellationToken cancellationToken)
     {
-        _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _readTask = Task.Run(() => ReadLoop(_cancellationTokenSource.Token), cancellationToken);
+        _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource (cancellationToken);
+        _readTask = Task.Run (() => ReadLoop (_cancellationTokenSource.Token), cancellationToken);
     }
     
-    public void Stop()
+    /// <inheritdoc/>
+    public void Stop ()
     {
-        _cancellationTokenSource?.Cancel();
-        _readTask?.Wait(TimeSpan.FromSeconds(1));
+        _cancellationTokenSource?.Cancel ();
+        _readTask?.Wait (TimeSpan.FromSeconds (1));
     }
     
     /// <summary>
     /// Platform-specific implementation of reading input.
     /// Runs on background thread, enqueues to InputBuffer.
     /// </summary>
-    protected abstract Task ReadLoop(CancellationToken cancellationToken);
+    protected abstract Task ReadLoop (CancellationToken cancellationToken);
 }
 ```
 
@@ -720,7 +893,7 @@ public interface IInputProcessor
     /// Process all available input from the source.
     /// Called by main loop on each iteration.
     /// </summary>
-    void ProcessInput();
+    void ProcessInput ();
     
     /// <summary>
     /// Keyboard event raised when key is pressed/released.
@@ -739,683 +912,458 @@ public interface IInputProcessor
     IAnsiResponseParser? AnsiParser { get; }
 }
 
+/// <summary>
+/// Implementation of IInputProcessor.
+/// </summary>
 public class InputProcessor : IInputProcessor
 {
     private readonly MouseInterpreter _mouseInterpreter;
     private readonly IAnsiResponseParser? _ansiParser;
     
+    /// <inheritdoc/>
     public IInputSource InputSource { get; }
+
+    /// <inheritdoc/>
     public ITimeProvider TimeProvider { get; }
+
+    /// <inheritdoc/>
     public IAnsiResponseParser? AnsiParser => _ansiParser;
     
+    /// <inheritdoc/>
     public event EventHandler<Key>? KeyDown;
+
+    /// <inheritdoc/>
     public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc/>
     public event EventHandler<Mouse>? MouseEvent;
     
-    public InputProcessor(IInputSource inputSource, ITimeProvider timeProvider, bool enableAnsiParsing = false)
+    public InputProcessor (IInputSource inputSource, ITimeProvider timeProvider, bool enableAnsiParsing = false)
     {
         InputSource = inputSource;
         TimeProvider = timeProvider;
-        _mouseInterpreter = new MouseInterpreter(timeProvider);
+        _mouseInterpreter = new MouseInterpreter (timeProvider);
         
         if (enableAnsiParsing)
         {
-            _ansiParser = new AnsiResponseParser<char>(timeProvider);
-            _ansiParser.Mouse += (s, e) => RaiseMouse(e);
-            _ansiParser.Keyboard += (s, e) => RaiseKeyboard(e);
+            _ansiParser = new AnsiResponseParser<char> (timeProvider);
+            _ansiParser.Mouse += (s, e) => RaiseMouse (e);
+            _ansiParser.Keyboard += (s, e) => RaiseKeyboard (e);
         }
     }
     
-    public void ProcessInput()
+    /// <inheritdoc/>
+    public void ProcessInput ()
     {
         // Read all available input
-        foreach (var record in InputSource.ReadAvailable())
+        foreach (InputRecord record in InputSource.ReadAvailable ())
         {
-            ProcessRecord(record);
+            ProcessRecord (record);
         }
         
         // Check for stale escape sequences (if using ANSI parser)
-        if (_ansiParser != null && _ansiParser.IsEscapeSequenceStale())
+        if (_ansiParser != null && _ansiParser.IsEscapeSequenceStale ())
         {
-            foreach (var released in _ansiParser.Release())
+            foreach (char released in _ansiParser.Release ())
             {
-                ProcessRecord(new AnsiRecord(released.ToString()) { Timestamp = TimeProvider.Now });
+                ProcessRecord (new AnsiRecord (released.ToString ()) { Timestamp = TimeProvider.Now });
             }
         }
     }
     
-    private void ProcessRecord(InputRecord record)
+    private void ProcessRecord (InputRecord record)
     {
         switch (record)
         {
             case KeyboardRecord kr:
-                RaiseKeyboard(kr.Key);
+                RaiseKeyboard (kr.Key);
+
                 break;
                 
             case MouseRecord mr:
-                RaiseMouse(mr.Mouse);
+                RaiseMouse (mr.Mouse);
+
                 break;
                 
             case AnsiRecord ar:
                 // Feed to ANSI parser
-                _ansiParser?.ProcessInput(ar.Sequence);
+                _ansiParser?.ProcessInput (ar.Sequence);
+
                 break;
         }
     }
     
-    private void RaiseKeyboard(Key key)
+    private void RaiseKeyboard (Key key)
     {
-        KeyDown?.Invoke(this, key);
-        KeyUp?.Invoke(this, key);
+        KeyDown?.Invoke (this, key);
+        KeyUp?.Invoke (this, key);
     }
     
-    private void RaiseMouse(Mouse mouse)
+    private void RaiseMouse (Mouse mouse)
     {
         // Process through MouseInterpreter to generate click events
-        foreach (var processedMouse in _mouseInterpreter.Process(mouse))
+        foreach (Mouse processedMouse in _mouseInterpreter.Process (mouse))
         {
-            MouseEvent?.Invoke(this, processedMouse);
+            MouseEvent?.Invoke (this, processedMouse);
         }
     }
 }
 ```
 
-**InputInjector now works directly with InputSource:**
+**InputInjector integration with InputSource:**
 ```csharp
+// InputInjector works directly with TestInputSource
 public class InputInjector : IInputInjector
 {
     private readonly IInputProcessor _processor;
     private readonly TestInputSource? _testSource;
     
-    public InputInjector(IInputProcessor processor)
+    public InputInjector (IInputProcessor processor)
     {
         _processor = processor;
         _testSource = processor.InputSource as TestInputSource;
         
         if (_testSource == null)
-            throw new InvalidOperationException("InputInjector requires TestInputSource");
-    }
-    
-    public void InjectKey(Key key, InputInjectionOptions? options = null)
-    {
-        options ??= new InputInjectionOptions();
-        var mode = ResolveMode(options.Mode);
-        
-        InputRecord record = mode == InputInjectionMode.Direct
-            ? new KeyboardRecord(key) { Timestamp = _processor.TimeProvider.Now }
-            : new AnsiRecord(AnsiKeyboardEncoder.Encode(key)) { Timestamp = _processor.TimeProvider.Now };
-        
-        _testSource.Enqueue(record);
-        
-        if (options.AutoProcess)
         {
-            _processor.ProcessInput();
+            throw new InvalidOperationException ("InputInjector requires TestInputSource");
         }
     }
     
-    public void InjectMouse(Mouse mouse, InputInjectionOptions? options = null)
+    public void InjectKey (Key key, InputInjectionOptions? options = null)
     {
-        options ??= new InputInjectionOptions();
-        var mode = ResolveMode(options.Mode);
+        options ??= new InputInjectionOptions ();
+        InputInjectionMode mode = ResolveMode (options.Mode);
+        
+        InputRecord record = mode == InputInjectionMode.Direct
+            ? new KeyboardRecord (key) { Timestamp = _processor.TimeProvider.Now }
+            : new AnsiRecord (AnsiKeyboardEncoder.Encode (key)) { Timestamp = _processor.TimeProvider.Now };
+        
+        _testSource.Enqueue (record);
+        
+        if (options.AutoProcess)
+        {
+            _processor.ProcessInput ();
+        }
+    }
+    
+    public void InjectMouse (Mouse mouse, InputInjectionOptions? options = null)
+    {
+        options ??= new InputInjectionOptions ();
+        InputInjectionMode mode = ResolveMode (options.Mode);
         
         mouse.Timestamp ??= _processor.TimeProvider.Now;
         
         InputRecord record = mode == InputInjectionMode.Direct
-            ? new MouseRecord(mouse) { Timestamp = mouse.Timestamp.Value }
-            : new AnsiRecord(AnsiMouseEncoder.Encode(mouse)) { Timestamp = mouse.Timestamp.Value };
+            ? new MouseRecord (mouse) { Timestamp = mouse.Timestamp.Value }
+            : new AnsiRecord (AnsiMouseEncoder.Encode (mouse)) { Timestamp = mouse.Timestamp.Value };
         
-        _testSource.Enqueue(record);
+        _testSource.Enqueue (record);
         
         if (options.AutoProcess)
         {
-            _processor.ProcessInput();
+            _processor.ProcessInput ();
         }
     }
     
-    public void ProcessQueue()
+    public void ProcessQueue ()
     {
-        _processor.ProcessInput();
+        _processor.ProcessInput ();
     }
     
-    // ... rest of implementation
-}
-```
-
-### 4. Application Integration
-
-**Problem:** Test setup requires manual wiring of components.
-
-**Solution:** Application factory methods that set up testability automatically.
-
-```csharp
-public static class Application
-{
-    /// <summary>
-    /// Create an application instance.
-    /// </summary>
-    public static IApplication Create(ITimeProvider? timeProvider = null)
+    private InputInjectionMode ResolveMode (InputInjectionMode mode)
     {
-        timeProvider ??= new SystemTimeProvider();
-        return new ApplicationImpl(timeProvider);
-    }
-    
-    /// <summary>
-    /// Create a test application with virtual time and test input source.
-    /// </summary>
-    public static IApplication CreateForTesting(VirtualTimeProvider? timeProvider = null)
-    {
-        timeProvider ??= new VirtualTimeProvider();
-        var app = new ApplicationImpl(timeProvider);
-        
-        // Configure for testing - will use TestInputSource
-        app.Metadata["TestMode"] = true;
-        
-        return app;
-    }
-}
-
-public class ApplicationImpl : IApplication
-{
-    private readonly ITimeProvider _timeProvider;
-    
-    public ITimeProvider GetTimeProvider() => _timeProvider;
-    
-    public ApplicationImpl(ITimeProvider timeProvider)
-    {
-        _timeProvider = timeProvider;
-    }
-    
-    public void Init(string? driverName = null)
-    {
-        // Determine if test mode
-        bool testMode = Metadata.ContainsKey("TestMode");
-        
-        // Create appropriate input source
-        IInputSource inputSource = testMode
-            ? new TestInputSource(_timeProvider)
-            : CreateProductionInputSource(driverName, _timeProvider);
-        
-        // Create input processor
-        bool enableAnsiParsing = driverName == DriverRegistry.Names.ANSI;
-        var processor = new InputProcessor(inputSource, _timeProvider, enableAnsiParsing);
-        
-        // Create driver with processor
-        Driver = CreateDriver(driverName, processor, _timeProvider);
-        
-        // Wire up events
-        processor.KeyDown += (s, e) => Keyboard.RaiseKeyDownEvent(e);
-        processor.KeyUp += (s, e) => Keyboard.RaiseKeyUpEvent(e);
-        processor.MouseEvent += (s, e) => Mouse.RaiseMouseEvent(e);
-    }
-    
-    private IInputSource CreateProductionInputSource(string? driverName, ITimeProvider timeProvider)
-    {
-        return driverName switch
+        if (mode != InputInjectionMode.Auto)
         {
-            DriverRegistry.Names.Windows => new WindowsInputSource(timeProvider),
-            DriverRegistry.Names.Unix => new UnixInputSource(timeProvider),
-            DriverRegistry.Names.Net => new NetInputSource(timeProvider),
-            DriverRegistry.Names.ANSI => new AnsiInputSource(timeProvider),
-            _ => new FakeInputSource(timeProvider)
-        };
-    }
-}
-```
-
-### 5. Simplified Test Helpers
-
-**Problem:** Current `InputTestHelpers` is complex with many manual steps.
-
-**Solution:** Much simpler helpers that just wrap `IInputInjector`.
-
-```csharp
-public static class InputTestHelpers
-{
-    /// <summary>
-    /// Inject a key and wait for it to be processed.
-    /// </summary>
-    public static void InjectAndProcessKey(this IApplication app, Key key)
-    {
-        app.InjectKey(key); // Auto-processes by default
-    }
-    
-    /// <summary>
-    /// Inject a mouse event and wait for it to be processed.
-    /// </summary>
-    public static void InjectAndProcessMouse(this IApplication app, Mouse mouse)
-    {
-        app.InjectMouse(mouse); // Auto-processes by default
-    }
-    
-    /// <summary>
-    /// Inject a click (press + release).
-    /// </summary>
-    public static void InjectClick(this IApplication app, Point position, MouseFlags button = MouseFlags.LeftButton)
-    {
-        var pressed = button switch
-        {
-            MouseFlags.LeftButton => MouseFlags.LeftButtonPressed,
-            MouseFlags.RightButton => MouseFlags.RightButtonPressed,
-            MouseFlags.MiddleButton => MouseFlags.MiddleButtonPressed,
-            _ => throw new ArgumentException("Invalid button", nameof(button))
-        };
-        
-        var released = button switch
-        {
-            MouseFlags.LeftButton => MouseFlags.LeftButtonReleased,
-            MouseFlags.RightButton => MouseFlags.RightButtonReleased,
-            MouseFlags.MiddleButton => MouseFlags.MiddleButtonReleased,
-            _ => throw new ArgumentException("Invalid button", nameof(button))
-        };
-        
-        app.InjectMouse(new() { Flags = pressed, Position = position });
-        app.InjectMouse(new() { Flags = released, Position = position });
-    }
-    
-    /// <summary>
-    /// Inject a sequence of keys.
-    /// </summary>
-    public static void InjectKeys(this IApplication app, params Key[] keys)
-    {
-        app.InjectSequence(keys.Select(k => new KeyEvent(k)).ToArray());
-    }
-    
-    /// <summary>
-    /// Type a string as key events.
-    /// </summary>
-    public static void TypeText(this IApplication app, string text)
-    {
-        var keys = text.Select(c => Key.FromChar(c));
-        app.InjectKeys(keys.ToArray());
-    }
-}
-```
-
-**Test comparison - before and after:**
-```csharp
-// BEFORE (current architecture)
-[Fact]
-public void Test_CurrentArchitecture()
-{
-    using var app = Application.Create();
-    app.Init(DriverRegistry.Names.ANSI);
-    
-    // Step 1: Inject
-    app.Driver.InjectKeyEvent(Key.A);
-    
-    // Step 2: Simulate input thread
-    app.SimulateInputThread();
-    
-    // Step 3: Process queue
-    app.Driver.GetInputProcessor().ProcessQueue();
-    
-    // Assert
-    Assert.True(keyReceived);
-}
-
-// AFTER (redesigned architecture)
-[Fact]
-public void Test_NewArchitecture()
-{
-    using var app = Application.CreateForTesting();
-    app.Init(DriverRegistry.Names.Fake);
-    
-    // Single step - everything handled automatically
-    app.InjectKey(Key.A);
-    
-    // Assert
-    Assert.True(keyReceived);
-}
-```
-
-### 6. Integration Test Support
-
-**Problem:** `GuiTestContext` has complex synchronization logic.
-
-**Solution:** Leverage virtual time to eliminate most synchronization complexity.
-
-```csharp
-/// <summary>
-/// Fluent test context for integration testing with full application lifecycle.
-/// Redesigned to use virtual time for simpler synchronization.
-/// </summary>
-public class GuiTestContext : IDisposable
-{
-    private readonly IApplication _app;
-    private readonly VirtualTimeProvider _time;
-    private readonly Task? _runTask;
-    private readonly CancellationTokenSource _cts;
-    
-    public IApplication App => _app;
-    public VirtualTimeProvider Time => _time;
-    
-    private GuiTestContext(IRunnable runnable, int width, int height, string driverName, TimeSpan timeout)
-    {
-        _time = new VirtualTimeProvider();
-        _app = Application.CreateForTesting(_time);
-        _cts = new CancellationTokenSource(timeout);
-        
-        _app.Init(driverName);
-        _app.Driver.SetScreenSize(width, height);
-        
-        // Start application on background thread
-        _runTask = Task.Run(() =>
-        {
-            try
-            {
-                _app.Run(runnable);
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected on timeout/stop
-            }
-        }, _cts.Token);
-        
-        // Wait for application to start (modal)
-        WaitForModal(runnable, timeout);
-    }
-    
-    public GuiTestContext InjectKey(Key key)
-    {
-        _app.InjectKey(key);
-        
-        // Advance time to let application process
-        _time.Advance(TimeSpan.FromMilliseconds(10));
-        
-        return this;
-    }
-    
-    public GuiTestContext InjectMouse(Mouse mouse)
-    {
-        _app.InjectMouse(mouse);
-        
-        // Advance time to let application process
-        _time.Advance(TimeSpan.FromMilliseconds(10));
-        
-        return this;
-    }
-    
-    public GuiTestContext LeftClick(int x, int y)
-    {
-        InjectMouse(new() { Flags = MouseFlags.LeftButtonPressed, Position = new(x, y) });
-        InjectMouse(new() { Flags = MouseFlags.LeftButtonReleased, Position = new(x, y) });
-        return this;
-    }
-    
-    public GuiTestContext WaitForCondition(Func<bool> condition, TimeSpan? timeout = null)
-    {
-        timeout ??= TimeSpan.FromSeconds(5);
-        var deadline = _time.Now + timeout.Value;
-        
-        while (!condition())
-        {
-            if (_time.Now >= deadline)
-                throw new TimeoutException("Condition not met within timeout");
-            
-            // Advance time and let application process
-            _time.Advance(TimeSpan.FromMilliseconds(10));
-            _app.GetInputInjector().ProcessQueue();
+            return mode;
         }
         
-        return this;
-    }
-    
-    public GuiTestContext AssertTrue(bool condition, string? message = null)
-    {
-        Assert.True(condition, message);
-        return this;
-    }
-    
-    public GuiTestContext AssertEqual<T>(T expected, T actual)
-    {
-        Assert.Equal(expected, actual);
-        return this;
-    }
-    
-    private void WaitForModal(IRunnable runnable, TimeSpan timeout)
-    {
-        var deadline = DateTime.Now + timeout;
-        
-        while (!runnable.IsModal)
-        {
-            if (DateTime.Now >= deadline)
-                throw new TimeoutException("Runnable did not become modal");
-            
-            Thread.Sleep(10);
-        }
-    }
-    
-    public void Dispose()
-    {
-        _cts.Cancel();
-        _runTask?.Wait(TimeSpan.FromSeconds(1));
-        _app.Dispose();
-        _cts.Dispose();
+        // Auto mode: Default to Direct for faster, simpler tests.
+        // Use Pipeline explicitly when you need to test encoding/parsing.
+        return InputInjectionMode.Direct;
     }
 }
 
-/// <summary>
-/// Fluent builder for GuiTestContext.
-/// </summary>
-public static class With
-{
-    public static GuiTestContextBuilder A<TRunnable>(int width, int height, string driverName = "Fake") 
-        where TRunnable : IRunnable, new()
-    {
-        return new GuiTestContextBuilder(new TRunnable(), width, height, driverName);
-    }
-}
-
-public class GuiTestContextBuilder
-{
-    private readonly IRunnable _runnable;
-    private readonly int _width;
-    private readonly int _height;
-    private readonly string _driverName;
-    private readonly List<View> _views = new();
-    
-    internal GuiTestContextBuilder(IRunnable runnable, int width, int height, string driverName)
-    {
-        _runnable = runnable;
-        _width = width;
-        _height = height;
-        _driverName = driverName;
-    }
-    
-    public GuiTestContextBuilder Add(View view)
-    {
-        _views.Add(view);
-        return this;
-    }
-    
-    public GuiTestContext Build(TimeSpan? timeout = null)
-    {
-        timeout ??= TimeSpan.FromSeconds(30);
-        
-        // Add views to runnable
-        foreach (var view in _views)
-        {
-            if (_runnable is View container)
-                container.Add(view);
-        }
-        
-        return new GuiTestContext(_runnable, _width, _height, _driverName, timeout.Value);
-    }
-    
-    // Fluent methods can also build implicitly
-    public GuiTestContext InjectKey(Key key) => Build().InjectKey(key);
-    public GuiTestContext LeftClick(int x, int y) => Build().LeftClick(x, y);
-}
-```
-
-**Integration test comparison:**
-```csharp
-// BEFORE (complex synchronization)
-[Fact]
-public void IntegrationTest_Current()
-{
-    using var context = With.A<Window>(40, 10, TestDriver.ANSI)
-        .Add(button);
-    
-    // Complex WaitIteration synchronization
-    context.WaitIteration(app => /* setup */);
-    context.LeftClick(5, 5);
-    context.WaitIteration(); // Wait for processing
-    context.AssertEqual(1, clickCount);
-}
-
-// AFTER (virtual time, simpler)
-[Fact]
-public void IntegrationTest_New()
-{
-    using var context = With.A<Window>(40, 10, "Fake")
-        .Add(button)
-        .LeftClick(5, 5) // Automatically advances virtual time
-        .AssertEqual(1, clickCount);
-}
 ```
 
 ## Migration Path
 
 ### Phase 1: Add New Infrastructure (Non-Breaking)
-1. Add `ITimeProvider`, `SystemTimeProvider`, `VirtualTimeProvider`
-2. Add `InputRecord` types, `IInputSource` interface
-3. Add new `InputProcessor` implementation alongside old `InputProcessorImpl`
-4. Add `IInputInjector` and `InputInjector`
-5. Update tests to use new APIs (opt-in)
+1. ✅ Add `ITimeProvider`, `SystemTimeProvider`, `VirtualTimeProvider` interfaces and implementations
+2. ✅ Add `InputRecord` types (`KeyboardRecord`, `MouseRecord`, `AnsiRecord`)
+3. ✅ Add `IInputSource` interface with `TestInputSource` and `ConsoleInputSource` implementations
+4. ✅ Add new `InputProcessor` implementation alongside existing code
+5. ✅ Add `IInputInjector` interface and `InputInjector` implementation
+6. ✅ Add extension methods in `InputInjectionExtensions`
 
 **Result:** New and old systems coexist. Tests can migrate incrementally.
 
 ### Phase 2: Update Core Components
-1. Add `ITimeProvider` parameter to `MouseButtonClickTracker`, `MouseInterpreter`
-2. Add `ITimeProvider` parameter to `AnsiResponseParser`
-3. Update `Application.Create()` to accept `ITimeProvider`
-4. Add `Application.CreateForTesting()` factory method
+1. ✅ Add `ITimeProvider` parameter to `MouseButtonClickTracker` constructor
+2. ✅ Add `ITimeProvider` parameter to `MouseInterpreter` constructor
+3. ✅ Add `ITimeProvider` parameter to `AnsiResponseParser` constructor
+4. ✅ Update `Application.Create()` to accept `ITimeProvider` parameter
+5. ✅ Add `Application.CreateForTesting()` factory method
+6. ✅ Update all uses of `DateTime.Now` to use `ITimeProvider.Now`
 
 **Result:** Core components support virtual time. Old tests still work.
 
 ### Phase 3: Migrate Tests
-1. Migrate unit tests from `InputTestHelpers` to `IInputInjector`
-2. Migrate integration tests from old `GuiTestContext` to new
-3. Update test documentation
+1. ✅ Create new `InputTestHelpers` class with simplified methods
+2. ✅ Migrate unit tests from old `InputTestHelpers` to new `IInputInjector` API
+3. ✅ Update integration tests to use `VirtualTimeProvider`
+4. ✅ Update test documentation and examples
+5. ✅ Mark old APIs with `[Obsolete]` attribute
 
-**Result:** All tests using new architecture. Old APIs marked `[Obsolete]`.
+**Note: Disabled tests** - Tests marked with `Skip = "Broken in #4474"` were disabled as part of other refactoring in this massive PR. All tests currently pass; but only because these were disabled. Refactor and re-enable if they are relevant to this redesign.
+
+**Result:** All tests using new architecture. Old APIs marked for removal.
 
 ### Phase 4: Remove Old Infrastructure
-1. Remove `ITestableInput` interface
-2. Remove old `InputTestHelpers`
-3. Remove old `GuiTestContext`
-4. Simplify `IInputProcessor` (no need for `InjectKeyDownEvent` etc.)
+1. ✅ Remove `ITestableInput` interface
+2. ✅ Remove old `InputTestHelpers` methods (SimulateInputThread, ProcessQueueWithEscapeHandling)
+3. ✅ Remove old injection methods from `IInputProcessor` (`InjectKeyDownEvent`, etc.)
+4. ✅ Clean up any remaining references to obsolete APIs
 
 **Result:** Clean architecture with only new system.
 
-## Benefits Summary
+## Implementation Checklist
 
-### For Test Authors
+> **🎯 For AI Agents**: Use this checklist to implement the redesign systematically.
 
-**Before:**
-```csharp
-// 3-step dance, easy to forget steps
-app.Driver.InjectKeyEvent(Key.A);
-app.SimulateInputThread();
-app.Driver.GetInputProcessor().ProcessQueue();
-```
+### Step 1: Create Core Time Abstraction
+- [ ] Create file: `Terminal.Gui/Time/ITimeProvider.cs`
+  - [ ] Add `ITimeProvider` interface
+  - [ ] Add `SystemTimeProvider` class
+  - [ ] Add `VirtualTimeProvider` class
+  - [ ] Add `VirtualTimer` helper class
+  - [ ] Add `VirtualDelay` helper class
+- [ ] Follow Terminal.Gui coding standards:
+  - [ ] NO `var` except for built-in types
+  - [ ] USE target-typed `new ()`
+  - [ ] USE collection initializers `[]`
+  - [ ] Add XML docs to all public members
 
-**After:**
-```csharp
-// Single call, automatic processing
-app.InjectKey(Key.A);
-```
+### Step 2: Create Input Source Abstraction
+- [ ] Create file: `Terminal.Gui/Drivers/Input/IInputSource.cs`
+  - [ ] Add `IInputSource` interface
+  - [ ] Add `InputRecord` base record
+  - [ ] Add `KeyboardRecord` record
+  - [ ] Add `MouseRecord` record
+  - [ ] Add `AnsiRecord` record
+- [ ] Create file: `Terminal.Gui/Drivers/Input/TestInputSource.cs`
+  - [ ] Implement `TestInputSource` class
+  - [ ] Add `Enqueue` method for test injection
+- [ ] Create file: `Terminal.Gui/Drivers/Input/ConsoleInputSource.cs`
+  - [ ] Add abstract `ConsoleInputSource` base class
+  - [ ] Add background thread support
+  - [ ] Add `ReadLoop` abstract method
 
-**Before:**
-```csharp
-// Real delays (60ms per escape key)
-processor.ProcessQueue();
-Thread.Sleep(60);
-processor.ProcessQueue();
-```
+### Step 3: Create Input Injector
+- [ ] Create file: `Terminal.Gui/Testing/IInputInjector.cs`
+  - [ ] Add `IInputInjector` interface
+  - [ ] Add `InputInjectionMode` enum
+  - [ ] Add `InputInjectionOptions` class
+  - [ ] Add `InputEvent` base record
+  - [ ] Add `KeyEvent` record
+  - [ ] Add `MouseEvent` record
+- [ ] Create file: `Terminal.Gui/Testing/InputInjector.cs`
+  - [ ] Implement `InputInjector` class
+  - [ ] Implement `InjectKey` method
+  - [ ] Implement `InjectMouse` method
+  - [ ] Implement `InjectSequence` method
+  - [ ] Implement `ProcessQueue` method
+  - [ ] Implement `ResolveMode` method
+- [ ] Create file: `Terminal.Gui/Testing/InputInjectionExtensions.cs`
+  - [ ] Add extension methods for `IApplication`
+  - [ ] Use `ConditionalWeakTable` for caching
 
-**After:**
-```csharp
-// Virtual time, instant
-time.Advance(TimeSpan.FromMilliseconds(60));
-app.InjectKey(Key.Esc);
-```
+### Step 4: Update Core Components
+- [ ] Update `Terminal.Gui/Drivers/MouseButtonClickTracker.cs`
+  - [ ] Add `ITimeProvider` constructor parameter
+  - [ ] Replace `DateTime.Now` with `_timeProvider.Now`
+- [ ] Update `Terminal.Gui/Drivers/MouseInterpreter.cs`
+  - [ ] Add `ITimeProvider` constructor parameter
+  - [ ] Pass to `MouseButtonClickTracker`
+- [ ] Update `Terminal.Gui/Drivers/ANSIDriver/AnsiResponseParser.cs`
+  - [ ] Add `ITimeProvider` constructor parameter
+  - [ ] Replace `DateTime.Now` with `_timeProvider.Now` for timeout checks
 
-**Before:**
-```csharp
-// Complex timestamp control
-app.InjectMouseEventDirectly(new() { 
-    Timestamp = baseTime.AddMilliseconds(600) 
-});
-```
+### Step 5: Update Application Layer
+- [ ] Update `Terminal.Gui/Application/Application.cs`
+  - [ ] Add `ITimeProvider` parameter to `Create` method (optional, defaults to `SystemTimeProvider`)
+  - [ ] Add `CreateForTesting` factory method (returns app with `VirtualTimeProvider` and `testMode: true`)
+- [ ] Update `Terminal.Gui/Application/ApplicationImpl.cs`
+  - [ ] Add `ITimeProvider` and `bool testMode` constructor parameters
+  - [ ] Add `GetTimeProvider()` method
+  - [ ] Update `Init()` to create `TestInputSource` when `testMode == true`
+  - [ ] Update `Init()` to pass `ITimeProvider` to all components
 
-**After:**
-```csharp
-// Natural time advancement
-time.Advance(TimeSpan.FromMilliseconds(600));
-app.InjectMouse(new() { Position = new(5, 5) });
-```
+### Step 6: Create New Test Helpers
+- [ ] Create file: `Tests/UnitTests/InputTestHelpers.cs` (new version)
+  - [ ] Add simplified `InjectAndProcessKey` method
+  - [ ] Add simplified `InjectAndProcessMouse` method
+  - [ ] Add `InjectClick` helper method
+  - [ ] Add `InjectKeys` helper method
+  - [ ] Add `TypeText` helper method
+  - [ ] Mark all methods with `// CoPilot` comment
 
-### For Maintainability
+### Step 7: Write Validation Tests
+- [ ] Create file: `Tests/UnitTestsParallelizable/Testing/VirtualTimeProviderTests.cs`
+  - [ ] Test `Advance` method
+  - [ ] Test `SetTime` method
+  - [ ] Test timer triggering
+  - [ ] Test delay completion
+- [ ] Create file: `Tests/UnitTestsParallelizable/Testing/InputInjectorTests.cs`
+  - [ ] Test Direct mode keyboard injection
+  - [ ] Test Direct mode mouse injection
+  - [ ] Test Pipeline mode ANSI encoding
+  - [ ] Test sequence injection with delays
+  - [ ] Test auto-processing vs manual processing
 
-1. **Cleaner architecture** - Single input path, clear responsibilities
-2. **Fewer interfaces** - No more `IInput`/`ITestableInput` split
-3. **Simpler tests** - Less boilerplate, more readable
-4. **Deterministic** - No race conditions, no real delays
-5. **Flexible** - Easy to test both direct events and full pipeline
+### Step 8: Migrate Example Tests
+- [ ] Pick 3-5 existing tests from `Tests/UnitTestsParallelizable/Application/Mouse/ApplicationMouseTests.cs`
+  - [ ] Rewrite using `Application.CreateForTesting()`
+  - [ ] Replace manual 3-step injection with `app.InjectMouse()`
+  - [ ] Use `VirtualTimeProvider.Advance()` instead of real delays
+  - [ ] Verify tests still pass
+  - [ ] Compare lines of code (should be ~50% reduction)
 
-### For External Applications (Low Priority)
+### Step 9: Update Documentation
+- [ ] Update `docfx/docs/testing.md`
+  - [ ] Add section on virtual time
+  - [ ] Add section on input injection
+  - [ ] Include code examples
+- [ ] Add inline code comments to all new classes explaining usage
 
-The new architecture doesn't directly solve external app injection, but it doesn't preclude it either:
-
-- `IInputInjector` could theoretically be exposed via remote API
-- Virtual time could be controlled externally
-- `Application.CreateForTesting()` could accept external input source
-
-However, this remains a low-priority use case that we won't optimize for in the initial design.
-
-## Open Questions
-
-1. **Driver-specific encoders** - Should `AnsiKeyboardEncoder`/`AnsiMouseEncoder` be driver-owned or shared?
-   - **Recommendation:** Keep as shared utilities. They're stateless and used by multiple components.
-
-2. **Event timestamps** - Should `Key` gain a `Timestamp` property (like `Mouse` has)?
-   - **Recommendation:** Yes, for consistency and future keyboard timing features (repeat, debouncing).
-
-3. **Backward compatibility** - How long do we keep old APIs with `[Obsolete]`?
-   - **Recommendation:** At least one major version (v3.x keeps old APIs, v4.x removes them).
-
-4. **Performance** - Does virtual time add overhead for production?
-   - **Recommendation:** Minimal. `SystemTimeProvider.Now` is just `DateTime.Now`. Profile if concerned.
-
-5. **Thread safety** - Is `VirtualTimeProvider.Advance()` thread-safe?
-   - **Recommendation:** No, assumes single-threaded test execution. Document this clearly.
+### Step 10: Phase Out Old Code (Later)
+- [ ] Mark old `ITestableInput` with `[Obsolete]`
+- [ ] Mark old `InputTestHelpers.SimulateInputThread` with `[Obsolete]`
+- [ ] Mark old `InjectKeyDownEvent` methods with `[Obsolete]`
+- [ ] Schedule removal for next major version
 
 ## Success Criteria
 
-The redesign is successful if:
+The redesign is successful when:
 
-1. ? Unit tests are **simpler** - fewer steps, more readable
-2. ? Tests are **faster** - no real delays (60ms ? 0ms for escape sequences)
-3. ? Tests are **deterministic** - no race conditions, consistent timing
-4. ? Pipeline testing is still possible - can verify ANSI encoding when needed
-5. ? Integration tests are simpler - less synchronization complexity
-6. ? Migration is gradual - old and new APIs can coexist
-7. ? Documentation is clear - easy for new contributors to understand
-8. ? No breaking changes to production code - drivers still work the same
+1. ✅ **Tests are simpler** - Compare before/after line counts for 5 migrated tests (expect 40-60% reduction)
+2. ✅ **Tests are faster** - No more `Thread.Sleep(60)` for escape sequences (measure before/after test execution time)
+3. ✅ **Tests are deterministic** - Run same test 100 times, verify identical results every time
+4. ✅ **Pipeline testing works** - Verify ANSI encoding/decoding tests still pass in Pipeline mode
+5. ✅ **Code coverage maintained** - Verify coverage doesn't drop after migration
+6. ✅ **All tests pass** - Both old (unmigrated) and new (migrated) tests pass
+7. ✅ **Documentation complete** - New contributors can understand and use the system
+8. ✅ **No production code breakage** - Drivers work identically to before
 
-## Next Steps
+## Coding Standards Reminder
 
-1. **Prototype** - Implement `ITimeProvider` and `VirtualTimeProvider` in a branch
-2. **Validate** - Port 2-3 tests to new architecture, verify benefits
-3. **Review** - Get feedback from team on design decisions
-4. **Implement** - Follow migration path (Phase 1 ? Phase 4)
-5. **Document** - Update testing guides with new patterns
+⚠️ **CRITICAL**: All code MUST follow these Terminal.Gui standards (from CONTRIBUTING.md):
+
+### Never Use `var` (Except Built-in Types)
+```csharp
+// ✅ CORRECT
+VirtualTimeProvider time = new ();
+InputInjector injector = new (app, time);
+List<InputRecord> records = [];
+var count = 0;  // OK - int is built-in
+
+// ❌ WRONG
+var time = new VirtualTimeProvider();
+var injector = new InputInjector(app, time);
+var records = new List<InputRecord>();
+```
+
+### Always Use Target-Typed `new ()`
+```csharp
+// ✅ CORRECT
+VirtualTimeProvider time = new ();
+Mouse mouse = new () { Position = new (5, 5) };
+
+// ❌ WRONG
+VirtualTimeProvider time = new VirtualTimeProvider();
+Mouse mouse = new Mouse() { Position = new Point(5, 5) };
+```
+
+### Always Use Collection Initializers
+```csharp
+// ✅ CORRECT
+List<VirtualTimer> timers = [];
+InputEvent [] events = [
+    new KeyEvent (Key.A),
+    new KeyEvent (Key.B)
+];
+
+// ❌ WRONG
+List<VirtualTimer> timers = new List<VirtualTimer>();
+List<InputEvent> events = new ();
+events.Add(new KeyEvent(Key.A));
+events.Add(new KeyEvent(Key.B));
+```
+
+### Always Add XML Documentation
+```csharp
+/// <summary>
+/// Advances virtual time by the specified duration.
+/// </summary>
+/// <param name="duration">The time span to advance.</param>
+public void Advance (TimeSpan duration)
+{
+    // ...
+}
+```
+
+### Add "CoPilot" Comment to All AI-Generated Code
+```csharp
+[Fact]
+public void MyTest ()
+{
+    // CoPilot - Test virtual time advancement
+    VirtualTimeProvider time = new ();
+    time.Advance (TimeSpan.FromSeconds (1));
+    // ...
+}
+```
+
+## Key Files to Reference
+
+While implementing, refer to these existing files for context:
+
+| File | Purpose |
+|------|---------|
+| `CONTRIBUTING.md` | Coding standards, build instructions, test patterns |
+| `./docfx/docs/drivers.md` | Driver deep dive |
+| `./docfx/docs/mouse.md` | Mouse deep dive |
+| `./docfx/docs/mouse-behavior-specification.md ` | New Mouse behavior details |
+| `./docfx/docs/application.md` | Application deep dive |
+| `Terminal.Gui/Drivers/MouseButtonClickTracker.cs` | Example of component needing `ITimeProvider` |
+| `Terminal.Gui/Drivers/MouseInterpreter.cs` | Example of component using timestamps |
+| `Tests/UnitTests/InputTestHelpers.cs` | Current helpers to be replaced |
+| `Tests/UnitTestsParallelizable/Application/Mouse/ApplicationMouseTests.cs` | Example tests to migrate |
+| `docfx/docs/driver-input-injection.md` | Current architecture documentation |
+
+## Questions/Issues During Implementation
+
+If you encounter issues:
+
+1. **Can't find where to add `ITimeProvider` parameter** - Look for constructors that currently use `DateTime.Now` directly
+2. **Tests fail after migration** - Check that `VirtualTimeProvider` is being passed correctly through all components
+3. **ANSI encoding tests fail** - Verify `InputInjectionMode.Pipeline` is being used correctly
+4. **Code style violations** - Run ReSharper/Rider cleanup, verify `.editorconfig` rules
+5. **Coverage drops** - Add tests for new `VirtualTimeProvider` and `InputInjector` classes
+
+## Expected Outcomes
+
+After completing this implementation:
+
+- **~15 new files** created for time abstraction and input injection
+- **~10 existing files** updated to accept `ITimeProvider`
+- **~50 test files** migrated to use new API (can be done incrementally)
+- **~40-60% reduction** in test code verbosity
+- **~2-3x faster** test execution (no real delays)
+- **100% deterministic** timing-dependent tests
 
 ---
 
-**Document Status:** Draft specification for discussion  
+**Document Status:** Implementation-Ready Specification  
 **Last Updated:** 2025-01-14  
 **Authors:** @copilot  
-**Reviewers:** (pending)
+**For AI Agents:** This document contains everything needed to implement the redesign. Follow the checklist systematically, refer to coding standards religiously, and validate at each step.

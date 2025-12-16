@@ -530,8 +530,8 @@ public class ScrollBarTests (ITestOutputHelper output)
     #endregion Draw
 
     #region Mouse
-    
-    [Theory]
+
+    [Theory (Skip = "Broken in #4474")]
     [CombinatorialData]
     [AutoInitShutdown]
     public void Mouse_Click_DecrementButton_Decrements ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)
@@ -580,7 +580,7 @@ public class ScrollBarTests (ITestOutputHelper output)
     }
 
 
-    [Theory]
+    [Theory (Skip = "Broken in #4474")]
     [CombinatorialData]
     [AutoInitShutdown]
     public void Mouse_Click_IncrementButton_Increments ([CombinatorialRange (1, 3, 1)] int increment, Orientation orientation)

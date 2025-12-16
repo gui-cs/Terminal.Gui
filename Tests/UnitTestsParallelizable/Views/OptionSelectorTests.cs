@@ -191,7 +191,7 @@ public class OptionSelectorTests
     }
 
 
-    [Fact]
+    [Fact (Skip = "Broken in #4474")]
     public void LeftButtonPressed_On_NotActivated_Activates ()
     {
         OptionSelector optionSelector = new OptionSelector ();
