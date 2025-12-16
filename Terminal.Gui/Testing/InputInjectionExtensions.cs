@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
-using Terminal.Gui.Input;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Testing;
 
 /// <summary>
 /// Extension methods for input injection.

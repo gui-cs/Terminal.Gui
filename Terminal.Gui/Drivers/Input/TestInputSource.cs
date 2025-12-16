@@ -1,20 +1,17 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Test input source - provides pre-programmed input for testing.
+///     Test input source - provides pre-programmed input for testing.
 /// </summary>
 public class TestInputSource : IInputSource
 {
     private readonly Queue<InputEventRecord> _inputQueue = new ();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TestInputSource"/> class.
+    ///     Initializes a new instance of the <see cref="TestInputSource"/> class.
     /// </summary>
     /// <param name="timeProvider">The time provider for timestamps.</param>
-    public TestInputSource (ITimeProvider timeProvider)
-    {
-        TimeProvider = timeProvider;
-    }
+    public TestInputSource (ITimeProvider timeProvider) { TimeProvider = timeProvider; }
 
     /// <inheritdoc/>
     public ITimeProvider TimeProvider { get; }
@@ -32,13 +29,13 @@ public class TestInputSource : IInputSource
     }
 
     /// <summary>
-    /// Adds input to the queue. Called by InputInjector.
+    ///     Adds input to the queue. Called by InputInjector.
     /// </summary>
     /// <param name="record">The input record to enqueue.</param>
     public void Enqueue (InputEventRecord record)
     {
         // Set timestamp if not already set
-        if (record.Timestamp == default)
+        if (record.Timestamp == default (DateTime))
         {
             record = record with { Timestamp = TimeProvider.Now };
         }

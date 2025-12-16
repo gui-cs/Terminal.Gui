@@ -1,4 +1,4 @@
-using ITimer = Terminal.Gui.ITimer;
+using ITimer = Terminal.Gui.Time.ITimer;
 
 namespace TimeTests;
 

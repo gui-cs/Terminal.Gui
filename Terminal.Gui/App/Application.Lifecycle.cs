@@ -1,10 +1,4 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using Microsoft.VisualBasic;
-using Terminal.Gui.App;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.App;
 
@@ -30,8 +24,10 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     ///     Creates a new <see cref="IApplication"/> instance.
     /// </summary>
     /// <param name="timeProvider">
-    ///     Optional time provider for controlling time in tests. If <see langword="null"/>, defaults to <see cref="SystemTimeProvider"/>.
-    ///     For production use, omit this parameter or pass <see langword="null"/>. For testing, pass a <see cref="VirtualTimeProvider"/>.
+    ///     Optional time provider for controlling time in tests. If <see langword="null"/>, defaults to
+    ///     <see cref="SystemTimeProvider"/>.
+    ///     For production use, omit this parameter or pass <see langword="null"/>. For testing, pass a
+    ///     <see cref="VirtualTimeProvider"/>.
     /// </param>
     /// <remarks>
     ///     The recommended pattern is for developers to call <c>Application.Create()</c> and then use the returned
@@ -46,37 +42,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         //Debug.Fail ("Application.Create() called");
         ApplicationImpl.MarkInstanceBasedModelUsed ();
 
-        return new ApplicationImpl (timeProvider ?? new SystemTimeProvider (), testMode: false);
-    }
-
-    /// <summary>
-    ///     Creates a new <see cref="IApplication"/> instance configured for testing.
-    /// </summary>
-    /// <param name="timeProvider">
-    ///     Optional time provider for controlling time in tests. If <see langword="null"/>, defaults to a new <see cref="VirtualTimeProvider"/>.
-    /// </param>
-    /// <remarks>
-    ///     <para>
-    ///         This factory method creates an application instance with:
-    ///     </para>
-    ///     <list type="bullet">
-    ///         <item><description>Virtual time control (via <see cref="VirtualTimeProvider"/>)</description></item>
-    ///         <item><description>Test input source (<see cref="TestInputSource"/>) for programmatic input injection</description></item>
-    ///         <item><description>Deterministic behavior for reliable testing</description></item>
-    ///     </list>
-    ///     <para>
-    ///         Use this method instead of <see cref="Create(ITimeProvider?)"/> when writing tests that need to control time or inject input.
-    ///     </para>
-    /// </remarks>
-    /// <returns>A new <see cref="IApplication"/> instance configured for testing.</returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown if the legacy static Application model has already been used in this process.
-    /// </exception>
-    public static IApplication CreateForTesting (ITimeProvider? timeProvider = null)
-    {
-        ApplicationImpl.MarkInstanceBasedModelUsed ();
-
-        return new ApplicationImpl (timeProvider ?? new VirtualTimeProvider (), testMode: true);
+        return new ApplicationImpl (timeProvider ?? new SystemTimeProvider (), false);
     }
 
     /// <inheritdoc cref="IApplication.Init"/>
@@ -101,7 +67,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static void Shutdown () => ApplicationImpl.Instance.Dispose ();
+    public static void Shutdown () { ApplicationImpl.Instance.Dispose (); }
 
     /// <inheritdoc cref="IApplication.Initialized"/>
     [Obsolete ("The legacy static Application object is going away.")]

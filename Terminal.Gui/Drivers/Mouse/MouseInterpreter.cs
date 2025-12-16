@@ -3,7 +3,8 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     INTERNAL: Processes raw mouse events from drivers and generates synthetic click events (single, double, triple clicks)
+///     INTERNAL: Processes raw mouse events from drivers and generates synthetic click events (single, double, triple
+///     clicks)
 ///     based on button state tracking and timing analysis.
 /// </summary>
 /// <remarks>
@@ -16,9 +17,15 @@ namespace Terminal.Gui.Drivers;
 ///         For each incoming <see cref="Mouse"/>, the interpreter:
 ///     </para>
 ///     <list type="number">
-///         <item><description>Yields the original event unchanged (for low-level handling)</description></item>
-///         <item><description>Updates the state of all four button trackers</description></item>
-///         <item><description>Immediately emits click events (single, double, triple) when detected</description></item>
+///         <item>
+///             <description>Yields the original event unchanged (for low-level handling)</description>
+///         </item>
+///         <item>
+///             <description>Updates the state of all four button trackers</description>
+///         </item>
+///         <item>
+///             <description>Immediately emits click events (single, double, triple) when detected</description>
+///         </item>
 ///     </list>
 ///     <para>
 ///         Click detection follows standard UI conventions: clicks are counted on button **release**, not press,
@@ -39,7 +46,8 @@ internal class MouseInterpreter
     ///     Initializes a new instance of the <see cref="MouseInterpreter"/> class.
     /// </summary>
     /// <param name="timeProvider">
-    ///     Optional time provider for getting the current time. If <see langword="null"/>, defaults to <see cref="SystemTimeProvider"/>.
+    ///     Optional time provider for getting the current time. If <see langword="null"/>, defaults to
+    ///     <see cref="SystemTimeProvider"/>.
     ///     Useful for unit tests to inject controlled time values via <see cref="VirtualTimeProvider"/>.
     /// </param>
     /// <param name="doubleClickThreshold">
@@ -105,8 +113,15 @@ internal class MouseInterpreter
     /// <returns>
     ///     An enumerable sequence of <see cref="Mouse"/>:
     ///     <list type="bullet">
-    ///         <item><description>The original input event (always yielded first)</description></item>
-    ///         <item><description>Synthesized click events (LeftButtonClicked, LeftButtonDoubleClicked, etc.) immediately when button released</description></item>
+    ///         <item>
+    ///             <description>The original input event (always yielded first)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 Synthesized click events (LeftButtonClicked, LeftButtonDoubleClicked, etc.) immediately when
+    ///                 button released
+    ///             </description>
+    ///         </item>
     ///     </list>
     /// </returns>
     /// <remarks>
@@ -138,7 +153,7 @@ internal class MouseInterpreter
         yield return mouse;
 
         // For each mouse button
-        for (int i = 0; i < 4; i++)
+        for (var i = 0; i < 4; i++)
         {
             _mouseButtonClickTracker [i].UpdateState (mouse, out int? numClicks);
 
@@ -175,7 +190,10 @@ internal class MouseInterpreter
     /// <summary>
     ///     Creates a synthetic click event based on button index and click count.
     /// </summary>
-    /// <param name="button">The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right, 3=Button4).</param>
+    /// <param name="button">
+    ///     The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right,
+    ///     3=Button4).
+    /// </param>
     /// <param name="numberOfClicks">The number of consecutive clicks detected (1=single, 2=double, 3+=triple).</param>
     /// <param name="mouseEventArgs">The original mouse event to copy screen position and view information from.</param>
     /// <returns>
@@ -195,7 +213,8 @@ internal class MouseInterpreter
             Timestamp = mouseEventArgs.Timestamp ?? TimeProvider.Now,
             Handled = false,
             Flags = ToClicks (button, numberOfClicks),
-            ScreenPosition = mouseEventArgs.ScreenPosition,
+            ScreenPosition = mouseEventArgs.ScreenPosition
+
             // View is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
             // Position is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
         };
@@ -207,13 +226,22 @@ internal class MouseInterpreter
     /// <summary>
     ///     Converts a button index and click count into the appropriate <see cref="MouseFlags"/> click flag.
     /// </summary>
-    /// <param name="buttonIdx">The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right, 3=Button4).</param>
+    /// <param name="buttonIdx">
+    ///     The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right,
+    ///     3=Button4).
+    /// </param>
     /// <param name="numberOfClicks">
     ///     The number of consecutive clicks detected:
     ///     <list type="bullet">
-    ///         <item><description>1 - Single click (Button*Clicked)</description></item>
-    ///         <item><description>2 - Double click (Button*DoubleClicked)</description></item>
-    ///         <item><description>3+ - Triple click (Button*TripleClicked)</description></item>
+    ///         <item>
+    ///             <description>1 - Single click (Button*Clicked)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>2 - Double click (Button*DoubleClicked)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>3+ - Triple click (Button*TripleClicked)</description>
+    ///         </item>
     ///     </list>
     /// </param>
     /// <returns>The corresponding <see cref="MouseFlags"/> value for the button and click count.</returns>
@@ -239,7 +267,10 @@ internal class MouseInterpreter
     ///         </item>
     ///         <item>
     ///             <term>1</term>
-    ///             <description>MiddleButton (Middle) → MiddleButtonClicked, MiddleButtonDoubleClicked, MiddleButtonTripleClicked</description>
+    ///             <description>
+    ///                 MiddleButton (Middle) → MiddleButtonClicked, MiddleButtonDoubleClicked,
+    ///                 MiddleButtonTripleClicked
+    ///             </description>
     ///         </item>
     ///         <item>
     ///             <term>2</term>

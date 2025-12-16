@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -30,27 +28,21 @@ internal partial class ApplicationImpl : IApplication
     ///     INTERNAL: Creates a new instance of the Application backend for legacy static model.
     ///     Uses SystemTimeProvider and production mode by default.
     /// </summary>
-    internal ApplicationImpl () : this (new SystemTimeProvider (), testMode: false) { }
+    internal ApplicationImpl () : this (new SystemTimeProvider (), false) { }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
     /// </summary>
     /// <param name="componentFactory"></param>
-    internal ApplicationImpl (IComponentFactory componentFactory) : this ()
-    {
-        _componentFactory = componentFactory;
-    }
+    internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
 
-    /// <summary>
-    ///     Gets the time provider used by this application instance.
-    /// </summary>
-    /// <returns>The <see cref="ITimeProvider"/> used for timing and timestamps.</returns>
-    public ITimeProvider GetTimeProvider () => _timeProvider;
+    /// <inheritdoc/>
+    public ITimeProvider GetTimeProvider () { return _timeProvider; }
 
     private string? _driverName;
 
     /// <inheritdoc/>
-    public new string ToString () => Driver?.ToString () ?? string.Empty;
+    public new string ToString () { return Driver?.ToString () ?? string.Empty; }
 
     #region Singleton - Legacy Static Support
 

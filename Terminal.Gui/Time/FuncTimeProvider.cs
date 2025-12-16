@@ -1,21 +1,18 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Time;
 
 /// <summary>
-/// Test helper that wraps a Func&lt;DateTime&gt; into an ITimeProvider for backward compatibility.
-/// Used in tests that need to control time via a lambda expression.
+///     Test helper that wraps a Func&lt;DateTime&gt; into an ITimeProvider for backward compatibility.
+///     Used in tests that need to control time via a lambda expression.
 /// </summary>
 internal class FuncTimeProvider : ITimeProvider
 {
     private readonly Func<DateTime> _timeFunc;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FuncTimeProvider"/> class.
+    ///     Initializes a new instance of the <see cref="FuncTimeProvider"/> class.
     /// </summary>
     /// <param name="timeFunc">Function that returns the current time.</param>
-    public FuncTimeProvider (Func<DateTime> timeFunc)
-    {
-        _timeFunc = timeFunc;
-    }
+    public FuncTimeProvider (Func<DateTime> timeFunc) { _timeFunc = timeFunc; }
 
     /// <inheritdoc/>
     public DateTime Now => _timeFunc ();

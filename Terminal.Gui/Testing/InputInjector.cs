@@ -1,7 +1,7 @@
 using Terminal.Gui.Drivers;
 using Terminal.Gui.Input;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Testing;
 
 /// <summary>
 /// Implementation of IInputInjector for testing.

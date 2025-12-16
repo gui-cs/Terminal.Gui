@@ -389,7 +389,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         p.ProcessInput (StringToBatch ("\u001b[<0;10;10m")); // Should match and increment `m`
 
         // Prepare expected result: 
-        List<Tuple<char, int>> expected = new()
+        List<Tuple<char, int>> expected = new ()
         {
             Tuple.Create ('\u001b', 0), // Escape character
             Tuple.Create ('[', 1),
@@ -457,7 +457,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
                         "Just test");
 
         // Expected unknown responses (ANSI sequences that are unknown)
-        List<string> expectedUnknownResponses = new()
+        List<string> expectedUnknownResponses = new ()
         {
             "\u001b[<0;0;0M",
             "\u001b[3c",
@@ -482,11 +482,13 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // ANSI escape sequence for mouse up (using a generic format example)
         const string MOUSE_UP = "\u001B[<0;25;50m";
 
-        var parser = new AnsiResponseParser (new SystemTimeProvider ());
+        AnsiResponseParser parser = new (new SystemTimeProvider ())
+        {
+            HandleMouse = true
+        };
 
-        parser.HandleMouse = true;
         string? foundDar = null;
-        List<Terminal.Gui.Input.Mouse> mouseEventArgs = new ();
+        List<Mouse> mouseEventArgs = new ();
 
         parser.Mouse += (s, e) => mouseEventArgs.Add (e);
         parser.ExpectResponse ("c", dar => foundDar = dar, null, false);

@@ -1,7 +1,7 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Time;
 
 /// <summary>
-/// Real time provider using DateTime.Now and Task.Delay for production use.
+///     Real time provider using DateTime.Now and Task.Delay for production use.
 /// </summary>
 public class SystemTimeProvider : ITimeProvider
 {
@@ -9,29 +9,23 @@ public class SystemTimeProvider : ITimeProvider
     public DateTime Now => DateTime.Now;
 
     /// <inheritdoc/>
-    public Task Delay (TimeSpan duration, CancellationToken cancellationToken = default)
-    {
-        return Task.Delay (duration, cancellationToken);
-    }
+    public Task Delay (TimeSpan duration, CancellationToken cancellationToken = default) { return Task.Delay (duration, cancellationToken); }
 
     /// <inheritdoc/>
-    public ITimer CreateTimer (TimeSpan interval, Action callback)
-    {
-        return new SystemTimer (interval, callback);
-    }
+    public ITimer CreateTimer (TimeSpan interval, Action callback) { return new SystemTimer (interval, callback); }
 }
 
 /// <summary>
-/// System timer implementation using System.Threading.Timer.
+///     System timer implementation using System.Threading.Timer.
 /// </summary>
 internal class SystemTimer : ITimer
 {
     private readonly Action _callback;
     private readonly TimeSpan _interval;
-    private System.Threading.Timer? _timer;
+    private Timer? _timer;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SystemTimer"/> class.
+    ///     Initializes a new instance of the <see cref="SystemTimer"/> class.
     /// </summary>
     /// <param name="interval">The interval between timer callbacks.</param>
     /// <param name="callback">The action to invoke when the timer fires.</param>
@@ -52,7 +46,7 @@ internal class SystemTimer : ITimer
             return;
         }
 
-        _timer = new System.Threading.Timer (_ => _callback (), null, _interval, _interval);
+        _timer = new (_ => _callback (), null, _interval, _interval);
         IsRunning = true;
     }
 
@@ -70,8 +64,5 @@ internal class SystemTimer : ITimer
     }
 
     /// <inheritdoc/>
-    public void Dispose ()
-    {
-        Stop ();
-    }
+    public void Dispose () { Stop (); }
 }

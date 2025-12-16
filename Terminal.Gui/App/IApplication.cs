@@ -424,7 +424,7 @@ public interface IApplication : IDisposable
     ///     }
     ///     </code>
     /// </example>
-    T? GetResult<T> () where T : class => GetResult () as T;
+    T? GetResult<T> () where T : class { return GetResult () as T; }
 
     #endregion Result Management
 
@@ -459,7 +459,8 @@ public interface IApplication : IDisposable
     ///         For testing, this can be a <see cref="VirtualTimeProvider"/> that allows explicit control of time.
     ///     </para>
     ///     <para>
-    ///         Use <see cref="Application.CreateForTesting"/> to create an application with a <see cref="VirtualTimeProvider"/>.
+    ///         Use <see cref="Application.Create"/> with <see cref="VirtualTimeProvider"/> to create an application with a
+    ///         virtual time provider for testing.
     ///     </para>
     /// </remarks>
     /// <returns>The <see cref="ITimeProvider"/> used for timing and timestamps.</returns>

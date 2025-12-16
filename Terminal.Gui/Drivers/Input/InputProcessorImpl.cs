@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
@@ -65,6 +64,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
         // Enable keyboard handling
         Parser.HandleKeyboard = true;
+
         Parser.Keyboard += (_, keyEvent) =>
                            {
                                RaiseKeyDownEvent (keyEvent);
@@ -86,10 +86,10 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     #region Core Processing
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public IAnsiResponseParser GetParser () { return Parser; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void ProcessQueue ()
     {
         while (InputQueue.TryDequeue (out TInputRecord input))
@@ -164,7 +164,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     private char _highSurrogate = '\0';
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool IsValidInput (Key key, out Key result)
     {
         result = key;
@@ -227,16 +227,13 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// </summary>
     public IKeyConverter<TInputRecord> KeyConverter { get; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<Key>? KeyDown;
 
-    /// <inheritdoc />
-    public void RaiseKeyDownEvent (Key a)
-    {
-        KeyDown?.Invoke (this, a);
-    }
+    /// <inheritdoc/>
+    public void RaiseKeyDownEvent (Key a) { KeyDown?.Invoke (this, a); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public virtual void InjectKeyDownEvent (Key key)
     {
         // Convert Key → TInputRecord
@@ -250,13 +247,13 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<Key>? KeyUp;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void RaiseKeyUpEvent (Key a) { KeyUp?.Invoke (this, a); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void InjectKeyUpEvent (Key key)
     {
         // TODO: Determine if we can still support this on Windows
@@ -267,10 +264,10 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     #region Mouse Events
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<Mouse>? MouseEventParsed;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void RaiseMouseEventParsed (Mouse mouse)
     {
         //Logging.Trace ($"{mouse}");
@@ -278,10 +275,10 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         RaiseSyntheticMouseEvent (mouse);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<Mouse>? SyntheticMouseEvent;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void RaiseSyntheticMouseEvent (Mouse mouse)
     {
         // Process through MouseInterpreter to generate clicks
@@ -295,21 +292,21 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public virtual void InjectMouseEvent (IApplication? app, Mouse mouse) { mouse.Timestamp ??= DateTime.Now; }
 
     #endregion
 
     #region ANSI Sequence Handling
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<string>? AnsiSequenceSwallowed;
 
     #endregion
 
     #region Disposal
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Dispose () { ExternalCancellationTokenSource?.Dispose (); }
 
     #endregion
