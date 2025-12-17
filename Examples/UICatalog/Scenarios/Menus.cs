@@ -347,6 +347,8 @@ public class Menus : Scenario
             };
 
             ContextMenu.EnableForDesign (ref host);
+            Application.Popover.Register (ContextMenu);
+
             ContextMenu.Visible = false;
 
             // Demo of PopoverMenu as a context menu
