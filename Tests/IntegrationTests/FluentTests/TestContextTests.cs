@@ -1,37 +1,36 @@
 ﻿using System.Drawing;
-using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.GuiTestContextTests;
+namespace IntegrationTests;
 
 /// <summary>
-///     Basic tests for GuiTestContext functionality including constructor, lifecycle, and resize operations.
+///     Basic tests for TestContext functionality including constructor, lifecycle, and resize operations.
 /// </summary>
-public class GuiTestContextTests (ITestOutputHelper outputHelper)
+public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
     private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Constructor_Sets_Application_Screen (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Constructor_Sets_Application_Screen (string d)
     {
-        using var context = new GuiTestContext (d, _out, TimeSpan.FromSeconds (10));
+        using var context = new TestContext (d,  _out, TimeSpan.FromSeconds (10));
 
         Assert.NotEqual (Rectangle.Empty, context.App?.Screen);
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ResizeConsole_Resizes (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void ResizeConsole_Resizes (string d)
     {
         var lbl = new Label
         {
             Width = Dim.Fill ()
         };
 
-        using GuiTestContext c = With.A<Window> (40, 10, d)
+        using TestContext c = With.A<Window> (40, 10, d)
                                      .Add (lbl)
                                      .AssertEqual (38, lbl.Frame.Width) // Window has 2 border
                                      .ResizeConsole (20, 20)
@@ -40,19 +39,19 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void With_New_A_Runs (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void With_New_A_Runs (string d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
+        using TestContext context = With.A<Window> (40, 10, d,  _out);
         Assert.True (context.App!.TopRunnable!.IsRunning);
         Assert.NotEqual (Rectangle.Empty, context.App!.Screen);
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void AnsiScreenShot_Renders_Ansi_Stream (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void AnsiScreenShot_Renders_Ansi_Stream (string d)
     {
-        using GuiTestContext context = With.A<Window> (10, 3, d, _out)
+        using TestContext context = With.A<Window> (10, 3, d,  _out)
                                            .Then (app =>
                                                   {
                                                       app.TopRunnableView!.BorderStyle = LineStyle.None;
@@ -65,21 +64,21 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void With_Starts_Stops_Without_Error (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void With_Starts_Stops_Without_Error (string d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
+        using TestContext context = With.A<Window> (40, 10, d,  _out);
 
         // No actual assertions are needed — if no exceptions are thrown, it's working
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void With_Without_Stop_Still_Cleans_Up (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void With_Without_Stop_Still_Cleans_Up (string d)
     {
-        GuiTestContext? context;
+        TestContext? context;
 
-        using (context = With.A<Window> (40, 10, d, _out))
+        using (context = With.A<Window> (40, 10, d,  _out))
         {
             Assert.False (context.Finished);
         }

@@ -1,19 +1,16 @@
-﻿using IntegrationTests.FluentTests;
-using TerminalGuiFluentTesting;
+﻿using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.TreeViewTests;
+namespace IntegrationTests;
 
-public class TreeViewFluentTests
+public class TreeViewTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
-    private readonly TextWriter _out;
-
-    public TreeViewFluentTests (ITestOutputHelper outputHelper) { _out = new TestOutputWriter (outputHelper); }
+    private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void TreeView_AllowReOrdering (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void TreeView_AllowReOrdering (string d)
     {
         var tv = new TreeView
         {
@@ -36,8 +33,8 @@ public class TreeViewFluentTests
         };
         tv.AddObject (root);
 
-        using GuiTestContext context =
-            With.A<Window> (40, 10, d, _out)
+        using TestContext context =
+            With.A<Window> (40, 10, d,  _out)
                 .Add (tv)
                 .Focus (tv)
                 .WaitIteration ()
@@ -75,8 +72,8 @@ public class TreeViewFluentTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void TreeViewReOrder_PreservesExpansion (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void TreeViewReOrder_PreservesExpansion (string d)
     {
         var tv = new TreeView
         {
@@ -129,7 +126,7 @@ public class TreeViewFluentTests
         tv.AddObject (root);
         tv.ExpandAll ();
 
-        using GuiTestContext context =
+        using TestContext context =
             With.A<Window> (40, 13, d)
                 .Add (tv)
                 .WaitIteration ()

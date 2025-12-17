@@ -7,6 +7,14 @@ namespace UnitTests;
 public abstract class TestDriverBase
 {
     /// <summary>
+    ///     Gets all registered driver names for use in Theory tests.
+    /// </summary>
+    public static IEnumerable<object []> GetAllDriverNames ()
+    {
+        return DriverRegistry.GetDriverNames ().Select (name => new object [] { name });
+    }
+
+    /// <summary>
     ///     Creates a new ANSI driver instance with the specified buffer size.
     ///     This is a convenience method for tests that need to use Draw() and DriverAssert
     ///     without relying on Application.Driver.

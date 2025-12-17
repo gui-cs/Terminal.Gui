@@ -1,21 +1,20 @@
 ﻿using System.Drawing;
-using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.TextFieldTests;
+namespace IntegrationTests;
 
-public class TextFieldFluentTests (ITestOutputHelper outputHelper)
+public class TextFieldTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
     private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void TextField_Cursor_AtEnd_WhenTyping (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void TextField_Cursor_AtEnd_WhenTyping (string d)
     {
         // Simulates typing abcd into a TextField with width 3 (wide enough to render 2 characters only)
-        using GuiTestContext c = With.A<Window> (100, 20, d, _out)
+        using TestContext c = With.A<Window> (100, 20, d,  _out)
                                      .Add (new TextField { Width = 3 })
                                      .Focus<TextField> ()
                                      .WaitIteration ()

@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Time;
-using Terminal.Gui.Testing;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -13,7 +12,7 @@ namespace TerminalGuiFluentTesting;
 ///     Fluent API context for testing a Terminal.Gui application. Create
 ///     an instance using <see cref="With"/> static class.
 /// </summary>
-public partial class GuiTestContext : IDisposable
+public partial class TestContext : IDisposable
 {
 
     // ===== Threading & Synchronization =====
@@ -33,7 +32,7 @@ public partial class GuiTestContext : IDisposable
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
-    private readonly ITimeProvider _timeProvider = new VirtualTimeProvider();
+    private readonly ITimeProvider _timeProvider = new VirtualTimeProvider ();
 
     /// <summary>
     ///     The IApplication instance that was created.
@@ -46,7 +45,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     public ITimeProvider TimeProvider => _timeProvider;
 
-    private TestDriver _driverType;
+    private string _driverName;
 
     // ===== Application State Preservation (for restoration) =====
     private ILogger? _originalLogger;
@@ -65,19 +64,20 @@ public partial class GuiTestContext : IDisposable
     ///     Constructor for tests that only need Application.Init without running the main loop.
     ///     Uses the driver's default screen size instead of forcing a specific size.
     /// </summary>
-    public GuiTestContext (TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    public TestContext (string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
+        _driverName = driverName;
         _logWriter = logWriter;
         _runApplication = false;
         _booting = new (0, 1);
         _timeoutCts = new CancellationTokenSource (timeout ?? TimeSpan.FromSeconds (10)); // NEW
 
         // Don't force a size - let the driver determine it
-        CommonInit (0, 0, driver, timeout);
+        CommonInit (0, 0, timeout);
 
         try
         {
-            App?.Init (GetDriverName ());
+            App?.Init (driverName);
             _booting.Release ();
 
             // After Init, Application.Screen should be set by the driver
@@ -114,13 +114,14 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     Constructor for tests that need to run the application with Application.Run.
     /// </summary>
-    internal GuiTestContext (Func<IRunnable> runnableBuilder, int width, int height, TestDriver driver, TextWriter? logWriter = null, TimeSpan? timeout = null)
+    internal TestContext (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
+        _driverName = driverName;
         _logWriter = logWriter;
         _runApplication = true;
         _booting = new (0, 1);
 
-        CommonInit (width, height, driver, timeout);
+        CommonInit (width, height, timeout);
 
         // Start the application in a background thread
         _runTask = Task.Run (
@@ -130,11 +131,11 @@ public partial class GuiTestContext : IDisposable
                                  {
                                      try
                                      {
-                                         App?.Init (GetDriverName ());
+                                         App?.Init (driverName);
                                      }
                                      catch (Exception e)
                                      {
-                                         Logging.Error(e.Message);
+                                         Logging.Error (e.Message);
                                          _runCancellationTokenSource.Cancel ();
                                      }
                                      finally
@@ -201,12 +202,11 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     Common initialization for both constructors.
     /// </summary>
-    private void CommonInit (int width, int height, TestDriver driverType, TimeSpan? timeout)
+    private void CommonInit (int width, int height, TimeSpan? timeout)
     {
         _timeout = timeout ?? TimeSpan.FromSeconds (30);
         _originalLogger = Logging.Logger;
         _logsSb = new ();
-        _driverType = driverType;
 
         ILogger logger = LoggerFactory.Create (builder =>
                                                    builder.SetMinimumLevel (LogLevel.Trace)
@@ -242,29 +242,29 @@ public partial class GuiTestContext : IDisposable
         // Only set size if explicitly provided (width and height > 0)
         if (width > 0 && height > 0)
         {
-           _output.SetSize (width, height);
+            _output.SetSize (width, height);
         }
 
         // TODO: As each drivers' IInput/IOutput implementations are made testable (e.g. 
         // TODO: safely injectable/mocked), we can expand this switch to use them.
-        switch (driverType)
+        switch (_driverName)
         {
-            case TestDriver.DotNet:
+            case DriverRegistry.Names.DOTNET:
                 _sizeMonitor = new (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
-            case TestDriver.Windows:
+            case DriverRegistry.Names.WINDOWS:
                 _sizeMonitor = new (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
-            case TestDriver.Unix:
+            case DriverRegistry.Names.UNIX:
                 _sizeMonitor = new (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
                 break;
-            case TestDriver.ANSI:
+            case DriverRegistry.Names.ANSI:
                 _sizeMonitor = new (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
 
@@ -272,20 +272,7 @@ public partial class GuiTestContext : IDisposable
         }
 
         _applicationImpl = new (cf!, _timeProvider, testMode: true);
-        Logging.Trace ($"Driver: {GetDriverName ()}. Timeout: {_timeout}");
-    }
-
-    private string GetDriverName ()
-    {
-        return _driverType switch
-        {
-            TestDriver.Windows => DriverRegistry.Names.WINDOWS,
-            TestDriver.DotNet => DriverRegistry.Names.DOTNET,
-            TestDriver.Unix => DriverRegistry.Names.UNIX,
-            TestDriver.ANSI => DriverRegistry.Names.ANSI,
-            _ =>
-                throw new ArgumentOutOfRangeException ()
-        };
+        Logging.Trace ($"Driver: {_driverName}. Timeout: {_timeout}");
     }
 
     /// <summary>
@@ -304,7 +291,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="doAction"></param>
     /// <returns></returns>
-    public GuiTestContext Then (Action<IApplication> doAction)
+    public TestContext Then (Action<IApplication> doAction)
     {
         try
         {
@@ -328,7 +315,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="action"></param>
     /// <returns></returns>
-    public GuiTestContext WaitIteration (Action<IApplication>? action = null)
+    public TestContext WaitIteration (Action<IApplication>? action = null)
     {
         // If application has already exited don't wait!
         if (Finished || _runCancellationTokenSource.Token.IsCancellationRequested || _ansiInput.ExternalCancellationTokenSource!.Token.IsCancellationRequested)
@@ -380,9 +367,9 @@ public partial class GuiTestContext : IDisposable
         return this;
     }
 
-    public GuiTestContext WaitUntil (Func<bool> condition)
+    public TestContext WaitUntil (Func<bool> condition)
     {
-        GuiTestContext? c = null;
+        TestContext? c = null;
         var sw = Stopwatch.StartNew ();
 
         Logging.Trace ($"WaitUntil started with timeout {_timeout}");
@@ -416,12 +403,12 @@ public partial class GuiTestContext : IDisposable
     /// <param name="width">new Width for the console.</param>
     /// <param name="height">new Height for the console.</param>
     /// <returns></returns>
-    public GuiTestContext ResizeConsole (int width, int height)
+    public TestContext ResizeConsole (int width, int height)
     {
         return WaitIteration ((app) => { app.Driver!.SetScreenSize (width, height); });
     }
 
-    public GuiTestContext ScreenShot (string title, TextWriter? writer)
+    public TestContext ScreenShot (string title, TextWriter? writer)
     {
         //Logging.Trace ($"{title}");
         return WaitIteration ((app) =>
@@ -433,7 +420,7 @@ public partial class GuiTestContext : IDisposable
                               });
     }
 
-    public GuiTestContext AnsiScreenShot (string title, TextWriter? writer)
+    public TestContext AnsiScreenShot (string title, TextWriter? writer)
     {
         //Logging.Trace ($"{title}");
         return WaitIteration ((app) =>
@@ -448,9 +435,9 @@ public partial class GuiTestContext : IDisposable
     /// <summary>
     ///     Stops the application and waits for the background thread to exit.
     /// </summary>
-    public GuiTestContext Stop ()
+    public TestContext Stop ()
     {
-        Logging.Trace ($"Stopping application for driver: {GetDriverName ()}");
+        Logging.Trace ($"Stopping application for driver: {_driverName}");
 
         if (_runTask is null || _runTask.IsCompleted)
         {
@@ -536,7 +523,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     /// <param name="writer"></param>
     /// <returns></returns>
-    public GuiTestContext WriteOutLogs (TextWriter? writer)
+    public TestContext WriteOutLogs (TextWriter? writer)
     {
         if (writer is null)
         {
@@ -577,7 +564,7 @@ public partial class GuiTestContext : IDisposable
     /// </summary>
     public void Dispose ()
     {
-        Logging.Trace ($"Disposing GuiTestContext");
+        Logging.Trace ($"Disposing TestContext");
         Stop ();
 
         bool shouldThrow = false;

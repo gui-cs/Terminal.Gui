@@ -1,16 +1,15 @@
 using System.Globalization;
 using System.Reflection;
-using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.MenuBarTests;
+namespace IntegrationTests;
 
 /// <summary>
 ///     Tests for the MenuBar class
 /// </summary>
-public class MenuBarTests
+public class MenuBarTests : TestsAllDrivers
 {
     private readonly TextWriter _out;
 
@@ -21,10 +20,10 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Initializes_WithNoItems (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Initializes_WithNoItems (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
+        using TestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 // Create a menu bar with no items
@@ -37,12 +36,12 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Initializes_WithItems (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Initializes_WithItems (string d)
     {
         MenuBarItem [] menuItems = [];
 
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
+        using TestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 // Create items for the menu bar
@@ -76,10 +75,10 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void AddsItems_WithMenusProperty (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void AddsItems_WithMenusProperty (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
+        using TestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -97,10 +96,10 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ChangesKey_RaisesEvent (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void ChangesKey_RaisesEvent (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
+        using TestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((_) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -134,13 +133,13 @@ public class MenuBarTests
 
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void DefaultKey_Activates (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void DefaultKey_Activates (string d)
     {
         MenuBar? menuBar = null;
         View? top = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((app) =>
                                             {
                                                 menuBar = new MenuBar ();
@@ -169,12 +168,12 @@ public class MenuBarTests
 
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void DefaultKey_DeActivates (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void DefaultKey_DeActivates (string d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -203,11 +202,11 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ShowHidePopovers (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void ShowHidePopovers (string d)
     {
         IApplication? app = null;
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
+        using TestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -260,10 +259,10 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void EnableForDesign_CreatesMenuItems (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void EnableForDesign_CreatesMenuItems (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
+        using TestContext c = With.A<Window> (80, 25, d, _out)
                                      .Then ((app) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -292,13 +291,13 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Navigation_Left_Right_Wraps (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Navigation_Left_Right_Wraps (string d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -332,13 +331,13 @@ public class MenuBarTests
 
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Restores_Focus_Correctly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Restores_Focus_Correctly (string d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -369,13 +368,13 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Restores_Focus_Correctly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Restores_Focus_Correctly (string d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Add (
                                            new View ()
                                            {
@@ -407,13 +406,13 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (string d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -443,13 +442,13 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Does_Not_Quit_MenuBar_SuperView (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MenuBarItem_Without_QuitKey_Open_QuitKey_Does_Not_Quit_MenuBar_SuperView (string d)
     {
         MenuBar? menuBar = null;
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -485,8 +484,8 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MenuBar_Not_Active_DoesNotEat_Space (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MenuBar_Not_Active_DoesNotEat_Space (string d)
     {
         int spaceKeyDownCount = 0;
         View testView = new View ()
@@ -503,7 +502,7 @@ public class MenuBarTests
                                 }
                             };
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBar ();
@@ -519,8 +518,8 @@ public class MenuBarTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MenuBar_Not_Active_DoesNotEat_Enter (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MenuBar_Not_Active_DoesNotEat_Enter (string d)
     {
         int enterKeyDownCount = 0;
         View testView = new View ()
@@ -537,7 +536,7 @@ public class MenuBarTests
                                 }
                             };
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d, _out)
                                      .Then ((a) =>
                                             {
                                                 var menuBar = new MenuBar ();

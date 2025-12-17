@@ -6,7 +6,7 @@ using Terminal.Gui.Time;
 
 namespace TerminalGuiFluentTesting;
 
-public partial class GuiTestContext
+public partial class TestContext
 {
     /// <summary>
     ///     Simulates a right click at the given screen coordinates on the current driver.
@@ -16,7 +16,7 @@ public partial class GuiTestContext
     /// <param name="screenX">0 indexed screen coordinates</param>
     /// <param name="screenY">0 indexed screen coordinates</param>
     /// <returns></returns>
-    public GuiTestContext RightClick (int screenX, int screenY)
+    public TestContext RightClick (int screenX, int screenY)
     {
         InjectMouseEvent (new ()
         {
@@ -41,7 +41,7 @@ public partial class GuiTestContext
     /// <param name="screenX">0 indexed screen coordinates</param>
     /// <param name="screenY">0 indexed screen coordinates</param>
     /// <returns></returns>
-    public GuiTestContext LeftClick (int screenX, int screenY)
+    public TestContext LeftClick (int screenX, int screenY)
     {
         InjectMouseEvent (new ()
         {
@@ -65,7 +65,7 @@ public partial class GuiTestContext
     /// <typeparam name="TView"></typeparam>
     /// <param name="evaluator"></param>
     /// <returns></returns>
-    public GuiTestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
+    public TestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
     {
         return InjectMouseEvent (new ()
         {
@@ -79,8 +79,8 @@ public partial class GuiTestContext
     /// </summary>
     /// <param name="mouse">The mouse event to inject.</param>
     /// <param name="advanceTimeAfter">Whether to advance time after this event to space clicks apart (prevents multi-click detection).</param>
-    /// <returns>This GuiTestContext for fluent chaining.</returns>
-    private GuiTestContext InjectMouseEvent (Mouse mouse, bool advanceTimeAfter = false)
+    /// <returns>This TestContext for fluent chaining.</returns>
+    private TestContext InjectMouseEvent (Mouse mouse, bool advanceTimeAfter = false)
     {
         // Use the new injection infrastructure
         WaitIteration ((app) =>
@@ -120,12 +120,12 @@ public partial class GuiTestContext
     /// </summary>
     /// <param name="mouse">The mouse event to inject.</param>
     /// <param name="evaluator">Function to find the target view.</param>
-    /// <returns>This GuiTestContext for fluent chaining.</returns>
-    private GuiTestContext InjectMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
+    /// <returns>This TestContext for fluent chaining.</returns>
+    private TestContext InjectMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
 
-        GuiTestContext ctx = WaitIteration ((_) =>
+        TestContext ctx = WaitIteration ((_) =>
                                             {
                                                 TView v = Find (evaluator);
                                                 screen = v.ViewportToScreen (new Point (0, 0));
@@ -143,8 +143,8 @@ public partial class GuiTestContext
     ///     Uses the new simplified injection API with virtual time support.
     /// </summary>
     /// <param name="key">The key to inject.</param>
-    /// <returns>This GuiTestContext for fluent chaining.</returns>
-    public GuiTestContext KeyDown (Key key)
+    /// <returns>This TestContext for fluent chaining.</returns>
+    public TestContext KeyDown (Key key)
     {
         //Logging.Trace ($"Injecting key: {key}");
 

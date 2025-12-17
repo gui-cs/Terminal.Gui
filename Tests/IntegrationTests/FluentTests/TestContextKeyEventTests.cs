@@ -1,22 +1,21 @@
-using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.GuiTestContextTests;
+namespace IntegrationTests;
 
 /// <summary>
-///     Integration tests for GuiTestContext keyboard event handling (InjectKeyEvent).
+///     Integration tests for TestContext keyboard event handling (InjectKeyEvent).
 /// </summary>
-public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
+public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
     private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void QuitKey_ViaApplication_Stops (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void QuitKey_ViaApplication_Stops (string d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d)
+        using TestContext context = With.A<Window> (40, 10, d)
                                            .Then ((app) =>
                                                   {
                                                       app?.Keyboard.RaiseKeyDownEvent (Application.QuitKey);
@@ -25,10 +24,10 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void QuitKey_ViaStops (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void QuitKey_ViaStops (string d)
     {
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out);
+        using TestContext context = With.A<Window> (40, 10, d,  _out);
         Assert.True (context.App?.TopRunnable!.IsRunning);
 
         IRunnable? top = context.App?.TopRunnable;
@@ -39,14 +38,14 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void AfterResizeConsole_StillWorks (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void AfterResizeConsole_StillWorks (string d)
     {
         var keyReceived = false;
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keyReceived = true;
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
                                            .ResizeConsole (50, 20)
@@ -56,12 +55,12 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Backspace_DeletesCharacter (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Backspace_DeletesCharacter (string d)
     {
         var textField = new TextField { Text = "TEST", Width = 20 };
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (textField)
                                            .Focus (textField)
                                            .Then ((_) => textField.CursorPosition = textField.Text.Length)
@@ -72,15 +71,15 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ChainedWithOtherOperations_WorksCorrectly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void ChainedWithOtherOperations_WorksCorrectly (string d)
     {
         var textField = new TextField { Width = 20 };
         var clickedCount = 0;
         var button = new Button { Text = "Click Me" };
         button.Accepting += (s, e) => clickedCount++;
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (textField)
                                            .Add (button)
                                            .Then ((_) => textField.SetFocus ())
@@ -96,8 +95,8 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void EnqueuesKeyAndProcessesIt (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void EnqueuesKeyAndProcessesIt (string d)
     {
         var keyReceived = false;
         var receivedKey = Key.Empty;
@@ -110,7 +109,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
             receivedKey = e;
         };
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
                                            .KeyDown (Key.A);
@@ -120,15 +119,15 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void FunctionKeys_ProcessesCorrectly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void FunctionKeys_ProcessesCorrectly (string d)
     {
         List<Key> keysReceived = [];
 
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
                                            .KeyDown (Key.F1)
@@ -142,15 +141,15 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MultipleKeys_ProcessesInOrder (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MultipleKeys_ProcessesInOrder (string d)
     {
         List<Key> keysReceived = [];
 
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
                                            .KeyDown (Key.A)
@@ -164,13 +163,13 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void NavigationKeys_ChangeFocus (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void NavigationKeys_ChangeFocus (string d)
     {
         var view1 = new View { Id = "view1", CanFocus = true };
         var view2 = new View { Id = "view2", CanFocus = true };
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view1)
                                            .Add (view2)
                                            .Then ((_) => view1.SetFocus ())
@@ -185,12 +184,12 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void NumericKeys_ProcessesCorrectly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void NumericKeys_ProcessesCorrectly (string d)
     {
         var textField = new TextField { Width = 20 };
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (textField)
                                            .Then ((_) => textField.SetFocus ())
                                            .KeyDown (Key.D1)
@@ -203,14 +202,14 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void RapidSequence_ProcessesAllKeys (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void RapidSequence_ProcessesAllKeys (string d)
     {
         List<Key> keysReceived = [];
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ());
 
@@ -229,15 +228,15 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void SpecialKeys_ProcessesCorrectly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void SpecialKeys_ProcessesCorrectly (string d)
     {
         List<Key> keysReceived = [];
 
         var view = new View { CanFocus = true };
         view.KeyDown += (s, e) => keysReceived.Add (e);
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
                                            .KeyDown (Key.Enter)
@@ -255,8 +254,8 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void WithListView_NavigatesItems (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void WithListView_NavigatesItems (string d)
     {
         var listView = new ListView
         {
@@ -266,7 +265,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
         listView.SetSource (["Item1", "Item2", "Item3", "Item4", "Item5"]);
         listView.SelectedItem = 0;
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (listView)
                                            .Then ((_) => listView.SetFocus ())
                                            .AssertEqual (0, listView.SelectedItem)
@@ -279,8 +278,8 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void WithModifiers_ProcessesCorrectly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void WithModifiers_ProcessesCorrectly (string d)
     {
         var keyReceived = false;
         var receivedKey = Key.Empty;
@@ -293,7 +292,7 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
             receivedKey = e;
         };
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (view)
                                            .Then ((_) => view.SetFocus ())
                                            .KeyDown (Key.A.WithCtrl);
@@ -304,12 +303,12 @@ public class GuiTestContextKeyEventTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void WithTextField_UpdatesText (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void WithTextField_UpdatesText (string d)
     {
         var textField = new TextField { Width = 20 };
 
-        using GuiTestContext context = With.A<Window> (40, 10, d, _out)
+        using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (textField)
                                            .KeyDown (Key.H.WithShift)
                                            .KeyDown (Key.E)

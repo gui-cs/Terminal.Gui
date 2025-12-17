@@ -66,7 +66,7 @@ public interface IInput<TInputRecord> : IDisposable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This property allows external code (e.g., test harnesses like <c>GuiTestContext</c>) to
+    ///         This property allows external code (e.g., test harnesses like <c>TestContext</c>) to
     ///         provide additional cancellation signals such as timeouts or hard-stop conditions.
     ///     </para>
     ///     <para>
