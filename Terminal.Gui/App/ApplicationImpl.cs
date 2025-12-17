@@ -37,6 +37,17 @@ internal partial class ApplicationImpl : IApplication
     /// <param name="componentFactory"></param>
     internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
 
+    /// <summary>
+    ///     INTERNAL: Creates a new instance of the Application backend for testing.
+    /// </summary>
+    /// <param name="componentFactory">The component factory.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    /// <param name="testMode">If <see langword="true"/>, configures application for testing with TestInputSource.</param>
+    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider, bool testMode) : this (timeProvider, testMode) 
+    { 
+        _componentFactory = componentFactory; 
+    }
+
     /// <inheritdoc/>
     public ITimeProvider GetTimeProvider () { return _timeProvider; }
 

@@ -1,4 +1,5 @@
 using System.Drawing;
+using Terminal.Gui.Testing;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -73,21 +74,23 @@ public partial class GuiTestContext
 
     /// <summary>
     /// Injects a mouse event to the current driver's input processor.
-    /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// Uses the new input injection infrastructure with virtual time support.
     /// </summary>
-    /// <param name="mouse"></param>
-    /// <returns></returns>
+    /// <param name="mouse">The mouse event to inject.</param>
+    /// <returns>This GuiTestContext for fluent chaining.</returns>
     private GuiTestContext InjectMouseEvent (Mouse mouse)
     {
-            // Enqueue the mouse event
+        // Use the new injection infrastructure
         WaitIteration ((app) =>
         {
             if (app.Driver is { })
             {
-                mouse.Timestamp = DateTime.Now;
+                // Set timestamp from virtual time provider
+                mouse.Timestamp = _timeProvider.Now;
                 mouse.Position = mouse.ScreenPosition;
 
-                app.Driver.GetInputProcessor ().InjectMouseEvent (app, mouse);
+                // Use the new simplified injection API
+                app.InjectMouse (mouse);
             }
             else
             {
@@ -95,17 +98,17 @@ public partial class GuiTestContext
             }
         });
 
-        // Wait for the event to be processed (similar to InjectKeyEvent)
+        // Wait for the event to be processed
         return WaitIteration ();
     }
 
     /// <summary>
     /// Injects a mouse event to the current driver's input processor.
-    /// This method sets the <see cref="Mouse.Timestamp"/> to <see cref="DateTime.Now"/>.
+    /// Uses the new input injection infrastructure with virtual time support.
     /// </summary>
-    /// <param name="mouse"></param>
-    /// <param name="evaluator"></param>
-    /// <returns></returns>
+    /// <param name="mouse">The mouse event to inject.</param>
+    /// <param name="evaluator">Function to find the target view.</param>
+    /// <returns>This GuiTestContext for fluent chaining.</returns>
     private GuiTestContext InjectMouseEvent<TView> (Mouse mouse, Func<TView, bool> evaluator) where TView : View
     {
         var screen = Point.Empty;
@@ -125,24 +128,25 @@ public partial class GuiTestContext
 
     /// <summary>
     ///     Injects a key down event to the current driver's input processor.
+    ///     Uses the new simplified injection API with virtual time support.
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    /// <summary>
-    ///     Enqueues a key down event to the current driver's input processor.
-    /// </summary>
+    /// <param name="key">The key to inject.</param>
+    /// <returns>This GuiTestContext for fluent chaining.</returns>
     public GuiTestContext InjectKeyEvent (Key key)
     {
-        //Logging.Trace ($"Enqueuing key: {key}");
+        //Logging.Trace ($"Injecting key: {key}");
 
-        // Enqueue the key event and wait for it to be processed.
+        // Use the new simplified injection API
         // We do this by subscribing to the Driver.KeyDown event and waiting until it is raised.
-        // This prevents the application from missing the key event if we enqueue it and immediately return.
+        // This prevents the application from missing the key event if we inject it and immediately return.
         bool keyReceived = false;
         if (App?.Driver is { })
         {
             App.Driver.KeyDown += DriverOnKeyDown;
-            App.Driver.InjectKeyEvent (key);
+            
+            // Use the new simplified injection API
+            App.InjectKey (key);
+            
             WaitUntil (() => keyReceived);
         }
 
