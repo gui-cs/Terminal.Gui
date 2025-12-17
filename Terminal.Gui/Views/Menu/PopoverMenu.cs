@@ -1,16 +1,29 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a cascading menu that pops over all other content. Can be used as a context menu or a drop-down
-///     all other content. Can be used as a context menu or a drop-down
-///     menu as part of <see cref="MenuBar"/> as part of <see cref="MenuBar"/>.
+///     A <see cref="PopoverBaseImpl"/>-derived view that provides a cascading menu.
+///     Can be used as a context menu or a drop-down menu as part of <see cref="MenuBar"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         To use as a context menu, register the popover menu with <see cref="IApplication.Popover"/> and call
-///         <see cref="MakeVisible"/>.
+///         <b>IMPORTANT:</b> Must be registered with <see cref="Application.Popover"/> via
+///         <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/> or
+///         <see cref="ApplicationPopover.Show"/>.
+///     </para>
+///     <para>
+///         <b>Usage Example:</b>
+///     </para>
+///     <code>
+///         var menu = new PopoverMenu ([
+///             new MenuItem ("Cut", Command.Cut),
+///             new MenuItem ("Copy", Command.Copy),
+///             new MenuItem ("Paste", Command.Paste)
+///         ]);
+///         Application.Popover?.Register (menu);
+///         menu.MakeVisible (); // or Application.Popover?.Show (menu);
+///     </code>
+///     <para>
+///         See <see cref="PopoverBaseImpl"/> and <see cref="IPopover"/> for lifecycle, focus, and keyboard handling details.
 ///     </para>
 /// </remarks>
 public class PopoverMenu : PopoverBaseImpl, IDesignable
@@ -22,9 +35,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class. If any of the elements of
-    ///     <paramref name="menuItems"/> is <see langword="null"/>,
-    ///     a see <see cref="Line"/> will be created instead.
+    ///     <paramref name="menuItems"/> is <see langword="null"/>, a <see cref="Line"/> will be created instead.
     /// </summary>
+    /// <param name="menuItems">The views to use as menu items. Null elements become separator lines.</param>
+    /// <remarks>
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    /// </remarks>
     public PopoverMenu (IEnumerable<View>? menuItems) : this (
                                                               new Menu (menuItems?.Select (item => item ?? new Line ()))
                                                               {
@@ -32,17 +48,27 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
                                                               })
     { }
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified menu items.
+    /// </summary>
+    /// <param name="menuItems">The menu items to display in the popover.</param>
+    /// <remarks>
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    /// </remarks>
     public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (
-                                                                    new Menu (menuItems)
-                                                                    {
-                                                                        Title = "Popover Root"
-                                                                    })
+                                                                  new Menu (menuItems)
+                                                                  {
+                                                                      Title = "Popover Root"
+                                                                  })
     { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menu"/>.
     /// </summary>
+    /// <param name="root">The root menu that contains the top-level menu items.</param>
+    /// <remarks>
+    ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
+    /// </remarks>
     public PopoverMenu (Menu? root)
     {
         // Do this to support debugging traces where Title gets set
@@ -132,7 +158,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     private Key _key = DefaultKey;
 
-    /// <summary>Specifies the key that will activate the context menu.</summary>
+    /// <summary>
+    ///     Gets or sets the key that will activate the popover menu when it is registered but not visible.
+    /// </summary>
+    /// <remarks>
+    ///     This key binding works as a global hotkey when the popover is registered with
+    ///     <see cref="Application.Popover"/>. The default value is <see cref="DefaultKey"/> (<see cref="Key.F10"/> with
+    ///     Shift).
+    /// </remarks>
     public Key Key
     {
         get => _key;
@@ -144,10 +177,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         }
     }
 
-    /// <summary>Raised when <see cref="Key"/> is changed.</summary>
+    /// <summary>
+    ///     Raised when the <see cref="Key"/> property is changed.
+    /// </summary>
     public event EventHandler<KeyChangedEventArgs>? KeyChanged;
 
-    /// <summary>The default key for activating popover menus.</summary>
+    /// <summary>
+    ///     Gets or sets the default key for activating popover menus. The default value is <see cref="Key.F10"/> with Shift.
+    /// </summary>
+    /// <remarks>
+    ///     This is a configuration property that affects all new <see cref="PopoverMenu"/> instances.
+    /// </remarks>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
@@ -159,12 +199,25 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <summary>
     ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the
-    ///     menu
-    ///     will be adjusted to
-    ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
-    ///     first MenuItem.
+    ///     menu will be adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over
+    ///     the first cell of the first <see cref="MenuItem"/>.
     /// </summary>
-    /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
+    /// <param name="idealScreenPosition">
+    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
+    ///     used.
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         IMPORTANT: The popover must be registered with <see cref="Application.Popover"/> before calling this
+    ///         method.
+    ///         Call <see cref="ApplicationPopover.Register"/> first.
+    ///     </para>
+    ///     <para>
+    ///         This method internally calls <see cref="ApplicationPopover.Show"/>, which will throw
+    ///         <see cref="InvalidOperationException"/> if the popover is not registered.
+    ///     </para>
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">Thrown if the popover has not been registered.</exception>
     public void MakeVisible (Point? idealScreenPosition = null)
     {
         if (Visible)
@@ -180,12 +233,18 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <summary>
-    ///     Locates the popover menu at <paramref name="idealScreenPosition"/>. The actual position of the menu will be
-    ///     adjusted to
-    ///     ensure the menu fully fits on the screen, and the mouse cursor is over the first cell of the
-    ///     first MenuItem (if possible).
+    ///     Sets the position of the popover menu at <paramref name="idealScreenPosition"/>. The actual position will be
+    ///     adjusted to ensure the menu fully fits on the screen, with the mouse cursor positioned over the first cell of
+    ///     the first <see cref="MenuItem"/> (if possible).
     /// </summary>
-    /// <param name="idealScreenPosition">If <see langword="null"/>, the current mouse position will be used.</param>
+    /// <param name="idealScreenPosition">
+    ///     The ideal screen-relative position for the menu. If <see langword="null"/>, the current mouse position will be
+    ///     used.
+    /// </param>
+    /// <remarks>
+    ///     This method only sets the position; it does not make the popover visible. Use <see cref="MakeVisible"/> to
+    ///     both position and show the popover.
+    /// </remarks>
     public void SetPosition (Point? idealScreenPosition = null)
     {
         idealScreenPosition ??= App?.Mouse.LastMousePosition;
@@ -212,6 +271,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    ///     When becoming visible, the root menu is added and shown. When becoming hidden, the root menu is removed
+    ///     and the popover is hidden via <see cref="ApplicationPopover.Hide"/>.
+    /// </remarks>
     protected override void OnVisibleChanged ()
     {
         // Logging.Debug ($"{Title} - Visible: {Visible}");
@@ -231,8 +294,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     private Menu? _root;
 
     /// <summary>
-    ///     Gets or sets the <see cref="Menu"/> that is the root of the Popover Menu.
+    ///     Gets or sets the <see cref="Menu"/> that is the root of the popover menu hierarchy.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The root menu contains the top-level menu items. Setting this property updates key bindings and
+    ///         event subscriptions for all menus in the hierarchy.
+    ///     </para>
+    ///     <para>
+    ///         When set, all submenus are configured with appropriate event handlers for selection and acceptance.
+    ///     </para>
+    /// </remarks>
     public Menu? Root
     {
         get => _root;
@@ -306,6 +378,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    ///     This method checks all menu items in the hierarchy for a matching key binding and invokes the
+    ///     appropriate menu item if found.
+    /// </remarks>
     protected override bool OnKeyDownNotHandled (Key key)
     {
         // See if any of our MenuItems have this key as Key
@@ -325,9 +401,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <summary>
-    ///     Gets all the submenus in the PopoverMenu.
+    ///     Gets all the submenus in the popover menu hierarchy, including the root menu.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An enumerable collection of all <see cref="Menu"/> instances in the hierarchy.</returns>
+    /// <remarks>
+    ///     This method performs a depth-first traversal of the menu tree, starting from <see cref="Root"/>.
+    /// </remarks>
     public IEnumerable<Menu> GetAllSubMenus ()
     {
         List<Menu> result = [];
@@ -358,9 +437,12 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <summary>
-    ///     Gets all the MenuItems in the PopoverMenu.
+    ///     Gets all the menu items in the popover menu hierarchy.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An enumerable collection of all <see cref="MenuItem"/> instances across all menus in the hierarchy.</returns>
+    /// <remarks>
+    ///     This method traverses all menus returned by <see cref="GetAllSubMenus"/> and collects their menu items.
+    /// </remarks>
     internal IEnumerable<MenuItem> GetMenuItemsOfAllSubMenus ()
     {
         List<MenuItem> result = [];
@@ -380,9 +462,17 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <summary>
-    ///     Pops up the submenu of the specified MenuItem, if there is one.
+    ///     Shows the submenu of the specified <see cref="MenuItem"/>, if it has one.
     /// </summary>
-    /// <param name="menuItem"></param>
+    /// <param name="menuItem">The menu item whose submenu should be shown.</param>
+    /// <remarks>
+    ///     <para>
+    ///         If another submenu is currently visible at the same level, it will be hidden before showing the new one.
+    ///     </para>
+    ///     <para>
+    ///         The submenu is positioned to the right of the menu item, adjusted to ensure full visibility on screen.
+    ///     </para>
+    /// </remarks>
     internal void ShowSubMenu (MenuItem? menuItem)
     {
         var menu = menuItem?.SuperView as Menu;
@@ -416,11 +506,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <summary>
-    ///     Gets the most visible screen-relative location for <paramref name="menu"/>.
+    ///     Calculates the most visible screen-relative location for the specified <paramref name="menu"/>.
     /// </summary>
-    /// <param name="menu">The menu to locate.</param>
-    /// <param name="idealLocation">Ideal screen-relative location.</param>
-    /// <returns></returns>
+    /// <param name="menu">The menu to position.</param>
+    /// <param name="idealLocation">The ideal screen-relative location.</param>
+    /// <returns>The adjusted screen-relative position that ensures maximum visibility of the menu.</returns>
+    /// <remarks>
+    ///     This method adjusts the position to keep the menu fully visible on screen, considering screen boundaries.
+    /// </remarks>
     internal Point GetMostVisibleLocationForSubMenu (Menu menu, Point idealLocation)
     {
         var pos = Point.Empty;
@@ -489,6 +582,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     private void MenuOnAccepting (object? sender, CommandEventArgs e)
     {
         var senderView = sender as View;
+
         // Logging.Debug ($"{Title} ({e.Context?.Source?.Title}) Command: {e.Context?.Command} - Sender: {senderView?.GetType ().Name}");
 
         if (e.Context?.Command != Command.HotKey)
@@ -524,6 +618,14 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    ///     <para>
+    ///         When the popover is not visible, only hotkey commands are processed.
+    ///     </para>
+    ///     <para>
+    ///         This method raises <see cref="View.Accepted"/> for commands that originate from menu items in the hierarchy.
+    ///     </para>
+    /// </remarks>
     protected override bool OnAccepting (CommandEventArgs args)
     {
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
@@ -560,8 +662,6 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         return false;
     }
 
-
-
     private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e)
     {
         // Logging.Debug ($"{Title} - e.Title: {e?.Title}");
@@ -569,6 +669,13 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc/>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if attempting to add a <see cref="Menu"/> or <see cref="MenuItem"/> directly to the popover.
+    /// </exception>
+    /// <remarks>
+    ///     Do not add <see cref="MenuItem"/> or <see cref="Menu"/> views directly to the popover.
+    ///     Use the <see cref="Root"/> property instead.
+    /// </remarks>
     protected override void OnSubViewAdded (View view)
     {
         if (Root is null && (view is Menu || view is MenuItem))
@@ -580,6 +687,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    ///     This method unsubscribes from all menu events and disposes the root menu.
+    /// </remarks>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
@@ -600,7 +710,16 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         base.Dispose (disposing);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Enables the popover menu for use in design-time scenarios.
+    /// </summary>
+    /// <typeparam name="TContext">The type of the target view context.</typeparam>
+    /// <param name="targetView">The target view to associate with the menu commands.</param>
+    /// <returns><see langword="true"/> if successfully enabled for design; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    ///     This method creates a default set of menu items (Cut, Copy, Paste, Select All, Quit) for design-time use.
+    ///     It is primarily used for demonstration and testing purposes.
+    /// </remarks>
     public bool EnableForDesign<TContext> (ref TContext targetView) where TContext : notnull
     {
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
