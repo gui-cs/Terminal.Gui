@@ -1007,4 +1007,98 @@ public class ButtonTests
 
         Assert.Equal (3, acceptingCount);
     }
+
+
+    [Theory (Skip = "Broken in #4474")]
+    [InlineData (MouseFlags.LeftButtonPressed, MouseFlags.LeftButtonReleased, MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonPressed, MouseFlags.MiddleButtonReleased, MouseFlags.MiddleButtonClicked)]
+    [InlineData (MouseFlags.RightButtonPressed, MouseFlags.RightButtonReleased, MouseFlags.RightButtonClicked)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
+    public void MouseHoldRepeat_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
+    {
+        var me = new Mouse ();
+
+        var button = new Button
+        {
+            Width = 1,
+            Height = 1,
+            MouseHoldRepeat = true
+        };
+
+        var activatingCount = 0;
+
+        button.Activating += (s, e) => activatingCount++;
+        var acceptedCount = 0;
+
+        button.Accepting += (s, e) =>
+        {
+            acceptedCount++;
+            e.Handled = true;
+        };
+
+        me = new ();
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptedCount);
+
+        me = new ();
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (0, activatingCount);
+        Assert.Equal (0, acceptedCount);
+
+        me = new ();
+        me.Flags = clicked;
+        button.NewMouseEvent (me);
+        Assert.Equal (1, activatingCount);
+        Assert.Equal (1, acceptedCount);
+
+        button.Dispose ();
+    }
+
+    [Theory (Skip = "Broken in #4474")]
+    [InlineData (MouseFlags.LeftButtonPressed, MouseFlags.LeftButtonReleased)]
+    [InlineData (MouseFlags.MiddleButtonPressed, MouseFlags.MiddleButtonReleased)]
+    [InlineData (MouseFlags.RightButtonPressed, MouseFlags.RightButtonReleased)]
+    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
+    public void MouseHoldRepeat_True_ButtonPressRelease_Does_Not_Raise_Selected_Or_Accepted (MouseFlags pressed, MouseFlags released)
+    {
+        var me = new Mouse ();
+
+        var button = new Button
+        {
+            Width = 1,
+            Height = 1,
+            MouseHoldRepeat = true
+        };
+
+        var acceptedCount = 0;
+
+        button.Accepting += (s, e) =>
+        {
+            acceptedCount++;
+            e.Handled = true;
+        };
+
+        var activatingCount = 0;
+
+        button.Activating += (s, e) =>
+        {
+            activatingCount++;
+            e.Handled = true;
+        };
+
+        me.Flags = pressed;
+        button.NewMouseEvent (me);
+        Assert.Equal (0, acceptedCount);
+        Assert.Equal (0, activatingCount);
+
+        me.Flags = released;
+        button.NewMouseEvent (me);
+        Assert.Equal (0, acceptedCount);
+        Assert.Equal (0, activatingCount);
+
+        button.Dispose ();
+    }
 }

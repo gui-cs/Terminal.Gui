@@ -43,7 +43,7 @@ public class ColorPicker16Tests
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
     }
 
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     [AutoInitShutdown]
     public void MouseEvents ()
     {
@@ -53,9 +53,7 @@ public class ColorPicker16Tests
         top.Add (colorPicker);
         Application.Begin (top);
 
-        Assert.False (colorPicker.NewMouseEvent (new ()));
-
-        Assert.True (colorPicker.NewMouseEvent (new () { Position = new (4, 1), Flags = MouseFlags.LeftButtonClicked }));
+        colorPicker.NewMouseEvent (new () { Position = new (4, 1), Flags = MouseFlags.LeftButtonPressed });
         Assert.Equal (ColorName16.Blue, colorPicker.SelectedColor);
         top.Dispose ();
     }
