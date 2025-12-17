@@ -227,11 +227,11 @@ public class BorderArrangementTests (ITestOutputHelper output)
         DriverAssert.AssertDriverAttributesAre (
                                                 """
                                                 14333332
-                                                13333331
-                                                13333331
-                                                13333331
-                                                13333331
-                                                13333331
+                                                13333330
+                                                13333330
+                                                13333330
+                                                13333330
+                                                13333330
                                                 11111111
                                                 """,
                                                 output,

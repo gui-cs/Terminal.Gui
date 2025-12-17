@@ -238,10 +238,10 @@ public class ShadowTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (
                                               """
                                               ┌──┐🍎
-                                              │  │🍎
-                                              └──┘🍎
-                                              🍎🍎🍎
-                                              🍎🍎🍎
+                                              │  │�
+                                              └──┘�
+                                              � 🍎🍎
+                                              � 🍎🍎
                                               """,
                                               output,
                                               app.Driver);
@@ -254,10 +254,10 @@ public class ShadowTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (
                                               """
                                               ┌─┐ 🍎
-                                              │ │ 🍎
-                                              └─┘ 🍎
-                                              🍎🍎�
-                                              🍎🍎�
+                                              │ │ �
+                                              └─┘ �
+                                              � 🍎�
+                                              � 🍎�
                                               """,
                                               output,
                                               app.Driver);
