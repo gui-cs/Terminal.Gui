@@ -220,7 +220,15 @@ public class GetViewsUnderLocationTests
         for (int i = 0; i < viewsUnderLocation.Count; i++)
         {
             View? v = viewsUnderLocation [i];
-            System.Diagnostics.Debug.WriteLine ($"  [{i}] {v?.GetType ().Name} - Frame: {v?.FrameToScreen ()}");
+            string parentInfo = v?.SuperView != null ? $", SuperView: {v.SuperView.GetType().Name}" : "";
+            System.Diagnostics.Debug.WriteLine ($"  [{i}] {v?.GetType ().Name} - Frame: {v?.FrameToScreen ()}{parentInfo}");
+        }
+        System.Console.WriteLine ($"Views at {testLocation}:");
+        for (int i = 0; i < viewsUnderLocation.Count; i++)
+        {
+            View? v = viewsUnderLocation [i];
+            string parentInfo = v?.SuperView != null ? $", SuperView: {v.SuperView.GetType().Name}" : "";
+            System.Console.WriteLine ($"  [{i}] {v?.GetType ().Name} - Frame: {v?.FrameToScreen ()}{parentInfo}");
         }
 
         // Assert
