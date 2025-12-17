@@ -92,11 +92,11 @@
 ///     
 ///     // Inject sequence with delays (virtual time advances instantly)
 ///     InputEvent[] sequence = [
-///         new KeyEvent(Key.H),
-///         new KeyEvent(Key.E) { Delay = TimeSpan.FromMilliseconds(100) },
-///         new KeyEvent(Key.L) { Delay = TimeSpan.FromMilliseconds(100) },
-///         new KeyEvent(Key.L) { Delay = TimeSpan.FromMilliseconds(100) },
-///         new KeyEvent(Key.O)
+///         new KeyInjectionEvent(Key.H),
+///         new KeyInjectionEvent(Key.E) { Delay = TimeSpan.FromMilliseconds(100) },
+///         new KeyInjectionEvent(Key.L) { Delay = TimeSpan.FromMilliseconds(100) },
+///         new KeyInjectionEvent(Key.L) { Delay = TimeSpan.FromMilliseconds(100) },
+///         new KeyInjectionEvent(Key.O)
 ///     ];
 ///     
 ///     app.InjectSequence(sequence);
@@ -203,11 +203,11 @@ public class InputInjector : IInputInjector
     }
 
     /// <inheritdoc/>
-    public void InjectSequence (IEnumerable<InputEvent> events, InputInjectionOptions? options = null)
+    public void InjectSequence (IEnumerable<InputInjectionEvent> events, InputInjectionOptions? options = null)
     {
         options ??= new () { TimeProvider = _timeProvider };
 
-        foreach (InputEvent evt in events)
+        foreach (InputInjectionEvent evt in events)
         {
             // Advance time if delay specified
             if (evt.Delay.HasValue && _timeProvider is VirtualTimeProvider vtp)
@@ -224,12 +224,12 @@ public class InputInjector : IInputInjector
 
             switch (evt)
             {
-                case KeyEvent ke:
+                case KeyInjectionEvent ke:
                     InjectKey (ke.Key, eventOptions);
 
                     break;
 
-                case MouseEvent me:
+                case MouseInjectionEvent me:
                     InjectMouse (me.Mouse, eventOptions);
 
                     break;

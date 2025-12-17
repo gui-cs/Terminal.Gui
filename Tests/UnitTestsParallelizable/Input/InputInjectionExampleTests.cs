@@ -112,11 +112,11 @@ public class InputInjectionExampleTests
         app.Keyboard.KeyDown += (s, e) => { receivedKeys.Add (e); };
 
         // Act - Inject sequence with delays (executes instantly)
-        InputEvent [] sequence =
+        InputInjectionEvent [] sequence =
         [
-            new KeyEvent (Key.A) { Delay = TimeSpan.FromMilliseconds (100) },
-            new KeyEvent (Key.B) { Delay = TimeSpan.FromMilliseconds (100) },
-            new KeyEvent (Key.C)
+            new KeyInjectionEvent (Key.A) { Delay = TimeSpan.FromMilliseconds (100) },
+            new KeyInjectionEvent (Key.B) { Delay = TimeSpan.FromMilliseconds (100) },
+            new KeyInjectionEvent (Key.C)
         ];
 
         app.InjectSequence (sequence);

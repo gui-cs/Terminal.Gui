@@ -357,7 +357,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
-        InputEvent [] emptySequence = [];
+        InputInjectionEvent [] emptySequence = [];
 
         // Act
         injector.InjectSequence (emptySequence);
@@ -378,11 +378,11 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
-        InputEvent [] sequence =
+        InputInjectionEvent [] sequence =
         [
-            new KeyEvent (Key.A),
-            new KeyEvent (Key.B),
-            new KeyEvent (Key.C)
+            new KeyInjectionEvent (Key.A),
+            new KeyInjectionEvent (Key.B),
+            new KeyInjectionEvent (Key.C)
         ];
 
         // Act
@@ -415,11 +415,11 @@ public class InputInjectorTests (ITestOutputHelper output)
                                  timestamps.Add (timeProvider.Now);
                              };
 
-        InputEvent [] sequence =
+        InputInjectionEvent [] sequence =
         [
-            new KeyEvent (Key.A),
-            new KeyEvent (Key.B) { Delay = TimeSpan.FromMilliseconds (100) },
-            new KeyEvent (Key.C) { Delay = TimeSpan.FromMilliseconds (200) }
+            new KeyInjectionEvent (Key.A),
+            new KeyInjectionEvent (Key.B) { Delay = TimeSpan.FromMilliseconds (100) },
+            new KeyInjectionEvent (Key.C) { Delay = TimeSpan.FromMilliseconds (200) }
         ];
 
         // Act
@@ -446,11 +446,11 @@ public class InputInjectorTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
         processor.MouseEventParsed += (_, mouse) => receivedMouse.Add (mouse);
 
-        InputEvent [] sequence =
+        InputInjectionEvent [] sequence =
         [
-            new KeyEvent (Key.A),
-            new MouseEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed }),
-            new KeyEvent (Key.B)
+            new KeyInjectionEvent (Key.A),
+            new MouseInjectionEvent (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed }),
+            new KeyInjectionEvent (Key.B)
         ];
 
         // Act
@@ -573,7 +573,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
-        InputEvent [] sequence = [new KeyEvent (Key.A)];
+        InputInjectionEvent [] sequence = [new KeyInjectionEvent (Key.A)];
 
         // Act - Pass null options
         injector.InjectSequence (sequence);

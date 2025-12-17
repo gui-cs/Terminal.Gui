@@ -24,5 +24,5 @@ public static class InputInjectionExtensions
     /// </summary>
     /// <param name="app">The application instance.</param>
     /// <param name="events">The events to inject.</param>
-    public static void InjectSequence (this IApplication app, params InputEvent [] events) { app.GetInputInjector ().InjectSequence (events); }
+    public static void InjectSequence (this IApplication app, params InputInjectionEvent [] events) { app.GetInputInjector ().InjectSequence (events); }
 }

@@ -132,7 +132,7 @@ public partial class GuiTestContext
     /// </summary>
     /// <param name="key">The key to inject.</param>
     /// <returns>This GuiTestContext for fluent chaining.</returns>
-    public GuiTestContext InjectKeyEvent (Key key)
+    public GuiTestContext KeyDown (Key key)
     {
         //Logging.Trace ($"Injecting key: {key}");
 

@@ -135,7 +135,7 @@ public class PopoverMenuTests
                                      .Then ((_) => app?.Popover!.Show (app?.Popover.Popovers.First ()))
                                      .ScreenShot ("After Show", _out)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .InjectKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover!.Popovers.Cast<PopoverMenu> ().FirstOrDefault ()!.Visible)
                                      .AssertNull (app?.Popover!.GetActivePopover ())
@@ -184,7 +184,7 @@ public class PopoverMenuTests
                                      .ScreenShot ("After Show", _out)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertIsType<MenuItem> (app?.Navigation!.GetFocused ())
-                                     .InjectKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ());
@@ -232,7 +232,7 @@ public class PopoverMenuTests
                                      .ScreenShot ("PopoverMenu after Show", _out)
                                      .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
                                      .AssertTrue (app?.TopRunnable!.IsRunning)
-                                     .InjectKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (app?.TopRunnable!.IsRunning);
@@ -273,7 +273,7 @@ public class PopoverMenuTests
                                             })
                                      .Add (testView)
                                      .Focus (testView)
-                                     .InjectKeyEvent (Key.Space)
+                                     .KeyDown (Key.Space)
                                      .AssertEqual (1, spaceKeyDownCount);
     }
 
@@ -313,7 +313,7 @@ public class PopoverMenuTests
                                             })
                                      .Add (testView)
                                      .Focus (testView)
-                                     .InjectKeyEvent (Key.Enter)
+                                     .KeyDown (Key.Enter)
                                      .AssertEqual (1, enterKeyDownCount);
     }
 
@@ -351,7 +351,7 @@ public class PopoverMenuTests
                                                 app?.Popover!.Register (popoverMenu);
                                             })
                                      .Add (testView)
-                                     .InjectKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .AssertEqual (1, quitKeyDownCount);
     }
 
@@ -422,13 +422,13 @@ public class PopoverMenuTests
                                      // Click in main area inside border
                                      .RightClick (1, 1)
                                      .ScreenShot ("After open menu", _out)
-                                     .InjectKeyEvent (Key.CursorDown)
-                                     .InjectKeyEvent (Key.CursorDown)
-                                     .InjectKeyEvent (Key.CursorDown)
-                                     .InjectKeyEvent (Key.CursorRight)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.CursorRight)
                                      .ScreenShot ("After open submenu", _out)
-                                     .InjectKeyEvent (Key.CursorDown)
-                                     .InjectKeyEvent (Key.Enter)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.Enter)
                                      .ScreenShot ("Menu should be closed after selecting", _out);
         Assert.True (clicked);
     }

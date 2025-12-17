@@ -43,7 +43,7 @@ public class TreeViewFluentTests
                 .ScreenShot ("Before expanding", _out)
                 .AssertEqual (root, tv.GetObjectOnRow (0))
                 .AssertNull (tv.GetObjectOnRow (1))
-                .InjectKeyEvent (Key.CursorRight)
+                .KeyDown (Key.CursorRight)
                 .ScreenShot ("After expanding", _out)
                 .AssertMultiple (
                                  () =>

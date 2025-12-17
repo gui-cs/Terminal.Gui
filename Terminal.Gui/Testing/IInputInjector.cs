@@ -24,22 +24,10 @@ public interface IInputInjector
     /// </summary>
     /// <param name="events">The sequence of events to inject.</param>
     /// <param name="options">Optional injection options.</param>
-    void InjectSequence (IEnumerable<InputEvent> events, InputInjectionOptions? options = null);
+    void InjectSequence (IEnumerable<InputInjectionEvent> events, InputInjectionOptions? options = null);
 
     /// <summary>
     ///     Forces processing of the input queue (usually automatic).
     /// </summary>
     void ProcessQueue ();
 }
-
-/// <summary>
-///     Keyboard event in a sequence.
-/// </summary>
-/// <param name="Key">The key to inject.</param>
-public record KeyEvent (Key Key) : InputEvent;
-
-/// <summary>
-///     Mouse event in a sequence.
-/// </summary>
-/// <param name="Mouse">The mouse event to inject.</param>
-public record MouseEvent (Mouse Mouse) : InputEvent;
