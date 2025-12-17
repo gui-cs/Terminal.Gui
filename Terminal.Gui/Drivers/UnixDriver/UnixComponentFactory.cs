@@ -15,7 +15,7 @@ public class UnixComponentFactory : ComponentFactoryImpl<char>
     public override IInput<char> CreateInput () { return new UnixInput (); }
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer) { return new UnixInputProcessor (inputBuffer); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null) { return new UnixInputProcessor (inputBuffer, timeProvider); }
 
     /// <inheritdoc/>
     public override IOutput CreateOutput () { return new UnixOutput (); }

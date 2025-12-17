@@ -15,7 +15,7 @@ public class NetComponentFactory : ComponentFactoryImpl<ConsoleKeyInfo>
     public override IInput<ConsoleKeyInfo> CreateInput () { return new NetInput (); }
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) { return new NetInputProcessor (inputBuffer); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, ITimeProvider? timeProvider = null) { return new NetInputProcessor (inputBuffer, timeProvider); }
 
     /// <inheritdoc/>
     public override IOutput CreateOutput () { return new NetOutput (); }

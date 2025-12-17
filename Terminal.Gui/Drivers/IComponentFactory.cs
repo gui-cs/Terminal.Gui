@@ -52,8 +52,9 @@ public interface IComponentFactory<TInputRecord> : IComponentFactory
     ///     implementations on the input thread and
     ///     read by <see cref="IInputProcessor"/> on the main loop thread.
     /// </param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control. If null, SystemTimeProvider is used.</param>
     /// <returns></returns>
-    IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputQueue);
+    IInputProcessor CreateInputProcessor (ConcurrentQueue<TInputRecord> inputQueue, ITimeProvider? timeProvider = null);
 
     /// <summary>
     ///     Creates <see cref="ISizeMonitor"/> class for the current driver implementation i.e. the class responsible for
