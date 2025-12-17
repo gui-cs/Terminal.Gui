@@ -155,7 +155,7 @@ public class UICatalogRunnable : Runnable
                                                               "_About...",
                                                               "About UI Catalog",
                                                               () => MessageBox.Query (
-                                                                                      App,
+                                                                                      App!,
                                                                                       "",
                                                                                       GetAboutBoxMessage (),
                                                                                       wrapMessage: false,

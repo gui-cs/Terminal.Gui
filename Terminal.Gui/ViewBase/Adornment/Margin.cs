@@ -96,7 +96,7 @@ public class Margin : Adornment
                 margin.ClearCachedClip ();
             }
 
-            foreach (View subview in view.SubViews)
+            foreach (View subview in view.SubViews.OrderBy (v => v.HasFocus && v.ShadowStyle != ShadowStyle.None).Reverse ())
             {
                 stack.Push (subview);
             }

@@ -132,7 +132,7 @@ public sealed class WideGlyphs : Scenario
         };
         arrangeableViewAtOdd.Accepting += (sender, args) =>
                                           {
-                                              MessageBox.Query ((sender as View)?.App, "Button Pressed", "You Pressed it!");
+                                              MessageBox.Query ((sender as View)?.App!, "Button Pressed", "You Pressed it!");
                                           };
         appWindow.Add (arrangeableViewAtOdd);
 
