@@ -1,3 +1,5 @@
+using Terminal.Gui.App;
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -5,28 +7,21 @@ namespace Terminal.Gui.ViewBase;
 ///     before <see cref="View.Remove(View?)"/>).
 /// </summary>
 /// <remarks>
-///     This event is raised before the <see cref="View.SuperView"/> property is changed, allowing access to the
-///     current SuperView and its associated resources (such as <see cref="View.App"/>) for cleanup purposes.
+///     <para>
+///         This event is raised before the <see cref="View.SuperView"/> property is changed, allowing access to the
+///         current SuperView and its associated resources (such as <see cref="View.App"/>) for cleanup purposes.
+///     </para>
+///     <para>
+///         This event follows the Cancellable Work Pattern (CWP) and can be cancelled by setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to <see langword="true"/>.
+///     </para>
 /// </remarks>
-public class SuperViewChangingEventArgs : EventArgs
+public class SuperViewChangingEventArgs : CancelEventArgs<View?>
 {
     /// <summary>Creates a new instance of the <see cref="SuperViewChangingEventArgs"/> class.</summary>
-    /// <param name="oldSuperView">The current SuperView before the change.</param>
+    /// <param name="currentSuperView">The current SuperView before the change.</param>
     /// <param name="newSuperView">The new SuperView that will be set, or <see langword="null"/> if being removed.</param>
-    /// <param name="subView">The view whose SuperView is changing.</param>
-    public SuperViewChangingEventArgs (View? oldSuperView, View? newSuperView, View? subView)
+    public SuperViewChangingEventArgs (View? currentSuperView, View? newSuperView) 
+        : base (currentSuperView, newSuperView)
     {
-        OldSuperView = oldSuperView;
-        NewSuperView = newSuperView;
-        SubView = subView;
     }
-
-    /// <summary>The current SuperView before the change.</summary>
-    public View? OldSuperView { get; }
-
-    /// <summary>The new SuperView that will be set, or <see langword="null"/> if being removed.</summary>
-    public View? NewSuperView { get; }
-
-    /// <summary>The view that is having its <see cref="View.SuperView"/> changed.</summary>
-    public View? SubView { get; }
 }

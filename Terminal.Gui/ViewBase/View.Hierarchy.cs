@@ -44,17 +44,25 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return;
         }
 
-        RaiseSuperViewChanging (value);
+        // Best practice is to call the virtual method first.
+        // This allows derived classes to handle the event and potentially cancel it.
+        if (OnSuperViewChanging (value, _superView))
+        {
+            return;
+        }
+
+        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        SuperViewChangingEventArgs args = new (_superView, value);
+        SuperViewChanging?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            return;
+        }
+
+        // If the event is not canceled, update the value.
         _superView = value;
         RaiseSuperViewChanged ();
-    }
-
-    private void RaiseSuperViewChanging (View? newSuperView)
-    {
-        SuperViewChangingEventArgs args = new (_superView, newSuperView, this);
-        OnSuperViewChanging (args);
-
-        SuperViewChanging?.Invoke (this, args);
     }
 
     /// <summary>
@@ -62,14 +70,22 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     is updated, allowing access to the current SuperView and its resources (such as <see cref="App"/>) for
     ///     cleanup purposes.
     /// </summary>
-    /// <param name="e">Event arguments containing the old and new SuperView.</param>
-    protected virtual void OnSuperViewChanging (SuperViewChangingEventArgs e) { }
+    /// <param name="newSuperView">The new SuperView that will be set, or <see langword="null"/> if being removed.</param>
+    /// <param name="currentSuperView">The current SuperView before the change.</param>
+    /// <returns><see langword="true"/> to cancel the change; <see langword="false"/> to allow it.</returns>
+    protected virtual bool OnSuperViewChanging (View? newSuperView, View? currentSuperView) => false;
 
     /// <summary>
     ///     Raised when the SuperView of this View is about to be changed. This is raised before the SuperView property
     ///     is updated, allowing access to the current SuperView and its resources (such as <see cref="App"/>) for
     ///     cleanup purposes.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event follows the Cancellable Work Pattern (CWP). Set <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> 
+    ///         to <see langword="true"/> in the event args to cancel the change.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<SuperViewChangingEventArgs>? SuperViewChanging;
 
     private void RaiseSuperViewChanged ()
@@ -139,9 +155,19 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         // Ensure views don't have focus when being added
         view.HasFocus = false;
 
+        // Try to set the SuperView - this may be cancelled
+        View? previousSuperView = view.SuperView;
+        view.SuperView = this;
+        
+        // Check if the SuperView change was cancelled
+        if (view.SuperView != this)
+        {
+            // The change was cancelled, don't add to SubViews
+            return null;
+        }
+
         // TODO: Make this thread safe
         InternalSubViews.Add (view);
-        view.SuperView = this;
 
         if (view is { Enabled: true, Visible: true, CanFocus: true })
         {
@@ -282,17 +308,27 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         Debug.Assert (!view.HasFocus);
 
+        // Try to set SuperView to null - this may be cancelled
+        View? previousSuperView = view.SuperView;
+        view.SuperView = null;
+        
+        // Check if the SuperView change was cancelled
+        if (view.SuperView != null)
+        {
+            // The change was cancelled, restore state and return null
+            view.CanFocus = couldFocus;
+            return null;
+        }
+
         InternalSubViews.Remove (view);
 
         // Clean up focus stuff
         _previouslyFocused = null;
 
-        if (view.SuperView is { } && view.SuperView._previouslyFocused == this)
+        if (previousSuperView is { } && previousSuperView._previouslyFocused == this)
         {
-            view.SuperView._previouslyFocused = null;
+            previousSuperView._previouslyFocused = null;
         }
-
-        view.SuperView = null;
 
         SetNeedsLayout ();
         SetNeedsDraw ();

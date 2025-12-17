@@ -158,7 +158,7 @@ public abstract class EditorBase : View
     }
 
     /// <inheritdoc />
-    protected override void OnSuperViewChanging (SuperViewChangingEventArgs e)
+    protected override bool OnSuperViewChanging (View? newSuperView, View? currentSuperView)
     {
         // Clean up event handlers before SuperView is set to null
         // This ensures App is still accessible for proper cleanup
@@ -168,7 +168,7 @@ public abstract class EditorBase : View
             App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
         }
 
-        base.OnSuperViewChanging (e);
+        return base.OnSuperViewChanging (newSuperView, currentSuperView);
     }
 
     /// <inheritdoc />

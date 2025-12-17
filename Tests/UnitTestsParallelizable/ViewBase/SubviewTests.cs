@@ -722,21 +722,21 @@ public class SubViewTests
         var superView = new View ();
         var subView = new View ();
 
-        View? oldSuperViewInEvent = new View (); // Set to non-null to ensure it gets updated
-        View? newSuperViewInEvent = null;
+        View? currentValueInEvent = new View (); // Set to non-null to ensure it gets updated
+        View? newValueInEvent = null;
 
         subView.SuperViewChanging += (s, e) =>
                                      {
-                                         oldSuperViewInEvent = e.OldSuperView;
-                                         newSuperViewInEvent = e.NewSuperView;
+                                         currentValueInEvent = e.CurrentValue;
+                                         newValueInEvent = e.NewValue;
                                      };
 
         // Act
         superView.Add (subView);
 
         // Assert
-        Assert.Null (oldSuperViewInEvent); // Was null before add
-        Assert.Equal (superView, newSuperViewInEvent); // Will be superView after add
+        Assert.Null (currentValueInEvent); // Was null before add
+        Assert.Equal (superView, newValueInEvent); // Will be superView after add
     }
 
     [Fact]
@@ -748,21 +748,21 @@ public class SubViewTests
 
         superView.Add (subView);
 
-        View? oldSuperViewInEvent = null;
-        View? newSuperViewInEvent = new View (); // Set to non-null to ensure it gets updated
+        View? currentValueInEvent = null;
+        View? newValueInEvent = new View (); // Set to non-null to ensure it gets updated
 
         subView.SuperViewChanging += (s, e) =>
                                      {
-                                         oldSuperViewInEvent = e.OldSuperView;
-                                         newSuperViewInEvent = e.NewSuperView;
+                                         currentValueInEvent = e.CurrentValue;
+                                         newValueInEvent = e.NewValue;
                                      };
 
         // Act
         superView.Remove (subView);
 
         // Assert
-        Assert.Equal (superView, oldSuperViewInEvent); // Was superView before remove
-        Assert.Null (newSuperViewInEvent); // Will be null after remove
+        Assert.Equal (superView, currentValueInEvent); // Was superView before remove
+        Assert.Null (newValueInEvent); // Will be null after remove
     }
 
     [Fact]
@@ -823,21 +823,21 @@ public class SubViewTests
 
         superView1.Add (subView);
 
-        View? oldSuperViewInEvent = null;
-        View? newSuperViewInEvent = null;
+        View? currentValueInEvent = null;
+        View? newValueInEvent = null;
 
         subView.SuperViewChanging += (s, e) =>
                                      {
-                                         oldSuperViewInEvent = e.OldSuperView;
-                                         newSuperViewInEvent = e.NewSuperView;
+                                         currentValueInEvent = e.CurrentValue;
+                                         newValueInEvent = e.NewValue;
                                      };
 
         // Act
         superView2.Add (subView);
 
         // Assert
-        Assert.Equal (superView1, oldSuperViewInEvent);
-        Assert.Equal (superView2, newSuperViewInEvent);
+        Assert.Equal (superView1, currentValueInEvent);
+        Assert.Equal (superView2, newValueInEvent);
     }
 
     // Helper class for testing virtual method calls
@@ -847,16 +847,136 @@ public class SubViewTests
 
         public TestViewWithSuperViewEvents (List<string> events) { _events = events; }
 
-        protected override void OnSuperViewChanging (SuperViewChangingEventArgs e)
+        protected override bool OnSuperViewChanging (View? newSuperView, View? currentSuperView)
         {
             _events.Add ("OnSuperViewChanging");
-            base.OnSuperViewChanging (e);
+            return base.OnSuperViewChanging (newSuperView, currentSuperView);
         }
 
         protected override void OnSuperViewChanged (SuperViewChangedEventArgs e)
         {
             _events.Add ("OnSuperViewChanged");
             base.OnSuperViewChanged (e);
+        }
+    }
+
+    [Fact]
+    public void SuperViewChanging_Can_Be_Cancelled_Via_Event ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView = new View ();
+
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         e.Cancel = true; // Cancel the change
+                                     };
+
+        // Act
+        superView.Add (subView);
+
+        // Assert - SuperView should not be set because the change was cancelled
+        Assert.Null (subView.SuperView);
+        Assert.Empty (superView.SubViews);
+    }
+
+    [Fact]
+    public void SuperViewChanging_Can_Be_Cancelled_Via_Virtual_Method ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView = new TestViewThatCancelsChange ();
+
+        // Act
+        superView.Add (subView);
+
+        // Assert - SuperView should not be set because the change was cancelled
+        Assert.Null (subView.SuperView);
+        Assert.Empty (superView.SubViews);
+    }
+
+    [Fact]
+    public void SuperViewChanging_Virtual_Method_Cancellation_Prevents_Event ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView = new TestViewThatCancelsChange ();
+
+        var eventRaised = false;
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         eventRaised = true;
+                                     };
+
+        // Act
+        superView.Add (subView);
+
+        // Assert - Event should not be raised because virtual method cancelled first
+        Assert.False (eventRaised);
+        Assert.Null (subView.SuperView);
+    }
+
+    [Fact]
+    public void SuperViewChanging_Cancellation_On_Remove ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView = new View ();
+
+        superView.Add (subView);
+        Assert.Equal (superView, subView.SuperView);
+
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         // Cancel removal if trying to set to null
+                                         if (e.NewValue is null)
+                                         {
+                                             e.Cancel = true;
+                                         }
+                                     };
+
+        // Act
+        superView.Remove (subView);
+
+        // Assert - SuperView should still be set because removal was cancelled
+        Assert.Equal (superView, subView.SuperView);
+        Assert.Single (superView.SubViews);
+    }
+
+    [Fact]
+    public void SuperViewChanging_Cancellation_When_Changing_Between_SuperViews ()
+    {
+        // Arrange
+        var superView1 = new View ();
+        var superView2 = new View ();
+        var subView = new View ();
+
+        superView1.Add (subView);
+
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         // Cancel if trying to move to superView2
+                                         if (e.NewValue == superView2)
+                                         {
+                                             e.Cancel = true;
+                                         }
+                                     };
+
+        // Act
+        superView2.Add (subView);
+
+        // Assert - Should still be in superView1 because change was cancelled
+        Assert.Equal (superView1, subView.SuperView);
+        Assert.Single (superView1.SubViews);
+        Assert.Empty (superView2.SubViews);
+    }
+
+    // Helper class for testing cancellation
+    private class TestViewThatCancelsChange : View
+    {
+        protected override bool OnSuperViewChanging (View? newSuperView, View? currentSuperView)
+        {
+            return true; // Always cancel the change
         }
     }
 }
