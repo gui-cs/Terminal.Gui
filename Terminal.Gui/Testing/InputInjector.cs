@@ -1,12 +1,123 @@
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Input;
-
-namespace Terminal.Gui.Testing;
+﻿namespace Terminal.Gui.Testing;
 
 /// <summary>
-/// Implementation of IInputInjector for testing.
-/// Provides a simplified API for injecting input into Terminal.Gui applications.
+///     Provides an API for injecting mouse and keyboard input into Terminal.Gui applications.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <c>InputInjector</c> offers two injection modes to support different testing scenarios:
+///     </para>
+///     <list type="bullet">
+///         <item>
+///             <description>
+///                 <b>Direct Mode</b> (default): Bypasses ANSI encoding/decoding and directly raises events.
+///                 Ideal for fast, deterministic tests that don't need to verify encoding/parsing behavior.
+///                 Use this mode when you want precise control over timestamps and event timing.
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 <b>Pipeline Mode</b>: Routes input through the complete processing pipeline including
+///                 ANSI encoding/decoding. Use this mode when testing driver-level behavior or verifying
+///                 that escape sequences are correctly encoded and parsed.
+///             </description>
+///         </item>
+///     </list>
+///     <para>
+///         For convenience, use the extension methods in <see cref="InputInjectionExtensions"/>:
+///         <see cref="InputInjectionExtensions.InjectKey"/>, <see cref="InputInjectionExtensions.InjectMouse"/>,
+///         and <see cref="InputInjectionExtensions.InjectSequence"/> to inject input without directly
+///         accessing the injector.
+///     </para>
+///     <para>
+///         When you need to specify injection options (such as Direct mode with timestamps), use
+///         <see cref="IApplication.GetInputInjector"/> to access the injector directly.
+///     </para>
+/// </remarks>
+/// <example>
+///     <b>Example 1: Basic key injection (using extension method)</b>
+///     <code>
+///     using IApplication app = Application.Create();
+///     app.Init(DriverRegistry.Names.ANSI);
+///     
+///     app.Keyboard.KeyDown += (s, e) =&gt; {
+///         Console.WriteLine($"Key pressed: {e}");
+///     };
+///     
+///     // Simple injection using extension method
+///     app.InjectKey(Key.A);
+///     app.InjectKey(Key.Enter);
+///     </code>
+///     <b>Example 2: Mouse injection with Direct mode (preserving timestamps)</b>
+///     <code>
+///     using IApplication app = Application.Create();
+///     app.Init(DriverRegistry.Names.ANSI);
+///     
+///     IInputInjector injector = app.GetInputInjector();
+///     InputInjectionOptions options = new() { Mode = InputInjectionMode.Direct };
+///     
+///     DateTime baseTime = new(2025, 1, 1, 12, 0, 0);
+///     
+///     // First click
+///     injector.InjectMouse(new() {
+///         ScreenPosition = new(10, 10),
+///         Flags = MouseFlags.LeftButtonPressed,
+///         Timestamp = baseTime
+///     }, options);
+///     
+///     injector.InjectMouse(new() {
+///         ScreenPosition = new(10, 10),
+///         Flags = MouseFlags.LeftButtonReleased,
+///         Timestamp = baseTime.AddMilliseconds(50)
+///     }, options);
+///     
+///     // Second click 600ms later (prevents double-click detection)
+///     injector.InjectMouse(new() {
+///         ScreenPosition = new(10, 10),
+///         Flags = MouseFlags.LeftButtonPressed,
+///         Timestamp = baseTime.AddMilliseconds(600)
+///     }, options);
+///     
+///     injector.InjectMouse(new() {
+///         ScreenPosition = new(10, 10),
+///         Flags = MouseFlags.LeftButtonReleased,
+///         Timestamp = baseTime.AddMilliseconds(650)
+///     }, options);
+///     </code>
+///     <b>Example 3: Event sequence with virtual time</b>
+///     <code>
+///     VirtualTimeProvider timeProvider = new();
+///     using IApplication app = Application.CreateForTesting(timeProvider);
+///     app.Init(DriverRegistry.Names.ANSI);
+///     
+///     // Inject sequence with delays (virtual time advances instantly)
+///     InputEvent[] sequence = [
+///         new KeyEvent(Key.H),
+///         new KeyEvent(Key.E) { Delay = TimeSpan.FromMilliseconds(100) },
+///         new KeyEvent(Key.L) { Delay = TimeSpan.FromMilliseconds(100) },
+///         new KeyEvent(Key.L) { Delay = TimeSpan.FromMilliseconds(100) },
+///         new KeyEvent(Key.O)
+///     ];
+///     
+///     app.InjectSequence(sequence);
+///     // Virtual time has advanced by 300ms, but test executes instantly
+///     </code>
+///     <b>Example 4: Testing ANSI encoding with Pipeline mode</b>
+///     <code>
+///     using IApplication app = Application.Create();
+///     app.Init(DriverRegistry.Names.ANSI);
+///     
+///     IInputInjector injector = app.GetInputInjector();
+///     
+///     // Use Pipeline mode to test encoding/decoding
+///     InputInjectionOptions options = new() { Mode = InputInjectionMode.Pipeline };
+///     
+///     // Key will go through: Key → ANSI sequence → Parser → Key event
+///     injector.InjectKey(Key.F1, options);
+///     injector.InjectKey(Key.CursorUp.WithCtrl, options);
+///     </code>
+/// </example>
+/// <seealso cref="InputInjectionExtensions"/>
 public class InputInjector : IInputInjector
 {
     private readonly IInputProcessor _processor;
@@ -14,7 +125,7 @@ public class InputInjector : IInputInjector
     private readonly TestInputSource? _testSource;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="InputInjector"/> class.
+    ///     Initializes a new instance of the <see cref="InputInjector"/> class.
     /// </summary>
     /// <param name="processor">The input processor to inject events into.</param>
     /// <param name="timeProvider">The time provider for timestamps.</param>
@@ -29,7 +140,7 @@ public class InputInjector : IInputInjector
     /// <inheritdoc/>
     public void InjectKey (Key key, InputInjectionOptions? options = null)
     {
-        options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
+        options ??= new () { TimeProvider = _timeProvider };
         InputInjectionMode mode = ResolveMode (options.Mode);
 
         if (mode == InputInjectionMode.Direct)
@@ -59,7 +170,7 @@ public class InputInjector : IInputInjector
     /// <inheritdoc/>
     public void InjectMouse (Mouse mouseEvent, InputInjectionOptions? options = null)
     {
-        options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
+        options ??= new () { TimeProvider = _timeProvider };
         InputInjectionMode mode = ResolveMode (options.Mode);
 
         // Set timestamp if not provided
@@ -94,7 +205,7 @@ public class InputInjector : IInputInjector
     /// <inheritdoc/>
     public void InjectSequence (IEnumerable<InputEvent> events, InputInjectionOptions? options = null)
     {
-        options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
+        options ??= new () { TimeProvider = _timeProvider };
 
         foreach (InputEvent evt in events)
         {
@@ -149,6 +260,18 @@ public class InputInjector : IInputInjector
         }
     }
 
+    /// <summary>
+    ///     Resolves the injection mode, converting <see cref="InputInjectionMode.Auto"/> to a concrete mode.
+    /// </summary>
+    /// <param name="mode">The requested injection mode.</param>
+    /// <returns>
+    ///     The resolved mode. <see cref="InputInjectionMode.Auto"/> is resolved to
+    ///     <see cref="InputInjectionMode.Direct"/> for faster, simpler tests.
+    /// </returns>
+    /// <remarks>
+    ///     Auto mode defaults to Direct for optimal test performance. Use Pipeline mode explicitly
+    ///     when you need to test ANSI encoding/decoding behavior.
+    /// </remarks>
     private InputInjectionMode ResolveMode (InputInjectionMode mode)
     {
         if (mode != InputInjectionMode.Auto)

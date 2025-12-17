@@ -309,7 +309,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
@@ -335,7 +335,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         // Act & Assert - Should not throw
         injector.ProcessQueue ();
@@ -352,7 +352,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
@@ -373,7 +373,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
@@ -404,7 +404,7 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Key> receivedKeys = [];
         List<DateTime> timestamps = [];
@@ -439,7 +439,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Key> receivedKeys = [];
         List<Mouse> receivedMouse = [];
@@ -477,7 +477,7 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         // Act - Advance time
         timeProvider.Advance (TimeSpan.FromMinutes (5));
@@ -495,7 +495,7 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         Mouse mouseEvent = new ()
         {
@@ -524,7 +524,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
@@ -543,7 +543,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Mouse> receivedEvents = [];
         processor.MouseEventParsed += (_, mouse) => receivedEvents.Add (mouse);
@@ -568,7 +568,7 @@ public class InputInjectorTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
         VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
+        IInputInjector injector = new InputInjector (processor, timeProvider);
 
         List<Key> receivedKeys = [];
         processor.KeyDown += (_, key) => receivedKeys.Add (key);

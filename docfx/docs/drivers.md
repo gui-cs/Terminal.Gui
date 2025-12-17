@@ -462,7 +462,7 @@ Terminal.Gui provides a sophisticated input injection system for testing applica
 ### Simple Test Example
 
 ```csharp
-// CoPilot - Create app with virtual time for testing
+// Create app with virtual time for testing
 VirtualTimeProvider time = new ();
 using IApplication app = Application.Create(time);
 app.Init(DriverRegistry.Names.ANSI);  // Use ANSI driver
@@ -482,7 +482,7 @@ Assert.True(acceptingCalled);
 The input injection system supports **virtual time** via `VirtualTimeProvider`, enabling deterministic testing of timing-dependent behavior like double-clicks:
 
 ```csharp
-// CoPilot - Test double-click with precise timing
+// Test double-click with precise timing
 VirtualTimeProvider time = new ();
 using IApplication app = Application.Create(time);
 app.Init(DriverRegistry.Names.ANSI);
@@ -522,7 +522,7 @@ The input injection system supports two modes:
 - **Pipeline Mode** - Goes through full ANSI encoding → parsing → decoding pipeline. Use when testing ANSI escape sequence handling.
 
 ```csharp
-// CoPilot - Test ANSI encoding/decoding pipeline
+// Test ANSI encoding/decoding pipeline
 VirtualTimeProvider time = new ();
 using IApplication app = Application.Create(time);
 app.Init(DriverRegistry.Names.ANSI);
@@ -544,6 +544,6 @@ app.InjectKey(Key.F1, options);
 - **No manual queue management** - The old 3-step dance (inject → simulate thread → process queue) is handled automatically
 - **Automatic escape handling** - Escape sequences are processed without manual `Thread.Sleep()` delays
 
-For complete documentation of the input injection architecture, see [Driver Input Injection - Redesign Specification](driver-input-injection-redesign.md).
+For complete documentation of the input injection architecture, see [Input Injection](input-injection-redesign.md).
 
 

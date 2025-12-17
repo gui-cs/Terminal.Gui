@@ -20,7 +20,7 @@ public interface IKeyboard
     ///     <see cref="KeyDown"/> event, then calls <see cref="View.NewKeyDownEvent"/> on all top level views, and finally
     ///     if the key was not handled, invokes any Application-scoped <see cref="KeyBindings"/>.
     /// </summary>
-    /// <remarks>Can be used to simulate key press events.</remarks>
+    /// <remarks>Can be used to simulate key press events without a driver. Use <see cref="InputInjector"/> for input injection.</remarks>
     /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
     bool RaiseKeyDownEvent (Key key);

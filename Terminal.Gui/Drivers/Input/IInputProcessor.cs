@@ -64,16 +64,6 @@ public interface IInputProcessor
     event EventHandler<Mouse>? MouseEventParsed;
 
     /// <summary>
-    ///     Raises the <see cref="SyntheticMouseEvent"/> event for generated click/double-click/triple-click events.
-    /// </summary>
-    /// <remarks>
-    ///     Called by <see cref="ProcessQueue"/> after processing raw mouse input through <see cref="MouseInterpreter"/>
-    ///     to generate higher-level click events based on timing and position.
-    /// </remarks>
-    /// <param name="mouse">The synthetic mouse event data.</param>
-    void RaiseSyntheticMouseEvent (Mouse mouse);
-
-    /// <summary>
     ///     Event raised when synthetic mouse events (clicks, double-clicks, triple-clicks) are generated.
     /// </summary>
     event EventHandler<Mouse>? SyntheticMouseEvent;

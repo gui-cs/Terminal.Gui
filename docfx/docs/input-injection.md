@@ -1,70 +1,176 @@
-﻿# Driver Input Injection - Deep Dive
+﻿# Input Injection
 
-- [Overview](#overview)
-- [Key Concepts](#key-concepts)
-  - [Virtual Time](#virtual-time)
-  - [Input Injection Modes](#input-injection-modes)
-  - [Single-Call Injection](#single-call-injection)
-- [Architecture Layers](#architecture-layers)
-  - [Layer 1: Time Abstraction](#layer-1-time-abstraction)
-  - [Layer 2: Input Source](#layer-2-input-source)
-  - [Layer 3: Input Processor](#layer-3-input-processor)
-  - [Layer 4: Input Injector](#layer-4-input-injector)
-  - [Layer 5: Application Integration](#layer-5-application-integration)
-- [Testing Patterns](#testing-patterns)
-  - [Simple Unit Tests](#simple-unit-tests)
-  - [Timing-Dependent Tests](#timing-dependent-tests)
-  - [ANSI Pipeline Tests](#ansi-pipeline-tests)
-  - [Integration Tests](#integration-tests)
-- [Best Practices](#best-practices)
-- [Advanced Topics](#advanced-topics)
-  - [Custom Input Sources](#custom-input-sources)
-  - [Custom Time Providers](#custom-time-providers)
-  - [Input Sequences](#input-sequences)
-- [Troubleshooting](#troubleshooting)
+> **Quick Start:** Most developers only need to use `app.InjectKey()` and `app.InjectMouse()`. See [Simple Examples](#simple-examples) below.
 
 ## Overview
 
-The input injection system allows tests to programmatically simulate user input (keyboard and mouse events) without requiring actual hardware or terminal interaction. The architecture was designed with these principles:
+Input injection allows tests to simulate user input (keyboard and mouse) without requiring actual hardware. The system provides:
 
-### Design Principles
+- **Single-call API** - `app.InjectKey(Key.A)` handles everything
+- **Virtual time control** - Tests run instantly, no real delays
+- **Two modes** - Direct (default, fast) and Pipeline (full ANSI encoding/parsing)
+- **Deterministic behavior** - Same input → same result, every time
 
-1. **Simplicity** - Single method call for complete injection cycle
-2. **Determinism** - Virtual time eliminates timing-related flakiness
-3. **Speed** - No real delays needed for escape sequence handling
-4. **Testability** - Full ANSI encoding/parsing pipeline can be tested
-5. **Clarity** - Clear separation of concerns across architectural layers
+## Simple Examples
 
-## Key Concepts
+### Basic Keyboard Input
 
-### Virtual Time
+```csharp
+using IApplication app = Application.Create();
+app.Init(DriverRegistry.Names.ANSI);
+
+// Subscribe to key events
+app.Keyboard.KeyDown += (s, e) => Console.WriteLine($"Key: {e}");
+
+// Inject keys
+app.InjectKey(Key.A);
+app.InjectKey(Key.Enter);
+app.InjectKey(Key.Esc);
+```
+
+### Basic Mouse Input
+
+```csharp
+using IApplication app = Application.Create();
+app.Init(DriverRegistry.Names.ANSI);
+
+// Subscribe to mouse events
+app.Mouse.MouseEvent += (s, e) => Console.WriteLine($"Mouse: {e.Flags} at {e.ScreenPosition}");
+
+// Inject mouse click
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonPressed 
+});
+
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonReleased 
+});
+```
+
+### Testing with Virtual Time
+
+```csharp
+// Create virtual time provider for deterministic timing
+VirtualTimeProvider time = new();
+time.SetTime(new DateTime(2025, 1, 1, 12, 0, 0));
+
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+// First click at T+0
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonPressed,
+    Timestamp = time.Now
+});
+
+time.Advance(TimeSpan.FromMilliseconds(50));
+
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonReleased,
+    Timestamp = time.Now
+});
+
+// Second click at T+300 (within double-click threshold)
+time.Advance(TimeSpan.FromMilliseconds(250));
+
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonPressed,
+    Timestamp = time.Now
+});
+
+time.Advance(TimeSpan.FromMilliseconds(50));
+
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonReleased,
+    Timestamp = time.Now
+});
+
+// Double-click was detected!
+```
+
+## When to Use Each Mode
+
+### Direct Mode (Default)
+
+**Use for:** 99% of tests - view behavior, command execution, event handling
+
+```csharp
+// Direct mode is default - just inject
+app.InjectKey(Key.A);
+app.InjectMouse(new() { ScreenPosition = new(10, 5), Flags = MouseFlags.LeftButtonClicked });
+```
+
+### Pipeline Mode (ANSI Testing)
+
+**Use for:** Testing ANSI encoding/parsing, escape sequences, driver behavior
+
+```csharp
+// Explicit Pipeline mode
+IInputInjector injector = app.GetInputInjector();
+InputInjectionOptions options = new() { Mode = InputInjectionMode.Pipeline };
+
+// This tests: Key.F1 → "\x1b[OP" → Parser → Key.F1
+injector.InjectKey(Key.F1, options);
+```
+
+### Auto Mode
+
+**Purpose:** Let the system choose the appropriate mode
+
+**Behavior:** Currently defaults to Direct mode for performance
+
+**When to Use:** When there are no specific requirements for mode selection
+
+---
+
+## Detailed Documentation
+
+The sections below provide in-depth documentation for advanced scenarios.
+
+- [Virtual Time Details](#virtual-time-details)
+- [Injection Modes Deep Dive](#injection-modes-deep-dive)
+- [Architecture Layers](#architecture-layers)
+- [Testing Patterns](#testing-patterns)
+- [Best Practices](#best-practices)
+- [Advanced Topics](#advanced-topics)
+- [Troubleshooting](#troubleshooting)
+
+---
+
+## Virtual Time Details
 
 **Virtual time** is the foundation of deterministic testing. Instead of relying on `DateTime.Now` and real delays, tests explicitly control time advancement.
 
-#### How Virtual Time Works
+### How Virtual Time Works
 
 ```csharp
 // Create virtual time provider
-VirtualTimeProvider time = new ();
+VirtualTimeProvider time = new();
 
 // Set initial time
 time.SetTime(new DateTime(2025, 1, 1, 12, 0, 0));
 
-// Advance time by 100ms
+// Advance time by 100ms (instant - no real delay)
 time.Advance(TimeSpan.FromMilliseconds(100));
 
 // Current virtual time is now 12:00:00.100
 DateTime now = time.Now;  // 2025-01-01 12:00:00.100
 ```
 
-#### Benefits of Virtual Time
+### Benefits of Virtual Time
 
 - **Fast** - No real delays; `time.Advance(TimeSpan.FromSeconds(10))` is instant
 - **Precise** - Control timing to the millisecond
 - **Repeatable** - Same time sequence → same test results
 - **Debuggable** - Pause time, inspect state, advance step-by-step
 
-#### Components Using Virtual Time
+### Components Using Virtual Time
 
 All timing-dependent components accept `ITimeProvider`:
 
@@ -72,6 +178,8 @@ All timing-dependent components accept `ITimeProvider`:
 - **`MouseInterpreter`** - Click timing and multi-click synthesis
 - **`AnsiResponseParser`** - Escape sequence timeout detection (50ms)
 - **Application timers and delays** - All time-based operations
+
+## Injection Modes Deep Dive
 
 ### Input Injection Modes
 
@@ -83,7 +191,7 @@ The system supports two injection modes to balance speed and coverage:
 
 **Flow:** 
 ```
-InputInjector → TestInputSource → InputProcessor → Events
+InputInjector → InputProcessor → Events
 ```
 
 **Characteristics:**
@@ -101,7 +209,7 @@ InputInjector → TestInputSource → InputProcessor → Events
 **Example:**
 ```csharp
 // Direct mode (default)
-VirtualTimeProvider time = new ();
+VirtualTimeProvider time = new();
 using IApplication app = Application.Create(time);
 app.Init(DriverRegistry.Names.ANSI);
 
@@ -133,17 +241,17 @@ InputInjector → ANSI Encoder → TestInputSource (chars) → AnsiResponseParse
 **Example:**
 ```csharp
 // Pipeline mode for ANSI testing
-VirtualTimeProvider time = new ();
+VirtualTimeProvider time = new();
 using IApplication app = Application.Create(time);
 app.Init(DriverRegistry.Names.ANSI);
 
-InputInjectionOptions options = new () 
+InputInjectionOptions options = new() 
 { 
     Mode = InputInjectionMode.Pipeline 
 };
 
 // This encodes Key.F1 → "\x1b[OP", injects chars, parses back
-app.InjectKey(Key.F1, options);
+app.GetInputInjector().InjectKey(Key.F1, options);
 
 // Verify ANSI encoding worked correctly
 // (parser should decode "\x1b[OP" back to Key.F1)
@@ -155,29 +263,7 @@ app.InjectKey(Key.F1, options);
 
 **Behavior:** Currently defaults to Direct mode for performance
 
-**When to Use:** When there are not specific requirements for mode selection
-
-### Single-Call Injection
-
-The most visible improvement is **single-call injection**. One method handles the complete injection cycle:
-
-```csharp
-// Complete injection in one call
-app.InjectKey(Key.A);      // Injects, processes, raises events
-app.InjectMouse(mouse);     // Injects, processes, raises events
-```
-
-**What Happens Behind the Scenes:**
-
-1. **Injection** - Event added to `TestInputSource` queue
-2. **Timestamp** - Current virtual time stamped on event
-3. **Processing** - Input processor drains queue
-4. **Parsing** - ANSI sequences parsed (if Pipeline mode)
-5. **Interpretation** - Click synthesis, multi-click detection
-6. **Event Raising** - Final events raised to application
-7. **Escape Handling** - Stale escape sequences automatically released
-
-All of this happens **synchronously** in one call, with **virtual time** controlling any delays.
+**When to Use:** When there are no specific requirements for mode selection
 
 ## Architecture Layers
 
@@ -911,7 +997,7 @@ app.InjectKey(Key.F1, new () { Mode = InputInjectionMode.Pipeline });
 ```csharp
 // ✅ CORRECT - Explicit time advancement
 app.InjectMouse(firstClick);
-time.Advance(TimeSpan.FromMilliseconds(300));
+time.Advance(TimeSpan.FromMilliseconds(50));
 app.InjectMouse(secondClick);
 
 // ❌ WRONG - Real delays defeat virtual time
@@ -1111,10 +1197,3 @@ app.InjectKey(key);  // Fast Direct mode
 
 // Use sequences for multiple inputs
 app.InjectSequence(events);  // Better than loop of InjectKey()
-```
-
-## See Also
-
-- [Drivers Deep Dive](drivers.md) - Driver architecture overview
-- [Mouse Deep Dive](mouse.md) - Mouse event processing details
-- [Testing Documentation](testing.md) - General testing guidance

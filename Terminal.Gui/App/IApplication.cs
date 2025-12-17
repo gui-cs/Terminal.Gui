@@ -268,7 +268,7 @@ public interface IApplication : IDisposable
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new ();
+        where TRunnable : IRunnable, new();
 
     #region Iteration & Invoke
 
@@ -450,48 +450,6 @@ public interface IApplication : IDisposable
     IClipboard? Clipboard { get; }
 
     /// <summary>
-    ///     Gets the time provider used by this application instance.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The time provider controls timing and timestamps throughout the application.
-    ///         For production applications, this is a <see cref="SystemTimeProvider"/> that uses <c>DateTime.Now</c>.
-    ///         For testing, this can be a <see cref="VirtualTimeProvider"/> that allows explicit control of time.
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="Application.Create"/> with <see cref="VirtualTimeProvider"/> to create an application with a
-    ///         virtual time provider for testing.
-    ///     </para>
-    /// </remarks>
-    /// <returns>The <see cref="ITimeProvider"/> used for timing and timestamps.</returns>
-    ITimeProvider GetTimeProvider ();
-
-    /// <summary>
-    ///     Gets the input injector for programmatic input injection in tests.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The input injector provides a simplified API for injecting keyboard and mouse events
-    ///         in tests. It handles encoding, queueing, and processing automatically.
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="Application.CreateForTesting"/> to create an application with
-    ///         <see cref="VirtualTimeProvider"/> for deterministic, fast tests.
-    ///     </para>
-    ///     <para>
-    ///         Example usage:
-    ///         <code>
-    ///             VirtualTimeProvider time = new ();
-    ///             using IApplication app = Application.CreateForTesting (time);
-    ///             app.Init ();
-    ///             app.InjectKey (Key.Enter);  // Extension method uses GetInputInjector()
-    ///         </code>
-    ///     </para>
-    /// </remarks>
-    /// <returns>The <see cref="IInputInjector"/> for input injection.</returns>
-    IInputInjector GetInputInjector ();
-
-    /// <summary>
     ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
@@ -534,7 +492,32 @@ public interface IApplication : IDisposable
 
     #endregion Screen and Driver
 
-    #region Keyboard
+    #region Input (Mouse/Keyboard)
+
+    /// <summary>
+    ///     Gets the input injector for programmatic input injection in tests.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The input injector provides a simplified API for injecting keyboard and mouse events
+    ///         in tests. It handles encoding, queueing, and processing automatically.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="Application.CreateForTesting"/> to create an application with
+    ///         <see cref="VirtualTimeProvider"/> for deterministic, fast tests.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///             VirtualTimeProvider time = new ();
+    ///             using IApplication app = Application.CreateForTesting (time);
+    ///             app.Init ();
+    ///             app.InjectKey (Key.Enter);  // Extension method uses GetInputInjector()
+    ///         </code>
+    ///     </para>
+    /// </remarks>
+    /// <returns>The <see cref="IInputInjector"/> for input injection.</returns>
+    IInputInjector GetInputInjector ();
 
     /// <summary>
     ///     Handles keyboard input and key bindings at the Application level.
@@ -546,10 +529,6 @@ public interface IApplication : IDisposable
     /// </remarks>
     IKeyboard Keyboard { get; set; }
 
-    #endregion Keyboard
-
-    #region Mouse
-
     /// <summary>
     ///     Handles mouse event state and processing.
     /// </summary>
@@ -560,7 +539,7 @@ public interface IApplication : IDisposable
     /// </remarks>
     IMouse Mouse { get; set; }
 
-    #endregion Mouse
+    #endregion Input (Mouse/Keyboard)
 
     #region Layout and Drawing
 

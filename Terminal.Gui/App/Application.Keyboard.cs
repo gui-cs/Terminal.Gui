@@ -12,7 +12,7 @@ public static partial class Application // Keyboard handling
     }
 
     /// <inheritdoc cref="IKeyboard.RaiseKeyDownEvent"/>
-    [Obsolete ("The legacy static Application object is going away.")] 
+    [Obsolete ("The legacy static Application object is going away.")]
     public static bool RaiseKeyDownEvent (Key key) => ApplicationImpl.Instance.Keyboard.RaiseKeyDownEvent (key);
 
     /// <summary>

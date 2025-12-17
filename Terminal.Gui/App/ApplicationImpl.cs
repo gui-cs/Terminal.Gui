@@ -43,29 +43,9 @@ internal partial class ApplicationImpl : IApplication
     /// <param name="componentFactory">The component factory.</param>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
     /// <param name="testMode">If <see langword="true"/>, configures application for testing with TestInputSource.</param>
-    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider, bool testMode) : this (timeProvider, testMode) 
-    { 
-        _componentFactory = componentFactory; 
-    }
-
-    /// <inheritdoc/>
-    public ITimeProvider GetTimeProvider () { return _timeProvider; }
-
-    /// <inheritdoc/>
-    public IInputInjector GetInputInjector ()
+    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider, bool testMode) : this (timeProvider, testMode)
     {
-        if (_inputInjector is null)
-        {
-            if (Driver is null)
-            {
-                throw new InvalidOperationException ("Driver not initialized. Call Init() first.");
-            }
-
-            IInputProcessor processor = Driver.GetInputProcessor ();
-            _inputInjector = new InputInjector (processor, _timeProvider);
-        }
-
-        return _inputInjector;
+        _componentFactory = componentFactory;
     }
 
     private string? _driverName;
@@ -199,7 +179,24 @@ internal partial class ApplicationImpl : IApplication
 
     #endregion Screen and Driver
 
-    #region Keyboard
+    #region Input (Mouse/Keyboard)
+
+    /// <inheritdoc/>
+    public IInputInjector GetInputInjector ()
+    {
+        if (_inputInjector is null)
+        {
+            if (Driver is null)
+            {
+                throw new InvalidOperationException ("Driver not initialized. Call Init() first.");
+            }
+
+            IInputProcessor processor = Driver.GetInputProcessor ();
+            _inputInjector = new InputInjector (processor, _timeProvider);
+        }
+
+        return _inputInjector;
+    }
 
     private IKeyboard? _keyboard;
 
@@ -215,10 +212,6 @@ internal partial class ApplicationImpl : IApplication
         set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion Keyboard
-
-    #region Mouse
-
     private IMouse? _mouse;
 
     /// <inheritdoc/>
@@ -233,7 +226,7 @@ internal partial class ApplicationImpl : IApplication
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion Mouse
+    #endregion Input (Mouse/Keyboard)
 
     #region Navigation and Popover
 

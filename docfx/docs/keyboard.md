@@ -230,3 +230,76 @@ The @Terminal.Gui.App.Keyboard class implements @Terminal.Gui.App.IKeyboard and 
 - **Command Implementations**: Handlers for Application-scoped commands (Quit, Suspend, Navigation, Refresh, Arrange)
 
 The @Terminal.Gui.App.IApplication implementations create and manage the @Terminal.Gui.App.IKeyboard instance, setting its `IApplication` property to `this` to provide the necessary @Terminal.Gui.App.IApplication reference.
+
+## Testing Keyboard Input
+
+> **For comprehensive documentation on testing,** see **[Input Injection](input-injection.md)**.
+
+Terminal.Gui provides a sophisticated input injection system for testing keyboard behavior without requiring actual keyboard hardware. Here's a quick overview:
+
+### Quick Test Example
+
+```csharp
+// Create application with virtual time for deterministic testing
+VirtualTimeProvider time = new();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+// Subscribe to key events
+app.Keyboard.KeyDown += (s, e) => Console.WriteLine($"Key: {e}");
+
+// Inject keys
+app.InjectKey(Key.A);
+app.InjectKey(Key.Enter);
+app.InjectKey(Key.Esc);
+```
+
+### Testing Key Commands
+
+```csharp
+VirtualTimeProvider time = new();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+Button button = new() { Text = "_Click Me" };
+bool acceptingCalled = false;
+button.Accepting += (s, e) => acceptingCalled = true;
+
+IRunnable runnable = new Runnable();
+(runnable as View)?.Add(button);
+app.Begin(runnable);
+
+// Inject hotkey (Alt+C)
+app.InjectKey(Key.C.WithAlt);
+
+Assert.True(acceptingCalled);
+```
+
+### Testing Escape Sequences with Pipeline Mode
+
+```csharp
+// Pipeline mode tests full ANSI encoding/decoding
+VirtualTimeProvider time = new();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+IInputInjector injector = app.GetInputInjector();
+InputInjectionOptions options = new() { Mode = InputInjectionMode.Pipeline };
+
+// This encodes Key.F1 ? "\x1b[OP", injects chars, parses back to Key.F1
+injector.InjectKey(Key.F1, options);
+```
+
+### Key Testing Features
+
+- **Virtual Time Control** - Deterministic timing for escape sequence handling
+- **Single-Call Injection** - `app.InjectKey(key)` handles everything
+- **No Real Delays** - Tests run instantly using virtual time
+- **Two Modes** - Direct (default, fast) and Pipeline (full ANSI encoding)
+- **Escape Sequence Handling** - Automatic release of stale escapes
+
+**Learn More:** See **[Input Injection](input-injection.md)** for complete documentation including:
+- Architecture and design
+- Testing patterns and best practices
+- Advanced scenarios (modifier keys, function keys, special keys)
+- Troubleshooting guide

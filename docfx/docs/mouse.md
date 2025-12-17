@@ -503,6 +503,85 @@ view.MouseEvent += (s, e) =>
 * Mouse coordinates are limited to character cell boundaries - sub-character precision is not available
 * Performance can be impacted by excessive mouse move event handling - use mouse enter/leave events when appropriate rather than tracking all mouse moves
 
+## Testing Mouse Input
+
+> **For comprehensive documentation on testing,** see **[Input Injection](input-injection.md)**.
+
+Terminal.Gui provides a sophisticated input injection system for testing mouse behavior without requiring actual hardware. Here's a quick overview:
+
+### Quick Test Example
+
+```csharp
+// Create application with virtual time for deterministic testing
+VirtualTimeProvider time = new();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+// Inject mouse click
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonPressed 
+});
+
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonReleased 
+});
+```
+
+### Testing Double-Click with Virtual Time
+
+```csharp
+VirtualTimeProvider time = new();
+time.SetTime(new DateTime(2025, 1, 1, 12, 0, 0));
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+// First click at T+0
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonPressed,
+    Timestamp = time.Now 
+});
+
+time.Advance(TimeSpan.FromMilliseconds(50));
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonReleased,
+    Timestamp = time.Now 
+});
+
+// Second click at T+300 (within double-click threshold)
+time.Advance(TimeSpan.FromMilliseconds(250));
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonPressed,
+    Timestamp = time.Now 
+});
+
+time.Advance(TimeSpan.FromMilliseconds(50));
+app.InjectMouse(new() { 
+    ScreenPosition = new(10, 5), 
+    Flags = MouseFlags.LeftButtonReleased,
+    Timestamp = time.Now 
+});
+
+// Double-click was detected!
+```
+
+### Key Testing Features
+
+- **Virtual Time Control** - Deterministic timing for multi-click detection
+- **Single-Call Injection** - `app.InjectMouse(mouse)` handles everything
+- **No Real Delays** - Tests run instantly using virtual time
+- **Two Modes** - Direct (default, fast) and Pipeline (full ANSI encoding)
+
+**Learn More:** See **[Input Injection](input-injection.md)** for complete documentation including:
+- Architecture and design
+- Testing patterns and best practices
+- Advanced scenarios (drag/drop, mouse wheel, enter/leave)
+- Troubleshooting guide
+
 ## How Drivers Work
 
 The **Driver Level** is the first stage of mouse event processing, where platform-specific mouse events are captured and converted into a standardized `Mouse` instance that the rest of Terminal.Gui can process uniformly.
@@ -1354,60 +1433,11 @@ public void MouseEnterLeave_UpdatesState ()
 
 ### Key Testing Concepts
 
-- **Virtual Time** - Use `VirtualTimeProvider` for deterministic timing control
+- **Virtual Time** - Use `VirtualTimeProvider` for deterministic, repeatable tests
 - **ANSI Driver** - Use `DriverRegistry.Names.ANSI` for cross-platform testing
-- **Single-Call Injection** - `app.InjectMouse(mouse)` handles everything automatically
-- **Time Advancement** - Use `time.Advance(timespan)` instead of `Thread.Sleep()`
-- **Direct Mode** - Default injection mode bypasses ANSI encoding for speed
-- **Pipeline Mode** - Use when testing ANSI mouse encoding/parsing
-- **ScreenPosition** - Always use `ScreenPosition` property for injection (framework sets `Position` during routing)
-- **View Hierarchy** - Add views to a runnable and call `app.Begin()` for proper event routing
-
-### Best Practices
-
-1. **Always use virtual time** - Creates deterministic, repeatable tests
-   ```csharp
-   VirtualTimeProvider time = new ();
-   using IApplication app = Application.Create (time);
-   ```
-
-2. **Use ANSI driver for tests** - Cross-platform, consistent behavior
-   ```csharp
-   app.Init (DriverRegistry.Names.ANSI);
-   ```
-
-3. **Advance time explicitly** - Don't use `Thread.Sleep()`
-   ```csharp
-   time.Advance (TimeSpan.FromMilliseconds (300));
-   ```
-
-4. **Test both press and release** - Complete click cycle
-   ```csharp
-   app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
-   app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
-   ```
-
-5. **Use ScreenPosition for injection** - The framework converts to viewport-relative `Position`
-   ```csharp
-   app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 5) });
-   ```
-
-6. **Add views to hierarchy for routing** - Mouse events need views in hierarchy
-   ```csharp
-   IRunnable runnable = new Runnable ();
-   (runnable as View)?.Add (myView);
-   app.Begin (runnable);
-   ```
-
-7. **Dispose properly** - Clean up runnables when done
-   ```csharp
-   (runnable as View)?.Dispose ();
-   ```
-
-8. **Handle nullable Position** - View-level `Position` property is nullable
-   ```csharp
-   if (e.Position.HasValue)
-   {
-       int x = e.Position.Value.X;
-   }
-   ```
+- **Advance time explicitly** - Don't use `Thread.Sleep()`
+- **Test both press and release** - Complete click cycle
+- **Use ScreenPosition for injection** - Framework converts to viewport-relative `Position`
+- **Add views to hierarchy for routing** - Mouse events need views in hierarchy
+- **Dispose properly** - Clean up runnables when done
+- **Handle nullable Position** - View-level `Position` property is nullable
