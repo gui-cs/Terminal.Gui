@@ -318,22 +318,8 @@ public interface IDriver : IDisposable
 
     #region Input Events
 
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
+    /// <summary>Event fired when a key is pressed down.</summary>
     event EventHandler<Key>? KeyDown;
-
-    /// <summary>Event fired when a key is released.</summary>
-    /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="IDriver.KeyDown"/>
-    ///     processing is
-    ///     complete.
-    /// </remarks>
-    event EventHandler<Key>? KeyUp;
-
-    /// <summary>
-    ///     Injects a key input event to the driver. For unit tests.
-    /// </summary>
-    /// <param name="key"></param>
-    void InjectKeyEvent (Key key);
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<Mouse>? MouseEvent;

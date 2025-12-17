@@ -235,7 +235,7 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.TextChanged += (s, e) => PathChanged ();
 
         _tableView.CellActivated += CellActivate;
-        _tableView.KeyDown += (s, k) => k.Handled = TableView_KeyUp (k);
+        _tableView.KeyDown += (s, k) => k.Handled = TableView_KeyDown (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
@@ -1309,7 +1309,7 @@ public class FileDialog : Dialog, IDesignable
         }
     }
 
-    private bool TableView_KeyUp (Key keyEvent)
+    private bool TableView_KeyDown (Key keyEvent)
     {
         if (keyEvent.KeyCode == KeyCode.Backspace)
         {

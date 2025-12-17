@@ -466,7 +466,6 @@ public class ApplicationImplTests
                             if (app.TopRunnableView != null)
                             {
                                 b.NewKeyDownEvent (Key.Enter);
-                                b.NewKeyUpEvent (Key.Enter);
                             }
 
                             return false;

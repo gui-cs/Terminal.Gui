@@ -36,7 +36,6 @@ public class InputInjector : IInputInjector
         {
             // Direct injection - bypass encoding, raise event directly
             _processor.RaiseKeyDownEvent (key);
-            _processor.RaiseKeyUpEvent (key);
         }
         else // Pipeline
         {

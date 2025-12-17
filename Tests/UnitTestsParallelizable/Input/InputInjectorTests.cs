@@ -74,54 +74,6 @@ public class InputInjectorTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void InjectKey_DirectMode_RaisesKeyUpEvent ()
-    {
-        // Arrange
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
-        TestInputProcessor processor = new (queue);
-        VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
-
-        List<Key> receivedKeys = [];
-        processor.KeyUp += (_, key) => receivedKeys.Add (key);
-
-        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
-
-        // Act
-        injector.InjectKey (Key.A, options);
-
-        // Assert - Should raise exactly 1 KeyUp event in Direct mode
-        Assert.Single (receivedKeys);
-        Assert.Equal (Key.A, receivedKeys [0]);
-    }
-
-    [Fact]
-    public void InjectKey_DirectMode_RaisesBothKeyEvents ()
-    {
-        // Arrange
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
-        TestInputProcessor processor = new (queue);
-        VirtualTimeProvider timeProvider = new ();
-        InputInjector injector = new (processor, timeProvider);
-
-        List<Key> keyDownEvents = [];
-        List<Key> keyUpEvents = [];
-        processor.KeyDown += (_, key) => keyDownEvents.Add (key);
-        processor.KeyUp += (_, key) => keyUpEvents.Add (key);
-
-        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
-
-        // Act
-        injector.InjectKey (Key.Enter, options);
-
-        // Assert - Should raise exactly 1 of each event
-        Assert.Single (keyDownEvents);
-        Assert.Equal (Key.Enter, keyDownEvents [0]);
-        Assert.Single (keyUpEvents);
-        Assert.Equal (Key.Enter, keyUpEvents [0]);
-    }
-
-    [Fact]
     public void InjectKey_DirectMode_MultipleKeys_RaisesAllEvents ()
     {
         // Arrange

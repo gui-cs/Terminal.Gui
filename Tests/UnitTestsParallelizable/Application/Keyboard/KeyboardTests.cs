@@ -162,23 +162,6 @@ public class KeyboardTests
     }
 
     [Fact]
-    public void KeyUp_Event_CanBeSubscribed ()
-    {
-        // Arrange
-        var keyboard = new KeyboardImpl ();
-        bool eventRaised = false;
-
-        // Act
-        keyboard.KeyUp += (sender, key) =>
-        {
-            eventRaised = true;
-        };
-
-        // Assert - event subscription doesn't throw
-        Assert.False (eventRaised); // Event hasn't been raised yet
-    }
-
-    [Fact]
     public void InvokeCommand_WithInvalidCommand_ThrowsNotSupportedException ()
     {
         // Arrange

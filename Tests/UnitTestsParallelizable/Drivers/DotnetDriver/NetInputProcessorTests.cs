@@ -100,20 +100,15 @@ public class NetInputProcessorTests
 
         var processor = new NetInputProcessor (queue, null);
 
-        List<Key> ups = new ();
         List<Key> downs = new ();
 
-        processor.KeyUp += (s, e) => { ups.Add (e); };
         processor.KeyDown += (s, e) => { downs.Add (e); };
 
-        Assert.Empty (ups);
         Assert.Empty (downs);
 
         processor.ProcessQueue ();
 
-        Assert.Equal (Key.H.WithShift, ups [0]);
         Assert.Equal (Key.H.WithShift, downs [0]);
-        Assert.Equal (Key.E, ups [1]);
         Assert.Equal (Key.E, downs [1]);
     }
 }

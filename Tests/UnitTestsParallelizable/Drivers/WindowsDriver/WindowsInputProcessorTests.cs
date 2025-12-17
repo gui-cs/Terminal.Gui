@@ -72,20 +72,15 @@ public class WindowsInputProcessorTests
 
         var processor = new WindowsInputProcessor (queue, null);
 
-        List<Key> ups = [];
         List<Key> downs = [];
 
-        processor.KeyUp += (s, e) => { ups.Add (e); };
         processor.KeyDown += (s, e) => { downs.Add (e); };
 
-        Assert.Empty (ups);
         Assert.Empty (downs);
 
         processor.ProcessQueue ();
 
-        Assert.Equal (Key.H.WithShift, ups [0]);
         Assert.Equal (Key.H.WithShift, downs [0]);
-        Assert.Equal (Key.I, ups [1]);
         Assert.Equal (Key.I, downs [1]);
     }
 

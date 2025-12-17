@@ -580,27 +580,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         Assert.Single (receivedKeys);
         Assert.Equal (testKey, receivedKeys [0]);
     }
-
-    [Fact]
-    public void RaiseKeyUpEvent_RaisesKeyUpEvent ()
-    {
-        // Arrange
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
-        TestInputProcessor processor = new (queue);
-
-        List<Key> receivedKeys = [];
-        processor.KeyUp += (_, key) => receivedKeys.Add (key);
-
-        Key testKey = Key.A;
-
-        // Act
-        processor.RaiseKeyUpEvent (testKey);
-
-        // Assert - Should raise exactly 1 KeyUp event
-        Assert.Single (receivedKeys);
-        Assert.Equal (testKey, receivedKeys [0]);
-    }
-
+    
     [Fact]
     public void RaiseKeyDownEvent_MultipleKeys_RaisesAllEvents ()
     {
@@ -627,31 +607,6 @@ public class InputProcessorImplTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void KeyDownAndKeyUp_BothEventsRaised ()
-    {
-        // Arrange
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
-        TestInputProcessor processor = new (queue);
-
-        List<Key> keyDownEvents = [];
-        List<Key> keyUpEvents = [];
-        processor.KeyDown += (_, key) => keyDownEvents.Add (key);
-        processor.KeyUp += (_, key) => keyUpEvents.Add (key);
-
-        Key testKey = Key.Enter;
-
-        // Act
-        processor.RaiseKeyDownEvent (testKey);
-        processor.RaiseKeyUpEvent (testKey);
-
-        // Assert - Each event should be raised exactly once
-        Assert.Single (keyDownEvents);
-        Assert.Equal (testKey, keyDownEvents [0]);
-        Assert.Single (keyUpEvents);
-        Assert.Equal (testKey, keyUpEvents [0]);
-    }
-
-    [Fact]
     public void InjectKeyDownEvent_WithTestableInput_InjectsIntoQueue ()
     {
         // Arrange
@@ -668,18 +623,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         // Assert - Should have injected into testable input
         Assert.Single (testableInput.InjectedInput);
     }
-
-    [Fact]
-    public void InjectKeyUpEvent_ThrowsNotImplementedException ()
-    {
-        // Arrange
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
-        TestInputProcessor processor = new (queue);
-
-        // Act & Assert
-        Assert.Throws<NotImplementedException> (() => processor.InjectKeyUpEvent (Key.A));
-    }
-
+    
     #endregion
 
     #region ProcessQueue Tests

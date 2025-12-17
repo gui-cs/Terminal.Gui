@@ -168,7 +168,6 @@ internal partial class ApplicationImpl
 
         Driver.SizeChanged += Driver_SizeChanged;
         Driver.KeyDown += Driver_KeyDown;
-        Driver.KeyUp += Driver_KeyUp;
         Driver.MouseEvent += Driver_MouseEvent;
     }
 
@@ -182,13 +181,10 @@ internal partial class ApplicationImpl
 
         Driver.SizeChanged -= Driver_SizeChanged;
         Driver.KeyDown -= Driver_KeyDown;
-        Driver.KeyUp -= Driver_KeyUp;
         Driver.MouseEvent -= Driver_MouseEvent;
     }
 
     private void Driver_KeyDown (object? sender, Key e) { Keyboard.RaiseKeyDownEvent (e); }
-
-    private void Driver_KeyUp (object? sender, Key e) { Keyboard.RaiseKeyUpEvent (e); }
 
     private void Driver_MouseEvent (object? sender, Mouse e) { Mouse.RaiseMouseEvent (e); }
 }

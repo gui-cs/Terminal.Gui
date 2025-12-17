@@ -38,7 +38,7 @@ public interface IInputProcessor
     void RaiseKeyDownEvent (Key key);
 
     /// <summary>
-    ///     Event raised when a key down event is dequeued. Precursor to <see cref="KeyUp"/>.
+    ///     Event raised when a key down event is dequeued.
     /// </summary>
     event EventHandler<Key>? KeyDown;
 
@@ -47,29 +47,6 @@ public interface IInputProcessor
     /// </summary>
     /// <param name="key">The key to enqueue.</param>
     void InjectKeyDownEvent (Key key);
-
-    /// <summary>
-    ///     Raises the <see cref="KeyUp"/> event after a key up event is dequeued.
-    /// </summary>
-    /// <remarks>
-    ///     Drivers that don't support key release will call this immediately after <see cref="RaiseKeyDownEvent"/>.
-    /// </remarks>
-    /// <param name="key">The key event data.</param>
-    void RaiseKeyUpEvent (Key key);
-
-    /// <summary>
-    ///     Event raised when a key up event is dequeued.
-    /// </summary>
-    /// <remarks>
-    ///     Drivers that don't support key release fire this immediately after <see cref="KeyDown"/>.
-    /// </remarks>
-    event EventHandler<Key>? KeyUp;
-
-    /// <summary>
-    ///     Injects a key up event. For unit tests.
-    /// </summary>
-    /// <param name="key">The key to enqueue.</param>
-    void InjectKeyUpEvent (Key key);
 
     #endregion
 

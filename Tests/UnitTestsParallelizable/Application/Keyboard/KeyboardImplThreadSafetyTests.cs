@@ -249,7 +249,7 @@ public class KeyboardImplThreadSafetyTests
     }
 
     [Fact]
-    public void KeyDown_KeyUp_Events_ConcurrentSubscription_NoExceptions ()
+    public void KeyDown_Events_ConcurrentSubscription_NoExceptions ()
     {
         // Arrange
         var keyboard = new KeyboardImpl ();
@@ -258,7 +258,6 @@ public class KeyboardImplThreadSafetyTests
         const int NUM_THREADS = 10;
         const int OPERATIONS_PER_THREAD = 20;
         var keyDownCount = 0;
-        var keyUpCount = 0;
 
         // Act
         List<Task> tasks = new ();
@@ -277,9 +276,6 @@ public class KeyboardImplThreadSafetyTests
                                              keyboard.KeyDown += handler;
                                              keyboard.KeyDown -= handler;
 
-                                             EventHandler<Key> upHandler = (s, e) => { Interlocked.Increment (ref keyUpCount); };
-                                             keyboard.KeyUp += upHandler;
-                                             keyboard.KeyUp -= upHandler;
                                          }
                                          catch (Exception ex)
                                          {

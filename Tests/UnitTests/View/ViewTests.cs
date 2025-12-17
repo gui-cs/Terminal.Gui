@@ -318,8 +318,6 @@ public class ViewTests
 
         Assert.False (r.NewKeyDownEvent (Key.Empty));
 
-        //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-        Assert.False (r.NewKeyUpEvent (Key.Empty));
         Assert.False (r.NewMouseEvent (new () { Flags = MouseFlags.AllEvents }));
 
         r.Dispose ();

@@ -396,58 +396,6 @@ public class ApplicationKeyboardTests
 
     #endregion
 
-    #region KeyUp Event Tests
-
-    [Fact]
-    public void InjectKeyEvent_AlsoRaisesKeyUp ()
-    {
-        // Arrange
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        bool keyUpRaised = false;
-        Key? receivedKeyUp = null;
-
-        app.Keyboard.KeyUp += (s, e) =>
-                              {
-                                  keyUpRaised = true;
-                                  receivedKeyUp = e;
-                              };
-
-        // Act
-        app.InjectKey (Key.A);
-
-        // Assert
-        Assert.True (keyUpRaised, "KeyUp should be raised after KeyDown");
-        Assert.Equal (Key.A, receivedKeyUp);
-    }
-
-    [Fact]
-    public void RaiseKeyUpEvent_RaisesKeyUpEvent ()
-    {
-        // Arrange
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        bool eventRaised = false;
-        Key? receivedKey = null;
-
-        app.Keyboard.KeyUp += (s, e) =>
-                              {
-                                  eventRaised = true;
-                                  receivedKey = e;
-                              };
-
-        // Act
-        app.Keyboard.RaiseKeyUpEvent (Key.C);
-
-        // Assert
-        Assert.True (eventRaised);
-        Assert.Equal (Key.C, receivedKey);
-    }
-
-    #endregion
-
     #region Integration with IApplication Instance Tests
 
     [Fact]

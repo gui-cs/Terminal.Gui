@@ -500,7 +500,7 @@ public class AnsiInputTestableTests
     }
 
     [Fact]
-    public void AnsiInput_InjectKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
+    public void AnsiInput_InjectKeyDownEvent_RaisesKeyDownEvent ()
     {
         // Arrange
         AnsiInput ansiInput = new ();
@@ -511,18 +511,14 @@ public class AnsiInputTestableTests
         processor.InputImpl = ansiInput;
 
         var keyDownCount = 0;
-        var keyUpCount = 0;
         processor.KeyDown += (_, _) => keyDownCount++;
-        processor.KeyUp += (_, _) => keyUpCount++;
 
         // Act
         processor.InjectKeyDownEvent (Key.A);
         SimulateInputThread (ansiInput, queue);
         processor.ProcessQueue ();
 
-        // Assert - FakeDriver simulates KeyUp immediately after KeyDown
         Assert.Equal (1, keyDownCount);
-        Assert.Equal (1, keyUpCount);
     }
 
     #endregion

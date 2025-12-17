@@ -502,7 +502,7 @@ public class UnixInputTestableTests
     }
 
     [Fact]
-    public void UnixInput_InjectKeyDownEvent_RaisesKeyDownAndKeyUpEvents ()
+    public void UnixInput_InjectKeyDownEvent_RaisesKeyDownEvent ()
     {
         // Arrange
         var unixInput = new UnixInput ();
@@ -513,18 +513,14 @@ public class UnixInputTestableTests
         processor.InputImpl = unixInput;
 
         var keyDownCount = 0;
-        var keyUpCount = 0;
         processor.KeyDown += (_, _) => keyDownCount++;
-        processor.KeyUp += (_, _) => keyUpCount++;
 
         // Act
         processor.InjectKeyDownEvent (Key.A);
         SimulateInputThread (unixInput, queue);
         processor.ProcessQueue ();
 
-        // Assert - UnixDriver simulates KeyUp immediately after KeyDown
         Assert.Equal (1, keyDownCount);
-        Assert.Equal (1, keyUpCount);
     }
 
     #endregion

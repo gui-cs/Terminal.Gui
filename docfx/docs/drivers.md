@@ -351,7 +351,7 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 - `GetCursorVisibility()`, `SetCursorVisibility()` - Visibility management
 
 #### Input Events
-- `KeyDown`, `KeyUp`, `MouseEvent` - Input events
+- `KeyDown`, `MouseEvent` - Input events
 - `InjectKeyEvent()` - Test support
 - `InjectMouseEvent()` - Test support
 

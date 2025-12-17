@@ -138,7 +138,7 @@ See the [Keyboard Deep Dive](keyboard.md).
 - [View.KeyBindings](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_KeyBindings) - Maps keys to Commands
 - [View.HotKey](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HotKey) - The hot key for the View
 - [View.HotKeySpecifier](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HotKeySpecifier) - Character used to denote hot keys in text (default: '_')
-- Events: `KeyDown`, `KeyUp`, `InvokingKeyBindings`
+- Events: `KeyDown`, `InvokingKeyBindings`
 
 #### Mouse
 
@@ -355,7 +355,6 @@ The keyboard subsystem processes key presses through:
 2. [View.OnKeyDown](~/api/Terminal.Gui.ViewBase.View.yml) virtual method
 3. [View.KeyBindings](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_KeyBindings) - Converts keys to commands
 4. Command handlers (registered via [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml))
-5. [View.KeyUp](~/api/Terminal.Gui.ViewBase.View.yml) event
 
 #### Mouse
 

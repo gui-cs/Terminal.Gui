@@ -1926,17 +1926,6 @@ public class TextView : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc/>
-    public override bool OnKeyUp (Key key)
-    {
-        if (key == Key.Space.WithCtrl)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.</summary>
     public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
     {

@@ -49,25 +49,6 @@ public static partial class Application // Navigation stuff
     /// <summary>Raised when <see cref="NextTabKey"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<Key>>? NextTabKeyChanged;
 
-    /// <summary>
-    ///     Raised when the user releases a key.
-    ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Unix) do not support firing the
-    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-    ///     <para>Fired after <see cref="KeyDown"/>.</para>
-    /// </remarks>
-    [Obsolete ("The legacy static Application object is going away.")]
-    public static event EventHandler<Key>? KeyUp
-    {
-        add => ApplicationImpl.Instance.Keyboard.KeyUp += value;
-        remove => ApplicationImpl.Instance.Keyboard.KeyUp -= value;
-    }
-
     private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrides
 
     /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>

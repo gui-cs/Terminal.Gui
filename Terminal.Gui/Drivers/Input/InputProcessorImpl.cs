@@ -68,7 +68,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         Parser.Keyboard += (_, keyEvent) =>
                            {
                                RaiseKeyDownEvent (keyEvent);
-                               RaiseKeyUpEvent (keyEvent);
                            };
 
         // Configure unexpected response handler
@@ -158,7 +157,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         if (IsValidInput (key, out key))
         {
             RaiseKeyDownEvent (key);
-            RaiseKeyUpEvent (key);
         }
     }
 
@@ -245,19 +243,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         {
             testableInput.InjectInput (inputRecord);
         }
-    }
-
-    /// <inheritdoc/>
-    public event EventHandler<Key>? KeyUp;
-
-    /// <inheritdoc/>
-    public void RaiseKeyUpEvent (Key a) { KeyUp?.Invoke (this, a); }
-
-    /// <inheritdoc/>
-    public void InjectKeyUpEvent (Key key)
-    {
-        // TODO: Determine if we can still support this on Windows
-        throw new NotImplementedException ();
     }
 
     #endregion
