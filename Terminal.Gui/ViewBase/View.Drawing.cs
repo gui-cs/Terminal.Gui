@@ -106,7 +106,7 @@ public partial class View // Drawing APIs
             DoClearViewport (context);
 
             // ------------------------------------
-            // Draw the subviews first (order matters: Text, Content, then Subviews)
+            // Draw the SubViews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
                 DoDrawSubViews (context);
