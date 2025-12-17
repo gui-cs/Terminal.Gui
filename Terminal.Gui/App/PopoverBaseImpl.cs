@@ -22,7 +22,7 @@ namespace Terminal.Gui.App;
 ///         This base class provides:
 ///     </para>
 ///     <list type="bullet">
-///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill"/>, <see cref="View.Height"/> = <see cref="Dim.Fill"/>).</item>
+///         <item>Fills the screen by default (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
 ///         <item>Transparent viewport settings for proper mouse event handling.</item>
 ///         <item>Automatic layout when becoming visible.</item>
 ///         <item>Focus restoration when hidden.</item>
@@ -44,7 +44,7 @@ public abstract class PopoverBaseImpl : View, IPopover
     ///         Sets up default popover behavior:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill"/>, <see cref="View.Height"/> = <see cref="Dim.Fill"/>).</item>
+    ///         <item>Fills the screen (<see cref="View.Width"/> = <see cref="Dim.Fill()"/>, <see cref="View.Height"/> = <see cref="Dim.Fill()"/>).</item>
     ///         <item>Sets <see cref="View.CanFocus"/> to <see langword="true"/>.</item>
     ///         <item>Configures <see cref="View.ViewportSettings"/> with <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/>.</item>
     ///         <item>Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when invoked.</item>

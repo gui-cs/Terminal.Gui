@@ -1032,7 +1032,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery ((sender as View)?.App, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery ((sender as View)?.App!, 60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1171,7 +1171,7 @@ public class TableEditor : Scenario
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery (_tableView?.App, "Could not find local drives", e.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView?.App!, "Could not find local drives", e.Message, "Ok");
         }
 
         _tableView!.Table = source;
@@ -1235,7 +1235,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (_tableView.App, 60, 20, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView.App!, 60, 20, "Failed to set", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
