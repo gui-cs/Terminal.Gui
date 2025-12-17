@@ -8,6 +8,7 @@ internal partial class ApplicationImpl : IApplication
 {
     private readonly ITimeProvider _timeProvider;
     private readonly bool _testMode;
+    private IInputInjector? _inputInjector;
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
@@ -38,6 +39,23 @@ internal partial class ApplicationImpl : IApplication
 
     /// <inheritdoc/>
     public ITimeProvider GetTimeProvider () { return _timeProvider; }
+
+    /// <inheritdoc/>
+    public IInputInjector GetInputInjector ()
+    {
+        if (_inputInjector is null)
+        {
+            if (Driver is null)
+            {
+                throw new InvalidOperationException ("Driver not initialized. Call Init() first.");
+            }
+
+            IInputProcessor processor = Driver.GetInputProcessor ();
+            _inputInjector = new InputInjector (processor, _timeProvider);
+        }
+
+        return _inputInjector;
+    }
 
     private string? _driverName;
 

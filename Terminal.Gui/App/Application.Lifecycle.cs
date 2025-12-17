@@ -45,6 +45,45 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         return new ApplicationImpl (timeProvider ?? new SystemTimeProvider (), false);
     }
 
+    /// <summary>
+    ///     Creates a new <see cref="IApplication"/> instance configured for testing with virtual time.
+    /// </summary>
+    /// <param name="timeProvider">
+    ///     Optional time provider for controlling time in tests. If <see langword="null"/>, creates a new
+    ///     <see cref="VirtualTimeProvider"/>.
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         This factory method is a convenience for test scenarios. It's equivalent to calling
+    ///         <c>Application.Create(new VirtualTimeProvider())</c> but more explicit about intent.
+    ///     </para>
+    ///     <para>
+    ///         The returned application uses virtual time, which allows tests to:
+    ///         <list type="bullet">
+    ///             <item>Control time explicitly with <see cref="VirtualTimeProvider.Advance"/></item>
+    ///             <item>Avoid real delays (<c>Thread.Sleep</c>)</item>
+    ///             <item>Produce deterministic, fast tests</item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///             VirtualTimeProvider time = new ();
+    ///             using IApplication app = Application.CreateForTesting (time);
+    ///             app.Init (DriverRegistry.Names.ANSI);
+    ///             app.InjectKey (Key.Enter);
+    ///             time.Advance (TimeSpan.FromSeconds (1));
+    ///         </code>
+    ///     </para>
+    /// </remarks>
+    /// <returns>A new <see cref="IApplication"/> instance configured for testing.</returns>
+    public static IApplication CreateForTesting (ITimeProvider? timeProvider = null)
+    {
+        ApplicationImpl.MarkInstanceBasedModelUsed ();
+
+        return new ApplicationImpl (timeProvider ?? new VirtualTimeProvider (), true);
+    }
+
     /// <inheritdoc cref="IApplication.Init"/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
