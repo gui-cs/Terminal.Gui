@@ -215,22 +215,6 @@ public class GetViewsUnderLocationTests
         // Act
         List<View?> viewsUnderLocation = runnable.GetViewsUnderLocation (testLocation, ViewportSettingsFlags.None);
 
-        // Debug: Print the views found
-        System.Diagnostics.Debug.WriteLine ($"Views at {testLocation}:");
-        for (int i = 0; i < viewsUnderLocation.Count; i++)
-        {
-            View? v = viewsUnderLocation [i];
-            string parentInfo = v?.SuperView != null ? $", SuperView: {v.SuperView.GetType().Name}" : "";
-            System.Diagnostics.Debug.WriteLine ($"  [{i}] {v?.GetType ().Name} - Frame: {v?.FrameToScreen ()}{parentInfo}");
-        }
-        System.Console.WriteLine ($"Views at {testLocation}:");
-        for (int i = 0; i < viewsUnderLocation.Count; i++)
-        {
-            View? v = viewsUnderLocation [i];
-            string parentInfo = v?.SuperView != null ? $", SuperView: {v.SuperView.GetType().Name}" : "";
-            System.Console.WriteLine ($"  [{i}] {v?.GetType ().Name} - Frame: {v?.FrameToScreen ()}{parentInfo}");
-        }
-
         // Assert
         View? deepestView = viewsUnderLocation.LastOrDefault ();
         Assert.NotNull (deepestView);
