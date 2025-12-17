@@ -33,7 +33,7 @@ public partial class GuiTestContext : IDisposable
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
-    private readonly VirtualTimeProvider _timeProvider = new ();
+    private readonly ITimeProvider _timeProvider = new SystemTimeProvider ();
 
     /// <summary>
     ///     The IApplication instance that was created.
@@ -41,9 +41,11 @@ public partial class GuiTestContext : IDisposable
     public IApplication? App => _applicationImpl;
 
     /// <summary>
-    ///     The VirtualTimeProvider for controlling time in tests.
+    ///     The ITimeProvider for time operations in tests.
+    ///     Uses SystemTimeProvider by default for compatibility with existing tests.
+    ///     Can be changed to VirtualTimeProvider for tests that need explicit time control.
     /// </summary>
-    public VirtualTimeProvider TimeProvider => _timeProvider;
+    public ITimeProvider TimeProvider => _timeProvider;
 
     private TestDriver _driverType;
 
