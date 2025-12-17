@@ -140,21 +140,31 @@ public partial class GuiTestContext
         // We do this by subscribing to the Driver.KeyDown event and waiting until it is raised.
         // This prevents the application from missing the key event if we inject it and immediately return.
         bool keyReceived = false;
-        if (App?.Driver is { })
+        IDriver? driver = App?.Driver;
+        
+        if (driver is { })
         {
-            App.Driver.KeyDown += DriverOnKeyDown;
+            driver.KeyDown += DriverOnKeyDown;
             
-            // Use the new simplified injection API
-            App.InjectKey (key);
-            
-            WaitUntil (() => keyReceived);
+            try
+            {
+                // Use the new simplified injection API
+                App.InjectKey (key);
+                
+                WaitUntil (() => keyReceived);
+            }
+            finally
+            {
+                // Always unsubscribe, even if wait times out or exception occurs
+                // Use the captured driver reference to avoid NullReferenceException
+                driver.KeyDown -= DriverOnKeyDown;
+            }
         }
 
         return this;
 
         void DriverOnKeyDown (object? sender, Key e)
         {
-            App.Driver.KeyDown -= DriverOnKeyDown;
             keyReceived = true;
         }
 
