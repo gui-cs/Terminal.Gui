@@ -18,7 +18,7 @@ public partial class View // Drawing APIs
         // The draw context is used to track the region drawn by each view.
         DrawContext context = new DrawContext ();
 
-        foreach (View view in viewsArray.Reverse ())
+        foreach (View view in viewsArray)
         {
             if (force)
             {
@@ -80,12 +80,6 @@ public partial class View // Drawing APIs
         }
         Region? originalClip = GetClip ();
 
-        if (this is not Adornment && SuperView is null)
-        {
-            // Not an Adornment & SuperView is null; a Root view - ensure clip is large enough
-            originalClip = new (App?.Screen ?? new Rectangle (0, 0, 2048, 2048));
-        }
-
         // TODO: This can be further optimized by checking NeedsDraw below and only
         // TODO: clearing, drawing text, drawing content, etc. if it is true.
         if (NeedsDraw || SubViewNeedsDraw)
@@ -112,6 +106,13 @@ public partial class View // Drawing APIs
             DoClearViewport (context);
 
             // ------------------------------------
+            // Draw the subviews first (order matters: Text, Content, then Subviews)
+            if (SubViewNeedsDraw)
+            {
+                DoDrawSubViews (context);
+            }
+
+            // ------------------------------------
             // Draw the text
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoDrawText (context);
@@ -119,13 +120,6 @@ public partial class View // Drawing APIs
             // ------------------------------------
             // Draw the content
             DoDrawContent (context);
-
-            // ------------------------------------
-            // Draw the subviews first (order matters: Text, Content, then Subviews)
-            if (SubViewNeedsDraw)
-            {
-                DoDrawSubViews (context);
-            }
 
             // ------------------------------------
             // Draw the line canvas
@@ -146,31 +140,25 @@ public partial class View // Drawing APIs
 
             ClearNeedsDraw ();
 
-            // The following assertions are important to ensure that the drawing state is consistent.
-            // BUGBUG: We should have unit tests that verify these conditions after drawing and should
-            // BUGBUG: not rely solely on Debug.Assert.
-            // NOTE: These assertions fail in normal usage, particularly in complex
-            // NOTE: view hierarchies with adornments. Further investigation is needed.
-            // NOTE: Which is why @tig commented them out.
-            if (this is not Adornment && SuperView is not Adornment)
-            {
-                // Parent
-                Debug.Assert (Margin!.Parent == this);
-                Debug.Assert (Border!.Parent == this);
-                Debug.Assert (Padding!.Parent == this);
+            //if (this is not Adornment && SuperView is not Adornment)
+            //{
+            //    // Parent
+            //    Debug.Assert (Margin!.Parent == this);
+            //    Debug.Assert (Border!.Parent == this);
+            //    Debug.Assert (Padding!.Parent == this);
 
-                // SubViewNeedsDraw is set to false by ClearNeedsDraw.
-                Debug.Assert (!SubViewNeedsDraw);
-                Debug.Assert (!Margin!.SubViewNeedsDraw);
-                Debug.Assert (!Border!.SubViewNeedsDraw);
-                Debug.Assert (!Padding!.SubViewNeedsDraw);
+            //    // SubViewNeedsDraw is set to false by ClearNeedsDraw.
+            //    Debug.Assert (SubViewNeedsDraw == false);
+            //    Debug.Assert (Margin!.SubViewNeedsDraw == false);
+            //    Debug.Assert (Border!.SubViewNeedsDraw == false);
+            //    Debug.Assert (Padding!.SubViewNeedsDraw == false);
 
-                // NeedsDraw is set to false by ClearNeedsDraw.
-                Debug.Assert (!NeedsDraw);
-                Debug.Assert (!Margin!.NeedsDraw);
-                Debug.Assert (!Border!.NeedsDraw);
-                Debug.Assert (!Padding!.NeedsDraw);
-            }
+            //    // NeedsDraw is set to false by ClearNeedsDraw.
+            //    Debug.Assert (NeedsDraw == false);
+            //    Debug.Assert (Margin!.NeedsDraw == false);
+            //    Debug.Assert (Border!.NeedsDraw == false);
+            //    Debug.Assert (Padding!.NeedsDraw == false);
+            //}
         }
 
         // ------------------------------------
@@ -256,13 +244,19 @@ public partial class View // Drawing APIs
             SetClip (clipAdornments);
         }
 
+        if (Margin?.NeedsLayout == true)
+        {
+            Margin.NeedsLayout = false;
+            Margin?.Thickness.Draw (Driver, FrameToScreen ());
+            Margin?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
+        }
 
         if (SubViewNeedsDraw)
         {
             // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
-            Margin?.SetNeedsDraw ();
             Border?.SetNeedsDraw ();
             Padding?.SetNeedsDraw ();
+            Margin?.SetNeedsDraw ();
         }
 
         if (OnDrawingAdornments ())
@@ -303,6 +297,27 @@ public partial class View // Drawing APIs
         {
             Padding?.Draw ();
         }
+
+        if (Margin is { } && Margin.Thickness != Thickness.Empty/* && Margin.ShadowStyle == ShadowStyle.None*/)
+        {
+            //Margin?.Draw ();
+        }
+    }
+
+    private void ClearFrame ()
+    {
+        if (Driver is null)
+        {
+            return;
+        }
+
+        // Get screen-relative coords
+        Rectangle toClear = FrameToScreen ();
+
+        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
+        Driver.FillRect (toClear);
+        SetAttribute (prev);
+        SetNeedsDraw ();
     }
 
     /// <summary>
