@@ -121,16 +121,16 @@ public class ViewDrawingFlowTests () : FakeDriverBase
 
         view.DrawingAdornmentsCallback = () => callOrder.Add ("DrawingAdornments");
         view.ClearingViewportCallback = () => callOrder.Add ("ClearingViewport");
+        view.DrawingSubViewsCallback = () => callOrder.Add ("DrawingSubViews");
         view.DrawingTextCallback = () => callOrder.Add ("DrawingText");
         view.DrawingContentCallback = () => callOrder.Add ("DrawingContent");
-        view.DrawingSubViewsCallback = () => callOrder.Add ("DrawingSubViews");
         view.RenderingLineCanvasCallback = () => callOrder.Add ("RenderingLineCanvas");
         view.DrawCompleteCallback = () => callOrder.Add ("DrawComplete");
 
         view.Draw ();
 
         Assert.Equal (
-                     new [] { "DrawingAdornments", "ClearingViewport", "DrawingText", "DrawingContent", "DrawingSubViews", "RenderingLineCanvas", "DrawComplete" },
+                     new [] { "DrawingAdornments", "ClearingViewport", "DrawingSubViews", "DrawingText", "DrawingContent", "RenderingLineCanvas", "DrawComplete" },
                      callOrder
                     );
     }
