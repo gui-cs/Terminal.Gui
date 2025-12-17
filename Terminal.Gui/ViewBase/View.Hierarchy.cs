@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Terminal.Gui.App;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -52,7 +54,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-        SuperViewChangingEventArgs args = new (_superView, value);
+#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint - View can be null when removed
+        CancelEventArgs<View?> args = new (in _superView, ref value);
+#pragma warning restore CS8714
         SuperViewChanging?.Invoke (this, args);
 
         if (args.Cancel)
@@ -82,11 +86,13 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This event follows the Cancellable Work Pattern (CWP). Set <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> 
+    ///         This event follows the Cancellable Work Pattern (CWP). Set <see cref="CancelEventArgs.Cancel"/> 
     ///         to <see langword="true"/> in the event args to cancel the change.
     ///     </para>
     /// </remarks>
-    public event EventHandler<SuperViewChangingEventArgs>? SuperViewChanging;
+#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint - View can be null when removed
+    public event EventHandler<CancelEventArgs<View?>>? SuperViewChanging;
+#pragma warning restore CS8714
 
     private void RaiseSuperViewChanged ()
     {
