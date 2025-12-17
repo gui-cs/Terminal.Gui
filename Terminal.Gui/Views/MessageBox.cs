@@ -11,8 +11,8 @@ namespace Terminal.Gui.Views;
 ///         or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> (typically Esc).
 ///     </para>
 ///     <para>
-///         <see cref="Query(IApplication?, string, string, string[])"/> uses the default Dialog color scheme.
-///         <see cref="ErrorQuery(IApplication?, string, string, string[])"/> uses the Error color scheme.
+///         <see cref="Query(IApplication, string, string, string[])"/> uses the default Dialog color scheme.
+///         <see cref="ErrorQuery(IApplication, string, string, string[])"/> uses the Error color scheme.
 ///     </para>
 ///     <para>
 ///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
@@ -126,11 +126,11 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Consider using <see cref="ErrorQuery(IApplication?, string, string, string[])"/> which automatically sizes the
+    ///     Consider using <see cref="ErrorQuery(IApplication, string, string, string[])"/> which automatically sizes the
     ///     MessageBox.
     /// </remarks>
     public static int? ErrorQuery (
-        IApplication? app,
+        IApplication app,
         int width,
         int height,
         string title,
@@ -165,7 +165,7 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? ErrorQuery (IApplication? app, string title, string message, params string [] buttons)
+    public static int? ErrorQuery (IApplication app, string title, string message, params string [] buttons)
     {
         return QueryFull (
                           app,
@@ -195,11 +195,11 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Consider using <see cref="ErrorQuery(IApplication?, string, string, int, string[])"/> which automatically sizes the
+    ///     Consider using <see cref="ErrorQuery(IApplication, string, string, int, string[])"/> which automatically sizes the
     ///     MessageBox.
     /// </remarks>
     public static int? ErrorQuery (
-        IApplication? app,
+        IApplication app,
         int width,
         int height,
         string title,
@@ -236,7 +236,7 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? ErrorQuery (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons)
+    public static int? ErrorQuery (IApplication app, string title, string message, int defaultButton = 0, params string [] buttons)
     {
         return QueryFull (
                           app,
@@ -270,11 +270,11 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Consider using <see cref="ErrorQuery(IApplication?, string, string, int, bool, string[])"/> which automatically
+    ///     Consider using <see cref="ErrorQuery(IApplication, string, string, int, bool, string[])"/> which automatically
     ///     sizes the MessageBox.
     /// </remarks>
     public static int? ErrorQuery (
-        IApplication? app,
+        IApplication app,
         int width,
         int height,
         string title,
@@ -317,7 +317,7 @@ public static class MessageBox
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
     public static int? ErrorQuery (
-        IApplication? app,
+        IApplication app,
         string title,
         string message,
         int defaultButton = 0,
@@ -352,10 +352,10 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Consider using <see cref="Query(IApplication?, string, string, string[])"/> which automatically sizes the
+    ///     Consider using <see cref="Query(IApplication, string, string, string[])"/> which automatically sizes the
     ///     MessageBox.
     /// </remarks>
-    public static int? Query (IApplication? app, int width, int height, string title, string message, params string [] buttons)
+    public static int? Query (IApplication app, int width, int height, string title, string message, params string [] buttons)
     {
         return QueryFull (
                           app,
@@ -384,7 +384,7 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? Query (IApplication? app, string title, string message, params string [] buttons)
+    public static int? Query (IApplication app, string title, string message, params string [] buttons)
     {
         return QueryFull (
                           app,
@@ -414,11 +414,11 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Consider using <see cref="Query(IApplication?, string, string, int, string[])"/> which automatically sizes the
+    ///     Consider using <see cref="Query(IApplication, string, string, int, string[])"/> which automatically sizes the
     ///     MessageBox.
     /// </remarks>
     public static int? Query (
-        IApplication? app,
+        IApplication app,
         int width,
         int height,
         string title,
@@ -455,7 +455,7 @@ public static class MessageBox
     /// <remarks>
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
-    public static int? Query (IApplication? app, string title, string message, int defaultButton = 0, params string [] buttons)
+    public static int? Query (IApplication app, string title, string message, int defaultButton = 0, params string [] buttons)
     {
         return QueryFull (
                           app,
@@ -489,11 +489,11 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     Consider using <see cref="Query(IApplication?, string, string, int, bool, string[])"/> which automatically sizes
+    ///     Consider using <see cref="Query(IApplication, string, string, int, bool, string[])"/> which automatically sizes
     ///     the MessageBox.
     /// </remarks>
     public static int? Query (
-        IApplication? app,
+        IApplication app,
         int width,
         int height,
         string title,
@@ -536,7 +536,7 @@ public static class MessageBox
     ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
     /// </remarks>
     public static int? Query (
-        IApplication? app,
+        IApplication app,
         string title,
         string message,
         int defaultButton = 0,
@@ -557,7 +557,7 @@ public static class MessageBox
     }
 
     private static int? QueryFull (
-        IApplication? app,
+        IApplication app,
         bool useErrorColors,
         int width,
         int height,
@@ -568,25 +568,22 @@ public static class MessageBox
         params string [] buttons
     )
     {
-        ArgumentNullException.ThrowIfNull (app);
-
-        // Create button array for Dialog
         var count = 0;
-        List<Button> buttonList = new ();
+        List<Button> buttonList = [];
         Clicked = null;
 
-        if (buttons is { })
+        if (buttons.Length > 0)
         {
             if (defaultButton > buttons.Length - 1)
             {
                 defaultButton = buttons.Length - 1;
             }
 
-            foreach (string s in buttons)
+            foreach (string buttonText in buttons)
             {
                 var b = new Button
                 {
-                    Text = s,
+                    Text = buttonText,
                     Data = count
                 };
 
@@ -596,7 +593,7 @@ public static class MessageBox
 
                     b.Accepting += (s, e) =>
                                    {
-                                       if (e?.Context?.Source is Button button)
+                                       if (e.Context?.Source is Button button)
                                        {
                                            Clicked = (int)button.Data!;
                                        }
@@ -605,10 +602,7 @@ public static class MessageBox
                                            Clicked = defaultButton;
                                        }
 
-                                       if (e is { })
-                                       {
-                                           e.Handled = true;
-                                       }
+                                       e.Handled = true;
 
                                        (s as View)?.App?.RequestStop ();
                                    };
@@ -619,7 +613,7 @@ public static class MessageBox
             }
         }
 
-        var d = new Dialog
+        Dialog dialog = new ()
         {
             Title = title,
             ButtonAlignment = DefaultButtonAlignment,
@@ -628,38 +622,39 @@ public static class MessageBox
             Buttons = buttonList.ToArray ()
         };
 
-        d.Width = Dim.Auto (
-                            DimAutoStyle.Auto,
-                            Dim.Func (_ => (int)((app.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
-                            Dim.Func (_ => (int)((app.Screen.Width - d.GetAdornmentsThickness ().Horizontal) * 0.9f)));
+        // ReSharper disable AccessToDisposedClosure
+        dialog.Width = Dim.Auto (
+                                 DimAutoStyle.Auto,
+                                 Dim.Func (_ => (int)((app.Screen.Width - dialog.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
+                                 Dim.Func (_ => (int)((app.Screen.Width - dialog.GetAdornmentsThickness ().Horizontal) * 0.9f)));
 
-        d.Height = Dim.Auto (
+        dialog.Height = Dim.Auto (
                              DimAutoStyle.Auto,
-                             Dim.Func (_ => (int)((app.Screen.Height - d.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
-                             Dim.Func (_ => (int)((app.Screen.Height - d.GetAdornmentsThickness ().Vertical) * 0.9f)));
+                             Dim.Func (_ => (int)((app.Screen.Height - dialog.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
+                             Dim.Func (_ => (int)((app.Screen.Height - dialog.GetAdornmentsThickness ().Vertical) * 0.9f)));
 
         if (width != 0)
         {
-            d.Width = width;
+            dialog.Width = width;
         }
 
         if (height != 0)
         {
-            d.Height = height;
+            dialog.Height = height;
         }
 
-        d.SchemeName = useErrorColors ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+        dialog.SchemeName = useErrorColors ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
-        d.HotKeySpecifier = new ('\xFFFF');
-        d.Text = message;
-        d.TextAlignment = Alignment.Center;
-        d.VerticalTextAlignment = Alignment.Start;
-        d.TextFormatter.WordWrap = wrapMessage;
-        d.TextFormatter.MultiLine = !wrapMessage;
+        dialog.HotKeySpecifier = new ('\xFFFF');
+        dialog.Text = message;
+        dialog.TextAlignment = Alignment.Center;
+        dialog.VerticalTextAlignment = Alignment.Start;
+        dialog.TextFormatter.WordWrap = wrapMessage;
+        dialog.TextFormatter.MultiLine = !wrapMessage;
 
-        // Run the modal; do not shut down the mainloop driver when done
-        app.Run (d);
-        d.Dispose ();
+        // Run the modal
+        app.Run (dialog);
+        dialog.Dispose ();
 
         return Clicked;
     }
