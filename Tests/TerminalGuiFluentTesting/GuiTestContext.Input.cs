@@ -148,8 +148,8 @@ public partial class GuiTestContext
             
             try
             {
-                // Use the new simplified injection API
-                App.InjectKey (key);
+                // Use Pipeline mode to match the old behavior (InjectKeyDownEvent)
+                App.GetInputInjector ().InjectKey (key, new InputInjectionOptions { Mode = InputInjectionMode.Pipeline });
                 
                 WaitUntil (() => keyReceived);
             }
