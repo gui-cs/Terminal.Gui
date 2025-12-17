@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using Terminal.Gui.App;
 
-namespace ApplicationTests;
+namespace ApplicationTests.Keyboard;
 
 /// <summary>
 ///     Parallelizable tests for keyboard handling.
@@ -9,6 +9,23 @@ namespace ApplicationTests;
 /// </summary>
 public class KeyboardTests
 {
+
+    [Fact]
+    public void Init_CreatesKeybindings ()
+    {
+        IApplication app = Application.Create ();
+
+        app.Keyboard.KeyBindings.Clear ();
+
+        Assert.Empty (app.Keyboard.KeyBindings.GetBindings ());
+
+        app.Init ("fake");
+
+        Assert.NotEmpty (app.Keyboard.KeyBindings.GetBindings ());
+
+        app.Dispose ();
+    }
+
     [Fact]
     public void Constructor_InitializesKeyBindings ()
     {
@@ -245,7 +262,7 @@ public class KeyboardTests
     }
 
     // Migrated from UnitTests/Application/KeyboardTests.cs
-    
+
     [Fact]
     public void KeyBindings_Add_Adds ()
     {
@@ -465,7 +482,7 @@ public class KeyboardTests
 
         // Get the commands from the old binding
         Assert.True (keyboard.KeyBindings.TryGet (oldKey, out KeyBinding oldBinding));
-        Command[] oldCommands = oldBinding.Commands.ToArray ();
+        Command [] oldCommands = oldBinding.Commands.ToArray ();
 
         // Act
         keyboard.KeyBindings.Replace (oldKey, newKey);

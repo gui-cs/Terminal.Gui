@@ -8,54 +8,64 @@ namespace Terminal.Gui.App;
 ///     <para>
 ///         A popover is a transient UI element that appears above other content to display contextual information or UI,
 ///         such as menus, tooltips, or dialogs.
-///         Popovers are managed by <see cref="ApplicationPopover"/> and are typically shown using
-///         <see cref="ApplicationPopover.Show"/>.
 ///     </para>
 ///     <para>
-///         Popovers are not modal; they do not block input to the rest of the application, but they do receive focus and
-///         input events while visible.
-///         When a popover is shown, it is responsible for handling its own layout and content.
+///         <b>IMPORTANT:</b> Popovers must be registered with <see cref="Application.Popover"/> using
+///         <see cref="ApplicationPopover.Register"/> before they can be shown with <see cref="ApplicationPopover.Show"/>.
 ///     </para>
 ///     <para>
+///         <b>Lifecycle:</b><br/>
+///         When registered, the popover's lifetime is managed by the application. Registered popovers are
+///         automatically disposed when <see cref="Application.Shutdown"/> is called. Call
+///         <see cref="ApplicationPopover.DeRegister"/> to manage the lifetime directly.
+///     </para>
+///     <para>
+///         <b>Visibility and Hiding:</b><br/>
 ///         Popovers are automatically hidden when:
-///         <list type="bullet">
-///             <item>The user clicks outside the popover (unless occluded by a subview of the popover).</item>
-///             <item>The user presses <see cref="Application.QuitKey"/> (typically <c>Esc</c>).</item>
-///             <item>Another popover is shown.</item>
-///         </list>
 ///     </para>
+///     <list type="bullet">
+///         <item>The user clicks outside the popover (unless clicking on a subview).</item>
+///         <item>The user presses <see cref="Application.QuitKey"/> (typically <c>Esc</c>).</item>
+///         <item>Another popover is shown.</item>
+///         <item><see cref="View.Visible"/> is set to <see langword="false"/>.</item>
+///     </list>
 ///     <para>
 ///         <b>Focus and Input:</b><br/>
-///         When visible, a popover receives focus and input events. If the user clicks outside the popover (and not on a
-///         subview),
-///         presses <see cref="Application.QuitKey"/>, or another popover is shown, the popover will be hidden
-///         automatically.
+///         Popovers are not modal but do receive focus and input events while visible.
+///         Registered popovers receive keyboard events even when not visible, enabling global hotkey support.
 ///     </para>
 ///     <para>
 ///         <b>Layout:</b><br/>
-///         When the popover becomes visible, it is automatically laid out to fill the screen by default. You can override
-///         this behavior
-///         by setting <see cref="View.Width"/> and <see cref="View.Height"/> in your derived class.
+///         When becoming visible, popovers are automatically laid out to fill the screen by default.
+///         Override <see cref="View.Width"/> and <see cref="View.Height"/> to customize size.
 ///     </para>
 ///     <para>
-///         <b>Mouse:</b><br/>
-///         Popovers are transparent to mouse events (see <see cref="ViewportSettingsFlags.TransparentMouse"/>),
-///         meaning mouse events in a popover that are not also within a subview of the popover will not be captured.
+///         <b>Mouse Events:</b><br/>
+///         Popovers use <see cref="ViewportSettingsFlags.TransparentMouse"/>, meaning mouse events
+///         outside subviews are not captured.
 ///     </para>
 ///     <para>
-///         <b>Custom Popovers:</b><br/>
-///         To create a custom popover, inherit from <see cref="PopoverBaseImpl"/> and add your own content and logic.
+///         <b>Creating Custom Popovers:</b><br/>
+///         Inherit from <see cref="PopoverBaseImpl"/> and add your own content and logic.
 ///     </para>
 /// </remarks>
 public interface IPopover
 {
     /// <summary>
-    ///     Gets or sets the <see cref="Current"/> that this Popover is associated with. If null, it is not associated with
-    ///     any Runnable and will receive all keyboard
-    ///     events from the <see cref="IApplication"/>. If set, it will only receive keyboard events the Runnable would normally
-    ///     receive.
-    ///     When <see cref="ApplicationPopover.Register"/> is called, the <see cref="Current"/> is set to the current
-    ///     <see cref="IApplication.TopRunnableView"/> if not already set.
+    ///     Gets or sets the <see cref="IRunnable"/> that this popover is associated with.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         If <see langword="null"/>, the popover is not associated with any runnable and will receive all keyboard
+    ///         events from the application.
+    ///     </para>
+    ///     <para>
+    ///         If set, the popover will only receive keyboard events when the associated runnable is active.
+    ///     </para>
+    ///     <para>
+    ///         When <see cref="ApplicationPopover.Register"/> is called, this property is automatically set to
+    ///         <see cref="IApplication.TopRunnableView"/> if not already set.
+    ///     </para>
+    /// </remarks>
     IRunnable? Current { get; set; }
 }

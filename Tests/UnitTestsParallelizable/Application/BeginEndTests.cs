@@ -1,6 +1,6 @@
 using Xunit.Abstractions;
 
-namespace ApplicationTests;
+namespace ApplicationTests.BeginEnd;
 
 /// <summary>
 ///     Comprehensive tests for ApplicationImpl.Begin/End logic that manages Current and SessionStack.
@@ -10,6 +10,74 @@ namespace ApplicationTests;
 public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
+
+
+    [Fact]
+    public void Init_Begin_End_Cleans_Up ()
+    {
+        IApplication? app = Application.Create ();
+
+        SessionToken? newSessionToken = null;
+
+        EventHandler<SessionTokenEventArgs> newSessionTokenFn = (s, e) =>
+                                                                {
+                                                                    Assert.NotNull (e.State);
+                                                                    newSessionToken = e.State;
+                                                                };
+        app.SessionBegun += newSessionTokenFn;
+
+        Runnable<bool> runnable = new ();
+        SessionToken sessionToken = app.Begin (runnable)!;
+        Assert.NotNull (sessionToken);
+        Assert.NotNull (newSessionToken);
+        Assert.Equal (sessionToken, newSessionToken);
+
+        // Assert.Equal (runnable, Application.TopRunnable);
+
+        app.SessionBegun -= newSessionTokenFn;
+        app.End (newSessionToken);
+
+        Assert.Null (app.TopRunnable);
+        Assert.Null (app.Driver);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void Begin_Null_Runnable_Throws ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+
+        // Test null Runnable
+        Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
+
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Begin_Sets_Application_Top_To_Console_Size ()
+    {
+        IApplication app = Application.Create ();
+        app.Init ("fake");
+
+        Assert.Null (app.TopRunnableView);
+        app.Driver!.SetScreenSize (80, 25);
+        Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+        Assert.Equal (new (0, 0, 80, 25), app.TopRunnableView!.Frame);
+        app.Driver!.SetScreenSize (5, 5);
+        app.LayoutAndDraw ();
+        Assert.Equal (new (0, 0, 5, 5), app.TopRunnableView!.Frame);
+
+        if (token is { })
+        {
+            app.End (token);
+        }
+        top.Dispose ();
+
+        app.Dispose ();
+    }
 
     [Fact]
     public void Begin_WithNullRunnable_ThrowsArgumentNullException ()

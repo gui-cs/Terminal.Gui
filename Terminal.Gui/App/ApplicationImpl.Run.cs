@@ -36,7 +36,7 @@ internal partial class ApplicationImpl
     public event EventHandler<EventArgs<IApplication?>>? Iteration;
 
     /// <inheritdoc/>
-    public void RaiseIteration () { Iteration?.Invoke (null, new (this)); }
+    public void RaiseIteration () { Iteration?.Invoke (this, new (this)); }
 
     #endregion Main Loop Iteration
 
@@ -367,6 +367,8 @@ internal partial class ApplicationImpl
             TopRunnable = previousRunnable;
             previousRunnable.RaiseIsModalChangedEvent (true);
         }
+
+        Mouse?.UngrabMouse ();
 
         runnable.RaiseIsRunningChangedEvent (false);
 

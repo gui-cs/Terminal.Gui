@@ -86,7 +86,7 @@ internal class MouseImpl : IMouse, IDisposable
             mouseEvent.View = deepestViewUnderMouse;
         }
 
-        MouseEvent?.Invoke (null, mouseEvent);
+        MouseEvent?.Invoke (this, mouseEvent);
 
         if (mouseEvent.Handled)
         {
@@ -266,8 +266,14 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public void GrabMouse (View? view)
     {
-        if (view is null || RaiseGrabbingMouseEvent (view))
+        if (RaiseGrabbingMouseEvent (view))
         {
+            return;
+        }
+
+        if (view is null)
+        {
+            UngrabMouse();
             return;
         }
 
@@ -284,13 +290,6 @@ internal class MouseImpl : IMouse, IDisposable
         {
             return;
         }
-
-#if DEBUG_IDISPOSABLE
-        if (View.EnableDebugIDisposableAsserts)
-        {
-            ObjectDisposedException.ThrowIf (MouseGrabView.WasDisposed, MouseGrabView);
-        }
-#endif
 
         if (!RaiseUnGrabbingMouseEvent (MouseGrabView))
         {

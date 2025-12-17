@@ -75,8 +75,15 @@ public class Button : View, IDesignable
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Command.HotKey);
 
+        // Replace default Activate binding with HotKey for mouse clicks
+        MouseBindings.Clear ();
+        MouseBindings.Add (MouseFlags.Button1Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button2Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button3Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
+        MouseBindings.Add (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.HotKey);
+
         TitleChanged += Button_TitleChanged;
-        MouseClick += Button_MouseClick;
 
         base.ShadowStyle = DefaultShadow;
         HighlightStates = DefaultHighlightStates;
@@ -91,7 +98,7 @@ public class Button : View, IDesignable
     {
         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-        if (RaiseSelecting (commandContext) is true)
+        if (RaiseActivating (commandContext) is true)
         {
             return true;
         }
@@ -114,16 +121,6 @@ public class Button : View, IDesignable
         }
 
         return false;
-    }
-    private void Button_MouseClick (object sender, MouseEventArgs e)
-    {
-        if (e.Handled)
-        {
-            return;
-        }
-
-        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
-        e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new KeyBinding ([Command.HotKey], this, data: null)) == true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)

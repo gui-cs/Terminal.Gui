@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -91,6 +92,52 @@ public class DriverTests (ITestOutputHelper output) : FakeDriverBase
         DriverAssert.AssertDriverContentsWithFrameAre (driverName!, output, app.Driver);
 
         app.Dispose ();
+    }
+
+    // Tests fix for https://github.com/gui-cs/Terminal.Gui/issues/4258
+    [Theory]
+    [InlineData ("fake")]
+    [InlineData ("windows")]
+    [InlineData ("dotnet")]
+    [InlineData ("unix")]
+    public void All_Drivers_When_Clipped_AddStr_Glyph_On_Second_Cell_Of_Wide_Glyph_Outputs_Correctly (string driverName)
+    {
+        IApplication? app = Application.Create ();
+        app.Init (driverName);
+        IDriver driver = app.Driver!;
+        driver.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
+
+        // Need to force "windows" driver to override legacy console mode for this test
+        driver.IsLegacyConsole = false;
+        driver.Force16Colors = false;
+
+        driver.SetScreenSize (6, 3);
+
+        driver!.Clip = new (driver.Screen);
+
+        driver.Move (1, 0);
+        driver.AddStr ("┌");
+        driver.Move (2, 0);
+        driver.AddStr ("─");
+        driver.Move (3, 0);
+        driver.AddStr ("┐");
+        driver.Clip.Exclude (new Region (new (1, 0, 3, 1)));
+
+        driver.Move (0, 0);
+        driver.AddStr ("🍎🍎🍎🍎");
+
+
+        DriverAssert.AssertDriverContentsAre (
+                                              """
+                                              ①┌─┐🍎
+                                              """,
+                                              output,
+                                              driver);
+
+        driver.Refresh ();
+
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+                                           output, driver);
     }
 }
 

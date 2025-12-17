@@ -35,7 +35,7 @@ public class ContextMenus : Scenario
         Application.Run (_appWindow);
         _appWindow.Dispose ();
         _appWindow.KeyDown -= OnAppWindowOnKeyDown;
-        _appWindow.MouseClick -= OnAppWindowOnMouseClick;
+        _appWindow.Activating -= OnAppWindowOnActivating;
         _winContextMenu?.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
@@ -81,23 +81,26 @@ public class ContextMenus : Scenario
             _appWindow.Add (_tfBottomRight);
 
             _appWindow.KeyDown += OnAppWindowOnKeyDown;
-            _appWindow.MouseClick += OnAppWindowOnMouseClick;
+            _appWindow.Activating += OnAppWindowOnActivating;
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
-            _appWindow.IsRunningChanged += (s, e) => {
+            _appWindow.IsRunningChanged += (_, e) => {
                                                if (!e.Value)
                                                {
                                                    Thread.CurrentThread.CurrentUICulture = originalCulture;
                                                } };
         }
 
-        void OnAppWindowOnMouseClick (object? s, MouseEventArgs e)
+        void OnAppWindowOnActivating (object? s, CommandEventArgs e)
         {
-            if (e.Flags == MouseFlags.Button3Clicked)
+            if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
-                // ReSharper disable once AccessToDisposedClosure
-                _winContextMenu?.MakeVisible (e.ScreenPosition);
-                e.Handled = true;
+                if (mouseArgs.Flags == MouseFlags.Button3Clicked)
+                {
+                    // ReSharper disable once AccessToDisposedClosure
+                    _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
+                    e.Handled = true;
+                }
             }
         }
 
@@ -139,7 +142,7 @@ public class ContextMenus : Scenario
                                        Title = "M_ore options",
                                        SubMenu = new (
                                                       [
-                                                          new MenuItem
+                                                          new ()
                                                           {
                                                               Title = "_Setup...",
                                                               HelpText = "Perform setup",
@@ -153,7 +156,7 @@ public class ContextMenus : Scenario
                                                                                   ),
                                                               Key = Key.T.WithCtrl
                                                           },
-                                                          new MenuItem
+                                                          new ()
                                                           {
                                                               Title = "_Maintenance...",
                                                               HelpText = "Maintenance mode",
@@ -194,7 +197,7 @@ public class ContextMenus : Scenario
 
             if (index == -1)
             {
-                // Create English because GetSupportedCutures doesn't include it
+                // Create English because GetSupportedCultures doesn't include it
                 culture.Id = "_English";
                 culture.Title = "_English";
                 culture.HelpText = "en-US";
@@ -240,38 +243,31 @@ public class ContextMenus : Scenario
 
     public override List<Key> GetDemoKeyStrokes ()
     {
-        List<Key> keys = new ();
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.Space.WithCtrl);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.Tab);
-
-        keys.Add (Key.Space.WithCtrl);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.Tab);
-
-        keys.Add (Key.Space.WithCtrl);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.CursorDown);
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.F10.WithShift);
-        keys.Add (Key.Esc);
+        List<Key> keys =
+        [
+            Key.F10.WithShift,
+            Key.Esc,
+            Key.Space.WithCtrl,
+            Key.CursorDown,
+            Key.Enter,
+            Key.F10.WithShift,
+            Key.Esc,
+            Key.Tab,
+            Key.Space.WithCtrl,
+            Key.CursorDown,
+            Key.CursorDown,
+            Key.Enter,
+            Key.F10.WithShift,
+            Key.Esc,
+            Key.Tab,
+            Key.Space.WithCtrl,
+            Key.CursorDown,
+            Key.CursorDown,
+            Key.CursorDown,
+            Key.Enter,
+            Key.F10.WithShift,
+            Key.Esc
+        ];
 
         return keys;
     }

@@ -1,7 +1,7 @@
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace ApplicationTests;
+namespace ApplicationTests.Mouse;
 
 /// <summary>
 ///     Parallelizable tests for mouse event routing and coordinate transformation.
@@ -32,9 +32,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         Point? receivedPosition = null;
-        var eventReceived = false;
+        bool eventReceived = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             eventReceived = true;
             receivedPosition = args.Position;
@@ -90,9 +90,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         Point? receivedPosition = null;
-        var eventReceived = false;
+        bool eventReceived = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             eventReceived = true;
             receivedPosition = args.Position;
@@ -100,7 +100,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (viewRelativeX, viewRelativeY),
+            Position = new (viewRelativeX, viewRelativeY),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -146,9 +146,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
 
         Point? subViewReceivedPosition = null;
-        var subViewEventReceived = false;
+        bool subViewEventReceived = false;
 
-        subView.MouseEvent += (sender, args) =>
+        subView.MouseEvent += (_, args) =>
         {
             subViewEventReceived = true;
             subViewReceivedPosition = args.Position;
@@ -175,7 +175,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void MouseClick_OnSubView_RaisesMouseClickEvent ()
+    public void MouseClick_OnSubView_RaisesSelectingEvent ()
     {
         // Arrange
         View superView = new ()
@@ -194,8 +194,8 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         superView.Add (subView);
 
-        var clickCount = 0;
-        subView.MouseClick += (sender, args) => clickCount++;
+        int activatingCount = 0;
+        subView.Activating += (_, _) => activatingCount++;
 
         MouseEventArgs mouseEvent = new ()
         {
@@ -207,7 +207,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         subView.NewMouseEvent (mouseEvent);
 
         // Assert
-        Assert.Equal (1, clickCount);
+        Assert.Equal (1, activatingCount);
 
         subView.Dispose ();
         superView.Dispose ();
@@ -222,20 +222,20 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var handlerCalled = false;
-        var clickHandlerCalled = false;
+        bool handlerCalled = false;
+        bool clickHandlerCalled = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             handlerCalled = true;
             args.Handled = true; // Mark as handled
         };
 
-        view.MouseClick += (sender, args) => { clickHandlerCalled = true; };
+        view.MouseEvent += (_, e) => { clickHandlerCalled = !e.IsSingleDoubleOrTripleClicked; ; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -255,20 +255,17 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var eventHandlerCalled = false;
-        var clickHandlerCalled = false;
+        bool eventHandlerCalled = false;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, _) =>
         {
             eventHandlerCalled = true;
             // Don't set Handled = true
         };
 
-        view.MouseClick += (sender, args) => { clickHandlerCalled = true; };
-
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -277,7 +274,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         // Assert
         Assert.True (eventHandlerCalled);
-        Assert.True (clickHandlerCalled); // Click handler should be called when event is not handled
 
         view.Dispose ();
     }
@@ -287,18 +283,17 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     #region Mouse Button Events
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed, 1, 0, 0)]
-    [InlineData (MouseFlags.Button1Released, 0, 1, 0)]
-    [InlineData (MouseFlags.Button1Clicked, 0, 0, 1)]
-    public void View_MouseButtonEvents_RaiseCorrectHandlers (MouseFlags flags, int expectedPressed, int expectedReleased, int expectedClicked)
+    [InlineData (MouseFlags.Button1Pressed, 1, 0)]
+    [InlineData (MouseFlags.Button1Released, 0, 1)]
+    [InlineData (MouseFlags.Button1Clicked, 0, 0)]
+    public void View_MouseButtonEvents_RaiseCorrectHandlers (MouseFlags flags, int expectedPressed, int expectedReleased)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var pressedCount = 0;
-        var releasedCount = 0;
-        var clickedCount = 0;
+        int pressedCount = 0;
+        int releasedCount = 0;
 
-        view.MouseEvent += (sender, args) =>
+        view.MouseEvent += (_, args) =>
         {
             if (args.Flags.HasFlag (MouseFlags.Button1Pressed))
             {
@@ -311,11 +306,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             }
         };
 
-        view.MouseClick += (sender, args) => { clickedCount++; };
-
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = flags
         };
 
@@ -325,7 +318,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         // Assert
         Assert.Equal (expectedPressed, pressedCount);
         Assert.Equal (expectedReleased, releasedCount);
-        Assert.Equal (expectedClicked, clickedCount);
 
         view.Dispose ();
     }
@@ -339,13 +331,13 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     {
         // Arrange
         View view = new () { Width = 10, Height = 10 };
-        var clickCount = 0;
+        int clickCount = 0;
 
-        view.MouseClick += (sender, args) => clickCount++;
+        view.MouseEvent += (_, a) => clickCount += a.IsSingleDoubleOrTripleClicked ? 1 : 0;
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = clickFlag
         };
 
@@ -373,12 +365,12 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Enabled = false
         };
 
-        var eventCalled = false;
-        view.MouseEvent += (sender, args) => { eventCalled = true; };
+        bool eventCalled = false;
+        view.MouseEvent += (_, _) => { eventCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -392,7 +384,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void View_Disabled_DoesNotRaiseMouseClickEvent ()
+    public void View_Disabled_DoesNotRaiseSelectingEvent ()
     {
         // Arrange
         View view = new ()
@@ -402,12 +394,12 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             Enabled = false
         };
 
-        var clickCalled = false;
-        view.MouseClick += (sender, args) => { clickCalled = true; };
+        bool selectingCalled = false;
+        view.Activating += (_, _) => { selectingCalled = true; };
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -415,7 +407,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         view.NewMouseEvent (mouseEvent);
 
         // Assert
-        Assert.False (clickCalled);
+        Assert.False (selectingCalled);
 
         view.Dispose ();
     }
@@ -445,7 +437,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (2, 2),
+            Position = new (2, 2),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -475,12 +467,12 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         superView.Add (view);
 
-        var selectingCount = 0;
-        view.Selecting += (sender, args) => selectingCount++;
+        int activatingCount = 0;
+        view.Activating += (_, _) => activatingCount++;
 
         MouseEventArgs mouseEvent = new ()
         {
-            Position = new Point (5, 5),
+            Position = new (5, 5),
             Flags = MouseFlags.Button1Clicked
         };
 
@@ -488,7 +480,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         view.NewMouseEvent (mouseEvent);
 
         // Assert
-        Assert.Equal (1, selectingCount);
+        Assert.Equal (1, activatingCount);
 
         view.Dispose ();
         superView.Dispose ();

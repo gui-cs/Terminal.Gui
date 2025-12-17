@@ -48,12 +48,13 @@ public enum Command
     HotKey,
 
     /// <summary>
-    ///     Selects the View or an item in the View (e.g. a list item or menu item) without necessarily accepting it.
+    ///     Activates the View or an item in the View, changing its state or preparing it for interaction
+    ///     (e.g. toggling a checkbox, selecting a list item, focusing a button, navigating a menu item) without necessarily accepting it.
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseSelecting"/>.
+    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseActivating"/>.
     ///     </para>
     /// </summary>
-    Select,
+    Activate,
 
     #endregion
 

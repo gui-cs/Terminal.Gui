@@ -1,4 +1,4 @@
-namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Wraps any <see cref="View"/> to make it runnable with a typed result, similar to how

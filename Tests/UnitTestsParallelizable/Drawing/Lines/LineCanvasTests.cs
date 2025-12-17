@@ -17,14 +17,14 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Empty_Canvas_ToString_Returns_EmptyString ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Equal (string.Empty, canvas.ToString ());
     }
 
     [Fact]
     public void Clear_Removes_All_Lines ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (0, 0), 3, Orientation.Vertical, LineStyle.Single);
 
@@ -38,7 +38,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Lines_Property_Returns_ReadOnly_Collection ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Single (canvas.Lines);
@@ -48,7 +48,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddLine_Adds_Line_To_Collection ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Empty (canvas.Lines);
 
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
@@ -94,7 +94,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         int expectedHeight
     )
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (x, y), length, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (x, y), length, Orientation.Vertical, LineStyle.Single);
 
@@ -119,7 +119,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         int expectedHeight
     )
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (x, y), length, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
@@ -128,7 +128,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Specific_Coordinates ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (5, 5), 3, Orientation.Horizontal, LineStyle.Single);
         Assert.Equal (new (5, 5, 3, 1), canvas.Bounds);
     }
@@ -136,14 +136,14 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Empty_Canvas_Returns_Empty_Rectangle ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Equal (Rectangle.Empty, canvas.Bounds);
     }
 
     [Fact]
     public void Bounds_Single_Point_Zero_Length ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (5, 5), 0, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Equal (new (5, 5, 1, 1), canvas.Bounds);
@@ -152,7 +152,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Horizontal_Line ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (2, 3), 5, Orientation.Horizontal, LineStyle.Single);
 
         Assert.Equal (new (2, 3, 5, 1), canvas.Bounds);
@@ -161,7 +161,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Vertical_Line ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (2, 3), 5, Orientation.Vertical, LineStyle.Single);
 
         Assert.Equal (new (2, 3, 1, 5), canvas.Bounds);
@@ -170,7 +170,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Multiple_Lines_Returns_Union ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (0, 0), 3, Orientation.Vertical, LineStyle.Single);
 
@@ -180,7 +180,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Negative_Length_Line ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (5, 5), -3, Orientation.Horizontal, LineStyle.Single);
 
         // Line from (5,5) going left 3 positions: includes points 3, 4, 5 (width 3, X starts at 3)
@@ -190,7 +190,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Bounds_Complex_Box ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // top
         canvas.AddLine (new (0, 0), 3, Orientation.Horizontal, LineStyle.Single);
@@ -214,7 +214,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void ClearExclusions_Clears_Exclusion_Region ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
 
         var region = new Region (new (0, 0, 2, 1));
@@ -229,7 +229,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Exclude_Removes_Points_From_Map ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
 
         var region = new Region (new (0, 0, 2, 1));
@@ -260,7 +260,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Fill_Property_Defaults_To_Null ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         Assert.Null (canvas.Fill);
     }
 
@@ -688,7 +688,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Theory]
     public void Length_0_Is_1_Long (int x, int y, Orientation orientation, string expected)
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Add a line at 5, 5 that's has length of 1
         canvas.AddLine (new (x, y), 1, orientation, LineStyle.Single);
@@ -741,9 +741,10 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData (-1, 0, -2, Orientation.Vertical, "│\r\n│")]
     [InlineData (0, -1, -2, Orientation.Vertical, "│\r\n│")]
     [InlineData (-1, -1, -2, Orientation.Vertical, "│\r\n│")]
-    [Theory]    public void Length_n_Is_n_Long (int x, int y, int length, Orientation orientation, string expected)
+    [Theory]
+    public void Length_n_Is_n_Long (int x, int y, int length, Orientation orientation, string expected)
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (new (x, y), length, orientation, LineStyle.Single);
 
         var result = canvas.ToString ();
@@ -755,7 +756,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     {
         var offset = new Point (5, 5);
 
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
         canvas.AddLine (offset, -3, Orientation.Horizontal, LineStyle.Single);
 
         var looksLike = "───";
@@ -820,7 +821,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void TestLineCanvas_LeaveMargin_Top1_Left1 ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Upper box
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
@@ -927,7 +928,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Top_Left_From_TopRight_LeftUp ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Upper box
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
@@ -943,7 +944,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Top_With_1Down ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Top      ─  
         canvas.AddLine (Point.Empty, 1, Orientation.Horizontal, LineStyle.Single);
@@ -1328,7 +1329,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Window ()
     {
-        var canvas = new LineCanvas ();
+        LineCanvas canvas = new ();
 
         // Frame
         canvas.AddLine (Point.Empty, 10, Orientation.Horizontal, LineStyle.Single);
@@ -1507,4 +1508,360 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
 
         return v;
     }
+
+    #region GetRegion Tests
+
+    [Fact]
+    public void GetRegion_EmptyCellMap_ReturnsEmptyRegion ()
+    {
+        Dictionary<Point, Cell?> cellMap = new ();
+        Region region = LineCanvas.GetRegion (cellMap);
+
+        Assert.NotNull (region);
+        Assert.True (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void GetRegion_SingleCell_ReturnsSingleRectangle ()
+    {
+        Dictionary<Point, Cell?> cellMap = new ()
+        {
+            { new Point (5, 10), new Cell { Grapheme = "X" } }
+        };
+
+        Region region = LineCanvas.GetRegion (cellMap);
+
+        Assert.NotNull (region);
+        Assert.False (region.IsEmpty ());
+        Assert.True (region.Contains (5, 10));
+    }
+
+    [Fact]
+    public void GetRegion_HorizontalLine_CreatesHorizontalSpan ()
+    {
+        Dictionary<Point, Cell?> cellMap = new ();
+        // Horizontal line from (5, 10) to (9, 10)
+        for (int x = 5; x <= 9; x++)
+        {
+            cellMap.Add (new Point (x, 10), new Cell { Grapheme = "─" });
+        }
+
+        Region region = LineCanvas.GetRegion (cellMap);
+
+        Assert.NotNull (region);
+        // All cells in the horizontal span should be in the region
+        for (int x = 5; x <= 9; x++)
+        {
+            Assert.True (region.Contains (x, 10), $"Expected ({x}, 10) to be in region");
+        }
+        // Cells outside the span should not be in the region
+        Assert.False (region.Contains (4, 10));
+        Assert.False (region.Contains (10, 10));
+        Assert.False (region.Contains (7, 9));
+        Assert.False (region.Contains (7, 11));
+    }
+
+    [Fact]
+    public void GetRegion_VerticalLine_CreatesMultipleHorizontalSpans ()
+    {
+        Dictionary<Point, Cell?> cellMap = new ();
+        // Vertical line from (5, 10) to (5, 14)
+        for (int y = 10; y <= 14; y++)
+        {
+            cellMap.Add (new Point (5, y), new Cell { Grapheme = "│" });
+        }
+
+        Region region = LineCanvas.GetRegion (cellMap);
+
+        Assert.NotNull (region);
+        // All cells in the vertical line should be in the region
+        for (int y = 10; y <= 14; y++)
+        {
+            Assert.True (region.Contains (5, y), $"Expected (5, {y}) to be in region");
+        }
+        // Cells outside should not be in the region
+        Assert.False (region.Contains (4, 12));
+        Assert.False (region.Contains (6, 12));
+    }
+
+    [Fact]
+    public void GetRegion_LShape_CreatesCorrectSpans ()
+    {
+        Dictionary<Point, Cell?> cellMap = new ();
+        // L-shape: horizontal line from (0, 0) to (5, 0), then vertical to (5, 3)
+        for (int x = 0; x <= 5; x++)
+        {
+            cellMap.Add (new Point (x, 0), new Cell { Grapheme = "─" });
+        }
+        for (int y = 1; y <= 3; y++)
+        {
+            cellMap.Add (new Point (5, y), new Cell { Grapheme = "│" });
+        }
+
+        Region region = LineCanvas.GetRegion (cellMap);
+
+        // Horizontal part
+        for (int x = 0; x <= 5; x++)
+        {
+            Assert.True (region.Contains (x, 0), $"Expected ({x}, 0) to be in region");
+        }
+        // Vertical part
+        for (int y = 1; y <= 3; y++)
+        {
+            Assert.True (region.Contains (5, y), $"Expected (5, {y}) to be in region");
+        }
+        // Empty cells should not be in region
+        Assert.False (region.Contains (1, 1));
+        Assert.False (region.Contains (4, 2));
+    }
+
+    [Fact]
+    public void GetRegion_DiscontiguousHorizontalCells_CreatesSeparateSpans ()
+    {
+        Dictionary<Point, Cell?> cellMap = new ()
+        {
+            { new Point (0, 5), new Cell { Grapheme = "X" } },
+            { new Point (1, 5), new Cell { Grapheme = "X" } },
+            // Gap at (2, 5)
+            { new Point (3, 5), new Cell { Grapheme = "X" } },
+            { new Point (4, 5), new Cell { Grapheme = "X" } }
+        };
+
+        Region region = LineCanvas.GetRegion (cellMap);
+
+        Assert.True (region.Contains (0, 5));
+        Assert.True (region.Contains (1, 5));
+        Assert.False (region.Contains (2, 5)); // Gap
+        Assert.True (region.Contains (3, 5));
+        Assert.True (region.Contains (4, 5));
+    }
+
+    [Fact]
+    public void GetRegion_IntersectingLines_CreatesCorrectRegion ()
+    {
+        Dictionary<Point, Cell?> cellMap = new ();
+        // Horizontal line
+        for (int x = 0; x <= 4; x++)
+        {
+            cellMap.Add (new Point (x, 2), new Cell { Grapheme = "─" });
+        }
+        // Vertical line intersecting at (2, 2)
+        for (int y = 0; y <= 4; y++)
+        {
+            cellMap [new Point (2, y)] = new Cell { Grapheme = "┼" };
+        }
+
+        Region region = LineCanvas.GetRegion (cellMap);
+
+        // Horizontal line
+        for (int x = 0; x <= 4; x++)
+        {
+            Assert.True (region.Contains (x, 2), $"Expected ({x}, 2) to be in region");
+        }
+        // Vertical line
+        for (int y = 0; y <= 4; y++)
+        {
+            Assert.True (region.Contains (2, y), $"Expected (2, {y}) to be in region");
+        }
+    }
+
+    #endregion
+
+    #region GetCellMapWithRegion Tests
+
+    [Fact]
+    public void GetCellMapWithRegion_EmptyCanvas_ReturnsEmptyMapAndRegion ()
+    {
+        LineCanvas canvas = new ();
+
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+
+        Assert.NotNull (cellMap);
+        Assert.Empty (cellMap);
+        Assert.NotNull (region);
+        Assert.True (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_SingleHorizontalLine_ReturnsCellMapAndRegion ()
+    {
+        LineCanvas canvas = new ();
+        canvas.AddLine (new Point (5, 10), 5, Orientation.Horizontal, LineStyle.Single);
+
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+        Assert.False (region.IsEmpty ());
+
+        // Both cellMap and region should contain the same cells
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_SingleVerticalLine_ReturnsCellMapAndRegion ()
+    {
+        LineCanvas canvas = new ();
+        canvas.AddLine (new Point (5, 10), 5, Orientation.Vertical, LineStyle.Single);
+
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+        Assert.False (region.IsEmpty ());
+
+        // Both cellMap and region should contain the same cells
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_IntersectingLines_CorrectlyHandlesIntersection ()
+    {
+        LineCanvas canvas = new ();
+        // Create a cross pattern
+        canvas.AddLine (new Point (0, 2), 5, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (2, 0), 5, Orientation.Vertical, LineStyle.Single);
+
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+
+        // Verify intersection point is in both
+        Assert.True (cellMap.ContainsKey (new Point (2, 2)), "Intersection should be in cellMap");
+        Assert.True (region.Contains (2, 2), "Intersection should be in region");
+
+        // All cells should be in both structures
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_ComplexShape_RegionMatchesCellMap ()
+    {
+        LineCanvas canvas = new ();
+        // Create a box
+        canvas.AddLine (new Point (0, 0), 5, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (0, 3), 5, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (0, 0), 4, Orientation.Vertical, LineStyle.Single);
+        canvas.AddLine (new Point (4, 0), 4, Orientation.Vertical, LineStyle.Single);
+
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+
+        // Every cell in the map should be in the region
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+
+        // Cells not in the map should not be in the region (interior of box)
+        Assert.False (cellMap.ContainsKey (new Point (2, 1)));
+        // Note: Region might contain interior if it's filled, so we just verify consistency
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_ResultsMatchSeparateCalls ()
+    {
+        LineCanvas canvas = new ();
+        // Create a complex pattern
+        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (5, 0), 10, Orientation.Vertical, LineStyle.Single);
+        canvas.AddLine (new Point (0, 5), 10, Orientation.Horizontal, LineStyle.Double);
+
+        // Get results from combined method
+        (Dictionary<Point, Cell?> combinedCellMap, Region combinedRegion) = canvas.GetCellMapWithRegion ();
+
+        // Get results from separate calls
+        Dictionary<Point, Cell?> separateCellMap = canvas.GetCellMap ();
+        Region separateRegion = LineCanvas.GetRegion (separateCellMap);
+
+        // Cell maps should be identical
+        Assert.Equal (separateCellMap.Count, combinedCellMap.Count);
+        foreach (KeyValuePair<Point, Cell?> kvp in separateCellMap)
+        {
+            Assert.True (combinedCellMap.ContainsKey (kvp.Key), $"Combined map missing key {kvp.Key}");
+        }
+
+        // Regions should contain the same points
+        foreach (Point p in combinedCellMap.Keys)
+        {
+            Assert.True (combinedRegion.Contains (p.X, p.Y), $"Combined region missing ({p.X}, {p.Y})");
+            Assert.True (separateRegion.Contains (p.X, p.Y), $"Separate region missing ({p.X}, {p.Y})");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_NegativeCoordinates_HandlesCorrectly ()
+    {
+        LineCanvas canvas = new ();
+        canvas.AddLine (new Point (-5, -5), 10, Orientation.Horizontal, LineStyle.Single);
+        canvas.AddLine (new Point (0, -5), 10, Orientation.Vertical, LineStyle.Single);
+
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+        Assert.NotNull (region);
+
+        // Verify negative coordinates are handled
+        Assert.True (cellMap.Keys.Any (p => p.X < 0 || p.Y < 0), "Should have negative coordinates");
+
+        // All cells should be in region
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+    }
+
+    [Fact]
+    public void GetCellMapWithRegion_WithExclusion_RegionExcludesExcludedCells ()
+    {
+        LineCanvas canvas = new ();
+        canvas.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+
+        // Exclude middle section
+        Region exclusionRegion = new ();
+        exclusionRegion.Combine (new Rectangle (3, 0, 4, 1), RegionOp.Union);
+        canvas.Exclude (exclusionRegion);
+
+        (Dictionary<Point, Cell?> cellMap, Region region) = canvas.GetCellMapWithRegion ();
+
+        Assert.NotNull (cellMap);
+        Assert.NotEmpty (cellMap);
+
+        // Excluded cells should not be in cellMap
+        for (int x = 3; x < 7; x++)
+        {
+            Assert.False (cellMap.ContainsKey (new Point (x, 0)), $"({x}, 0) should be excluded from cellMap");
+        }
+
+        // Region should match cellMap
+        foreach (Point p in cellMap.Keys)
+        {
+            Assert.True (region.Contains (p.X, p.Y), $"Expected ({p.X}, {p.Y}) to be in region");
+        }
+
+        // Excluded points should not be in region
+        for (int x = 3; x < 7; x++)
+        {
+            Assert.False (region.Contains (x, 0), $"({x}, 0) should be excluded from region");
+        }
+    }
+
+    #endregion
 }
