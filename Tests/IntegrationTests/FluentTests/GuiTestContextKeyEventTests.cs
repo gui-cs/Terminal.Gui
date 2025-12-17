@@ -1,8 +1,9 @@
+using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.GuiTestContextTests;
 
 /// <summary>
 ///     Integration tests for GuiTestContext keyboard event handling (InjectKeyEvent).

@@ -1,9 +1,10 @@
 ﻿using System.Drawing;
+using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.GuiTestContextTests;
 
 /// <summary>
 ///     Basic tests for GuiTestContext functionality including constructor, lifecycle, and resize operations.
@@ -52,7 +53,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     public void AnsiScreenShot_Renders_Ansi_Stream (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (10, 3, d, _out)
-                                           .Then ((app) =>
+                                           .Then (app =>
                                                   {
                                                       app.TopRunnableView!.BorderStyle = LineStyle.None;
                                                       app.TopRunnableView!.Border!.Thickness = Thickness.Empty;
@@ -60,7 +61,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
                                                   })
                                            .ScreenShot ("ScreenShot", _out)
                                            .AnsiScreenShot ("AnsiScreenShot", _out)
-;
+            ;
     }
 
     [Theory]
@@ -68,6 +69,7 @@ public class GuiTestContextTests (ITestOutputHelper outputHelper)
     public void With_Starts_Stops_Without_Error (TestDriver d)
     {
         using GuiTestContext context = With.A<Window> (40, 10, d, _out);
+
         // No actual assertions are needed — if no exceptions are thrown, it's working
     }
 

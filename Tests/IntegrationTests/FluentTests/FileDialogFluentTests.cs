@@ -2,11 +2,12 @@
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
+using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.FileDialogTests;
 
 public class FileDialogFluentTests
 {

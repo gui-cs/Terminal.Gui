@@ -1,9 +1,10 @@
 using System.Drawing;
+using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.GuiTestContextTests;
 
 /// <summary>
 ///     Integration tests for GuiTestContext mouse event handling (LeftClick, RightClick).
@@ -17,6 +18,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void Click_RaisesAccepting (TestDriver d)
     {
         var clickedCount = 0;
+
         var button = new Button
         {
             X = 5,
@@ -36,6 +38,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void Click_TView_RaisesAccepting (TestDriver d)
     {
         var clickedCount = 0;
+
         var button = new Button
         {
             X = 5,
@@ -55,7 +58,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void Click_OnView_RaisesMouseEvent (TestDriver d)
     {
         var mouseReceived = false;
-        Point receivedPosition = Point.Empty;
+        var receivedPosition = Point.Empty;
 
         var view = new View
         {
@@ -66,10 +69,10 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
         };
 
         view.MouseEvent += (_, mouse) =>
-        {
-            mouseReceived = true;
-            receivedPosition = mouse.Position!.Value;
-        };
+                           {
+                               mouseReceived = true;
+                               receivedPosition = mouse.Position!.Value;
+                           };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
@@ -82,6 +85,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void MultipleClicks_ProcessesInOrder (TestDriver d)
     {
         var clickCount = 0;
+
         var button = new Button
         {
             X = 5,
@@ -103,6 +107,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void RightClick_RaisesCorrectEvent (TestDriver d)
     {
         var rightClickCount = 0;
+
         var view = new View
         {
             X = 10,
@@ -112,12 +117,12 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
         };
 
         view.MouseEvent += (s, e) =>
-        {
-            if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
-            {
-                rightClickCount++;
-            }
-        };
+                           {
+                               if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
+                               {
+                                   rightClickCount++;
+                               }
+                           };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view)
@@ -152,7 +157,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view1)
                                            .Add (view2)
-                                           .Then ((_) => view1.SetFocus ())
+                                           .Then (_ => view1.SetFocus ())
                                            .AssertTrue (view1.HasFocus)
                                            .LeftClick (25, 7) // Click on view2
                                            .AssertFalse (view1.HasFocus)
@@ -205,6 +210,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void RapidClicks_AllProcessed (TestDriver d)
     {
         var clickCount = 0;
+
         var view = new View
         {
             X = 10,
@@ -215,12 +221,12 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
 
         // Only count Clicked events, not all mouse events (Pressed, Released, Clicked)
         view.MouseEvent += (s, e) =>
-        {
-            if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked))
-            {
-                clickCount++;
-            }
-        };
+                           {
+                               if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                               {
+                                   clickCount++;
+                               }
+                           };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view);
@@ -239,6 +245,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void Click_OutsideView_DoesNotRaiseEvent (TestDriver d)
     {
         var clickCount = 0;
+
         var view = new View
         {
             X = 10,
@@ -260,6 +267,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void ClickOnDisabledView_DoesNotTrigger (TestDriver d)
     {
         var clickCount = 0;
+
         var button = new Button
         {
             X = 5,
@@ -280,6 +288,7 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
     public void AfterResize_StillWorks (TestDriver d)
     {
         var clickCount = 0;
+
         var button = new Button
         {
             X = 5,

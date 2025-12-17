@@ -1,9 +1,10 @@
 using System.Globalization;
+using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.PopoverMenuTests;
 
 /// <summary>
 ///     Tests for the PopoverMenu class

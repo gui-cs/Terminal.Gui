@@ -1,9 +1,10 @@
 ﻿#nullable enable
+using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.NavigationTests;
 
 public class NavigationTests (ITestOutputHelper outputHelper)
 {

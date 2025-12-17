@@ -1,10 +1,11 @@
 using System.Globalization;
 using System.Reflection;
+using IntegrationTests.FluentTests;
 using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.MenuBarTests;
 
 /// <summary>
 ///     Tests for the MenuBar class

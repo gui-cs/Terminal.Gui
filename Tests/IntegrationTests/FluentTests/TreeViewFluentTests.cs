@@ -1,8 +1,9 @@
-﻿using TerminalGuiFluentTesting;
+﻿using IntegrationTests.FluentTests;
+using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests.TreeViewTests;
 
 public class TreeViewFluentTests
 {
@@ -45,17 +46,15 @@ public class TreeViewFluentTests
                 .AssertNull (tv.GetObjectOnRow (1))
                 .KeyDown (Key.CursorRight)
                 .ScreenShot ("After expanding", _out)
-                .AssertMultiple (
-                                 () =>
+                .AssertMultiple (() =>
                                  {
                                      Assert.Equal (root, tv.GetObjectOnRow (0));
                                      Assert.Equal (car, tv.GetObjectOnRow (1));
                                      Assert.Equal (lorry, tv.GetObjectOnRow (2));
                                      Assert.Equal (bike, tv.GetObjectOnRow (3));
                                  })
-                .AssertIsAssignableFrom <ITreeNode>(tv.SelectedObject)
-                .Then (
-                       (_) =>
+                .AssertIsAssignableFrom<ITreeNode> (tv.SelectedObject)
+                .Then (_ =>
                        {
                            // Re order
                            root.Children = [bike, car, lorry];
@@ -63,8 +62,7 @@ public class TreeViewFluentTests
                        })
                 .WaitIteration ()
                 .ScreenShot ("After re-order", _out)
-                .AssertMultiple (
-                                 () =>
+                .AssertMultiple (() =>
                                  {
                                      Assert.Equal (root, tv.GetObjectOnRow (0));
                                      Assert.Equal (bike, tv.GetObjectOnRow (1));
@@ -136,8 +134,7 @@ public class TreeViewFluentTests
                 .Add (tv)
                 .WaitIteration ()
                 .ScreenShot ("Initial State", _out)
-                .AssertMultiple (
-                                 () =>
+                .AssertMultiple (() =>
                                  {
                                      Assert.Equal (root, tv.GetObjectOnRow (0));
                                      Assert.Equal (car, tv.GetObjectOnRow (1));
@@ -149,8 +146,7 @@ public class TreeViewFluentTests
                                      Assert.Equal (mrD, tv.GetObjectOnRow (7));
                                      Assert.Equal (mrE, tv.GetObjectOnRow (8));
                                  })
-                .Then (
-                       (_) =>
+                .Then (_ =>
                        {
                            // Re order
                            root.Children = [bike, car, lorry];
@@ -158,8 +154,7 @@ public class TreeViewFluentTests
                        })
                 .WaitIteration ()
                 .ScreenShot ("After re-order", _out)
-                .AssertMultiple (
-                                 () =>
+                .AssertMultiple (() =>
                                  {
                                      Assert.Equal (root, tv.GetObjectOnRow (0));
                                      Assert.Equal (bike, tv.GetObjectOnRow (1));
