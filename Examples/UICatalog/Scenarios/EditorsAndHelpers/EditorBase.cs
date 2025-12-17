@@ -158,14 +158,23 @@ public abstract class EditorBase : View
     }
 
     /// <inheritdoc />
-    protected override void Dispose (bool disposing)
+    protected override bool OnSuperViewChanging (View? newSuperView, View? currentSuperView)
     {
-        if (disposing && App is {})
+        // Clean up event handlers before SuperView is set to null
+        // This ensures App is still accessible for proper cleanup
+        if (App is {})
         {
             App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
             App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
         }
 
+        return base.OnSuperViewChanging (newSuperView, currentSuperView);
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        // Event handlers are now cleaned up in OnSuperViewChanging
         base.Dispose (disposing);
     }
 }
