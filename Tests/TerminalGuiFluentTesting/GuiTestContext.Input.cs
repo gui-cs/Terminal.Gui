@@ -141,16 +141,16 @@ public partial class GuiTestContext
         // This prevents the application from missing the key event if we inject it and immediately return.
         bool keyReceived = false;
         IDriver? driver = App?.Driver;
-        
+
         if (driver is { })
         {
             driver.KeyDown += DriverOnKeyDown;
-            
+
             try
             {
                 // Use Pipeline mode to match the old behavior (InjectKeyDownEvent)
-                App.GetInputInjector ().InjectKey (key, new InputInjectionOptions { Mode = InputInjectionMode.Pipeline });
-                
+                App?.GetInputInjector ().InjectKey (key, new () { Mode = InputInjectionMode.Pipeline });
+
                 WaitUntil (() => keyReceived);
             }
             finally

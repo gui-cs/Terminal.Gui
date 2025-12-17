@@ -152,7 +152,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               └──┘🍎
                                               � 🍎🍎
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         view.Margin!.ShadowSize = new (1, 2);
@@ -167,7 +167,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               � 🍎🍎
                                               � 🍎🍎
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
     }
 
@@ -190,7 +190,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               | Hi |▖
                                               ▝▀▀▀▀▀▘
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.LeftButtonPressed });
@@ -200,7 +200,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               """
                                               | Hi |
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.LeftButtonReleased });
@@ -211,7 +211,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               | Hi |▖
                                               ▝▀▀▀▀▀▘
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
     }
 
@@ -365,7 +365,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               🍎🍎🍎🍎🍎
                                               🍎🍎🍎🍎🍎
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         Runnable modalSuperview = new () { Y = 1, Width = Dim.Fill (), Height = 4, BorderStyle = LineStyle.Single };
@@ -384,7 +384,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               │▝▀▀▀▀▀▀▘│
                                               └────────┘
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
 
@@ -430,7 +430,7 @@ public class ShadowTests (ITestOutputHelper output)
         _output.WriteLine ("Actual driver contents:");
         _output.WriteLine (app.Driver.ToString ());
         _output.WriteLine ("\nActual driver output:");
-        string? output = app.Driver.GetOutput ().GetLastOutput ();
+        string output = app.Driver.GetOutput ().GetLastOutput ();
         _output.WriteLine (output);
 
         DriverAssert.AssertDriverOutputIs ("""
@@ -477,7 +477,7 @@ public class ShadowTests (ITestOutputHelper output)
         _output.WriteLine ("Actual driver contents:");
         _output.WriteLine (app.Driver.ToString ());
         _output.WriteLine ("\nActual driver output:");
-        string? output = app.Driver.GetOutput ().GetLastOutput ();
+        string output = app.Driver.GetOutput ().GetLastOutput ();
         _output.WriteLine (output);
 
         DriverAssert.AssertDriverOutputIs ("""
