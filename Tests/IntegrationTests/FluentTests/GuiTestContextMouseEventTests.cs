@@ -213,7 +213,14 @@ public class GuiTestContextMouseEventTests (ITestOutputHelper outputHelper)
             Height = 5
         };
 
-        view.MouseEvent += (s, e) => clickCount++;
+        // Only count Clicked events, not all mouse events (Pressed, Released, Clicked)
+        view.MouseEvent += (s, e) =>
+        {
+            if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+            {
+                clickCount++;
+            }
+        };
 
         using GuiTestContext context = With.A<Window> (40, 10, d, _out)
                                            .Add (view);

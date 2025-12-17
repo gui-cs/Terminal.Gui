@@ -77,7 +77,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Abandoned = () =>
                         {
                             _expectingResponse = false;
-                            Logging.Trace ("Size query abandoned");
+                            //Logging.Trace ("Size query abandoned");
                         }
         };
 
@@ -114,7 +114,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
         if (currentSize != _lastSize)
         {
-            Logging.Trace ($"Terminal size changed from {_lastSize.Width}x{_lastSize.Height} to {currentSize.Width}x{currentSize.Height}");
+            //Logging.Trace ($"Terminal size changed from {_lastSize.Width}x{_lastSize.Height} to {currentSize.Width}x{currentSize.Height}");
             _lastSize = currentSize;
             SizeChanged?.Invoke (this, new (currentSize));
 

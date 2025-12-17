@@ -317,7 +317,7 @@ public class PopoverMenuTests
                                      .AssertEqual (1, enterKeyDownCount);
     }
 
-    [Theory (Skip = "Broke in #4474")]
+    [Theory]
     [ClassData (typeof (TestDrivers))]
     public void Not_Active_DoesNotEat_QuitKey (TestDriver d)
     {
@@ -355,7 +355,7 @@ public class PopoverMenuTests
                                      .AssertEqual (1, quitKeyDownCount);
     }
 
-    [Theory (Skip = "Broke in #4474")]
+    [Theory]
     [ClassData (typeof (TestDrivers))]
     public void ContextMenu_CrashesOnRight (TestDriver d)
     {

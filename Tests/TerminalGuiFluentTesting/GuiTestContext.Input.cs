@@ -1,5 +1,6 @@
 using System.Drawing;
 using Terminal.Gui.Testing;
+using Terminal.Gui.Time;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -22,14 +23,14 @@ public partial class GuiTestContext
             Flags = MouseFlags.RightButtonPressed,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
-        });
+        }, advanceTimeAfter: false); // Don't advance time between Press and Release
 
         return InjectMouseEvent (new ()
         {
             Flags = MouseFlags.RightButtonReleased,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
-        });
+        }, advanceTimeAfter: true); // Advance time after the complete click
     }
 
     /// <summary>
@@ -47,14 +48,14 @@ public partial class GuiTestContext
             Flags = MouseFlags.LeftButtonPressed,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
-        });
+        }, advanceTimeAfter: false); // Don't advance time between Press and Release
 
         return InjectMouseEvent (new ()
         {
             Flags = MouseFlags.LeftButtonReleased,
             ScreenPosition = new (screenX, screenY),
             Position = new (screenX, screenY)
-        });
+        }, advanceTimeAfter: true); // Advance time after the complete click
     }
 
     /// <summary>
@@ -77,8 +78,9 @@ public partial class GuiTestContext
     /// Uses the new input injection infrastructure with virtual time support.
     /// </summary>
     /// <param name="mouse">The mouse event to inject.</param>
+    /// <param name="advanceTimeAfter">Whether to advance time after this event to space clicks apart (prevents multi-click detection).</param>
     /// <returns>This GuiTestContext for fluent chaining.</returns>
-    private GuiTestContext InjectMouseEvent (Mouse mouse)
+    private GuiTestContext InjectMouseEvent (Mouse mouse, bool advanceTimeAfter = false)
     {
         // Use the new injection infrastructure
         WaitIteration ((app) =>
@@ -91,6 +93,16 @@ public partial class GuiTestContext
 
                 // Use the new simplified injection API
                 app.InjectMouse (mouse);
+
+                // Advance virtual time after complete clicks to space them apart
+                // This prevents rapid clicks from being detected as multi-clicks
+                // while keeping Press+Release pairs together (no delay within a single click)
+                if (advanceTimeAfter && _timeProvider is VirtualTimeProvider vtp)
+                {
+                    // Advance virtual time beyond the double-click threshold (500ms)
+                    // This is instant - no real delay!
+                    vtp.Advance (TimeSpan.FromMilliseconds (550));
+                }
             }
             else
             {
