@@ -69,8 +69,9 @@ public class InputInjector : IInputInjector
         if (mode == InputInjectionMode.Direct)
         {
             // Direct injection - bypass encoding, raise event directly
+            // Note: RaiseMouseEventParsed internally calls RaiseSyntheticMouseEvent,
+            // so we don't need to call it separately
             _processor.RaiseMouseEventParsed (mouseEvent);
-            _processor.RaiseSyntheticMouseEvent (mouseEvent);
         }
         else // Pipeline
         {

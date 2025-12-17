@@ -1,7 +1,5 @@
 ﻿# Mouse Deep Dive
 
-## Table of Contents
-
 - [Tenets for Terminal.Gui Mouse Handling](#tenets-for-terminalgui-mouse-handling-unless-you-know-better-ones)
 - [Mouse Behavior - End User's Perspective](#mouse-behavior---end-users-perspective)
 - [Mouse APIs](#mouse-apis)
@@ -1092,11 +1090,324 @@ Command.Accept → Open item (from DoubleClicked or Enter key)
 | **MouseBindings** | Only `LeftButtonClicked` → `Activate` | Add `LeftButtonDoubleClicked` → `Accept` | Matches command.md design |
 | **Documentation** | Scattered | Centralized pipeline doc (this section) | Developer productivity |
 
+## Testing Mouse Behavior
 
+Terminal.Gui provides a sophisticated input injection system for testing mouse behavior without requiring actual mouse hardware. The system supports **virtual time control** for deterministic testing of timing-dependent behavior like double-clicks and triple-clicks.
 
-## See Also
+### Basic Mouse Injection
 
-* [Cancellable Work Pattern](cancellable-work-pattern.md)
-* [Command Deep Dive](command.md)
-* [Keyboard Deep Dive](keyboard.md)
-* [Lexicon & Taxonomy](lexicon.md)
+```csharp
+    // Simple mouse click test
+    [Fact]
+    public void Button_ClickWithMouse_RaisesAccepting ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);  // Use ANSI driver for testing
+
+        IRunnable runnable = new Runnable ();
+        Button button = new () { Text = "Click Me" };
+        (runnable as View)?.Add (button);
+        app.Begin (runnable);
+
+        bool acceptingCalled = false;
+        button.Accepting += (s, e) => acceptingCalled = true;
+
+        // Single-call injection - press
+        app.InjectMouse (new ()
+        {
+            Flags = MouseFlags.LeftButtonPressed, 
+            ScreenPosition = new (0,0)
+        });
+
+        // Single-call injection - release
+        app.InjectMouse (new ()
+        {
+            Flags = MouseFlags.LeftButtonReleased,
+            ScreenPosition = new (0, 0)
+        });
+
+        Assert.True (acceptingCalled);
+        (runnable as View)?.Dispose ();
+    }
+```
+
+### Testing Double-Click Detection
+
+The input injection system provides **virtual time control** for precise testing of timing-dependent behavior:
+
+```csharp
+[Fact]
+public void DoubleClick_WithinThreshold_DetectsDoubleClick ()
+{
+    VirtualTimeProvider time = new ();
+    time.SetTime (new (2025, 1, 1, 12, 0, 0));
+    
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI);
+    
+    List<MouseFlags> receivedFlags = [];
+    app.Mouse.MouseEvent += (s, e) => receivedFlags.Add (e.Flags);
+    
+    // First click at T+0
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.LeftButtonPressed
+    });
+    
+    time.Advance (TimeSpan.FromMilliseconds (50));
+    
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.LeftButtonReleased
+    });
+    
+    // Second click at T+350 (within 500ms double-click threshold)
+    time.Advance (TimeSpan.FromMilliseconds (300));
+    
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.LeftButtonPressed
+    });
+    
+    time.Advance (TimeSpan.FromMilliseconds (50));
+    
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.LeftButtonReleased
+    });
+    
+    // Verify double-click detected
+    Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.LeftButtonDoubleClicked));
+}
+```
+
+### Testing Triple-Click Detection
+
+```csharp
+[Fact]
+public void TripleClick_WithinThreshold_DetectsTripleClick ()
+{
+    VirtualTimeProvider time = new ();
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI);
+    
+    List<MouseFlags> receivedFlags = [];
+    app.Mouse.MouseEvent += (s, e) => receivedFlags.Add (e.Flags);
+    
+    // First click
+    app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
+    time.Advance (TimeSpan.FromMilliseconds (50));
+    app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
+    
+    // Second click (within 500ms)
+    time.Advance (TimeSpan.FromMilliseconds (200));
+    app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
+    time.Advance (TimeSpan.FromMilliseconds (50));
+    app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
+    
+    // Third click (within 500ms of second)
+    time.Advance (TimeSpan.FromMilliseconds (200));
+    app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
+    time.Advance (TimeSpan.FromMilliseconds (50));
+    app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
+    
+    // Verify triple-click detected
+    Assert.Contains (receivedFlags, f => f.HasFlag (MouseFlags.LeftButtonTripleClicked));
+}
+```
+
+### Testing Mouse Drag
+
+```csharp
+[Fact]
+public void MouseDrag_MovesView ()
+{
+    VirtualTimeProvider time = new ();
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI);
+    
+    View view = new () { X = 0, Y = 0, Width = 10, Height = 10 };
+    Point? lastPosition = null;
+    
+    view.MouseEvent += (s, e) =>
+    {
+        if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        {
+            lastPosition = e.Position;
+        }
+        else if (e.Flags.HasFlag (MouseFlags.PositionReport) && lastPosition.HasValue && e.Position.HasValue)
+        {
+            // Handle drag
+            view.X += e.Position.Value.X - lastPosition.Value.X;
+            view.Y += e.Position.Value.Y - lastPosition.Value.Y;
+            lastPosition = e.Position;
+        }
+    };
+    
+    IRunnable runnable = new Runnable ();
+    (runnable as View)?.Add (view);
+    app.Begin (runnable);
+    
+    // Press at (5, 5)
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.LeftButtonPressed,
+        ScreenPosition = new (5, 5)
+    });
+    
+    // Drag to (10, 10)
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.PositionReport | MouseFlags.LeftButtonPressed,
+        ScreenPosition = new (10, 10)
+    });
+    
+    // Release
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.LeftButtonReleased,
+        ScreenPosition = new (10, 10)
+    });
+    
+    Assert.Equal (5, view.X);
+    Assert.Equal (5, view.Y);
+    
+    (runnable as View)?.Dispose ();
+}
+```
+
+### Testing Mouse Wheel
+
+```csharp
+[Fact]
+public void MouseWheel_ScrollsContent ()
+{
+    VirtualTimeProvider time = new ();
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI);
+    
+    ListView listView = new () { Width = 20, Height = 10 };
+    ObservableCollection<string> source = new (Enumerable.Range (0, 100).Select (i => $"Item {i}").ToList ());
+    listView.SetSource (source);
+    
+    IRunnable runnable = new Runnable ();
+    (runnable as View)?.Add (listView);
+    app.Begin (runnable);
+    
+    // Scroll down
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.WheeledDown,
+        ScreenPosition = new (10, 5)
+    });
+    
+    // Verify no exception thrown
+    Assert.NotNull (listView);
+    
+    (runnable as View)?.Dispose ();
+}
+```
+
+### Testing Mouse Enter/Leave
+
+```csharp
+[Fact]
+public void MouseEnterLeave_UpdatesState ()
+{
+    VirtualTimeProvider time = new ();
+    using IApplication app = Application.Create (time);
+    app.Init (DriverRegistry.Names.ANSI);
+    
+    View view = new () { X = 5, Y = 5, Width = 10, Height = 5 };
+    bool entered = false;
+    bool left = false;
+    
+    view.MouseEnter += (s, e) => entered = true;
+    view.MouseLeave += (s, e) => left = true;
+    
+    IRunnable runnable = new Runnable ();
+    (runnable as View)?.Add (view);
+    app.Begin (runnable);
+    
+    // Move mouse into view
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.PositionReport,
+        ScreenPosition = new (7, 7)
+    });
+    
+    Assert.True (entered);
+    
+    // Move mouse out of view
+    app.InjectMouse (new ()
+    {
+        Flags = MouseFlags.PositionReport,
+        ScreenPosition = new (20, 20)
+    });
+    
+    Assert.True (left);
+    
+    (runnable as View)?.Dispose ();
+}
+```
+
+### Key Testing Concepts
+
+- **Virtual Time** - Use `VirtualTimeProvider` for deterministic timing control
+- **ANSI Driver** - Use `DriverRegistry.Names.ANSI` for cross-platform testing
+- **Single-Call Injection** - `app.InjectMouse(mouse)` handles everything automatically
+- **Time Advancement** - Use `time.Advance(timespan)` instead of `Thread.Sleep()`
+- **Direct Mode** - Default injection mode bypasses ANSI encoding for speed
+- **Pipeline Mode** - Use when testing ANSI mouse encoding/parsing
+- **ScreenPosition** - Always use `ScreenPosition` property for injection (framework sets `Position` during routing)
+- **View Hierarchy** - Add views to a runnable and call `app.Begin()` for proper event routing
+
+### Best Practices
+
+1. **Always use virtual time** - Creates deterministic, repeatable tests
+   ```csharp
+   VirtualTimeProvider time = new ();
+   using IApplication app = Application.Create (time);
+   ```
+
+2. **Use ANSI driver for tests** - Cross-platform, consistent behavior
+   ```csharp
+   app.Init (DriverRegistry.Names.ANSI);
+   ```
+
+3. **Advance time explicitly** - Don't use `Thread.Sleep()`
+   ```csharp
+   time.Advance (TimeSpan.FromMilliseconds (300));
+   ```
+
+4. **Test both press and release** - Complete click cycle
+   ```csharp
+   app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed });
+   app.InjectMouse (new () { Flags = MouseFlags.LeftButtonReleased });
+   ```
+
+5. **Use ScreenPosition for injection** - The framework converts to viewport-relative `Position`
+   ```csharp
+   app.InjectMouse (new () { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new (10, 5) });
+   ```
+
+6. **Add views to hierarchy for routing** - Mouse events need views in hierarchy
+   ```csharp
+   IRunnable runnable = new Runnable ();
+   (runnable as View)?.Add (myView);
+   app.Begin (runnable);
+   ```
+
+7. **Dispose properly** - Clean up runnables when done
+   ```csharp
+   (runnable as View)?.Dispose ();
+   ```
+
+8. **Handle nullable Position** - View-level `Position` property is nullable
+   ```csharp
+   if (e.Position.HasValue)
+   {
+       int x = e.Position.Value.X;
+   }
+   ```

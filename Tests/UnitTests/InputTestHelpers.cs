@@ -108,35 +108,6 @@ public static class InputTestHelpers
     }
 
     /// <summary>
-    ///     Injects a key event and processes the input queue for a specific processor and input implementation.
-    /// </summary>
-    /// <typeparam name="TInputRecord">The input record type</typeparam>
-    /// <param name="processor">The input processor</param>
-    /// <param name="input">The input implementation (must extend InputImpl)</param>
-    /// <param name="inputBuffer">The input buffer</param>
-    /// <param name="key">The key to inject</param>
-    public static void InjectAndProcessKey<TInputRecord> (
-        this IInputProcessor processor,
-        InputImpl<TInputRecord> input,
-        ConcurrentQueue<TInputRecord> inputBuffer,
-        Key key
-    )
-    {
-        processor.InjectKeyDownEvent (key);
-        input.SimulateInputThread (inputBuffer);
-
-        // Process the queue (with special handling for Esc key and Alt combinations)
-        if (key.KeyCode == KeyCode.Esc || key.IsAlt)
-        {
-            processor.ProcessQueueWithEscapeHandling ();
-        }
-        else
-        {
-            processor.ProcessQueue ();
-        }
-    }
-
-    /// <summary>
     ///     Injects a mouse event and processes the input queue, simulating what happens during a main loop iteration.
     /// </summary>
     /// <param name="app">The application instance</param>
@@ -150,26 +121,6 @@ public static class InputTestHelpers
 
         // Process the queue
         app.Driver.GetInputProcessor ().ProcessQueue ();
-    }
-
-    /// <summary>
-    ///     Injects a mouse event and processes the input queue for a specific processor and input implementation.
-    /// </summary>
-    /// <typeparam name="TInputRecord">The input record type</typeparam>
-    /// <param name="processor">The input processor</param>
-    /// <param name="input">The input implementation (must extend InputImpl)</param>
-    /// <param name="inputBuffer">The input buffer</param>
-    /// <param name="mouse">The mouse event to inject</param>
-    public static void InjectAndProcessMouse<TInputRecord> (
-        this IInputProcessor processor,
-        InputImpl<TInputRecord> input,
-        ConcurrentQueue<TInputRecord> inputBuffer,
-        Mouse mouse
-    )
-    {
-        processor.InjectMouseEvent (null, mouse);
-        input.SimulateInputThread (inputBuffer);
-        processor.ProcessQueue ();
     }
 
     /// <summary>

@@ -6,6 +6,11 @@ The driver model is the mechanism by which Terminal.Gui supports multiple platfo
 
 Terminal.Gui v2 uses a sophisticated driver architecture that separates concerns and enables platform-specific optimizations while maintaining a consistent API. The architecture is based on the **Component Factory** pattern and uses **multi-threading** to ensure responsive input handling.
 
+**Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
+- `View.Move(col, row)` for positioning
+- `View.AddRune()` and `View.AddStr()` for drawing
+- `View.App.Screen` for screen dimensions
+ 
 ## Available Drivers
 
 Terminal.Gui provides console driver implementations optimized for different platforms:
@@ -17,14 +22,14 @@ Terminal.Gui provides console driver implementations optimized for different pla
 
 ### Automatic Driver Selection
 
-The appropriate driver is automatically selected based on the platform when you call `Application.Init()`:
+The appropriate driver is automatically selected based on the platform when `Application.Init()` is called:
 
 - **Windows** (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
 - **Unix/Linux/macOS** → `UnixDriver`
 
 ### Explicit Driver Selection
 
-You can explicitly specify a driver in several ways:
+Explicitly specify a driver in several ways:
 
 Method 1: Set ForceDriver using Configuration Manager
 
@@ -283,7 +288,7 @@ This separation ensures that input is never lost and the UI remains responsive d
 
 ### Initialization Flow
 
-When you call `Application.Init()`:
+When `Application.Init()` is called:
 
 1. **IApplication.Init()** is invoked
 2. Creates a `MainLoopCoordinator<T>` with the appropriate `ComponentFactory<T>`
@@ -445,13 +450,100 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 - Works on all platforms with ANSI support
 - Specify with `IApplication.ForceDriver` = `"ansi"` or `DriverRegistry.Names.ANSI`
 
-**Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
-- `View.Move(col, row)` for positioning
-- `View.AddRune()` and `View.AddStr()` for drawing
-- `View.App.Screen` for screen dimensions
+## Testing and Input Injection
 
-## See Also
+Terminal.Gui provides a sophisticated input injection system for testing applications without requiring actual keyboard/mouse hardware or terminal interaction. The ANSI driver is the **recommended driver for testing** because:
 
-- @Terminal.Gui.Drivers - API Reference
-- @Terminal.Gui.App.IApplication - Application interface
-- @Terminal.Gui.App.MainLoopCoordinator`1 - Main loop coordination
+- ✅ **Cross-platform** - Works identically on all platforms
+- ✅ **Full pipeline testing** - Tests the complete ANSI encoding/parsing pipeline
+- ✅ **Deterministic** - Virtual time control eliminates timing-related test flakiness
+- ✅ **Fast** - No real delays needed for escape sequence handling
+
+### Simple Test Example
+
+```csharp
+// CoPilot - Create app with virtual time for testing
+VirtualTimeProvider time = new ();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);  // Use ANSI driver
+
+Button button = new () { Text = "Click Me" };
+bool acceptingCalled = false;
+button.Accepting += (s, e) => acceptingCalled = true;
+
+// Single-call injection - handles everything automatically
+app.InjectKey(Key.Enter);
+
+Assert.True(acceptingCalled);
+```
+
+### Virtual Time Control
+
+The input injection system supports **virtual time** via `VirtualTimeProvider`, enabling deterministic testing of timing-dependent behavior like double-clicks:
+
+```csharp
+// CoPilot - Test double-click with precise timing
+VirtualTimeProvider time = new ();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+// First click at T+0
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonPressed,
+    Position = new (5, 5)
+});
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonReleased,
+    Position = new (5, 5)
+});
+
+// Advance virtual time by 300ms (within double-click threshold)
+time.Advance(TimeSpan.FromMilliseconds(300));
+
+// Second click at T+300
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonPressed,
+    Position = new (5, 5)
+});
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonReleased,
+    Position = new (5, 5)
+});
+
+// Verify double-click was detected
+Assert.Contains(receivedEvents, e => e.Flags.HasFlag(MouseFlags.LeftButtonDoubleClicked));
+```
+
+### Input Injection Modes
+
+The input injection system supports two modes:
+
+- **Direct Mode** (default) - Bypasses ANSI encoding/decoding for faster, simpler tests. Input events are raised directly.
+- **Pipeline Mode** - Goes through full ANSI encoding → parsing → decoding pipeline. Use when testing ANSI escape sequence handling.
+
+```csharp
+// CoPilot - Test ANSI encoding/decoding pipeline
+VirtualTimeProvider time = new ();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+InputInjectionOptions options = new () 
+{ 
+    Mode = InputInjectionMode.Pipeline,
+    TimeProvider = time 
+};
+
+// This will encode to ANSI, parse back, and raise events
+app.InjectKey(Key.F1, options);
+```
+
+### Key Concepts
+
+- **Single-call injection** - `app.InjectKey(key)` and `app.InjectMouse(mouse)` handle injection, processing, and event raising in one call
+- **Virtual time** - Control time explicitly via `VirtualTimeProvider.Advance()` for deterministic tests
+- **No manual queue management** - The old 3-step dance (inject → simulate thread → process queue) is handled automatically
+- **Automatic escape handling** - Escape sequences are processed without manual `Thread.Sleep()` delays
+
+For complete documentation of the input injection architecture, see [Driver Input Injection - Redesign Specification](driver-input-injection-redesign.md).
+
+

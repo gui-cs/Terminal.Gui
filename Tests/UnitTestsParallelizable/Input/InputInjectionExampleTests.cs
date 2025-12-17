@@ -1,7 +1,4 @@
-using Terminal.Gui.Testing;
-using UnitTests;
-
-namespace Terminal.Gui.InputTests;
+namespace InputTests;
 
 /// <summary>
 ///     Example tests demonstrating the simplified input injection API (Phase 6).
@@ -28,12 +25,12 @@ public class InputInjectionExampleTests
         using IApplication app = Application.CreateForTesting (time);
         app.Init (DriverRegistry.Names.ANSI);
 
-        var keyPressed = false;
+        int keyPressed = 0;
         Key? receivedKey = null;
 
         app.Keyboard.KeyDown += (s, e) =>
                                 {
-                                    keyPressed = true;
+                                    keyPressed++;
                                     receivedKey = e;
                                 };
 
@@ -41,7 +38,7 @@ public class InputInjectionExampleTests
         app.InjectKey (Key.A);
 
         // Assert
-        Assert.True (keyPressed, "Key event should have been raised");
+        Assert.Equal (1, keyPressed);
         Assert.Equal (Key.A, receivedKey);
     }
 
@@ -81,16 +78,17 @@ public class InputInjectionExampleTests
         };
 
         app.InjectMouse (press);
-        
+
         // Advance virtual time (instant, no real delay)
         time.Advance (TimeSpan.FromMilliseconds (50));
-        
+
         app.InjectMouse (release);
 
         // Assert - MouseInterpreter should synthesize Click event
         Assert.Contains (receivedEvents, f => f.HasFlag (MouseFlags.LeftButtonPressed));
         Assert.Contains (receivedEvents, f => f.HasFlag (MouseFlags.LeftButtonReleased));
         Assert.Contains (receivedEvents, f => f.HasFlag (MouseFlags.LeftButtonClicked));
+        Assert.Equal (3, receivedEvents.Count);
     }
 
     #endregion
