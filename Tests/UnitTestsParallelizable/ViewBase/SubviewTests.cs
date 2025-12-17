@@ -393,23 +393,23 @@ public class SubViewTests
         var superView = new View ();
 
         int superViewChangedCount = 0;
-        //int superViewChangingCount = 0;
+        int superViewChangingCount = 0;
 
         view.SuperViewChanged += (s, e) =>
         {
             superViewChangedCount++;
         };
 
-        //view.SuperViewChanging += (s, e) =>
-        //{
-        //    superViewChangingCount++;
-        //};
+        view.SuperViewChanging += (s, e) =>
+        {
+            superViewChangingCount++;
+        };
 
         // Act
         superView.Add (view);
 
         // Assert
-        //Assert.Equal (1, superViewChangingCount);
+        Assert.Equal (1, superViewChangingCount);
         Assert.Equal (1, superViewChangedCount);
 
     }
@@ -691,5 +691,172 @@ public class SubViewTests
         Assert.Contains (subView3, superView.SubViews);
         Assert.Single (removedViews);
         Assert.Contains (subView2, removedViews);
+    }
+
+    [Fact]
+    public void SuperViewChanging_Raised_Before_SuperViewChanged ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView = new View ();
+
+        var events = new List<string> ();
+
+        subView.SuperViewChanging += (s, e) => { events.Add ("SuperViewChanging"); };
+
+        subView.SuperViewChanged += (s, e) => { events.Add ("SuperViewChanged"); };
+
+        // Act
+        superView.Add (subView);
+
+        // Assert
+        Assert.Equal (2, events.Count);
+        Assert.Equal ("SuperViewChanging", events [0]);
+        Assert.Equal ("SuperViewChanged", events [1]);
+    }
+
+    [Fact]
+    public void SuperViewChanging_Provides_OldSuperView_On_Add ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView = new View ();
+
+        View? oldSuperViewInEvent = new View (); // Set to non-null to ensure it gets updated
+        View? newSuperViewInEvent = null;
+
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         oldSuperViewInEvent = e.OldSuperView;
+                                         newSuperViewInEvent = e.NewSuperView;
+                                     };
+
+        // Act
+        superView.Add (subView);
+
+        // Assert
+        Assert.Null (oldSuperViewInEvent); // Was null before add
+        Assert.Equal (superView, newSuperViewInEvent); // Will be superView after add
+    }
+
+    [Fact]
+    public void SuperViewChanging_Provides_OldSuperView_On_Remove ()
+    {
+        // Arrange
+        var superView = new View ();
+        var subView = new View ();
+
+        superView.Add (subView);
+
+        View? oldSuperViewInEvent = null;
+        View? newSuperViewInEvent = new View (); // Set to non-null to ensure it gets updated
+
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         oldSuperViewInEvent = e.OldSuperView;
+                                         newSuperViewInEvent = e.NewSuperView;
+                                     };
+
+        // Act
+        superView.Remove (subView);
+
+        // Assert
+        Assert.Equal (superView, oldSuperViewInEvent); // Was superView before remove
+        Assert.Null (newSuperViewInEvent); // Will be null after remove
+    }
+
+    [Fact]
+    public void SuperViewChanging_Allows_Access_To_App_Before_Remove ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        var runnable = new Runnable<bool> ();
+        var subView = new View ();
+
+        runnable.Add (subView);
+        SessionToken? token = app.Begin (runnable);
+
+        IApplication? appInEvent = null;
+
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         // At this point, SuperView is still set, so App should be accessible
+                                         appInEvent = (s as View)?.App;
+                                     };
+
+        // Act
+        runnable.Remove (subView);
+
+        // Assert
+        Assert.NotNull (appInEvent);
+        Assert.Equal (app, appInEvent);
+
+        app.End (token!);
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void OnSuperViewChanging_Called_Before_OnSuperViewChanged ()
+    {
+        // Arrange
+        var superView = new View ();
+        var events = new List<string> ();
+
+        var subView = new TestViewWithSuperViewEvents (events);
+
+        // Act
+        superView.Add (subView);
+
+        // Assert
+        Assert.Equal (2, events.Count);
+        Assert.Equal ("OnSuperViewChanging", events [0]);
+        Assert.Equal ("OnSuperViewChanged", events [1]);
+    }
+
+    [Fact]
+    public void SuperViewChanging_Raised_When_Changing_Between_SuperViews ()
+    {
+        // Arrange
+        var superView1 = new View ();
+        var superView2 = new View ();
+        var subView = new View ();
+
+        superView1.Add (subView);
+
+        View? oldSuperViewInEvent = null;
+        View? newSuperViewInEvent = null;
+
+        subView.SuperViewChanging += (s, e) =>
+                                     {
+                                         oldSuperViewInEvent = e.OldSuperView;
+                                         newSuperViewInEvent = e.NewSuperView;
+                                     };
+
+        // Act
+        superView2.Add (subView);
+
+        // Assert
+        Assert.Equal (superView1, oldSuperViewInEvent);
+        Assert.Equal (superView2, newSuperViewInEvent);
+    }
+
+    // Helper class for testing virtual method calls
+    private class TestViewWithSuperViewEvents : View
+    {
+        private readonly List<string> _events;
+
+        public TestViewWithSuperViewEvents (List<string> events) { _events = events; }
+
+        protected override void OnSuperViewChanging (SuperViewChangingEventArgs e)
+        {
+            _events.Add ("OnSuperViewChanging");
+            base.OnSuperViewChanging (e);
+        }
+
+        protected override void OnSuperViewChanged (SuperViewChangedEventArgs e)
+        {
+            _events.Add ("OnSuperViewChanged");
+            base.OnSuperViewChanged (e);
+        }
     }
 }

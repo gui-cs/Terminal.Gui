@@ -27,6 +27,8 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     Gets this Views SuperView (the View's container), or <see langword="null"/> if this view has not been added as a
     ///     SubView.
     /// </summary>
+    /// <seealso cref="OnSuperViewChanging"/>
+    /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
     public View? SuperView
@@ -42,9 +44,33 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return;
         }
 
+        RaiseSuperViewChanging (value);
         _superView = value;
         RaiseSuperViewChanged ();
     }
+
+    private void RaiseSuperViewChanging (View? newSuperView)
+    {
+        SuperViewChangingEventArgs args = new (_superView, newSuperView, this);
+        OnSuperViewChanging (args);
+
+        SuperViewChanging?.Invoke (this, args);
+    }
+
+    /// <summary>
+    ///     Called when the SuperView of this View is about to be changed. This is called before the SuperView property
+    ///     is updated, allowing access to the current SuperView and its resources (such as <see cref="App"/>) for
+    ///     cleanup purposes.
+    /// </summary>
+    /// <param name="e">Event arguments containing the old and new SuperView.</param>
+    protected virtual void OnSuperViewChanging (SuperViewChangingEventArgs e) { }
+
+    /// <summary>
+    ///     Raised when the SuperView of this View is about to be changed. This is raised before the SuperView property
+    ///     is updated, allowing access to the current SuperView and its resources (such as <see cref="App"/>) for
+    ///     cleanup purposes.
+    /// </summary>
+    public event EventHandler<SuperViewChangingEventArgs>? SuperViewChanging;
 
     private void RaiseSuperViewChanged ()
     {
