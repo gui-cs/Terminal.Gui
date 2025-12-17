@@ -1402,10 +1402,10 @@ public partial class View // Layout APIs
             // This ensures that adornment subviews (e.g., ExpanderButton in Border) are considered "deeper" than
             // regular subviews' adornments (e.g., childView.Border) when they overlap.
             // Push in reverse order (Padding, Border, Margin) so they're processed in correct order (Margin, Border, Padding)
+            Point superViewRelativeLocation = currentView.SuperView?.ScreenToViewport (location) ?? location;
+
             if (currentView.Padding is { } padding && padding.Thickness != Thickness.Empty)
             {
-                Point superViewRelativeLocation = currentView.SuperView?.ScreenToViewport (location) ?? location;
-
                 if (padding.Contains (superViewRelativeLocation) && padding.FrameToScreen ().Contains (location))
                 {
                     viewsToProcess.Push (padding);
@@ -1414,8 +1414,6 @@ public partial class View // Layout APIs
 
             if (currentView.Border is { } border && border.Thickness != Thickness.Empty)
             {
-                Point superViewRelativeLocation = currentView.SuperView?.ScreenToViewport (location) ?? location;
-
                 if (border.Contains (superViewRelativeLocation) && border.FrameToScreen ().Contains (location))
                 {
                     viewsToProcess.Push (border);
@@ -1424,8 +1422,6 @@ public partial class View // Layout APIs
 
             if (currentView.Margin is { } margin && margin.Thickness != Thickness.Empty)
             {
-                Point superViewRelativeLocation = currentView.SuperView?.ScreenToViewport (location) ?? location;
-
                 if (margin.Contains (superViewRelativeLocation) && margin.FrameToScreen ().Contains (location))
                 {
                     viewsToProcess.Push (margin);
