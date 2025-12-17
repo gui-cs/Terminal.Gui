@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Terminal.Gui.Time;
+using Terminal.Gui.Testing;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -31,11 +33,19 @@ public partial class GuiTestContext : IDisposable
     private IOutput? _output;
     private SizeMonitorImpl? _sizeMonitor;
     private ApplicationImpl? _applicationImpl;
+    private readonly ITimeProvider _timeProvider = new SystemTimeProvider ();
 
     /// <summary>
     ///     The IApplication instance that was created.
     /// </summary>
     public IApplication? App => _applicationImpl;
+
+    /// <summary>
+    ///     The ITimeProvider for time operations in tests.
+    ///     Uses SystemTimeProvider by default for compatibility with existing tests.
+    ///     Can be changed to VirtualTimeProvider for tests that need explicit time control.
+    /// </summary>
+    public ITimeProvider TimeProvider => _timeProvider;
 
     private TestDriver _driverType;
 
@@ -262,7 +272,7 @@ public partial class GuiTestContext : IDisposable
                 break;
         }
 
-        _applicationImpl = new (cf!);
+        _applicationImpl = new (cf!, _timeProvider, testMode: true);
         Logging.Trace ($"Driver: {GetDriverName ()}. Timeout: {_timeout}");
     }
 

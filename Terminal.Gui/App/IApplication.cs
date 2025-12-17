@@ -467,6 +467,31 @@ public interface IApplication : IDisposable
     ITimeProvider GetTimeProvider ();
 
     /// <summary>
+    ///     Gets the input injector for programmatic input injection in tests.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The input injector provides a simplified API for injecting keyboard and mouse events
+    ///         in tests. It handles encoding, queueing, and processing automatically.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="Application.CreateForTesting"/> to create an application with
+    ///         <see cref="VirtualTimeProvider"/> for deterministic, fast tests.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///             VirtualTimeProvider time = new ();
+    ///             using IApplication app = Application.CreateForTesting (time);
+    ///             app.Init ();
+    ///             app.InjectKey (Key.Enter);  // Extension method uses GetInputInjector()
+    ///         </code>
+    ///     </para>
+    /// </remarks>
+    /// <returns>The <see cref="IInputInjector"/> for input injection.</returns>
+    IInputInjector GetInputInjector ();
+
+    /// <summary>
     ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
