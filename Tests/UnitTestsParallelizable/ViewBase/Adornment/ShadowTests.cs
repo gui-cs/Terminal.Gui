@@ -226,7 +226,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               └──┘🍎
                                               � 🍎🍎
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         view.Margin!.ShadowSize = new (1, 2);
@@ -243,7 +243,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               � 🍎🍎
                                               � 🍎🍎
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         view.Width = Dim.Fill (1);
@@ -259,7 +259,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               � 🍎�
                                               � 🍎�
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
     }
 
@@ -282,7 +282,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               | Hi |▖
                                               ▝▀▀▀▀▀▘
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.Button1Pressed });
@@ -292,7 +292,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               """
                                               | Hi |
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.Button1Released });
@@ -303,7 +303,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               | Hi |▖
                                               ▝▀▀▀▀▀▘
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
     }
 
@@ -457,7 +457,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               🍎🍎🍎🍎🍎
                                               🍎🍎🍎🍎🍎
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
         Runnable modalSuperview = new () { Y = 1, Width = Dim.Fill (), Height = 4, BorderStyle = LineStyle.Single };
@@ -476,7 +476,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               │▝▀▀▀▀▀▀▘│
                                               └────────┘
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
 
 
