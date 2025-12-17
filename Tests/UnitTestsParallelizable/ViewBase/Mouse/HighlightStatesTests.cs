@@ -1,7 +1,7 @@
 ﻿using UnitTests;
 using Xunit.Abstractions;
 
-namespace ViewBaseTests.Mouse;
+namespace ViewBaseTests.MouseTests;
 
 public class HighlightStatesTests (ITestOutputHelper output)
 {
@@ -18,7 +18,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
         superview.SetScheme (new () { Focus = focus, Highlight = highlight });
-        View view = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hi |", HighlightStates = MouseState.In };
+        View view = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hi |", MouseHighlightStates = MouseState.In };
         superview.Add (view);
 
         app.Begin (superview);
@@ -30,7 +30,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre ("| Hi |", output, app.Driver);
 
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.ReportMousePosition });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.PositionReport });
         app.LayoutAndDraw ();
 
         for (var i = 0; i < app.Driver?.Cols; i++)
@@ -56,7 +56,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
         superview.SetScheme (new () { Focus = focus, Highlight = highlight });
-        View view = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hi |", HighlightStates = MouseState.In };
+        View view = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hi |", MouseHighlightStates = MouseState.In };
         superview.Add (view);
 
         app.Begin (superview);
@@ -66,7 +66,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         Runnable modalSuperview = new () { Y = 1, Width = 9, Height = 4, BorderStyle = LineStyle.Single };
         modalSuperview.SetScheme (new () { Normal = normal, Highlight = highlight2 });
-        View view2 = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hey |", HighlightStates = MouseState.In };
+        View view2 = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = "| Hey |", MouseHighlightStates = MouseState.In };
         modalSuperview.Add (view2);
 
         app.Begin (modalSuperview);
@@ -90,7 +90,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
                                               """
                                               , output, app.Driver);
 
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.ReportMousePosition });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.PositionReport });
         app.LayoutAndDraw ();
 
         for (var i = 0; i < app.Driver?.Cols; i++)
