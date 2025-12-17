@@ -259,7 +259,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               � 🍎�
                                               � 🍎�
                                               """,
-                                              output,
+                                              _output,
                                               app.Driver);
     }
 

@@ -83,13 +83,13 @@ public class WizardAsView : Scenario
         wizard.Finished += (s, args) =>
                            {
                                //args.Cancel = true;
-                               MessageBox.Query ((s as View)?.App, "Setup Wizard", "Finished", "Ok");
+                               MessageBox.Query ((s as View)?.App!, "Setup Wizard", "Finished", "Ok");
                                Application.RequestStop ();
                            };
 
         wizard.Cancelled += (s, args) =>
                             {
-                                int? btn = MessageBox.Query ((s as View)?.App, "Setup Wizard", "Are you sure you want to cancel?", "Yes", "No");
+                                int? btn = MessageBox.Query ((s as View)?.App!, "Setup Wizard", "Are you sure you want to cancel?", "Yes", "No");
                                 args.Cancel = btn == 1;
 
                                 if (btn == 0)
@@ -126,7 +126,7 @@ public class WizardAsView : Scenario
                             {
                                 secondStep.Title = "2nd Step";
 
-                                MessageBox.Query ((s as View)?.App,
+                                MessageBox.Query ((s as View)?.App!,
                                                   "Wizard Scenario",
                                                   "This Wizard Step's title was changed to '2nd Step'",
                                                   "Ok"

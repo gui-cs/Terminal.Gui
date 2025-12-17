@@ -331,9 +331,12 @@ public class ApplicationPopoverTests
         public List<Key> HandledKeys { get; } = [];
         public int NewCommandInvokeCount { get; private set; }
 
+#if DEBUG_IDISPOSABLE
         // NOTE: Hides the base DisposedCount property
         public new int DisposedCount { get; private set; }
-
+#else
+        public int DisposedCount { get; private set; }
+#endif
         public PopoverTestClass ()
         {
             CanFocus = true;
