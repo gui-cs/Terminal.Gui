@@ -42,8 +42,6 @@ public class TextField : View, IDesignable
 
         Initialized += TextField_Initialized;
 
-        SuperViewChanged += TextField_SuperViewChanged;
-
         // Things this view knows how to do
         AddCommand (
                     Command.DeleteCharRight,
@@ -1776,9 +1774,11 @@ public class TextField : View, IDesignable
         }
     }
 
-    private void TextField_SuperViewChanged (object sender, SuperViewChangedEventArgs e)
+    /// <inheritdoc />
+    protected override void OnSuperViewChanged ()
     {
-        if (e.SuperView is { })
+        base.OnSuperViewChanged ();
+        if (SuperView is { })
         {
             if (Autocomplete.HostControl is null)
             {
@@ -1791,6 +1791,7 @@ public class TextField : View, IDesignable
             Autocomplete.HostControl = null;
         }
     }
+
 
     private void TextField_Initialized (object sender, EventArgs e)
     {

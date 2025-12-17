@@ -48,20 +48,18 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     private void RaiseSuperViewChanged ()
     {
-        SuperViewChangedEventArgs args = new (SuperView, this);
-        OnSuperViewChanged (args);
+        OnSuperViewChanged ();
 
-        SuperViewChanged?.Invoke (this, args);
+        SuperViewChanged?.Invoke (this, EventArgs.Empty);
     }
 
     /// <summary>
     ///     Called when the SuperView of this View has changed.
     /// </summary>
-    /// <param name="e"></param>
-    protected virtual void OnSuperViewChanged (SuperViewChangedEventArgs e) { }
+    protected virtual void OnSuperViewChanged () { }
 
     /// <summary>Raised when the SuperView of this View has changed.</summary>
-    public event EventHandler<SuperViewChangedEventArgs>? SuperViewChanged;
+    public event EventHandler<EventArgs>? SuperViewChanged;
 
     #region AddRemove
 

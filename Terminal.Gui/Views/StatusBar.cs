@@ -34,7 +34,7 @@ public class StatusBar : Bar, IDesignable
         SuperViewChanged += OnSuperViewChanged;
     }
 
-    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    private void OnSuperViewChanged (object? sender, EventArgs e)
     {
         if (SuperView is null)
         {

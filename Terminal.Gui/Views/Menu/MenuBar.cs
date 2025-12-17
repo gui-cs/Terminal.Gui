@@ -102,7 +102,7 @@ public class MenuBar : Menu, IDesignable
         bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
     }
 
-    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    private void OnSuperViewChanged (object? sender, EventArgs e)
     {
         if (SuperView is null)
         {

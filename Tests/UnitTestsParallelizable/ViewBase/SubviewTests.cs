@@ -18,7 +18,7 @@ public class SubViewTests
                               };
         sub.SuperViewChanged += (s, e) =>
                                 {
-                                    if (e.SuperView is { })
+                                    if (sub.SuperView is { })
                                     {
                                         subRaisedCount++;
                                     }
@@ -46,7 +46,7 @@ public class SubViewTests
                                 };
         sub.SuperViewChanged += (s, e) =>
                               {
-                                  if (e.SuperView is null)
+                                  if (sub.SuperView is null)
                                   {
                                       subRaisedCount++;
                                   }
