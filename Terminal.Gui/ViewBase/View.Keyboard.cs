@@ -227,6 +227,7 @@ public partial class View // Keyboard APIs
     {
         if (HotKeySpecifier == new Rune ('\xFFFF'))
         {
+            HotKey = Key.Empty;
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
 
