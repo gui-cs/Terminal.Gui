@@ -4626,9 +4626,9 @@ public class TextView : View, IDesignable
 
 
     /// <inheritdoc />
-    protected override void OnSuperViewChanged ()
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> args)
     {
-        base.OnSuperViewChanged ();
+        base.OnSuperViewChanged (args);
         if (SuperView is { })
         {
             if (Autocomplete.HostControl is null)

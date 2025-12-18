@@ -1,14 +1,10 @@
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Terminal.Gui.App;
 
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
 {
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly IReadOnlyCollection<View> _empty = [];
 
     private readonly List<View>? _subviews = [];
@@ -33,40 +29,30 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
-    public View? SuperView
-    {
-        get => _superView!;
-        private set => SetSuperView (value);
-    }
+    public View? SuperView => _superView!;
 
-    private void SetSuperView (View? value)
+    /// <summary>
+    ///     INTERNAL: Sets the SuperView of this View.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns><see langword="true"/> if the SuperView was changed; otherwise, <see langword="false"/>.</returns>
+    private bool SetSuperView (View? value)
     {
         if (_superView == value)
         {
-            return;
+           return true;
         }
 
-        // Best practice is to call the virtual method first.
-        // This allows derived classes to handle the event and potentially cancel it.
-        if (OnSuperViewChanging (value, _superView))
-        {
-            return;
-        }
-
-        // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
-#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint - View can be null when removed
-        CancelEventArgs<View?> args = new (in _superView, ref value);
-#pragma warning restore CS8714
-        SuperViewChanging?.Invoke (this, args);
-
-        if (args.Cancel)
-        {
-            return;
-        }
-
-        // If the event is not canceled, update the value.
-        _superView = value;
-        RaiseSuperViewChanged ();
+        return CWPPropertyHelper.ChangeProperty (
+                                                 this,
+                                                 ref _superView,
+                                                 value,
+                                                 OnSuperViewChanging,
+                                                 SuperViewChanging,
+                                                 newValue => _superView = newValue,
+                                                 OnSuperViewChanged,
+                                                 SuperViewChanged,
+                                                 out View? _);
     }
 
     /// <summary>
@@ -74,10 +60,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     is updated, allowing access to the current SuperView and its resources (such as <see cref="App"/>) for
     ///     cleanup purposes.
     /// </summary>
-    /// <param name="newSuperView">The new SuperView that will be set, or <see langword="null"/> if being removed.</param>
-    /// <param name="currentSuperView">The current SuperView before the change.</param>
+    /// <param name="args">Hold the new SuperView that will be set, or <see langword="null"/> if being removed.</param>
     /// <returns><see langword="true"/> to cancel the change; <see langword="false"/> to allow it.</returns>
-    protected virtual bool OnSuperViewChanging (View? newSuperView, View? currentSuperView) => false;
+    protected virtual bool OnSuperViewChanging (ValueChangingEventArgs<View?> args) => false;
 
     /// <summary>
     ///     Raised when the SuperView of this View is about to be changed. This is raised before the SuperView property
@@ -86,35 +71,27 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This event follows the Cancellable Work Pattern (CWP). Set <see cref="CancelEventArgs.Cancel"/> 
+    ///         This event follows the Cancellable Work Pattern (CWP). Set <see cref="ValueChangingEventArgs{T}.Handled"/>
     ///         to <see langword="true"/> in the event args to cancel the change.
     ///     </para>
     /// </remarks>
-#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint - View can be null when removed
-    public event EventHandler<CancelEventArgs<View?>>? SuperViewChanging;
-#pragma warning restore CS8714
-
-    private void RaiseSuperViewChanged ()
-    {
-        OnSuperViewChanged ();
-
-        SuperViewChanged?.Invoke (this, EventArgs.Empty);
-    }
+    public event EventHandler<ValueChangingEventArgs<View?>>? SuperViewChanging;
 
     /// <summary>
     ///     Called when the SuperView of this View has changed.
     /// </summary>
-    protected virtual void OnSuperViewChanged () { }
+    protected virtual void OnSuperViewChanged (ValueChangedEventArgs<View?> args) { }
 
     /// <summary>Raised when the SuperView of this View has changed.</summary>
-    public event EventHandler<EventArgs>? SuperViewChanged;
+    public event EventHandler<ValueChangedEventArgs<View?>>? SuperViewChanged;
 
     #region AddRemove
 
+    // TODO: Make this non-virtual once WizardStep is refactored to use events
     /// <summary>Adds a SubView (child) to this view.</summary>
     /// <remarks>
     ///     <para>
-    ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property. 
+    ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property.
     ///     </para>
     ///     <para>
     ///         To check if a View has been added to this View, compare it's <see cref="SuperView"/> property to this View.
@@ -136,7 +113,10 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="RemoveAll"/>
     /// <seealso cref="OnSubViewAdded"/>
     /// <seealso cref="SubViewAdded"/>
-
+    /// <seealso cref="OnSuperViewChanging"/>
+    /// <seealso cref="SuperViewChanging"/>
+    /// <seealso cref="OnSuperViewChanged"/>
+    /// <seealso cref="SuperViewChanged"/>
     public virtual View? Add (View? view)
     {
         if (view is null)
@@ -145,7 +125,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         //Debug.Assert (view.SuperView is null, $"{view} already has a SuperView: {view.SuperView}.");
-        if (view.SuperView is {})
+        if (view.SuperView is { })
         {
             Logging.Warning ($"{view} already has a SuperView: {view.SuperView}.");
         }
@@ -156,22 +136,19 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             Logging.Warning ($"{view} has already been Added to {this}.");
         }
 
-        // Ensure views don't have focus when being added
-        view.HasFocus = false;
+        // TODO: Make this thread safe
+        InternalSubViews.Add (view);
 
         // Try to set the SuperView - this may be cancelled
-        View? previousSuperView = view.SuperView;
-        view.SuperView = this;
-        
-        // Check if the SuperView change was cancelled
-        if (view.SuperView != this)
+        if (!view.SetSuperView (this))
         {
-            // The change was cancelled, don't add to SubViews
+            InternalSubViews.Remove (view);
+            // The change was cancelled
             return null;
         }
 
-        // TODO: Make this thread safe
-        InternalSubViews.Add (view);
+        // Ensure views don't have focus when being added
+        view.HasFocus = false;
 
         if (view is { Enabled: true, Visible: true, CanFocus: true })
         {
@@ -249,6 +226,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </remarks>
     public event EventHandler<SuperViewChangedEventArgs>? SubViewAdded;
 
+    // TODO: Make this non-virtual once WizardStep is refactored to use events
     /// <summary>Removes a SubView added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
     ///     <para>
@@ -266,8 +244,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <returns>
     ///     The removed View. <see langword="null"/> if the View could not be removed.
     /// </returns>
+    /// <seealso cref="Add(View)"/>
+    /// <seealso cref="RemoveAll"/>
+    /// <seealso cref="OnSubViewAdded"/>
     /// <seealso cref="OnSubViewRemoved"/>
-    /// <seealso cref="SubViewRemoved"/>"/>
+    /// <seealso cref="SubViewRemoved"/>
+    /// <seealso cref="OnSuperViewChanging"/>
+    /// <seealso cref="SuperViewChanging"/>
+    /// <seealso cref="OnSuperViewChanged"/>
+    /// <seealso cref="SuperViewChanged"/>
     public virtual View? Remove (View? view)
     {
         if (view is null)
@@ -277,7 +262,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (InternalSubViews.Count == 0)
         {
-           return view;
+            return view;
         }
 
         if (view.SuperView is null)
@@ -312,18 +297,18 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         Debug.Assert (!view.HasFocus);
 
-        // Try to set SuperView to null - this may be cancelled
         View? previousSuperView = view.SuperView;
-        view.SuperView = null;
-        
-        // Check if the SuperView change was cancelled
-        if (view.SuperView != null)
+
+        // Try to clear the SuperView - this may be cancelled
+        if (!view.SetSuperView (null))
         {
             // The change was cancelled, restore state and return null
             view.CanFocus = couldFocus;
+
             return null;
         }
 
+        Debug.Assert(view.SuperView is null);
         InternalSubViews.Remove (view);
 
         // Clean up focus stuff
@@ -372,6 +357,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <summary>Raised when a SubView has been added to this View.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? SubViewRemoved;
 
+    // TODO: Make this non-virtual once WizardStep is refactored to use events
     /// <summary>
     ///     Removes all SubViews added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
     /// </summary>
@@ -386,12 +372,23 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <returns>
     ///     A list of removed Views.
     /// </returns>
+    /// <seealso cref="Add(View)"/>
+    /// <seealso cref="Remove(View)"/>
+    /// <seealso cref="OnSubViewAdded"/>
+    /// <seealso cref="OnSubViewRemoved"/>
+    /// <seealso cref="SubViewRemoved"/>
+    /// <seealso cref="OnSuperViewChanging"/>
+    /// <seealso cref="SuperViewChanging"/>
+    /// <seealso cref="OnSuperViewChanged"/>
+    /// <seealso cref="SuperViewChanged"/>
     public virtual IReadOnlyCollection<View> RemoveAll ()
     {
-        List<View> removedList = new List<View> ();
+        List<View> removedList = new ();
+
         while (InternalSubViews.Count > 0)
         {
             View? removed = Remove (InternalSubViews [0]);
+
             if (removed is { })
             {
                 removedList.Add (removed);
@@ -415,14 +412,16 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <returns>
     ///     A list of removed Views.
     /// </returns>
-    public virtual IReadOnlyCollection<TView> RemoveAll<TView> () where TView : View
+    public IReadOnlyCollection<TView> RemoveAll<TView> () where TView : View
     {
-        List<TView> removedList = new List<TView> ();
+        List<TView> removedList = new ();
+
         foreach (TView view in InternalSubViews.OfType<TView> ().ToList ())
         {
             Remove (view);
             removedList.Add (view);
         }
+
         return removedList.AsReadOnly ();
     }
 

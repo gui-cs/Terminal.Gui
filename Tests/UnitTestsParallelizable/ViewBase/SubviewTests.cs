@@ -780,9 +780,13 @@ public class SubViewTests
 
         subView.SuperViewChanging += (s, e) =>
                                      {
+                                         Assert.NotNull (s);
                                          // At this point, SuperView is still set, so App should be accessible
                                          appInEvent = (s as View)?.App;
                                      };
+
+
+        Assert.NotNull (runnable.App);
 
         // Act
         runnable.Remove (subView);
@@ -847,16 +851,16 @@ public class SubViewTests
 
         public TestViewWithSuperViewEvents (List<string> events) { _events = events; }
 
-        protected override bool OnSuperViewChanging (View? newSuperView, View? currentSuperView)
+        protected override bool OnSuperViewChanging (ValueChangingEventArgs<View?> args)
         {
             _events.Add ("OnSuperViewChanging");
-            return base.OnSuperViewChanging (newSuperView, currentSuperView);
+            return base.OnSuperViewChanging (args);
         }
 
-        protected override void OnSuperViewChanged (SuperViewChangedEventArgs e)
+        protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> args)
         {
             _events.Add ("OnSuperViewChanged");
-            base.OnSuperViewChanged (e);
+            base.OnSuperViewChanged (args);
         }
     }
 
@@ -869,7 +873,7 @@ public class SubViewTests
 
         subView.SuperViewChanging += (s, e) =>
                                      {
-                                         e.Cancel = true; // Cancel the change
+                                         e.Handled = true; // Cancel the change
                                      };
 
         // Act
@@ -931,7 +935,7 @@ public class SubViewTests
                                          // Cancel removal if trying to set to null
                                          if (e.NewValue is null)
                                          {
-                                             e.Cancel = true;
+                                             e.Handled = true;
                                          }
                                      };
 
@@ -958,7 +962,7 @@ public class SubViewTests
                                          // Cancel if trying to move to superView2
                                          if (e.NewValue == superView2)
                                          {
-                                             e.Cancel = true;
+                                             e.Handled = true;
                                          }
                                      };
 
@@ -974,7 +978,7 @@ public class SubViewTests
     // Helper class for testing cancellation
     private class TestViewThatCancelsChange : View
     {
-        protected override bool OnSuperViewChanging (View? newSuperView, View? currentSuperView)
+        protected override bool OnSuperViewChanging (ValueChangingEventArgs<View?> args)
         {
             return true; // Always cancel the change
         }

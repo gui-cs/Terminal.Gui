@@ -78,6 +78,11 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
             for (int i = InternalSubViews.Count - 1; i >= 0; i--)
             {
+                // Remove may have modified InternalSubViews, so we need to check the count
+                if (i > InternalSubViews.Count -1)
+                {
+                    continue;
+                }
                 View subview = InternalSubViews [i];
                 Remove (subview);
                 subview.Dispose ();
