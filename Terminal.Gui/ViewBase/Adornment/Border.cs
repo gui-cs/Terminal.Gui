@@ -108,11 +108,6 @@ public partial class Border : Adornment
     {
         base.BeginInit ();
 
-        if (App is { })
-        {
-            App.Mouse.GrabbingMouse += Application_GrabbingMouse;
-        }
-
         if (Parent is null)
         {
             return;

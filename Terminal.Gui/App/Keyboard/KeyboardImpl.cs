@@ -325,7 +325,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
 
                         if (viewToArrange is { })
                         {
-                            return viewToArrange.Border?.EnterArrangeMode (ViewArrangement.Fixed);
+                            return viewToArrange.Border?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
                         }
 
                         return false;
