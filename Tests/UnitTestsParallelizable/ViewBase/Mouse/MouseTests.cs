@@ -11,10 +11,24 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var testView = new View ();
 
+        Assert.Contains (MouseFlags.LeftButtonPressed, testView.MouseBindings.GetAllFromCommands (Command.Activate));
         Assert.Contains (MouseFlags.LeftButtonClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
-        //        Assert.Contains (MouseFlags.LeftButtonDoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+        Assert.Contains (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
 
-        Assert.Equal (6, testView.MouseBindings.GetBindings ().Count ());
+        Assert.Equal (3, testView.MouseBindings.GetBindings ().Count ());
+
+        testView = new ()
+        {
+            MouseHoldRepeat = true
+        };
+
+        Assert.Contains (MouseFlags.LeftButtonPressed, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+        Assert.Contains (MouseFlags.LeftButtonClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+        Assert.Contains (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
+        Assert.Contains (MouseFlags.LeftButtonReleased, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+
+        Assert.Equal (4, testView.MouseBindings.GetBindings ().Count ());
+
     }
 
     [Fact]

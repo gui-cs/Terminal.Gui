@@ -344,15 +344,15 @@ public class Buttons : Scenario
             Title = "Numeric Up/Down (press-and-_hold):",
         };
 
-        var numericUpDown = new NumericUpDown<int>
+        NumericUpDown<int> numericUpDown = new ()
         {
             Value = 69,
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
         };
-        numericUpDown.ValueChanged += NumericUpDown_ValueChanged;
+        numericUpDown.ValueChanged += NumericUpDownValueChanged;
 
-        void NumericUpDown_ValueChanged (object sender, EventArgs<int> e) { }
+        void NumericUpDownValueChanged (object sender, EventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
@@ -364,7 +364,7 @@ public class Buttons : Scenario
         };
         var noRepeatAcceptCount = 0;
 
-        var noRepeatButton = new Button
+        Button noRepeatButton = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -387,7 +387,7 @@ public class Buttons : Scenario
         };
         var noRepeatNoHighlightAcceptCount = 0;
 
-        var noRepeatNoHighlight = new Button
+        Button noRepeatNoHighlight = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -412,37 +412,42 @@ public class Buttons : Scenario
 
         var repeatButtonAcceptingCount = 0;
 
-        var repeatButton = new Button
+        Button repeatButton = new ()
         {
             Id = "repeatButton",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Title = $"Accepting Count: {repeatButtonAcceptingCount}",
+            Title = $"Accepting Co_unt: {repeatButtonAcceptingCount}",
             MouseHoldRepeat = true
         };
         repeatButton.Accepting += (s, e) =>
                                {
-                                   repeatButton.Title = $"Accepting Count: {++repeatButtonAcceptingCount}";
+                                   repeatButton.Title = $"Accepting Co_unt: {++repeatButtonAcceptingCount}";
+                                   Logging.Debug (repeatButton.Title);
                                    e.Handled = true;
                                };
 
-        var enableCB = new CheckBox
+        CheckBox enableCb = new ()
         {
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
             CheckedState = CheckState.Checked
         };
-        enableCB.CheckedStateChanging += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
-        main.Add (label, repeatButton, enableCB);
+        enableCb.CheckedStateChanging += (s, e) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        main.Add (label, repeatButton, enableCb);
 
-        var decNumericUpDown = new NumericUpDown<int>
+        NumericUpDown<int> decNumericUpDown = new () 
         {
+            // ReSharper disable once StringLiteralTypo
+            Title = "Hexadecima_l Format",
             Value = 911,
             Increment = 1,
             Format = "{0:X}",
             X = 0,
-            Y = Pos.Bottom (enableCB) + 1,
+            Y = Pos.Bottom (enableCb) + 1,
+            BorderStyle = LineStyle.Single,
+            Width = 25
         };
 
         main.Add (decNumericUpDown);

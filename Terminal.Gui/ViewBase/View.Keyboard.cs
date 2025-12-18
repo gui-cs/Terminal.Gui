@@ -10,6 +10,8 @@ public partial class View // Keyboard APIs
     {
         KeyBindings = new (this);
         KeyBindings.Add (Key.Space, Command.Activate);
+
+        // QUESTION: Should subclasses be required to enable Accept?
         KeyBindings.Add (Key.Enter, Command.Accept);
 
         HotKeyBindings = new (this);

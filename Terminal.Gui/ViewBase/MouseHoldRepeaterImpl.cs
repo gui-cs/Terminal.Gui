@@ -98,8 +98,8 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
         {
             _timeout = new SmoothAcceleratingTimeout (
                 TimeSpan.FromMilliseconds (500),
-                TimeSpan.FromMilliseconds (50),
-                0.7,
+                TimeSpan.FromMilliseconds (10),
+                0.8,
                 TickWhileMouseIsHeldDown);
         }
 

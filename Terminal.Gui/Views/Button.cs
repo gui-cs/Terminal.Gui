@@ -73,58 +73,45 @@ public class Button : View, IDesignable
         KeyBindings.ReplaceCommands (Key.Space, Command.HotKey);
         KeyBindings.ReplaceCommands (Key.Enter, Command.HotKey);
 
-        // Replace default Activate binding with HotKey for mouse clicks
+        // Replace default Accept binding with HotKey for mouse clicks
         // These are managed dynamically when MouseHoldRepeat changes
-        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.HotKey);
-        MouseBindings.ReplaceCommands (MouseFlags.MiddleButtonClicked, Command.HotKey);
-        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.HotKey);
-        MouseBindings.ReplaceCommands (MouseFlags.Button4Clicked, Command.HotKey);
-        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
+        SetMouseBindings (MouseHoldRepeat);
 
         TitleChanged += Button_TitleChanged;
 
         base.ShadowStyle = DefaultShadow;
-        MouseHighlightStates = DefaultMouseHighlightStates;
+        //MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
     /// <inheritdoc/>
     protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<bool> args)
     {
-        if (args.NewValue)
+        SetMouseBindings (args.NewValue);
+    }
+
+    private void SetMouseBindings (bool mouseHoldRepeat)
+    {
+        if (mouseHoldRepeat)
         {
             // MouseHoldRepeat enabled: Remove ALL Click/Release bindings, add only Released→HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
-            MouseBindings.Remove (MouseFlags.MiddleButtonClicked);
-            MouseBindings.Remove (MouseFlags.RightButtonClicked);
-            MouseBindings.Remove (MouseFlags.Button4Clicked);
-            MouseBindings.Remove (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl);
+            MouseBindings.Remove (MouseFlags.LeftButtonDoubleClicked);
+            MouseBindings.Remove (MouseFlags.LeftButtonTripleClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
-            MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
-            MouseBindings.Remove (MouseFlags.Button4Released);
 
             // Add Released→HotKey bindings
             MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.HotKey);
-            MouseBindings.Add (MouseFlags.MiddleButtonReleased, Command.HotKey);
-            MouseBindings.Add (MouseFlags.Button4Released, Command.HotKey);
         }
         else
         {
             // MouseHoldRepeat disabled: Remove ALL Click/Release bindings, add only Clicked→HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
-            MouseBindings.Remove (MouseFlags.MiddleButtonClicked);
-            MouseBindings.Remove (MouseFlags.RightButtonClicked);
-            MouseBindings.Remove (MouseFlags.Button4Clicked);
-            MouseBindings.Remove (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
-            MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
-            MouseBindings.Remove (MouseFlags.Button4Released);
 
             // Add Clicked→HotKey bindings
             MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
-            MouseBindings.Add (MouseFlags.MiddleButtonClicked, Command.HotKey);
-            MouseBindings.Add (MouseFlags.RightButtonClicked, Command.HotKey);
-            MouseBindings.Add (MouseFlags.Button4Clicked, Command.HotKey);
-            MouseBindings.Add (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.HotKey);
+            MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.HotKey);
+            MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.HotKey);
         }
     }
 
@@ -138,6 +125,7 @@ public class Button : View, IDesignable
         {
             return true;
         }
+        SetFocus ();
 
         handled = RaiseAccepting (commandContext);
 
@@ -146,7 +134,6 @@ public class Button : View, IDesignable
             return true;
         }
 
-        SetFocus ();
 
         // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
         // TODO: no use-case has been identified for any View other than Button to act like this.
