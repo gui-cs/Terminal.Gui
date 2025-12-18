@@ -373,4 +373,43 @@ public class HotKeyTests
         Assert.Equal ("", view.Title);
         Assert.Equal (KeyCode.Null, view.HotKey);
     }
+
+    [Fact]
+    public void HotKeySpecifier_0xFFFF_Clears_HotKey ()
+    {
+        // Arrange: Create a view with a hotkey
+        View view = new () { HotKeySpecifier = (Rune)'_', Title = "_Test" };
+        Assert.Equal (KeyCode.T, view.HotKey);
+
+        // Act: Set HotKeySpecifier to 0xFFFF
+        view.HotKeySpecifier = (Rune)0xFFFF;
+
+        // Assert: HotKey should be cleared
+        Assert.Equal (KeyCode.Null, view.HotKey);
+    }
+
+    [Fact]
+    public void HotKeySpecifier_0xFFFF_Before_Title_Set_Prevents_HotKey ()
+    {
+        // Arrange & Act: Set HotKeySpecifier to 0xFFFF before setting Title
+        View view = new () { HotKeySpecifier = (Rune)0xFFFF };
+        view.Title = "_Test";
+
+        // Assert: HotKey should remain empty
+        Assert.Equal (KeyCode.Null, view.HotKey);
+    }
+
+    [Fact]
+    public void HotKeySpecifier_0xFFFF_With_Underscore_In_Title ()
+    {
+        // Arrange & Act: This is the scenario from the bug report
+        View view = new ()
+        {
+            HotKeySpecifier = (Rune)0xFFFF,
+            Title = "my label with an _underscore"
+        };
+
+        // Assert: HotKey should be empty (no hotkey should be set)
+        Assert.Equal (KeyCode.Null, view.HotKey);
+    }
 }
