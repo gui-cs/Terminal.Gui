@@ -21,7 +21,7 @@ public class LinearRange : LinearRange<object>
 }
 
 /// <summary>
-///     Provides a tpe-safe linear range control letting the user navigate from a set of typed options in a linear manner using the
+///     Provides a type-safe linear range control letting the user navigate from a set of typed options in a linear manner using the
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
