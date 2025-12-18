@@ -222,10 +222,11 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     /// <summary>
     /// Tests that keyboard arrangement mode properly shows arrangement buttons
     /// for ViewArrangement.Resizable (all directions)
+    /// For fully Resizable views, only move and all-size buttons should be visible in keyboard mode
     /// </summary>
     [Fact]
     [AutoInitShutdown]
-    public void EnterArrangeMode_Keyboard_Resizable_ShowsAllResizeButtons ()
+    public void EnterArrangeMode_Keyboard_Resizable_ShowsMoveAndAllSizeButtons ()
     {
         var superView = new View { Width = 80, Height = 25 };
         var view = new View
@@ -248,26 +249,23 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
         Assert.True (result);
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranging);
 
-        // All resize buttons should be visible
-        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "leftSizeButton");
-        Assert.NotNull (leftButton);
-        Assert.True (leftButton.Visible);
-
-        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "rightSizeButton");
-        Assert.NotNull (rightButton);
-        Assert.True (rightButton.Visible);
-
-        View? topButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "topSizeButton");
-        Assert.NotNull (topButton);
-        Assert.True (topButton.Visible);
-
-        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "bottomSizeButton");
-        Assert.NotNull (bottomButton);
-        Assert.True (bottomButton.Visible);
-
+        // For fully Resizable, only the all-size button should be visible (not individual direction buttons)
         View? allSizeButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "allSizeButton");
         Assert.NotNull (allSizeButton);
         Assert.True (allSizeButton.Visible);
+
+        // Individual direction buttons should not be visible for fully Resizable
+        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "leftSizeButton");
+        Assert.True (leftButton == null || !leftButton.Visible);
+
+        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "rightSizeButton");
+        Assert.True (rightButton == null || !rightButton.Visible);
+
+        View? topButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "topSizeButton");
+        Assert.True (topButton == null || !topButton.Visible);
+
+        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v.Id == "bottomSizeButton");
+        Assert.True (bottomButton == null || !bottomButton.Visible);
     }
 
     /// <summary>
