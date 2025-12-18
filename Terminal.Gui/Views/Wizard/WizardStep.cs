@@ -67,16 +67,19 @@ public class WizardStep : View
     /// <remarks>The default text is "Back"</remarks>
     public string BackButtonText { get; set; } = string.Empty;
 
+    /// <summary>Calculates the width for the help text padding based on the current frame width.</summary>
+    /// <returns>The padding width (30% of frame width, minimum 10)</returns>
+    private int CalculateHelpPaddingWidth () => Math.Max (10, (int)(Frame.Width * 0.3));
+
     /// <inheritdoc/>
     protected override void OnFrameChanged (in Rectangle frame)
     {
         base.OnFrameChanged (frame);
         
         // Update padding thickness when frame changes
-        if (Padding is { } && _helpTextView.Text.Length > 0)
+        if (Padding is not null && _helpTextView.Text.Length > 0)
         {
-            int paddingWidth = Math.Max (10, (int)(frame.Width * 0.3));
-            Padding.Thickness = new Thickness (0, 0, paddingWidth, 0);
+            Padding.Thickness = new Thickness (0, 0, CalculateHelpPaddingWidth (), 0);
         }
     }
 
@@ -155,7 +158,7 @@ public class WizardStep : View
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>
     internal void ShowHide ()
     {
-        // Check if Padding is available (might be null during disposal)
+        // Check if views are available (might be null during disposal)
         if (Padding is null || _contentView is null || _helpTextView is null)
         {
             return;
@@ -163,10 +166,8 @@ public class WizardStep : View
 
         if (_helpTextView.Text.Length > 0)
         {
-            // Help text goes in right Padding - calculate 30% of current width
-            // We'll use LayoutStarted to set the actual thickness based on the frame
-            int paddingWidth = Math.Max (10, (int)(Frame.Width * 0.3));
-            Padding.Thickness = new Thickness (0, 0, paddingWidth, 0);
+            // Help text goes in right Padding - set thickness based on current frame width
+            Padding.Thickness = new Thickness (0, 0, CalculateHelpPaddingWidth (), 0);
             
             // Add help to padding if not already there
             if (_helpTextView.SuperView != Padding)
