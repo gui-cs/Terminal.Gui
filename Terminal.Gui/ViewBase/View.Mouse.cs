@@ -201,6 +201,7 @@ public partial class View // Mouse APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
+                                              this,
                                               ref _mouseHoldRepeat,
                                               value,
                                               OnMouseHoldRepeatChanging,

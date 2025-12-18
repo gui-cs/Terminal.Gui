@@ -1,4 +1,3 @@
-
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
@@ -11,34 +10,7 @@ namespace Terminal.Gui.Drivers;
 
 internal class UnixOutput : OutputBase, IOutput
 {
-    [StructLayout (LayoutKind.Sequential)]
-    private struct WinSize
-    {
-        public ushort ws_row;
-        public ushort ws_col;
-        public ushort ws_xpixel;
-        public ushort ws_ypixel;
-    }
-
-    private static readonly uint TIOCGWINSZ =
-        RuntimeInformation.IsOSPlatform (OSPlatform.OSX) ||
-        RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD)
-            ? 0x40087468u  // Darwin/BSD
-            : 0x5413u;     // Linux
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int ioctl (int fd, uint request, out WinSize ws);
-
-    // File descriptor for stdout
-    private const int STDOUT_FILENO = 1;
-
-    [DllImport ("libc")]
-    private static extern int write (int fd, byte [] buf, int n);
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int dup (int fd);
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
     {
         if (Force16Colors)
@@ -65,26 +37,18 @@ internal class UnixOutput : OutputBase, IOutput
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
         base.Write (output);
-        try
-        {
-            byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
 
-            // Write to stdout (fd 1)
-            write (STDOUT_FILENO, utf8, utf8.Length);
-        }
-        catch
-        {
-            // ignore for unit tests
-        }
+        byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
+        UnixIOHelper.TryWriteStdout (utf8);
     }
 
     private Point? _lastCursorPosition;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
         if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == screenPositionX && _lastCursorPosition.Value.Y == screenPositionY)
@@ -112,23 +76,24 @@ internal class UnixOutput : OutputBase, IOutput
     private TextWriter? CreateUnixStdoutWriter ()
     {
         // duplicate stdout so we don't mess with Console.Out's FD
-        int fdCopy = dup (STDOUT_FILENO);
+        int fdCopy = UnixIOHelper.dup (UnixIOHelper.STDOUT_FILENO);
 
         if (fdCopy == -1)
         {
             // Log but don't throw - we're likely running without a TTY (CI/CD, tests, etc.)
-            var errno = Marshal.GetLastWin32Error ();
+            int errno = Marshal.GetLastWin32Error ();
             Logging.Warning ($"Failed to dup STDOUT_FILENO, errno={errno}. Running without TTY support.");
-            return null;  // Return null instead of throwing
+
+            return null; // Return null instead of throwing
         }
 
         try
         {
             // wrap the raw fd into a SafeFileHandle
-            SafeFileHandle handle = new SafeFileHandle (fdCopy, ownsHandle: true);
+            var handle = new SafeFileHandle (fdCopy, true);
 
             // create FileStream from the safe handle
-            FileStream stream = new FileStream (handle, FileAccess.Write);
+            var stream = new FileStream (handle, FileAccess.Write);
 
             return new StreamWriter (stream)
             {
@@ -138,42 +103,24 @@ internal class UnixOutput : OutputBase, IOutput
         catch (Exception ex)
         {
             Logging.Warning ($"Failed to create TextWriter from dup'd STDOUT: {ex.Message}");
+
             return null;
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
-        try
-        {
-            byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
-
-            // Write to stdout (fd 1)
-            write (STDOUT_FILENO, utf8, utf8.Length);
-        }
-        catch
-        {
-            // ignore for unit tests
-        }
+        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+        UnixIOHelper.TryWriteStdout (utf8);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Size GetSize ()
     {
-        try
+        if (UnixIOHelper.TryGetTerminalSize (out Size size))
         {
-            if (ioctl (1, TIOCGWINSZ, out WinSize ws) == 0)
-            {
-                if (ws.ws_col > 0 && ws.ws_row > 0)
-                {
-                    return new (ws.ws_col, ws.ws_row);
-                }
-            }
-        }
-        catch
-        {
-            // ignore
+            return size;
         }
 
         return new (80, 25); // fallback
@@ -208,26 +155,18 @@ internal class UnixOutput : OutputBase, IOutput
         }
     }
 
-    /// <inheritdoc />
-    public Point GetCursorPosition ()
-    {
-        return _lastCursorPosition ?? Point.Empty;
-    }
+    /// <inheritdoc/>
+    public Point GetCursorPosition () => _lastCursorPosition ?? Point.Empty;
 
-    /// <inheritdoc />
-    public void SetCursorPosition (int col, int row)
-    {
-        SetCursorPositionImpl (col, row);
-    }
+    /// <inheritdoc/>
+    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void SetSize (int width, int height)
     {
         // Do nothing
     }
 
-    /// <inheritdoc />
-    public void Dispose ()
-    {
-    }
+    /// <inheritdoc/>
+    public void Dispose () { }
 }

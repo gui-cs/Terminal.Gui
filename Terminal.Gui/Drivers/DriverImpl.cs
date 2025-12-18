@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
-using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Drivers;
 
@@ -51,6 +50,7 @@ internal class DriverImpl : IDriver
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+
         _inputProcessor.SyntheticMouseEvent += (s, e) =>
                                                {
                                                    //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
@@ -73,10 +73,7 @@ internal class DriverImpl : IDriver
     public void Init () { throw new NotSupportedException (); }
 
     /// <inheritdoc/>
-    public void Refresh ()
-    {
-        _output.Write (_outputBuffer);
-    }
+    public void Refresh () { _output.Write (_outputBuffer); }
 
     /// <inheritdoc/>
     public string? GetName () => _componentFactory.GetDriverName ();
@@ -146,7 +143,7 @@ internal class DriverImpl : IDriver
 
     private readonly IComponentFactory _componentFactory;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public IOutputBuffer GetOutputBuffer () => _outputBuffer;
 
     private readonly IOutput _output;
@@ -418,7 +415,7 @@ internal class DriverImpl : IDriver
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void InjectMouseEvent (Mouse mouse) { GetInputProcessor ().InjectMouseEvent (null, mouse); }
 
     #endregion Input Events

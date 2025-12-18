@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Runtime.InteropServices;
 
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
@@ -16,45 +15,8 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
     // Platform-specific raw mode helper
     private readonly UnixRawModeHelper _rawModeHelper = new ();
 
-    private const int STDIN_FILENO = 0;
     private readonly bool _terminalInitialized;
-
-    [StructLayout (LayoutKind.Sequential)]
-    private struct Pollfd
-    {
-        public int fd;
-        public short events;
-        public readonly short revents;
-    }
-
-    [Flags]
-    private enum Condition : short
-    {
-        PollIn = 1,
-        PollPri = 2,
-        PollOut = 4,
-        PollErr = 8,
-        PollHup = 16,
-        PollNval = 32
-    }
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int read (int fd, byte [] buf, int count);
-
-    private const int STDOUT_FILENO = 1;
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int write (int fd, byte [] buf, int count);
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int tcflush (int fd, int queueSelector);
-
-    private const int TCIFLUSH = 0;
-
-    private readonly Pollfd []? _pollMap;
+    private readonly UnixIOHelper.Pollfd []? _pollMap;
 
     public UnixInput ()
     {
@@ -62,9 +24,8 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 
         try
         {
-            _pollMap = new Pollfd [1];
-            _pollMap [0].fd = STDIN_FILENO;
-            _pollMap [0].events = (short)Condition.PollIn;
+            // Set up poll map using shared helper
+            _pollMap = UnixIOHelper.CreateStdinPollMap ();
 
             // Enable raw mode using the helper
             _terminalInitialized = _rawModeHelper.TryEnable ();
@@ -107,18 +68,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
             return false;
         }
 
-        try
-        {
-            int n = poll (_pollMap, (uint)_pollMap.Length, 0);
-
-            return n != 0;
-        }
-        catch (Exception ex)
-        {
-            Logging.Error ($"Error in Peek: {ex.Message}");
-
-            return false;
-        }
+        return UnixIOHelper.IsInputAvailable (_pollMap);
     }
 
     private void WriteRaw (string text)
@@ -128,15 +78,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
             return;
         }
 
-        try
-        {
-            byte [] utf8 = Encoding.UTF8.GetBytes (text);
-            write (STDOUT_FILENO, utf8, utf8.Length);
-        }
-        catch
-        {
-            // ignore exceptions during write
-        }
+        UnixIOHelper.TryWriteStdout (text);
     }
 
     /// <inheritdoc/>
@@ -153,18 +95,25 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
             yield break;
         }
 
-        while (poll (_pollMap, (uint)_pollMap.Length, 0) != 0)
+        while (UnixIOHelper.IsInputAvailable (_pollMap))
         {
-            if ((_pollMap [0].revents & (int)Condition.PollIn) != 0)
+            if ((_pollMap [0].revents & (int)UnixIOHelper.Condition.PollIn) == 0)
             {
-                var buf = new byte [256];
-                int bytesRead = read (0, buf, buf.Length);
-                string input = Encoding.UTF8.GetString (buf, 0, bytesRead);
+                continue;
+            }
 
-                foreach (char ch in input)
-                {
-                    yield return ch;
-                }
+            byte [] buf = new byte [256];
+
+            if (!UnixIOHelper.TryReadStdin (buf, out int bytesRead) || bytesRead <= 0)
+            {
+                continue;
+            }
+
+            string input = Encoding.UTF8.GetString (buf, 0, bytesRead);
+
+            foreach (char ch in input)
+            {
+                yield return ch;
             }
         }
     }
@@ -178,14 +127,16 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 
         try
         {
-            Pollfd [] fds = new Pollfd [1];
-            fds [0].fd = STDIN_FILENO;
-            fds [0].events = (short)Condition.PollIn;
+            if (_pollMap == null)
+            {
+                return;
+            }
+
             var buf = new byte [256];
 
-            while (poll (fds, 1, 0) > 0)
+            while (UnixIOHelper.IsInputAvailable (_pollMap))
             {
-                read (STDIN_FILENO, buf, buf.Length);
+                UnixIOHelper.TryReadStdin (buf, out _);
             }
         }
         catch
@@ -211,7 +162,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
         {
             WriteRaw (EscSeqUtils.CSI_DisableMouseEvents);
             FlushConsoleInput ();
-            tcflush (STDIN_FILENO, TCIFLUSH);
+            UnixIOHelper.TryFlushStdin ();
             WriteRaw (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
             WriteRaw (EscSeqUtils.CSI_ShowCursor);
 

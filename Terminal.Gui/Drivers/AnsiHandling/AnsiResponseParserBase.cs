@@ -120,7 +120,6 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             bool isEscape = currentChar == ESCAPE;
 
-            // Logging.Trace($"Processing character '{currentChar}' (isEscape: {isEscape})");
             switch (State)
             {
                 case AnsiResponseParserState.Normal:
@@ -238,17 +237,19 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             // We have something totally unexpected, not a CSI and
             // still Esc+<something>. So give last minute swallow chance
-            if (cur!.Length >= 2 && cur [0] == ESCAPE)
+            if (cur!.Length < 2 || cur [0] != ESCAPE)
             {
-                // Maybe swallow anyway if user has custom delegate
-                bool swallow = ShouldSwallowUnexpectedResponse ();
+                return;
+            }
 
-                if (swallow)
-                {
-                    _heldContent.ClearHeld ();
+            // Maybe swallow anyway if user has custom delegate
+            bool swallow = ShouldSwallowUnexpectedResponse ();
 
-                    //Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
-                }
+            if (swallow)
+            {
+                _heldContent.ClearHeld ();
+
+                //Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
             }
         }
     }
@@ -322,26 +323,29 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             // Finally if it is a valid ansi response but not one we are expect (e.g. its mouse activity)
             // then we can release it back to input processing stream
-            if (_knownTerminators.Contains (cur!.Last ()) && cur!.StartsWith (EscSeqUtils.CSI))
+            if (!_knownTerminators.Contains (cur!.Last ()) || !cur!.StartsWith (EscSeqUtils.CSI))
             {
-                // We have found a terminator so bail
-                State = AnsiResponseParserState.Normal;
+                return false; // Continue accumulating
+            }
 
-                // Maybe swallow anyway if user has custom delegate
-                bool swallow = ShouldSwallowUnexpectedResponse ();
+            // We have found a terminator so bail
+            State = AnsiResponseParserState.Normal;
 
-                if (swallow)
-                {
+            // Maybe swallow anyway if user has custom delegate
+            bool swallow = ShouldSwallowUnexpectedResponse ();
+
+            switch (swallow)
+            {
+                case true:
                     _heldContent.ClearHeld ();
 
                     //Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
 
                     // Do not send back to input stream
                     return false;
-                }
-
-                // Do release back to input stream
-                return true;
+                default:
+                    // Do release back to input stream
+                    return true;
             }
         }
 
@@ -384,26 +388,27 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         // Check for expected responses
         AnsiResponseExpectation? matchingResponse = collection.FirstOrDefault (r => r.Matches (cur));
 
-        if (matchingResponse?.Response != null)
+        if (matchingResponse?.Response == null)
         {
-            //Logging.Trace ($"AnsiResponseParser processed '{cur}'");
-
-            if (invokeCallback)
-            {
-                matchingResponse.Response.Invoke (_heldContent);
-            }
-
-            ResetState ();
-
-            if (removeExpectation)
-            {
-                collection.Remove (matchingResponse);
-            }
-
-            return true;
+            return false;
         }
 
-        return false;
+        //Logging.Trace ($"AnsiResponseParser processed '{cur}'");
+
+        if (invokeCallback)
+        {
+            matchingResponse.Response.Invoke (_heldContent);
+        }
+
+        ResetState ();
+
+        if (removeExpectation)
+        {
+            collection.Remove (matchingResponse);
+        }
+
+        return true;
+
     }
 
     /// <inheritdoc/>
@@ -496,7 +501,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         }
     }
 
-    private bool IsMouse (string? cur) { return _mouseParser.IsMouse (cur); }
+    private bool IsMouse (string? cur) => _mouseParser.IsMouse (cur);
 
     #endregion
 
