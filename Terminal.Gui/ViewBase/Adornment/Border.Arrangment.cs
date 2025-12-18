@@ -83,12 +83,14 @@ public partial class Border
     /// </summary>
     private void CreateArrangementButtons ()
     {
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+        ViewArrangement parentArrangement = Parent!.Arrangement;
+
+        if (parentArrangement.HasFlag (ViewArrangement.Movable))
         {
             _moveButton = CreateArrangementButton ("moveButton", Glyphs.Move, 0, 0, ViewArrangement.Movable);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+        if (parentArrangement.HasFlag (ViewArrangement.Resizable))
         {
             _allSizeButton = CreateArrangementButton (
                                                       "allSizeButton",
@@ -98,7 +100,7 @@ public partial class Border
                                                       ViewArrangement.Resizable);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
         {
             _topSizeButton = CreateArrangementButton (
                                                       "topSizeButton",
@@ -108,7 +110,7 @@ public partial class Border
                                                       ViewArrangement.TopResizable);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
             _rightSizeButton = CreateArrangementButton (
                                                         "rightSizeButton",
@@ -118,7 +120,7 @@ public partial class Border
                                                         ViewArrangement.RightResizable);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
             _leftSizeButton = CreateArrangementButton (
                                                        "leftSizeButton",
@@ -128,7 +130,7 @@ public partial class Border
                                                        ViewArrangement.LeftResizable);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
             _bottomSizeButton = CreateArrangementButton (
                                                          "bottomSizeButton",
@@ -173,32 +175,33 @@ public partial class Border
     /// </summary>
     private void SetVisibilityForKeyboardMode ()
     {
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable))
+        ViewArrangement parentArrangement = Parent!.Arrangement;
+        if (parentArrangement.HasFlag (ViewArrangement.Movable))
         {
             SetVisibleButton (_moveButton);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+        if (parentArrangement.HasFlag (ViewArrangement.Resizable))
         {
             SetVisibleButton (_allSizeButton);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
         {
             SetVisibleButton (_topSizeButton);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
             SetVisibleButton (_rightSizeButton);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
             SetVisibleButton (_leftSizeButton);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
+        if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
             SetVisibleButton (_bottomSizeButton);
         }
@@ -213,74 +216,88 @@ public partial class Border
         {
             case ViewArrangement.Movable:
                 SetVisibleButton (_moveButton);
-
                 break;
 
-            case ViewArrangement.RightResizable | ViewArrangement.BottomResizable:
             case ViewArrangement.Resizable:
-                SetVisibleButton (_rightSizeButton);
-                SetVisibleButton (_bottomSizeButton);
-
-                if (_allSizeButton != null)
-                {
-                    _allSizeButton.X = Pos.AnchorEnd ();
-                    _allSizeButton.Y = Pos.AnchorEnd ();
-                    _allSizeButton.Visible = true;
-                }
-
+            case ViewArrangement.RightResizable | ViewArrangement.BottomResizable:
+                ShowResizableButtons (right: true, bottom: true);
+                ShowAllSizeButton (Pos.AnchorEnd (), Pos.AnchorEnd ());
                 break;
 
             case ViewArrangement.LeftResizable:
                 SetVisibleButton (_leftSizeButton);
-
                 break;
 
             case ViewArrangement.RightResizable:
                 SetVisibleButton (_rightSizeButton);
-
                 break;
 
             case ViewArrangement.TopResizable:
                 SetVisibleButton (_topSizeButton);
-
                 break;
 
             case ViewArrangement.BottomResizable:
                 SetVisibleButton (_bottomSizeButton);
-
                 break;
 
             case ViewArrangement.LeftResizable | ViewArrangement.BottomResizable:
-                SetVisibleButton (_leftSizeButton);
-                SetVisibleButton (_bottomSizeButton);
-
-                if (_allSizeButton != null)
-                {
-                    _allSizeButton.X = 0;
-                    _allSizeButton.Y = Pos.AnchorEnd ();
-                    _allSizeButton.Visible = true;
-                }
-
+                ShowResizableButtons (left: true, bottom: true);
+                ShowAllSizeButton (x: 0, Pos.AnchorEnd ());
                 break;
 
             case ViewArrangement.LeftResizable | ViewArrangement.TopResizable:
-                SetVisibleButton (_leftSizeButton);
-                SetVisibleButton (_topSizeButton);
-
+                ShowResizableButtons (left: true, top: true);
                 break;
 
             case ViewArrangement.RightResizable | ViewArrangement.TopResizable:
-                SetVisibleButton (_rightSizeButton);
-                SetVisibleButton (_topSizeButton);
-
-                if (_allSizeButton != null)
-                {
-                    _allSizeButton.X = Pos.AnchorEnd ();
-                    _allSizeButton.Y = 0;
-                    _allSizeButton.Visible = true;
-                }
-
+                ShowResizableButtons (right: true, top: true);
+                ShowAllSizeButton (Pos.AnchorEnd (), y: 0);
                 break;
+        }
+    }
+
+    /// <summary>
+    ///     Shows the specified directional resize buttons.
+    /// </summary>
+    /// <param name="left">Show left resize button.</param>
+    /// <param name="right">Show right resize button.</param>
+    /// <param name="top">Show top resize button.</param>
+    /// <param name="bottom">Show bottom resize button.</param>
+    private void ShowResizableButtons (bool left = false, bool right = false, bool top = false, bool bottom = false)
+    {
+        if (left)
+        {
+            SetVisibleButton (_leftSizeButton);
+        }
+
+        if (right)
+        {
+            SetVisibleButton (_rightSizeButton);
+        }
+
+        if (top)
+        {
+            SetVisibleButton (_topSizeButton);
+        }
+
+        if (bottom)
+        {
+            SetVisibleButton (_bottomSizeButton);
+        }
+    }
+
+    /// <summary>
+    ///     Shows and positions the all-size button at the specified location.
+    /// </summary>
+    /// <param name="x">X position for the all-size button.</param>
+    /// <param name="y">Y position for the all-size button.</param>
+    private void ShowAllSizeButton (Pos x, Pos y)
+    {
+        if (_allSizeButton != null)
+        {
+            _allSizeButton.X = x;
+            _allSizeButton.Y = y;
+            _allSizeButton.Visible = true;
         }
     }
 
@@ -544,7 +561,7 @@ public partial class Border
     /// </summary>
     private void DisposeSizeButton (ref Button? button)
     {
-        if (button is {})
+        if (button is { })
         {
             Remove (button);
             button.Dispose ();
