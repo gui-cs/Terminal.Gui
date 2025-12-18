@@ -93,7 +93,6 @@ public class MenuBar : Menu, IDesignable
         BorderStyle = DefaultBorderStyle;
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
-        SuperViewChanged += OnSuperViewChanged;
 
         return;
 
@@ -102,7 +101,8 @@ public class MenuBar : Menu, IDesignable
         bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
     }
 
-    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    /// <inheritdoc />
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> e)
     {
         if (SuperView is null)
         {
@@ -758,7 +758,6 @@ public class MenuBar : Menu, IDesignable
 
         if (disposing)
         {
-            SuperViewChanged += OnSuperViewChanged;
             ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
