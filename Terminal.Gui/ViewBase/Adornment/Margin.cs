@@ -67,7 +67,7 @@ public class Margin : Adornment
     }
 
     /// <summary>
-    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from <see cref="View.Draw"/> on each
+    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from <see cref="View.Draw(DrawContext)"/> on each
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
     /// <remarks>
@@ -96,7 +96,7 @@ public class Margin : Adornment
                 margin.ClearCachedClip ();
             }
 
-            foreach (View subview in view.SubViews)
+            foreach (View subview in view.SubViews.OrderBy (v => v.HasFocus && v.ShadowStyle != ShadowStyle.None).Reverse ())
             {
                 stack.Push (subview);
             }
