@@ -1775,7 +1775,7 @@ public class TextField : View, IDesignable
     }
 
     /// <inheritdoc />
-    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> args)
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View> args)
     {
         base.OnSuperViewChanged (args);
         if (SuperView is { })
