@@ -315,184 +315,12 @@ public partial class Border
     private void AddArrangeModeKeyBindings ()
     {
         AddCommand (Command.Quit, EndArrangeMode);
-
-        AddCommand (
-                    Command.Up,
-                    () =>
-                    {
-                        if (Parent is null)
-                        {
-                            return false;
-                        }
-
-                        var handled = false;
-
-                        if (Arranging.HasFlag (ViewArrangement.Movable))
-                        {
-                            Parent.Y -= 1;
-                            handled = true;
-                        }
-
-                        if (Arranging == ViewArrangement.Resizable || ((ViewArrangement)Focused?.Data!).HasFlag (ViewArrangement.BottomResizable))
-                        {
-                            if (Parent.Viewport.Height > 0)
-                            {
-                                Parent.Height -= 1;
-                                handled = true;
-                            }
-                        }
-
-                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.TopResizable)
-                        {
-                            if (Parent.Viewport.Height >= 0)
-                            {
-                                Parent.Y -= 1;
-                                Parent.Height += 1;
-                                handled = true;
-                            }
-                        }
-
-                        return handled;
-                    });
-
-        AddCommand (
-                    Command.Down,
-                    () =>
-                    {
-                        if (Parent is null)
-                        {
-                            return false;
-                        }
-
-                        var handled = false;
-
-                        if (Arranging.HasFlag (ViewArrangement.Movable))
-                        {
-                            Parent.Y += 1;
-                            handled = true;
-                        }
-
-                        if (Arranging == ViewArrangement.Resizable || ((ViewArrangement)Focused?.Data!).HasFlag (ViewArrangement.BottomResizable))
-                        {
-                            Parent.Height += 1;
-                            handled = true;
-                        }
-
-                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.TopResizable)
-                        {
-                            if (Parent.Viewport.Height > 0)
-                            {
-                                Parent.Y += 1;
-                                Parent.Height -= 1;
-                                handled = true;
-                            }
-                        }
-
-                        if (((ViewArrangement)Focused?.Data!).HasFlag (ViewArrangement.Resizable))
-                        {
-                            Parent.Height += 1;
-                            handled = true;
-                        }
-
-                        return handled;
-                    });
-
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        if (Parent is null)
-                        {
-                            return false;
-                        }
-
-                        var handled = false;
-
-                        if (Arranging.HasFlag (ViewArrangement.Movable))
-                        {
-                            Parent.X -= 1;
-                            handled = true;
-                        }
-
-                        if (Arranging == ViewArrangement.Resizable || ((ViewArrangement)Focused?.Data!).HasFlag (ViewArrangement.RightResizable))
-                        {
-                            if (Parent.Viewport.Width > 0)
-                            {
-                                Parent.Width -= 1;
-                                handled = true;
-                            }
-                        }
-
-                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.LeftResizable)
-                        {
-                            Parent.X -= 1;
-                            Parent.Width += 1;
-                            handled = true;
-                        }
-
-                        return handled;
-                    });
-
-        AddCommand (
-                    Command.Right,
-                    () =>
-                    {
-                        if (Parent is null)
-                        {
-                            return false;
-                        }
-
-                        var handled = false;
-
-                        if (Arranging.HasFlag (ViewArrangement.Movable))
-                        {
-                            Parent.X += 1;
-                            handled = true;
-                        }
-
-                        if (Arranging == ViewArrangement.Resizable || ((ViewArrangement)Focused?.Data!).HasFlag (ViewArrangement.RightResizable))
-                        {
-                            Parent.Width += 1;
-                            handled = true;
-                        }
-
-                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.LeftResizable)
-                        {
-                            if (Parent.Viewport.Width > 0)
-                            {
-                                Parent.X += 1;
-                                Parent.Width -= 1;
-                                handled = true;
-                            }
-                        }
-
-                        return handled;
-                    });
-
-        AddCommand (
-                    Command.Tab,
-                    () =>
-                    {
-                        // BUGBUG: If an arrangeable view has only arrangeable subviews, it's not possible to activate
-                        // BUGBUG: ArrangeMode with keyboard for the superview.
-                        // BUGBUG: AdvanceFocus should be wise to this and when in ArrangeMode, should move across
-                        // BUGBUG: the view hierarchy.
-
-                        AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-                        Arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
-
-                        return true; // Always eat
-                    });
-
-        AddCommand (
-                    Command.BackTab,
-                    () =>
-                    {
-                        AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
-                        Arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
-
-                        return true; // Always eat
-                    });
+        AddCommand (Command.Up, HandleArrangeModeUp);
+        AddCommand (Command.Down, HandleArrangeModeDown);
+        AddCommand (Command.Left, HandleArrangeModeLeft);
+        AddCommand (Command.Right, HandleArrangeModeRight);
+        AddCommand (Command.Tab, HandleArrangeModeTab);
+        AddCommand (Command.BackTab, HandleArrangeModeBackTab);
 
         HotKeyBindings.Add (Key.Esc, Command.Quit);
         HotKeyBindings.Add (Application.ArrangeKey, Command.Quit);
@@ -500,9 +328,201 @@ public partial class Border
         HotKeyBindings.Add (Key.CursorDown, Command.Down);
         HotKeyBindings.Add (Key.CursorLeft, Command.Left);
         HotKeyBindings.Add (Key.CursorRight, Command.Right);
-
         HotKeyBindings.Add (Key.Tab, Command.Tab);
         HotKeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
+    }
+
+    /// <summary>
+    ///     Handles Up arrow key in arrange mode: moves view up or adjusts top/bottom resize.
+    /// </summary>
+    private bool? HandleArrangeModeUp ()
+    {
+        if (Parent is null)
+        {
+            return false;
+        }
+
+        bool handled = false;
+
+        if (Arranging.HasFlag (ViewArrangement.Movable))
+        {
+            Parent.Y -= 1;
+            handled = true;
+        }
+
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.BottomResizable))
+        {
+            if (Parent.Viewport.Height > 0)
+            {
+                Parent.Height -= 1;
+                handled = true;
+            }
+        }
+
+        if (GetFocusedArrangement () == ViewArrangement.TopResizable)
+        {
+            if (Parent.Viewport.Height >= 0)
+            {
+                Parent.Y -= 1;
+                Parent.Height += 1;
+                handled = true;
+            }
+        }
+
+        return handled;
+    }
+
+    /// <summary>
+    ///     Handles Down arrow key in arrange mode: moves view down or adjusts top/bottom resize.
+    /// </summary>
+    private bool? HandleArrangeModeDown ()
+    {
+        if (Parent is null)
+        {
+            return false;
+        }
+
+        bool handled = false;
+
+        if (Arranging.HasFlag (ViewArrangement.Movable))
+        {
+            Parent.Y += 1;
+            handled = true;
+        }
+
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.BottomResizable))
+        {
+            Parent.Height += 1;
+            handled = true;
+        }
+
+        if (GetFocusedArrangement () == ViewArrangement.TopResizable)
+        {
+            if (Parent.Viewport.Height > 0)
+            {
+                Parent.Y += 1;
+                Parent.Height -= 1;
+                handled = true;
+            }
+        }
+
+        if (GetFocusedArrangement ().HasFlag (ViewArrangement.Resizable))
+        {
+            Parent.Height += 1;
+            handled = true;
+        }
+
+        return handled;
+    }
+
+    /// <summary>
+    ///     Handles Left arrow key in arrange mode: moves view left or adjusts left/right resize.
+    /// </summary>
+    private bool? HandleArrangeModeLeft ()
+    {
+        if (Parent is null)
+        {
+            return false;
+        }
+
+        bool handled = false;
+
+        if (Arranging.HasFlag (ViewArrangement.Movable))
+        {
+            Parent.X -= 1;
+            handled = true;
+        }
+
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.RightResizable))
+        {
+            if (Parent.Viewport.Width > 0)
+            {
+                Parent.Width -= 1;
+                handled = true;
+            }
+        }
+
+        if (GetFocusedArrangement () == ViewArrangement.LeftResizable)
+        {
+            Parent.X -= 1;
+            Parent.Width += 1;
+            handled = true;
+        }
+
+        return handled;
+    }
+
+    /// <summary>
+    ///     Handles Right arrow key in arrange mode: moves view right or adjusts left/right resize.
+    /// </summary>
+    private bool? HandleArrangeModeRight ()
+    {
+        if (Parent is null)
+        {
+            return false;
+        }
+
+        bool handled = false;
+
+        if (Arranging.HasFlag (ViewArrangement.Movable))
+        {
+            Parent.X += 1;
+            handled = true;
+        }
+
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.RightResizable))
+        {
+            Parent.Width += 1;
+            handled = true;
+        }
+
+        if (GetFocusedArrangement () == ViewArrangement.LeftResizable)
+        {
+            if (Parent.Viewport.Width > 0)
+            {
+                Parent.X += 1;
+                Parent.Width -= 1;
+                handled = true;
+            }
+        }
+
+        return handled;
+    }
+
+    /// <summary>
+    ///     Handles Tab key in arrange mode: advances focus to next arrangement button.
+    /// </summary>
+    private bool? HandleArrangeModeTab ()
+    {
+        // BUGBUG: If an arrangeable view has only arrangeable subviews, it's not possible to activate
+        // BUGBUG: ArrangeMode with keyboard for the superview.
+        // BUGBUG: AdvanceFocus should be wise to this and when in ArrangeMode, should move across
+        // BUGBUG: the view hierarchy.
+
+        AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        Arranging = GetFocusedArrangement ();
+
+        return true; // Always eat
+    }
+
+    /// <summary>
+    ///     Handles Shift+Tab key in arrange mode: advances focus to previous arrangement button.
+    /// </summary>
+    private bool? HandleArrangeModeBackTab ()
+    {
+        AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        Arranging = GetFocusedArrangement ();
+
+        return true; // Always eat
+    }
+
+    /// <summary>
+    ///     Gets the arrangement type from the currently focused button's Data property.
+    /// </summary>
+    /// <returns>The ViewArrangement stored in the focused button, or Fixed if none.</returns>
+    private ViewArrangement GetFocusedArrangement ()
+    {
+        return (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
     }
 
     private void ApplicationOnMouseEvent (object? sender, Mouse mouse)
