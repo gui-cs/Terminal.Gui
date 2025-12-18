@@ -192,7 +192,7 @@ public class DimAutoDemo : Scenario
             BorderStyle = LineStyle.Double,
             Title = "_Slider"
         };
-        sliderFrameView.Add (slider);
+        sliderFrameView.Add (linearRange);
 
         return sliderFrameView;
     }

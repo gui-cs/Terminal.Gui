@@ -84,19 +84,19 @@ public class LinearRanges : Scenario
 
         single.SubViewLayout += (s, e) =>
                                 {
-                                    if (linearRange.Orientation == Orientation.Horizontal)
+                                    if (single.Orientation == Orientation.Horizontal)
                                     {
-                                        linearRange.Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () };
-                                        linearRange.Style.OptionChar = new () { Grapheme = Glyphs.HLine.ToString () };
+                                        single.Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () };
+                                        single.Style.OptionChar = new () { Grapheme = Glyphs.HLine.ToString () };
                                     }
                                     else
                                     {
-                                        linearRange.Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
-                                        linearRange.Style.OptionChar = new () { Grapheme = Glyphs.VLine.ToString () };
+                                        single.Style.SpaceChar = new () { Grapheme = Glyphs.VLine.ToString () };
+                                        single.Style.OptionChar = new () { Grapheme = Glyphs.VLine.ToString () };
                                     }
                                 };
-        linearRange.Style.SetChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
-        linearRange.Style.DragChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
+        single.Style.SetChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
+        single.Style.DragChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
 
         v.Add (single);
 

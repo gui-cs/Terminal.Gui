@@ -211,7 +211,7 @@ public class ViewportSettings : Scenario
             BorderStyle = LineStyle.Double,
             Title = "_Slider"
         };
-        view.Add (slider);
+        view.Add (linearRange);
 
         adornmentsEditor.Initialized += (s, e) =>
                               {
