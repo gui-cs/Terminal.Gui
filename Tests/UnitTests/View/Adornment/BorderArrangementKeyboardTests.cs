@@ -25,7 +25,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -60,7 +59,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
@@ -94,7 +92,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
@@ -128,7 +125,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
@@ -162,7 +158,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
@@ -196,7 +191,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
@@ -239,7 +233,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
@@ -287,7 +280,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
@@ -328,7 +320,6 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-
         
         superView.BeginInit ();
         superView.EndInit ();
