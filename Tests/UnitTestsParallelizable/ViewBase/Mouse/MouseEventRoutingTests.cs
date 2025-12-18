@@ -1,7 +1,7 @@
 using Terminal.Gui.App;
 using Xunit.Abstractions;
 
-namespace ApplicationTests.MouseTests;
+namespace ViewBaseTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable tests for mouse event routing and coordinate transformation.
@@ -40,7 +40,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new Point (screenX, screenY),
             Flags = MouseFlags.LeftButtonClicked
@@ -155,7 +155,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         };
 
         // Click at position (2, 2) relative to subView (which is at 5,5 relative to superView)
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new Point (2, 2), // Relative to subView
             Flags = MouseFlags.LeftButtonClicked
@@ -194,7 +194,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, e) => { clickHandlerCalled = !e.IsSingleDoubleOrTripleClicked; ; };
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.LeftButtonClicked
@@ -224,7 +224,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             // Don't set Handled = true
         };
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.LeftButtonClicked
@@ -241,7 +241,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
     #endregion
 
-    #region Mouse Button Events
+
 
     [Theory]
     [InlineData (MouseFlags.LeftButtonPressed, 1, 0)]
@@ -282,6 +282,9 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.Dispose ();
     }
+
+    #region Mouse Button Events
+
 
     [Theory]
     [InlineData (MouseFlags.LeftButtonClicked)]
@@ -412,5 +415,6 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Dispose ();
     }
 
-    #endregion
+    #endregion    
+
 }

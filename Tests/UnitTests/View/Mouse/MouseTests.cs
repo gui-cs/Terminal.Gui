@@ -101,36 +101,6 @@ public class MouseTests : TestsAllViews
         Application.ResetState (true);
     }
 
-    [Theory (Skip = "Broken in #4474")]
-    [InlineData (MouseFlags.LeftButtonClicked)]
-    [InlineData (MouseFlags.MiddleButtonClicked)]
-    //[InlineData (MouseFlags.RightButtonClicked)]
-    [InlineData (MouseFlags.Button4Clicked)]
-    public void MouseHoldRepeat_True_Button_Clicked_Raises_Activating (MouseFlags clicked)
-    {
-        Mouse me = new ();
-
-        View view = new ()
-        {
-            Width = 1,
-            Height = 1,
-            MouseHoldRepeat = true
-        };
-
-        var activatingCount = 0;
-
-        view.Activating += (s, e) => activatingCount++;
-
-        me.Flags = clicked;
-        view.NewMouseEvent (me);
-        Assert.Equal (1, activatingCount);
-
-        view.Dispose ();
-
-        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.MouseGrabView to be set
-        Application.ResetState (true);
-    }
-
     [Theory]
     [InlineData (MouseFlags.LeftButtonPressed, MouseFlags.LeftButtonReleased)]
     [InlineData (MouseFlags.MiddleButtonPressed, MouseFlags.MiddleButtonReleased)]

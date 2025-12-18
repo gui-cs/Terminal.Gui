@@ -55,7 +55,7 @@ public interface IMouse : IMouseGrabHandler
     ///     INTERNAL API: Called when a mouse event is raised by the driver. Determines the view under the mouse and
     ///     calls the appropriate View mouse event handlers.
     /// </summary>
-    /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
+    /// <remarks>Can be used to simulate mouse events without a driver. Use <see cref="InputInjector"/> for input injection.</remarks>
     /// <param name="mouse">The mouse event with coordinates relative to the screen.</param>
     void RaiseMouseEvent (Mouse mouse);
 

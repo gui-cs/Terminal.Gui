@@ -114,7 +114,7 @@ public class SixelSupportDetectorTests
                                            new AnsiInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,
-                                           new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                           new AnsiRequestScheduler (new AnsiResponseParser (new SystemTimeProvider ())),
                                            new SizeMonitorImpl (output)
                                           );
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
@@ -182,7 +182,7 @@ public class SixelSupportDetectorTests
                                            new AnsiInputProcessor (null!),
                                            new OutputBufferImpl (),
                                            output,
-                                           new AnsiRequestScheduler (new AnsiResponseParser ()),
+                                           new AnsiRequestScheduler (new AnsiResponseParser (new SystemTimeProvider ())),
                                            new SizeMonitorImpl (output)
                                           );
 

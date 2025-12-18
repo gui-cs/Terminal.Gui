@@ -1,6 +1,6 @@
 # Application Architecture
 
-Terminal.Gui v2 uses an instance-based application architecture with the **IRunnable** interface pattern that decouples views from the global application state, improving testability, enabling multiple application contexts, and providing type-safe result handling.
+Terminal.Gui v2 uses an instance-based application architecture that decouples views from the global application state, enabling multiple application contexts, providing type-safe result handling, enabling testability.
 
 ## Key Features
 
@@ -142,8 +142,6 @@ public class View
 
 ### Accessing Application from Views
 
-**Recommended pattern:**
-
 ```csharp
 public class MyView : View
 {
@@ -158,26 +156,6 @@ public class MyView : View
         {
             // Work with sessions
         }
-    }
-}
-```
-
-**Alternative - dependency injection:**
-
-```csharp
-public class MyView : View
-{
-    private readonly IApplication _app;
-    
-    public MyView (IApplication app)
-    {
-        _app = app;
-        // Completely decoupled from obsolete static Application
-    }
-    
-    public void DoWork ()
-    {
-        _app.TopRunnable?.SetNeedsDraw ();
     }
 }
 ```
@@ -256,6 +234,8 @@ using (IApplication app = Application.Create ().Init ())
     dialog.Dispose ();  // Caller must dispose
 }
 ```
+
+**NOTE**: The semantics of `view.Add (subView)` is such that ownership of the `subView` is controlled by `view` unless `view.Remove (subView)` is explicitly called.
 
 ### Creating Runnable Views
 
@@ -926,21 +906,6 @@ public void Refresh ()
 public void Refresh ()
 {
     App?.TopRunnableView?.SetNeedsDraw ();
-}
-```
-
-### DO: Override GetApp() for Custom Resolution
-
-```csharp
-// ✅ GOOD - Custom application resolution:
-public class SpecialView : View
-{
-    private IApplication? _customApp;
-    
-    public override IApplication? GetApp ()
-    {
-        return _customApp ?? base.GetApp ();
-    }
 }
 ```
 

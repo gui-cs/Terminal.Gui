@@ -3,15 +3,15 @@ using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests;
 
-public class NavigationTests (ITestOutputHelper outputHelper)
+public class NavigationTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
     private readonly TextWriter? _out = new TestOutputWriter (outputHelper);
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Runnable_TabGroup_Forward_Backward (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Runnable_TabGroup_Forward_Backward (string d)
     {
         var v1 = new View { Id = "v1", CanFocus = true };
         var v2 = new View { Id = "v2", CanFocus = true };
@@ -20,7 +20,7 @@ public class NavigationTests (ITestOutputHelper outputHelper)
         var v5 = new View { Id = "v5", CanFocus = true };
         var v6 = new View { Id = "v6", CanFocus = true };
 
-        using GuiTestContext c = With.A<Window> (50, 20, d, _out)
+        using TestContext c = With.A<Window> (50, 20, d,  _out)
                                      .Then ((app) =>
                                             {
                                                 var w1 = new Window { Id = "w1" };
@@ -33,41 +33,41 @@ public class NavigationTests (ITestOutputHelper outputHelper)
                                                 app?.TopRunnableView!.Add (w1, w2, w3);
                                             })
                                      .AssertTrue (v5.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v3.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v1.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v3.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v5.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v3.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v1.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v3.HasFocus)
-                                     .InjectKeyEvent (Key.Tab)
+                                     .KeyDown (Key.Tab)
                                      .AssertTrue (v4.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v5.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v1.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v5.HasFocus)
-                                     .InjectKeyEvent (Key.Tab)
+                                     .KeyDown (Key.Tab)
                                      .AssertTrue (v6.HasFocus)
-                                     .InjectKeyEvent (Key.F6.WithShift)
+                                     .KeyDown (Key.F6.WithShift)
                                      .AssertTrue (v4.HasFocus)
-                                     .InjectKeyEvent (Key.F6)
+                                     .KeyDown (Key.F6)
                                      .AssertTrue (v6.HasFocus);
         Assert.False (v1.HasFocus);
         Assert.False (v2.HasFocus);

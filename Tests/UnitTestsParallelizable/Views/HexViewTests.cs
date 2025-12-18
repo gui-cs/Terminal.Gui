@@ -4,7 +4,7 @@ using UnitTests;
 
 namespace ViewsTests;
 
-public class HexViewTests : FakeDriverBase
+public class HexViewTests : TestDriverBase
 {
     [Theory]
     [InlineData (0, 4)]

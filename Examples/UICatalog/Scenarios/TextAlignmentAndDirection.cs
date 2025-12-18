@@ -443,7 +443,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        app.KeyUp += (s, m) =>
+        app.KeyDown += (s, m) =>
                      {
                          foreach (View v in singleLineLabels)
                          {

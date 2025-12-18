@@ -129,7 +129,7 @@ public class ContextMenus : Scenario
                                    {
                                        Title = "_Configuration...",
                                        HelpText = "Show configuration",
-                                       Action = () => MessageBox.Query (app,
+                                       Action = () => MessageBox.Query (app!,
                                                                         50,
                                                                         10,
                                                                         "Configuration",
@@ -147,7 +147,7 @@ public class ContextMenus : Scenario
                                                               Title = "_Setup...",
                                                               HelpText = "Perform setup",
                                                               Action = () => MessageBox
-                                                                           .Query (app,
+                                                                           .Query (app!,
                                                                                    50,
                                                                                    10,
                                                                                    "Setup",
@@ -161,7 +161,7 @@ public class ContextMenus : Scenario
                                                               Title = "_Maintenance...",
                                                               HelpText = "Maintenance mode",
                                                               Action = () => MessageBox
-                                                                           .Query (app,
+                                                                           .Query (app!,
                                                                                    50,
                                                                                    10,
                                                                                    "Maintenance",

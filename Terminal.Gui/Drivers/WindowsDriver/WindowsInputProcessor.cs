@@ -12,7 +12,10 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     private readonly bool [] _lastWasPressed = new bool [4];
 
     /// <inheritdoc/>
-    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ())
+    /// <param name="inputBuffer">The input buffer to process.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer, ITimeProvider? timeProvider = null)
+        : base (inputBuffer, new WindowsKeyConverter (), timeProvider)
     {
     }
 
@@ -33,8 +36,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         {
             case WindowsConsole.EventType.Key:
 
-                // TODO: v1 supported distinct key up/down events on Windows.
-                // TODO: For now ignore keyup because ANSI comes in as down+up which is confusing to try and parse/pair these things up
+                // Ignore keyup because TG v2 does not support keyup events
                 if (!inputEvent.KeyEvent.bKeyDown)
                 {
                     return;

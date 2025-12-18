@@ -36,7 +36,7 @@ public class OutputBaseTests
                                          new AnsiInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,
-                                         new (new AnsiResponseParser ()),
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
                                          new SizeMonitorImpl (output));
 
         // Set Force16Colors on the driver (which propagates to output)
@@ -255,7 +255,7 @@ public class OutputBaseTests
                                          new AnsiInputProcessor (null!),
                                          new OutputBufferImpl (),
                                          output,
-                                         new (new AnsiResponseParser ()),
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
                                          new SizeMonitorImpl (output));
 
         // Add the Sixel to the driver

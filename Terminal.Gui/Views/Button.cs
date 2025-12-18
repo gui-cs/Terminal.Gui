@@ -90,9 +90,6 @@ public class Button : View, IDesignable
     /// <inheritdoc/>
     protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<bool> args)
     {
-        // Don't call base - doWork handler in property setter has already updated base Accept bindings
-        // We need to override those with HotKey bindings for Button
-
         if (args.NewValue)
         {
             // MouseHoldRepeat enabled: Remove ALL Click/Release bindings, add only Released→HotKey

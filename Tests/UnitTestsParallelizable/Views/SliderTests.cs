@@ -3,7 +3,7 @@ using UnitTests;
 
 namespace ViewsTests;
 
-public class SliderOptionTests : FakeDriverBase
+public class SliderOptionTests : TestDriverBase
 {
     [Fact]
     public void OnChanged_Should_Raise_ChangedEvent ()
@@ -95,7 +95,7 @@ public class SliderOptionTests : FakeDriverBase
     }
 }
 
-public class SliderEventArgsTests : FakeDriverBase
+public class SliderEventArgsTests : TestDriverBase
 {
     [Fact]
     public void Constructor_Sets_Cancel_Default_To_False ()
@@ -139,7 +139,7 @@ public class SliderEventArgsTests : FakeDriverBase
     }
 }
 
-public class SliderTests : FakeDriverBase
+public class SliderTests : TestDriverBase
 {
     [Fact]
     public void Constructor_Default ()

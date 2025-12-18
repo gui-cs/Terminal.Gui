@@ -9,139 +9,116 @@ public class MouseTester : Scenario
     public override void Main ()
     {
         Application.Init ();
+        // Prepping for modern app model
+        IApplication app = Application.Instance;
 
-        Window win = new ()
+        Runnable runnable = new ()
         {
-            Id = "win",
-            Title = GetQuitKeyAndName ()
+            Id = "runnable",
         };
 
-        Slider<MouseFlags> filterSlider = new ()
+        MenuBar menuBar = new MenuBar ();
+        menuBar.Add (new MenuBarItem ("_File", [new MenuItem { Title = "_Quit", Action = () => app.RequestStop () }]));
+
+        FlagSelector<DemoMouseFlags> mouseFlagsFilter = new ()
         {
-            Title = "_Filter",
-            X = 0,
-            Y = 0,
-            BorderStyle = LineStyle.Single,
-            Type = SliderType.Multiple,
-            Orientation = Orientation.Vertical,
-            UseMinimumSize = true,
-            MinimumInnerSpacing = 0
+            AssignHotKeys = true,
+            Value = (DemoMouseFlags.All & ~DemoMouseFlags.PositionReport),
         };
 
-        filterSlider.Options = Enum.GetValues (typeof (MouseFlags))
-                                   .Cast<MouseFlags> ()
-                                   .Where (value => !value.ToString ().Contains ("None") && !value.ToString ().Contains ("All"))
-                                   .Select (
-                                            value => new SliderOption<MouseFlags>
-                                            {
-                                                Legend = value.ToString (),
-                                                Data = value
-                                            })
-                                   .ToList ();
-
-        for (var i = 0; i < filterSlider.Options.Count; i++)
-        {
-            if (filterSlider.Options [i].Data != MouseFlags.PositionReport)
-            {
-                filterSlider.SetOption (i);
-            }
-        }
-
-        win.Add (filterSlider);
-
-        var clearButton = new Button
-        {
-            Title = "_Clear Logs",
-            X = 1,
-            Y = Pos.Bottom (filterSlider) + 1
-        };
-        win.Add (clearButton);
+        menuBar.Add (
+                     new MenuBarItem (
+                                      "_Filter",
+                                      [
+                                          new MenuItem
+                                          {
+                                              CommandView = mouseFlagsFilter
+                                          },
+                                      ]
+                                     ),
+                     new MenuBarItem (runnable, Command.DeleteAll, "_Clear Logs")
+                    );
+        runnable.Add (menuBar);
 
         View lastDriverEvent = new ()
         {
             Height = 1,
             Width = Dim.Auto (),
-            X = Pos.Right (filterSlider),
-            Y = 0,
+            Y = Pos.Bottom (menuBar),
             Text = "Last Driver Event: "
         };
 
-        win.Add (lastDriverEvent);
+        runnable.Add (lastDriverEvent);
 
         View lastAppEvent = new ()
         {
             Height = 1,
             Width = Dim.Auto (),
-            X = Pos.Right (filterSlider),
             Y = Pos.Bottom (lastDriverEvent),
             Text = "Last App Event: "
         };
 
-        win.Add (lastAppEvent);
+        runnable.Add (lastAppEvent);
 
-        View lastWinEvent = new ()
+        View lastViewEvent = new ()
         {
             Height = 1,
             Width = Dim.Auto (),
-            X = Pos.Right (filterSlider),
             Y = Pos.Bottom (lastAppEvent),
-            Text = "Last Win Event: "
+            Text = "Last View Event: "
         };
 
-        win.Add (lastWinEvent);
+        runnable.Add (lastViewEvent);
 
-        CheckBox cbWantContinuousPresses = new ()
+        CheckBox cbRepeatOnHold = new ()
         {
-            X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (lastWinEvent),
-            Title = "_Want Continuous Button Pressed"
+            Y = Pos.Bottom (lastViewEvent),
+            Title = "_Repeat On Hold"
         };
 
-        win.Add (cbWantContinuousPresses);
+        runnable.Add (cbRepeatOnHold);
 
         CheckBox cbHighlightOnPressed = new ()
         {
-            X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (cbWantContinuousPresses),
+            Y = Pos.Bottom (cbRepeatOnHold),
             Title = "_Highlight on Pressed"
         };
 
-        win.Add (cbHighlightOnPressed);
+        runnable.Add (cbHighlightOnPressed);
 
         CheckBox cbHighlightOnPressedOutside = new ()
         {
-            X = Pos.Right (filterSlider),
             Y = Pos.Bottom (cbHighlightOnPressed),
             Title = "_Highlight on PressedOutside"
         };
 
-        win.Add (cbHighlightOnPressedOutside);
+        runnable.Add (cbHighlightOnPressedOutside);
 
         var demo = new MouseEventDemoView
         {
             Id = "demo",
-            X = Pos.Right (filterSlider),
             Y = Pos.Bottom (cbHighlightOnPressedOutside),
             Width = Dim.Fill (),
             Height = 15,
             Title = "Enter/Leave Demo"
         };
 
+        MouseEventDemoView demoInPadding = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Func (_ => demo.Padding.Thickness.Top),
+            Title = "inPadding",
+            Id = "inPadding",
+        };
+        demo.Padding!.Add (demoInPadding);
+
         demo.Padding!.Initialized += DemoPaddingOnInitialized;
 
         void DemoPaddingOnInitialized (object o, EventArgs eventArgs)
         {
-            demo.Padding!.Add (
-                               new MouseEventDemoView
-                               {
-                                   X = 0,
-                                   Y = 0,
-                                   Width = Dim.Fill (),
-                                   Height = Dim.Func (_ => demo.Padding.Thickness.Top),
-                                   Title = "inPadding",
-                                   Id = "inPadding"
-                               });
-            demo.Padding.Thickness = demo.Padding.Thickness with { Top = 5 };
+            demo.Padding!.Thickness = demo.Padding.Thickness with { Top = 5 };
         }
 
         View sub1 = new MouseEventDemoView
@@ -167,7 +144,7 @@ public class MouseTester : Scenario
 
         demo.Add (sub2);
 
-        win.Add (demo);
+        runnable.Add (demo);
 
         cbHighlightOnPressed.CheckedState = demo.MouseHighlightStates.HasFlag (MouseState.Pressed) ? CheckState.Checked : CheckState.UnChecked;
 
@@ -245,7 +222,7 @@ public class MouseTester : Scenario
                                                                 }
                                                             };
 
-        cbWantContinuousPresses.CheckedStateChanging += (_, _) =>
+        cbRepeatOnHold.CheckedStateChanging += (_, _) =>
                                                         {
                                                             demo.MouseHoldRepeat = !demo.MouseHoldRepeat;
 
@@ -263,7 +240,7 @@ public class MouseTester : Scenario
         var label = new Label
         {
             Text = "Dri_ver Events:",
-            X = Pos.Right (filterSlider),
+            //X = Pos.Right (filterSlider),
             Y = Pos.Bottom (demo)
         };
 
@@ -273,18 +250,21 @@ public class MouseTester : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (20)),
             Height = Dim.Fill (),
-            SchemeName = "Runnable",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
             Source = new ListWrapper<string> (driverLogList)
         };
-        win.Add (label, driverLog);
+        runnable.Add (label, driverLog);
 
-        Application.Driver.GetInputProcessor ().MouseEventParsed += (_, mouse) =>
+        app.Driver!.GetInputProcessor ().MouseEventParsed += (_, mouse) =>
                                   {
-                                      int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
+                                      if (!mouseFlagsFilter.Value.HasValue)
+                                      {
+                                          return;
+                                      }
 
-                                      if (filterSlider.GetSetOptions ().Contains (i))
+                                      if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                       {
                                           lastDriverEvent.Text = $"Last Driver Event: {mouse}";
                                           Logging.Trace (lastDriverEvent.Text);
@@ -301,22 +281,25 @@ public class MouseTester : Scenario
 
         ObservableCollection<string> appLogList = new ();
 
-        var appLog = new ListView
+        ListView appLog = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (20)),
             Height = Dim.Fill (),
-            SchemeName = "Runnable",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
             Source = new ListWrapper<string> (appLogList)
         };
-        win.Add (label, appLog);
+        runnable.Add (label, appLog);
 
         Application.MouseEvent += (_, mouse) =>
                                   {
-                                      int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
+                                      if (!mouseFlagsFilter.Value.HasValue)
+                                      {
+                                          return;
+                                      }
 
-                                      if (filterSlider.GetSetOptions ().Contains (i))
+                                      if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                       {
                                           lastAppEvent.Text = $"   Last App Event: {mouse}";
                                           appLogList.Add ($"{mouse.Position}:{mouse.Flags}");
@@ -326,48 +309,158 @@ public class MouseTester : Scenario
 
         label = new ()
         {
-            Text = "_Window Events:",
+            Text = "_View Events:",
             X = Pos.Right (appLog) + 1,
             Y = Pos.Top (label)
         };
-        ObservableCollection<string> winLogList = [];
+        ObservableCollection<string> viewLogList = [];
 
-        var winLog = new ListView
+        ListView viewLog = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (20)),
             Height = Dim.Fill (),
-            SchemeName = "Runnable",
-            Source = new ListWrapper<string> (winLogList)
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
+            Source = new ListWrapper<string> (viewLogList)
         };
-        win.Add (label, winLog);
+        runnable.Add (label, viewLog);
 
-        clearButton.Accepting += (_, _) =>
-                                 {
-                                     driverLogList.Clear ();
-                                     driverLog.SetSource (driverLogList);
-                                     appLogList.Clear ();
-                                     appLog.SetSource (appLogList);
-                                     winLogList.Clear ();
-                                     winLog.SetSource (winLogList);
-                                 };
 
-        win.MouseEvent += (_, mouse) =>
+        demo.MouseEvent += (_, mouse) =>
                           {
-                              int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
-
-                              if (filterSlider.GetSetOptions ().Contains (i))
+                              if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                               {
-                                  lastWinEvent.Text = $"   Last Win Event: {mouse}";
-                                  winLogList.Add ($"{mouse.Position}:{mouse.Flags}");
-                                  winLog.MoveEnd ();
+                                  lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                  viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                                  viewLog.MoveEnd ();
                               }
                           };
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        demoInPadding.MouseEvent += (_, mouse) =>
+                                    {
+                                        if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                                        {
+                                            lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                            viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                                            viewLog.MoveEnd ();
+                                        }
+                                    };
+
+        sub1.MouseEvent += (_, mouse) =>
+                           {
+                               if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                               {
+                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                   viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                                   viewLog.MoveEnd ();
+                               }
+                           };
+
+        sub2.MouseEvent += (_, mouse) =>
+                           {
+                               if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                               {
+                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                   viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                                   viewLog.MoveEnd ();
+                               }
+                           };
+        label = new ()
+        {
+            Text = "_Commands:",
+            X = Pos.Right (viewLog) + 1,
+            Y = Pos.Top (label)
+        };
+        ObservableCollection<string> commandLogList = [];
+
+        var commandLog = new ListView
+        {
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (15)),
+            Height = Dim.Fill (),
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base),
+            Source = new ListWrapper<string> (commandLogList)
+        };
+        runnable.Add (label, commandLog);
+
+        demo.Activating += (_, args) =>
+                         {
+                             commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                             commandLog.MoveEnd ();
+                             args.Handled = true;
+                         };
+
+        demo.Accepting += (_, args) =>
+                          {
+                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLog.MoveEnd ();
+                              args.Handled = true;
+                          };
+
+        demoInPadding.Activating += (_, args) =>
+                                    {
+                                        commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                        commandLog.MoveEnd ();
+                                        args.Handled = true;
+                                    };
+
+        demoInPadding.Accepting += (_, args) =>
+                                   {
+                                       commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                                       commandLog.MoveEnd ();
+                                       args.Handled = true;
+                                   };
+
+        sub1.Activating += (_, args) =>
+                           {
+                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLog.MoveEnd ();
+                               args.Handled = true;
+                           };
+
+        sub1.Accepting += (_, args) =>
+                          {
+                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLog.MoveEnd ();
+                              args.Handled = true;
+                          };
+
+        sub2.Activating += (_, args) =>
+                           {
+                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                               commandLog.MoveEnd ();
+                               args.Handled = true;
+                           };
+
+        sub2.Accepting += (_, args) =>
+                          {
+                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
+                              commandLog.MoveEnd ();
+                              args.Handled = true;
+                          };
+
+
+        runnable.CommandNotBound += (_, args) =>
+                                    {
+                                        if (args.Context!.Command == Command.DeleteAll)
+                                        {
+                                            driverLogList.Clear ();
+                                            driverLog.SetSource (driverLogList);
+                                            appLogList.Clear ();
+                                            appLog.SetSource (appLogList);
+                                            viewLogList.Clear ();
+                                            viewLog.SetSource (viewLogList);
+                                            commandLogList.Clear ();
+                                            commandLog.SetSource (commandLogList);
+                                            args.Handled = true;
+                                        }
+                                    };
+
+        app.Run (runnable);
+        runnable.Dispose ();
+        app.Dispose();
     }
 
     public class MouseEventDemoView : View
@@ -377,40 +470,42 @@ public class MouseTester : Scenario
             CanFocus = true;
             Id = "mouseEventDemoView";
 
-            Initialized += OnInitialized;
-
             MouseLeave += (_, _) => { Text = "Leave"; };
             MouseEnter += (_, _) => { Text = "Enter"; };
+        }
 
-            return;
+        /// <inheritdoc />
+        public override void EndInit ()
+        {
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
 
-            void OnInitialized (object sender, EventArgs e)
+            TextAlignment = Alignment.Center;
+            VerticalTextAlignment = Alignment.Center;
+
+            Padding!.Thickness = new (1, 1, 1, 1);
+            Padding!.SetScheme (new (new Attribute (Color.DarkGray)));
+            Padding.Id = $"{Id}.Padding";
+
+            Border!.Thickness = new (1);
+            Border.LineStyle = LineStyle.Rounded;
+            Border.Id = $"{Id}.Border";
+            base.EndInit ();
+        }
+
+        /// <inheritdoc />
+        protected override void OnMouseStateChanged (EventArgs<MouseState> args)
+        {
+            base.OnMouseStateChanged (args);
+            if (args.Value.HasFlag (MouseState.PressedOutside))
             {
-                TextAlignment = Alignment.Center;
-                VerticalTextAlignment = Alignment.Center;
-
-                Padding!.Thickness = new (1, 1, 1, 1);
-                Padding!.SetScheme (new (new Attribute (Color.Black)));
-                Padding.Id = $"{Id}.Padding";
-
-                Border!.Thickness = new (1);
-                Border.LineStyle = LineStyle.Rounded;
-                Border.Id = $"{Id}.Border";
-
-                MouseStateChanged += (_, args) =>
-                                     {
-                                         if (args.Value.HasFlag (MouseState.PressedOutside))
-                                         {
-                                             Border.LineStyle = LineStyle.Dotted;
-                                         }
-                                         else
-                                         {
-                                             Border.LineStyle = LineStyle.Single;
-                                         }
-
-                                         SetNeedsDraw ();
-                                     };
+                Border!.LineStyle = LineStyle.Dotted;
             }
+            else
+            {
+                Border!.LineStyle = LineStyle.Single;
+            }
+
+            SetNeedsDraw ();
         }
 
         /// <inheritdoc/>
@@ -429,4 +524,92 @@ public class MouseTester : Scenario
             return base.OnGettingAttributeForRole (in role, ref currentAttribute);
         }
     }
+}
+
+// All the MouseFlags we can set for filtering
+[Flags]
+internal enum DemoMouseFlags
+{
+    /// <summary>
+    ///     No mouse event. This is the default value for <see cref="Mouse.Flags"/> when no mouse event is being
+    ///     reported.
+    /// </summary>
+    None = 0,
+
+    /// <summary>The first mouse button was pressed.</summary>
+    LeftButtonPressed = 0x2,
+
+    /// <summary>The first mouse button was released.</summary>
+    LeftButtonReleased = 0x1,
+
+    /// <summary>The first mouse button was clicked (press+release).</summary>
+    LeftButtonClicked = 0x4,
+
+    /// <summary>The first mouse button was double-clicked.</summary>
+    LeftButtonDoubleClicked = 0x8,
+
+    /// <summary>The first mouse button was triple-clicked.</summary>
+    LeftButtonTripleClicked = 0x10,
+
+    /// <summary>The second mouse button was pressed.</summary>
+    MiddleButtonPressed = 0x80,
+
+    /// <summary>The second mouse button was released.</summary>
+    MiddleButtonReleased = 0x40,
+
+    /// <summary>The second mouse button was clicked (press+release).</summary>
+    MiddleButtonClicked = 0x100,
+
+    /// <summary>The second mouse button was double-clicked.</summary>
+    MiddleButtonDoubleClicked = 0x200,
+
+    /// <summary>The second mouse button was triple-clicked.</summary>
+    MiddleButtonTripleClicked = 0x400,
+
+    /// <summary>The third mouse button was pressed.</summary>
+    RightButtonPressed = 0x2000,
+
+    /// <summary>The third mouse button was released.</summary>
+    RightButtonReleased = 0x1000,
+
+    /// <summary>The third mouse button was clicked (press+release).</summary>
+    RightButtonClicked = 0x4000,
+
+    /// <summary>The third mouse button was double-clicked.</summary>
+    RightButtonDoubleClicked = 0x8000,
+
+    /// <summary>The third mouse button was triple-clicked.</summary>
+    RightButtonTripleClicked = 0x10000,
+
+    /// <summary>The fourth mouse button was pressed.</summary>
+    Button4Pressed = 0x80000,
+
+    /// <summary>The fourth mouse button was released.</summary>
+    Button4Released = 0x40000,
+
+    /// <summary>The fourth mouse button was clicked.</summary>
+    Button4Clicked = 0x100000,
+
+    /// <summary>The fourth mouse button was double-clicked.</summary>
+    Button4DoubleClicked = 0x200000,
+
+    /// <summary>The fourth mouse button was triple-clicked.</summary>
+    Button4TripleClicked = 0x400000,
+
+    /// <summary>The mouse position is being reported in this event.</summary>
+    PositionReport = 0x8000000,
+
+    /// <summary>Vertical button wheeled up.</summary>
+    WheeledUp = 0x10000000,
+
+    /// <summary>Vertical button wheeled down.</summary>
+    WheeledDown = 0x20000000,
+
+    /// <summary>Vertical button wheeled up while pressing Ctrl.</summary>
+    WheeledLeft = 0x1000000 | WheeledUp,
+
+    /// <summary>Vertical button wheeled down while pressing Ctrl.</summary>
+    WheeledRight = 0x1000000 | WheeledDown,
+
+    All = (-1)
 }

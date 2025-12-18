@@ -8,7 +8,10 @@ namespace Terminal.Gui.Drivers;
 internal class UnixInputProcessor : InputProcessorImpl<char>
 {
     /// <inheritdoc />
-    public UnixInputProcessor (ConcurrentQueue<char> inputBuffer) : base (inputBuffer, new AnsiKeyConverter ())
+    /// <param name="inputBuffer">The input buffer to process.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    public UnixInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null)
+        : base (inputBuffer, new AnsiKeyConverter (), timeProvider)
     {
     }
 

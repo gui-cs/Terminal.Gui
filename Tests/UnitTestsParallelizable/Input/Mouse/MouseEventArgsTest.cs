@@ -1,4 +1,4 @@
-﻿namespace InputTests;
+﻿namespace InputTests.MouseTests;
 
 public class MouseEventArgsTests
 {

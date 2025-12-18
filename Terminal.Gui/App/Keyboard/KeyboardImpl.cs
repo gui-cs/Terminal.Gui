@@ -145,9 +145,6 @@ internal class KeyboardImpl : IKeyboard, IDisposable
     public event EventHandler<Key>? KeyDown;
 
     /// <inheritdoc/>
-    public event EventHandler<Key>? KeyUp;
-
-    /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
         // TODO: Add a way to ignore certain keys, esp for debugging.
@@ -176,7 +173,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
         {
             if (App?.SessionStack is { })
             {
-                foreach (IRunnable? runnable in App.SessionStack.Select(r => r.Runnable))
+                foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
                 {
                     if (runnable is View view && view.NewKeyDownEvent (key))
                     {
@@ -207,43 +204,7 @@ internal class KeyboardImpl : IKeyboard, IDisposable
 
         return false;
     }
-
-    /// <inheritdoc/>
-    public bool RaiseKeyUpEvent (Key key)
-    {
-        if (App?.Initialized != true)
-        {
-            return true;
-        }
-
-        KeyUp?.Invoke (this, key);
-
-        if (key.Handled)
-        {
-            return true;
-        }
-
-        // TODO: Add Popover support
-
-        if (App?.SessionStack is { })
-        {
-            foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
-            {
-                if (runnable is View view && view.NewKeyUpEvent (key))
-                {
-                    return true;
-                }
-
-                if (runnable!.IsModal)
-                {
-                    break;
-                }
-            }
-        }
-
-        return false;
-    }
-
+    
     /// <inheritdoc/>
     public bool? InvokeCommandsBoundToKey (Key key)
     {

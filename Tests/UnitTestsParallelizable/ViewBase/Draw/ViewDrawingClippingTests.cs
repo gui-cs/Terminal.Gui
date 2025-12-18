@@ -4,14 +4,14 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Drawing;
 
-public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBase
+public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBase
 {
     #region GetClip / SetClip Tests
 
     [Fact]
     public void GetClip_ReturnsDriverClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var region = new Region (new (10, 10, 20, 20));
         driver.Clip = region;
         View view = new () { Driver = driver };
@@ -25,7 +25,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void SetClip_NullRegion_DoesNothing ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var original = new Region (new (5, 5, 10, 10));
         driver.Clip = original;
 
@@ -39,7 +39,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void SetClip_ValidRegion_SetsDriverClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var region = new Region (new (10, 10, 30, 30));
         View view = new () { Driver = driver };
 
@@ -55,7 +55,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void SetClipToScreen_ReturnsPreviousClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var original = new Region (new (5, 5, 10, 10));
         driver.Clip = original;
         View view = new () { Driver = driver };
@@ -69,7 +69,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void SetClipToScreen_SetsClipToScreen ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         View view = new () { Driver = driver };
 
         view.SetClipToScreen ();
@@ -93,7 +93,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void ExcludeFromClip_Rectangle_ExcludesArea ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (new (0, 0, 80, 25));
         View view = new () { Driver = driver };
 
@@ -117,7 +117,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void ExcludeFromClip_Region_ExcludesArea ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (new (0, 0, 80, 25));
         View view = new () { Driver = driver };
 
@@ -148,7 +148,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void AddFrameToClip_IntersectsWithFrame ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -192,7 +192,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void AddViewportToClip_IntersectsWithViewport ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -220,7 +220,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void AddViewportToClip_WithClipContentOnly_LimitsToVisibleContent ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -257,7 +257,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void ClipRegions_StackCorrectly_WithNestedViews ()
     {
-        IDriver driver = CreateFakeDriver (100, 100);
+        IDriver driver = CreateTestDriver (100, 100);
         driver.Clip = new (driver.Screen);
 
         var superView = new View
@@ -301,7 +301,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void ClipRegions_RespectPreviousClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var initialClip = new Region (new (20, 20, 40, 40));
         driver.Clip = initialClip;
 
@@ -339,7 +339,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void AddFrameToClip_EmptyFrame_WorksCorrectly ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -363,7 +363,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void AddViewportToClip_EmptyViewport_WorksCorrectly ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -390,7 +390,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void ClipRegions_OutOfBounds_HandledCorrectly ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -420,7 +420,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Clip_Set_BeforeDraw_ClipsDrawing ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var clip = new Region (new (10, 10, 10, 10));
         driver.Clip = clip;
 
@@ -445,7 +445,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_UpdatesDriverClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -471,7 +471,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_WithSubViews_ClipsCorrectly ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var superView = new View
@@ -630,7 +630,11 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
                                               output,
                                               driver);
 
-
+        // After a full redraw, all cells should be clean
+        foreach (Cell cell in driver.Contents!)
+        {
+            Assert.False (cell.IsDirty);
+        }
     }
 
     [Fact]
@@ -766,7 +770,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_NonVisibleView_DoesNotUpdateClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var originalClip = new Region (driver.Screen);
         driver.Clip = originalClip.Clone ();
 
@@ -791,7 +795,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void ExcludeFromClip_ExcludesRegion ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -816,7 +820,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void ExcludeFromClip_WithNullClip_DoesNotThrow ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = null!;
 
         var view = new View
@@ -840,7 +844,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void SetClip_SetsDriverClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var view = new View
         {
@@ -860,7 +864,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact (Skip = "See BUGBUG in SetClip")]
     public void SetClip_WithNullClip_ClearsClip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (new (10, 10, 20, 20));
 
         var view = new View
@@ -880,7 +884,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_Excludes_View_From_Clip ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         var originalClip = new Region (driver.Screen);
         driver.Clip = originalClip.Clone ();
 
@@ -908,7 +912,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_EmptyViewport_DoesNotCrash ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -933,7 +937,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_VeryLargeView_HandlesClippingCorrectly ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -956,7 +960,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_NegativeCoordinates_HandlesClippingCorrectly ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View
@@ -979,7 +983,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : FakeDriverBas
     [Fact]
     public void Draw_OutOfScreenBounds_HandlesClippingCorrectly ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         var view = new View

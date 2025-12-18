@@ -12,7 +12,7 @@ public static partial class Application // Keyboard handling
     }
 
     /// <inheritdoc cref="IKeyboard.RaiseKeyDownEvent"/>
-    [Obsolete ("The legacy static Application object is going away.")] 
+    [Obsolete ("The legacy static Application object is going away.")]
     public static bool RaiseKeyDownEvent (Key key) => ApplicationImpl.Instance.Keyboard.RaiseKeyDownEvent (key);
 
     /// <summary>
@@ -22,11 +22,6 @@ public static partial class Application // Keyboard handling
     ///         additional processing.
     ///     </para>
     /// </summary>
-    /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Unix) do not support firing the
-    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-    ///     <para>Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.</para>
-    /// </remarks>
     [Obsolete ("The legacy static Application object is going away.")]
     public static event EventHandler<Key>? KeyDown
     {

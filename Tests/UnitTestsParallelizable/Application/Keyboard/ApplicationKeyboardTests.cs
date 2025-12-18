@@ -1,10 +1,8 @@
-﻿using UnitTests;
-
-namespace ApplicationTests.Keyboard;
+﻿namespace ApplicationTests.Keyboard;
 
 /// <summary>
 ///     Tests for <see cref="IApplication.Keyboard"/> proving the integration between
-///     <see cref="IDriver.InjectKeyEvent"/> and <see cref="IKeyboard.RaiseKeyDownEvent"/>.
+///     input injection and <see cref="IKeyboard.RaiseKeyDownEvent"/>.
 /// </summary>
 [Trait ("Category", "Keyboard")]
 public class ApplicationKeyboardTests
@@ -18,7 +16,7 @@ public class ApplicationKeyboardTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var keyDownRaised = false;
+        bool keyDownRaised = false;
         Key? receivedKey = null;
 
         app.Keyboard.KeyDown += (s, e) =>
@@ -28,7 +26,7 @@ public class ApplicationKeyboardTests
                                 };
 
         // Act
-        app.InjectAndProcessKey (Key.A);
+        app.InjectKey (Key.A);
 
         // Assert
         Assert.True (keyDownRaised, "Keyboard.KeyDown event should have been raised");
@@ -42,7 +40,7 @@ public class ApplicationKeyboardTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var keyDownRaised = false;
+        bool keyDownRaised = false;
         Key? receivedKey = null;
 
         app.Keyboard.KeyDown += (s, e) =>
@@ -54,7 +52,7 @@ public class ApplicationKeyboardTests
         Key testKey = Key.A.WithCtrl;
 
         // Act
-        app.InjectAndProcessKey (testKey);
+        app.InjectKey (testKey);
 
         // Assert
         Assert.True (keyDownRaised);
@@ -78,13 +76,13 @@ public class ApplicationKeyboardTests
         // Act
         foreach (Key key in keysToInject)
         {
-            app.InjectAndProcessKey (key);
+            app.InjectKey (key);
         }
 
         // Assert
         Assert.Equal (keysToInject.Length, receivedKeys.Count);
 
-        for (var i = 0; i < keysToInject.Length; i++)
+        for (int i = 0; i < keysToInject.Length; i++)
         {
             Assert.Equal (keysToInject [i], receivedKeys [i]);
         }
@@ -109,13 +107,13 @@ public class ApplicationKeyboardTests
         // Act
         foreach (Key key in specialKeys)
         {
-            app.InjectAndProcessKey (key);
+            app.InjectKey (key);
         }
 
         // Assert
         Assert.Equal (specialKeys.Length, receivedKeys.Count);
 
-        for (var i = 0; i < specialKeys.Length; i++)
+        for (int i = 0; i < specialKeys.Length; i++)
         {
             Assert.Equal (specialKeys [i], receivedKeys [i]);
         }
@@ -140,13 +138,13 @@ public class ApplicationKeyboardTests
         // Act
         foreach (Key key in shiftedFunctionKeys)
         {
-            app.InjectAndProcessKey (key);
+            app.InjectKey (key);
         }
 
         // Assert
         Assert.Equal (shiftedFunctionKeys.Length, receivedKeys.Count);
 
-        for (var i = 0; i < shiftedFunctionKeys.Length; i++)
+        for (int i = 0; i < shiftedFunctionKeys.Length; i++)
         {
             Assert.Equal (shiftedFunctionKeys [i], receivedKeys [i]);
             Assert.True (receivedKeys [i].IsShift, $"Key {receivedKeys [i]} should have Shift modifier");
@@ -171,7 +169,7 @@ public class ApplicationKeyboardTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var keyDownRaised = false;
+        bool keyDownRaised = false;
         Key? receivedKey = null;
         Key expectedKey = new (keyCode);
 
@@ -182,7 +180,7 @@ public class ApplicationKeyboardTests
                                 };
 
         // Act
-        app.InjectAndProcessKey (expectedKey);
+        app.InjectKey (expectedKey);
 
         // Assert
         Assert.True (keyDownRaised, $"Keyboard.KeyDown should be raised for {keyCode}");
@@ -200,10 +198,10 @@ public class ApplicationKeyboardTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var keyReceived = false;
+        bool keyReceived = false;
         Key? receivedKey = null;
 
-        var view = new View { CanFocus = true, App = app };
+        View view = new () { CanFocus = true, App = app };
 
         view.KeyDown += (s, e) =>
                         {
@@ -211,14 +209,14 @@ public class ApplicationKeyboardTests
                             receivedKey = e;
                         };
 
-        var top = new Runnable { App = app };
+        Runnable top = new () { App = app };
         top.Add (view);
         SessionToken? token = app.Begin (top);
 
         view.SetFocus ();
 
         // Act
-        app.InjectAndProcessKey (Key.A);
+        app.InjectKey (Key.A);
 
         // Assert
         Assert.True (keyReceived, "View should receive the key");
@@ -235,9 +233,9 @@ public class ApplicationKeyboardTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var applicationKeyDownFired = false;
-        var viewKeyDownFired = false;
-        List<string> fireOrder = new ();
+        bool applicationKeyDownFired = false;
+        bool viewKeyDownFired = false;
+        List<string> fireOrder = [];
 
         app.Keyboard.KeyDown += (s, e) =>
                                 {
@@ -245,7 +243,7 @@ public class ApplicationKeyboardTests
                                     fireOrder.Add ("Application");
                                 };
 
-        var view = new View { CanFocus = true, App = app };
+        View view = new () { CanFocus = true, App = app };
 
         view.KeyDown += (s, e) =>
                         {
@@ -253,14 +251,14 @@ public class ApplicationKeyboardTests
                             fireOrder.Add ("View");
                         };
 
-        var top = new Runnable { App = app };
+        Runnable top = new () { App = app };
         top.Add (view);
         SessionToken? token = app.Begin (top);
 
         view.SetFocus ();
 
         // Act
-        app.InjectAndProcessKey (Key.A);
+        app.InjectKey (Key.A);
 
         // Assert
         Assert.True (applicationKeyDownFired, "Application.Keyboard.KeyDown should fire");
@@ -280,25 +278,25 @@ public class ApplicationKeyboardTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var viewKeyDownFired = false;
+        bool viewKeyDownFired = false;
 
         app.Keyboard.KeyDown += (s, e) =>
                                 {
                                     e.Handled = true; // Handle at application level
                                 };
 
-        var view = new View { CanFocus = true, App = app };
+        View view = new () { CanFocus = true, App = app };
 
         view.KeyDown += (s, e) => viewKeyDownFired = true;
 
-        var top = new Runnable { App = app };
+        Runnable top = new () { App = app };
         top.Add (view);
         SessionToken? token = app.Begin (top);
 
         view.SetFocus ();
 
         // Act
-        app.InjectAndProcessKey (Key.A);
+        app.InjectKey (Key.A);
 
         // Assert
         Assert.False (viewKeyDownFired, "View should not receive key when handled at Application level");
@@ -318,7 +316,7 @@ public class ApplicationKeyboardTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var eventRaised = false;
+        bool eventRaised = false;
         Key? receivedKey = null;
 
         app.Keyboard.KeyDown += (s, e) =>
@@ -381,11 +379,11 @@ public class ApplicationKeyboardTests
         // Use a custom command implementation via app.Keyboard
         app.Keyboard.KeyBindings.Add (Key.F9, Command.Refresh);
 
-        var top = new Runnable { App = app };
+        Runnable top = new () { App = app };
         SessionToken? token = app.Begin (top);
 
         // Act
-        app.InjectAndProcessKey (Key.F9);
+        app.InjectKey (Key.F9);
 
         // Assert
         // Command.Refresh is handled at Application level, so we just verify no exception
@@ -394,58 +392,6 @@ public class ApplicationKeyboardTests
 
         app.End (token!);
         top.Dispose ();
-    }
-
-    #endregion
-
-    #region KeyUp Event Tests
-
-    [Fact]
-    public void InjectKeyEvent_AlsoRaisesKeyUp ()
-    {
-        // Arrange
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        var keyUpRaised = false;
-        Key? receivedKeyUp = null;
-
-        app.Keyboard.KeyUp += (s, e) =>
-                              {
-                                  keyUpRaised = true;
-                                  receivedKeyUp = e;
-                              };
-
-        // Act
-        app.InjectAndProcessKey (Key.A);
-
-        // Assert
-        Assert.True (keyUpRaised, "KeyUp should be raised after KeyDown");
-        Assert.Equal (Key.A, receivedKeyUp);
-    }
-
-    [Fact]
-    public void RaiseKeyUpEvent_RaisesKeyUpEvent ()
-    {
-        // Arrange
-        using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        var eventRaised = false;
-        Key? receivedKey = null;
-
-        app.Keyboard.KeyUp += (s, e) =>
-                              {
-                                  eventRaised = true;
-                                  receivedKey = e;
-                              };
-
-        // Act
-        app.Keyboard.RaiseKeyUpEvent (Key.C);
-
-        // Assert
-        Assert.True (eventRaised);
-        Assert.Equal (Key.C, receivedKey);
     }
 
     #endregion
@@ -485,15 +431,15 @@ public class ApplicationKeyboardTests
         using IApplication app2 = Application.Create ();
         app2.Init (DriverRegistry.Names.ANSI);
 
-        var app1KeyDownCount = 0;
-        var app2KeyDownCount = 0;
+        int app1KeyDownCount = 0;
+        int app2KeyDownCount = 0;
 
         app1.Keyboard.KeyDown += (s, e) => app1KeyDownCount++;
         app2.Keyboard.KeyDown += (s, e) => app2KeyDownCount++;
 
         // Act
-        app1.InjectAndProcessKey (Key.A);
-        app2.InjectAndProcessKey (Key.B);
+        app1.InjectKey (Key.A);
+        app2.InjectKey (Key.B);
 
         // Assert
         Assert.Equal (1, app1KeyDownCount);

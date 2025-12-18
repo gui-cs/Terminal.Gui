@@ -7,7 +7,7 @@ namespace Terminal.Gui.Drivers;
 ///     This parser variant works with plain strings without metadata, suitable for simpler
 ///     input processing scenarios or when platform-specific metadata is not needed.
 /// </remarks>
-internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ())
+internal class AnsiResponseParser (ITimeProvider timeProvider) : AnsiResponseParserBase (new StringHeld (), timeProvider)
 {
     /// <summary>
     ///     Delegate for handling unexpected but complete ANSI escape sequences.

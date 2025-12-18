@@ -4,15 +4,23 @@
 
 **Key Design Principles:**
 
-1. **ClickCount is metadata** on every mouse event (AppKit model)
-2. **Flag type changes** based on ClickCount (Clicked → DoubleClicked → TripleClicked)
-3. **MouseHoldRepeat** is about timer-based repetition, NOT multi-click semantics
-4. **MouseState** provides visual feedback, independent of command execution
-5. **One event per physical action** - no duplicate event emission
+1. **Decouple Drivers from Application from Views**
+2. **ANSI Mouse Esc Sequences** define core 'click' behavior (`press`->`release` is all that's sent).
+3. **ClickCount is metadata** on every mouse event (AppKit model)
+4. **Clicks are synthetic** and **Flag type changes** based on ClickCount (Clicked → DoubleClicked → TripleClicked)
+5. **MouseHoldRepeat** is about timer-based repetition, NOT multi-click semantics
+6. **MouseState** supports visual feedback, independent of command execution
+7. **One event per physical action** - no duplicate event emission; IOW, Driver's follow ANSI model, synthesizing click events in a consistent way.
+
+`Button` is a key example as it supports use cases that exercise a broad swath of functionality. Other built-in `View` subclasses that drive the design:
+
+- `CheckBox` - Supports `MouseHightlightStates`, can act as both a checkbox and a radio-button, double-click to accept, and is used within the `Selector`s and `Shortcut`, requiring `Command` propagation.
+- `FlagSelector`/`OptionSelector` -
+- `ListView` - Currently does not support `MouseHightlightStates` or `MouseHeldDown` scenarios.
 
 ## The Three Button Types
 
-### 1. Normal Button (Default)
+### 1. Normal Button (Default) - Visual feedback on hover & press; no repeat by default
 ```csharp
 var button = new Button
 {
@@ -27,7 +35,7 @@ button.Accepting += (s, e) =>
 };
 ```
 
-### 2. Repeat Button (Press-and-Hold)
+### 2. Repeat Button (Press-and-Hold) - Visual feedback on hover & press; repeat enabled
 ```csharp
 var repeatButton = new Button
 {
@@ -42,7 +50,7 @@ repeatButton.Accepting += (s, e) =>
 };
 ```
 
-### 3. No Highlight Button
+### 3. No Highlight Button - Visual feedback disabled; no repeat - acts just like ViewBase.
 ```csharp
 var noHighlight = new Button
 {
@@ -51,8 +59,6 @@ var noHighlight = new Button
     MouseHighlightStates = MouseState.None  // NO VISUAL FEEDBACK
 };
 ```
-
----
 
 ## Behavior Matrix
 
@@ -66,8 +72,6 @@ var noHighlight = new Button
 | **Triple-click** (3 quick clicks) | 3 press/release cycles | **3** | Release(1): `1`<br/>Release(2): `2`<br/>Release(3): `3` | Three Accept invocations |
 
 **Key Point:** Each release fires Accept. ClickCount tracks which click in the sequence.
-
----
 
 ### Repeat Button (MouseHoldRepeat = true)
 
@@ -84,8 +88,6 @@ var noHighlight = new Button
 **Implementation Rule:** When `MouseHoldRepeat = true`, `View.NewMouseEvent` must ignore `IsSingleDoubleOrTripleClicked` events and only invoke commands on **Press** (to start timer) and **Release** (to fire final Accept and stop timer). This ensures every click fires Accept once, regardless of multi-click detection.
 
 **Key Point:** Timer and multi-click are **independent** concepts. Timer repeats during continuous hold. Multi-click (double/triple) is detected but **ignored** when MouseHoldRepeat is true—only the Press/Release events matter.
-
----
 
 ## Mouse Event Flow (Pipeline)
 
@@ -418,7 +420,7 @@ A: They're independent. Timer fires Accept repeatedly with ClickCount=1. Quick d
 A: For low-level handlers (OnMouseEvent) or when you want to handle Clicked but behave differently based on ClickCount. Most apps just bind to Clicked vs DoubleClicked flags.
 
 **Q: What if I want different actions on single vs double click?**  
-A: Use separate commands:
+A: You have to distinguish and ensure semantics work. Eg if you use separate commands per below, both will be invoked on a double-click. The use case will either have to be ok with Accept happening always, before Toggle, or you'll need to be able to "undo" Accept on Toggle. Or similar. 
 ```csharp
 MouseBindings.Add(MouseFlags.LeftButtonClicked, Command.Accept);
 MouseBindings.Add(MouseFlags.LeftButtonDoubleClicked, Command.Toggle);

@@ -20,7 +20,7 @@ public partial class View // Mouse APIs
         MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Context);
 
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
-        
+
         // Released bindings are added/removed dynamically when MouseHoldRepeat changes
         // See OnMouseHoldRepeatChanged
     }
@@ -193,67 +193,47 @@ public partial class View // Mouse APIs
     ///     Gets or sets whether the <see cref="View"/> wants continuous button pressed events. When set to
     ///     <see langword="true"/>,
     ///     and the user presses and holds the mouse button, <see cref="NewMouseEvent"/> will be
-    ///     repeatedly called with the same <see cref="MouseFlags"/> for as long as the mouse button remains pressed.
+    ///     repeatedly called with <see cref="MouseFlags.LeftButtonPressed"/> for as long as the mouse button remains pressed.
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When <see langword="true"/>, the View uses Press/Release events to invoke commands, ignoring
-    ///         Click/DoubleClick/TripleClick synthesized events. This ensures each press/release cycle fires
-    ///         exactly one Accept, regardless of multi-click detection.
-    ///     </para>
-    ///     <para>
-    ///         Mouse bindings are automatically adjusted when this property changes to use Released events
-    ///         instead of Clicked events.
-    ///     </para>
-    /// </remarks>
     public bool MouseHoldRepeat
     {
         get => _mouseHoldRepeat;
         set
         {
-            CWPPropertyHelper.ChangeProperty(
-                ref _mouseHoldRepeat,
-                value,
-                args => OnMouseHoldRepeatChanging(args),
-                MouseHoldRepeatChanging,
-                newValue => 
+            CWPPropertyHelper.ChangeProperty (
+                                              ref _mouseHoldRepeat,
+                                              value,
+                                              OnMouseHoldRepeatChanging,
+                                              MouseHoldRepeatChanging,
+                                              DoWork,
+                                              OnMouseHoldRepeatChanged,
+                                              MouseHoldRepeatChanged,
+                                              out _
+                                             );
+
+            return;
+
+            void DoWork (bool newValue)
+            {
+                if (newValue)
                 {
-                    // Update mouse bindings based on new value
-                    if (MouseBindings is null)
-                    {
-                        return;
-                    }
-                    
-                    if (newValue)
-                    {
-                        // MouseHoldRepeat enabled: Remove Clicked bindings, add Released bindings
-                        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
-                        
-                        MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Accept);
-                        MouseBindings.Add (MouseFlags.MiddleButtonReleased, Command.Accept);
-                        MouseBindings.Add (MouseFlags.Button4Released, Command.Accept);
-                    }
-                    else
-                    {
-                        // MouseHoldRepeat disabled: Remove Released bindings, restore Clicked bindings
-                        MouseBindings.Remove (MouseFlags.LeftButtonReleased);
-                        MouseBindings.Remove (MouseFlags.MiddleButtonReleased);
-                        MouseBindings.Remove (MouseFlags.Button4Released);
-                        
-                        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
-                    }
-                },
-                args => OnMouseHoldRepeatChanged(args),
-                MouseHoldRepeatChanged,
-                out _
-            );
+                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Activate);
+                }
+                else
+                {
+                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Accept);
+
+                }
+
+                _mouseHoldRepeat = newValue;
+            }
         }
     }
 
     /// <summary>
     ///     Called before <see cref="MouseHoldRepeat"/> changes. Return <see langword="true"/> to cancel the change.
     /// </summary>
-    protected virtual bool OnMouseHoldRepeatChanging(ValueChangingEventArgs<bool> args)
+    protected virtual bool OnMouseHoldRepeatChanging (ValueChangingEventArgs<bool> args)
     {
         return false;
     }
@@ -267,7 +247,7 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     Called after <see cref="MouseHoldRepeat"/> has changed.
     /// </summary>
-    protected virtual void OnMouseHoldRepeatChanged(ValueChangedEventArgs<bool> args)
+    protected virtual void OnMouseHoldRepeatChanged (ValueChangedEventArgs<bool> args)
     {
     }
 
@@ -279,7 +259,7 @@ public partial class View // Mouse APIs
     /// <summary>
     ///     Gets or sets whether the <see cref="View"/> wants mouse position reports.</summary>
     /// <value><see langword="true"/> if mouse position reports are wanted; otherwise, <see langword="false"/>.</value>
-    public bool MousePositionTracking  { get; set; }
+    public bool MousePositionTracking { get; set; }
 
     /// <summary>
     ///     Gets whether auto-grab should be enabled for this view based on <see cref="MouseHighlightStates"/> 
@@ -438,7 +418,7 @@ public partial class View // Mouse APIs
         // When ShouldAutoGrab: Only Clicked events invoke commands (Pressed does visual feedback only)
         // When MouseHoldRepeat: Only Release events invoke commands via Released bindings (Press/Click/DoubleClick/TripleClick ALL ignored)
         // Otherwise: Both Pressed and Clicked invoke commands
-        
+
         // For MouseHoldRepeat: Press starts timer (no command), Release invokes command via binding
         // Timer handler (MouseHoldRepeaterOnMouseIsHeldDownTick) invokes commands during hold
         // ALL other events (Pressed, Clicked, DoubleClicked, TripleClicked) are ignored
@@ -449,7 +429,7 @@ public partial class View // Mouse APIs
             {
                 return RaiseCommandsBoundToButtonFlags (mouse);
             }
-            
+
             // Ignore all other events when MouseHoldRepeat is true
             return false;
         }

@@ -7,7 +7,7 @@ namespace ViewBaseTests.Drawing;
 /// Tests for the static View.Draw(IEnumerable&lt;View&gt;, bool) method
 /// </summary>
 [Trait ("Category", "Output")]
-public class StaticDrawTests : FakeDriverBase
+public class StaticDrawTests : TestDriverBase
 {
     [Fact]
     public void StaticDraw_ClearsSubViewNeedsDraw_AfterMarginDrawMargins ()
@@ -24,7 +24,7 @@ public class StaticDrawTests : FakeDriverBase
         // at the very end, AFTER Margin.DrawMargins(), clearing any SubViewNeedsDraw flags
         // that were set during margin drawing.
 
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         // Create a view hierarchy where a subview's subview has a margin
@@ -104,7 +104,7 @@ public class StaticDrawTests : FakeDriverBase
     public void StaticDraw_WithForceTrue_SetsNeedsDrawOnAllViews ()
     {
         // Verify that when force=true, all views get SetNeedsDraw() called before drawing
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         View view1 = new () { X = 0, Y = 0, Width = 10, Height = 10, Driver = driver, Id = "View1" };
@@ -143,7 +143,7 @@ public class StaticDrawTests : FakeDriverBase
     {
         // This test verifies that the static Draw method properly clears SubViewNeedsDraw
         // flags throughout a nested view hierarchy after Margin.DrawMargins
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         View topView = new ()

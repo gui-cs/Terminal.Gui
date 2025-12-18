@@ -6,12 +6,12 @@ using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 
-public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
+public class ContentsTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void AddStr_Combining_Character_1st_Column ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var expected = "\u0301!";
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
@@ -23,7 +23,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void AddStr_With_Combining_Characters ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var acuteAccent = new Rune (0x0301); // Combining acute accent (é)
         string combined = "e" + acuteAccent;
@@ -72,7 +72,7 @@ public class ContentsTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Move_Bad_Coordinates ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         Assert.Equal (0, driver.Col);
         Assert.Equal (0, driver.Row);

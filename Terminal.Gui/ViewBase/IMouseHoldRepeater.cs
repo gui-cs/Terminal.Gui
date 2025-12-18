@@ -16,6 +16,17 @@ namespace Terminal.Gui.ViewBase;
 public interface IMouseHoldRepeater : IDisposable
 {
     /// <summary>
+    ///     Gets or sets the timeout behavior for mouse hold repetition.
+    ///     If not set, defaults to <see cref="SmoothAcceleratingTimeout"/> with 500ms initial delay,
+    ///     50ms minimum delay, and 0.7 decay factor.
+    /// </summary>
+    /// <remarks>
+    ///     Setting a custom timeout allows tests to use simpler, more predictable timing behavior.
+    ///     The timeout's callback will be set automatically by the repeater.
+    /// </remarks>
+    App.Timeout? Timeout { get; set; }
+
+    /// <summary>
     ///     Periodically raised when the mouse is pressed down inside the view <see cref="View"/>.
     /// </summary>
     public event EventHandler<CancelEventArgs<Mouse>> MouseIsHeldDownTick;

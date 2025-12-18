@@ -8,7 +8,10 @@ namespace Terminal.Gui.Drivers;
 public class NetInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
 {
     /// <inheritdoc/>
-    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter ())
+    /// <param name="inputBuffer">The input buffer to process.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, ITimeProvider? timeProvider = null)
+        : base (inputBuffer, new NetKeyConverter (), timeProvider)
     {
     }
 

@@ -268,7 +268,7 @@ public interface IApplication : IDisposable
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new ();
+        where TRunnable : IRunnable, new();
 
     #region Iteration & Invoke
 
@@ -424,7 +424,7 @@ public interface IApplication : IDisposable
     ///     }
     ///     </code>
     /// </example>
-    T? GetResult<T> () where T : class => GetResult () as T;
+    T? GetResult<T> () where T : class { return GetResult () as T; }
 
     #endregion Result Management
 
@@ -492,7 +492,32 @@ public interface IApplication : IDisposable
 
     #endregion Screen and Driver
 
-    #region Keyboard
+    #region Input (Mouse/Keyboard)
+
+    /// <summary>
+    ///     Gets the input injector for programmatic input injection in tests.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The input injector provides a simplified API for injecting keyboard and mouse events
+    ///         in tests. It handles encoding, queueing, and processing automatically.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="Application.Create"/> to create an application with
+    ///         <see cref="VirtualTimeProvider"/> for deterministic, fast tests.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///             VirtualTimeProvider time = new ();
+    ///             using IApplication app = Application.Create (time);
+    ///             app.Init ();
+    ///             app.InjectKey (Key.Enter);  // Extension method uses GetInputInjector()
+    ///         </code>
+    ///     </para>
+    /// </remarks>
+    /// <returns>The <see cref="IInputInjector"/> for input injection.</returns>
+    IInputInjector GetInputInjector ();
 
     /// <summary>
     ///     Handles keyboard input and key bindings at the Application level.
@@ -504,10 +529,6 @@ public interface IApplication : IDisposable
     /// </remarks>
     IKeyboard Keyboard { get; set; }
 
-    #endregion Keyboard
-
-    #region Mouse
-
     /// <summary>
     ///     Handles mouse event state and processing.
     /// </summary>
@@ -518,7 +539,7 @@ public interface IApplication : IDisposable
     /// </remarks>
     IMouse Mouse { get; set; }
 
-    #endregion Mouse
+    #endregion Input (Mouse/Keyboard)
 
     #region Layout and Drawing
 

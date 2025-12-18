@@ -23,16 +23,18 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="inputQueue">Thread-safe queue for buffering raw console input</param>
     /// <param name="loop">The main application loop instance</param>
     /// <param name="componentFactory">Factory for creating driver-specific components (input, output, etc.)</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
     public MainLoopCoordinator (
         ITimedEvents timedEvents,
         ConcurrentQueue<TInputRecord> inputQueue,
         IApplicationMainLoop<TInputRecord> loop,
-        IComponentFactory<TInputRecord> componentFactory
+        IComponentFactory<TInputRecord> componentFactory,
+        ITimeProvider? timeProvider = null
     )
     {
         _timedEvents = timedEvents;
         _inputQueue = inputQueue;
-        _inputProcessor = componentFactory.CreateInputProcessor (_inputQueue);
+        _inputProcessor = componentFactory.CreateInputProcessor (_inputQueue, timeProvider);
         _loop = loop;
         _componentFactory = componentFactory;
     }

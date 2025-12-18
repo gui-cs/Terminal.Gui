@@ -51,7 +51,6 @@ internal class DriverImpl : IDriver
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
-        _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.SyntheticMouseEvent += (s, e) =>
                                                {
                                                    //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
@@ -413,14 +412,8 @@ internal class DriverImpl : IDriver
 
     #region Input Events
 
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
+    /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;
-
-    /// <inheritdoc/>
-    public event EventHandler<Key>? KeyUp;
-
-    /// <inheritdoc/>
-    public void InjectKeyEvent (Key key) { GetInputProcessor ().InjectKeyDownEvent (key); }
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
