@@ -327,6 +327,7 @@ public partial class View // Layout APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
+                                              this,
                                               ref _height,
                                               value,
                                               OnHeightChanging,
@@ -415,6 +416,7 @@ public partial class View // Layout APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
+                                              this,
                                               ref _width,
                                               value,
                                               OnWidthChanging,
