@@ -9,6 +9,7 @@ internal partial class ApplicationImpl : IApplication
     private readonly ITimeProvider _timeProvider;
     private readonly bool _testMode;
     private IInputInjector? _inputInjector;
+    private readonly ITimedEvents _timedEvents;
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
@@ -20,6 +21,9 @@ internal partial class ApplicationImpl : IApplication
     {
         _timeProvider = timeProvider;
         _testMode = testMode;
+        
+        // Initialize TimedEvents with the time provider for testable timing
+        _timedEvents = new TimedEvents (timeProvider);
 
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;

@@ -503,14 +503,14 @@ public interface IApplication : IDisposable
     ///         in tests. It handles encoding, queueing, and processing automatically.
     ///     </para>
     ///     <para>
-    ///         Use <see cref="Application.CreateForTesting"/> to create an application with
+    ///         Use <see cref="Application.Create"/> to create an application with
     ///         <see cref="VirtualTimeProvider"/> for deterministic, fast tests.
     ///     </para>
     ///     <para>
     ///         Example usage:
     ///         <code>
     ///             VirtualTimeProvider time = new ();
-    ///             using IApplication app = Application.CreateForTesting (time);
+    ///             using IApplication app = Application.Create (time);
     ///             app.Init ();
     ///             app.InjectKey (Key.Enter);  // Extension method uses GetInputInjector()
     ///         </code>

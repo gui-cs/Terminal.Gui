@@ -515,7 +515,7 @@ public class ScrollBar : View, IOrientation, IDesignable
         return true;
     }
 
-    // TODO: Change this to work OnMouseEvent with continuouse press and grab so it's continous.
+    // TODO: Change this to work OnMouseEvent with MouseHoldRepeat
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {

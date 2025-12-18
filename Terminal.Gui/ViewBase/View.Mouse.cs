@@ -217,10 +217,11 @@ public partial class View // Mouse APIs
             {
                 if (newValue)
                 {
-                    MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Activate);
+                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Activate);
                 }
                 else
                 {
+                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Accept);
 
                 }
 

@@ -87,7 +87,7 @@
 ///     <b>Example 3: Event sequence with virtual time</b>
 ///     <code>
 ///     VirtualTimeProvider timeProvider = new();
-///     using IApplication app = Application.CreateForTesting(timeProvider);
+///     using IApplication app = Application.Create(timeProvider);
 ///     app.Init(DriverRegistry.Names.ANSI);
 ///     
 ///     // Inject sequence with delays (virtual time advances instantly)

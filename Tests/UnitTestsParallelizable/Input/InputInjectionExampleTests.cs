@@ -22,7 +22,7 @@ public class InputInjectionExampleTests
     {
         // Arrange - Create application with virtual time
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         int keyPressed = 0;
@@ -55,7 +55,7 @@ public class InputInjectionExampleTests
     {
         // Arrange
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         List<MouseFlags> receivedEvents = [];
@@ -104,7 +104,7 @@ public class InputInjectionExampleTests
     {
         // Arrange
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         List<Key> receivedKeys = [];
@@ -141,7 +141,7 @@ public class InputInjectionExampleTests
     {
         // Arrange
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         string typedText = "";
@@ -178,7 +178,7 @@ public class InputInjectionExampleTests
     {
         // Arrange
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         var ctrlCPressed = false;
@@ -215,7 +215,7 @@ public class InputInjectionExampleTests
     {
         // Arrange
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         List<MouseFlags> clicks = [];
@@ -258,7 +258,7 @@ public class InputInjectionExampleTests
     {
         // NEW API - Clean, simple, deterministic
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         var eventRaised = false;

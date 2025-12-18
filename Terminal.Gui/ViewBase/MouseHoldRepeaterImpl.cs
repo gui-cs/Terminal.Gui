@@ -9,8 +9,8 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         This class implements an accelerating timeout pattern: the first tick occurs after 500ms, 
-///         subsequent ticks occur every 50ms with a 0.5 acceleration factor.
+///         This class implements an accelerating timeout pattern by default: the first tick occurs after 500ms, 
+///         subsequent ticks accelerate with a 0.7 decay factor down to a minimum of 50ms.
 ///     </para>
 ///     <para>
 ///         When started, it automatically grabs the mouse to ensure all mouse events are directed to the host view.
@@ -20,6 +20,9 @@ namespace Terminal.Gui.ViewBase;
 ///     <para>
 ///         This is typically used by views that set <see cref="View.MouseHoldRepeat"/> to <see langword="true"/>,
 ///         enabling behaviors like auto-scrolling or button repeat.
+///     </para>
+///     <para>
+///         For testing or custom timing behavior, set the <see cref="Timeout"/> property before calling <see cref="Start"/>.
 ///     </para>
 /// </remarks>
 internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
@@ -35,16 +38,30 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
         _mouseGrabView = host;
         _timedEvents = timedEvents;
         _mouseGrabber = mouseGrabber;
-        _smoothTimeout = new (TimeSpan.FromMilliseconds (500), TimeSpan.FromMilliseconds (50), 0.5, TickWhileMouseIsHeldDown);
     }
 
     private readonly View _mouseGrabView;
     private readonly ITimedEvents? _timedEvents;
     private readonly IMouseGrabHandler? _mouseGrabber;
 
-    private readonly SmoothAcceleratingTimeout _smoothTimeout;
+    private App.Timeout? _timeout;
+    private App.Timeout? _userTimeout;
     private bool _isDown;
-    private object? _timeout;
+    private object? _timeoutToken;
+
+    /// <inheritdoc/>
+    public App.Timeout? Timeout
+    {
+        get => _userTimeout;
+        set
+        {
+            if (_isDown)
+            {
+                throw new InvalidOperationException ("Cannot change timeout while mouse is held down. Call Stop() first.");
+            }
+            _userTimeout = value;
+        }
+    }
 
     /// <summary>
     /// The most recent mouse event arguments associated with the mouse held down action.
@@ -71,8 +88,23 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
         _isDown = true;
         _mouseGrabber?.GrabMouse (_mouseGrabView);
 
+        // Use custom timeout if provided, otherwise default to SmoothAcceleratingTimeout
+        if (_userTimeout != null)
+        {
+            _timeout = _userTimeout;
+            _timeout.Callback = TickWhileMouseIsHeldDown;
+        }
+        else
+        {
+            _timeout = new SmoothAcceleratingTimeout (
+                TimeSpan.FromMilliseconds (500),
+                TimeSpan.FromMilliseconds (50),
+                0.7,
+                TickWhileMouseIsHeldDown);
+        }
+
         // Then periodic ticks
-        _timeout = _timedEvents?.Add (_smoothTimeout);
+        _timeoutToken = _timedEvents?.Add (_timeout);
     }
 
     public void Stop ()
@@ -86,16 +118,21 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
         Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 
         _mouseEvent = null;
-        _smoothTimeout.Reset ();
+
+        // Reset timeout if it's SmoothAcceleratingTimeout
+        if (_timeout is SmoothAcceleratingTimeout smoothTimeout)
+        {
+            smoothTimeout.Reset ();
+        }
 
         if (_mouseGrabber?.MouseGrabView == _mouseGrabView)
         {
             _mouseGrabber?.UngrabMouse ();
         }
 
-        if (_timeout != null)
+        if (_timeoutToken != null)
         {
-            _timedEvents?.Remove (_timeout);
+            _timedEvents?.Remove (_timeoutToken);
         }
 
         _mouseGrabView.MouseState = MouseState.None;
@@ -136,12 +173,20 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
     {
         if (_isDown)
         {
-            _smoothTimeout.AdvanceStage ();
+            // Only advance stage if using SmoothAcceleratingTimeout
+            if (_timeout is SmoothAcceleratingTimeout smoothTimeout)
+            {
+                smoothTimeout.AdvanceStage ();
+            }
             RaiseMouseIsHeldDownTick ();
         }
         else
         {
-            _smoothTimeout.Reset ();
+            // Only reset if using SmoothAcceleratingTimeout
+            if (_timeout is SmoothAcceleratingTimeout smoothTimeout)
+            {
+                smoothTimeout.Reset ();
+            }
             Stop ();
         }
 

@@ -79,30 +79,30 @@ public class MouseTester : Scenario
 
         win.Add (lastAppEvent);
 
-        View lastWinEvent = new ()
+        View lastViewEvent = new ()
         {
             Height = 1,
             Width = Dim.Auto (),
             X = Pos.Right (filterSlider),
             Y = Pos.Bottom (lastAppEvent),
-            Text = "Last Win Event: "
+            Text = "Last View Event: "
         };
 
-        win.Add (lastWinEvent);
+        win.Add (lastViewEvent);
 
-        CheckBox cbWantContinuousPresses = new ()
+        CheckBox cbRepeatOnHold = new ()
         {
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (lastWinEvent),
-            Title = "_Want Continuous Button Pressed"
+            Y = Pos.Bottom (lastViewEvent),
+            Title = "_Repeat On Hold"
         };
 
-        win.Add (cbWantContinuousPresses);
+        win.Add (cbRepeatOnHold);
 
         CheckBox cbHighlightOnPressed = new ()
         {
             X = Pos.Right (filterSlider),
-            Y = Pos.Bottom (cbWantContinuousPresses),
+            Y = Pos.Bottom (cbRepeatOnHold),
             Title = "_Highlight on Pressed"
         };
 
@@ -245,7 +245,7 @@ public class MouseTester : Scenario
                                                                 }
                                                             };
 
-        cbWantContinuousPresses.CheckedStateChanging += (_, _) =>
+        cbRepeatOnHold.CheckedStateChanging += (_, _) =>
                                                         {
                                                             demo.MouseHoldRepeat = !demo.MouseHoldRepeat;
 
@@ -273,7 +273,7 @@ public class MouseTester : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (20)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (driverLogList)
@@ -305,7 +305,7 @@ public class MouseTester : Scenario
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (20)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
             Source = new ListWrapper<string> (appLogList)
@@ -326,22 +326,120 @@ public class MouseTester : Scenario
 
         label = new ()
         {
-            Text = "_Window Events:",
+            Text = "_View Events:",
             X = Pos.Right (appLog) + 1,
             Y = Pos.Top (label)
         };
-        ObservableCollection<string> winLogList = [];
+        ObservableCollection<string> viewLogList = [];
 
-        var winLog = new ListView
+        ListView viewLog = new () 
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
-            Width = Dim.Auto (minimumContentDim: Dim.Percent (25)),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (20)),
             Height = Dim.Fill (),
             SchemeName = "Runnable",
-            Source = new ListWrapper<string> (winLogList)
+            Source = new ListWrapper<string> (viewLogList)
         };
-        win.Add (label, winLog);
+        win.Add (label, viewLog);
+
+
+        demo.MouseEvent += (_, mouse) =>
+                          {
+                              int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
+
+                              if (filterSlider.GetSetOptions ().Contains (i))
+                              {
+                                  lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                  viewLogList.Add ($"{mouse.Position}:{mouse.View.Id}:{mouse.Flags}");
+                                  viewLog.MoveEnd ();
+                              }
+                          };
+
+        sub1.MouseEvent += (_, mouse) =>
+                           {
+                               int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
+
+                               if (filterSlider.GetSetOptions ().Contains (i))
+                               {
+                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                   viewLogList.Add ($"{mouse.Position}:{mouse.View.Id}:{mouse.Flags}");
+                                   viewLog.MoveEnd ();
+                               }
+                           };
+
+        sub2.MouseEvent += (_, mouse) =>
+                           {
+                               int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
+
+                               if (filterSlider.GetSetOptions ().Contains (i))
+                               {
+                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                   viewLogList.Add ($"{mouse.Position}:{mouse.View.Id}:{mouse.Flags}");
+                                   viewLog.MoveEnd ();
+                               }
+                           };
+        label = new ()
+        {
+            Text = "_Commands:",
+            X = Pos.Right (viewLog) + 1,
+            Y = Pos.Top (label)
+        };
+        ObservableCollection<string> commandLogList = [];
+
+        var commandLog = new ListView
+        {
+            X = Pos.Left (label),
+            Y = Pos.Bottom (label),
+            Width = Dim.Auto (minimumContentDim: Dim.Percent (15)),
+            Height = Dim.Fill (),
+            SchemeName = "Runnable",
+            Source = new ListWrapper<string> (commandLogList)
+        };
+        win.Add (label, commandLog);
+
+        demo.Activating += (_, args) =>
+                         {
+                             commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                             commandLog.MoveEnd ();
+                             args.Handled = true;
+                         };
+
+        demo.Accepting += (_, args) =>
+                          {
+                              commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                              commandLog.MoveEnd ();
+                              args.Handled = true;
+                          };
+
+        sub1.Activating += (_, args) =>
+                           {
+                               commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                               commandLog.MoveEnd ();
+                               args.Handled = true;
+                           };
+
+        sub1.Accepting += (_, args) =>
+                          {
+                              commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                              commandLog.MoveEnd ();
+                              args.Handled = true;
+                          };
+
+        sub2.Activating += (_, args) =>
+                           {
+                               commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                               commandLog.MoveEnd ();
+                               args.Handled = true;
+                           };
+
+        sub2.Accepting += (_, args) =>
+                          {
+                              commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                              commandLog.MoveEnd ();
+                              args.Handled = true;
+                          };
+
 
         clearButton.Accepting += (_, _) =>
                                  {
@@ -349,21 +447,11 @@ public class MouseTester : Scenario
                                      driverLog.SetSource (driverLogList);
                                      appLogList.Clear ();
                                      appLog.SetSource (appLogList);
-                                     winLogList.Clear ();
-                                     winLog.SetSource (winLogList);
+                                     viewLogList.Clear ();
+                                     viewLog.SetSource (viewLogList);
+                                     commandLogList.Clear ();
+                                     commandLog.SetSource (commandLogList);
                                  };
-
-        win.MouseEvent += (_, mouse) =>
-                          {
-                              int i = filterSlider.Options.FindIndex (o => mouse.Flags.HasFlag (o.Data));
-
-                              if (filterSlider.GetSetOptions ().Contains (i))
-                              {
-                                  lastWinEvent.Text = $"   Last Win Event: {mouse}";
-                                  winLogList.Add ($"{mouse.Position}:{mouse.Flags}");
-                                  winLog.MoveEnd ();
-                              }
-                          };
 
         Application.Run (win);
         win.Dispose ();

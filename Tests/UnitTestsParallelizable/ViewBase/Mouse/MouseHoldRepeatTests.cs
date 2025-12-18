@@ -421,12 +421,13 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         (runnable as View)?.Dispose ();
     }
 
-    [Fact (Skip = "TimedEvents doesn't support ITimer")]
+    [Fact]
     public void MouseHoldRepeat_True_AppInjection_Press_Wait_Release_Raises_Activating_Multiple_Times ()
     {
         // Arrange
+        const int TIME_OUT_INTERVAL = 100;
         VirtualTimeProvider time = new ();
-        using IApplication app = Application.CreateForTesting (time);
+        using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable runnable = new Runnable ();
@@ -439,11 +440,20 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
+        // Override the MouseHoldRepeater with a test instance
+        view.MouseHoldRepeater = new MouseHoldRepeaterImpl (view, app.TimedEvents, app.Mouse);
+
+        // Configure a simple repeating timeout for predictable testing (100ms interval)
+        view.MouseHoldRepeater.Timeout = new ()
+        {
+            Span = TimeSpan.FromMilliseconds (TIME_OUT_INTERVAL),
+            Callback = null! // Will be set by MouseHoldRepeaterImpl
+        };
+
         var activatingCount = 0;
         view.Activating += (_, e) =>
         {
             activatingCount++;
-            _output.WriteLine ($"Activating #{activatingCount}");
             e.Handled = true;
         };
 
@@ -457,22 +467,15 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
 
         Assert.Equal (0, activatingCount); // Should not fire on press
 
-        _output.WriteLine ($"After press: {app.TimedEvents?.Timeouts.Count ?? 0} timeouts registered");
-
-        // Advance time and manually trigger timer processing
-        // Initial delay is 500ms for MouseHoldRepeater
-        time.Advance (TimeSpan.FromMilliseconds (500));
-        _output.WriteLine ($"After time advance 500ms: {app.TimedEvents?.Timeouts.Count ?? 0} timeouts");
-        app.TimedEvents?.RunTimers (); // First tick
-        _output.WriteLine ($"After RunTimers #1: activatingCount={activatingCount}, timeouts={app.TimedEvents?.Timeouts.Count ?? 0}");
-
-        time.Advance (TimeSpan.FromMilliseconds (50));
-        app.TimedEvents?.RunTimers (); // Second tick
-        _output.WriteLine ($"After RunTimers #2: activatingCount={activatingCount}, timeouts={app.TimedEvents?.Timeouts.Count ?? 0}");
-
-        time.Advance (TimeSpan.FromMilliseconds (50));
-        app.TimedEvents?.RunTimers (); // Third tick
-        _output.WriteLine ($"After RunTimers #3: activatingCount={activatingCount}, timeouts={app.TimedEvents?.Timeouts.Count ?? 0}");
+        // With a simple 100ms repeating timeout, we can precisely control timing
+        // Advance time and trigger 5 timer ticks (5 ensure no triple-click logic 
+        // is involved.
+        for (var i = 1; i <= 5; i++)
+        {
+            time.Advance (TimeSpan.FromMilliseconds (TIME_OUT_INTERVAL));
+            app.TimedEvents?.RunTimers ();
+            _output.WriteLine ($"After tick {i}: activatingCount={activatingCount}");
+        }
 
         // Act - Release button
         app.InjectMouse (
@@ -482,10 +485,9 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
                              ScreenPosition = new (0, 0)
                          });
 
-        _output.WriteLine ($"After release: activatingCount={activatingCount}");
-
-        // Assert - Should have >= 3 activations (3 from timer ticks + 1 from release)
-        Assert.True (activatingCount >= 3, $"Expected >= 3 activations, got {activatingCount}");
+        // Assert - Should have >= 5 activations (5 from timer ticks + 1 from release)
+        Assert.True (activatingCount >= 5, $"Expected >= 5 activations, got {activatingCount}");
+        _output.WriteLine ($"Expected >= 5 activations, got {activatingCount}");
 
         (runnable as View)?.Dispose ();
     }
