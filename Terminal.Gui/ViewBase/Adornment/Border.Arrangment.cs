@@ -142,7 +142,7 @@ public partial class Border
     }
 
     /// <summary>
-    ///     Factory method to create a standardized arrangement button
+    ///     Factory method to create a standardized arrangement button.
     /// </summary>
     private Button CreateArrangementButton (string id, Rune glyph, Pos x, Pos y, ViewArrangement arrangement)
     {
@@ -789,104 +789,109 @@ public partial class Border
         switch (Arranging)
         {
             case ViewArrangement.Movable:
-                Parent.X = parentLoc.X - _startGrabPoint.X;
-                Parent.Y = parentLoc.Y - _startGrabPoint.Y;
-
+                MoveParent (parentLoc);
                 break;
 
             case ViewArrangement.TopResizable:
-                // Get how much the mouse has moved since the start of the drag
-                // and adjust the height of the parent by that amount
-                int deltaY = parentLoc.Y - Parent.Frame.Y;
-                int newHeight = Math.Max (minHeight, Parent.Frame.Height - deltaY);
-
-                if (newHeight != Parent.Frame.Height)
-                {
-                    Parent.Height = newHeight;
-                    Parent.Y = parentLoc.Y - _startGrabPoint.Y;
-                }
-
+                ResizeParentTop (parentLoc, minHeight);
                 break;
 
             case ViewArrangement.BottomResizable:
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
-
+                ResizeParentBottom (parentLoc, minHeight);
                 break;
 
             case ViewArrangement.LeftResizable:
-                // Get how much the mouse has moved since the start of the drag
-                // and adjust the width of the parent by that amount
-                int deltaX = parentLoc.X - Parent.Frame.X;
-                int newWidth = Math.Max (minWidth, Parent.Frame.Width - deltaX);
-
-                if (newWidth != Parent.Frame.Width)
-                {
-                    Parent.Width = newWidth;
-                    Parent.X = parentLoc.X - _startGrabPoint.X;
-                }
-
+                ResizeParentLeft (parentLoc, minWidth);
                 break;
 
             case ViewArrangement.RightResizable:
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
-
+                ResizeParentRight (parentLoc, minWidth);
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.RightResizable:
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
-
+                ResizeParentRight (parentLoc, minWidth);
+                ResizeParentBottom (parentLoc, minHeight);
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.LeftResizable:
-                int dX = parentLoc.X - Parent.Frame.X;
-                int newW = Math.Max (minWidth, Parent.Frame.Width - dX);
-
-                if (newW != Parent.Frame.Width)
-                {
-                    Parent.Width = newW;
-                    Parent.X = parentLoc.X - _startGrabPoint.X;
-                }
-
-                Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
-
+                ResizeParentLeft (parentLoc, minWidth);
+                ResizeParentBottom (parentLoc, minHeight);
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.RightResizable:
-                int dY = parentLoc.Y - Parent.Frame.Y;
-                int newH = Math.Max (minHeight, Parent.Frame.Height - dY);
-
-                if (newH != Parent.Frame.Height)
-                {
-                    Parent.Height = newH;
-                    Parent.Y = parentLoc.Y - _startGrabPoint.Y;
-                }
-
-                Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
-
+                ResizeParentTop (parentLoc, minHeight);
+                ResizeParentRight (parentLoc, minWidth);
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.LeftResizable:
-                int dY2 = parentLoc.Y - Parent.Frame.Y;
-                int newH2 = Math.Max (minHeight, Parent.Frame.Height - dY2);
-
-                if (newH2 != Parent.Frame.Height)
-                {
-                    Parent.Height = newH2;
-                    Parent.Y = parentLoc.Y - _startGrabPoint.Y;
-                }
-
-                int dX2 = parentLoc.X - Parent.Frame.X;
-                int newW2 = Math.Max (minWidth, Parent.Frame.Width - dX2);
-
-                if (newW2 != Parent.Frame.Width)
-                {
-                    Parent.Width = newW2;
-                    Parent.X = parentLoc.X - _startGrabPoint.X;
-                }
-
+                ResizeParentTop (parentLoc, minHeight);
+                ResizeParentLeft (parentLoc, minWidth);
                 break;
         }
+    }
+
+    /// <summary>
+    ///     Moves the parent view to follow the mouse position.
+    /// </summary>
+    /// <param name="parentLoc">Mouse position in parent's coordinate space.</param>
+    private void MoveParent (Point parentLoc)
+    {
+        Parent!.X = parentLoc.X - _startGrabPoint.X;
+        Parent.Y = parentLoc.Y - _startGrabPoint.Y;
+    }
+
+    /// <summary>
+    ///     Resizes parent from the top edge, adjusting Y position and height.
+    /// </summary>
+    /// <param name="parentLoc">Mouse position in parent's coordinate space.</param>
+    /// <param name="minHeight">Minimum allowed height.</param>
+    private void ResizeParentTop (Point parentLoc, int minHeight)
+    {
+        int deltaY = parentLoc.Y - Parent!.Frame.Y;
+        int newHeight = Math.Max (minHeight, Parent.Frame.Height - deltaY);
+
+        if (newHeight != Parent.Frame.Height)
+        {
+            Parent.Height = newHeight;
+            Parent.Y = parentLoc.Y - _startGrabPoint.Y;
+        }
+    }
+
+    /// <summary>
+    ///     Resizes parent from the bottom edge, adjusting height only.
+    /// </summary>
+    /// <param name="parentLoc">Mouse position in parent's coordinate space.</param>
+    /// <param name="minHeight">Minimum allowed height.</param>
+    private void ResizeParentBottom (Point parentLoc, int minHeight)
+    {
+        Parent!.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent.Margin!.Thickness.Bottom + 1);
+    }
+
+    /// <summary>
+    ///     Resizes parent from the left edge, adjusting X position and width.
+    /// </summary>
+    /// <param name="parentLoc">Mouse position in parent's coordinate space.</param>
+    /// <param name="minWidth">Minimum allowed width.</param>
+    private void ResizeParentLeft (Point parentLoc, int minWidth)
+    {
+        int deltaX = parentLoc.X - Parent!.Frame.X;
+        int newWidth = Math.Max (minWidth, Parent.Frame.Width - deltaX);
+
+        if (newWidth != Parent.Frame.Width)
+        {
+            Parent.Width = newWidth;
+            Parent.X = parentLoc.X - _startGrabPoint.X;
+        }
+    }
+
+    /// <summary>
+    ///     Resizes parent from the right edge, adjusting width only.
+    /// </summary>
+    /// <param name="parentLoc">Mouse position in parent's coordinate space.</param>
+    /// <param name="minWidth">Minimum allowed width.</param>
+    private void ResizeParentRight (Point parentLoc, int minWidth)
+    {
+        Parent!.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent.Margin!.Thickness.Right + 1);
     }
 
     /// <summary>
