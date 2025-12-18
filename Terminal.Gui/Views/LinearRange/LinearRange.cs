@@ -1,5 +1,6 @@
 #nullable disable
 ﻿using System.Transactions;
+using Terminal.Gui.App;
 
 namespace Terminal.Gui.Views;
 
@@ -210,11 +211,35 @@ public class LinearRange<T> : View, IOrientation
         get => _config._minInnerSpacing;
         set
         {
-            _config._minInnerSpacing = value;
-
-            SetContentSize ();
+            CWPPropertyHelper.ChangeProperty (
+                this,
+                ref _config._minInnerSpacing,
+                value,
+                OnMinimumInnerSpacingChanging,
+                MinimumInnerSpacingChanging,
+                newValue =>
+                {
+                    _config._minInnerSpacing = newValue;
+                    SetContentSize ();
+                },
+                OnMinimumInnerSpacingChanged,
+                MinimumInnerSpacingChanged,
+                out int finalValue
+            );
         }
     }
+
+    /// <summary>Event raised before the <see cref="MinimumInnerSpacing"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<int>> MinimumInnerSpacingChanging;
+
+    /// <summary>Event raised after the <see cref="MinimumInnerSpacing"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<int>> MinimumInnerSpacingChanged;
+
+    /// <summary>Called before <see cref="MinimumInnerSpacing"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnMinimumInnerSpacingChanging (ValueChangingEventArgs<int> args) => false;
+
+    /// <summary>Called after <see cref="MinimumInnerSpacing"/> has changed.</summary>
+    protected virtual void OnMinimumInnerSpacingChanged (ValueChangedEventArgs<int> args) { }
 
     /// <summary>LinearRange Type. <see cref="LinearRangeType"></see></summary>
     public LinearRangeType Type
@@ -222,13 +247,39 @@ public class LinearRange<T> : View, IOrientation
         get => _config._type;
         set
         {
-            _config._type = value;
-
-            // Todo: Custom logic to preserve options.
-            _setOptions.Clear ();
-            SetNeedsDraw ();
+            LinearRangeType oldValue = _config._type;
+            
+            CWPPropertyHelper.ChangeProperty (
+                this,
+                ref _config._type,
+                value,
+                OnTypeChanging,
+                TypeChanging,
+                newValue =>
+                {
+                    _config._type = newValue;
+                    // Todo: Custom logic to preserve options.
+                    _setOptions.Clear ();
+                    SetNeedsDraw ();
+                },
+                OnTypeChanged,
+                TypeChanged,
+                out LinearRangeType finalValue
+            );
         }
     }
+
+    /// <summary>Event raised before the <see cref="Type"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<LinearRangeType>> TypeChanging;
+
+    /// <summary>Event raised after the <see cref="Type"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<LinearRangeType>> TypeChanged;
+
+    /// <summary>Called before <see cref="Type"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnTypeChanging (ValueChangingEventArgs<LinearRangeType> args) => false;
+
+    /// <summary>Called after <see cref="Type"/> has changed.</summary>
+    protected virtual void OnTypeChanged (ValueChangedEventArgs<LinearRangeType> args) { }
 
 
     /// <summary>
@@ -276,11 +327,35 @@ public class LinearRange<T> : View, IOrientation
         get => _config._legendsOrientation;
         set
         {
-            _config._legendsOrientation = value;
-
-            SetContentSize ();
+            CWPPropertyHelper.ChangeProperty (
+                this,
+                ref _config._legendsOrientation,
+                value,
+                OnLegendsOrientationChanging,
+                LegendsOrientationChanging,
+                newValue =>
+                {
+                    _config._legendsOrientation = newValue;
+                    SetContentSize ();
+                },
+                OnLegendsOrientationChanged,
+                LegendsOrientationChanged,
+                out Orientation finalValue
+            );
         }
     }
+
+    /// <summary>Event raised before the <see cref="LegendsOrientation"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<Orientation>> LegendsOrientationChanging;
+
+    /// <summary>Event raised after the <see cref="LegendsOrientation"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<Orientation>> LegendsOrientationChanged;
+
+    /// <summary>Called before <see cref="LegendsOrientation"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnLegendsOrientationChanging (ValueChangingEventArgs<Orientation> args) => false;
+
+    /// <summary>Called after <see cref="LegendsOrientation"/> has changed.</summary>
+    protected virtual void OnLegendsOrientationChanged (ValueChangedEventArgs<Orientation> args) { }
 
     /// <summary>LinearRange styles. <see cref="LinearRangeStyle"></see></summary>
     public LinearRangeStyle Style { get; set; } = new ();
@@ -317,10 +392,35 @@ public class LinearRange<T> : View, IOrientation
         get => _config._showEndSpacing;
         set
         {
-            _config._showEndSpacing = value;
-            SetContentSize ();
+            CWPPropertyHelper.ChangeProperty (
+                this,
+                ref _config._showEndSpacing,
+                value,
+                OnShowEndSpacingChanging,
+                ShowEndSpacingChanging,
+                newValue =>
+                {
+                    _config._showEndSpacing = newValue;
+                    SetContentSize ();
+                },
+                OnShowEndSpacingChanged,
+                ShowEndSpacingChanged,
+                out bool finalValue
+            );
         }
     }
+
+    /// <summary>Event raised before the <see cref="ShowEndSpacing"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<bool>> ShowEndSpacingChanging;
+
+    /// <summary>Event raised after the <see cref="ShowEndSpacing"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<bool>> ShowEndSpacingChanged;
+
+    /// <summary>Called before <see cref="ShowEndSpacing"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnShowEndSpacingChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>Called after <see cref="ShowEndSpacing"/> has changed.</summary>
+    protected virtual void OnShowEndSpacingChanged (ValueChangedEventArgs<bool> args) { }
 
     /// <summary>Show/Hide the options legends.</summary>
     public bool ShowLegends
@@ -328,10 +428,35 @@ public class LinearRange<T> : View, IOrientation
         get => _config._showLegends;
         set
         {
-            _config._showLegends = value;
-            SetContentSize ();
+            CWPPropertyHelper.ChangeProperty (
+                this,
+                ref _config._showLegends,
+                value,
+                OnShowLegendsChanging,
+                ShowLegendsChanging,
+                newValue =>
+                {
+                    _config._showLegends = newValue;
+                    SetContentSize ();
+                },
+                OnShowLegendsChanged,
+                ShowLegendsChanged,
+                out bool finalValue
+            );
         }
     }
+
+    /// <summary>Event raised before the <see cref="ShowLegends"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<bool>> ShowLegendsChanging;
+
+    /// <summary>Event raised after the <see cref="ShowLegends"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<bool>> ShowLegendsChanged;
+
+    /// <summary>Called before <see cref="ShowLegends"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnShowLegendsChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>Called after <see cref="ShowLegends"/> has changed.</summary>
+    protected virtual void OnShowLegendsChanged (ValueChangedEventArgs<bool> args) { }
 
     /// <summary>
     ///     Gets or sets whether the minimum or ideal size will be used when calculating the size of the linear range.
@@ -341,10 +466,35 @@ public class LinearRange<T> : View, IOrientation
         get => _config._useMinimumSize;
         set
         {
-            _config._useMinimumSize = value;
-            SetContentSize ();
+            CWPPropertyHelper.ChangeProperty (
+                this,
+                ref _config._useMinimumSize,
+                value,
+                OnUseMinimumSizeChanging,
+                UseMinimumSizeChanging,
+                newValue =>
+                {
+                    _config._useMinimumSize = newValue;
+                    SetContentSize ();
+                },
+                OnUseMinimumSizeChanged,
+                UseMinimumSizeChanged,
+                out bool finalValue
+            );
         }
     }
+
+    /// <summary>Event raised before the <see cref="UseMinimumSize"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<bool>> UseMinimumSizeChanging;
+
+    /// <summary>Event raised after the <see cref="UseMinimumSize"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<bool>> UseMinimumSizeChanged;
+
+    /// <summary>Called before <see cref="UseMinimumSize"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnUseMinimumSizeChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>Called after <see cref="UseMinimumSize"/> has changed.</summary>
+    protected virtual void OnUseMinimumSizeChanged (ValueChangedEventArgs<bool> args) { }
 
     #endregion
 
