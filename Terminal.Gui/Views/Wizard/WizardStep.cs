@@ -3,11 +3,10 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> view is
-///     divided horizontally in two. On the left is the content view where <see cref="View"/>s can be added,  On the right
-///     is the help for the step. Set <see cref="WizardStep.HelpText"/> to set the help text. If the help text is empty the
-///     help pane will not be shown. If there are no Views added to the WizardStep the <see cref="HelpText"/> (if not
-///     empty) will fill the wizard step.
+///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> fills the 
+///     Wizard's content area. <see cref="View"/>s can be added to the step's content area. Help text can be displayed
+///     in the right <see cref="Padding"/> by setting <see cref="WizardStep.HelpText"/>. If the help text is empty, the
+///     right padding will not be shown and content will fill the entire step.
 /// </summary>
 /// <remarks>
 ///     If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
@@ -43,20 +42,43 @@ public class WizardStep : View
         CanFocus = true;
         BorderStyle = LineStyle.None;
 
+        // Content fills the entire viewport
+        _contentView.X = 0;
+        _contentView.Y = 0;
+        _contentView.Width = Dim.Fill ();
+        _contentView.Height = Dim.Fill ();
         base.Add (_contentView);
 
-        base.Add (_helpTextView);
+        // Help text goes in the right Padding
+        _helpTextView.X = 0;
+        _helpTextView.Y = 0;
+        _helpTextView.Width = Dim.Fill ();
+        _helpTextView.Height = Dim.Fill ();
 
         // Enable built-in scrollbars for the help text view
         _helpTextView.VerticalScrollBar.AutoShow = true;
         _helpTextView.HorizontalScrollBar.AutoShow = true;
 
+        // Help will be added to Padding in ShowHide when there's help text
         ShowHide ();
     }
 
     /// <summary>Sets or gets the text for the back button. The back button will only be visible on steps after the first step.</summary>
     /// <remarks>The default text is "Back"</remarks>
     public string BackButtonText { get; set; } = string.Empty;
+
+    /// <inheritdoc/>
+    protected override void OnFrameChanged (in Rectangle frame)
+    {
+        base.OnFrameChanged (frame);
+        
+        // Update padding thickness when frame changes
+        if (Padding is { } && _helpTextView.Text.Length > 0)
+        {
+            int paddingWidth = Math.Max (10, (int)(frame.Width * 0.3));
+            Padding.Thickness = new Thickness (0, 0, paddingWidth, 0);
+        }
+    }
 
     /// <summary>
     ///     Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty the help
@@ -133,34 +155,50 @@ public class WizardStep : View
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>
     internal void ShowHide ()
     {
-        _contentView.Height = Dim.Fill ();
-        _helpTextView.Height = Dim.Height(_contentView);
-        _helpTextView.Width = Dim.Fill ();
-
-        if (_contentView.InternalSubViews?.Count > 0)
+        // Check if Padding is available (might be null during disposal)
+        if (Padding is null || _contentView is null || _helpTextView is null)
         {
-            if (_helpTextView.Text.Length > 0)
+            return;
+        }
+
+        if (_helpTextView.Text.Length > 0)
+        {
+            // Help text goes in right Padding - calculate 30% of current width
+            // We'll use LayoutStarted to set the actual thickness based on the frame
+            int paddingWidth = Math.Max (10, (int)(Frame.Width * 0.3));
+            Padding.Thickness = new Thickness (0, 0, paddingWidth, 0);
+            
+            // Add help to padding if not already there
+            if (_helpTextView.SuperView != Padding)
             {
-                _contentView.Width = Dim.Percent (70);
-                _helpTextView.X = Pos.Right (_contentView);
-                _helpTextView.Width = Dim.Fill ();
+                // Remove from main view if it was there
+                if (_helpTextView.SuperView == this)
+                {
+                    Remove (_helpTextView);
+                }
+                Padding.Add (_helpTextView);
             }
-            else
-            {
-                _contentView.Width = Dim.Fill ();
-            }
+            
+            _helpTextView.Visible = true;
+            _contentView.Width = Dim.Fill ();
+            _contentView.Height = Dim.Fill ();
         }
         else
         {
-            if (_helpTextView.Text.Length > 0)
+            // No help text - no right padding needed
+            Padding.Thickness = Thickness.Empty;
+            
+            // Remove help from padding if it's there
+            if (_helpTextView.SuperView == Padding)
             {
-                _helpTextView.X = 0;
+                Padding.Remove (_helpTextView);
             }
-
-            // Error - no pane shown
+            
+            _helpTextView.Visible = false;
+            _contentView.Width = Dim.Fill ();
+            _contentView.Height = Dim.Fill ();
         }
 
-        _contentView.Visible = _contentView.InternalSubViews?.Count > 0;
-        _helpTextView.Visible = _helpTextView.Text.Length > 0;
+        _contentView.Visible = true;
     }
 } // end of WizardStep class

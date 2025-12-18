@@ -2,9 +2,9 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (
-///     <see cref="WizardStep"/>) can host arbitrary <see cref="View"/>s, much like a <see cref="Dialog"/>. Each step also
-///     has a pane for help text. Along the bottom of the Wizard view are customizable buttons enabling the user to
-///     navigate forward and backward through the Wizard.
+///     <see cref="WizardStep"/>) can host arbitrary <see cref="View"/>s, much like a <see cref="Dialog"/>. Each step 
+///     can display help text in its right <see cref="Padding"/>. Navigation buttons are displayed in the bottom 
+///     <see cref="Padding"/> of the Wizard, enabling the user to navigate forward and backward through the steps.
 /// </summary>
 /// <remarks>
 ///     The Wizard can be displayed either as a modal (pop-up) <see cref="Window"/> (like <see cref="Dialog"/>) or as
@@ -62,25 +62,29 @@ public class Wizard : Dialog
     /// </remarks>
     public Wizard ()
     {
-        // TODO: LastEndRestStart will enable a "Quit" button to always appear at the far left
-        ButtonAlignment = Alignment.Start;
-        ButtonAlignmentModes |= AlignmentModes.IgnoreFirstOrLast;
         BorderStyle = LineStyle.Double;
 
-        BackButton = new () { Text = Strings.wzBack };
+        // Set up Padding to hold buttons
+        Padding!.Thickness = new Thickness (0, 0, 0, 1);
+
+        BackButton = new () 
+        { 
+            Text = Strings.wzBack,
+            X = 0,
+            Y = 0
+        };
 
         NextFinishButton = new ()
         {
             Text = Strings.wzFinish,
-            IsDefault = true
+            IsDefault = true,
+            X = Pos.Right (BackButton) + 1,
+            Y = 0
         };
 
-        // Add a horiz separator
-        var separator = new Line { Orientation = Orientation.Horizontal, X = -1, Y = Pos.Top (BackButton) - 1, Length = Dim.Fill (-1) };
-
-        base.Add (separator);
-        AddButton (BackButton);
-        AddButton (NextFinishButton);
+        // Add buttons to bottom Padding instead of using AddButton
+        Padding.Add (BackButton);
+        Padding.Add (NextFinishButton);
 
         BackButton.Accepting += BackBtn_Accepting;
         NextFinishButton.Accepting += NextFinishBtn_Accepting;
@@ -473,31 +477,10 @@ public class Wizard : Dialog
 
     private void SizeStep (WizardStep step)
     {
-        if (IsModal)
-        {
-            // If we're modal, then we expand the WizardStep so that the top and side 
-            // borders and not visible. The bottom border is the separator above the buttons.
-            step.X = step.Y = 0;
-
-            step.Height = Dim.Fill (
-                                    Dim.Func (
-                                              v => IsInitialized
-                                                        ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
-                                                        : 1)); // for button frame (+1 for lineView)
-            step.Width = Dim.Fill ();
-        }
-        else
-        {
-            // If we're not a modal, then we show the border around the WizardStep
-            step.X = step.Y = 0;
-
-            step.Height = Dim.Fill (
-                                    Dim.Func (
-                                              v => IsInitialized
-                                                       ? SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _)).Frame.Height + 1
-                                                       : 2)); // for button frame (+1 for lineView)
-            step.Width = Dim.Fill ();
-        }
+        // Steps now fill the entire Viewport since buttons are in Padding
+        step.X = step.Y = 0;
+        step.Width = Dim.Fill ();
+        step.Height = Dim.Fill ();
     }
 
     private void UpdateButtonsAndTitle ()
