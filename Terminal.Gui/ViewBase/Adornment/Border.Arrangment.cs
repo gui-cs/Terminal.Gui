@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Reflection.Metadata;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -34,16 +33,9 @@ public partial class Border
             return false;
         }
 
-        bool mouseMode = false;
-        if (App is { } && App.Mouse.MouseGrabView == this)
-        {
-            mouseMode = true;
-        }
+        bool mouseMode = App is { } && App.Mouse.MouseGrabView == this;
 
         MouseState |= MouseState.Pressed;
-
-        // Add Commands and KeyBindings - Note it's ok these get added each time. KeyBindings are cleared in EndArrange()
-        AddArrangeModeKeyBindings ();
 
         if (App is { })
         {
@@ -53,62 +45,41 @@ public partial class Border
         // Create all necessary arrangement buttons
         CreateArrangementButtons ();
 
-        if (!mouseMode)
+        if (mouseMode)
         {
-            // Keyboard mode
+            Arranging = arrangement;
+            SetVisibilityForMouseMode (arrangement);
+        }
+        else
+        {
+            // Add Commands and KeyBindings - Note it's ok these get added each time. KeyBindings are cleared in EndArrange()
+            AddArrangeModeKeyBindings ();
+
             SetVisibilityForKeyboardMode ();
+
             // strip off overlapped
             Arranging = Parent!.Arrangement & ~ViewArrangement.Overlapped;
             CanFocus = true;
             SetFocus ();
         }
-        else
-        {
-            // Mouse mode
-            Arranging = arrangement;
-            SetVisibilityForMouseMode (arrangement);
-        }
 
-        if (Arranging != ViewArrangement.Fixed)
-        {
-            if (arrangement == ViewArrangement.Fixed)
-            {
-                // Keyboard mode - enable nav
-                // TODO: Keyboard mode only supports sizing from bottom/right.
-                //       Arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
-            }
-
-            return true;
-        }
-
-        // Hack for now
-        EndArrangeMode ();
-
-        return false;
+        return true;
     }
 
     /// <summary>
-    /// Checks if the parent view has any arrangement options enabled
+    ///     Checks if the parent view has any arrangement options enabled
     /// </summary>
     private bool HasAnyArrangementOptions ()
     {
         return Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
-            || Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
-            || Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable)
-            || Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable)
-            || Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable);
-    }
-
-    private bool HasResizable (ViewArrangement arrangement)
-    {
-        return arrangement.HasFlag (ViewArrangement.BottomResizable)
-               || arrangement.HasFlag (ViewArrangement.TopResizable)
-               || arrangement.HasFlag (ViewArrangement.LeftResizable)
-               || arrangement.HasFlag (ViewArrangement.RightResizable);
+               || Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
+               || Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable)
+               || Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable)
+               || Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable);
     }
 
     /// <summary>
-    /// Creates all the buttons required for the arrange mode based on allowed arrangement options
+    ///     Creates all the buttons required for the arrangement mode based on allowed arrangement options
     /// </summary>
     private void CreateArrangementButtons ()
     {
@@ -120,56 +91,56 @@ public partial class Border
         if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
         {
             _allSizeButton = CreateArrangementButton (
-                "allSizeButton",
-                Glyphs.SizeBottomRight,
-                Pos.AnchorEnd (),
-                Pos.AnchorEnd (),
-                ViewArrangement.Resizable);
+                                                      "allSizeButton",
+                                                      Glyphs.SizeBottomRight,
+                                                      Pos.AnchorEnd (),
+                                                      Pos.AnchorEnd (),
+                                                      ViewArrangement.Resizable);
         }
 
         if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable))
         {
             _topSizeButton = CreateArrangementButton (
-                "topSizeButton",
-                Glyphs.SizeVertical,
-                Pos.Center () + Parent!.Margin!.Thickness.Horizontal,
-                0,
-                ViewArrangement.TopResizable);
+                                                      "topSizeButton",
+                                                      Glyphs.SizeVertical,
+                                                      Pos.Center () + Parent!.Margin!.Thickness.Horizontal,
+                                                      0,
+                                                      ViewArrangement.TopResizable);
         }
 
         if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
         {
             _rightSizeButton = CreateArrangementButton (
-                "rightSizeButton",
-                Glyphs.SizeHorizontal,
-                Pos.AnchorEnd (),
-                Pos.Center () + Parent!.Margin!.Thickness.Vertical / 2,
-                ViewArrangement.RightResizable);
+                                                        "rightSizeButton",
+                                                        Glyphs.SizeHorizontal,
+                                                        Pos.AnchorEnd (),
+                                                        Pos.Center () + Parent!.Margin!.Thickness.Vertical / 2,
+                                                        ViewArrangement.RightResizable);
         }
 
         if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
         {
             _leftSizeButton = CreateArrangementButton (
-                "leftSizeButton",
-                Glyphs.SizeHorizontal,
-                0,
-                Pos.Center () + Parent!.Margin!.Thickness.Vertical / 2,
-                ViewArrangement.LeftResizable);
+                                                       "leftSizeButton",
+                                                       Glyphs.SizeHorizontal,
+                                                       0,
+                                                       Pos.Center () + Parent!.Margin!.Thickness.Vertical / 2,
+                                                       ViewArrangement.LeftResizable);
         }
 
         if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
         {
             _bottomSizeButton = CreateArrangementButton (
-                "bottomSizeButton",
-                Glyphs.SizeVertical,
-                Pos.Center () + Parent!.Margin!.Thickness.Horizontal / 2,
-                Pos.AnchorEnd (),
-                ViewArrangement.BottomResizable);
+                                                         "bottomSizeButton",
+                                                         Glyphs.SizeVertical,
+                                                         Pos.Center () + Parent!.Margin!.Thickness.Horizontal / 2,
+                                                         Pos.AnchorEnd (),
+                                                         ViewArrangement.BottomResizable);
         }
     }
 
     /// <summary>
-    /// Factory method to create a standardized arrangement button
+    ///     Factory method to create a standardized arrangement button
     /// </summary>
     private Button CreateArrangementButton (string id, Rune glyph, Pos x, Pos y, ViewArrangement arrangement)
     {
@@ -193,11 +164,12 @@ public partial class Border
         button.KeyBindings.Remove (Key.Enter);
 
         Add (button);
+
         return button;
     }
 
     /// <summary>
-    /// Sets button visibility for keyboard arrangement mode
+    ///     Sets button visibility for keyboard arrangement mode
     /// </summary>
     private void SetVisibilityForKeyboardMode ()
     {
@@ -233,7 +205,7 @@ public partial class Border
     }
 
     /// <summary>
-    /// Sets button visibility based on the specified mouse arrangement mode
+    ///     Sets button visibility based on the specified mouse arrangement mode
     /// </summary>
     private void SetVisibilityForMouseMode (ViewArrangement arrangement)
     {
@@ -241,67 +213,79 @@ public partial class Border
         {
             case ViewArrangement.Movable:
                 SetVisibleButton (_moveButton);
+
                 break;
 
             case ViewArrangement.RightResizable | ViewArrangement.BottomResizable:
             case ViewArrangement.Resizable:
                 SetVisibleButton (_rightSizeButton);
                 SetVisibleButton (_bottomSizeButton);
+
                 if (_allSizeButton != null)
                 {
                     _allSizeButton.X = Pos.AnchorEnd ();
                     _allSizeButton.Y = Pos.AnchorEnd ();
                     _allSizeButton.Visible = true;
                 }
+
                 break;
 
             case ViewArrangement.LeftResizable:
                 SetVisibleButton (_leftSizeButton);
+
                 break;
 
             case ViewArrangement.RightResizable:
                 SetVisibleButton (_rightSizeButton);
+
                 break;
 
             case ViewArrangement.TopResizable:
                 SetVisibleButton (_topSizeButton);
+
                 break;
 
             case ViewArrangement.BottomResizable:
                 SetVisibleButton (_bottomSizeButton);
+
                 break;
 
             case ViewArrangement.LeftResizable | ViewArrangement.BottomResizable:
                 SetVisibleButton (_leftSizeButton);
                 SetVisibleButton (_bottomSizeButton);
+
                 if (_allSizeButton != null)
                 {
                     _allSizeButton.X = 0;
                     _allSizeButton.Y = Pos.AnchorEnd ();
                     _allSizeButton.Visible = true;
                 }
+
                 break;
 
             case ViewArrangement.LeftResizable | ViewArrangement.TopResizable:
                 SetVisibleButton (_leftSizeButton);
                 SetVisibleButton (_topSizeButton);
+
                 break;
 
             case ViewArrangement.RightResizable | ViewArrangement.TopResizable:
                 SetVisibleButton (_rightSizeButton);
                 SetVisibleButton (_topSizeButton);
+
                 if (_allSizeButton != null)
                 {
                     _allSizeButton.X = Pos.AnchorEnd ();
                     _allSizeButton.Y = 0;
                     _allSizeButton.Visible = true;
                 }
+
                 break;
         }
     }
 
     /// <summary>
-    /// Helper method to make a button visible if it's not null
+    ///     Helper method to make a button visible if it's not null
     /// </summary>
     private void SetVisibleButton (Button? button)
     {
@@ -324,7 +308,7 @@ public partial class Border
                             return false;
                         }
 
-                        bool handled = false;
+                        var handled = false;
 
                         if (Arranging.HasFlag (ViewArrangement.Movable))
                         {
@@ -341,7 +325,7 @@ public partial class Border
                             }
                         }
 
-                        if (((ViewArrangement)Focused?.Data!) == ViewArrangement.TopResizable)
+                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.TopResizable)
                         {
                             if (Parent.Viewport.Height >= 0)
                             {
@@ -363,7 +347,7 @@ public partial class Border
                             return false;
                         }
 
-                        bool handled = false;
+                        var handled = false;
 
                         if (Arranging.HasFlag (ViewArrangement.Movable))
                         {
@@ -377,7 +361,7 @@ public partial class Border
                             handled = true;
                         }
 
-                        if (((ViewArrangement)Focused?.Data!) == ViewArrangement.TopResizable)
+                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.TopResizable)
                         {
                             if (Parent.Viewport.Height > 0)
                             {
@@ -405,8 +389,8 @@ public partial class Border
                             return false;
                         }
 
+                        var handled = false;
 
-                        bool handled = false;
                         if (Arranging.HasFlag (ViewArrangement.Movable))
                         {
                             Parent.X -= 1;
@@ -422,7 +406,7 @@ public partial class Border
                             }
                         }
 
-                        if (((ViewArrangement)Focused?.Data!) == ViewArrangement.LeftResizable)
+                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.LeftResizable)
                         {
                             Parent.X -= 1;
                             Parent.Width += 1;
@@ -441,7 +425,8 @@ public partial class Border
                             return false;
                         }
 
-                        bool handled = false;
+                        var handled = false;
+
                         if (Arranging.HasFlag (ViewArrangement.Movable))
                         {
                             Parent.X += 1;
@@ -454,7 +439,7 @@ public partial class Border
                             handled = true;
                         }
 
-                        if (((ViewArrangement)Focused?.Data!) == ViewArrangement.LeftResizable)
+                        if ((ViewArrangement)Focused?.Data! == ViewArrangement.LeftResizable)
                         {
                             if (Parent.Viewport.Width > 0)
                             {
@@ -522,7 +507,6 @@ public partial class Border
 
     private bool? EndArrangeMode ()
     {
-        // Debug.Assert (_arranging != ViewArrangement.Fixed);
         Arranging = ViewArrangement.Fixed;
 
         MouseState &= ~MouseState.Pressed;
@@ -556,18 +540,17 @@ public partial class Border
     }
 
     /// <summary>
-    /// Helper method to dispose and remove a button
+    ///     Helper method to dispose and remove a button
     /// </summary>
     private void DisposeSizeButton (ref Button? button)
     {
-        if (button != null)
+        if (button is {})
         {
             Remove (button);
             button.Dispose ();
             button = null;
         }
     }
-
 
     #region Mouse Support
 
@@ -577,7 +560,6 @@ public partial class Border
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouseEvent)
     {
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             Parent!.SetFocus ();
@@ -604,9 +586,6 @@ public partial class Border
                 // Determine the mode based on where the click occurred
                 ViewArrangement arrangeMode = DetermineArrangeModeFromClick ();
                 EnterArrangeMode (arrangeMode);
-
-                // BUGBUG: Should we return the result of EnterArrangeMode?
-                return true;
             }
 
             return true;
@@ -617,6 +596,7 @@ public partial class Border
             if (_dragPosition.HasValue)
             {
                 HandleDragOperation (mouseEvent);
+
                 return true;
             }
         }
@@ -635,7 +615,7 @@ public partial class Border
     }
 
     /// <summary>
-    /// Determines the arrangement mode based on where the mouse was clicked
+    ///     Determines the arrangement mode based on where the mouse was clicked
     /// </summary>
     internal ViewArrangement DetermineArrangeModeFromClick ()
     {
@@ -645,6 +625,7 @@ public partial class Border
         if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable))
         {
             sideRect = new (Frame.X, Frame.Y + Thickness.Top, Thickness.Left, Frame.Height - Thickness.Top - Thickness.Bottom);
+
             if (sideRect.Contains (_startGrabPoint))
             {
                 return ViewArrangement.LeftResizable;
@@ -655,14 +636,14 @@ public partial class Border
         if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable))
         {
             sideRect = new (
-                Frame.X + Frame.Width - Thickness.Right,
-                Frame.Y + Thickness.Top,
-                Thickness.Right,
-                Frame.Height - Thickness.Top - Thickness.Bottom);
+                            Frame.X + Frame.Width - Thickness.Right,
+                            Frame.Y + Thickness.Top,
+                            Thickness.Right,
+                            Frame.Height - Thickness.Top - Thickness.Bottom);
 
             if (sideRect.Contains (_startGrabPoint))
             {
-                return (ViewArrangement.RightResizable);
+                return ViewArrangement.RightResizable;
             }
         }
 
@@ -673,7 +654,7 @@ public partial class Border
 
             if (sideRect.Contains (_startGrabPoint))
             {
-                return (ViewArrangement.TopResizable);
+                return ViewArrangement.TopResizable;
             }
         }
 
@@ -681,14 +662,14 @@ public partial class Border
         if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
         {
             sideRect = new (
-                Frame.X + Thickness.Left,
-                Frame.Y + Frame.Height - Thickness.Bottom,
-                Frame.Width - Thickness.Left - Thickness.Right,
-                Thickness.Bottom);
+                            Frame.X + Thickness.Left,
+                            Frame.Y + Frame.Height - Thickness.Bottom,
+                            Frame.Width - Thickness.Left - Thickness.Right,
+                            Thickness.Bottom);
 
             if (sideRect.Contains (_startGrabPoint))
             {
-                return (ViewArrangement.BottomResizable);
+                return ViewArrangement.BottomResizable;
             }
         }
 
@@ -699,7 +680,7 @@ public partial class Border
 
             if (sideRect.Contains (_startGrabPoint))
             {
-                return (ViewArrangement.BottomResizable | ViewArrangement.LeftResizable);
+                return ViewArrangement.BottomResizable | ViewArrangement.LeftResizable;
             }
         }
 
@@ -710,7 +691,7 @@ public partial class Border
 
             if (sideRect.Contains (_startGrabPoint))
             {
-                return (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
+                return ViewArrangement.BottomResizable | ViewArrangement.RightResizable;
             }
         }
 
@@ -721,7 +702,7 @@ public partial class Border
 
             if (sideRect.Contains (_startGrabPoint))
             {
-                return (ViewArrangement.TopResizable | ViewArrangement.RightResizable);
+                return ViewArrangement.TopResizable | ViewArrangement.RightResizable;
             }
         }
 
@@ -732,7 +713,7 @@ public partial class Border
 
             if (sideRect.Contains (_startGrabPoint))
             {
-                return (ViewArrangement.TopResizable | ViewArrangement.LeftResizable);
+                return ViewArrangement.TopResizable | ViewArrangement.LeftResizable;
             }
         }
 
@@ -746,7 +727,7 @@ public partial class Border
     }
 
     /// <summary>
-    /// Handles drag operations for moving and resizing
+    ///     Handles drag operations for moving and resizing
     /// </summary>
     internal void HandleDragOperation (Mouse mouseEvent)
     {
@@ -773,6 +754,7 @@ public partial class Border
             case ViewArrangement.Movable:
                 Parent.X = parentLoc.X - _startGrabPoint.X;
                 Parent.Y = parentLoc.Y - _startGrabPoint.Y;
+
                 break;
 
             case ViewArrangement.TopResizable:
@@ -786,10 +768,12 @@ public partial class Border
                     Parent.Height = newHeight;
                     Parent.Y = parentLoc.Y - _startGrabPoint.Y;
                 }
+
                 break;
 
             case ViewArrangement.BottomResizable:
                 Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
+
                 break;
 
             case ViewArrangement.LeftResizable:
@@ -803,15 +787,18 @@ public partial class Border
                     Parent.Width = newWidth;
                     Parent.X = parentLoc.X - _startGrabPoint.X;
                 }
+
                 break;
 
             case ViewArrangement.RightResizable:
                 Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
+
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.RightResizable:
                 Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
                 Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
+
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.LeftResizable:
@@ -825,6 +812,7 @@ public partial class Border
                 }
 
                 Parent.Height = Math.Max (minHeight, parentLoc.Y - Parent.Frame.Y + Parent!.Margin!.Thickness.Bottom + 1);
+
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.RightResizable:
@@ -838,6 +826,7 @@ public partial class Border
                 }
 
                 Parent.Width = Math.Max (minWidth, parentLoc.X - Parent.Frame.X + Parent!.Margin!.Thickness.Right + 1);
+
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.LeftResizable:
@@ -858,6 +847,7 @@ public partial class Border
                     Parent.Width = newW2;
                     Parent.X = parentLoc.X - _startGrabPoint.X;
                 }
+
                 break;
         }
     }
