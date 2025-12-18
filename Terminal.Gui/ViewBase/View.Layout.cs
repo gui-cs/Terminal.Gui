@@ -11,7 +11,7 @@ public partial class View // Layout APIs
     /// </summary>
     /// <param name="location">SuperView-relative coordinate</param>
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
-    public virtual bool Contains (in Point location) { return Frame.Contains (location); }
+    public virtual bool Contains (in Point location) => Frame.Contains (location);
 
     private Rectangle? _frame;
 
@@ -227,7 +227,7 @@ public partial class View // Layout APIs
     /// </remarks>
     public Pos X
     {
-        get => VerifyIsInitialized (_x, nameof (X));
+        get => _x;
         set
         {
             if (Equals (_x, value))
@@ -272,7 +272,7 @@ public partial class View // Layout APIs
     /// </remarks>
     public Pos Y
     {
-        get => VerifyIsInitialized (_y, nameof (Y));
+        get => _y;
         set
         {
             if (Equals (_y, value))
@@ -323,7 +323,7 @@ public partial class View // Layout APIs
     /// <seealso cref="HeightChanged"/>
     public Dim Height
     {
-        get => VerifyIsInitialized (_height, nameof (Height));
+        get => _height;
         set
         {
             CWPPropertyHelper.ChangeProperty (
@@ -352,7 +352,7 @@ public partial class View // Layout APIs
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new height.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnHeightChanging (ValueChangingEventArgs<Dim> args) { return false; }
+    protected virtual bool OnHeightChanging (ValueChangingEventArgs<Dim> args) => false;
 
     /// <summary>
     ///     Called after the <see cref="Height"/> property changes, allowing subclasses to react to the change.
@@ -411,7 +411,7 @@ public partial class View // Layout APIs
     /// <seealso cref="WidthChanged"/>
     public Dim Width
     {
-        get => VerifyIsInitialized (_width, nameof (Width));
+        get => _width;
         set
         {
             CWPPropertyHelper.ChangeProperty (
@@ -437,8 +437,9 @@ public partial class View // Layout APIs
 
     private void NeedsClearScreenNextIteration ()
     {
-        if (App is { TopRunnableView: { } } && App.TopRunnableView == this
-                                        && App.SessionStack!.Select (r => r.Runnable as View).Count() == 1)
+        if (App is { TopRunnableView: { } }
+            && App.TopRunnableView == this
+            && App.SessionStack!.Select (r => r.Runnable as View).Count () == 1)
         {
             // If this is the only Runnable, we need to redraw the screen
             App.ClearScreenNextIteration = true;
@@ -450,7 +451,7 @@ public partial class View // Layout APIs
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new width.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnWidthChanging (ValueChangingEventArgs<Dim> args) { return false; }
+    protected virtual bool OnWidthChanging (ValueChangingEventArgs<Dim> args) => false;
 
     /// <summary>
     ///     Called after the <see cref="Width"/> property changes, allowing subclasses to react to the change.
@@ -575,7 +576,6 @@ public partial class View // Layout APIs
     {
         Debug.Assert (_x is { });
         Debug.Assert (_y is { });
-
 
         CheckDimAuto ();
 
@@ -968,6 +968,7 @@ public partial class View // Layout APIs
 
         if (dim!.Has (out DimCombine dc))
         {
+            // TODO: Redo without recursion
             CollectDim (dc.Left, from, ref nNodes, ref nEdges);
             CollectDim (dc.Right, from, ref nNodes, ref nEdges);
         }
@@ -998,6 +999,7 @@ public partial class View // Layout APIs
 
                 return;
             case PosCombine pc:
+                // TODO: Redo without recursion
                 CollectPos (pc.Left, from, ref nNodes, ref nEdges);
                 CollectPos (pc.Right, from, ref nNodes, ref nEdges);
 
@@ -1119,11 +1121,9 @@ public partial class View // Layout APIs
                                             : App?.Screen.Size ?? new (2048, 2048));
 
         return superViewContentSize;
-
     }
 
     // BUGBUG: This method interferes with Dialog/MessageBox default min/max size.
-    // TODO: Get rid of MenuBar coupling as part of https://github.com/gui-cs/Terminal.Gui/issues/2975
     // TODO: Refactor / rewrite this - It's a mess
     /// <summary>
     ///     Gets a new location of the <see cref="View"/> that is within the Viewport of the <paramref name="viewToMove"/>'s
@@ -1176,35 +1176,19 @@ public partial class View // Layout APIs
         {
             nx = Math.Max (targetX, 0);
             nx = nx + viewToMove.Frame.Width > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Width, 0) : nx;
-
-            //if (nx > viewToMove.Frame.X + viewToMove.Frame.Width)
-            //{
-            //    nx = Math.Max (viewToMove.Frame.Right, 0);
-            //}
         }
         else
         {
             nx = 0; //targetX;
         }
 
-        //System.Diagnostics.Debug.WriteLine ($"nx:{nx}, rWidth:{rWidth}");
-        //var menuVisible = false;
-        //var statusVisible = false;
-
         maxDimension = 0;
 
         ny = Math.Max (targetY, maxDimension);
 
-        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove?.SuperView == app?.TopRunnableView)
+        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove.SuperView == app?.TopRunnableView)
         {
-            if (app is { })
-            {
-                maxDimension = app.Screen.Height;
-            }
-            else
-            {
-                maxDimension = 0;
-            }
+            maxDimension = app is { } ? app.Screen.Height : 0;
         }
         else
         {
@@ -1229,9 +1213,7 @@ public partial class View // Layout APIs
             ny = 0;
         }
 
-        //System.Diagnostics.Debug.WriteLine ($"ny:{ny}, rHeight:{rHeight}");
-
-        return superView!;
+        return superView;
     }
 
     /// <summary>
@@ -1267,7 +1249,7 @@ public partial class View // Layout APIs
         // Traverse all visible runnables, topmost first (reverse stack order)
         if (App?.SessionStack!.Count > 0)
         {
-            foreach (View? runnable in App.SessionStack!.Select(r => r.Runnable as View))
+            foreach (View? runnable in App.SessionStack!.Select (r => r.Runnable as View))
             {
                 if (runnable!.Visible && runnable.Contains (screenLocation))
                 {
@@ -1398,10 +1380,35 @@ public partial class View // Layout APIs
             // Add the current view to the result
             result.Add (currentView);
 
-            // Add adornments for the current view
-            result.AddRange (Adornment.GetViewsAtLocation (currentView.Margin, location));
-            result.AddRange (Adornment.GetViewsAtLocation (currentView.Border, location));
-            result.AddRange (Adornment.GetViewsAtLocation (currentView.Padding, location));
+            // Push adornments onto the stack BEFORE subviews so adornments' subviews are processed AFTER regular subviews
+            // This ensures that adornment subviews (e.g., ExpanderButton in Border) are considered "deeper" than
+            // regular subviews' adornments (e.g., childView.Border) when they overlap.
+            // Push in reverse order (Padding, Border, Margin) so they're processed in correct order (Margin, Border, Padding)
+            Point superViewRelativeLocation = currentView.SuperView?.ScreenToViewport (location) ?? location;
+
+            if (currentView.Padding is { } padding && padding.Thickness != Thickness.Empty)
+            {
+                if (padding.Contains (superViewRelativeLocation) && padding.FrameToScreen ().Contains (location))
+                {
+                    viewsToProcess.Push (padding);
+                }
+            }
+
+            if (currentView.Border is { } border && border.Thickness != Thickness.Empty)
+            {
+                if (border.Contains (superViewRelativeLocation) && border.FrameToScreen ().Contains (location))
+                {
+                    viewsToProcess.Push (border);
+                }
+            }
+
+            if (currentView.Margin is { } margin && margin.Thickness != Thickness.Empty)
+            {
+                if (margin.Contains (superViewRelativeLocation) && margin.FrameToScreen ().Contains (location))
+                {
+                    viewsToProcess.Push (margin);
+                }
+            }
 
             // Add subviews to the stack in reverse order
             // This maintains the original depth-first traversal order
@@ -1423,35 +1430,6 @@ public partial class View // Layout APIs
 
     #region Diagnostics and Verification
 
-    // Diagnostics to highlight when X or Y is read before the view has been initialized
-    private Pos VerifyIsInitialized (Pos pos, string member)
-    {
-        //#if DEBUG
-        //        if (pos.ReferencesOtherViews () && !IsInitialized)
-        //        {
-        //            Debug.WriteLine (
-        //                             $"WARNING: {member} = {pos} of {this} is dependent on other views and {member} "
-        //                             + $"is being accessed before the View has been initialized. This is likely a bug."
-        //                            );
-        //        }
-        //#endif // DEBUG
-        return pos;
-    }
-
-    // Diagnostics to highlight when Width or Height is read before the view has been initialized
-    private Dim VerifyIsInitialized (Dim dim, string member)
-    {
-        //#if DEBUG
-        //        if (dim.ReferencesOtherViews () && !IsInitialized)
-        //        {
-        //            Debug.WriteLine (
-        //                             $"WARNING: {member} = {dim} of {this} is dependent on other views and {member} "
-        //                             + $"is being accessed before the View has been initialized. This is likely a bug."
-        //                            );
-        //        }
-        //#endif // DEBUG
-        return dim;
-    }
 
     /// <summary>Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs.</summary>
     /// <remarks>
