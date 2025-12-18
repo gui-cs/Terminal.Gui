@@ -378,7 +378,7 @@ public class HotKeyTests
     public void HotKeySpecifier_0xFFFF_Clears_HotKey ()
     {
         // Arrange: Create a view with a hotkey
-        var view = new View { HotKeySpecifier = (Rune)'_', Title = "_Test" };
+        View view = new () { HotKeySpecifier = (Rune)'_', Title = "_Test" };
         Assert.Equal (KeyCode.T, view.HotKey);
 
         // Act: Set HotKeySpecifier to 0xFFFF
@@ -392,7 +392,7 @@ public class HotKeyTests
     public void HotKeySpecifier_0xFFFF_Before_Title_Set_Prevents_HotKey ()
     {
         // Arrange & Act: Set HotKeySpecifier to 0xFFFF before setting Title
-        var view = new View { HotKeySpecifier = (Rune)0xFFFF };
+        View view = new () { HotKeySpecifier = (Rune)0xFFFF };
         view.Title = "_Test";
 
         // Assert: HotKey should remain empty
@@ -403,7 +403,7 @@ public class HotKeyTests
     public void HotKeySpecifier_0xFFFF_With_Underscore_In_Title ()
     {
         // Arrange & Act: This is the scenario from the bug report
-        var view = new View
+        View view = new ()
         {
             HotKeySpecifier = (Rune)0xFFFF,
             Title = "my label with an _underscore"
