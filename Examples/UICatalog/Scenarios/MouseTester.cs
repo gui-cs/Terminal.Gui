@@ -332,7 +332,7 @@ public class MouseTester : Scenario
         };
         ObservableCollection<string> viewLogList = [];
 
-        ListView viewLog = new () 
+        ListView viewLog = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
@@ -351,7 +351,7 @@ public class MouseTester : Scenario
                               if (filterSlider.GetSetOptions ().Contains (i))
                               {
                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
-                                  viewLogList.Add ($"{mouse.Position}:{mouse.View.Id}:{mouse.Flags}");
+                                  viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
                                   viewLog.MoveEnd ();
                               }
                           };
@@ -363,7 +363,7 @@ public class MouseTester : Scenario
                                if (filterSlider.GetSetOptions ().Contains (i))
                                {
                                    lastViewEvent.Text = $"  Last View Event: {mouse}";
-                                   viewLogList.Add ($"{mouse.Position}:{mouse.View.Id}:{mouse.Flags}");
+                                   viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
                                    viewLog.MoveEnd ();
                                }
                            };
@@ -375,7 +375,7 @@ public class MouseTester : Scenario
                                if (filterSlider.GetSetOptions ().Contains (i))
                                {
                                    lastViewEvent.Text = $"  Last View Event: {mouse}";
-                                   viewLogList.Add ($"{mouse.Position}:{mouse.View.Id}:{mouse.Flags}");
+                                   viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
                                    viewLog.MoveEnd ();
                                }
                            };
@@ -400,42 +400,42 @@ public class MouseTester : Scenario
 
         demo.Activating += (_, args) =>
                          {
-                             commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                             commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
                              commandLog.MoveEnd ();
                              args.Handled = true;
                          };
 
         demo.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
 
         sub1.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         sub1.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
 
         sub2.Activating += (_, args) =>
                            {
-                               commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                               commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
                                commandLog.MoveEnd ();
                                args.Handled = true;
                            };
 
         sub2.Accepting += (_, args) =>
                           {
-                              commandLogList.Add ($"{args.Context!.Source.Id}:{args.Context!.Command}");
+                              commandLogList.Add ($"{args.Context!.Source!.Id}:{args.Context!.Command}");
                               commandLog.MoveEnd ();
                               args.Handled = true;
                           };
