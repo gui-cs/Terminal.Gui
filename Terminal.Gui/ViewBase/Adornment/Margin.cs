@@ -328,7 +328,7 @@ public class Margin : Adornment
         }
 
         bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.MouseHighlightStates.HasFlag (MouseState.Pressed);
-        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.MouseHighlightStates.HasFlag (MouseState.PressedOutside); ;
+        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.MouseHighlightStates.HasFlag (MouseState.PressedOutside);
 
         if (pressedOutside)
         {

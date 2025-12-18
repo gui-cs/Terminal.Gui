@@ -10,6 +10,8 @@ public partial class View // Keyboard APIs
     {
         KeyBindings = new (this);
         KeyBindings.Add (Key.Space, Command.Activate);
+
+        // QUESTION: Should subclasses be required to enable Accept?
         KeyBindings.Add (Key.Enter, Command.Accept);
 
         HotKeyBindings = new (this);
@@ -225,6 +227,7 @@ public partial class View // Keyboard APIs
     {
         if (HotKeySpecifier == new Rune ('\xFFFF'))
         {
+            HotKey = Key.Empty;
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
 

@@ -48,6 +48,8 @@ internal class AnsiSizeMonitor : ISizeMonitor
     {
         if (driver is null)
         {
+            Logging.Warning ("ANSISizeMonitor: Initialize called with null driver");
+
             return;
         }
 
@@ -66,6 +68,13 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
     private void SendSizeQuery ()
     {
+        if (_queueAnsiRequest is null)
+        {
+            Logging.Warning ("ANSISizeMonitor: Cannot send size query - _queueAnsiRequest is null");
+
+            return;
+        }
+
         _expectingResponse = true;
         _lastQuery = DateTime.Now;
 
@@ -74,14 +83,9 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Request = EscSeqUtils.CSI_ReportWindowSizeInChars.Request,
             Terminator = EscSeqUtils.CSI_ReportWindowSizeInChars.Terminator,
             ResponseReceived = HandleSizeResponse,
-            Abandoned = () =>
-                        {
-                            _expectingResponse = false;
-                            //Logging.Trace ("Size query abandoned");
-                        }
+            Abandoned = () => { _expectingResponse = false; }
         };
 
-        // Logging.Trace ("Queueing ANSI size query");
         _queueAnsiRequest! (request);
     }
 
@@ -114,7 +118,6 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
         if (currentSize != _lastSize)
         {
-            //Logging.Trace ($"Terminal size changed from {_lastSize.Width}x{_lastSize.Height} to {currentSize.Width}x{currentSize.Height}");
             _lastSize = currentSize;
             SizeChanged?.Invoke (this, new (currentSize));
 

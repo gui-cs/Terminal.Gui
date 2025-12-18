@@ -436,19 +436,23 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 
 ### UnixDriver (UnixComponentFactory)
 
-- Uses Unix/Linux terminal APIs
-- Input: Reads raw `char` data from terminal
-- Output: Uses ANSI escape sequences
-- Supports Unix-specific features
+- Uses Unix/Linux terminal APIs via P/Invoke to libc
+- Input: Reads raw `char` data from stdin using `poll()` and `read()` syscalls
+- Output: Writes ANSI escape sequences to stdout using `write()` syscall
+- Terminal control: Uses termios for raw mode (via `UnixRawModeHelper`)
+- Size detection: Uses `ioctl(TIOCGWINSZ)` to get terminal dimensions
 - Automatically selected on Unix/Linux/macOS platforms
 
 ### AnsiDriver (AnsiComponentFactory)
 
 - Pure ANSI escape sequence cross-platform driver
-- Uses ANSI escape sequences for keyboard, mouse input and output
-- Best for unit testing and headless environments
-- Works on all platforms with ANSI support
-- Specify with `IApplication.ForceDriver` = `"ansi"` or `DriverRegistry.Names.ANSI`
+- **Windows**: Uses Virtual Terminal Input mode (`ReadFile` API)
+- **Unix/Linux/macOS**: Uses the same low-level syscalls as UnixDriver (`poll()`, `read()`) via shared `UnixIOHelper`
+- Shares code with UnixDriver:
+  - `UnixRawModeHelper` - Terminal raw mode configuration (termios)
+  - `UnixIOHelper` - Shared Unix syscall wrappers (poll, read, write, ioctl)
+- Best for unit testing, headless environments, and maximum portability
+- Specify with `IApplication.ForceDriver = "ansi"` or `DriverRegistry.Names.ANSI`
 
 ## Testing and Input Injection
 

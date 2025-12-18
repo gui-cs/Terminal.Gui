@@ -50,9 +50,28 @@ public partial class Border
         {
             // Keyboard mode
             SetVisibilityForKeyboardMode ();
-            Arranging = ViewArrangement.Movable;
-            CanFocus = true;
-            SetFocus ();
+            
+            // Focus on the first visible button to enable keyboard navigation
+            Button? firstVisibleButton = SubViews
+                .OfType<Button> ()
+                .FirstOrDefault (b => b.Visible);
+            
+            if (firstVisibleButton != null)
+            {
+                Arranging = (ViewArrangement)(firstVisibleButton.Data ?? ViewArrangement.Movable);
+                CanFocus = true;
+                SetFocus ();
+                firstVisibleButton.SetFocus ();
+            }
+            else
+            {
+                // No visible buttons, default to Movable if available
+                Arranging = Parent!.Arrangement.HasFlag (ViewArrangement.Movable) 
+                    ? ViewArrangement.Movable 
+                    : ViewArrangement.Fixed;
+                CanFocus = true;
+                SetFocus ();
+            }
         }
         else
         {
@@ -63,13 +82,6 @@ public partial class Border
 
         if (Arranging != ViewArrangement.Fixed)
         {
-            if (arrangement == ViewArrangement.Fixed)
-            {
-                // Keyboard mode - enable nav
-                // TODO: Keyboard mode only supports sizing from bottom/right.
-                Arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
-            }
-
             return true;
         }
 
@@ -101,7 +113,15 @@ public partial class Border
             _moveButton = CreateArrangementButton ("moveButton", Glyphs.Move, 0, 0, ViewArrangement.Movable);
         }
 
-        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
+        // Create allSizeButton if there's a corner combination (two perpendicular resizable directions)
+        bool hasCornerCombination = 
+            (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable) && 
+             (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable) || Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)))
+            ||
+            (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable) && 
+             (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable) || Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)));
+
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable) || hasCornerCombination)
         {
             _allSizeButton = CreateArrangementButton (
                 "allSizeButton",
@@ -182,14 +202,80 @@ public partial class Border
     /// </summary>
     private void SetVisibilityForKeyboardMode ()
     {
-        if (_moveButton != null)
+        // For fully Resizable views, only show move button and all-size button
+        // For specific direction resizing, show individual direction buttons
+        
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.Movable) && _moveButton != null)
         {
             _moveButton.Visible = true;
         }
 
-        if (_allSizeButton != null)
+        // If the view is fully resizable, only show the all-size button
+        if (Parent!.Arrangement.HasFlag (ViewArrangement.Resizable))
         {
-            _allSizeButton.Visible = true;
+            if (_allSizeButton != null)
+            {
+                _allSizeButton.X = Pos.AnchorEnd ();
+                _allSizeButton.Y = Pos.AnchorEnd ();
+                _allSizeButton.Visible = true;
+            }
+        }
+        else
+        {
+            // Otherwise, show buttons for the specific enabled directions
+            if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable) && _leftSizeButton != null)
+            {
+                _leftSizeButton.Visible = true;
+            }
+
+            if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable) && _rightSizeButton != null)
+            {
+                _rightSizeButton.Visible = true;
+            }
+
+            if (Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable) && _topSizeButton != null)
+            {
+                _topSizeButton.Visible = true;
+            }
+
+            if (Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable) && _bottomSizeButton != null)
+            {
+                _bottomSizeButton.Visible = true;
+            }
+
+            // Show all-size button for corner combinations
+            if (_allSizeButton != null)
+            {
+                // Position and show the all-size button based on which corner combinations are available
+                if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable) 
+                    && Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
+                {
+                    _allSizeButton.X = Pos.AnchorEnd ();
+                    _allSizeButton.Y = Pos.AnchorEnd ();
+                    _allSizeButton.Visible = true;
+                }
+                else if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable) 
+                         && Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable))
+                {
+                    _allSizeButton.X = 0;
+                    _allSizeButton.Y = Pos.AnchorEnd ();
+                    _allSizeButton.Visible = true;
+                }
+                else if (Parent!.Arrangement.HasFlag (ViewArrangement.RightResizable) 
+                         && Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable))
+                {
+                    _allSizeButton.X = Pos.AnchorEnd ();
+                    _allSizeButton.Y = 0;
+                    _allSizeButton.Visible = true;
+                }
+                else if (Parent!.Arrangement.HasFlag (ViewArrangement.LeftResizable) 
+                         && Parent!.Arrangement.HasFlag (ViewArrangement.TopResizable))
+                {
+                    _allSizeButton.X = 0;
+                    _allSizeButton.Y = 0;
+                    _allSizeButton.Visible = true;
+                }
+            }
         }
     }
 

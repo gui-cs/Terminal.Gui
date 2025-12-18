@@ -11,14 +11,26 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     {
         var testView = new View ();
 
-        Assert.Contains (MouseFlags.LeftButtonClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
-        //        Assert.Contains (MouseFlags.LeftButtonDoubleClicked, testView.MouseBindings.GetAllFromCommands (Command.Accept));
+        Assert.Contains (MouseFlags.LeftButtonPressed, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+        Assert.Contains (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
 
-        Assert.Equal (6, testView.MouseBindings.GetBindings ().Count ());
+        Assert.Equal (2, testView.MouseBindings.GetBindings ().Count ());
+
+        testView = new ()
+        {
+            MouseHoldRepeat = true
+        };
+
+        Assert.Contains (MouseFlags.LeftButtonPressed, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+        Assert.Contains (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, testView.MouseBindings.GetAllFromCommands (Command.Context));
+        Assert.Contains (MouseFlags.LeftButtonReleased, testView.MouseBindings.GetAllFromCommands (Command.Activate));
+
+        Assert.Equal (3, testView.MouseBindings.GetBindings ().Count ());
+
     }
 
     [Fact]
-    public void LeftButtonClicked_OnSubView_RaisesSelectingEvent ()
+    public void LeftButtonClicked_OnSubView_Does_Not_RaiseAcceptingEvent ()
     {
         // Arrange
         View superView = new ()
@@ -50,14 +62,14 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         subView.NewMouseEvent (mouse);
 
         // Assert
-        Assert.Equal (1, acceptingCount);
+        Assert.Equal (0, acceptingCount);
 
         subView.Dispose ();
         superView.Dispose ();
     }
 
     [Fact]
-    public void LeftButtonClicked_RaisesSelecting_WhenCanFocus ()
+    public void LeftButtonPressed_RaisesActivating_WhenCanFocus ()
     {
         // Arrange
         View superView = new () { CanFocus = true, Width = 20, Height = 20 };
@@ -73,12 +85,12 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         superView.Add (view);
 
         int acceptingCount = 0;
-        view.Accepting += (_, _) => acceptingCount++;
+        view.Activating += (_, _) => acceptingCount++;
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (5, 5),
-            Flags = MouseFlags.LeftButtonClicked
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act
@@ -154,7 +166,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (false, false, 1)]
     [InlineData (true, false, 1)]
     [InlineData (true, true, 1)]
-    public void MouseClick_Raises_Accepting (bool canFocus, bool setFocus, int expectedAcceptingCount)
+    public void LeftButtonPressed_Raises_Activating (bool canFocus, bool setFocus, int expectedAcceptingCount)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
@@ -173,9 +185,9 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         var acceptingCount = 0;
-        testView.Accepting += (sender, args) => acceptingCount++;
+        testView.Activating += (sender, args) => acceptingCount++;
 
-        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        testView.NewMouseEvent (new () { Timestamp = DateTime.Now, Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.True (superView.HasFocus);
         Assert.Equal (expectedAcceptingCount, acceptingCount);
     }
@@ -250,43 +262,6 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         view.NewMouseEvent (mouseEventDoubleClicked);
 
         Assert.Equal (6, mouseEventCount);
-
-        view.Dispose ();
-    }
-
-    [Fact]
-    public void NewMouseEvent_DoubleClick_Pattern_Raises_Accept_Once ()
-    {
-        View view = new ()
-        {
-            Visible = true,
-            Enabled = true,
-            Width = 1,
-            Height = 1
-        };
-        int acceptingCount = 0;
-
-        view.Accepting += (s, e) =>
-                           {
-                               acceptingCount++;
-                               e.Handled = true;
-                           };
-
-        Mouse mouseEventPressed1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed };
-        view.NewMouseEvent (mouseEventPressed1);
-        Mouse mouseEventReleased1 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonReleased };
-        view.NewMouseEvent (mouseEventReleased1);
-        Mouse mouseEventClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonClicked };
-        view.NewMouseEvent (mouseEventClicked);
-
-        Mouse mouseEventPressed2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed };
-        view.NewMouseEvent (mouseEventPressed2);
-        Mouse mouseEventReleased2 = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonReleased };
-        view.NewMouseEvent (mouseEventReleased2);
-        Mouse mouseEventDoubleClicked = new () { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonDoubleClicked };
-        view.NewMouseEvent (mouseEventDoubleClicked);
-
-        Assert.Equal (1, acceptingCount);
 
         view.Dispose ();
     }

@@ -45,17 +45,29 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     public AnsiOutput ()
     {
+        Logging.Information ($"Creating {nameof (AnsiOutput)}");
+
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);
 
         try
         {
             // Check if console is available (not redirected)
-            if (!Console.IsOutputRedirected && !Console.IsInputRedirected)
+            if (Console.IsOutputRedirected || Console.IsInputRedirected)
+            {
+                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                _terminalInitialized = false;
+            }
+            else
             {
                 Stream stream = Console.OpenStandardOutput ();
 
-                if (stream.CanWrite)
+                if (!stream.CanWrite)
+                {
+                    Logging.Warning ("Console output stream is not writable. Running in degraded mode.");
+                    _terminalInitialized = false;
+                }
+                else
                 {
                     _terminalInitialized = true;
 
@@ -67,6 +79,10 @@ public class AnsiOutput : OutputBase, IOutput
                     Write (EscSeqUtils.CSI_HideCursor);
                     Write (EscSeqUtils.CSI_EnableMouseEvents);
 
+                    // Flush to ensure all sequences are sent
+                    Console.Out.Flush ();
+                    Logging.Information ("ANSIOutput initialized successfully");
+
                     // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
                     // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
                     // not the alternate screen buffer we just activated.
@@ -75,8 +91,10 @@ public class AnsiOutput : OutputBase, IOutput
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
+            Logging.Warning ($"Failed to initialize ANSIOutput: {ex.GetType ().Name}: {ex.Message}");
+            Logging.Warning ($"Stack trace: {ex.StackTrace}");
             _terminalInitialized = false;
         }
     }
@@ -85,7 +103,7 @@ public class AnsiOutput : OutputBase, IOutput
     ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
     ///     a reference to the buffer last written with <see cref="Write(IOutputBuffer)"/>.
     /// </summary>
-    public IOutputBuffer? GetLastBuffer () { return _lastBuffer; }
+    public IOutputBuffer? GetLastBuffer () => _lastBuffer;
 
     ///// <inheritdoc cref="IOutput.GetLastOutput"/>
     //public override string GetLastOutput () => _outputStringBuilder.ToString ();
@@ -94,7 +112,7 @@ public class AnsiOutput : OutputBase, IOutput
     public void SetSize (int width, int height) { _consoleSize = new (width, height); }
 
     /// <inheritdoc/>
-    public Size GetSize () { return _consoleSize; }
+    public Size GetSize () => _consoleSize;
 
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
@@ -145,7 +163,7 @@ public class AnsiOutput : OutputBase, IOutput
     private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
 
     /// <inheritdoc/>
-    public Point GetCursorPosition () { return _lastCursorPosition ?? Point.Empty; }
+    public Point GetCursorPosition () => _lastCursorPosition ?? Point.Empty;
 
     /// <inheritdoc/>
     public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
@@ -160,7 +178,11 @@ public class AnsiOutput : OutputBase, IOutput
 
         try
         {
-            if (visibility != CursorVisibility.Invisible)
+            if (visibility == CursorVisibility.Invisible)
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
+            else
             {
                 if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
                 {
@@ -170,10 +192,6 @@ public class AnsiOutput : OutputBase, IOutput
                 }
 
                 Write (EscSeqUtils.CSI_ShowCursor);
-            }
-            else
-            {
-                Write (EscSeqUtils.CSI_HideCursor);
             }
         }
         catch
@@ -262,8 +280,6 @@ public class AnsiOutput : OutputBase, IOutput
                 if (int.TryParse (match.Groups [2].Value, out int height) && int.TryParse (match.Groups [3].Value, out int width))
                 {
                     _consoleSize = new (width, height);
-
-                    //Logging.Trace ($"Terminal size from ANSI query: {width}x{height}");
                 }
             }
         }

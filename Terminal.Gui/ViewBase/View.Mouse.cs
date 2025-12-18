@@ -12,15 +12,9 @@ public partial class View // Mouse APIs
     {
         MouseBindings = new ();
 
-        // TODO: Should the default really work with any button or just LeftButton?
+        // By default, left click activates. No binding to Accept by default.
         MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
-        MouseBindings.Add (MouseFlags.MiddleButtonPressed, Command.Activate);
-        MouseBindings.Add (MouseFlags.Button4Pressed, Command.Activate);
-        MouseBindings.Add (MouseFlags.RightButtonPressed, Command.Context);
         MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Context);
-
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
-
         // Released bindings are added/removed dynamically when MouseHoldRepeat changes
         // See OnMouseHoldRepeatChanged
     }
@@ -201,6 +195,7 @@ public partial class View // Mouse APIs
         set
         {
             CWPPropertyHelper.ChangeProperty (
+                                              this,
                                               ref _mouseHoldRepeat,
                                               value,
                                               OnMouseHoldRepeatChanging,
@@ -217,11 +212,14 @@ public partial class View // Mouse APIs
             {
                 if (newValue)
                 {
+                    // Enabled: LeftButtonReleased invokes Activate
                     MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Activate);
                 }
                 else
                 {
-                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonReleased, Command.Accept);
+                    // Disabled: LeftButtonPressed invokes Activate
+                    MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+                    MouseBindings.ReplaceCommands (MouseFlags.LeftButtonPressed, Command.Activate);
 
                 }
 
@@ -494,7 +492,8 @@ public partial class View // Mouse APIs
     // LEGACY - Can be rewritten
     private void MouseHoldRepeaterOnMouseIsHeldDownTick (object? sender, CancelEventArgs<Mouse> e)
     {
-        Logging.Trace ($"MouseHoldRepeater tick - raising commands bound {e.NewValue.Flags}");
+        e.NewValue.Flags = MouseFlags.LeftButtonReleased;
+        //Logging.Trace ($"MouseHoldRepeater tick - raising commands bound {e.NewValue.Flags}");
         e.NewValue.ScreenPosition = App?.Mouse.LastMousePosition ?? e.NewValue.ScreenPosition;
         /*e.Cancel = */
         RaiseCommandsBoundToButtonFlags (e.NewValue);
