@@ -89,6 +89,22 @@ public class Wizard : Dialog
         IsRunningChanged += Wizard_IsRunningChanged;
         TitleChanged += Wizard_TitleChanged;
 
+        // Add key binding for Esc when not modal - fires Cancelled event
+        AddCommand (Command.Quit, ctx =>
+        {
+            // Only handle if not modal (modal is handled by Dialog/Application)
+            if (!IsModal)
+            {
+                var args = new WizardButtonEventArgs ();
+                Cancelled?.Invoke (this, args);
+
+                return true;
+            }
+
+            return false;
+        });
+        KeyBindings.Add (Application.QuitKey, Command.Quit);
+
         SetNeedsLayout ();
     }
 
@@ -369,31 +385,6 @@ public class Wizard : Dialog
     public event EventHandler<WizardButtonEventArgs>? MovingNext;
 
     /// <summary>
-    ///     <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
-    ///     <see cref="IApplication.RequestStop(IRunnable)"/>, closing the Dialog. Wizard overrides
-    ///     <see cref="OnKeyDownNotHandled"/> to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a
-    ///     non-modal.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    protected override bool OnKeyDownNotHandled (Key key)
-    {
-        // BUGBUG: Why is this not handled by a key binding???
-        if (!IsModal)
-        {
-            if (key == Key.Esc)
-            {
-                var args = new WizardButtonEventArgs ();
-                Cancelled?.Invoke (this, args);
-
-                return false;
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>
     ///     Called when the <see cref="Wizard"/> has completed transition to a new <see cref="WizardStep"/>. Fires the
     ///     <see cref="StepChanged"/> event.
     /// </summary>
@@ -440,6 +431,10 @@ public class Wizard : Dialog
         if (!args.Cancel)
         {
             e.Handled = GoBack ();
+        }
+        else
+        {
+            e.Handled = true;
         }
     }
 
