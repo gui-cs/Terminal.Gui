@@ -53,7 +53,7 @@ public class ViewportSettings : Scenario
             MouseEvent += VirtualDemoView_MouseEvent;
         }
 
-        private void VirtualDemoView_MouseEvent (object sender, Terminal.Gui.Input.Mouse e)
+        private void VirtualDemoView_MouseEvent (object sender, Terminal.Gui.Input.MouseEventArgs e)
         {
             if (e.Flags == MouseFlags.WheeledDown)
             {

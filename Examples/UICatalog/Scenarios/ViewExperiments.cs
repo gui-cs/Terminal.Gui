@@ -90,7 +90,7 @@ public class ViewExperiments : Scenario
         {
             if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
-                if (mouseArgs.Flags == MouseFlags.RightButtonClicked)
+                if (mouseArgs.Flags == MouseFlags.Button3Clicked)
                 {
                     popoverView.X = mouseArgs.ScreenPosition.X;
                     popoverView.Y = mouseArgs.ScreenPosition.Y;

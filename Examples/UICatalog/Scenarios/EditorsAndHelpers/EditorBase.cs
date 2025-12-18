@@ -127,15 +127,15 @@ public abstract class EditorBase : View
         ViewToEdit = App!.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, Terminal.Gui.Input.Mouse mouse)
+    private void ApplicationOnMouseEvent (object? sender, Terminal.Gui.Input.MouseEventArgs mouse)
     {
-        if (mouse.Flags != MouseFlags.LeftButtonClicked || !AutoSelectViewToEdit)
+        if (mouse.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
         {
             return;
         }
 
-        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position!.Value))
-            || FrameToScreen ().Contains (mouse.Position!.Value))
+        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position))
+            || FrameToScreen ().Contains (mouse.Position))
         {
             return;
         }

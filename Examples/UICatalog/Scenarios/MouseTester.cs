@@ -10,9 +10,9 @@ public class MouseTester : Scenario
     {
         Application.Init ();
         // Prepping for modern app model
-        IApplication app = Application.Instance;
+        using IApplication app = Application.Instance;
 
-        Runnable runnable = new ()
+        using Runnable runnable = new ()
         {
             Id = "runnable",
         };
@@ -146,28 +146,28 @@ public class MouseTester : Scenario
 
         runnable.Add (demo);
 
-        cbHighlightOnPressed.CheckedState = demo.MouseHighlightStates.HasFlag (MouseState.Pressed) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPressed.CheckedState = demo.HighlightStates.HasFlag (MouseState.Pressed) ? CheckState.Checked : CheckState.UnChecked;
 
         cbHighlightOnPressed.CheckedStateChanging += (_, e) =>
                                                      {
                                                          if (e.Result == CheckState.Checked)
                                                          {
-                                                             demo.MouseHighlightStates |= MouseState.Pressed;
+                                                             demo.HighlightStates |= MouseState.Pressed;
                                                          }
                                                          else
                                                          {
-                                                             demo.MouseHighlightStates &= ~MouseState.Pressed;
+                                                             demo.HighlightStates &= ~MouseState.Pressed;
                                                          }
 
                                                          foreach (View subview in demo.SubViews)
                                                          {
                                                              if (e.Result == CheckState.Checked)
                                                              {
-                                                                 subview.MouseHighlightStates |= MouseState.Pressed;
+                                                                 subview.HighlightStates |= MouseState.Pressed;
                                                              }
                                                              else
                                                              {
-                                                                 subview.MouseHighlightStates &= ~MouseState.Pressed;
+                                                                 subview.HighlightStates &= ~MouseState.Pressed;
                                                              }
                                                          }
 
@@ -175,37 +175,37 @@ public class MouseTester : Scenario
                                                          {
                                                              if (e.Result == CheckState.Checked)
                                                              {
-                                                                 subview.MouseHighlightStates |= MouseState.Pressed;
+                                                                 subview.HighlightStates |= MouseState.Pressed;
                                                              }
                                                              else
                                                              {
-                                                                 subview.MouseHighlightStates &= ~MouseState.Pressed;
+                                                                 subview.HighlightStates &= ~MouseState.Pressed;
                                                              }
                                                          }
                                                      };
 
-        cbHighlightOnPressedOutside.CheckedState = demo.MouseHighlightStates.HasFlag (MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
+        cbHighlightOnPressedOutside.CheckedState = demo.HighlightStates.HasFlag (MouseState.PressedOutside) ? CheckState.Checked : CheckState.UnChecked;
 
         cbHighlightOnPressedOutside.CheckedStateChanging += (_, e) =>
                                                             {
                                                                 if (e.Result == CheckState.Checked)
                                                                 {
-                                                                    demo.MouseHighlightStates |= MouseState.PressedOutside;
+                                                                    demo.HighlightStates |= MouseState.PressedOutside;
                                                                 }
                                                                 else
                                                                 {
-                                                                    demo.MouseHighlightStates &= ~MouseState.PressedOutside;
+                                                                    demo.HighlightStates &= ~MouseState.PressedOutside;
                                                                 }
 
                                                                 foreach (View subview in demo.SubViews)
                                                                 {
                                                                     if (e.Result == CheckState.Checked)
                                                                     {
-                                                                        subview.MouseHighlightStates |= MouseState.PressedOutside;
+                                                                        subview.HighlightStates |= MouseState.PressedOutside;
                                                                     }
                                                                     else
                                                                     {
-                                                                        subview.MouseHighlightStates &= ~MouseState.PressedOutside;
+                                                                        subview.HighlightStates &= ~MouseState.PressedOutside;
                                                                     }
                                                                 }
 
@@ -213,27 +213,27 @@ public class MouseTester : Scenario
                                                                 {
                                                                     if (e.Result == CheckState.Checked)
                                                                     {
-                                                                        subview.MouseHighlightStates |= MouseState.PressedOutside;
+                                                                        subview.HighlightStates |= MouseState.PressedOutside;
                                                                     }
                                                                     else
                                                                     {
-                                                                        subview.MouseHighlightStates &= ~MouseState.PressedOutside;
+                                                                        subview.HighlightStates &= ~MouseState.PressedOutside;
                                                                     }
                                                                 }
                                                             };
 
         cbRepeatOnHold.CheckedStateChanging += (_, _) =>
                                                         {
-                                                            demo.MouseHoldRepeat = !demo.MouseHoldRepeat;
+                                                            demo.WantContinuousButtonPressed = !demo.WantContinuousButtonPressed;
 
                                                             foreach (View subview in demo.SubViews)
                                                             {
-                                                                subview.MouseHoldRepeat = demo.MouseHoldRepeat;
+                                                                subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
                                                             }
 
                                                             foreach (View subview in demo.Padding.SubViews)
                                                             {
-                                                                subview.MouseHoldRepeat = demo.MouseHoldRepeat;
+                                                                subview.WantContinuousButtonPressed = demo.WantContinuousButtonPressed;
                                                             }
                                                         };
 
@@ -257,7 +257,7 @@ public class MouseTester : Scenario
         };
         runnable.Add (label, driverLog);
 
-        app.Driver!.GetInputProcessor ().MouseEventParsed += (_, mouse) =>
+        app.Driver!.MouseEvent += (_, mouse) =>
                                   {
                                       if (!mouseFlagsFilter.Value.HasValue)
                                       {
@@ -292,7 +292,7 @@ public class MouseTester : Scenario
         };
         runnable.Add (label, appLog);
 
-        Application.MouseEvent += (_, mouse) =>
+        app.Mouse.MouseEvent += (_, mouse) =>
                                   {
                                       if (!mouseFlagsFilter.Value.HasValue)
                                       {
@@ -459,8 +459,6 @@ public class MouseTester : Scenario
                                     };
 
         app.Run (runnable);
-        runnable.Dispose ();
-        app.Dispose();
     }
 
     public class MouseEventDemoView : View
@@ -513,7 +511,7 @@ public class MouseTester : Scenario
         {
             if (role == VisualRole.Normal)
             {
-                if (MouseState.HasFlag (MouseState.Pressed) && MouseHighlightStates.HasFlag (MouseState.Pressed))
+                if (MouseState.HasFlag (MouseState.Pressed) && HighlightStates.HasFlag (MouseState.Pressed))
                 {
                     currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
 
@@ -537,19 +535,19 @@ internal enum DemoMouseFlags
     None = 0,
 
     /// <summary>The first mouse button was pressed.</summary>
-    LeftButtonPressed = 0x2,
+    Button1Pressed = 0x2,
 
     /// <summary>The first mouse button was released.</summary>
-    LeftButtonReleased = 0x1,
+    Button1Released = 0x1,
 
     /// <summary>The first mouse button was clicked (press+release).</summary>
-    LeftButtonClicked = 0x4,
+    Button1Clicked = 0x4,
 
     /// <summary>The first mouse button was double-clicked.</summary>
-    LeftButtonDoubleClicked = 0x8,
+    Button1DoubleClicked = 0x8,
 
     /// <summary>The first mouse button was triple-clicked.</summary>
-    LeftButtonTripleClicked = 0x10,
+    Button1TripleClicked = 0x10,
 
     /// <summary>The second mouse button was pressed.</summary>
     MiddleButtonPressed = 0x80,
@@ -567,19 +565,19 @@ internal enum DemoMouseFlags
     MiddleButtonTripleClicked = 0x400,
 
     /// <summary>The third mouse button was pressed.</summary>
-    RightButtonPressed = 0x2000,
+    Button3Pressed = 0x2000,
 
     /// <summary>The third mouse button was released.</summary>
-    RightButtonReleased = 0x1000,
+    Button3Released = 0x1000,
 
     /// <summary>The third mouse button was clicked (press+release).</summary>
-    RightButtonClicked = 0x4000,
+    Button3Clicked = 0x4000,
 
     /// <summary>The third mouse button was double-clicked.</summary>
-    RightButtonDoubleClicked = 0x8000,
+    Button3DoubleClicked = 0x8000,
 
     /// <summary>The third mouse button was triple-clicked.</summary>
-    RightButtonTripleClicked = 0x10000,
+    Button3TripleClicked = 0x10000,
 
     /// <summary>The fourth mouse button was pressed.</summary>
     Button4Pressed = 0x80000,

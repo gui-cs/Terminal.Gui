@@ -623,16 +623,16 @@ public class TableEditor : Scenario
                                          return;
                                      }
 
-                                     _tableView!.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
+                                     _tableView!.ScreenToCell (mouse.Position, out int? clickedCol);
 
                                      if (clickedCol != null)
                                      {
-                                         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                         if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
                                          {
                                              // left click in a header
                                              SortColumn (clickedCol.Value);
                                          }
-                                         else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
+                                         else if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
                                          {
                                              // right click in a header
                                              ShowHeaderContextMenu (clickedCol.Value, mouse);
@@ -1380,7 +1380,7 @@ public class TableEditor : Scenario
         _tableView!.Update ();
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, Terminal.Gui.Input.Mouse e)
+    private void ShowHeaderContextMenu (int clickedCol, Terminal.Gui.Input.MouseEventArgs e)
     {
         if (HasCheckboxes () && clickedCol == 0)
         {

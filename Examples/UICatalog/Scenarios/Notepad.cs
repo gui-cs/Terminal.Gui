@@ -306,7 +306,7 @@ public class Notepad : Scenario
     private void TabView_TabClicked (object? sender, TabMouseEventArgs e)
     {
         // we are only interested in right clicks
-        if (!e.MouseEvent.Flags.HasFlag (MouseFlags.RightButtonClicked))
+        if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
         {
             return;
         }

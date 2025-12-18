@@ -50,9 +50,9 @@ public class RegionScenario : Scenario
         // Add drag handling to window
         appWindow.MouseEvent += (s, e) =>
                           {
-                              if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+                              if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
                               {
-                                  if (!e.Flags.HasFlag (MouseFlags.PositionReport))
+                                  if (!e.Flags.HasFlag (MouseFlags.ReportMousePosition))
                                   { // Start drag
                                       _dragStart = e.ScreenPosition;
                                       _isDragging = true;
@@ -67,7 +67,7 @@ public class RegionScenario : Scenario
                                   }
                               }
 
-                              if (e.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+                              if (e.Flags.HasFlag (MouseFlags.Button1Released))
                               {
                                   if (_isDragging && _dragStart.HasValue)
                                   {
@@ -109,7 +109,7 @@ public class RegionScenario : Scenario
                                   // If currently dragging, draw preview rectangle
                                   if (_isDragging && _dragStart.HasValue)
                                   {
-                                      Point currentMousePos = appWindow.App!.Mouse.LastMousePosition!.Value;
+                                      Point currentMousePos = appWindow.App!.Mouse.LastMousePosition.Value;
                                       Rectangle previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
                                       var previewRegion = new Region (previewRect);
 
@@ -324,15 +324,15 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
+    protected override bool OnMouseEvent (Terminal.Gui.Input.MouseEventArgs mouse)
     {
-        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
+            if (IsForegroundPoint (mouse.Position.X, mouse.Position.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
+            else if (IsBackgroundPoint (mouse.Position.X, mouse.Position.Y))
             {
                 ClickedInBackground ();
             }
