@@ -219,7 +219,6 @@ public class LinearRange<T> : View, IOrientation
                 MinimumInnerSpacingChanging,
                 newValue =>
                 {
-                    _config._minInnerSpacing = newValue;
                     SetContentSize ();
                 },
                 OnMinimumInnerSpacingChanged,
@@ -247,8 +246,6 @@ public class LinearRange<T> : View, IOrientation
         get => _config._type;
         set
         {
-            LinearRangeType oldValue = _config._type;
-            
             CWPPropertyHelper.ChangeProperty (
                 this,
                 ref _config._type,
@@ -257,7 +254,6 @@ public class LinearRange<T> : View, IOrientation
                 TypeChanging,
                 newValue =>
                 {
-                    _config._type = newValue;
                     // Todo: Custom logic to preserve options.
                     _setOptions.Clear ();
                     SetNeedsDraw ();
@@ -335,7 +331,6 @@ public class LinearRange<T> : View, IOrientation
                 LegendsOrientationChanging,
                 newValue =>
                 {
-                    _config._legendsOrientation = newValue;
                     SetContentSize ();
                 },
                 OnLegendsOrientationChanged,
@@ -400,7 +395,6 @@ public class LinearRange<T> : View, IOrientation
                 ShowEndSpacingChanging,
                 newValue =>
                 {
-                    _config._showEndSpacing = newValue;
                     SetContentSize ();
                 },
                 OnShowEndSpacingChanged,
@@ -436,7 +430,6 @@ public class LinearRange<T> : View, IOrientation
                 ShowLegendsChanging,
                 newValue =>
                 {
-                    _config._showLegends = newValue;
                     SetContentSize ();
                 },
                 OnShowLegendsChanged,
@@ -474,7 +467,6 @@ public class LinearRange<T> : View, IOrientation
                 UseMinimumSizeChanging,
                 newValue =>
                 {
-                    _config._useMinimumSize = newValue;
                     SetContentSize ();
                 },
                 OnUseMinimumSizeChanged,

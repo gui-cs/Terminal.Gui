@@ -596,3 +596,261 @@ public class LinearRangeTests : FakeDriverBase
 
     // Add more tests for different scenarios and edge cases.
 }
+
+public class LinearRangeCWPTests : FakeDriverBase
+{
+    [Fact]
+    public void Type_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        LinearRangeType oldValue = LinearRangeType.Single;
+        LinearRangeType newValue = LinearRangeType.Range;
+
+        linearRange.TypeChanging += (sender, args) =>
+        {
+            changingRaised = true;
+            Assert.Equal (oldValue, args.CurrentValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        linearRange.TypeChanged += (sender, args) =>
+        {
+            changedRaised = true;
+            Assert.Equal (oldValue, args.OldValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        // Act
+        linearRange.Type = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.Type);
+    }
+
+    [Fact]
+    public void Type_PropertyChange_CanBeCancelled ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        LinearRangeType oldValue = linearRange.Type;
+
+        linearRange.TypeChanging += (sender, args) =>
+        {
+            args.Handled = true;
+        };
+
+        // Act
+        linearRange.Type = LinearRangeType.Range;
+
+        // Assert
+        Assert.Equal (oldValue, linearRange.Type);
+    }
+
+    [Fact]
+    public void LegendsOrientation_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        Orientation oldValue = Orientation.Horizontal;
+        Orientation newValue = Orientation.Vertical;
+
+        linearRange.LegendsOrientationChanging += (sender, args) =>
+        {
+            changingRaised = true;
+            Assert.Equal (oldValue, args.CurrentValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        linearRange.LegendsOrientationChanged += (sender, args) =>
+        {
+            changedRaised = true;
+            Assert.Equal (oldValue, args.OldValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        // Act
+        linearRange.LegendsOrientation = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.LegendsOrientation);
+    }
+
+    [Fact]
+    public void MinimumInnerSpacing_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        var oldValue = 1;
+        var newValue = 5;
+
+        linearRange.MinimumInnerSpacingChanging += (sender, args) =>
+        {
+            changingRaised = true;
+            Assert.Equal (oldValue, args.CurrentValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        linearRange.MinimumInnerSpacingChanged += (sender, args) =>
+        {
+            changedRaised = true;
+            Assert.Equal (oldValue, args.OldValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        // Act
+        linearRange.MinimumInnerSpacing = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.MinimumInnerSpacing);
+    }
+
+    [Fact]
+    public void ShowLegends_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        var oldValue = true;
+        var newValue = false;
+
+        linearRange.ShowLegendsChanging += (sender, args) =>
+        {
+            changingRaised = true;
+            Assert.Equal (oldValue, args.CurrentValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        linearRange.ShowLegendsChanged += (sender, args) =>
+        {
+            changedRaised = true;
+            Assert.Equal (oldValue, args.OldValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        // Act
+        linearRange.ShowLegends = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.ShowLegends);
+    }
+
+    [Fact]
+    public void ShowEndSpacing_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        var oldValue = false;
+        var newValue = true;
+
+        linearRange.ShowEndSpacingChanging += (sender, args) =>
+        {
+            changingRaised = true;
+            Assert.Equal (oldValue, args.CurrentValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        linearRange.ShowEndSpacingChanged += (sender, args) =>
+        {
+            changedRaised = true;
+            Assert.Equal (oldValue, args.OldValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        // Act
+        linearRange.ShowEndSpacing = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.ShowEndSpacing);
+    }
+
+    [Fact]
+    public void UseMinimumSize_PropertyChange_RaisesChangingAndChangedEvents ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+        var oldValue = false;
+        var newValue = true;
+
+        linearRange.UseMinimumSizeChanging += (sender, args) =>
+        {
+            changingRaised = true;
+            Assert.Equal (oldValue, args.CurrentValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        linearRange.UseMinimumSizeChanged += (sender, args) =>
+        {
+            changedRaised = true;
+            Assert.Equal (oldValue, args.OldValue);
+            Assert.Equal (newValue, args.NewValue);
+        };
+
+        // Act
+        linearRange.UseMinimumSize = newValue;
+
+        // Assert
+        Assert.True (changingRaised);
+        Assert.True (changedRaised);
+        Assert.Equal (newValue, linearRange.UseMinimumSize);
+    }
+
+    [Fact]
+    public void Type_PropertyChange_NoEventsWhenValueUnchanged ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var changingRaised = false;
+        var changedRaised = false;
+
+        linearRange.TypeChanging += (sender, args) => changingRaised = true;
+        linearRange.TypeChanged += (sender, args) => changedRaised = true;
+
+        // Act
+        linearRange.Type = linearRange.Type;
+
+        // Assert
+        Assert.False (changingRaised);
+        Assert.False (changedRaised);
+    }
+
+    [Fact]
+    public void Type_PropertyChange_ChangingEventCanModifyNewValue ()
+    {
+        // Arrange
+        LinearRange<int> linearRange = new ();
+        var modifiedValue = LinearRangeType.Multiple;
+
+        linearRange.TypeChanging += (sender, args) =>
+        {
+            args.NewValue = modifiedValue;
+        };
+
+        // Act
+        linearRange.Type = LinearRangeType.Range;
+
+        // Assert
+        Assert.Equal (modifiedValue, linearRange.Type);
+    }
+}
