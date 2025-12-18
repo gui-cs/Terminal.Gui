@@ -166,7 +166,7 @@ public class StatusBar : Bar, IDesignable
 
         return true;
 
-        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App, "Hi", $"You clicked {sender}"); }
+        void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App!, "Hi", $"You clicked {sender}"); }
     }
 
     /// <inheritdoc />

@@ -100,13 +100,13 @@ public class ExampleWindow : Runnable<string>
                            {
                                if (userNameText.Text == "admin" && passwordText.Text == "password")
                                {
-                                   MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
+                                   MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
                                    Result = userNameText.Text;
                                    App?.RequestStop ();
                                }
                                else
                                {
-                                   MessageBox.ErrorQuery (App, "Logging In", "Incorrect username or password", "Ok");
+                                   MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "Ok");
                                }
                                // When Accepting is handled, set e.Handled to true to prevent further processing.
                                e.Handled = true;

@@ -160,7 +160,7 @@ public class DimEditor : EditorBase
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery (App, "Exception", e.Message, "Ok");
+            MessageBox.ErrorQuery (App!, "Exception", e.Message, "Ok");
         }
     }
 }
