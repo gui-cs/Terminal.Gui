@@ -348,8 +348,6 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                     return true;
             }
         }
-
-        return false; // Continue accumulating
     }
 
     /// <summary>

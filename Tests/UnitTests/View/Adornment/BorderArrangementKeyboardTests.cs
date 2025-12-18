@@ -1,20 +1,19 @@
 #nullable enable
-// CoPilot - GitHub Copilot AI Agent
-using Xunit.Abstractions;
 
 namespace UnitTests.ViewBaseTests;
 
-public class BorderArrangementKeyboardTests (ITestOutputHelper output)
+public class BorderArrangementKeyboardTests
 {
     /// <summary>
-    /// Tests that keyboard arrangement mode (CTRL-F5) properly shows arrangement buttons
-    /// for ViewArrangement.LeftResizable
+    ///     Tests that keyboard arrangement mode (CTRL-F5) properly shows arrangement buttons
+    ///     for ViewArrangement.LeftResizable
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_LeftResizable_ShowsLeftSizeButton ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.LeftResizable,
@@ -41,14 +40,15 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode properly shows arrangement buttons
-    /// for ViewArrangement.RightResizable
+    ///     Tests that keyboard arrangement mode properly shows arrangement buttons
+    ///     for ViewArrangement.RightResizable
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_RightResizable_ShowsRightSizeButton ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.RightResizable,
@@ -59,7 +59,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -74,14 +74,15 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode properly shows arrangement buttons
-    /// for ViewArrangement.TopResizable
+    ///     Tests that keyboard arrangement mode properly shows arrangement buttons
+    ///     for ViewArrangement.TopResizable
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_TopResizable_ShowsTopSizeButton ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.TopResizable,
@@ -92,7 +93,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -107,14 +108,15 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode properly shows arrangement buttons
-    /// for ViewArrangement.BottomResizable
+    ///     Tests that keyboard arrangement mode properly shows arrangement buttons
+    ///     for ViewArrangement.BottomResizable
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_BottomResizable_ShowsBottomSizeButton ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.BottomResizable,
@@ -125,7 +127,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -140,14 +142,15 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode properly shows arrangement buttons
-    /// for ViewArrangement.Movable
+    ///     Tests that keyboard arrangement mode properly shows arrangement buttons
+    ///     for ViewArrangement.Movable
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_Movable_ShowsMoveButton ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.Movable,
@@ -158,7 +161,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -173,14 +176,15 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode properly shows arrangement buttons
-    /// for combined arrangements like LeftResizable | BottomResizable
+    ///     Tests that keyboard arrangement mode properly shows arrangement buttons
+    ///     for combined arrangements like LeftResizable | BottomResizable
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_LeftAndBottomResizable_ShowsCorrectButtons ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.LeftResizable | ViewArrangement.BottomResizable,
@@ -191,7 +195,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -214,15 +218,16 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode properly shows arrangement buttons
-    /// for ViewArrangement.Resizable (all directions)
-    /// For fully Resizable views, only move and all-size buttons should be visible in keyboard mode
+    ///     Tests that keyboard arrangement mode properly shows arrangement buttons
+    ///     for ViewArrangement.Resizable (all directions)
+    ///     For fully Resizable views, only move and all-size buttons should be visible in keyboard mode
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_Resizable_ShowsMoveAndAllSizeButtons ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.Resizable,
@@ -233,7 +238,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -262,14 +267,15 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode properly shows arrangement buttons
-    /// for TopResizable | RightResizable combination
+    ///     Tests that keyboard arrangement mode properly shows arrangement buttons
+    ///     for TopResizable | RightResizable combination
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_TopAndRightResizable_ShowsCorrectButtons ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.TopResizable | ViewArrangement.RightResizable,
@@ -280,7 +286,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 
@@ -303,13 +309,14 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    /// Tests that keyboard arrangement mode only shows buttons for enabled arrangements
+    ///     Tests that keyboard arrangement mode only shows buttons for enabled arrangements
     /// </summary>
     [Fact]
     [AutoInitShutdown]
     public void EnterArrangeMode_Keyboard_OnlyShowsButtonsForEnabledArrangements ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.LeftResizable,
@@ -320,7 +327,7 @@ public class BorderArrangementKeyboardTests (ITestOutputHelper output)
             Height = 10
         };
         superView.Add (view);
-        
+
         superView.BeginInit ();
         superView.EndInit ();
 

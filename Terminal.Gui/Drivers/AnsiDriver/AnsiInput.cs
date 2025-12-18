@@ -235,7 +235,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     private IEnumerable<char> ReadUnixInput (byte [] buffer)
     {
         // Poll again to ensure data is still available
-        while (UnixIOHelper.IsInputAvailable (_pollMap))
+        while (_pollMap is { } && UnixIOHelper.IsInputAvailable (_pollMap))
         {
             if ((_pollMap [0].revents & (short)UnixIOHelper.Condition.PollIn) == 0)
             {

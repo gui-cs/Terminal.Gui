@@ -393,7 +393,11 @@ public class MenuBarTests ()
         // Act
         Application.RaiseMouseEvent (new ()
         {
-            Flags = MouseFlags.LeftButtonClicked
+            Flags = MouseFlags.LeftButtonPressed
+        });
+        Application.RaiseMouseEvent (new ()
+        {
+            Flags = MouseFlags.LeftButtonReleased
         });
         Assert.True (menuBar.Active);
         Assert.True (menuBar.IsOpen ());
