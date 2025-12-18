@@ -201,12 +201,12 @@ public class ViewportSettings : Scenario
 
         List<object> options = new () { "Option 1", "Option 2", "Option 3" };
 
-        Slider slider = new (options)
+        LinearRange linearRange = new (options)
         {
             X = 0,
             Y = Pos.Bottom (textField) + 1,
             Orientation = Orientation.Vertical,
-            Type = SliderType.Multiple,
+            Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
             Title = "_Slider"

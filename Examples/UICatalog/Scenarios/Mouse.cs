@@ -16,13 +16,13 @@ public class Mouse : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        Slider<MouseFlags> filterSlider = new ()
+        LinearRange<MouseFlags> filterSlider = new ()
         {
             Title = "_Filter",
             X = 0,
             Y = 0,
             BorderStyle = LineStyle.Single,
-            Type = SliderType.Multiple,
+            Type = LinearRangeType.Multiple,
             Orientation = Orientation.Vertical,
             UseMinimumSize = true,
             MinimumInnerSpacing = 0
@@ -32,7 +32,7 @@ public class Mouse : Scenario
                                    .Cast<MouseFlags> ()
                                    .Where (value => !value.ToString ().Contains ("None") && !value.ToString ().Contains ("All"))
                                    .Select (
-                                            value => new SliderOption<MouseFlags>
+                                            value => new LinearRangeOption<MouseFlags>
                                             {
                                                 Legend = value.ToString (),
                                                 Data = value
