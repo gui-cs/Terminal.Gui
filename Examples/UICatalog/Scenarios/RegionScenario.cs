@@ -50,9 +50,9 @@ public class RegionScenario : Scenario
         // Add drag handling to window
         appWindow.MouseEvent += (s, e) =>
                           {
-                              if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
+                              if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
                               {
-                                  if (!e.Flags.HasFlag (MouseFlags.ReportMousePosition))
+                                  if (!e.Flags.HasFlag (MouseFlags.PositionReport))
                                   { // Start drag
                                       _dragStart = e.ScreenPosition;
                                       _isDragging = true;
@@ -67,7 +67,7 @@ public class RegionScenario : Scenario
                                   }
                               }
 
-                              if (e.Flags.HasFlag (MouseFlags.Button1Released))
+                              if (e.Flags.HasFlag (MouseFlags.LeftButtonReleased))
                               {
                                   if (_isDragging && _dragStart.HasValue)
                                   {
@@ -324,23 +324,23 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            if (IsForegroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            else if (IsBackgroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }
         }
 
-        mouseEvent.Handled = true;
+        mouse.Handled = true;
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     private bool IsForegroundPoint (int x, int y) { return _foregroundPoints.Contains ((x, y)); }

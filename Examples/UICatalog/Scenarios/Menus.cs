@@ -114,7 +114,7 @@ public class Menus : Scenario
                             return true;
                         });
 
-            MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
+            MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
             KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
             AddCommand (
@@ -129,7 +129,7 @@ public class Menus : Scenario
                             return true;
                         });
 
-            MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Cancel);
+            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Cancel);
 
             Label lastCommandLabel = new ()
             {

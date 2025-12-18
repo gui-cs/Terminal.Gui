@@ -4,7 +4,7 @@ namespace UICatalog.Scenarios;
 
 public interface ITool
 {
-    void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent);
+    void OnMouseEvent (DrawingArea area, Terminal.Gui.Input.Mouse mouse);
 }
 
 internal class DrawLineTool : ITool
@@ -13,15 +13,15 @@ internal class DrawLineTool : ITool
     public LineStyle LineStyle { get; set; } = LineStyle.Single;
 
     /// <inheritdoc/>
-    public void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent)
+    public void OnMouseEvent (DrawingArea area, Terminal.Gui.Input.Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (_currentLine == null)
             {
                 // Mouse pressed down
                 _currentLine = new (
-                                    mouseEvent.Position,
+                                    mouse.Position!.Value,
                                     0,
                                     Orientation.Vertical,
                                     LineStyle,
@@ -34,7 +34,7 @@ internal class DrawLineTool : ITool
             {
                 // Mouse dragged
                 Point start = _currentLine.Start;
-                Point end = mouseEvent.Position;
+                Point end = mouse.Position!.Value;
                 var orientation = Orientation.Vertical;
                 int length = end.Y - start.Y;
 
@@ -93,7 +93,7 @@ internal class DrawLineTool : ITool
             }
         }
 
-        mouseEvent.Handled = true;
+        mouse.Handled = true;
     }
 }
 
@@ -325,11 +325,11 @@ public class DrawingArea : View
         return false;
     }
 
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
     {
-        CurrentTool.OnMouseEvent (this, mouseEvent);
+        CurrentTool.OnMouseEvent (this, mouse);
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     internal void AddLayer ()
@@ -432,23 +432,23 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            if (IsForegroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            else if (IsBackgroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }
 
-            mouseEvent.Handled = true;
+            mouse.Handled = true;
         }
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     private bool IsForegroundPoint (int x, int y) { return ForegroundPoints.Contains ((x, y)); }
