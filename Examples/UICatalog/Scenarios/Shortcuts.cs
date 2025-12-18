@@ -229,7 +229,7 @@ public class Shortcuts : Scenario
             X = 0,
             Y = Pos.Bottom (optionSelectorShortcut),
             Width = Dim.Fill ()! - Dim.Width (eventLog),
-            HelpText = "Sliders work!",
+            HelpText = "LinearRanges work!",
             CommandView = new LinearRange<string>
             {
                 Orientation = Orientation.Horizontal,
