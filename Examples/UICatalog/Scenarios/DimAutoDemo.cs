@@ -190,7 +190,7 @@ public class DimAutoDemo : Scenario
             Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
-            Title = "_Slider"
+            Title = "_LinearRange"
         };
         sliderFrameView.Add (linearRange);
 
