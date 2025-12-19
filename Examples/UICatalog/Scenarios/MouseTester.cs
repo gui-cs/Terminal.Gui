@@ -17,7 +17,7 @@ public class MouseTester : Scenario
             Id = "runnable",
         };
 
-        MenuBar menuBar = new MenuBar ();
+        MenuBar menuBar = new ();
         menuBar.Add (new MenuBarItem ("_File", [new MenuItem { Title = "_Quit", Action = () => app.RequestStop () }]));
 
         FlagSelector<DemoMouseFlags> mouseFlagsFilter = new ()
@@ -94,7 +94,7 @@ public class MouseTester : Scenario
 
         runnable.Add (cbHighlightOnPressedOutside);
 
-        var demo = new MouseEventDemoView
+        MouseEventDemoView demo = new ()
         {
             Id = "demo",
             Y = Pos.Bottom (cbHighlightOnPressedOutside),
@@ -108,7 +108,7 @@ public class MouseTester : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Func (_ => demo.Padding.Thickness.Top),
+            Height = Dim.Func (_ => demo.Padding!.Thickness.Top),
             Title = "inPadding",
             Id = "inPadding",
         };
@@ -121,7 +121,7 @@ public class MouseTester : Scenario
             demo.Padding!.Thickness = demo.Padding.Thickness with { Top = 5 };
         }
 
-        View sub1 = new MouseEventDemoView
+        MouseEventDemoView sub1 = new ()
         {
             X = 0,
             Y = 0,
@@ -132,7 +132,7 @@ public class MouseTester : Scenario
         };
         demo.Add (sub1);
 
-        View sub2 = new MouseEventDemoView
+        MouseEventDemoView sub2 = new ()
         {
             X = Pos.Right (sub1) - 4,
             Y = Pos.Top (sub1) + 1,
@@ -237,7 +237,7 @@ public class MouseTester : Scenario
                                                             }
                                                         };
 
-        var label = new Label
+        Label label = new ()
         {
             Text = "Dri_ver Events:",
             //X = Pos.Right (filterSlider),
@@ -246,7 +246,7 @@ public class MouseTester : Scenario
 
         ObservableCollection<string> driverLogList = new ();
 
-        var driverLog = new ListView
+        ListView driverLog = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
@@ -272,7 +272,7 @@ public class MouseTester : Scenario
                                           driverLog.MoveEnd ();
                                       }
                                   };
-        label = new Label
+        label = new ()
         {
             Text = "_App Events:",
             X = Pos.Right (driverLog) + 1,
@@ -374,7 +374,7 @@ public class MouseTester : Scenario
         };
         ObservableCollection<string> commandLogList = [];
 
-        var commandLog = new ListView
+        ListView commandLog = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
@@ -494,14 +494,7 @@ public class MouseTester : Scenario
         protected override void OnMouseStateChanged (EventArgs<MouseState> args)
         {
             base.OnMouseStateChanged (args);
-            if (args.Value.HasFlag (MouseState.PressedOutside))
-            {
-                Border!.LineStyle = LineStyle.Dotted;
-            }
-            else
-            {
-                Border!.LineStyle = LineStyle.Single;
-            }
+            Border!.LineStyle = args.Value.HasFlag (MouseState.PressedOutside) ? LineStyle.Dotted : LineStyle.Single;
 
             SetNeedsDraw ();
         }
@@ -509,17 +502,15 @@ public class MouseTester : Scenario
         /// <inheritdoc/>
         protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
         {
-            if (role == VisualRole.Normal)
+            switch (role)
             {
-                if (MouseState.HasFlag (MouseState.Pressed) && HighlightStates.HasFlag (MouseState.Pressed))
-                {
+                case VisualRole.Normal when MouseState.HasFlag (MouseState.Pressed) && HighlightStates.HasFlag (MouseState.Pressed):
                     currentAttribute = currentAttribute with { Background = currentAttribute.Foreground.GetBrighterColor () };
 
                     return true;
-                }
+                default:
+                    return base.OnGettingAttributeForRole (in role, ref currentAttribute);
             }
-
-            return base.OnGettingAttributeForRole (in role, ref currentAttribute);
         }
     }
 }
@@ -529,7 +520,7 @@ public class MouseTester : Scenario
 internal enum DemoMouseFlags
 {
     /// <summary>
-    ///     No mouse event. This is the default value for <see cref="Mouse.Flags"/> when no mouse event is being
+    ///     No mouse event. This is the default value for <see cref="MouseEventArgs.Flags"/> when no mouse event is being
     ///     reported.
     /// </summary>
     None = 0,
@@ -609,5 +600,5 @@ internal enum DemoMouseFlags
     /// <summary>Vertical button wheeled down while pressing Ctrl.</summary>
     WheeledRight = 0x1000000 | WheeledDown,
 
-    All = (-1)
+    All = -1
 }
