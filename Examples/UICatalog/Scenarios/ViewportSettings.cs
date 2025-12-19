@@ -209,7 +209,7 @@ public class ViewportSettings : Scenario
             Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
-            Title = "_Slider"
+            Title = "_LinearRange"
         };
         view.Add (linearRange);
 
