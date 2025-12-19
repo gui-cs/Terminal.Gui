@@ -202,4 +202,19 @@ public class WizardStep : View
 
         _contentView.Visible = true;
     }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            // Ensure _helpTextView is disposed even if it wasn't added to a parent
+            if (_helpTextView?.SuperView is null)
+            {
+                _helpTextView?.Dispose ();
+            }
+        }
+
+        base.Dispose (disposing);
+    }
 } // end of WizardStep class
