@@ -122,7 +122,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 **AI or AI Agent Written or Modified Code MUST Follow these instructions**
 
-- Use existing `.editorconfig` and `Terminal.sln.DotSettings` to determine code style and formatting.
+- Read and study `.editorconfig` and `Terminal.sln.DotSettings` to determine code style and formatting.
 - Format code with:
   1. ReSharper/Rider (`Ctrl-E-C`)
   2. JetBrains CleanupCode CLI tool (free)

@@ -7,14 +7,6 @@ namespace Terminal.Gui.ViewBase;
 internal sealed class Arranger : IDisposable
 {
     private readonly Border _border;
-    private Button? _moveButton;
-    private Button? _allSizeButton;
-    private Button? _leftSizeButton;
-    private Button? _rightSizeButton;
-    private Button? _topSizeButton;
-    private Button? _bottomSizeButton;
-    private Point? _dragPosition;
-    private Point _startGrabPoint;
 
     /// <summary>
     ///     Creates a new Arranger for the specified border.
@@ -32,32 +24,17 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool IsArranging => Arranging != ViewArrangement.Fixed;
 
+    private Point? _dragPosition;
+
     /// <summary>
     ///     Gets whether a mouse drag operation is in progress.
     /// </summary>
     internal bool IsDragging => _dragPosition.HasValue;
 
-    /// <summary>
-    ///     Checks if the border's parent view has any arrangement options enabled.
-    /// </summary>
-    internal bool HasAnyArrangementOptions ()
-    {
-        View? parent = _border.Parent;
-
-        if (parent is null)
-        {
-            return false;
-        }
-
-        return parent.Arrangement.HasFlag (ViewArrangement.Movable)
-               || parent.Arrangement.HasFlag (ViewArrangement.BottomResizable)
-               || parent.Arrangement.HasFlag (ViewArrangement.TopResizable)
-               || parent.Arrangement.HasFlag (ViewArrangement.LeftResizable)
-               || parent.Arrangement.HasFlag (ViewArrangement.RightResizable);
-    }
 
     /// <summary>
-    ///     Starts "Arrange Mode" where <see cref="Adornment.Parent"/> of a <see cref="Border"/> can be moved and/or resized using the mouse
+    ///     Starts "Arrange Mode" where <see cref="Adornment.Parent"/> of a <see cref="Border"/> can be moved and/or resized
+    ///     using the mouse
     ///     or keyboard.
     /// </summary>
     /// <remarks>
@@ -111,7 +88,6 @@ internal sealed class Arranger : IDisposable
         return true;
     }
 
-
     private void ApplicationOnMouseEvent (object? sender, Mouse mouse)
     {
         if (mouse.Flags != MouseFlags.LeftButtonClicked)
@@ -141,7 +117,7 @@ internal sealed class Arranger : IDisposable
     /// </remarks>
     private void ApplicationOnGrabbingMouse (object? sender, GrabMouseEventArgs e)
     {
-        if (_border.App?.Mouse.MouseGrabView == _border && IsDragging == true)
+        if (_border.App?.Mouse.MouseGrabView == _border && IsDragging)
         {
             e.Cancel = true;
         }
@@ -186,7 +162,33 @@ internal sealed class Arranger : IDisposable
         return true;
     }
 
+    /// <summary>
+    ///     Checks if the border's parent view has any arrangement options enabled.
+    /// </summary>
+    internal bool HasAnyArrangementOptions ()
+    {
+        View? parent = _border.Parent;
+
+        if (parent is null)
+        {
+            return false;
+        }
+
+        return parent.Arrangement.HasFlag (ViewArrangement.Movable)
+               || parent.Arrangement.HasFlag (ViewArrangement.BottomResizable)
+               || parent.Arrangement.HasFlag (ViewArrangement.TopResizable)
+               || parent.Arrangement.HasFlag (ViewArrangement.LeftResizable)
+               || parent.Arrangement.HasFlag (ViewArrangement.RightResizable);
+    }
+
     #region Button Management
+
+    private Button? _moveButton;
+    private Button? _allSizeButton;
+    private Button? _leftSizeButton;
+    private Button? _rightSizeButton;
+    private Button? _topSizeButton;
+    private Button? _bottomSizeButton;
 
     /// <summary>
     ///     Creates all the arrangement buttons based on parent's arrangement options.
@@ -251,7 +253,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private Button CreateArrangementButton (ArrangeButtons buttonType, Rune glyph, Pos x, Pos y)
     {
-        var button = new Button
+        Button button = new ()
         {
             Id = buttonType.ToString (),
             CanFocus = true,
@@ -292,10 +294,11 @@ internal sealed class Arranger : IDisposable
             SetVisibleButton (_allSizeButton);
         }
 
-        ShowResizableButtons (left: parentArrangement.HasFlag (ViewArrangement.LeftResizable),
-                              right: parentArrangement.HasFlag (ViewArrangement.RightResizable),
-                              top: parentArrangement.HasFlag (ViewArrangement.TopResizable),
-                              bottom: parentArrangement.HasFlag (ViewArrangement.BottomResizable));
+        ShowResizableButtons (
+                              parentArrangement.HasFlag (ViewArrangement.LeftResizable),
+                              parentArrangement.HasFlag (ViewArrangement.RightResizable),
+                              parentArrangement.HasFlag (ViewArrangement.TopResizable),
+                              parentArrangement.HasFlag (ViewArrangement.BottomResizable));
     }
 
     /// <summary>
@@ -338,19 +341,19 @@ internal sealed class Arranger : IDisposable
                 break;
 
             case ViewArrangement.LeftResizable | ViewArrangement.BottomResizable:
-                ShowResizableButtons (left: true, bottom: true);
-                ShowAllSizeButton (x: 0, Pos.AnchorEnd ());
+                ShowResizableButtons (true, bottom: true);
+                ShowAllSizeButton (0, Pos.AnchorEnd ());
 
                 break;
 
             case ViewArrangement.LeftResizable | ViewArrangement.TopResizable:
-                ShowResizableButtons (left: true, top: true);
+                ShowResizableButtons (true, top: true);
 
                 break;
 
             case ViewArrangement.RightResizable | ViewArrangement.TopResizable:
                 ShowResizableButtons (right: true, top: true);
-                ShowAllSizeButton (Pos.AnchorEnd (), y: 0);
+                ShowAllSizeButton (Pos.AnchorEnd (), 0);
 
                 break;
         }
@@ -419,7 +422,7 @@ internal sealed class Arranger : IDisposable
         }
     }
 
-    #endregion
+    #endregion Button Management
 
     #region Keyboard Arrangement
 
@@ -467,8 +470,8 @@ internal sealed class Arranger : IDisposable
 
         int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
         int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
-        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
-        bool handled = false;
+        ViewManipulator manipulator = new (parent, minWidth, minHeight);
+        var handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
@@ -503,8 +506,8 @@ internal sealed class Arranger : IDisposable
 
         int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
         int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
-        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
-        bool handled = false;
+        ViewManipulator manipulator = new (parent, minWidth, minHeight);
+        var handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
@@ -539,8 +542,8 @@ internal sealed class Arranger : IDisposable
 
         int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
         int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
-        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
-        bool handled = false;
+        ViewManipulator manipulator = new (parent, minWidth, minHeight);
+        var handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
@@ -575,8 +578,8 @@ internal sealed class Arranger : IDisposable
 
         int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
         int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
-        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
-        bool handled = false;
+        ViewManipulator manipulator = new (parent, minWidth, minHeight);
+        var handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
@@ -619,7 +622,7 @@ internal sealed class Arranger : IDisposable
         return true;
     }
 
-    #endregion
+    #endregion Keyboard Arrangement
 
     #region Mouse Arrangement
 
@@ -641,6 +644,7 @@ internal sealed class Arranger : IDisposable
             && _dragPosition.HasValue)
         {
             HandleMouseDrag (mouseEvent);
+
             return true;
         }
 
@@ -690,16 +694,17 @@ internal sealed class Arranger : IDisposable
         }
 
         // Set the start grab point to the Frame coords
-        _startGrabPoint = new (
-                               mouseEvent.Position!.Value.X + _border.Frame.X,
-                               mouseEvent.Position!.Value.Y + _border.Frame.Y);
+        GrabPoint = new (
+                         mouseEvent.Position!.Value.X + _border.Frame.X,
+                         mouseEvent.Position!.Value.Y + _border.Frame.Y);
         _dragPosition = mouseEvent.Position;
 
         // Grab mouse
         _border.App?.Mouse.GrabMouse (_border);
 
         // Determine the arrangement mode and request entry
-        ViewArrangement arrangeMode = DetermineArrangeModeFromClick (_startGrabPoint);
+        ViewArrangement arrangeMode = DetermineArrangeModeFromClick (GrabPoint);
+
         return EnterArrangeMode (arrangeMode);
     }
 
@@ -728,7 +733,7 @@ internal sealed class Arranger : IDisposable
         _dragPosition = mouseEvent.Position;
 
         Point parentLoc = parent.SuperView?.ScreenToViewport (
-                                                               new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
+                                                              new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
                           ?? mouseEvent.ScreenPosition;
 
         HandleDragOperation (parentLoc);
@@ -738,7 +743,7 @@ internal sealed class Arranger : IDisposable
     ///     Gets the grab point for the current drag operation.
     ///     INTERNAL: Exposed for testing purposes.
     /// </summary>
-    internal Point GrabPoint => _startGrabPoint;
+    internal Point GrabPoint { get; private set; }
 
     /// <summary>
     ///     Starts a mouse drag operation.
@@ -746,7 +751,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal void StartDrag (Point grabPoint, Point dragPosition)
     {
-        _startGrabPoint = grabPoint;
+        GrabPoint = grabPoint;
         _dragPosition = dragPosition;
     }
 
@@ -777,7 +782,7 @@ internal sealed class Arranger : IDisposable
         // Left edge
         if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            var leftRect = new Rectangle (frame.X, frame.Y + thickness.Top, thickness.Left, frame.Height - thickness.Top - thickness.Bottom);
+            Rectangle leftRect = new (frame.X, frame.Y + thickness.Top, thickness.Left, frame.Height - thickness.Top - thickness.Bottom);
 
             if (leftRect.Contains (clickPoint))
             {
@@ -788,7 +793,11 @@ internal sealed class Arranger : IDisposable
         // Right edge
         if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
-            var rightRect = new Rectangle (frame.X + frame.Width - thickness.Right, frame.Y + thickness.Top, thickness.Right, frame.Height - thickness.Top - thickness.Bottom);
+            Rectangle rightRect = new (
+                                       frame.X + frame.Width - thickness.Right,
+                                       frame.Y + thickness.Top,
+                                       thickness.Right,
+                                       frame.Height - thickness.Top - thickness.Bottom);
 
             if (rightRect.Contains (clickPoint))
             {
@@ -799,7 +808,7 @@ internal sealed class Arranger : IDisposable
         // Top edge (only if not movable)
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable) && !parentArrangement.HasFlag (ViewArrangement.Movable))
         {
-            var topRect = new Rectangle (frame.X + thickness.Left, frame.Y, frame.Width - thickness.Left - thickness.Right, thickness.Top);
+            Rectangle topRect = new (frame.X + thickness.Left, frame.Y, frame.Width - thickness.Left - thickness.Right, thickness.Top);
 
             if (topRect.Contains (clickPoint))
             {
@@ -810,7 +819,11 @@ internal sealed class Arranger : IDisposable
         // Bottom edge
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
-            var bottomRect = new Rectangle (frame.X + thickness.Left, frame.Y + frame.Height - thickness.Bottom, frame.Width - thickness.Left - thickness.Right, thickness.Bottom);
+            Rectangle bottomRect = new (
+                                        frame.X + thickness.Left,
+                                        frame.Y + frame.Height - thickness.Bottom,
+                                        frame.Width - thickness.Left - thickness.Right,
+                                        thickness.Bottom);
 
             if (bottomRect.Contains (clickPoint))
             {
@@ -822,7 +835,7 @@ internal sealed class Arranger : IDisposable
         // Bottom-left
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable) && parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            var corner = new Rectangle (frame.X, frame.Height - thickness.Top, thickness.Left, thickness.Bottom);
+            Rectangle corner = new (frame.X, frame.Height - thickness.Top, thickness.Left, thickness.Bottom);
 
             if (corner.Contains (clickPoint))
             {
@@ -833,7 +846,7 @@ internal sealed class Arranger : IDisposable
         // Bottom-right
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable) && parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
-            var corner = new Rectangle (frame.X + frame.Width - thickness.Right, frame.Height - thickness.Top, thickness.Right, thickness.Bottom);
+            Rectangle corner = new (frame.X + frame.Width - thickness.Right, frame.Height - thickness.Top, thickness.Right, thickness.Bottom);
 
             if (corner.Contains (clickPoint))
             {
@@ -844,7 +857,7 @@ internal sealed class Arranger : IDisposable
         // Top-right
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable) && parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
-            var corner = new Rectangle (frame.X + frame.Width - thickness.Right, frame.Y, thickness.Right, thickness.Top);
+            Rectangle corner = new (frame.X + frame.Width - thickness.Right, frame.Y, thickness.Right, thickness.Top);
 
             if (corner.Contains (clickPoint))
             {
@@ -855,7 +868,7 @@ internal sealed class Arranger : IDisposable
         // Top-left
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable) && parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            var corner = new Rectangle (frame.X, frame.Y, thickness.Left, thickness.Top);
+            Rectangle corner = new (frame.X, frame.Y, thickness.Left, thickness.Top);
 
             if (corner.Contains (clickPoint))
             {
@@ -880,7 +893,7 @@ internal sealed class Arranger : IDisposable
     internal void HandleDragOperation (Mouse mouseEvent)
     {
         Point targetLocation = _border.Parent!.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
-                          ?? mouseEvent.ScreenPosition;
+                               ?? mouseEvent.ScreenPosition;
 
         HandleDragOperation (targetLocation);
     }
@@ -907,53 +920,62 @@ internal sealed class Arranger : IDisposable
         int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
         int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
 
-        var manipulator = new ViewManipulator (parent, _startGrabPoint, minWidth, minHeight);
+        ViewManipulator manipulator = new (parent, GrabPoint, minWidth, minHeight);
 
         switch (Arranging)
         {
             case ViewArrangement.Movable:
                 manipulator.Move (targetLocation);
+
                 break;
 
             case ViewArrangement.TopResizable:
                 manipulator.ResizeTop (targetLocation);
+
                 break;
 
             case ViewArrangement.BottomResizable:
                 manipulator.ResizeBottom (targetLocation);
+
                 break;
 
             case ViewArrangement.LeftResizable:
                 manipulator.ResizeLeft (targetLocation);
+
                 break;
 
             case ViewArrangement.RightResizable:
                 manipulator.ResizeRight (targetLocation);
+
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.RightResizable:
                 manipulator.ResizeRight (targetLocation);
                 manipulator.ResizeBottom (targetLocation);
+
                 break;
 
             case ViewArrangement.BottomResizable | ViewArrangement.LeftResizable:
                 manipulator.ResizeLeft (targetLocation);
                 manipulator.ResizeBottom (targetLocation);
+
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.RightResizable:
                 manipulator.ResizeTop (targetLocation);
                 manipulator.ResizeRight (targetLocation);
+
                 break;
 
             case ViewArrangement.TopResizable | ViewArrangement.LeftResizable:
                 manipulator.ResizeTop (targetLocation);
                 manipulator.ResizeLeft (targetLocation);
+
                 break;
         }
     }
 
-    #endregion
+    #endregion Mouse Arrangement
 
     /// <inheritdoc/>
     public void Dispose ()
@@ -963,8 +985,6 @@ internal sealed class Arranger : IDisposable
         {
             _border.App?.Mouse.UngrabMouse ();
         }
-
-
 
         ExitArrangeMode ();
     }

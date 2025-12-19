@@ -1,4 +1,4 @@
-namespace ViewBaseTests.AdornmentTests;
+namespace ViewBaseTests.Adornments;
 
 /// <summary>
 ///     Tests for keyboard-based border arrangement mode (CTRL-F5).
