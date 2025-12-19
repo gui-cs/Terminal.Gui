@@ -31,10 +31,10 @@ public class StatusBar : Bar, IDesignable
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
-        SuperViewChanged += OnSuperViewChanged;
     }
 
-    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    /// <inheritdoc />
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> e)
     {
         if (SuperView is null)
         {
@@ -174,7 +174,6 @@ public class StatusBar : Bar, IDesignable
     {
         base.Dispose (disposing);
 
-        SuperViewChanged -= OnSuperViewChanged;
         ConfigurationManager.Applied -= OnConfigurationManagerApplied;
     }
 }
