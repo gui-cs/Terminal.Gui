@@ -66,7 +66,7 @@ public class Wizard : Runnable, IDesignable
         X = Pos.Center ();
         Y = Pos.Center ();
         Width = Dim.Auto (minimumContentDim: Dim.Percent (80));
-        Height = Dim.Auto ();
+        Height = Dim.Auto (minimumContentDim: Dim.Percent (50));
 
         BackButton = new ()
         {
@@ -131,7 +131,7 @@ public class Wizard : Runnable, IDesignable
                                              Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height };
                                          };
 
-        Padding.SetScheme (SchemeManager.Schemes ["base"]);
+        Padding?.SetScheme (SchemeManager.Schemes ["base"]);
 
         // Add buttons to bottom Padding instead of using AddButton
         Padding?.Add (BackButton);
@@ -192,6 +192,14 @@ public class Wizard : Runnable, IDesignable
     /// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
     public void AddStep (WizardStep newStep)
     {
+        newStep.SuperViewRendersLineCanvas = true;
+        newStep.BorderStyle = LineStyle.Single;
+        newStep.Border!.Thickness = new Thickness (0, 0, 0, 1);
+        newStep.Padding!.Thickness = newStep.Padding!.Thickness with { Left = 1, Right = 1 };
+        newStep.X = -1;
+        newStep.Width = Dim.Fill () + 1;
+        newStep.Height = Dim.Fill ();
+
         newStep.EnabledChanged += (_, _) => UpdateButtonsAndTitle ();
         newStep.TitleChanged += (_, _) => UpdateButtonsAndTitle ();
         _steps.AddLast (newStep);
@@ -472,13 +480,6 @@ public class Wizard : Runnable, IDesignable
         }
     }
 
-    private void SizeStep (WizardStep step)
-    {
-        step.X = -1;
-        step.Width = Dim.Fill ()+1;
-        step.SuperViewRendersLineCanvas = true;
-    }
-
     private void UpdateButtonsAndTitle ()
     {
         if (CurrentStep is null)
@@ -507,8 +508,6 @@ public class Wizard : Runnable, IDesignable
                                         ? CurrentStep.NextButtonText
                                         : Strings.wzNext; // "_Next...";
         }
-
-        SizeStep (CurrentStep);
     }
 
     bool IDesignable.EnableForDesign ()
