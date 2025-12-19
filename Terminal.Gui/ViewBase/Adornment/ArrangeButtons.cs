@@ -3,7 +3,7 @@ namespace Terminal.Gui.ViewBase;
 /// <summary>
 ///     Identifies the different arrangement buttons that can be displayed on a border during arrange mode.
 /// </summary>
-internal enum ArrangeButtons
+public enum ArrangeButtons
 {
     /// <summary>
     ///     Button for moving the view (typically displayed in top-left corner).

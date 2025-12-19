@@ -255,7 +255,9 @@ internal sealed class Arranger : IDisposable
     {
         Button button = new ()
         {
+#if DEBUG
             Id = buttonType.ToString (),
+#endif
             CanFocus = true,
             Width = 1,
             Height = 1,

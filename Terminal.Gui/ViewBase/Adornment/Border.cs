@@ -68,7 +68,9 @@ public partial class Border : Adornment
             {
                 DrawIndicator = new ()
                 {
+#if DEBUG
                     Id = "DrawIndicator",
+#endif
                     X = 1,
                     Style = new SpinnerStyle.Dots2 (),
                     SpinDelay = 0,
