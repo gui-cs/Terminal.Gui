@@ -72,6 +72,10 @@ public class Arrangement : Scenario
         tiledView3.Height = Dim.Height (tiledView1);
         View tiledView4 = CreateTiledView (3, Pos.Left (tiledView1), Pos.Bottom (tiledView1) - 1);
         tiledView4.Width = Dim.Func (_ => tiledView3.Frame.Width + tiledView2.Frame.Width + tiledView1.Frame.Width - 2);
+        tiledView1.SuperViewRendersLineCanvas = true;
+        tiledView2.SuperViewRendersLineCanvas = true;
+        tiledView3.SuperViewRendersLineCanvas = true;
+        tiledView4.SuperViewRendersLineCanvas = true;
         tiledFrame.Add (tiledView4, tiledView3, tiledView2, tiledView1);
 
         testFrame.Add (tiledFrame);
@@ -271,7 +275,6 @@ public class Arrangement : Scenario
             BorderStyle = LineStyle.Single,
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            SuperViewRendersLineCanvas = true,
             Arrangement = ViewArrangement.Resizable
         };
 

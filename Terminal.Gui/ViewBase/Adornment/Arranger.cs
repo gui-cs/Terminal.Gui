@@ -465,31 +465,25 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
+        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
+        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
         bool handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
-            parent.Y -= 1;
+            manipulator.AdjustY (-1);
             handled = true;
         }
 
         if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.BottomResizable))
         {
-            if (parent.Viewport.Height > 0)
-            {
-                parent.Height -= 1;
-                handled = true;
-            }
+            handled |= manipulator.AdjustHeight (-1);
         }
 
         if (GetFocusedArrangement () == ViewArrangement.TopResizable)
         {
-            if (parent.Viewport.Height >= 0)
-            {
-                parent.Y -= 1;
-                parent.Height += 1;
-                handled = true;
-            }
+            handled |= manipulator.ResizeFromTop (-1);
         }
 
         return handled;
@@ -507,34 +501,25 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
+        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
+        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
         bool handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
-            parent.Y += 1;
+            manipulator.AdjustY (1);
             handled = true;
         }
 
         if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.BottomResizable))
         {
-            parent.Height += 1;
-            handled = true;
+            handled |= manipulator.AdjustHeight (1);
         }
 
         if (GetFocusedArrangement () == ViewArrangement.TopResizable)
         {
-            if (parent.Viewport.Height > 0)
-            {
-                parent.Y += 1;
-                parent.Height -= 1;
-                handled = true;
-            }
-        }
-
-        if (GetFocusedArrangement ().HasFlag (ViewArrangement.Resizable))
-        {
-            parent.Height += 1;
-            handled = true;
+            handled |= manipulator.ResizeFromTop (1);
         }
 
         return handled;
@@ -552,28 +537,25 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
+        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
+        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
         bool handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
-            parent.X -= 1;
+            manipulator.AdjustX (-1);
             handled = true;
         }
 
         if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.RightResizable))
         {
-            if (parent.Viewport.Width > 0)
-            {
-                parent.Width -= 1;
-                handled = true;
-            }
+            handled |= manipulator.AdjustWidth (-1);
         }
 
         if (GetFocusedArrangement () == ViewArrangement.LeftResizable)
         {
-            parent.X -= 1;
-            parent.Width += 1;
-            handled = true;
+            handled |= manipulator.ResizeFromLeft (-1);
         }
 
         return handled;
@@ -591,28 +573,25 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
+        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
+        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        var manipulator = new ViewManipulator (parent, minWidth, minHeight);
         bool handled = false;
 
         if (Arranging.HasFlag (ViewArrangement.Movable))
         {
-            parent.X += 1;
+            manipulator.AdjustX (1);
             handled = true;
         }
 
         if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.RightResizable))
         {
-            parent.Width += 1;
-            handled = true;
+            handled |= manipulator.AdjustWidth (1);
         }
 
         if (GetFocusedArrangement () == ViewArrangement.LeftResizable)
         {
-            if (parent.Viewport.Width > 0)
-            {
-                parent.X += 1;
-                parent.Width -= 1;
-                handled = true;
-            }
+            handled |= manipulator.ResizeFromLeft (1);
         }
 
         return handled;

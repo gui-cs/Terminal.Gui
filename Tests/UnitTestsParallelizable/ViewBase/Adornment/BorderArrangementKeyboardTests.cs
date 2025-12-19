@@ -1,5 +1,3 @@
-using Terminal.Gui.ViewBase;
-
 namespace ViewBaseTests.AdornmentTests;
 
 /// <summary>
@@ -41,7 +39,7 @@ public class BorderArrangementKeyboardTests
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranger.Arranging);
 
         // Check that the left size button was created and is visible
-        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.LeftSize));
+        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.LeftSize));
         Assert.NotNull (leftButton);
         Assert.True (leftButton.Visible);
 
@@ -79,7 +77,7 @@ public class BorderArrangementKeyboardTests
         Assert.True (result);
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranger.Arranging);
 
-        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.RightSize));
+        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.RightSize));
         Assert.NotNull (rightButton);
         Assert.True (rightButton.Visible);
 
@@ -117,7 +115,7 @@ public class BorderArrangementKeyboardTests
         Assert.True (result);
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranger.Arranging);
 
-        View? topButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.TopSize));
+        View? topButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.TopSize));
         Assert.NotNull (topButton);
         Assert.True (topButton.Visible);
 
@@ -155,7 +153,7 @@ public class BorderArrangementKeyboardTests
         Assert.True (result);
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranger.Arranging);
 
-        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.BottomSize));
+        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.BottomSize));
         Assert.NotNull (bottomButton);
         Assert.True (bottomButton.Visible);
 
@@ -193,7 +191,7 @@ public class BorderArrangementKeyboardTests
         Assert.True (result);
         Assert.Equal (ViewArrangement.Movable, view.Border.Arranger.Arranging);
 
-        View? moveButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.Move));
+        View? moveButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.Move));
         Assert.NotNull (moveButton);
         Assert.True (moveButton.Visible);
 
@@ -231,13 +229,13 @@ public class BorderArrangementKeyboardTests
         Assert.True (result);
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranger.Arranging);
 
-        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.LeftSize), Visible: true });
+        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.LeftSize), Visible: true });
         Assert.NotNull (leftButton);
 
-        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.BottomSize), Visible: true });
+        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.BottomSize), Visible: true });
         Assert.NotNull (bottomButton);
 
-        View? moveButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.Move), Visible: true });
+        View? moveButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.Move), Visible: true });
         Assert.Null (moveButton);
 
         // Cleanup
@@ -276,20 +274,20 @@ public class BorderArrangementKeyboardTests
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranger.Arranging);
 
         // For fully Resizable, only the all-size button should be visible (not individual direction buttons)
-        View? allSizeButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.AllSize));
+        View? allSizeButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.AllSize));
         Assert.NotNull (allSizeButton);
         Assert.True (allSizeButton.Visible);
 
         // Individual direction buttons should be visible for fully Resizable
-        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.LeftSize), Visible: true });
+        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.LeftSize), Visible: true });
         Assert.NotNull (leftButton);
 
-        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.RightSize), Visible: true });
+        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.RightSize), Visible: true });
         Assert.NotNull (rightButton);
 
-        View? topButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.TopSize), Visible: true });
+        View? topButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.TopSize), Visible: true });
 
-        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.BottomSize), Visible: true });
+        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.BottomSize), Visible: true });
         Assert.NotNull (bottomButton);
 
         // Cleanup
@@ -326,10 +324,10 @@ public class BorderArrangementKeyboardTests
         Assert.True (result);
         Assert.NotEqual (ViewArrangement.Fixed, view.Border.Arranger.Arranging);
 
-        View? topButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.TopSize), Visible: true });
+        View? topButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.TopSize), Visible: true });
         Assert.NotNull (topButton);
 
-        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof(ArrangeButtons.RightSize), Visible: true });
+        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v is { Id: nameof (ArrangeButtons.RightSize), Visible: true });
         Assert.NotNull (rightButton);
 
         // Cleanup
@@ -365,18 +363,18 @@ public class BorderArrangementKeyboardTests
         Assert.True (result);
 
         // Only left button should be visible
-        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.LeftSize));
+        View? leftButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.LeftSize));
         Assert.NotNull (leftButton);
         Assert.True (leftButton.Visible);
 
         // Other buttons should not exist or be invisible
-        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.RightSize));
+        View? rightButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.RightSize));
         Assert.True (rightButton == null || !rightButton.Visible);
 
-        View? topButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.TopSize));
+        View? topButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.TopSize));
         Assert.True (topButton == null || !topButton.Visible);
 
-        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof(ArrangeButtons.BottomSize));
+        View? bottomButton = view.Border.SubViews.FirstOrDefault (v => v.Id == nameof (ArrangeButtons.BottomSize));
         Assert.True (bottomButton == null || !bottomButton.Visible);
 
         // Cleanup
