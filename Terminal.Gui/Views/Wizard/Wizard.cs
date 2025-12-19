@@ -2,8 +2,8 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (
-///     <see cref="WizardStep"/>) can host arbitrary <see cref="View"/>s, much like a <see cref="Dialog"/>. Each step 
-///     can display help text in its right <see cref="Padding"/>. Navigation buttons are displayed in the bottom 
+///     <see cref="WizardStep"/>) can host arbitrary <see cref="View"/>s, much like a <see cref="Dialog"/>. Each step
+///     can display help text in its right <see cref="Padding"/>. Navigation buttons are displayed in the bottom
 ///     <see cref="Padding"/> of the Wizard, enabling the user to navigate forward and backward through the steps.
 /// </summary>
 /// <remarks>
@@ -59,6 +59,7 @@ public class Wizard : Runnable, IDesignable
     /// </remarks>
     public Wizard ()
     {
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
         BorderStyle = LineStyle.Double;
         Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
         base.ShadowStyle = Dialog.DefaultShadow;
@@ -86,19 +87,7 @@ public class Wizard : Runnable, IDesignable
         IsRunningChanged += WizardIsRunningChanged;
         TitleChanged += WizardTitleChanged;
 
-        // Add key binding for Esc when not modal - fires Cancelled event
-        AddCommand (Command.Quit, ctx =>
-        {
-            // Only handle if not modal (modal is handled by Dialog/Application)
-            if (!IsModal)
-            {
-                Cancelled?.Invoke (this, new ());
-
-                return true;
-            }
-
-            return false;
-        });
+        AddCommand (Command.Quit, QuitHandler);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
 
         return;
@@ -119,19 +108,28 @@ public class Wizard : Runnable, IDesignable
                 _wizardTitle = e.Value;
             }
         }
+
+        // Add key binding for Esc when not modal - fires Cancelled event
+        bool? QuitHandler (ICommandContext? ctx)
+        {
+            // Only handle if not modal (modal is handled by Dialog/Application)
+            if (!IsModal)
+            {
+                Cancelled?.Invoke (this, new ());
+
+                return true;
+            }
+
+            return false;
+        }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();
 
-        NextFinishButton.FrameChanged += (s, e) =>
-                                         {
-                                             Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height };
-                                         };
-
-        Padding?.SetScheme (SchemeManager.Schemes ["base"]);
+        NextFinishButton.FrameChanged += (s, e) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height }; };
 
         // Add buttons to bottom Padding instead of using AddButton
         Padding?.Add (BackButton);
@@ -143,18 +141,6 @@ public class Wizard : Runnable, IDesignable
         CurrentStep = GetFirstStep ();
     }
 
-    /// <inheritdoc />
-    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
-    {
-        base.OnSubViewsLaidOut (args);
-    }
-
-    /// <inheritdoc />
-    protected override void OnSubViewLayout (LayoutEventArgs args)
-    {
-        base.OnSubViewLayout (args);
-    }
-
     /// <summary>
     ///     If the <see cref="CurrentStep"/> is not the first step in the wizard, this button causes the
     ///     <see cref="MovingBack"/> event to be fired and the wizard moves to the previous step.
@@ -164,6 +150,7 @@ public class Wizard : Runnable, IDesignable
 
     private readonly LinkedList<WizardStep> _steps = [];
     private WizardStep? _currentStep;
+
     /// <summary>Gets or sets the currently active <see cref="WizardStep"/>.</summary>
     public WizardStep? CurrentStep
     {
@@ -194,7 +181,7 @@ public class Wizard : Runnable, IDesignable
     {
         newStep.SuperViewRendersLineCanvas = true;
         newStep.BorderStyle = LineStyle.Single;
-        newStep.Border!.Thickness = new Thickness (0, 0, 0, 1);
+        newStep.Border!.Thickness = new (0, 0, 0, 1);
         newStep.Padding!.Thickness = newStep.Padding!.Thickness with { Left = 1, Right = 1 };
         newStep.X = -1;
         newStep.Width = Dim.Fill () + 1;
@@ -317,7 +304,10 @@ public class Wizard : Runnable, IDesignable
     ///     Causes the wizard to move to the previous enabled step (or first step if <see cref="CurrentStep"/> is not set).
     ///     If there is no previous step, does nothing.
     /// </summary>
-    /// <returns><see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found or the operation was cancelled.</returns>
+    /// <returns>
+    ///     <see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found
+    ///     or the operation was cancelled.
+    /// </returns>
     public bool GoBack ()
     {
         WizardStep? previous = GetPreviousStep ();
@@ -334,7 +324,10 @@ public class Wizard : Runnable, IDesignable
     ///     Causes the wizard to move to the next enabled step (or last step if <see cref="CurrentStep"/> is not set). If
     ///     there is no previous step, does nothing.
     /// </summary>
-    /// <returns><see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found or the operation was cancelled.</returns>
+    /// <returns>
+    ///     <see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found
+    ///     or the operation was cancelled.
+    /// </returns>
     public bool GoNext ()
     {
         WizardStep? nextStep = GetNextStep ();
@@ -349,7 +342,10 @@ public class Wizard : Runnable, IDesignable
 
     /// <summary>Changes to the specified <see cref="WizardStep"/>.</summary>
     /// <param name="newStep">The step to go to.</param>
-    /// <returns><see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found or the operation was cancelled.</returns>
+    /// <returns>
+    ///     <see langword="true"/> if the transition to the step succeeded. <see langword="false"/> if the step was not found
+    ///     or the operation was cancelled.
+    /// </returns>
     public bool GoToStep (WizardStep? newStep)
     {
         if (OnStepChanging (_currentStep, newStep) || newStep is { Enabled: false })
@@ -447,6 +443,7 @@ public class Wizard : Runnable, IDesignable
             e.Handled = true;
         }
     }
+
     private void NextFinishBtnOnAccepting (object? sender, CommandEventArgs e)
     {
         if (CurrentStep == GetLastStep ())

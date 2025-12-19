@@ -64,7 +64,7 @@ public class WizardStep : View, IDesignable
 
     /// <summary>Calculates the width for the help text padding based on the current frame width.</summary>
     /// <returns>The padding width (30% of frame width, minimum 10)</returns>
-    private int CalculateHelpPaddingWidth () => Math.Min (20, (int)(Frame.Width * 0.3));
+    private int CalculateHelpPaddingWidth () => Math.Max (20, (int)(Frame.Width * 0.4));
 
     /// <inheritdoc/>
     protected override void OnFrameChanged (in Rectangle frame)
