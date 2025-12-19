@@ -59,6 +59,8 @@ public partial class View // Drawing APIs
         }
     }
 
+
+
     /// <summary>
     ///     Draws the view if it needs to be drawn.
     /// </summary>

@@ -6,16 +6,14 @@ public class SubViewTests
     [Fact]
     public void SuperViewChanged_Raised_On_Add ()
     {
-        var super = new View { };
+        var super = new View ();
         var sub = new View ();
 
-        int superRaisedCount = 0;
-        int subRaisedCount = 0;
+        var superRaisedCount = 0;
+        var subRaisedCount = 0;
 
-        super.SuperViewChanged += (s, e) =>
-                              {
-                                  superRaisedCount++;
-                              };
+        super.SuperViewChanged += (s, e) => { superRaisedCount++; };
+
         sub.SuperViewChanged += (s, e) =>
                                 {
                                     if (sub.SuperView is { })
@@ -34,23 +32,21 @@ public class SubViewTests
     [Fact]
     public void SuperViewChanged_Raised_On_Remove ()
     {
-        var super = new View { };
+        var super = new View ();
         var sub = new View ();
 
-        int superRaisedCount = 0;
-        int subRaisedCount = 0;
+        var superRaisedCount = 0;
+        var subRaisedCount = 0;
 
-        super.SuperViewChanged += (s, e) =>
-                                {
-                                    superRaisedCount++;
-                                };
+        super.SuperViewChanged += (s, e) => { superRaisedCount++; };
+
         sub.SuperViewChanged += (s, e) =>
-                              {
-                                  if (sub.SuperView is null)
-                                  {
-                                      subRaisedCount++;
-                                  }
-                              };
+                                {
+                                    if (sub.SuperView is null)
+                                    {
+                                        subRaisedCount++;
+                                    }
+                                };
 
         super.Add (sub);
         Assert.True (super.SubViews.Count == 1);
@@ -392,18 +388,12 @@ public class SubViewTests
         var view = new View ();
         var superView = new View ();
 
-        int superViewChangedCount = 0;
-        int superViewChangingCount = 0;
+        var superViewChangedCount = 0;
+        var superViewChangingCount = 0;
 
-        view.SuperViewChanged += (s, e) =>
-        {
-            superViewChangedCount++;
-        };
+        view.SuperViewChanged += (s, e) => { superViewChangedCount++; };
 
-        view.SuperViewChanging += (s, e) =>
-        {
-            superViewChangingCount++;
-        };
+        view.SuperViewChanging += (s, e) => { superViewChangingCount++; };
 
         // Act
         superView.Add (view);
@@ -411,7 +401,6 @@ public class SubViewTests
         // Assert
         Assert.Equal (1, superViewChangingCount);
         Assert.Equal (1, superViewChangedCount);
-
     }
 
     [Fact]
@@ -450,7 +439,6 @@ public class SubViewTests
         top2.Dispose ();
     }
 
-
     [Fact]
     public void Initialized_Event_Comparing_With_Added_Event ()
     {
@@ -479,10 +467,10 @@ public class SubViewTests
         int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
 
         winAddedToTop.SubViewAdded += (s, e) =>
-        {
-            Assert.Equal (e.SuperView!.Frame.Width, winAddedToTop.Frame.Width);
-            Assert.Equal (e.SuperView.Frame.Height, winAddedToTop.Frame.Height);
-        };
+                                      {
+                                          Assert.Equal (e.SuperView!.Frame.Width, winAddedToTop.Frame.Width);
+                                          Assert.Equal (e.SuperView.Frame.Height, winAddedToTop.Frame.Height);
+                                      };
 
         v1AddedToWin.SubViewAdded += (s, e) =>
                                      {
@@ -503,69 +491,70 @@ public class SubViewTests
                                     };
 
         top.Initialized += (s, e) =>
-        {
-            tc++;
-            Assert.Equal (1, tc);
-            Assert.Equal (1, wc);
-            Assert.Equal (1, v1c);
-            Assert.Equal (1, v2c);
-            Assert.Equal (1, sv1c);
+                           {
+                               tc++;
+                               Assert.Equal (1, tc);
+                               Assert.Equal (1, wc);
+                               Assert.Equal (1, v1c);
+                               Assert.Equal (1, v2c);
+                               Assert.Equal (1, sv1c);
 
-            Assert.True (top.CanFocus);
-            Assert.True (winAddedToTop.CanFocus);
-            Assert.False (v1AddedToWin.CanFocus);
-            Assert.False (v2AddedToWin.CanFocus);
-            Assert.False (svAddedTov1.CanFocus);
+                               Assert.True (top.CanFocus);
+                               Assert.True (winAddedToTop.CanFocus);
+                               Assert.False (v1AddedToWin.CanFocus);
+                               Assert.False (v2AddedToWin.CanFocus);
+                               Assert.False (svAddedTov1.CanFocus);
 
-            top.Layout ();
-        };
+                               top.Layout ();
+                           };
 
         winAddedToTop.Initialized += (s, e) =>
-        {
-            wc++;
-            Assert.Equal (top.Viewport.Width, winAddedToTop.Frame.Width);
-            Assert.Equal (top.Viewport.Height, winAddedToTop.Frame.Height);
-        };
+                                     {
+                                         wc++;
+                                         Assert.Equal (top.Viewport.Width, winAddedToTop.Frame.Width);
+                                         Assert.Equal (top.Viewport.Height, winAddedToTop.Frame.Height);
+                                     };
 
         v1AddedToWin.Initialized += (s, e) =>
-        {
-            v1c++;
+                                    {
+                                        v1c++;
 
-            // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
-            // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-            // in no way should the v1AddedToWin.Frame be the same as the Top.Frame/Viewport
-            // as it is a subview of winAddedToTop, which has a border!
-            //Assert.Equal (top.Viewport.Width,  v1AddedToWin.Frame.Width);
-            //Assert.Equal (top.Viewport.Height, v1AddedToWin.Frame.Height);
-        };
+                                        // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
+                                        // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
+                                        // in no way should the v1AddedToWin.Frame be the same as the Top.Frame/Viewport
+                                        // as it is a subview of winAddedToTop, which has a border!
+                                        //Assert.Equal (top.Viewport.Width,  v1AddedToWin.Frame.Width);
+                                        //Assert.Equal (top.Viewport.Height, v1AddedToWin.Frame.Height);
+                                    };
 
         v2AddedToWin.Initialized += (s, e) =>
-        {
-            v2c++;
+                                    {
+                                        v2c++;
 
-            // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
-            // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-            // in no way should the v2AddedToWin.Frame be the same as the Top.Frame/Viewport
-            // as it is a subview of winAddedToTop, which has a border!
-            //Assert.Equal (top.Viewport.Width,  v2AddedToWin.Frame.Width);
-            //Assert.Equal (top.Viewport.Height, v2AddedToWin.Frame.Height);
-        };
+                                        // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
+                                        // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
+                                        // in no way should the v2AddedToWin.Frame be the same as the Top.Frame/Viewport
+                                        // as it is a subview of winAddedToTop, which has a border!
+                                        //Assert.Equal (top.Viewport.Width,  v2AddedToWin.Frame.Width);
+                                        //Assert.Equal (top.Viewport.Height, v2AddedToWin.Frame.Height);
+                                    };
 
         svAddedTov1.Initialized += (s, e) =>
-        {
-            sv1c++;
+                                   {
+                                       sv1c++;
 
-            // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
-            // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
-            // in no way should the svAddedTov1.Frame be the same as the Top.Frame/Viewport
-            // because sv1AddedTov1 is a subview of v1AddedToWin, which is a subview of
-            // winAddedToTop, which has a border!
-            //Assert.Equal (top.Viewport.Width,  svAddedTov1.Frame.Width);
-            //Assert.Equal (top.Viewport.Height, svAddedTov1.Frame.Height);
-            Assert.False (svAddedTov1.CanFocus);
-            //Assert.Throws<InvalidOperationException> (() => svAddedTov1.CanFocus = true);
-            Assert.False (svAddedTov1.CanFocus);
-        };
+                                       // Top.Frame: 0, 0, 80, 25; Top.Viewport: 0, 0, 80, 25
+                                       // BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
+                                       // in no way should the svAddedTov1.Frame be the same as the Top.Frame/Viewport
+                                       // because sv1AddedTov1 is a subview of v1AddedToWin, which is a subview of
+                                       // winAddedToTop, which has a border!
+                                       //Assert.Equal (top.Viewport.Width,  svAddedTov1.Frame.Width);
+                                       //Assert.Equal (top.Viewport.Height, svAddedTov1.Frame.Height);
+                                       Assert.False (svAddedTov1.CanFocus);
+
+                                       //Assert.Throws<InvalidOperationException> (() => svAddedTov1.CanFocus = true);
+                                       Assert.False (svAddedTov1.CanFocus);
+                                   };
 
         v1AddedToWin.Add (svAddedTov1);
         winAddedToTop.Add (v1AddedToWin, v2AddedToWin);
@@ -639,7 +628,7 @@ public class SubViewTests
         superView.Add (subView1, subView2, subView3);
 
         // Act
-        var removedViews = superView.RemoveAll ();
+        IReadOnlyCollection<View> removedViews = superView.RemoveAll ();
 
         // Assert
         Assert.Empty (superView.SubViews);
@@ -662,7 +651,7 @@ public class SubViewTests
         superView.Add (subView1, subView2, subView3, subView4);
 
         // Act
-        var removedViews = superView.RemoveAll<Button> ();
+        IReadOnlyCollection<Button> removedViews = superView.RemoveAll<Button> ();
 
         // Assert
         Assert.Equal (3, superView.SubViews.Count);
@@ -683,7 +672,7 @@ public class SubViewTests
         superView.Add (subView1, subView2, subView3);
 
         // Act
-        var removedViews = superView.RemoveAll<Button> ();
+        IReadOnlyCollection<Button> removedViews = superView.RemoveAll<Button> ();
 
         // Assert
         Assert.Equal (2, superView.SubViews.Count);
@@ -700,7 +689,7 @@ public class SubViewTests
         var superView = new View ();
         var subView = new View ();
 
-        var events = new List<string> ();
+        List<string> events = new ();
 
         subView.SuperViewChanging += (s, e) => { events.Add ("SuperViewChanging"); };
 
@@ -722,7 +711,7 @@ public class SubViewTests
         var superView = new View ();
         var subView = new View ();
 
-        View? currentValueInEvent = new View (); // Set to non-null to ensure it gets updated
+        var currentValueInEvent = new View (); // Set to non-null to ensure it gets updated
         View? newValueInEvent = null;
 
         subView.SuperViewChanging += (s, e) =>
@@ -749,7 +738,7 @@ public class SubViewTests
         superView.Add (subView);
 
         View? currentValueInEvent = null;
-        View? newValueInEvent = new View (); // Set to non-null to ensure it gets updated
+        var newValueInEvent = new View (); // Set to non-null to ensure it gets updated
 
         subView.SuperViewChanging += (s, e) =>
                                      {
@@ -770,7 +759,7 @@ public class SubViewTests
     {
         // Arrange
         using IApplication app = Application.Create ();
-        var runnable = new Runnable<bool> ();
+        Runnable<bool> runnable = new ();
         var subView = new View ();
 
         runnable.Add (subView);
@@ -781,10 +770,10 @@ public class SubViewTests
         subView.SuperViewChanging += (s, e) =>
                                      {
                                          Assert.NotNull (s);
+
                                          // At this point, SuperView is still set, so App should be accessible
                                          appInEvent = (s as View)?.App;
                                      };
-
 
         Assert.NotNull (runnable.App);
 
@@ -804,7 +793,7 @@ public class SubViewTests
     {
         // Arrange
         var superView = new View ();
-        var events = new List<string> ();
+        List<string> events = new ();
 
         var subView = new TestViewWithSuperViewEvents (events);
 
@@ -854,6 +843,7 @@ public class SubViewTests
         protected override bool OnSuperViewChanging (ValueChangingEventArgs<View?> args)
         {
             _events.Add ("OnSuperViewChanging");
+
             return base.OnSuperViewChanging (args);
         }
 
@@ -907,10 +897,7 @@ public class SubViewTests
         var subView = new TestViewThatCancelsChange ();
 
         var eventRaised = false;
-        subView.SuperViewChanging += (s, e) =>
-                                     {
-                                         eventRaised = true;
-                                     };
+        subView.SuperViewChanging += (s, e) => { eventRaised = true; };
 
         // Act
         superView.Add (subView);
@@ -983,4 +970,346 @@ public class SubViewTests
             return true; // Always cancel the change
         }
     }
+
+    #region GetSubViews Tests
+
+    [Fact]
+    public void GetSubViews_Returns_Empty_Collection_When_No_SubViews ()
+    {
+        // Arrange
+        View view = new ();
+
+        // Act
+        IReadOnlyCollection<View> result = view.GetSubViews ();
+
+        // Assert
+        Assert.NotNull (result);
+        Assert.Empty (result);
+    }
+
+    [Fact]
+    public void GetSubViews_Returns_Direct_SubViews_By_Default ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView1 = new () { Id = "subView1" };
+        View subView2 = new () { Id = "subView2" };
+        View subView3 = new () { Id = "subView3" };
+
+        superView.Add (subView1, subView2, subView3);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews ();
+
+        // Assert
+        Assert.NotNull (result);
+        Assert.Equal (3, result.Count);
+        Assert.Contains (subView1, result);
+        Assert.Contains (subView2, result);
+        Assert.Contains (subView3, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Does_Not_Include_Adornment_SubViews_By_Default ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView = new () { Id = "subView" };
+
+        superView.Add (subView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Add a subview to the Border (e.g., ShadowView)
+        View borderSubView = new () { Id = "borderSubView" };
+        superView.Border!.Add (borderSubView);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews ();
+
+        // Assert
+        Assert.Single (result);
+        Assert.Contains (subView, result);
+        Assert.DoesNotContain (borderSubView, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Includes_Margin_SubViews_When_IncludeAdornments_Is_True ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView = new () { Id = "subView" };
+
+        superView.Add (subView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Add a subview to the Margin
+        View marginSubView = new () { Id = "marginSubView" };
+        superView.Margin!.Add (marginSubView);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+
+        // Assert
+        Assert.Equal (2, result.Count);
+        Assert.Contains (subView, result);
+        Assert.Contains (marginSubView, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Includes_Border_SubViews_When_IncludeAdornments_Is_True ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView = new () { Id = "subView" };
+
+        superView.Add (subView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Add a subview to the Border
+        View borderSubView = new () { Id = "borderSubView" };
+        superView.Border!.Add (borderSubView);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+
+        // Assert
+        Assert.Equal (2, result.Count);
+        Assert.Contains (subView, result);
+        Assert.Contains (borderSubView, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Includes_Padding_SubViews_When_IncludeAdornments_Is_True ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView = new () { Id = "subView" };
+
+        superView.Add (subView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Add a subview to the Padding
+        View paddingSubView = new () { Id = "paddingSubView" };
+        superView.Padding!.Add (paddingSubView);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+
+        // Assert
+        Assert.Equal (2, result.Count);
+        Assert.Contains (subView, result);
+        Assert.Contains (paddingSubView, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Includes_All_Adornment_SubViews_When_IncludeAdornments_Is_True ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView1 = new () { Id = "subView1" };
+        View subView2 = new () { Id = "subView2" };
+
+        superView.Add (subView1, subView2);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Add subviews to each adornment
+        View marginSubView = new () { Id = "marginSubView" };
+        View borderSubView = new () { Id = "borderSubView" };
+        View paddingSubView = new () { Id = "paddingSubView" };
+
+        superView.Margin!.Add (marginSubView);
+        superView.Border!.Add (borderSubView);
+        superView.Padding!.Add (paddingSubView);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+
+        // Assert
+        Assert.Equal (5, result.Count);
+        Assert.Contains (subView1, result);
+        Assert.Contains (subView2, result);
+        Assert.Contains (marginSubView, result);
+        Assert.Contains (borderSubView, result);
+        Assert.Contains (paddingSubView, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Returns_Correct_Order ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView1 = new () { Id = "subView1" };
+        View subView2 = new () { Id = "subView2" };
+
+        superView.Add (subView1, subView2);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        View marginSubView = new () { Id = "marginSubView" };
+        View borderSubView = new () { Id = "borderSubView" };
+        View paddingSubView = new () { Id = "paddingSubView" };
+
+        superView.Margin!.Add (marginSubView);
+        superView.Border!.Add (borderSubView);
+        superView.Padding!.Add (paddingSubView);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        List<View> resultList = result.ToList ();
+
+        // Assert - Order should be: direct SubViews, Margin, Border, Padding
+        Assert.Equal (5, resultList.Count);
+        Assert.Equal (subView1, resultList [0]);
+        Assert.Equal (subView2, resultList [1]);
+        Assert.Equal (marginSubView, resultList [2]);
+        Assert.Equal (borderSubView, resultList [3]);
+        Assert.Equal (paddingSubView, resultList [4]);
+    }
+
+    [Fact]
+    public void GetSubViews_Returns_Snapshot_Safe_For_Modification ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView1 = new () { Id = "subView1" };
+        View subView2 = new () { Id = "subView2" };
+
+        superView.Add (subView1, subView2);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews ();
+
+        // Modify the SuperView's SubViews
+        View subView3 = new () { Id = "subView3" };
+        superView.Add (subView3);
+
+        // Assert - The snapshot should not include subView3
+        Assert.Equal (2, result.Count);
+        Assert.Contains (subView1, result);
+        Assert.Contains (subView2, result);
+        Assert.DoesNotContain (subView3, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Multiple_SubViews_In_Each_Adornment ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView = new () { Id = "subView" };
+
+        superView.Add (subView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Add multiple subviews to each adornment
+        View marginSubView1 = new () { Id = "marginSubView1" };
+        View marginSubView2 = new () { Id = "marginSubView2" };
+        View borderSubView1 = new () { Id = "borderSubView1" };
+        View borderSubView2 = new () { Id = "borderSubView2" };
+        View paddingSubView1 = new () { Id = "paddingSubView1" };
+        View paddingSubView2 = new () { Id = "paddingSubView2" };
+
+        superView.Margin!.Add (marginSubView1, marginSubView2);
+        superView.Border!.Add (borderSubView1, borderSubView2);
+        superView.Padding!.Add (paddingSubView1, paddingSubView2);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+
+        // Assert
+        Assert.Equal (7, result.Count);
+        Assert.Contains (subView, result);
+        Assert.Contains (marginSubView1, result);
+        Assert.Contains (marginSubView2, result);
+        Assert.Contains (borderSubView1, result);
+        Assert.Contains (borderSubView2, result);
+        Assert.Contains (paddingSubView1, result);
+        Assert.Contains (paddingSubView2, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Works_With_Adornment_Itself ()
+    {
+        // Arrange - Test that an Adornment (which is a View) can also have GetSubViews called
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        View marginSubView = new () { Id = "marginSubView" };
+        view.Margin!.Add (marginSubView);
+
+        // Act - Call GetSubViews on the Margin itself
+        IReadOnlyCollection<View> result = view.Margin.GetSubViews ();
+
+        // Assert
+        Assert.Single (result);
+        Assert.Contains (marginSubView, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Handles_Null_Adornments_Gracefully ()
+    {
+        // Arrange - Create an Adornment view which doesn't have its own adornments
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        // Border is an Adornment and doesn't have Margin, Border, Padding
+        View borderSubView = new () { Id = "borderSubView" };
+        view.Border!.Add (borderSubView);
+
+        // Act - GetSubViews on Border (an Adornment) with includeAdornments
+        IReadOnlyCollection<View> result = view.Border.GetSubViews (true);
+
+        // Assert - Should only return direct subviews, not crash
+        Assert.Single (result);
+        Assert.Contains (borderSubView, result);
+    }
+
+    [Fact]
+    public void GetSubViews_Returns_IReadOnlyCollection ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView = new () { Id = "subView" };
+        superView.Add (subView);
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews ();
+
+        // Assert
+        Assert.IsAssignableFrom<IReadOnlyCollection<View>> (result);
+
+        // Verify Count property is available and single item
+        Assert.Single (result);
+    }
+
+    [Fact]
+    public void GetSubViews_Empty_Adornments_Do_Not_Add_Nulls ()
+    {
+        // Arrange
+        View superView = new ();
+        View subView = new () { Id = "subView" };
+
+        superView.Add (subView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Don't add any subviews to adornments
+
+        // Act
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+
+        // Assert - Should only have the direct subview, no nulls
+        Assert.Single (result);
+        Assert.Contains (subView, result);
+        Assert.All (result, Assert.NotNull);
+    }
 }
+
+#endregion GetSubViews Tests
