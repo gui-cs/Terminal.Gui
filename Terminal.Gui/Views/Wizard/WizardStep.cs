@@ -14,15 +14,8 @@ namespace Terminal.Gui.Views;
 ///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
 ///     user, set <see cref="View.Enabled"/>.
 /// </remarks>
-public class WizardStep : View
+public class WizardStep : View, IDesignable
 {
-    // The contentView works like the ContentView in FrameView.
-    private readonly View _contentView = new ()
-    {
-        CanFocus = true,
-        TabStop = TabBehavior.TabStop,
-        Id = "WizardStep._contentView"
-    };
     private readonly TextView _helpTextView = new ()
     {
         CanFocus = true,
@@ -30,7 +23,11 @@ public class WizardStep : View
         ReadOnly = true,
         WordWrap = true,
         AllowsTab = false,
+        X = Pos.AnchorEnd () + 1,
+        Height = Dim.Fill (),
+#if DEBUG
         Id = "WizardStep._helpTextView"
+#endif
     };
 
     /// <summary>
@@ -40,27 +37,25 @@ public class WizardStep : View
     {
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
-        BorderStyle = LineStyle.None;
+        BorderStyle = LineStyle.Dotted;
 
-        // Content fills the entire viewport
-        _contentView.X = 0;
-        _contentView.Y = 0;
-        _contentView.Width = Dim.Fill ();
-        _contentView.Height = Dim.Fill ();
-        base.Add (_contentView);
+        Width = Dim.Auto (minimumContentDim: _helpTextView.Visible ? _helpTextView.Frame.Width : 0);
+        Height = Dim.Auto (minimumContentDim: _helpTextView.Visible ? 5: 0);
+    }
 
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
         // Help text goes in the right Padding
-        _helpTextView.X = 0;
-        _helpTextView.Y = 0;
-        _helpTextView.Width = Dim.Fill ();
-        _helpTextView.Height = Dim.Fill ();
-
         // Enable built-in scrollbars for the help text view
         _helpTextView.VerticalScrollBar.AutoShow = true;
         _helpTextView.HorizontalScrollBar.AutoShow = true;
+        _helpTextView.Width = Dim.Func (_ => CalculateHelpPaddingWidth ());
 
-        // Help will be added to Padding in ShowHide when there's help text
+        Padding?.Add (_helpTextView);
+
         ShowHide ();
+        base.EndInit ();
     }
 
     /// <summary>Sets or gets the text for the back button. The back button will only be visible on steps after the first step.</summary>
@@ -69,17 +64,18 @@ public class WizardStep : View
 
     /// <summary>Calculates the width for the help text padding based on the current frame width.</summary>
     /// <returns>The padding width (30% of frame width, minimum 10)</returns>
-    private int CalculateHelpPaddingWidth () => Math.Max (10, (int)(Frame.Width * 0.3));
+    private int CalculateHelpPaddingWidth () => Math.Min (20, (int)(Frame.Width * 0.3));
 
     /// <inheritdoc/>
     protected override void OnFrameChanged (in Rectangle frame)
     {
         base.OnFrameChanged (frame);
-        
+
         // Update padding thickness when frame changes
         if (Padding is not null && _helpTextView.Text.Length > 0)
         {
-            Padding.Thickness = new Thickness (0, 0, CalculateHelpPaddingWidth (), 0);
+            Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
+            App?.Invoke (() => Layout ());
         }
     }
 
@@ -94,72 +90,20 @@ public class WizardStep : View
         set
         {
             _helpTextView.Text = value;
+            _helpTextView.MoveHome ();
             ShowHide ();
-            SetNeedsDraw ();
         }
     }
 
     /// <summary>Sets or gets the text for the next/finish button.</summary>
-    /// <remarks>The default text is "Next..." if the Pane is not the last pane. Otherwise it is "Finish"</remarks>
+    /// <remarks>The default text is "Next..." if the Pane is not the last pane. Otherwise, it is "Finish"</remarks>
     public string NextButtonText { get; set; } = string.Empty;
-
-    /// <summary>Add the specified <see cref="View"/> to the <see cref="WizardStep"/>.</summary>
-    /// <param name="view"><see cref="View"/> to add to this container</param>
-    public override View Add (View? view)
-    {
-        _contentView.Add (view);
-
-        if (view!.CanFocus)
-        {
-            CanFocus = true;
-        }
-
-        ShowHide ();
-
-        return view;
-    }
-
-    /// <summary>Removes a <see cref="View"/> from <see cref="WizardStep"/>.</summary>
-    /// <remarks></remarks>
-    public override View? Remove (View? view)
-    {
-        SetNeedsDraw ();
-        View? container = view?.SuperView;
-
-        if (container == this)
-        {
-            base.Remove (view);
-        }
-        else
-        {
-            container?.Remove (view);
-        }
-
-        if (_contentView.InternalSubViews.Count < 1)
-        {
-            CanFocus = false;
-        }
-
-        ShowHide ();
-
-        return view;
-    }
-
-    /// <summary>Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.</summary>
-    /// <remarks></remarks>
-    public override IReadOnlyCollection<View> RemoveAll ()
-    {
-        IReadOnlyCollection<View> removed = _contentView.RemoveAll ();
-        ShowHide ();
-
-        return removed;
-    }
 
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>
     internal void ShowHide ()
     {
         // Check if views are available (might be null during disposal)
-        if (Padding is null || _contentView is null || _helpTextView is null)
+        if (Padding is null)
         {
             return;
         }
@@ -167,54 +111,38 @@ public class WizardStep : View
         if (_helpTextView.Text.Length > 0)
         {
             // Help text goes in right Padding - set thickness based on current frame width
-            Padding.Thickness = new Thickness (0, 0, CalculateHelpPaddingWidth (), 0);
-            
-            // Add help to padding if not already there
-            if (_helpTextView.SuperView != Padding)
-            {
-                // Remove from main view if it was there
-                if (_helpTextView.SuperView == this)
-                {
-                    Remove (_helpTextView);
-                }
-                Padding.Add (_helpTextView);
-            }
-            
+            Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
             _helpTextView.Visible = true;
-            _contentView.Width = Dim.Fill ();
-            _contentView.Height = Dim.Fill ();
+            _helpTextView.Enabled = true;
         }
         else
         {
             // No help text - no right padding needed
-            Padding.Thickness = Thickness.Empty;
-            
-            // Remove help from padding if it's there
-            if (_helpTextView.SuperView == Padding)
-            {
-                Padding.Remove (_helpTextView);
-            }
-            
+            Padding.Thickness = Padding.Thickness with { Right = 0 };
             _helpTextView.Visible = false;
-            _contentView.Width = Dim.Fill ();
-            _contentView.Height = Dim.Fill ();
+            _helpTextView.Enabled = false;
         }
-
-        _contentView.Visible = true;
     }
 
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
+    bool IDesignable.EnableForDesign ()
     {
-        if (disposing)
+        Title = "Example Step";
+        Label label = new ()
         {
-            // Ensure _helpTextView is disposed even if it wasn't added to a parent
-            if (_helpTextView?.SuperView is null)
-            {
-                _helpTextView?.Dispose ();
-            }
-        }
+            Title = "_Enter Text:",
+        };
+        TextField textField = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Width = 20,
+        };
+        Add (label, textField);
 
-        base.Dispose (disposing);
+        HelpText = """
+                   This is some help text for the WizardStep. 
+                   You can provide instructions or information to guide the user through this step of the wizard.
+                   """;
+
+        return true;
     }
 } // end of WizardStep class

@@ -98,6 +98,19 @@ public class Margin : Adornment
 
             foreach (View subview in view.SubViews.OrderBy (v => v.HasFocus && v.ShadowStyle != ShadowStyle.None).Reverse ())
             {
+                // We don't support arbitrary SubViews of Margin, just Padding and Border
+                if (subview.Padding is { } subviewPadding
+                    && subviewPadding.Thickness != Thickness.Empty
+                    && subviewPadding.SubViews.Count > 0)
+                {
+                    stack.Push (subviewPadding);
+                }
+                if (subview.Border is { } subviewBorder
+                    && subviewBorder.Thickness != Thickness.Empty
+                    && subviewBorder.SubViews.Count > 0)
+                {
+                    stack.Push (subviewBorder);
+                }
                 stack.Push (subview);
             }
         }

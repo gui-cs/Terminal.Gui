@@ -46,11 +46,8 @@ namespace Terminal.Gui.Views;
 /// Application.Shutdown ();
 /// </code>
 /// </example>
-public class Wizard : Dialog
+public class Wizard : Runnable, IDesignable
 {
-    private readonly LinkedList<WizardStep> _steps = new ();
-    private WizardStep? _currentStep;
-    private bool _finishedPressed;
     private string _wizardTitle = string.Empty;
 
     /// <summary>
@@ -63,35 +60,31 @@ public class Wizard : Dialog
     public Wizard ()
     {
         BorderStyle = LineStyle.Double;
+        Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
+        base.ShadowStyle = Dialog.DefaultShadow;
 
-        // Set up Padding to hold buttons
-        Padding!.Thickness = new Thickness (0, 0, 0, 1);
+        X = Pos.Center ();
+        Y = Pos.Center ();
+        Width = Dim.Auto (minimumContentDim: Dim.Percent (80));
+        Height = Dim.Auto ();
 
-        BackButton = new () 
-        { 
+        BackButton = new ()
+        {
             Text = Strings.wzBack,
             X = 0,
-            Y = 0
+            Y = Pos.AnchorEnd ()
         };
 
         NextFinishButton = new ()
         {
             Text = Strings.wzFinish,
             IsDefault = true,
-            X = Pos.Right (BackButton) + 1,
-            Y = 0
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd ()
         };
 
-        // Add buttons to bottom Padding instead of using AddButton
-        Padding.Add (BackButton);
-        Padding.Add (NextFinishButton);
-
-        BackButton.Accepting += BackBtn_Accepting;
-        NextFinishButton.Accepting += NextFinishBtn_Accepting;
-
-        IsModalChanged += Wizard_IsModalChanged;
-        IsRunningChanged += Wizard_IsRunningChanged;
-        TitleChanged += Wizard_TitleChanged;
+        IsRunningChanged += WizardIsRunningChanged;
+        TitleChanged += WizardTitleChanged;
 
         // Add key binding for Esc when not modal - fires Cancelled event
         AddCommand (Command.Quit, ctx =>
@@ -99,8 +92,7 @@ public class Wizard : Dialog
             // Only handle if not modal (modal is handled by Dialog/Application)
             if (!IsModal)
             {
-                var args = new WizardButtonEventArgs ();
-                Cancelled?.Invoke (this, args);
+                Cancelled?.Invoke (this, new ());
 
                 return true;
             }
@@ -109,7 +101,58 @@ public class Wizard : Dialog
         });
         KeyBindings.Add (Application.QuitKey, Command.Quit);
 
-        SetNeedsLayout ();
+        return;
+
+        void WizardIsRunningChanged (object? sender, EventArgs<bool> args)
+        {
+            if (!args.Value && !_finishedPressed)
+            {
+                var a = new WizardButtonEventArgs ();
+                Cancelled?.Invoke (this, a);
+            }
+        }
+
+        void WizardTitleChanged (object? sender, EventArgs<string> e)
+        {
+            if (string.IsNullOrEmpty (_wizardTitle))
+            {
+                _wizardTitle = e.Value;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        base.EndInit ();
+
+        NextFinishButton.FrameChanged += (s, e) =>
+                                         {
+                                             Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height };
+                                         };
+
+        Padding.SetScheme (SchemeManager.Schemes ["base"]);
+
+        // Add buttons to bottom Padding instead of using AddButton
+        Padding?.Add (BackButton);
+        Padding?.Add (NextFinishButton);
+
+        BackButton.Accepting += BackBtnOnAccepting;
+        NextFinishButton.Accepting += NextFinishBtnOnAccepting;
+
+        CurrentStep = GetFirstStep ();
+    }
+
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    {
+        base.OnSubViewsLaidOut (args);
+    }
+
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs args)
+    {
+        base.OnSubViewLayout (args);
     }
 
     /// <summary>
@@ -119,6 +162,8 @@ public class Wizard : Dialog
     /// <remarks>Use the <see cref="MovingBack"></see> event to be notified when the user attempts to go back.</remarks>
     public Button BackButton { get; }
 
+    private readonly LinkedList<WizardStep> _steps = [];
+    private WizardStep? _currentStep;
     /// <summary>Gets or sets the currently active <see cref="WizardStep"/>.</summary>
     public WizardStep? CurrentStep
     {
@@ -126,51 +171,7 @@ public class Wizard : Dialog
         set => GoToStep (value);
     }
 
-    ///// <summary>
-    /////     Determines whether the <see cref="Wizard"/> is displayed as modal pop-up or not. The default is
-    /////     <see langword="true"/>. The Wizard will be shown with a frame and title and will behave like any
-    /////     <see cref="Runnable"/> window. If set to <c>false</c> the Wizard will have no frame and will behave like any
-    /////     embedded <see cref="View"/>. To use Wizard as an embedded View
-    /////     <list type="number">
-    /////         <item>
-    /////             <description>Set <see cref="Modal"/> to <c>false</c>.</description>
-    /////         </item>
-    /////         <item>
-    /////             <description>Add the Wizard to a containing view with <see cref="View.Add(View)"/>.</description>
-    /////         </item>
-    /////     </list>
-    /////     If a non-Modal Wizard is added to the application after
-    /////     <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/> has
-    /////     been called the first step must be explicitly set by setting <see cref="CurrentStep"/> to
-    /////     <see cref="GetNextStep()"/>:
-    /////     <code>
-    /////    wizard.CurrentStep = wizard.GetNextStep();
-    ///// </code>
-    ///// </summary>
-    //public new bool Modal
-    //{
-    //    get => base.Modal;
-    //    set
-    //    {
-    //        base.Modal = value;
-
-    //        foreach (WizardStep step in _steps)
-    //        {
-    //            SizeStep (step);
-    //        }
-
-    //        if (base.Modal)
-    //        {
-    //            SchemeName = "Dialog";
-    //            BorderStyle = LineStyle.Rounded;
-    //        }
-    //        else
-    //        {
-    //            CanFocus = true;
-    //            BorderStyle = LineStyle.None;
-    //        }
-    //    }
-    //}
+    private bool _finishedPressed;
 
     /// <summary>
     ///     If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes the <see cref="Finished"/>
@@ -191,10 +192,8 @@ public class Wizard : Dialog
     /// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
     public void AddStep (WizardStep newStep)
     {
-        SizeStep (newStep);
-
-        newStep.EnabledChanged += (s, e) => UpdateButtonsAndTitle ();
-        newStep.TitleChanged += (s, e) => UpdateButtonsAndTitle ();
+        newStep.EnabledChanged += (_, _) => UpdateButtonsAndTitle ();
+        newStep.TitleChanged += (_, _) => UpdateButtonsAndTitle ();
         _steps.AddLast (newStep);
         Add (newStep);
         UpdateButtonsAndTitle ();
@@ -362,7 +361,6 @@ public class Wizard : Dialog
 
         UpdateButtonsAndTitle ();
 
-        // Set focus on the contentview
         newStep?.SubViews.ToArray () [0].SetFocus ();
 
         if (OnStepChanged (oldStep, _currentStep))
@@ -427,7 +425,7 @@ public class Wizard : Dialog
     /// </summary>
     public event EventHandler<StepChangeEventArgs>? StepChanging;
 
-    private void BackBtn_Accepting (object? sender, CommandEventArgs e)
+    private void BackBtnOnAccepting (object? sender, CommandEventArgs e)
     {
         var args = new WizardButtonEventArgs ();
         MovingBack?.Invoke (this, args);
@@ -441,12 +439,11 @@ public class Wizard : Dialog
             e.Handled = true;
         }
     }
-
-    private void NextFinishBtn_Accepting (object? sender, CommandEventArgs e)
+    private void NextFinishBtnOnAccepting (object? sender, CommandEventArgs e)
     {
         if (CurrentStep == GetLastStep ())
         {
-            var args = new WizardButtonEventArgs ();
+            WizardButtonEventArgs args = new ();
             Finished?.Invoke (this, args);
 
             if (!args.Cancel)
@@ -459,14 +456,14 @@ public class Wizard : Dialog
                     e.Handled = true;
                 }
 
-                // Wizard was created as a non-modal (just added to another View). 
+                // Wizard was created as a non-modal (just added to another View).
                 // Do nothing
             }
         }
         else
         {
-            var args = new WizardButtonEventArgs ();
-            MovingNext?.Invoke (this, args);
+            WizardButtonEventArgs args = new ();
+            MovingNext?.Invoke (this, new ());
 
             if (!args.Cancel)
             {
@@ -477,10 +474,9 @@ public class Wizard : Dialog
 
     private void SizeStep (WizardStep step)
     {
-        // Steps now fill the entire Viewport since buttons are in Padding
-        step.X = step.Y = 0;
-        step.Width = Dim.Fill ();
-        step.Height = Dim.Fill ();
+        step.X = -1;
+        step.Width = Dim.Fill ()+1;
+        step.SuperViewRendersLineCanvas = true;
     }
 
     private void UpdateButtonsAndTitle ()
@@ -513,33 +509,15 @@ public class Wizard : Dialog
         }
 
         SizeStep (CurrentStep);
-
-        SetNeedsLayout ();
     }
 
-    private void Wizard_IsRunningChanged (object? sender, EventArgs<bool> args)
+    bool IDesignable.EnableForDesign ()
     {
-        if (!_finishedPressed)
-        {
-            var a = new WizardButtonEventArgs ();
-            Cancelled?.Invoke (this, a);
-        }
-    }
+        Title = "Wizard Title";
+        WizardStep wizardStep = new ();
+        (wizardStep as IDesignable).EnableForDesign ();
+        AddStep (wizardStep);
 
-    private void Wizard_IsModalChanged (object? sender, EventArgs<bool> args)
-    {
-        if (args.Value)
-        {
-            CurrentStep = GetFirstStep ();
-            // gets the first step if CurrentStep == null
-        }
-    }
-
-    private void Wizard_TitleChanged (object? sender, EventArgs<string> e)
-    {
-        if (string.IsNullOrEmpty (_wizardTitle))
-        {
-            _wizardTitle = e.Value;
-        }
+        return true;
     }
 }

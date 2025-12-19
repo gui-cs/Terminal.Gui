@@ -95,7 +95,7 @@ public class Adornments : Scenario
 
         window.Padding.Data = "Padding";
         window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
-        window.Padding.Thickness = new (3);
+        window.Padding.Thickness = new (4);
         window.Padding.SchemeName = "Error";
         window.Padding.CanFocus = true;
 
@@ -131,11 +131,11 @@ public class Adornments : Scenario
                                       Y = 1,
                                       Text = "_Button in Padding Y = 1",
                                       CanFocus = true,
-                                      HighlightStates = MouseState.None,
+                                      //HighlightStates = MouseState.None,
                                   };
                                   btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (appWindow.App, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
-                                  btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                  btnButtonInPadding.Border!.Thickness = new (1, 1, 1, 1);
+                                  //btnButtonInPadding.BorderStyle = LineStyle.Dashed;
+                                  //btnButtonInPadding.Border!.Thickness = new (1, 1, 1, 1);
                                   window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER

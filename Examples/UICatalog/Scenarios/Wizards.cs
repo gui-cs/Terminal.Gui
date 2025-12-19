@@ -1,4 +1,5 @@
-﻿namespace UICatalog.Scenarios;
+﻿// ReSharper disable AccessToDisposedClosure
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
 [ScenarioCategory ("Dialogs")]
@@ -9,22 +10,27 @@ public class Wizards : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = GetQuitKeyAndName () };
+        using IApplication app = Application.Instance;
+        using Window win = new ();
+        win.Title = GetQuitKeyAndName ();
 
-        var frame = new FrameView
+        FrameView settingsFrame = new ()
         {
             X = Pos.Center (),
             Y = 0,
             Width = Dim.Percent (75),
-            SchemeName = "Base",
+            Height = Dim.Auto (),
             Title = "Wizard Options"
         };
-        win.Add (frame);
+        win.Add (settingsFrame);
 
-        var label = new Label { X = 0, Y = 0, TextAlignment = Alignment.End, Text = "_Width:", Width = 10 };
-        frame.Add (label);
+        Label label = new ()
+        {
+            X = 0, Y = 0, TextAlignment = Alignment.End, Text = "_Width:", Width = 10
+        };
+        settingsFrame.Add (label);
 
-        var widthEdit = new TextField
+        TextField widthEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -32,7 +38,7 @@ public class Wizards : Scenario
             Height = 1,
             Text = "80"
         };
-        frame.Add (widthEdit);
+        settingsFrame.Add (widthEdit);
 
         label = new ()
         {
@@ -44,9 +50,9 @@ public class Wizards : Scenario
             TextAlignment = Alignment.End,
             Text = "_Height:"
         };
-        frame.Add (label);
+        settingsFrame.Add (label);
 
-        var heightEdit = new TextField
+        TextField heightEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -54,21 +60,20 @@ public class Wizards : Scenario
             Height = 1,
             Text = "20"
         };
-        frame.Add (heightEdit);
+        settingsFrame.Add (heightEdit);
 
         label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
-
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
             Text = "_Title:"
         };
-        frame.Add (label);
+        settingsFrame.Add (label);
 
-        var titleEdit = new TextField
+        TextField titleEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -76,15 +81,7 @@ public class Wizards : Scenario
             Height = 1,
             Text = "Gandolf"
         };
-        frame.Add (titleEdit);
-
-        void Win_Loaded (object sender, EventArgs args)
-        {
-            frame.Height = widthEdit.Frame.Height + heightEdit.Frame.Height + titleEdit.Frame.Height + 2;
-            win.IsModalChanged -= Win_Loaded;
-        }
-
-        win.IsModalChanged += Win_Loaded;
+        settingsFrame.Add (titleEdit);
 
         label = new ()
         {
@@ -92,295 +89,299 @@ public class Wizards : Scenario
         };
         win.Add (label);
 
-        var actionLabel = new Label
+        Label actionLabel = new ()
         {
             X = Pos.Right (label), Y = Pos.AnchorEnd (1), SchemeName = "Error"
         };
         win.Add (actionLabel);
 
-        var showWizardButton = new Button
+        Button showWizardButton = new ()
         {
-            X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show Wizard"
+            X = Pos.Center (), Y = Pos.Bottom (settingsFrame) + 2, IsDefault = true, Text = "_Show Wizard"
         };
 
-        showWizardButton.Accepting += (s, e) =>
-                                      {
-                                          try
-                                          {
-                                              var width = 0;
-                                              int.TryParse (widthEdit.Text, out width);
-                                              var height = 0;
-                                              int.TryParse (heightEdit.Text, out height);
+        void ShowWizard (object s, CommandEventArgs e)
+        {
+            if (!int.TryParse (widthEdit.Text, out int width))
+            {
+                MessageBox.ErrorQuery (
+                   (s as View)?.App!,
+                   "Nope",
+                   "Width must be a valid number",
+                   "Ok");
+                return;
+            }
+            if (!int.TryParse (heightEdit.Text, out int height))
+            {
+                MessageBox.ErrorQuery (
+                   (s as View)?.App!,
+                   "Nope",
+                   "Height must be a valid number",
+                   "Ok");
+                return;
+            }
 
-                                              if (width < 1 || height < 1)
-                                              {
-                                                  MessageBox.ErrorQuery (
-                                                                         (s as View)?.App,
-                                                                         "Nope",
-                                                                         "Height and width must be greater than 0 (much bigger)",
-                                                                         "Ok"
-                                                                        );
+            if (width < 1 || height < 1)
+            {
+                MessageBox.ErrorQuery (
+                                       (s as View)?.App!,
+                                       "Nope",
+                                       "Height and width must be greater than 0 (much bigger)",
+                                       "Ok");
 
-                                                  return;
-                                              }
+                return;
+            }
 
-                                              actionLabel.Text = string.Empty;
+            actionLabel.Text = string.Empty;
 
-                                              var wizard = new Wizard { Title = titleEdit.Text, Width = width, Height = height };
+            Wizard wizard = new () { Title = titleEdit.Text };
 
-                                              wizard.MovingBack += (s, args) =>
-                                                                   {
-                                                                       //args.Cancel = true;
-                                                                       actionLabel.Text = "Moving Back";
-                                                                   };
+            wizard.MovingBack += (_, args) =>
+                                 {
+                                     //args.Cancel = true;
+                                     actionLabel.Text = "Moving Back";
+                                 };
 
-                                              wizard.MovingNext += (s, args) =>
-                                                                   {
-                                                                       //args.Cancel = true;
-                                                                       actionLabel.Text = "Moving Next";
-                                                                   };
+            wizard.MovingNext += (_, args) =>
+                                 {
+                                     //args.Cancel = true;
+                                     actionLabel.Text = "Moving Next";
+                                 };
 
-                                              wizard.Finished += (s, args) =>
-                                                                 {
-                                                                     //args.Cancel = true;
-                                                                     actionLabel.Text = "Finished";
-                                                                 };
+            wizard.Finished += (_, args) =>
+                               {
+                                   //args.Cancel = true;
+                                   actionLabel.Text = "Finished";
+                               };
 
-                                              wizard.Cancelled += (s, args) =>
-                                                                  {
-                                                                      //args.Cancel = true;
-                                                                      actionLabel.Text = "Cancelled";
-                                                                  };
+            wizard.Cancelled += (_, args) =>
+                                {
+                                    //args.Cancel = true;
+                                    actionLabel.Text = "Cancelled";
+                                };
 
-                                              // Add 1st step
-                                              var firstStep = new WizardStep { Title = "End User License Agreement" };
-                                              firstStep.NextButtonText = "Accept!";
+            // Add 1st step
+            WizardStep firstStep = new () { Title = "End User License Agreement" };
+            firstStep.NextButtonText = "Accept!";
 
-                                              firstStep.HelpText =
-                                                  "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
+            firstStep.HelpText = "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
 
-                                              OptionSelector optionSelector = new ()
-                                              {
-                                                  Labels = ["_One", "_Two", "_3"]
-                                              };
-                                              firstStep.Add (optionSelector);
+            OptionSelector optionSelector = new ()
+            {
+                Labels = ["_One", "_Two", "_3"]
+            };
+            firstStep.Add (optionSelector);
 
-                                              wizard.AddStep (firstStep);
+            wizard.AddStep (firstStep);
 
-                                              // Add 2nd step
-                                              var secondStep = new WizardStep { Title = "Second Step" };
-                                              wizard.AddStep (secondStep);
+            //// Add 2nd step
+            //WizardStep secondStep = new () { Title = "Second Step" };
+            //wizard.AddStep (secondStep);
 
-                                              secondStep.HelpText =
-                                                  "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
+            //secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
-                                              var buttonLbl = new Label { Text = "Second Step Button: ", X = 1, Y = 1 };
+            //Label buttonLbl = new () { Text = "Second Step Button: ", X = 1, Y = 1 };
 
-                                              var button = new Button
-                                              {
-                                                  Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
-                                              };
+            //Button button = new ()
+            //{
+            //    Text = "Press Me to Rename Step", X = Pos.Right (buttonLbl), Y = Pos.Top (buttonLbl)
+            //};
 
-                                              OptionSelector optionSelecor2 = new ()
-                                              {
-                                                  Labels = ["_A", "_B", "_C"],
-                                                  Orientation = Orientation.Horizontal
-                                              };
-                                              secondStep.Add (optionSelecor2);
+            //OptionSelector optionSelector2 = new ()
+            //{
+            //    Labels = ["_A", "_B", "_C"], Orientation = Orientation.Horizontal
+            //};
+            //secondStep.Add (optionSelector2);
 
-                                              button.Accepting += (s, e) =>
-                                                                  {
-                                                                      secondStep.Title = "2nd Step";
+            //button.Accepting += (sender, _) =>
+            //                    {
+            //                        secondStep.Title = "2nd Step";
 
-                                                                      MessageBox.Query (
-                                                                                        (s as View)?.App,
-                                                                                        "Wizard Scenario",
-                                                                                        "This Wizard Step's title was changed to '2nd Step'"
-                                                                                       );
-                                                                  };
-                                              secondStep.Add (buttonLbl, button);
-                                              var lbl = new Label { Text = "First Name: ", X = 1, Y = Pos.Bottom (buttonLbl) };
+            //                        MessageBox.Query (
+            //                                          (sender as View)?.App!,
+            //                                          "Wizard Scenario",
+            //                                          "This Wizard Step's title was changed to '2nd Step'");
+            //                    };
+            //secondStep.Add (buttonLbl, button);
+            //Label lbl = new ()
+            //{
+            //    Text = "First Name: ", X = 1, Y = Pos.Bottom (buttonLbl)
+            //};
 
-                                              var firstNameField =
-                                                  new TextField { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
-                                              secondStep.Add (lbl, firstNameField);
-                                              lbl = new () { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
-                                              var lastNameField = new TextField { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
-                                              secondStep.Add (lbl, lastNameField);
+            //TextField firstNameField = new ()
+            //{
+            //    Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl)
+            //};
+            //secondStep.Add (lbl, firstNameField);
+            //lbl = new ()
+            //{
+            //    Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl)
+            //};
+            //TextField lastNameField = new ()
+            //{
+            //    Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl)
+            //};
+            //secondStep.Add (lbl, lastNameField);
 
-                                              var thirdStepEnabledCeckBox = new CheckBox
-                                              {
-                                                  Text = "Enable Step _3",
-                                                  CheckedState = CheckState.UnChecked,
-                                                  X = Pos.Left (lastNameField),
-                                                  Y = Pos.Bottom (lastNameField)
-                                              };
-                                              secondStep.Add (thirdStepEnabledCeckBox);
+            //CheckBox thirdStepEnabledCheckBox = new ()
+            //{
+            //    Text = "Enable Step _3", CheckedState = CheckState.UnChecked, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField)
+            //};
+            //secondStep.Add (thirdStepEnabledCheckBox);
 
-                                              // Add a frame 
-                                              var frame = new FrameView
-                                              {
-                                                  X = 0,
-                                                  Y = Pos.Bottom (thirdStepEnabledCeckBox) + 2,
-                                                  Width = Dim.Fill (),
-                                                  Height = 4,
-                                                  Title = "A Broken Frame (by Depeche Mode)",
-                                                  TabStop = TabBehavior.NoStop
-                                              };
-                                              frame.Add (new TextField { Text = "This is a TextField inside of the frame." });
-                                              secondStep.Add (frame);
+            //// Add a frame
+            //FrameView frame = new ()
+            //{
+            //    X = 0,
+            //    Y = Pos.Bottom (thirdStepEnabledCheckBox) + 2,
+            //    Width = Dim.Fill (),
+            //    Height = 4,
+            //    Title = "A Broken Frame (by Depeche Mode)",
+            //    TabStop = TabBehavior.NoStop
+            //};
+            //frame.Add (new TextField
+            //{
+            //    Text = "This is a TextField inside of the frame."
+            //});
+            //secondStep.Add (frame);
 
-                                              wizard.StepChanging += (s, args) =>
-                                                                     {
-                                                                         if (args.OldStep == secondStep && string.IsNullOrEmpty (firstNameField.Text))
-                                                                         {
-                                                                             args.Cancel = true;
+            //wizard.StepChanging += (_, args) =>
+            //                       {
+            //                           if (args.OldStep != secondStep || !string.IsNullOrEmpty (firstNameField.Text))
+            //                           {
+            //                               return;
+            //                           }
 
-                                                                             int? btn = MessageBox.ErrorQuery (
-                                                                                  (s as View)?.App,
-                                                                                  "Second Step",
-                                                                                  "You must enter a First Name to continue",
-                                                                                  "Ok"
-                                                                                 );
-                                                                         }
-                                                                     };
+            //                           args.Cancel = true;
 
-                                              // Add 3rd (optional) step
-                                              var thirdStep = new WizardStep { Title = "Third Step (Optional)" };
-                                              wizard.AddStep (thirdStep);
+            //                           int? btn = MessageBox.ErrorQuery (
+            //                                                             (s as View)?.App!,
+            //                                                             "Second Step",
+            //                                                             "You must enter a First Name to continue",
+            //                                                             "Ok");
+            //                       };
 
-                                              thirdStep.HelpText =
-                                                  "This is step is optional (WizardStep.Enabled = false). Enable it with the checkbox in Step 2.";
-                                              var step3Label = new Label { Text = "This step is optional.", X = 0, Y = 0 };
-                                              thirdStep.Add (step3Label);
-                                              var progLbl = new Label { Text = "Third Step ProgressBar: ", X = 1, Y = 10 };
+            //// Add 3rd (optional) step
+            //WizardStep thirdStep = new () { Title = "Third Step (Optional)" };
+            //wizard.AddStep (thirdStep);
 
-                                              var progressBar = new ProgressBar
-                                              {
-                                                  X = Pos.Right (progLbl), Y = Pos.Top (progLbl), Width = 40, Fraction = 0.42F
-                                              };
-                                              thirdStep.Add (progLbl, progressBar);
-                                              thirdStep.Enabled = thirdStepEnabledCeckBox.CheckedState == CheckState.Checked;
+            //thirdStep.HelpText = "This is step is optional (WizardStep.Enabled = false). Enable it with the checkbox in Step 2.";
+            //Label step3Label = new ()
+            //{
+            //    Text = "This step is optional.", X = 0, Y = 0
+            //};
+            //thirdStep.Add (step3Label);
+            //Label progLbl = new ()
+            //{
+            //    Text = "Third Step ProgressBar: ", X = 1, Y = 10
+            //};
 
-                                              thirdStepEnabledCeckBox.CheckedStateChanged += (s, e) =>
-                                                                                             {
-                                                                                                 thirdStep.Enabled =
-                                                                                                     thirdStepEnabledCeckBox.CheckedState == CheckState.Checked;
-                                                                                             };
+            //ProgressBar progressBar = new ()
+            //{
+            //    X = Pos.Right (progLbl),
+            //    Y = Pos.Top (progLbl),
+            //    Width = 40,
+            //    Fraction = 0.42F
+            //};
+            //thirdStep.Add (progLbl, progressBar);
+            //thirdStep.Enabled = thirdStepEnabledCheckBox.CheckedState == CheckState.Checked;
 
-                                              // Add 4th step
-                                              var fourthStep = new WizardStep { Title = "Step Four" };
-                                              wizard.AddStep (fourthStep);
+            //thirdStepEnabledCheckBox.CheckedStateChanged += (_, _) =>
+            //                                                {
+            //                                                    thirdStep.Enabled = thirdStepEnabledCheckBox.CheckedState == CheckState.Checked;
+            //                                                };
 
-                                              var someText = new TextView
-                                              {
-                                                  Text =
-                                                      "This step (Step Four) shows how to show/hide the Help pane. The step contains this TextView (but it's hard to tell it's a TextView because of Issue #1800).",
-                                                  X = 0,
-                                                  Y = 0,
-                                                  Width = Dim.Fill (),
-                                                  WordWrap = true,
-                                                  AllowsTab = false,
-                                                  SchemeName = "Base"
-                                              };
+            //// Add 4th step
+            //WizardStep fourthStep = new () { Title = "Step Four" };
+            //wizard.AddStep (fourthStep);
 
-                                              someText.Height = Dim.Fill (
-                                                                          Dim.Func (v => someText.SuperView is { IsInitialized: true }
-                                                                                             ? someText.SuperView.SubViews
-                                                                                                       .First (view => view.Y.Has<PosAnchorEnd> (out _))
-                                                                                                       .Frame.Height
-                                                                                             : 1));
-                                              var help = "This is helpful.";
-                                              fourthStep.Add (someText);
+            //TextView someText = new ()
+            //{
+            //    Text = "This step (Step Four) shows how to show/hide the Help pane. The step contains this TextView (but it's hard to tell it's a TextView because of Issue #1800).",
+            //    X = 0,
+            //    Y = 0,
+            //    Width = Dim.Fill (),
+            //    WordWrap = true,
+            //    AllowsTab = false,
+            //    SchemeName = "Base"
+            //};
 
-                                              var hideHelpBtn = new Button
-                                              {
-                                                  Text = "Press me to show/hide help",
-                                                  X = Pos.Center (),
-                                                  Y = Pos.AnchorEnd ()
-                                              };
+            //someText.Height = Dim.Fill (
+            //                            Dim.Func (v => someText.SuperView is { IsInitialized: true }
+            //                                               ? someText.SuperView.SubViews.First (view => view.Y.Has<PosAnchorEnd> (out _))
+            //                                                         .Frame.Height
+            //                                               : 1));
+            //fourthStep.Add (someText);
 
-                                              hideHelpBtn.Accepting += (s, e) =>
-                                                                       {
-                                                                           if (fourthStep.HelpText.Length > 0)
-                                                                           {
-                                                                               fourthStep.HelpText = string.Empty;
-                                                                           }
-                                                                           else
-                                                                           {
-                                                                               fourthStep.HelpText = help;
-                                                                           }
-                                                                       };
-                                              fourthStep.Add (hideHelpBtn);
-                                              fourthStep.NextButtonText = "_Go To Last Step";
+            //Button hideHelpBtn = new ()
+            //{
+            //    Text = "Press me to show/hide help", X = Pos.Center (), Y = Pos.AnchorEnd ()
+            //};
 
-                                              //var scrollBar = new ScrollBarView (someText, true);
+            //hideHelpBtn.Accepting += (_, _) =>
+            //                         {
+            //                             fourthStep.HelpText = fourthStep.HelpText.Length > 0 ? string.Empty : "This is helpful.";
+            //                         };
+            //fourthStep.Add (hideHelpBtn);
+            //fourthStep.NextButtonText = "_Go To Last Step";
 
-                                              //scrollBar.ChangedPosition += (s, e) =>
-                                              //                             {
-                                              //                                 someText.TopRow = scrollBar.Position;
+            ////var scrollBar = new ScrollBarView (someText, true);
 
-                                              //                                 if (someText.TopRow != scrollBar.Position)
-                                              //                                 {
-                                              //                                     scrollBar.Position = someText.TopRow;
-                                              //                                 }
+            ////scrollBar.ChangedPosition += (s, e) =>
+            ////                             {
+            ////                                 someText.TopRow = scrollBar.Position;
 
-                                              //                                 someText.SetNeedsDraw ();
-                                              //                             };
+            ////                                 if (someText.TopRow != scrollBar.Position)
+            ////                                 {
+            ////                                     scrollBar.Position = someText.TopRow;
+            ////                                 }
 
-                                              //someText.DrawingContent += (s, e) =>
-                                              //                        {
-                                              //                            scrollBar.Size = someText.Lines;
-                                              //                            scrollBar.Position = someText.TopRow;
+            ////                                 someText.SetNeedsDraw ();
+            ////                             };
 
-                                              //                            if (scrollBar.OtherScrollBarView != null)
-                                              //                            {
-                                              //                                scrollBar.OtherScrollBarView.Size = someText.Maxlength;
-                                              //                                scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
-                                              //                            }
-                                              //                        };
-                                              //fourthStep.Add (scrollBar);
+            ////someText.DrawingContent += (s, e) =>
+            ////                        {
+            ////                            scrollBar.Size = someText.Lines;
+            ////                            scrollBar.Position = someText.TopRow;
 
-                                              // Add last step
-                                              var lastStep = new WizardStep { Title = "The last step" };
-                                              wizard.AddStep (lastStep);
+            ////                            if (scrollBar.OtherScrollBarView != null)
+            ////                            {
+            ////                                scrollBar.OtherScrollBarView.Size = someText.Maxlength;
+            ////                                scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
+            ////                            }
+            ////                        };
+            ////fourthStep.Add (scrollBar);
 
-                                              lastStep.HelpText =
-                                                  "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
+            //// Add last step
+            //WizardStep lastStep = new () { Title = "The last step" };
+            //wizard.AddStep (lastStep);
 
-                                              var finalFinalStepEnabledCeckBox =
-                                                  new CheckBox { Text = "Enable _Final Final Step", CheckedState = CheckState.UnChecked, X = 0, Y = 1 };
-                                              lastStep.Add (finalFinalStepEnabledCeckBox);
+            //lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
 
-                                              // Add an optional FINAL last step
-                                              var finalFinalStep = new WizardStep { Title = "The VERY last step" };
-                                              wizard.AddStep (finalFinalStep);
+            //CheckBox finalFinalStepEnabledCheckBox = new () { Text = "Enable _Final Final Step", CheckedState = CheckState.UnChecked, X = 0, Y = 1 };
+            //lastStep.Add (finalFinalStepEnabledCheckBox);
 
-                                              finalFinalStep.HelpText =
-                                                  "This step only shows if it was enabled on the other last step.";
-                                              finalFinalStep.Enabled = thirdStepEnabledCeckBox.CheckedState == CheckState.Checked;
+            //// Add an optional FINAL last step
+            //WizardStep finalFinalStep = new () { Title = "The VERY last step" };
+            //wizard.AddStep (finalFinalStep);
 
-                                              finalFinalStepEnabledCeckBox.CheckedStateChanged += (s, e) =>
-                                                                                                  {
-                                                                                                      finalFinalStep.Enabled =
-                                                                                                          finalFinalStepEnabledCeckBox.CheckedState
-                                                                                                          == CheckState.Checked;
-                                                                                                  };
+            //finalFinalStep.HelpText = "This step only shows if it was enabled on the other last step.";
+            //finalFinalStep.Enabled = thirdStepEnabledCheckBox.CheckedState == CheckState.Checked;
 
-                                              Application.Run (wizard);
-                                              wizard.Dispose ();
-                                          }
-                                          catch (FormatException)
-                                          {
-                                              actionLabel.Text = "Invalid Options";
-                                          }
-                                      };
+            //finalFinalStepEnabledCheckBox.CheckedStateChanged += (_, _) =>
+            //                                                    {
+            //                                                        finalFinalStep.Enabled = finalFinalStepEnabledCheckBox.CheckedState
+            //                                                                                 == CheckState.Checked;
+            //                                                    };
+
+            app.Run (wizard);
+            wizard.Dispose ();
+
+        }
+
+        showWizardButton.Accepting += ShowWizard;
         win.Add (showWizardButton);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
-
-    private void Wizard_StepChanged (object sender, StepChangeEventArgs e) { throw new NotImplementedException (); }
 }
