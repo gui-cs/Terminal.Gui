@@ -500,7 +500,7 @@ public class AdornmentNavigationTests
         view.EndInit ();
 
         // Test: Navigate through all focusable elements
-        var focusedViews = new List<View> ();
+        List<View> focusedViews = new ();
 
         // Advance focus 4 times to cycle through all elements
         for (var i = 0; i < 4; i++)
@@ -597,7 +597,7 @@ public class AdornmentNavigationTests
         parent.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // Track which views receive focus
-        var focusedIds = new List<string> ();
+        List<string> focusedIds = new ();
 
         for (var i = 0; i < 5; i++)
         {
