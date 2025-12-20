@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -66,8 +68,8 @@ public class Wizard : Runnable, IDesignable
 
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (minimumContentDim: Dim.Percent (80));
-        Height = Dim.Auto (minimumContentDim: Dim.Percent (50));
+        Width = Dim.Auto (minimumContentDim: Dim.Percent (80), maximumContentDim: Dim.Percent (90));
+        Height = Dim.Auto (minimumContentDim: Dim.Percent (10), maximumContentDim: Dim.Percent (90));
 
         BackButton = new ()
         {
@@ -83,23 +85,14 @@ public class Wizard : Runnable, IDesignable
             X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd ()
         };
+        NextFinishButton.FrameChanged += (_, _) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height }; };
 
-        IsRunningChanged += WizardIsRunningChanged;
         TitleChanged += WizardTitleChanged;
 
         AddCommand (Command.Quit, QuitHandler);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
 
         return;
-
-        void WizardIsRunningChanged (object? sender, EventArgs<bool> args)
-        {
-            if (!args.Value && !_finishedPressed)
-            {
-                var a = new WizardButtonEventArgs ();
-                Cancelled?.Invoke (this, a);
-            }
-        }
 
         void WizardTitleChanged (object? sender, EventArgs<string> e)
         {
@@ -112,24 +105,17 @@ public class Wizard : Runnable, IDesignable
         // Add key binding for Esc when not modal - fires Cancelled event
         bool? QuitHandler (ICommandContext? ctx)
         {
-            // Only handle if not modal (modal is handled by Dialog/Application)
-            if (!IsModal)
-            {
-                Cancelled?.Invoke (this, new ());
+            CancelEventArgs args = new ();
+            Cancelled?.Invoke (this, args);
 
-                return true;
-            }
-
-            return false;
+            return args.Cancel;
         }
     }
 
     /// <inheritdoc/>
     public override void EndInit ()
     {
-        base.EndInit ();
-
-        NextFinishButton.FrameChanged += (s, e) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height }; };
+        Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Error));
 
         // Add buttons to bottom Padding instead of using AddButton
         Padding?.Add (BackButton);
@@ -139,6 +125,7 @@ public class Wizard : Runnable, IDesignable
         NextFinishButton.Accepting += NextFinishBtnOnAccepting;
 
         CurrentStep = GetFirstStep ();
+        base.EndInit ();
     }
 
     /// <summary>
@@ -158,18 +145,19 @@ public class Wizard : Runnable, IDesignable
         set => GoToStep (value);
     }
 
-    private bool _finishedPressed;
-
     /// <summary>
-    ///     If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes the <see cref="Finished"/>
-    ///     event to be fired and the wizard to close. If the step is not the last step, the <see cref="MovingNext"/> event
+    ///     If the <see cref="CurrentStep"/> is the last step in the wizard, this button causes the
+    ///     <see cref="View.Accepting"/>
+    ///     event to be raised and the wizard to close. If the step is not the last step, the <see cref="MovingNext"/> event
     ///     will be fired and the wizard will move next step.
     /// </summary>
     /// <remarks>
-    ///     Use the <see cref="MovingNext"></see> and <see cref="Finished"></see> events to be notified when the user
+    ///     Use the <see cref="MovingNext"></see> and <see cref="View.Accepting"></see> events to be notified when the user
     ///     attempts go to the next step or finish the wizard.
     /// </remarks>
     public Button NextFinishButton { get; }
+
+    private Size _maxStepSize = Size.Empty;
 
     /// <summary>
     ///     Adds a step to the wizard. The Next and Back buttons navigate through the added steps in the order they were
@@ -179,34 +167,42 @@ public class Wizard : Runnable, IDesignable
     /// <remarks>The "Next..." button of the last step added will read "Finish" (unless changed from default).</remarks>
     public void AddStep (WizardStep newStep)
     {
-        newStep.SuperViewRendersLineCanvas = true;
-        newStep.BorderStyle = LineStyle.Single;
-        newStep.Border!.Thickness = new (0, 0, 0, 1);
-        newStep.Padding!.Thickness = newStep.Padding!.Thickness with { Left = 1, Right = 1 };
-        newStep.X = -1;
-        newStep.Width = Dim.Fill () + 1;
-        newStep.Height = Dim.Fill ();
-
         newStep.EnabledChanged += (_, _) => UpdateButtonsAndTitle ();
         newStep.TitleChanged += (_, _) => UpdateButtonsAndTitle ();
         _steps.AddLast (newStep);
         Add (newStep);
+
+        // Find the step's natural size
+        //newStep.SuperViewRendersLineCanvas = true;
+        newStep.Width = Dim.Auto ();
+        newStep.Height = Dim.Auto ();
+        newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
+        newStep.LayoutSubViews ();
+
+        _maxStepSize = new (
+                            Math.Max (_maxStepSize.Width, newStep.Frame.Width),
+                            Math.Max (_maxStepSize.Height, newStep.Frame.Height));
+
+        //newStep.BorderStyle = LineStyle.None;
+        //newStep.Border!.Thickness = new(0, 0, 0, 1);
+        //newStep.Padding!.Thickness = newStep.Padding!.Thickness with { Left = 1, Right = 1 };
+
+        // newStep.X = -1;
+        newStep.Width = Dim.Fill ();
+        newStep.Height = Dim.Fill ();
+
+        newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
+        newStep.LayoutSubViews ();
+        Width = Dim.Auto (minimumContentDim: _maxStepSize.Width + 2);
+        Height = Dim.Auto (minimumContentDim: _maxStepSize.Height + NextFinishButton.Frame.Height + 3);
+
         UpdateButtonsAndTitle ();
     }
 
     /// <summary>
-    ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressing the Esc key. To prevent a modal (
-    ///     <see cref="WizardButtonEventArgs.Cancel"/> to <c>true</c> before returning from the event handler.
+    ///     Raised when the user has cancelled the <see cref="Wizard"/> by pressing the Esc key.
     /// </summary>
-    public event EventHandler<WizardButtonEventArgs>? Cancelled;
-
-    /// <summary>
-    ///     Raised when the Next/Finish button in the <see cref="Wizard"/> is clicked. The Next/Finish button is always
-    ///     the last button in the array of Buttons passed to the <see cref="Wizard"/> constructor, if any. This event is only
-    ///     raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow (otherwise the <see cref="Finished"/>
-    ///     event is raised).
-    /// </summary>
-    public event EventHandler<WizardButtonEventArgs>? Finished;
+    public event EventHandler<CancelEventArgs>? Cancelled;
 
     /// <summary>Returns the first enabled step in the Wizard</summary>
     /// <returns>The last enabled step</returns>
@@ -226,7 +222,7 @@ public class Wizard : Runnable, IDesignable
     /// </returns>
     public WizardStep? GetNextStep ()
     {
-        LinkedListNode<WizardStep>? step = null;
+        LinkedListNode<WizardStep>? step;
 
         if (CurrentStep is null)
         {
@@ -237,11 +233,7 @@ public class Wizard : Runnable, IDesignable
         {
             // Get the step after current
             step = _steps.Find (CurrentStep);
-
-            if (step is { })
-            {
-                step = step.Next;
-            }
+            step = step?.Next;
         }
 
         // step now points to the potential next step
@@ -268,7 +260,7 @@ public class Wizard : Runnable, IDesignable
     /// </returns>
     public WizardStep? GetPreviousStep ()
     {
-        LinkedListNode<WizardStep>? step = null;
+        LinkedListNode<WizardStep>? step;
 
         if (CurrentStep is null)
         {
@@ -279,11 +271,7 @@ public class Wizard : Runnable, IDesignable
         {
             // Get the step before current
             step = _steps.Find (CurrentStep);
-
-            if (step is { })
-            {
-                step = step.Previous;
-            }
+            step = step?.Previous;
         }
 
         // step now points to the potential previous step
@@ -312,12 +300,7 @@ public class Wizard : Runnable, IDesignable
     {
         WizardStep? previous = GetPreviousStep ();
 
-        if (previous is { })
-        {
-            return GoToStep (previous);
-        }
-
-        return false;
+        return previous is { } && GoToStep (previous);
     }
 
     /// <summary>
@@ -332,13 +315,22 @@ public class Wizard : Runnable, IDesignable
     {
         WizardStep? nextStep = GetNextStep ();
 
-        if (nextStep is { })
-        {
-            return GoToStep (nextStep);
-        }
-
-        return false;
+        return nextStep is { } && GoToStep (nextStep);
     }
+
+    /// <summary>
+    ///     Raised when the Back button in the <see cref="Wizard"/> is clicked. The Back button is always the first button
+    ///     in the array of Buttons passed to the <see cref="Wizard"/> constructor, if any.
+    /// </summary>
+    public event EventHandler<CancelEventArgs>? MovingBack;
+
+    /// <summary>
+    ///     Raised when the Next/Finish button in the <see cref="Wizard"/> is clicked (or the user presses Enter). The
+    ///     Next/Finish button is always the last button in the array of Buttons passed to the <see cref="Wizard"/>
+    ///     constructor, if any. This event is only raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow
+    ///     (otherwise the <see cref="View.Accepting"/> event is raised).
+    /// </summary>
+    public event EventHandler<CancelEventArgs>? MovingNext;
 
     /// <summary>Changes to the specified <see cref="WizardStep"/>.</summary>
     /// <param name="newStep">The step to go to.</param>
@@ -348,126 +340,80 @@ public class Wizard : Runnable, IDesignable
     /// </returns>
     public bool GoToStep (WizardStep? newStep)
     {
-        if (OnStepChanging (_currentStep, newStep) || newStep is { Enabled: false })
-        {
-            return false;
-        }
+        return CWPPropertyHelper.ChangeProperty (
+                                                 this,
+                                                 ref _currentStep,
+                                                 newStep,
+                                                 OnStepChanging,
+                                                 StepChanging,
+                                                 newValue =>
+                                                 {
+                                                     ValueChangingEventArgs<WizardStep?> args = new (_currentStep, newValue);
+                                                     StepChanging?.Invoke (this, args);
 
-        // Hide all but the new step
-        foreach (WizardStep step in _steps)
-        {
-            step.Visible = step == newStep;
-            step.ShowHide ();
-        }
+                                                     if (args.Handled)
+                                                     {
+                                                         return;
+                                                     }
 
-        WizardStep? oldStep = _currentStep;
-        _currentStep = newStep;
+                                                     // Hide all but the new step
+                                                     foreach (WizardStep step in _steps)
+                                                     {
+                                                         step.Visible = step == newValue;
+                                                         step.ShowHide ();
+                                                     }
 
-        UpdateButtonsAndTitle ();
-
-        newStep?.SubViews.ToArray () [0].SetFocus ();
-
-        if (OnStepChanged (oldStep, _currentStep))
-        {
-            // For correctness, we do this, but it's meaningless because there's nothing to cancel
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    ///     Raised when the Back button in the <see cref="Wizard"/> is clicked. The Back button is always the first button
-    ///     in the array of Buttons passed to the <see cref="Wizard"/> constructor, if any.
-    /// </summary>
-    public event EventHandler<WizardButtonEventArgs>? MovingBack;
-
-    /// <summary>
-    ///     Raised when the Next/Finish button in the <see cref="Wizard"/> is clicked (or the user presses Enter). The
-    ///     Next/Finish button is always the last button in the array of Buttons passed to the <see cref="Wizard"/>
-    ///     constructor, if any. This event is only raised if the <see cref="CurrentStep"/> is the last Step in the Wizard flow
-    ///     (otherwise the <see cref="Finished"/> event is raised).
-    /// </summary>
-    public event EventHandler<WizardButtonEventArgs>? MovingNext;
-
-    /// <summary>
-    ///     Called when the <see cref="Wizard"/> has completed transition to a new <see cref="WizardStep"/>. Fires the
-    ///     <see cref="StepChanged"/> event.
-    /// </summary>
-    /// <param name="oldStep">The step the Wizard changed from</param>
-    /// <param name="newStep">The step the Wizard has changed to</param>
-    /// <returns>True if the change is to be cancelled.</returns>
-    public virtual bool OnStepChanged (WizardStep? oldStep, WizardStep? newStep)
-    {
-        var args = new StepChangeEventArgs (oldStep, newStep);
-        StepChanged?.Invoke (this, args);
-
-        return args.Cancel;
+                                                     _currentStep = newValue;
+                                                     UpdateButtonsAndTitle ();
+                                                 },
+                                                 OnStepChanged,
+                                                 StepChanged,
+                                                 out _);
     }
 
     /// <summary>
     ///     Called when the <see cref="Wizard"/> is about to transition to another <see cref="WizardStep"/>. Fires the
     ///     <see cref="StepChanging"/> event.
     /// </summary>
-    /// <param name="oldStep">The step the Wizard is about to change from</param>
-    /// <param name="newStep">The step the Wizard is about to change to</param>
     /// <returns>True if the change is to be cancelled.</returns>
-    public virtual bool OnStepChanging (WizardStep? oldStep, WizardStep? newStep)
-    {
-        var args = new StepChangeEventArgs (oldStep, newStep);
-        StepChanging?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
-    /// <summary>This event is raised after the <see cref="Wizard"/> has changed the <see cref="CurrentStep"/>.</summary>
-    public event EventHandler<StepChangeEventArgs>? StepChanged;
+    protected virtual bool OnStepChanging (ValueChangingEventArgs<WizardStep?> args) { return false; }
 
     /// <summary>
     ///     This event is raised when the current <see cref="CurrentStep"/>) is about to change. Use
-    ///     <see cref="StepChangeEventArgs.Cancel"/> to abort the transition.
+    ///     <see cref="ValueChangingEventArgs{T}.Handled"/> to abort the transition.
     /// </summary>
-    public event EventHandler<StepChangeEventArgs>? StepChanging;
+    public event EventHandler<ValueChangingEventArgs<WizardStep?>>? StepChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="Wizard"/> has completed transition to a new <see cref="WizardStep"/>. Fires the
+    ///     <see cref="StepChanged"/> event.
+    /// </summary>
+    protected virtual void OnStepChanged (ValueChangedEventArgs<WizardStep?> args) { }
+
+    /// <summary>This event is raised after the <see cref="Wizard"/> has changed the <see cref="CurrentStep"/>.</summary>
+    public event EventHandler<ValueChangedEventArgs<WizardStep?>>? StepChanged;
 
     private void BackBtnOnAccepting (object? sender, CommandEventArgs e)
     {
-        var args = new WizardButtonEventArgs ();
+        var args = new CancelEventArgs ();
         MovingBack?.Invoke (this, args);
 
-        if (!args.Cancel)
-        {
-            e.Handled = GoBack ();
-        }
-        else
-        {
-            e.Handled = true;
-        }
+        e.Handled = args.Cancel || GoBack ();
     }
 
     private void NextFinishBtnOnAccepting (object? sender, CommandEventArgs e)
     {
         if (CurrentStep == GetLastStep ())
         {
-            WizardButtonEventArgs args = new ();
-            Finished?.Invoke (this, args);
-
-            if (!args.Cancel)
+            if (RaiseAccepting (e.Context) is false)
             {
-                _finishedPressed = true;
-
-                if (IsCurrentTop)
-                {
-                    (sender as View)?.App?.RequestStop (this);
-                    e.Handled = true;
-                }
-
-                // Wizard was created as a non-modal (just added to another View).
-                // Do nothing
+                e.Handled = true;
+                RequestStop ();
             }
         }
         else
         {
-            WizardButtonEventArgs args = new ();
+            CancelEventArgs args = new ();
             MovingNext?.Invoke (this, new ());
 
             if (!args.Cancel)
@@ -510,9 +456,58 @@ public class Wizard : Runnable, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         Title = "Wizard Title";
-        WizardStep wizardStep = new ();
-        (wizardStep as IDesignable).EnableForDesign ();
-        AddStep (wizardStep);
+
+        WizardStep firstStep = new ();
+        (firstStep as IDesignable).EnableForDesign ();
+        AddStep (firstStep);
+
+        Label schemeLabel = new ()
+        {
+            Title = "_Scheme:"
+        };
+
+        OptionSelector<Schemes> selector = new ()
+        {
+            X = Pos.Right (schemeLabel) + 1,
+            Title = "Select Scheme"
+        };
+
+        selector.ValueChanged += (_, _) =>
+                                 {
+                                     if (selector.Value is { } scheme)
+                                     {
+                                         SchemeName = SchemeManager.SchemesToSchemeName (scheme);
+                                     }
+                                 };
+
+        Label borderStyleLabel = new ()
+        {
+            Title = "_Border Style:",
+            X = Pos.Right (selector) + 2
+        };
+
+        OptionSelector<LineStyle> borderStyleSelector = new ()
+        {
+            X = Pos.Right (borderStyleLabel) + 1,
+            Title = "Select Border Style"
+        };
+
+        borderStyleSelector.ValueChanged += (_, _) =>
+                                            {
+                                                if (borderStyleSelector.Value is { } style)
+                                                {
+                                                    BorderStyle = style;
+                                                }
+                                            };
+
+        WizardStep secondStep = new ()
+        {
+            Title = "Second Step",
+            HelpText = "This is the help text for the Second Step."
+        };
+        secondStep.Add (schemeLabel, selector, borderStyleLabel, borderStyleSelector);
+
+        AddStep (secondStep);
 
         return true;
     }
