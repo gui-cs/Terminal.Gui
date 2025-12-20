@@ -1,9 +1,12 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using Xunit.Abstractions;
 
 namespace ViewBaseTests.Adornments;
 
-public class AdornmentSubViewTests ()
+public class AdornmentSubViewTests (ITestOutputHelper output)
 {
+    private readonly ITestOutputHelper _output = output;
+
     [Fact]
     public void Setting_Thickness_Causes_Adornment_SubView_Layout ()
     {
@@ -92,4 +95,123 @@ public class AdornmentSubViewTests ()
         Assert.Equal (runnable.Padding, runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ());
 
     }
+
+    [Fact]
+    public void Button_With_Opaque_ShadowStyle_In_Margin_Should_NOT_Draw_ANYTHING ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init ("fake");
+        app.Driver?.SetScreenSize (1, 4);
+        app.Driver!.Force16Colors = true;
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+        window.Text = @"XXXXXX";
+        window.SetScheme (new (new Attribute (Color.Black, Color.White)));
+
+        // Setup padding with some thickness so we have space for the button
+        window.Margin!.Thickness = new (0, 3, 0, 0);
+
+        // Add a button with a transparent shadow to the Padding adornment
+        Button buttonInMargin = new ()
+        {
+            X = 0,
+            Y = 0,
+            Text = "B",
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = ShadowStyle.Opaque,
+        };
+
+        window.Margin.Add (buttonInMargin);
+        app.Begin (window);
+
+        DriverAssert.AssertDriverOutputIs ("""
+                                           \x1b[97m\x1b[40m   X
+                                           """,
+                                           _output,
+                                           app.Driver);
+    }
+
+    [Fact]
+    public void Button_With_Opaque_ShadowStyle_In_Border_Should_Draw_Shadow ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init ("fake");
+        app.Driver?.SetScreenSize (1, 4);
+        app.Driver!.Force16Colors = true;
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+        window.Text = @"XXXXXX";
+        window.SetScheme (new (new Attribute (Color.Black, Color.White)));
+
+        // Setup padding with some thickness so we have space for the button
+        window.Border!.Thickness = new (0, 3, 0, 0);
+
+        // Add a button with a transparent shadow to the Padding adornment
+        Button buttonInBorder = new ()
+        {
+            X = 0,
+            Y = 0,
+            Text = "B",
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = ShadowStyle.Opaque,
+        };
+
+        window.Border.Add (buttonInBorder);
+        app.Begin (window);
+
+        DriverAssert.AssertDriverOutputIs ("""
+                                           \x1b[30m\x1b[107mB▝ \x1b[97m\x1b[40mX
+                                           """,
+                                           _output,
+                                           app.Driver);
+    }
+
+    [Fact]
+    public void Button_With_Opaque_ShadowStyle_In_Padding_Should_Draw_Shadow ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init ("fake");
+        app.Driver?.SetScreenSize (1, 4);
+        app.Driver!.Force16Colors = true;
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+        window.Text = @"XXXXXX";
+        window.SetScheme (new (new Attribute (Color.Black, Color.White)));
+
+        // Setup padding with some thickness so we have space for the button
+        window.Padding!.Thickness = new (0, 3, 0, 0);
+
+        // Add a button with a transparent shadow to the Padding adornment
+        Button buttonInPadding = new ()
+        {
+            X = 0,
+            Y = 0,
+            Text = "B",
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = ShadowStyle.Opaque,
+        };
+
+        window.Padding.Add (buttonInPadding);
+        app.Begin (window);
+
+        DriverAssert.AssertDriverOutputIs ("""
+                                           \x1b[30m\x1b[107mB▝ \x1b[97m\x1b[40mX
+                                           """,
+                                           _output,
+                                           app.Driver);
+    }
+
 }
+

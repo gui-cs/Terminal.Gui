@@ -96,7 +96,8 @@ public class Margin : Adornment
                 margin.ClearCachedClip();
             }
 
-            foreach (View subview in view.GetSubViews(includePadding: true)
+            // Do not include Margin views of subviews; not supported
+            foreach (View subview in view.GetSubViews(includeMargin: false, includePadding: true, includeBorder: true)
                                          .OrderBy(v => v.ShadowStyle != ShadowStyle.None)
                                          .Reverse())
             {
