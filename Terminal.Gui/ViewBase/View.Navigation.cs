@@ -348,7 +348,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         get
         {
-            View? focused = SubViews.FirstOrDefault (v => v.HasFocus);
+            View? focused = GetSubViews (includeAdornments: true).FirstOrDefault (v => v.HasFocus);
 
             if (focused is { })
             {
@@ -1007,11 +1007,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (behavior.HasValue)
         {
-            filteredSubViews = InternalSubViews?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includeAdornments: true)?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            filteredSubViews = InternalSubViews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includeAdornments: true)?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
         // How about in Adornments? 

@@ -246,35 +246,74 @@ public class Adornment : View, IDesignable
         return Thickness.Contains (outside, location);
     }
 
+    ///// <summary>
+    /////     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="Adornment"/> hierarchcy that are at <paramref name="screenLocation"/>,
+    /////     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="View.Visible"/> set to <see langword="false"/> will not be included.
+    /////     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
+    ///// </summary>
+    ///// <param name="adornment">The root Adornment from which the search for subviews begins.</param>
+    ///// <param name="screenLocation">The screen-relative location where the search for views is focused.</param>
+    ///// <returns>A list of views that are located under the specified point.</returns>
+    //internal static List<View?> GetViewsAtLocation (Adornment? adornment, in Point screenLocation)
+    //{
+    //    List<View?> result = [];
+
+    //    if (adornment is null || adornment.Thickness == Thickness.Empty)
+    //    {
+    //        return result;
+    //    }
+
+    //    Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToViewport (screenLocation) ?? screenLocation;
+
+    //    if (adornment.Contains (superViewRelativeLocation))
+    //    {
+    //        List<View?> adornmentResult = GetViewsAtLocation (adornment as View, screenLocation);
+    //        if (adornmentResult.Count > 0)
+    //        {
+    //            result.AddRange (adornmentResult);
+    //        }
+    //    }
+
+    //    return result;
+    //}
+
     /// <summary>
-    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="Adornment"/> hierarchcy that are at <paramref name="screenLocation"/>,
-    ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="View.Visible"/> set to <see langword="false"/> will not be included.
-    ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
+    ///     Gets all SubViews of this Adornment, optionally including SubViews of the Adornment's Parent.
     /// </summary>
-    /// <param name="adornment">The root Adornment from which the search for subviews begins.</param>
-    /// <param name="screenLocation">The screen-relative location where the search for views is focused.</param>
-    /// <returns>A list of views that are located under the specified point.</returns>
-    internal static List<View?> GetViewsAtLocation (Adornment? adornment, in Point screenLocation)
+    /// <param name="includeAdornments">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Parent"/>.
+    ///     If <see langword="false"/> (default), returns only the direct SubViews
+    ///     of this Adornment.
+    /// </param>
+    /// <returns>
+    ///     A read-only collection containing all SubViews. If <paramref name="includeAdornments"/> is
+    ///     <see langword="true"/>, the collection includes SubViews from this Adornment's direct SubViews as well
+    ///     as SubViews from the Adornment's Parent.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method returns a snapshot of the SubViews at the time of the call. The collection is
+    ///         safe to iterate even if SubViews are added or removed during iteration.
+    ///     </para>
+    ///     <para>
+    ///         The order of SubViews in the returned collection is:
+    ///         <list type="number">
+    ///             <item>Direct SubViews of this Adornment</item>
+    ///             <item>SubViews of Parent (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
+
+    public override IReadOnlyCollection<View> GetSubViews (bool includeAdornments = false)
     {
-        List<View?> result = [];
-
-        if (adornment is null || adornment.Thickness == Thickness.Empty)
+        List<View> subViewsOfThisAdornment = new (base.GetSubViews (includeAdornments));
+        if (includeAdornments && Parent is { })
         {
-            return result;
+            // Include SubViews from Parent. Since we are an Adornment of Parent do not
+            // request Adornments again to avoid infinite recursion.
+            subViewsOfThisAdornment.AddRange (Parent.GetSubViews (includeAdornments: false));
         }
-
-        Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToViewport (screenLocation) ?? screenLocation;
-
-        if (adornment.Contains (superViewRelativeLocation))
-        {
-            List<View?> adornmentResult = GetViewsAtLocation (adornment as View, screenLocation);
-            if (adornmentResult.Count > 0)
-            {
-                result.AddRange (adornmentResult);
-            }
-        }
-
-        return result;
+        return subViewsOfThisAdornment;
     }
 
     #endregion View Overrides

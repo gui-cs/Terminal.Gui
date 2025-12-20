@@ -115,11 +115,17 @@ public class Wizard : Runnable, IDesignable
     /// <inheritdoc/>
     public override void EndInit ()
     {
-        Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Error));
+        // Configure Padding
+        if (Padding is { })
+        {
+            Padding.SetScheme (SchemeManager.GetScheme (Schemes.Base));
+            Padding.CanFocus = true;
+            TabStop = TabBehavior.TabStop;
 
-        // Add buttons to bottom Padding instead of using AddButton
-        Padding?.Add (BackButton);
-        Padding?.Add (NextFinishButton);
+            // Add buttons to bottom Padding instead of using AddButton
+            Padding?.Add (BackButton);
+            Padding?.Add (NextFinishButton);
+        }
 
         BackButton.Accepting += BackBtnOnAccepting;
         NextFinishButton.Accepting += NextFinishBtnOnAccepting;
@@ -360,6 +366,7 @@ public class Wizard : Runnable, IDesignable
                                                      foreach (WizardStep step in _steps)
                                                      {
                                                          step.Visible = step == newValue;
+
                                                          step.ShowHide ();
                                                      }
 
