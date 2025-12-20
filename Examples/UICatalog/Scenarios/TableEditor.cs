@@ -618,24 +618,24 @@ public class TableEditor : Scenario
                                      }
 
                                      // Only handle mouse clicks
-                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
                                      {
                                          return;
                                      }
 
-                                     _tableView!.ScreenToCell (mouseArgs.Position, out int? clickedCol);
+                                     _tableView!.ScreenToCell (mouse.Position, out int? clickedCol);
 
                                      if (clickedCol != null)
                                      {
-                                         if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                         if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
                                          {
                                              // left click in a header
                                              SortColumn (clickedCol.Value);
                                          }
-                                         else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                         else if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
                                          {
                                              // right click in a header
-                                             ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
+                                             ShowHeaderContextMenu (clickedCol.Value, mouse);
                                          }
                                      }
                                  };
@@ -1380,7 +1380,7 @@ public class TableEditor : Scenario
         _tableView!.Update ();
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, Terminal.Gui.Input.MouseEventArgs e)
     {
         if (HasCheckboxes () && clickedCol == 0)
         {
