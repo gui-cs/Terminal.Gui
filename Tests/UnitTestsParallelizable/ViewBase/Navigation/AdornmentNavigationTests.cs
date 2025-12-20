@@ -502,7 +502,7 @@ public class AdornmentNavigationTests
         // Test: Navigate through all focusable elements
         List<View> focusedViews = new ();
 
-        // Advance focus 4 times to cycle through all elements
+        // Advance focus 4 times to cycle through all 4 elements (marginButton, borderButton, paddingButton, contentButton)
         for (var i = 0; i < 4; i++)
         {
             view.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
@@ -599,6 +599,7 @@ public class AdornmentNavigationTests
         // Track which views receive focus
         List<string> focusedIds = new ();
 
+        // Navigate multiple times to test nested navigation (extra iteration to allow for wrapping)
         for (var i = 0; i < 5; i++)
         {
             if (parentPaddingButton.HasFocus)
