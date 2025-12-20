@@ -18,7 +18,7 @@ public class WizardStep : View, IDesignable
     {
         CanFocus = true,
         TabStop = TabBehavior.TabStop,
-        ReadOnly = true,
+        //ReadOnly = true,
         WordWrap = true,
         AllowsTab = false,
         X = Pos.AnchorEnd () + 1,
@@ -109,19 +109,32 @@ public class WizardStep : View, IDesignable
 
         if (_helpTextView.Text.Length > 0)
         {
-            // Help text goes in right Padding - set thickness based on current frame width
-            Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
-            _helpTextView.Visible = true;
+            // Configure Padding
+            if (Padding is { })
+            {
+                Padding.CanFocus = true;
+                Padding.TabStop = TabBehavior.TabStop;
 
-            //_helpTextView.Enabled = true;
+                // Help text goes in right Padding - set thickness based on current frame width
+                Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
+            }
+
+            _helpTextView.Visible = true;
+            _helpTextView.Enabled = true;
         }
         else
         {
-            // No help text - no right padding needed
-            Padding.Thickness = Padding.Thickness with { Right = 0 };
-            _helpTextView.Visible = false;
+            // Configure Padding
+            if (Padding is { })
+            {
+                Padding.CanFocus = false;
 
-            // _helpTextView.Enabled = false;
+                // No help text - no right padding needed
+                Padding.Thickness = Padding.Thickness with { Right = 0 };
+            }
+
+            _helpTextView.Visible = false;
+            _helpTextView.Enabled = false;
         }
 
         SetNeedsLayout ();
@@ -156,7 +169,8 @@ public class WizardStep : View, IDesignable
             Y = Pos.Top (label),
             Height = Dim.Auto (),
             Width = 10,
-            Source = new ListWrapper<string> (["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"])
+            Source = new ListWrapper<string> (["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"]),
+            SelectedItem = 0
         };
         Add (label, listView);
 

@@ -47,7 +47,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///         </list>
     ///     </para>
     /// </remarks>
-    public IReadOnlyCollection<View> GetSubViews (bool includeAdornments = false)
+    public virtual IReadOnlyCollection<View> GetSubViews (bool includeAdornments = false)
     {
         List<View> result = [];
 
