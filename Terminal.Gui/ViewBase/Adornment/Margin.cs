@@ -75,7 +75,7 @@ public class Margin : Adornment
     /// </remarks>
     /// <param name="views"></param>
     /// <returns><see langword="true"/></returns>
-    internal static bool DrawTransparentMargins(IEnumerable<View> views)
+    internal static bool DrawMargins(IEnumerable<View> views)
     {
         Stack<View> stack = new(views);
 
@@ -96,8 +96,8 @@ public class Margin : Adornment
                 margin.ClearCachedClip();
             }
 
-            foreach (View subview in view.GetSubViews(includeAdornments: true)
-                                         .OrderBy(v => v.HasFocus && v.ShadowStyle != ShadowStyle.None)
+            foreach (View subview in view.GetSubViews(includePadding: true)
+                                         .OrderBy(v => v.ShadowStyle != ShadowStyle.None)
                                          .Reverse())
             {
                 stack.Push(subview);

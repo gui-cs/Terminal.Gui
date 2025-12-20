@@ -277,44 +277,6 @@ public class Adornment : View, IDesignable
     //    return result;
     //}
 
-    /// <summary>
-    ///     Gets all SubViews of this Adornment, optionally including SubViews of the Adornment's Parent.
-    /// </summary>
-    /// <param name="includeAdornments">
-    ///     If <see langword="true"/>, includes SubViews from <see cref="Parent"/>.
-    ///     If <see langword="false"/> (default), returns only the direct SubViews
-    ///     of this Adornment.
-    /// </param>
-    /// <returns>
-    ///     A read-only collection containing all SubViews. If <paramref name="includeAdornments"/> is
-    ///     <see langword="true"/>, the collection includes SubViews from this Adornment's direct SubViews as well
-    ///     as SubViews from the Adornment's Parent.
-    /// </returns>
-    /// <remarks>
-    ///     <para>
-    ///         This method returns a snapshot of the SubViews at the time of the call. The collection is
-    ///         safe to iterate even if SubViews are added or removed during iteration.
-    ///     </para>
-    ///     <para>
-    ///         The order of SubViews in the returned collection is:
-    ///         <list type="number">
-    ///             <item>Direct SubViews of this Adornment</item>
-    ///             <item>SubViews of Parent (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
-    ///         </list>
-    ///     </para>
-    /// </remarks>
-    public override IReadOnlyCollection<View> GetSubViews (bool includeAdornments = false)
-    {
-        List<View> subViewsOfThisAdornment = new (base.GetSubViews (includeAdornments));
-        if (includeAdornments && Parent is { })
-        {
-            // Include SubViews from Parent. Since we are an Adornment of Parent do not
-            // request Adornments again to avoid infinite recursion.
-            subViewsOfThisAdornment.AddRange (Parent.GetSubViews (includeAdornments: false));
-        }
-        return subViewsOfThisAdornment;
-    }
-
     #endregion View Overrides
 
     /// <inheritdoc/>

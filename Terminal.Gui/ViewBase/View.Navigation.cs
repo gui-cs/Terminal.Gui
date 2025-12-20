@@ -97,12 +97,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     return false;
                 }
 
-                // TabGroup is special-cased. 
+                // TabGroup is special-cased.
                 if (focused?.TabStop == TabBehavior.TabGroup)
                 {
-                    if (SuperView?.GetFocusChain (direction, TabBehavior.TabGroup)?.Length > 0)
+                    if (SuperView?.GetFocusChain (direction, TabBehavior.TabGroup).Length > 0)
                     {
-                        // Our superview has a TabGroup subview; signal we couldn't move so we nav out to it
+                        // Our superview has a TabGroup subview; signal we couldn't move so nav out to it
                         return false;
                     }
                 }
@@ -348,7 +348,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         get
         {
-            View? focused = GetSubViews (includeAdornments: true).FirstOrDefault (v => v.HasFocus);
+            View? focused = GetSubViews (includePadding: true).FirstOrDefault (v => v.HasFocus);
 
             if (focused is { })
             {
@@ -841,7 +841,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
                 _canFocus = false;
-                bool restoredFocus = applicationFocused!.RestoreFocus ();
+                bool restoredFocus = applicationFocused.RestoreFocus ();
                 _canFocus = prevCanFocus;
 
                 if (restoredFocus)
@@ -921,9 +921,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // Notify caused HasFocus to change to false.
             return;
         }
-
-        // Get whatever peer has focus, if any so we can update our superview's _previouslyMostFocused
-        View? focusedPeer = superViewOrParent?.Focused;
 
         // Set HasFocus false
         _hasFocus = false;
@@ -1007,11 +1004,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (behavior.HasValue)
         {
-            filteredSubViews = GetSubViews (includeAdornments: true)?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includePadding: true)?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            filteredSubViews = GetSubViews (includeAdornments: true)?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includePadding: true)?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
         // How about in Adornments? 
@@ -1035,7 +1032,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             filteredSubViews = filteredSubViews?.Reverse ();
         }
 
-        return filteredSubViews?.ToArray () ?? Array.Empty<View> ();
+        return filteredSubViews?.ToArray () ?? [];
     }
 
     private TabBehavior? _tabStop;

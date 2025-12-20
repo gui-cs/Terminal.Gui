@@ -22,13 +22,23 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     Gets all SubViews of this View, optionally including SubViews of the View's Adornments
     ///     (Margin, Border, and Padding).
     /// </summary>
-    /// <param name="includeAdornments">
-    ///     If <see langword="true"/>, includes SubViews from <see cref="Margin"/>, <see cref="Border"/>,
-    ///     and <see cref="Padding"/>. If <see langword="false"/> (default), returns only the direct SubViews
+    /// <param name="includeMargin">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Margin"/>. If <see langword="false"/> (default),
+    ///     returns only the direct SubViews
+    ///     of this View.
+    /// </param>
+    /// <param name="includeBorder">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Border"/>. If <see langword="false"/> (default),
+    ///     returns only the direct SubViews
+    ///     of this View.
+    /// </param>
+    /// <param name="includePadding">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Padding"/>. If <see langword="false"/> (default),
+    ///     returns only the direct SubViews
     ///     of this View.
     /// </param>
     /// <returns>
-    ///     A read-only collection containing all SubViews. If <paramref name="includeAdornments"/> is
+    ///     A read-only collection containing all SubViews. If <paramref name="includeMargin"/> is
     ///     <see langword="true"/>, the collection includes SubViews from this View's direct SubViews as well
     ///     as SubViews from the Margin, Border, and Padding adornments.
     /// </returns>
@@ -41,33 +51,39 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///         The order of SubViews in the returned collection is:
     ///         <list type="number">
     ///             <item>Direct SubViews of this View</item>
-    ///             <item>SubViews of Margin (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
-    ///             <item>SubViews of Border (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
-    ///             <item>SubViews of Padding (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
+    ///             <item>SubViews of Margin (if <paramref name="includeMargin"/> is <see langword="true"/>)</item>
+    ///             <item>SubViews of Border (if <paramref name="includeBorder"/> is <see langword="true"/>)</item>
+    ///             <item>SubViews of Padding (if <paramref name="includePadding"/> is <see langword="true"/>)</item>
     ///         </list>
     ///     </para>
     /// </remarks>
-    public virtual IReadOnlyCollection<View> GetSubViews (bool includeAdornments = false)
+    public virtual IReadOnlyCollection<View> GetSubViews (bool includeMargin = false, bool includeBorder = false, bool includePadding = false)
     {
         List<View> result = [];
 
         // Add direct SubViews
         result.AddRange (InternalSubViews);
 
-        if (includeAdornments)
+        if (includeMargin)
         {
             // Add Margin SubViews
             if (Margin?.SubViews is { })
             {
                 result.AddRange (Margin.SubViews);
             }
+        }
 
+        if (includeBorder)
+        {
             // Add Border SubViews
             if (Border?.SubViews is { })
             {
                 result.AddRange (Border.SubViews);
             }
+        }
 
+        if (includePadding)
+        {
             // Add Padding SubViews
             if (Padding?.SubViews is { })
             {

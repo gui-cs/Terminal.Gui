@@ -1049,7 +1049,7 @@ public class SubViewTests
         superView.Margin!.Add (marginSubView);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (includeMargin: true);
 
         // Assert
         Assert.Equal (2, result.Count);
@@ -1073,7 +1073,7 @@ public class SubViewTests
         superView.Border!.Add (borderSubView);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (includeBorder: true);
 
         // Assert
         Assert.Equal (2, result.Count);
@@ -1097,7 +1097,7 @@ public class SubViewTests
         superView.Padding!.Add (paddingSubView);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (includePadding: true);
 
         // Assert
         Assert.Equal (2, result.Count);
@@ -1127,7 +1127,7 @@ public class SubViewTests
         superView.Padding!.Add (paddingSubView);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
 
         // Assert
         Assert.Equal (5, result.Count);
@@ -1159,7 +1159,7 @@ public class SubViewTests
         superView.Padding!.Add (paddingSubView);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
         List<View> resultList = result.ToList ();
 
         // Assert - Order should be: direct SubViews, Margin, Border, Padding
@@ -1219,7 +1219,7 @@ public class SubViewTests
         superView.Padding!.Add (paddingSubView1, paddingSubView2);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
 
         // Assert
         Assert.Equal (7, result.Count);
