@@ -500,17 +500,28 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 return;
             }
 
-            if (!OnTitleChanging (ref value))
+            if (OnTitleChanging (ref value))
             {
-                string old = _title;
-                _title = value;
-                TitleTextFormatter.Text = _title;
-
-                SetTitleTextFormatterSize ();
-                SetHotKeyFromTitle ();
-                SetNeedsDraw ();
-                OnTitleChanged ();
+                return;
             }
+            CancelEventArgs<string> args = new (ref _title, ref value);
+            TitleChanging?.Invoke (this, args);
+
+            if (args.Cancel)
+            {
+                return;
+            }
+
+            string old = _title;
+            _title = value;
+            TitleTextFormatter.Text = _title;
+
+            SetTitleTextFormatterSize ();
+            SetHotKeyFromTitle ();
+            SetNeedsDraw ();
+
+            OnTitleChanged ();
+            TitleChanged?.Invoke (this, new (in _title));
         }
     }
 
@@ -524,32 +535,26 @@ public partial class View : IDisposable, ISupportInitializeNotification
                                                   1);
     }
 
-    // TODO: Change this event to match the standard TG event model.
-    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
-    protected void OnTitleChanged () { TitleChanged?.Invoke (this, new (in _title)); }
-
     /// <summary>
     ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
     ///     be cancelled.
     /// </summary>
     /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
     /// <returns>`true` if an event handler canceled the Title change.</returns>
-    protected bool OnTitleChanging (ref string newTitle)
-    {
-        CancelEventArgs<string> args = new (ref _title, ref newTitle);
-        TitleChanging?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
-    /// <summary>Raised after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<EventArgs<string>>? TitleChanged;
+    protected virtual bool OnTitleChanging (ref string newTitle) => false;
 
     /// <summary>
     ///     Raised when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
     public event EventHandler<CancelEventArgs<string>>? TitleChanging;
+
+    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
+    protected virtual void OnTitleChanged () { }
+
+    /// <summary>Raised after the <see cref="View.Title"/> has been changed.</summary>
+    public event EventHandler<EventArgs<string>>? TitleChanged;
+
 
     #endregion
 

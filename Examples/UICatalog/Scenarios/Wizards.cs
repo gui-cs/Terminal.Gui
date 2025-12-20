@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
 // ReSharper disable AccessToDisposedClosure
+using Terminal.Gui.Views;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
@@ -9,6 +11,10 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Runnable")]
 public class Wizards : Scenario
 {
+    private Wizard? _wizard;
+    private View? _actionLabel;
+    private TextField? _titleEdit;
+
     public override void Main ()
     {
         Application.Init ();
@@ -35,7 +41,7 @@ public class Wizards : Scenario
         };
         settingsFrame.Add (label);
 
-        TextField titleEdit = new ()
+        _titleEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -43,7 +49,26 @@ public class Wizards : Scenario
             Height = 1,
             Text = "Gandolf"
         };
-        settingsFrame.Add (titleEdit);
+        settingsFrame.Add (_titleEdit);
+
+        CheckBox cbRun = new ()
+        {
+            Title = "_Run Wizard as a modal",
+            X = 0,
+            Y = Pos.Bottom (label),
+            CheckedState = CheckState.Checked
+        };
+        settingsFrame.Add (cbRun);
+
+        Button showWizardButton = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (cbRun),
+            IsDefault = true,
+            Text = "_Show Wizard"
+        };
+
+        settingsFrame.Add (showWizardButton);
 
         label = new ()
         {
@@ -51,66 +76,91 @@ public class Wizards : Scenario
         };
         win.Add (label);
 
-        View actionLabel = new ()
+        _actionLabel = new ()
         {
-            X = Pos.Right (label), Y = Pos.AnchorEnd (1), SchemeName = "Error",
+            X = Pos.Right (label),
+            Y = Pos.AnchorEnd (1),
+            SchemeName = "Error",
             Width = Dim.Auto (),
             Height = Dim.Auto ()
         };
-        win.Add (actionLabel);
+        win.Add (_actionLabel);
 
-        Button showWizardButton = new ()
+        _wizard = CreateWizard ();
+        if (cbRun.CheckedState != CheckState.Checked)
         {
-            X = Pos.Center (), Y = Pos.Bottom (settingsFrame) + 2, IsDefault = true, Text = "_Show Wizard"
+            showWizardButton.Enabled = false;
+            win.Add (_wizard);
+        }
+
+        cbRun.CheckedStateChanged += (s, a) =>
+        {
+            if (s is not CheckBox cb)
+            {
+                return;
+            }
+
+            if (a.Value == CheckState.Checked)
+            {
+                showWizardButton.Enabled = true;
+                win.Remove (_wizard);
+            }
+            else
+            {
+                showWizardButton.Enabled = false;
+                win.Add (_wizard);
+            }
         };
 
-        showWizardButton.Accepting += ShowWizard;
-        win.Add (showWizardButton);
-        app.Run (win);
-
-        return;
-
-        void ShowWizard (object? s, CommandEventArgs e)
+        showWizardButton.Accepting += (_, _) =>
         {
-            actionLabel.Text = string.Empty;
+            if (_wizard is not null)
+            {
+                app.Run (_wizard);
+            }
+        };
 
-            using Wizard wizard = new ();
-            wizard.Title = titleEdit.Text;
+        app.Run (win);
+    }
 
-            wizard.MovingBack += (_, args) =>
-                                 {
-                                     // Set Cancel to true to prevent moving back
-                                     args.Cancel = false;
-                                     actionLabel.Text = "Moving Back";
-                                 };
+    private Wizard CreateWizard ()
+    {
+        Wizard wizard = new ();
+        wizard.Title = _titleEdit.Text;
 
-            wizard.MovingNext += (_, args) =>
-                                 {
-                                     // Set Cancel to true to prevent moving next
-                                     args.Cancel = false;
-                                     actionLabel.Text = "Moving Next";
-                                 };
+        wizard.MovingBack += (_, args) =>
+                             {
+                                 // Set Cancel to true to prevent moving back
+                                 args.Cancel = false;
+                                 _actionLabel.Text = "Moving Back";
+                             };
 
-            wizard.Accepting += (_, args) =>
-                                {
-                                    actionLabel.Text = "Finished";
-                                    MessageBox.Query ((s as View)?.App!, "Wizard", "The Wizard has been completed and accepted!", "Ok");
+        wizard.MovingNext += (_, args) =>
+                             {
+                                 // Set Cancel to true to prevent moving next
+                                 args.Cancel = false;
+                                 _actionLabel.Text = "Moving Next";
+                             };
 
-                                    // Don't set args.Handled to true to allow the wizard to close
-                                    args.Handled = false;
-                                };
+        wizard.Accepting += (s, args) =>
+                            {
+                                _actionLabel.Text = "Finished";
+                                MessageBox.Query ((s as View)?.App!, "Wizard", "The Wizard has been completed and accepted!", "Ok");
 
-            wizard.Cancelled += (_, args) =>
-                                {
-                                    actionLabel.Text = "Cancelled";
+                                // Don't set args.Handled to true to allow the wizard to close
+                                args.Handled = false;
+                            };
 
-                                    int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "Yes", "No");
-                                    args.Cancel = btn == 1;
-                                };
+        wizard.Cancelled += (s, args) =>
+                            {
+                                _actionLabel.Text = "Cancelled";
 
-            ((IDesignable)wizard).EnableForDesign ();
+                                int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "Yes", "No");
+                                args.Cancel = btn == 1;
+                            };
 
-            app.Run (wizard);
-        }
+        ((IDesignable)wizard).EnableForDesign ();
+
+        return wizard;
     }
 }

@@ -303,7 +303,6 @@ public class Adornment : View, IDesignable
     ///         </list>
     ///     </para>
     /// </remarks>
-
     public override IReadOnlyCollection<View> GetSubViews (bool includeAdornments = false)
     {
         List<View> subViewsOfThisAdornment = new (base.GetSubViews (includeAdornments));

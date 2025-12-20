@@ -61,11 +61,6 @@ public class Wizard : Runnable, IDesignable
     /// </remarks>
     public Wizard ()
     {
-        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-        BorderStyle = LineStyle.Double;
-        Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
-        base.ShadowStyle = Dialog.DefaultShadow;
-
         X = Pos.Center ();
         Y = Pos.Center ();
         Width = Dim.Auto (minimumContentDim: Dim.Percent (80), maximumContentDim: Dim.Percent (90));
@@ -87,20 +82,10 @@ public class Wizard : Runnable, IDesignable
         };
         NextFinishButton.FrameChanged += (_, _) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height }; };
 
-        TitleChanged += WizardTitleChanged;
-
         AddCommand (Command.Quit, QuitHandler);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
 
         return;
-
-        void WizardTitleChanged (object? sender, EventArgs<string> e)
-        {
-            if (string.IsNullOrEmpty (_wizardTitle))
-            {
-                _wizardTitle = e.Value;
-            }
-        }
 
         // Add key binding for Esc when not modal - fires Cancelled event
         bool? QuitHandler (ICommandContext? ctx)
@@ -112,9 +97,32 @@ public class Wizard : Runnable, IDesignable
         }
     }
 
+    /// <inheritdoc />
+    protected override void OnTitleChanged ()
+    {
+        if (string.IsNullOrEmpty (_wizardTitle))
+        {
+            _wizardTitle = Title;
+        }
+    }
+
     /// <inheritdoc/>
     public override void EndInit ()
     {
+        if (IsModal)
+        {
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            BorderStyle = LineStyle.Double;
+            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
+            base.ShadowStyle = Dialog.DefaultShadow;
+        }
+        else
+        {
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+            BorderStyle = LineStyle.Single;
+            base.ShadowStyle = ShadowStyle.None;
+        }
+
         // Configure Padding
         if (Padding is { })
         {
