@@ -137,8 +137,6 @@ public class Wizard : Runnable, IDesignable
         // Configure Padding
         if (Padding is { })
         {
-            Padding.CanFocus = true;
-
             // Add buttons to bottom Padding instead of using AddButton
             Padding?.Add (BackButton);
             Padding?.Add (NextFinishButton);

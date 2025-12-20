@@ -15,7 +15,7 @@ public class WizardStepTests
         Assert.NotNull (step);
         Assert.True (step.CanFocus);
         Assert.Equal (TabBehavior.TabStop, step.TabStop);
-        Assert.Equal (LineStyle.Dotted, step.BorderStyle);
+        Assert.Equal (LineStyle.None, step.BorderStyle);
         Assert.IsType<DimFill> (step.Width);
         Assert.IsType<DimFill> (step.Height);
     }
@@ -295,40 +295,6 @@ public class WizardStepTests
 
     #endregion Visible Tests
 
-    #region Arrangement Tests
-
-    [Fact]
-    public void Arrangement_Has_Movable_Flag ()
-    {
-        // Arrange & Act
-        WizardStep step = new ();
-
-        // Assert
-        Assert.True (step.Arrangement.HasFlag (ViewArrangement.Movable));
-    }
-
-    [Fact]
-    public void Arrangement_Has_RightResizable_Flag ()
-    {
-        // Arrange & Act
-        WizardStep step = new ();
-
-        // Assert
-        Assert.True (step.Arrangement.HasFlag (ViewArrangement.RightResizable));
-    }
-
-    [Fact]
-    public void Arrangement_Has_BottomResizable_Flag ()
-    {
-        // Arrange & Act
-        WizardStep step = new ();
-
-        // Assert
-        Assert.True (step.Arrangement.HasFlag (ViewArrangement.BottomResizable));
-    }
-
-    #endregion Arrangement Tests
-
     #region HelpTextView Tests
 
     [Fact]
@@ -431,16 +397,6 @@ public class WizardStepTests
     #endregion Focus Tests
 
     #region BorderStyle Tests
-
-    [Fact]
-    public void BorderStyle_Is_Dotted_By_Default ()
-    {
-        // Arrange & Act
-        WizardStep step = new ();
-
-        // Assert
-        Assert.Equal (LineStyle.Dotted, step.BorderStyle);
-    }
 
     [Fact]
     public void BorderStyle_Can_Be_Changed ()

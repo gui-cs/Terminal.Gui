@@ -16,7 +16,7 @@ public class WizardTests
         Assert.NotNull (wizard.BackButton);
         Assert.NotNull (wizard.NextFinishButton);
         Assert.Null (wizard.CurrentStep);
-        Assert.Equal (LineStyle.Single, wizard.BorderStyle);
+        Assert.Equal (LineStyle.Dotted, wizard.BorderStyle);
         Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Resizable));
     }

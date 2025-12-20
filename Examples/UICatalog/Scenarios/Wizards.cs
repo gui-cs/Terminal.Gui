@@ -80,37 +80,35 @@ public class Wizards : Scenario
         {
             X = Pos.Right (label),
             Y = Pos.AnchorEnd (1),
-            SchemeName = "Error",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error),
             Width = Dim.Auto (),
             Height = Dim.Auto ()
         };
         win.Add (_actionLabel);
 
-        _wizard = CreateWizard ();
         if (cbRun.CheckedState != CheckState.Checked)
         {
             showWizardButton.Enabled = false;
+            _wizard = CreateWizard ();
             win.Add (_wizard);
         }
 
-        cbRun.CheckedStateChanged += (s, a) =>
+        cbRun.CheckedStateChanged += (_, a) =>
         {
-            if (s is not CheckBox cb)
-            {
-                return;
-            }
-
             if (a.Value == CheckState.Checked)
             {
                 showWizardButton.Enabled = true;
-                _wizard.X = Pos.Center ();
+                _wizard!.X = Pos.Center ();
                 _wizard.Y = Pos.Center ();
 
                 win.Remove (_wizard);
+                _wizard.Dispose ();
+                _wizard = null;
             }
             else
             {
                 showWizardButton.Enabled = false;
+                _wizard = CreateWizard ();
                 _wizard.Y = Pos.Bottom (settingsFrame) + 1;
                 win.Add (_wizard);
             }
@@ -118,10 +116,9 @@ public class Wizards : Scenario
 
         showWizardButton.Accepting += (_, _) =>
         {
-            if (_wizard is not null)
-            {
-                app.Run (_wizard);
-            }
+            _wizard = CreateWizard ();
+            app.Run (_wizard);
+            _wizard.Dispose ();
         };
 
         app.Run (win);
@@ -140,28 +137,36 @@ public class Wizards : Scenario
                              {
                                  // Set Cancel to true to prevent moving back
                                  args.Cancel = false;
-                                 _actionLabel.Text = "Moving Back";
+                                 _actionLabel!.Text = "Moving Back";
                              };
 
         wizard.MovingNext += (_, args) =>
                              {
                                  // Set Cancel to true to prevent moving next
                                  args.Cancel = false;
-                                 _actionLabel.Text = "Moving Next";
+                                 _actionLabel!.Text = "Moving Next";
                              };
 
         wizard.Accepting += (s, args) =>
                             {
-                                _actionLabel.Text = "Finished";
+                                _actionLabel!.Text = "Finished";
                                 MessageBox.Query ((s as View)?.App!, "Wizard", "The Wizard has been completed and accepted!", "_Ok");
 
-                                // Don't set args.Handled to true to allow the wizard to close
-                                args.Handled = false;
+                                if (wizard.IsRunning)
+                                {
+                                    // Don't set args.Handled to true to allow the wizard to close
+                                    args.Handled = false;
+                                }
+                                else
+                                {
+                                    wizard.App!.RequestStop();
+                                    args.Handled = true;
+                                }
                             };
 
         wizard.Cancelled += (s, args) =>
                             {
-                                _actionLabel.Text = "Cancelled";
+                                _actionLabel!.Text = "Cancelled";
 
                                 int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "_Yes", "_No");
                                 args.Cancel = btn is not 0;

@@ -92,6 +92,13 @@ public class SubViewTests
     }
 
     [Fact]
+    public void Add_Margin_Throws ()
+    {
+        View view = new ();
+        Assert.Throws<InvalidOperationException> (() => view.Margin!.Add (new View ()));
+    }
+
+    [Fact]
     public void Remove_Does_Not_Impact_ContentSize ()
     {
         var view = new View ();
@@ -1034,30 +1041,6 @@ public class SubViewTests
     }
 
     [Fact]
-    public void GetSubViews_Includes_Margin_SubViews_When_IncludeAdornments_Is_True ()
-    {
-        // Arrange
-        View superView = new ();
-        View subView = new () { Id = "subView" };
-
-        superView.Add (subView);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        // Add a subview to the Margin
-        View marginSubView = new () { Id = "marginSubView" };
-        superView.Margin!.Add (marginSubView);
-
-        // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (includeMargin: true);
-
-        // Assert
-        Assert.Equal (2, result.Count);
-        Assert.Contains (subView, result);
-        Assert.Contains (marginSubView, result);
-    }
-
-    [Fact]
     public void GetSubViews_Includes_Border_SubViews_When_IncludeAdornments_Is_True ()
     {
         // Arrange
@@ -1070,6 +1053,8 @@ public class SubViewTests
 
         // Add a subview to the Border
         View borderSubView = new () { Id = "borderSubView" };
+        // Thickness matters
+        superView.Border!.Thickness = new (1);
         superView.Border!.Add (borderSubView);
 
         // Act
@@ -1094,6 +1079,8 @@ public class SubViewTests
 
         // Add a subview to the Padding
         View paddingSubView = new () { Id = "paddingSubView" };
+        // Thickness matters
+        superView.Padding!.Thickness = new (1);
         superView.Padding!.Add (paddingSubView);
 
         // Act
@@ -1118,22 +1105,24 @@ public class SubViewTests
         superView.EndInit ();
 
         // Add subviews to each adornment
-        View marginSubView = new () { Id = "marginSubView" };
         View borderSubView = new () { Id = "borderSubView" };
         View paddingSubView = new () { Id = "paddingSubView" };
 
-        superView.Margin!.Add (marginSubView);
+        // Thickness matters
+        //superView.Margin!.Thickness = new  (1);
+        //superView.Margin!.Add (marginSubView);
+        superView.Border!.Thickness = new  (1);
         superView.Border!.Add (borderSubView);
+        superView.Padding!.Thickness = new  (1);
         superView.Padding!.Add (paddingSubView);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
 
         // Assert
-        Assert.Equal (5, result.Count);
+        Assert.Equal (4, result.Count);
         Assert.Contains (subView1, result);
         Assert.Contains (subView2, result);
-        Assert.Contains (marginSubView, result);
         Assert.Contains (borderSubView, result);
         Assert.Contains (paddingSubView, result);
     }
@@ -1150,25 +1139,25 @@ public class SubViewTests
         superView.BeginInit ();
         superView.EndInit ();
 
-        View marginSubView = new () { Id = "marginSubView" };
         View borderSubView = new () { Id = "borderSubView" };
         View paddingSubView = new () { Id = "paddingSubView" };
 
-        superView.Margin!.Add (marginSubView);
+        // Thickness matters
+        superView.Border!.Thickness = new (1);
         superView.Border!.Add (borderSubView);
+        superView.Padding!.Thickness = new (1);
         superView.Padding!.Add (paddingSubView);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
         List<View> resultList = result.ToList ();
 
-        // Assert - Order should be: direct SubViews, Margin, Border, Padding
-        Assert.Equal (5, resultList.Count);
+        // Assert - Order should be: direct SubViews, Border, Padding
+        Assert.Equal (4, resultList.Count);
         Assert.Equal (subView1, resultList [0]);
         Assert.Equal (subView2, resultList [1]);
-        Assert.Equal (marginSubView, resultList [2]);
-        Assert.Equal (borderSubView, resultList [3]);
-        Assert.Equal (paddingSubView, resultList [4]);
+        Assert.Equal (borderSubView, resultList [2]);
+        Assert.Equal (paddingSubView, resultList [3]);
     }
 
     [Fact]
@@ -1207,25 +1196,24 @@ public class SubViewTests
         superView.EndInit ();
 
         // Add multiple subviews to each adornment
-        View marginSubView1 = new () { Id = "marginSubView1" };
-        View marginSubView2 = new () { Id = "marginSubView2" };
         View borderSubView1 = new () { Id = "borderSubView1" };
         View borderSubView2 = new () { Id = "borderSubView2" };
         View paddingSubView1 = new () { Id = "paddingSubView1" };
         View paddingSubView2 = new () { Id = "paddingSubView2" };
 
-        superView.Margin!.Add (marginSubView1, marginSubView2);
+        // Thickness matters
+        superView.Border!.Thickness = new (1);
         superView.Border!.Add (borderSubView1, borderSubView2);
+        // Thickness matters
+        superView.Padding!.Thickness = new (1);
         superView.Padding!.Add (paddingSubView1, paddingSubView2);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
 
         // Assert
-        Assert.Equal (7, result.Count);
+        Assert.Equal (5, result.Count);
         Assert.Contains (subView, result);
-        Assert.Contains (marginSubView1, result);
-        Assert.Contains (marginSubView2, result);
         Assert.Contains (borderSubView1, result);
         Assert.Contains (borderSubView2, result);
         Assert.Contains (paddingSubView1, result);
@@ -1240,15 +1228,15 @@ public class SubViewTests
         view.BeginInit ();
         view.EndInit ();
 
-        View marginSubView = new () { Id = "marginSubView" };
-        view.Margin!.Add (marginSubView);
+        View paddingSubView = new () { Id = "paddingSubView" };
+        view.Padding!.Add (paddingSubView);
 
         // Act - Call GetSubViews on the Margin itself
-        IReadOnlyCollection<View> result = view.Margin.GetSubViews ();
+        IReadOnlyCollection<View> result = view.Padding.GetSubViews ();
 
         // Assert
         Assert.Single (result);
-        Assert.Contains (marginSubView, result);
+        Assert.Contains (paddingSubView, result);
     }
 
     [Fact]

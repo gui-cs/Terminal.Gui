@@ -67,7 +67,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         if (includeMargin)
         {
             // Add Margin SubViews
-            if (Margin?.SubViews is { })
+            if (Margin is { SubViews: { Count: > 0 } } && Margin.Thickness != Thickness.Empty)
             {
                 result.AddRange (Margin.SubViews);
             }
@@ -76,7 +76,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         if (includeBorder)
         {
             // Add Border SubViews
-            if (Border?.SubViews is { })
+            if (Border is { SubViews: { Count: > 0 } } && Border.Thickness != Thickness.Empty)
             {
                 result.AddRange (Border.SubViews);
             }
@@ -85,7 +85,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         if (includePadding)
         {
             // Add Padding SubViews
-            if (Padding?.SubViews is { })
+            if (Padding is { SubViews: { Count: > 0 } } && Padding.Thickness != Thickness.Empty)
             {
                 result.AddRange (Padding.SubViews);
             }
@@ -162,7 +162,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     #region AddRemove
 
-    // TODO: Make this non-virtual once WizardStep is refactored to use events
     /// <summary>Adds a SubView (child) to this view.</summary>
     /// <remarks>
     ///     <para>
@@ -192,7 +191,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
-    public virtual View? Add (View? view)
+    public View? Add (View? view)
     {
         if (view is null)
         {
@@ -209,6 +208,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         if (InternalSubViews.Contains (view))
         {
             Logging.Warning ($"{view} has already been Added to {this}.");
+        }
+
+        // TODO: Add AddingSubView event
+        if (this is Margin margin)
+        {
+            if (view is not ShadowView)
+            {
+                throw new InvalidOperationException ("SubViews of Margin are not supported.");
+            }
         }
 
         // TODO: Make this thread safe
@@ -302,7 +310,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </remarks>
     public event EventHandler<SuperViewChangedEventArgs>? SubViewAdded;
 
-    // TODO: Make this non-virtual once WizardStep is refactored to use events
     /// <summary>Removes a SubView added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
     ///     <para>
@@ -329,7 +336,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
-    public virtual View? Remove (View? view)
+    public View? Remove (View? view)
     {
         if (view is null)
         {
