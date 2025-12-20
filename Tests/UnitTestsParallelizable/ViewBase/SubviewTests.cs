@@ -1219,7 +1219,7 @@ public class SubViewTests
         superView.Padding!.Add (paddingSubView1, paddingSubView2);
 
         // Act
-        IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
+        IReadOnlyCollection<View> result = superView.GetSubViews (true);
 
         // Assert
         Assert.Equal (7, result.Count);

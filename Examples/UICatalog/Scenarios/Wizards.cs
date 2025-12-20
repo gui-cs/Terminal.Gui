@@ -103,11 +103,15 @@ public class Wizards : Scenario
             if (a.Value == CheckState.Checked)
             {
                 showWizardButton.Enabled = true;
+                _wizard.X = Pos.Center ();
+                _wizard.Y = Pos.Center ();
+
                 win.Remove (_wizard);
             }
             else
             {
                 showWizardButton.Enabled = false;
+                _wizard.Y = Pos.Bottom (settingsFrame) + 1;
                 win.Add (_wizard);
             }
         };
@@ -126,7 +130,11 @@ public class Wizards : Scenario
     private Wizard CreateWizard ()
     {
         Wizard wizard = new ();
-        wizard.Title = _titleEdit.Text;
+
+        if (_titleEdit is { })
+        {
+            wizard.Title = _titleEdit.Text;
+        }
 
         wizard.MovingBack += (_, args) =>
                              {
@@ -145,7 +153,7 @@ public class Wizards : Scenario
         wizard.Accepting += (s, args) =>
                             {
                                 _actionLabel.Text = "Finished";
-                                MessageBox.Query ((s as View)?.App!, "Wizard", "The Wizard has been completed and accepted!", "Ok");
+                                MessageBox.Query ((s as View)?.App!, "Wizard", "The Wizard has been completed and accepted!", "_Ok");
 
                                 // Don't set args.Handled to true to allow the wizard to close
                                 args.Handled = false;
@@ -155,8 +163,8 @@ public class Wizards : Scenario
                             {
                                 _actionLabel.Text = "Cancelled";
 
-                                int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "Yes", "No");
-                                args.Cancel = btn == 1;
+                                int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "_Yes", "_No");
+                                args.Cancel = btn is not 0;
                             };
 
         ((IDesignable)wizard).EnableForDesign ();

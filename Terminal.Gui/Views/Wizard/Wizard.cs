@@ -115,7 +115,7 @@ public class Wizard : Runnable, IDesignable
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
             Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
-            BorderStyle = LineStyle.Rounded;
+            BorderStyle = LineStyle.Dotted;
             // strip out movable and resizable
             Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
             base.ShadowStyle = ShadowStyle.None;
