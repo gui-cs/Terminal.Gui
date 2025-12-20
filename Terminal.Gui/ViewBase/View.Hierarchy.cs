@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -18,6 +17,66 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     Use <see cref="Add(View?)"/> and <see cref="Remove(View?)"/> to add or remove subviews.
     /// </remarks>
     public IReadOnlyCollection<View> SubViews => InternalSubViews?.AsReadOnly () ?? _empty;
+
+    /// <summary>
+    ///     Gets all SubViews of this View, optionally including SubViews of the View's Adornments
+    ///     (Margin, Border, and Padding).
+    /// </summary>
+    /// <param name="includeAdornments">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Margin"/>, <see cref="Border"/>,
+    ///     and <see cref="Padding"/>. If <see langword="false"/> (default), returns only the direct SubViews
+    ///     of this View.
+    /// </param>
+    /// <returns>
+    ///     A read-only collection containing all SubViews. If <paramref name="includeAdornments"/> is
+    ///     <see langword="true"/>, the collection includes SubViews from this View's direct SubViews as well
+    ///     as SubViews from the Margin, Border, and Padding adornments.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method returns a snapshot of the SubViews at the time of the call. The collection is
+    ///         safe to iterate even if SubViews are added or removed during iteration.
+    ///     </para>
+    ///     <para>
+    ///         The order of SubViews in the returned collection is:
+    ///         <list type="number">
+    ///             <item>Direct SubViews of this View</item>
+    ///             <item>SubViews of Margin (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
+    ///             <item>SubViews of Border (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
+    ///             <item>SubViews of Padding (if <paramref name="includeAdornments"/> is <see langword="true"/>)</item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
+    public IReadOnlyCollection<View> GetSubViews (bool includeAdornments = false)
+    {
+        List<View> result = [];
+
+        // Add direct SubViews
+        result.AddRange (InternalSubViews);
+
+        if (includeAdornments)
+        {
+            // Add Margin SubViews
+            if (Margin?.SubViews is { })
+            {
+                result.AddRange (Margin.SubViews);
+            }
+
+            // Add Border SubViews
+            if (Border?.SubViews is { })
+            {
+                result.AddRange (Border.SubViews);
+            }
+
+            // Add Padding SubViews
+            if (Padding?.SubViews is { })
+            {
+                result.AddRange (Padding.SubViews);
+            }
+        }
+
+        return result.AsReadOnly ();
+    }
 
     private View? _superView;
 
@@ -40,7 +99,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     {
         if (_superView == value)
         {
-           return true;
+            return true;
         }
 
         return CWPPropertyHelper.ChangeProperty (
@@ -62,7 +121,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </summary>
     /// <param name="args">Hold the new SuperView that will be set, or <see langword="null"/> if being removed.</param>
     /// <returns><see langword="true"/> to cancel the change; <see langword="false"/> to allow it.</returns>
-    protected virtual bool OnSuperViewChanging (ValueChangingEventArgs<View?> args) => false;
+    protected virtual bool OnSuperViewChanging (ValueChangingEventArgs<View?> args) { return false; }
 
     /// <summary>
     ///     Raised when the SuperView of this View is about to be changed. This is raised before the SuperView property
@@ -143,6 +202,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         if (!view.SetSuperView (this))
         {
             InternalSubViews.Remove (view);
+
             // The change was cancelled
             return null;
         }
@@ -308,7 +368,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return null;
         }
 
-        Debug.Assert(view.SuperView is null);
+        Debug.Assert (view.SuperView is null);
         InternalSubViews.Remove (view);
 
         // Clean up focus stuff

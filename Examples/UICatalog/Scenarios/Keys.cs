@@ -161,7 +161,6 @@ public class Keys : Scenario
         Application.Driver!.GetInputProcessor ().AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
 
         Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
-        Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
         void KeyDownPressUp (Key args, string updown)
         {

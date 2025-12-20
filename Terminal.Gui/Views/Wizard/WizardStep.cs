@@ -1,9 +1,7 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> fills the 
+///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> fills the
 ///     Wizard's content area. <see cref="View"/>s can be added to the step's content area. Help text can be displayed
 ///     in the right <see cref="Padding"/> by setting <see cref="WizardStep.HelpText"/>. If the help text is empty, the
 ///     right padding will not be shown and content will fill the entire step.
@@ -39,17 +37,19 @@ public class WizardStep : View, IDesignable
         CanFocus = true;
         BorderStyle = LineStyle.Dotted;
 
-        Width = Dim.Auto (minimumContentDim: _helpTextView.Visible ? _helpTextView.Frame.Width : 0);
-        Height = Dim.Auto (minimumContentDim: _helpTextView.Visible ? 5: 0);
+        Width = Dim.Fill ();
+        Height = Dim.Fill ();
+
+        Arrangement = ViewArrangement.Movable | ViewArrangement.RightResizable | ViewArrangement.BottomResizable;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         // Help text goes in the right Padding
-        // Enable built-in scrollbars for the help text view
-        _helpTextView.VerticalScrollBar.AutoShow = true;
-        _helpTextView.HorizontalScrollBar.AutoShow = true;
+        // TODO: Enable built-in scrollbars for the help text view once TextView supports
+        //_helpTextView.VerticalScrollBar.AutoShow = true;
+        //_helpTextView.HorizontalScrollBar.AutoShow = true;
         _helpTextView.Width = Dim.Func (_ => CalculateHelpPaddingWidth ());
 
         Padding?.Add (_helpTextView);
@@ -63,8 +63,7 @@ public class WizardStep : View, IDesignable
     public string BackButtonText { get; set; } = string.Empty;
 
     /// <summary>Calculates the width for the help text padding based on the current frame width.</summary>
-    /// <returns>The padding width (30% of frame width, minimum 10)</returns>
-    private int CalculateHelpPaddingWidth () => Math.Min (20, (int)(Frame.Width * 0.3));
+    private int CalculateHelpPaddingWidth () { return 25; }
 
     /// <inheritdoc/>
     protected override void OnFrameChanged (in Rectangle frame)
@@ -72,7 +71,7 @@ public class WizardStep : View, IDesignable
         base.OnFrameChanged (frame);
 
         // Update padding thickness when frame changes
-        if (Padding is not null && _helpTextView.Text.Length > 0)
+        if (Padding is { } && _helpTextView.Text.Length > 0)
         {
             Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
             App?.Invoke (() => Layout ());
@@ -113,30 +112,53 @@ public class WizardStep : View, IDesignable
             // Help text goes in right Padding - set thickness based on current frame width
             Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
             _helpTextView.Visible = true;
-            _helpTextView.Enabled = true;
+
+            //_helpTextView.Enabled = true;
         }
         else
         {
             // No help text - no right padding needed
             Padding.Thickness = Padding.Thickness with { Right = 0 };
             _helpTextView.Visible = false;
-            _helpTextView.Enabled = false;
+
+            // _helpTextView.Enabled = false;
         }
+
+        SetNeedsLayout ();
     }
 
     bool IDesignable.EnableForDesign ()
     {
         Title = "Example Step";
+
         Label label = new ()
         {
-            Title = "_Enter Text:",
+            Title = "_Enter Text:"
         };
+
         TextField textField = new ()
         {
             X = Pos.Right (label) + 1,
-            Width = 20,
+            Width = 20
         };
         Add (label, textField);
+
+        label = new ()
+        {
+            Title = "    _A List:",
+            Y = Pos.Bottom (label) + 1
+        };
+
+        ListView listView = new ()
+        {
+            BorderStyle = LineStyle.Dashed,
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Height = Dim.Auto (),
+            Width = 10,
+            Source = new ListWrapper<string> (["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"])
+        };
+        Add (label, listView);
 
         HelpText = """
                    This is some help text for the WizardStep. 
