@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.Views;
 
 /// <summary>All <see cref="LinearRange{T}"/> configuration are grouped in this class.</summary>

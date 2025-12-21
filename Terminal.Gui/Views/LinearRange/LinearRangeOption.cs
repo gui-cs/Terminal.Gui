@@ -1,9 +1,8 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
-/// <summary>Represents an option in a <see cref="LinearRange{T}"/> .</summary>
-/// <typeparam name="T">Data type of the option.</typeparam>
-public class LinearRangeOption<T>
+ /// <summary>Represents an option in a <see cref="LinearRange{T}"/> .</summary>
+ /// <typeparam name="T">Data type of the option.</typeparam>
+ public class LinearRangeOption<T>
 {
     /// <summary>Creates a new empty instance of the <see cref="LinearRangeOption{T}"/> class.</summary>
     public LinearRangeOption () { }
@@ -17,13 +16,13 @@ public class LinearRangeOption<T>
     }
 
     /// <summary>Event fired when an option has changed.</summary>
-    public event EventHandler<LinearRangeOptionEventArgs> Changed;
+    public event EventHandler<LinearRangeOptionEventArgs>? Changed;
 
     /// <summary>Custom data of the option.</summary>
-    public T Data { get; set; }
+    public T? Data { get; set; }
 
     /// <summary>Legend of the option.</summary>
-    public string Legend { get; set; }
+    public string? Legend { get; set; }
 
     /// <summary>
     ///     Abbreviation of the Legend. When the <see cref="LinearRange{T}.MinimumInnerSpacing"/> too small to fit
@@ -32,13 +31,13 @@ public class LinearRangeOption<T>
     public Rune LegendAbbr { get; set; }
 
     /// <summary>Event Raised when this option is set.</summary>
-    public event EventHandler<LinearRangeOptionEventArgs> Set;
+    public event EventHandler<LinearRangeOptionEventArgs>? Set;
 
     /// <summary>Creates a human-readable string that represents this <see cref="LinearRangeOption{T}"/>.</summary>
-    public override string ToString () { return "{Legend=" + Legend + ", LegendAbbr=" + LegendAbbr + ", Data=" + Data + "}"; }
+    public override string ToString () => "{Legend=" + Legend + ", LegendAbbr=" + LegendAbbr + ", Data=" + Data + "}";
 
     /// <summary>Event Raised when this option is unset.</summary>
-    public event EventHandler<LinearRangeOptionEventArgs> UnSet;
+    public event EventHandler<LinearRangeOptionEventArgs>? UnSet;
 
     /// <summary>To Raise the <see cref="Changed"/> event from the LinearRange.</summary>
     internal void OnChanged (bool isSet) { Changed?.Invoke (this, new (isSet)); }

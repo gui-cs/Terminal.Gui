@@ -29,8 +29,8 @@ public class LinearRanges : Scenario
             prev = view;
         }
 
-        List<object> singleOptions = new ()
-        {
+        List<object> singleOptions =
+        [
             1,
             2,
             3,
@@ -70,9 +70,9 @@ public class LinearRanges : Scenario
             37,
             38,
             39
-        };
+        ];
 
-        var single = new LinearRange (singleOptions)
+        LinearRange single = new (singleOptions)
         {
             Title = "_Continuous",
             X = 0,
@@ -119,16 +119,14 @@ public class LinearRanges : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        Window app = new ()
-        {
-            Title = GetQuitKeyAndName ()
-        };
+        using Window mainWindow = new ();
+        mainWindow.Title = GetQuitKeyAndName ();
 
         MakeSliders (
-                     app,
-                     new ()
-                     {
+                     mainWindow,
+                     [
                          500,
                          1000,
                          1500,
@@ -139,7 +137,7 @@ public class LinearRanges : Scenario
                          4000,
                          4500,
                          5000
-                     }
+                     ]
                     );
 
         var configView = new FrameView
@@ -152,7 +150,7 @@ public class LinearRanges : Scenario
             SchemeName = "Dialog"
         };
 
-        app.Add (configView);
+        mainWindow.Add (configView);
 
         #region Config LinearRange
 
@@ -180,39 +178,7 @@ public class LinearRanges : Scenario
 
         configView.Add (optionsSlider);
 
-        optionsSlider.OptionsChanged += (sender, e) =>
-                                        {
-                                            foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
-                                            {
-                                                s.ShowLegends = e.Options.ContainsKey (0);
-                                                s.RangeAllowSingle = e.Options.ContainsKey (1);
-                                                s.ShowEndSpacing = e.Options.ContainsKey (2);
-
-                                                if (e.Options.ContainsKey (3))
-                                                {
-                                                    s.Width = Dim.Auto (DimAutoStyle.Content);
-                                                    s.Height = Dim.Auto (DimAutoStyle.Content);
-                                                }
-                                                else
-                                                {
-                                                    if (s.Orientation == Orientation.Horizontal)
-                                                    {
-                                                        s.Width = Dim.Percent (50);
-
-                                                        int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
-                                                                    ? s.Options.Max (o => o.Legend.Length) + 3
-                                                                    : 4;
-                                                        s.Height = h;
-                                                    }
-                                                    else
-                                                    {
-                                                        int w = s.ShowLegends ? s.Options.Max (o => o.Legend.Length) + 3 : 3;
-                                                        s.Width = w;
-                                                        s.Height = Dim.Fill ();
-                                                    }
-                                                }
-                                            }
-                                        };
+        optionsSlider.OptionsChanged += OnOptionsSliderOnOptionsChanged;
         optionsSlider.SetOption (0); // Legends
         optionsSlider.SetOption (1); // RangeAllowSingle
         optionsSlider.SetOption (3); // DimAuto
@@ -226,7 +192,7 @@ public class LinearRanges : Scenario
 
         dimAutoUsesMin.CheckedStateChanging += (sender, e) =>
                                                {
-                                                   foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
+                                                   foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
                                                    {
                                                        s.UseMinimumSize = !s.UseMinimumSize;
                                                    }
@@ -251,7 +217,7 @@ public class LinearRanges : Scenario
                                             {
                                                 View prev = null;
 
-                                                foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
+                                                foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
                                                 {
                                                     if (e.Options.ContainsKey (0))
                                                     {
@@ -334,7 +300,7 @@ public class LinearRanges : Scenario
 
         legendsOrientationSlider.OptionsChanged += (sender, e) =>
                                                    {
-                                                       foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
+                                                       foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
                                                        {
                                                            if (e.Options.ContainsKey (0))
                                                            {
@@ -395,7 +361,7 @@ public class LinearRanges : Scenario
             X = Pos.Right (label) + 1
         };
 
-        innerSpacingUpDown.Value = app.SubViews.OfType<LinearRange> ().First ().MinimumInnerSpacing;
+        innerSpacingUpDown.Value = mainWindow.SubViews.OfType<LinearRange> ().First ().MinimumInnerSpacing;
 
         innerSpacingUpDown.ValueChanging += (sender, e) =>
                                             {
@@ -406,7 +372,7 @@ public class LinearRanges : Scenario
                                                     return;
                                                 }
 
-                                                foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
+                                                foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
                                                 {
                                                     s.MinimumInnerSpacing = e.NewValue;
                                                 }
@@ -419,12 +385,12 @@ public class LinearRanges : Scenario
 
         #region Color LinearRange
 
-        foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
+        foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
         {
-            s.Style.OptionChar = s.Style.OptionChar with { Attribute = app.GetAttributeForRole (VisualRole.Normal) };
-            s.Style.SetChar = s.Style.SetChar with { Attribute = app.GetAttributeForRole (VisualRole.Normal) };
-            s.Style.LegendAttributes.SetAttribute = app.GetAttributeForRole (VisualRole.Normal);
-            s.Style.RangeChar = s.Style.RangeChar with { Attribute = app.GetAttributeForRole (VisualRole.Normal) };
+            s.Style.OptionChar = s.Style.OptionChar with { Attribute = mainWindow.GetAttributeForRole (VisualRole.Normal) };
+            s.Style.SetChar = s.Style.SetChar with { Attribute = mainWindow.GetAttributeForRole (VisualRole.Normal) };
+            s.Style.LegendAttributes.SetAttribute = mainWindow.GetAttributeForRole (VisualRole.Normal);
+            s.Style.RangeChar = s.Style.RangeChar with { Attribute = mainWindow.GetAttributeForRole (VisualRole.Normal) };
         }
 
         LinearRange<(Color, Color)> sliderFGColor = new ()
@@ -474,7 +440,7 @@ public class LinearRanges : Scenario
                                             {
                                                 (Color, Color) data = e.Options.First ().Value.Data;
 
-                                                foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
+                                                foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
                                                 {
                                                     s.SetScheme (
                                                                  new (s.GetScheme ())
@@ -564,7 +530,7 @@ public class LinearRanges : Scenario
                                             {
                                                 (Color, Color) data = e.Options.First ().Value.Data;
 
-                                                foreach (LinearRange s in app.SubViews.OfType<LinearRange> ())
+                                                foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
                                                 {
                                                     s.SetScheme (
                                                                  new (s.GetScheme ())
@@ -582,7 +548,7 @@ public class LinearRanges : Scenario
 
         #endregion Config LinearRange
 
-        ObservableCollection<string> eventSource = new ();
+        ObservableCollection<string> eventSource = [];
 
         var eventLog = new ListView
         {
@@ -595,16 +561,18 @@ public class LinearRanges : Scenario
         };
         configView.Add (eventLog);
 
-        foreach (LinearRange slider in app.SubViews.Where (v => v is LinearRange)!)
+        foreach (View view in mainWindow.SubViews.Where (v => v is LinearRange)!)
         {
-            slider.Accepting += (o, args) =>
+            var slider = (LinearRange)view;
+
+            slider.Accepting += (_, args) =>
                                 {
                                     eventSource.Add ($"Accept: {string.Join (",", slider.GetSetOptions ())}");
                                     eventLog.MoveDown ();
                                     args.Handled = true;
                                 };
 
-            slider.OptionsChanged += (o, args) =>
+            slider.OptionsChanged += (_, args) =>
                                      {
                                          eventSource.Add ($"OptionsChanged: {string.Join (",", slider.GetSetOptions ())}");
                                          eventLog.MoveDown ();
@@ -612,10 +580,44 @@ public class LinearRanges : Scenario
                                      };
         }
 
-        app.FocusDeepest (NavigationDirection.Forward, null);
+        mainWindow.FocusDeepest (NavigationDirection.Forward, null);
 
-        Application.Run (app);
-        app.Dispose ();
-        Application.Shutdown ();
+        app.Run (mainWindow);
+
+        return;
+
+        void OnOptionsSliderOnOptionsChanged (object sender, LinearRangeEventArgs<string> e)
+        {
+            foreach (LinearRange s in mainWindow.SubViews.OfType<LinearRange> ())
+            {
+                s.ShowLegends = e.Options.ContainsKey (0);
+                s.RangeAllowSingle = e.Options.ContainsKey (1);
+                s.ShowEndSpacing = e.Options.ContainsKey (2);
+
+                if (e.Options.ContainsKey (3))
+                {
+                    s.Width = Dim.Auto (DimAutoStyle.Content);
+                    s.Height = Dim.Auto (DimAutoStyle.Content);
+                }
+                else
+                {
+                    if (s.Orientation == Orientation.Horizontal)
+                    {
+                        s.Width = Dim.Percent (50);
+
+                        int h = s.ShowLegends && s.LegendsOrientation == Orientation.Vertical
+                                    ? s.Options.Max (o => o.Legend!.Length) + 3
+                                    : 4;
+                        s.Height = h;
+                    }
+                    else
+                    {
+                        int w = s.ShowLegends ? s.Options.Max (o => o.Legend!.Length) + 3 : 3;
+                        s.Width = w;
+                        s.Height = Dim.Fill ();
+                    }
+                }
+            }
+        }
     }
 }

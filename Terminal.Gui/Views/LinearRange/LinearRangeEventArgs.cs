@@ -1,4 +1,3 @@
-#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="EventArgs"/> for <see cref="LinearRange{T}"/> events.</summary>

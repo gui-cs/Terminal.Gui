@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.Views;
+﻿namespace Terminal.Gui.Views;
 
 /// <summary><see cref="LinearRange{T}"/> Style</summary>
 public class LinearRangeStyle

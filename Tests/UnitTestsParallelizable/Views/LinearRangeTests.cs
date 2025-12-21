@@ -176,8 +176,8 @@ public class LinearRangeTests : FakeDriverBase
         // 0123456789
         // 1 2 3
         Assert.Equal (1, slider.MinimumInnerSpacing);
-        Assert.Equal (new Size (5, 2), slider.GetContentSize ());
-        Assert.Equal (new Size (5, 2), slider.Frame.Size);
+        Assert.Equal (new (5, 2), slider.GetContentSize ());
+        Assert.Equal (new (5, 2), slider.Frame.Size);
         Assert.NotNull (slider);
         Assert.NotNull (slider.Options);
         Assert.Equal (options.Count, slider.Options.Count);
@@ -348,6 +348,7 @@ public class LinearRangeTests : FakeDriverBase
     {
         // Arrange
         LinearRange<int> slider = new (new () { 1, 2, 3, 4 });
+
         // 0123456789
         // 1234
 
@@ -510,7 +511,7 @@ public class LinearRangeTests : FakeDriverBase
         LinearRange slider = new (options)
         {
             Orientation = Orientation.Vertical,
-            Type = LinearRangeType.Multiple,
+            Type = LinearRangeType.Multiple
         };
         view.Add (slider);
         view.BeginInit ();
@@ -576,7 +577,7 @@ public class LinearRangeTests : FakeDriverBase
         {
             Orientation = Orientation.Vertical,
             Type = LinearRangeType.Multiple,
-            Width = 10,
+            Width = 10
         };
         view.Add (slider);
         view.BeginInit ();
@@ -596,7 +597,6 @@ public class LinearRangeTests : FakeDriverBase
 
     // Add more tests for different scenarios and edge cases.
 }
-
 public class LinearRangeCWPTests : FakeDriverBase
 {
     [Fact]
@@ -606,22 +606,22 @@ public class LinearRangeCWPTests : FakeDriverBase
         LinearRange<int> linearRange = new ();
         var changingRaised = false;
         var changedRaised = false;
-        LinearRangeType oldValue = LinearRangeType.Single;
-        LinearRangeType newValue = LinearRangeType.Range;
+        var oldValue = LinearRangeType.Single;
+        var newValue = LinearRangeType.Range;
 
         linearRange.TypeChanging += (sender, args) =>
-        {
-            changingRaised = true;
-            Assert.Equal (oldValue, args.CurrentValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                    {
+                                        changingRaised = true;
+                                        Assert.Equal (oldValue, args.CurrentValue);
+                                        Assert.Equal (newValue, args.NewValue);
+                                    };
 
         linearRange.TypeChanged += (sender, args) =>
-        {
-            changedRaised = true;
-            Assert.Equal (oldValue, args.OldValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                   {
+                                       changedRaised = true;
+                                       Assert.Equal (oldValue, args.OldValue);
+                                       Assert.Equal (newValue, args.NewValue);
+                                   };
 
         // Act
         linearRange.Type = newValue;
@@ -639,10 +639,7 @@ public class LinearRangeCWPTests : FakeDriverBase
         LinearRange<int> linearRange = new ();
         LinearRangeType oldValue = linearRange.Type;
 
-        linearRange.TypeChanging += (sender, args) =>
-        {
-            args.Handled = true;
-        };
+        linearRange.TypeChanging += (sender, args) => { args.Handled = true; };
 
         // Act
         linearRange.Type = LinearRangeType.Range;
@@ -658,22 +655,22 @@ public class LinearRangeCWPTests : FakeDriverBase
         LinearRange<int> linearRange = new ();
         var changingRaised = false;
         var changedRaised = false;
-        Orientation oldValue = Orientation.Horizontal;
-        Orientation newValue = Orientation.Vertical;
+        var oldValue = Orientation.Horizontal;
+        var newValue = Orientation.Vertical;
 
         linearRange.LegendsOrientationChanging += (sender, args) =>
-        {
-            changingRaised = true;
-            Assert.Equal (oldValue, args.CurrentValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                                  {
+                                                      changingRaised = true;
+                                                      Assert.Equal (oldValue, args.CurrentValue);
+                                                      Assert.Equal (newValue, args.NewValue);
+                                                  };
 
         linearRange.LegendsOrientationChanged += (sender, args) =>
-        {
-            changedRaised = true;
-            Assert.Equal (oldValue, args.OldValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                                 {
+                                                     changedRaised = true;
+                                                     Assert.Equal (oldValue, args.OldValue);
+                                                     Assert.Equal (newValue, args.NewValue);
+                                                 };
 
         // Act
         linearRange.LegendsOrientation = newValue;
@@ -695,18 +692,18 @@ public class LinearRangeCWPTests : FakeDriverBase
         var newValue = 5;
 
         linearRange.MinimumInnerSpacingChanging += (sender, args) =>
-        {
-            changingRaised = true;
-            Assert.Equal (oldValue, args.CurrentValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                                   {
+                                                       changingRaised = true;
+                                                       Assert.Equal (oldValue, args.CurrentValue);
+                                                       Assert.Equal (newValue, args.NewValue);
+                                                   };
 
         linearRange.MinimumInnerSpacingChanged += (sender, args) =>
-        {
-            changedRaised = true;
-            Assert.Equal (oldValue, args.OldValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                                  {
+                                                      changedRaised = true;
+                                                      Assert.Equal (oldValue, args.OldValue);
+                                                      Assert.Equal (newValue, args.NewValue);
+                                                  };
 
         // Act
         linearRange.MinimumInnerSpacing = newValue;
@@ -728,18 +725,18 @@ public class LinearRangeCWPTests : FakeDriverBase
         var newValue = false;
 
         linearRange.ShowLegendsChanging += (sender, args) =>
-        {
-            changingRaised = true;
-            Assert.Equal (oldValue, args.CurrentValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                           {
+                                               changingRaised = true;
+                                               Assert.Equal (oldValue, args.CurrentValue);
+                                               Assert.Equal (newValue, args.NewValue);
+                                           };
 
         linearRange.ShowLegendsChanged += (sender, args) =>
-        {
-            changedRaised = true;
-            Assert.Equal (oldValue, args.OldValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                          {
+                                              changedRaised = true;
+                                              Assert.Equal (oldValue, args.OldValue);
+                                              Assert.Equal (newValue, args.NewValue);
+                                          };
 
         // Act
         linearRange.ShowLegends = newValue;
@@ -761,18 +758,18 @@ public class LinearRangeCWPTests : FakeDriverBase
         var newValue = true;
 
         linearRange.ShowEndSpacingChanging += (sender, args) =>
-        {
-            changingRaised = true;
-            Assert.Equal (oldValue, args.CurrentValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                              {
+                                                  changingRaised = true;
+                                                  Assert.Equal (oldValue, args.CurrentValue);
+                                                  Assert.Equal (newValue, args.NewValue);
+                                              };
 
         linearRange.ShowEndSpacingChanged += (sender, args) =>
-        {
-            changedRaised = true;
-            Assert.Equal (oldValue, args.OldValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                             {
+                                                 changedRaised = true;
+                                                 Assert.Equal (oldValue, args.OldValue);
+                                                 Assert.Equal (newValue, args.NewValue);
+                                             };
 
         // Act
         linearRange.ShowEndSpacing = newValue;
@@ -794,18 +791,18 @@ public class LinearRangeCWPTests : FakeDriverBase
         var newValue = true;
 
         linearRange.UseMinimumSizeChanging += (sender, args) =>
-        {
-            changingRaised = true;
-            Assert.Equal (oldValue, args.CurrentValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                              {
+                                                  changingRaised = true;
+                                                  Assert.Equal (oldValue, args.CurrentValue);
+                                                  Assert.Equal (newValue, args.NewValue);
+                                              };
 
         linearRange.UseMinimumSizeChanged += (sender, args) =>
-        {
-            changedRaised = true;
-            Assert.Equal (oldValue, args.OldValue);
-            Assert.Equal (newValue, args.NewValue);
-        };
+                                             {
+                                                 changedRaised = true;
+                                                 Assert.Equal (oldValue, args.OldValue);
+                                                 Assert.Equal (newValue, args.NewValue);
+                                             };
 
         // Act
         linearRange.UseMinimumSize = newValue;
@@ -842,10 +839,7 @@ public class LinearRangeCWPTests : FakeDriverBase
         LinearRange<int> linearRange = new ();
         var modifiedValue = LinearRangeType.Multiple;
 
-        linearRange.TypeChanging += (sender, args) =>
-        {
-            args.NewValue = modifiedValue;
-        };
+        linearRange.TypeChanging += (sender, args) => { args.NewValue = modifiedValue; };
 
         // Act
         linearRange.Type = LinearRangeType.Range;
