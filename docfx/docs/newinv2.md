@@ -502,7 +502,7 @@ See the [Arrangement Deep Dive](arrangement.md) for complete details.
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -529,10 +529,10 @@ v2 decouples navigation concepts:
 
 ```csharp
 // Configure navigation keys
-Application.NextTabStopKey = Key.Tab;
-Application.PrevTabStopKey = Key.Tab.WithShift;
-Application.NextTabGroupKey = Key.F6;
-Application.PrevTabGroupKey = Key.F6.WithShift;
+App.Keyboard.NextTabStopKey = Key.Tab;
+App.Keyboard.PrevTabStopKey = Key.Tab.WithShift;
+App.Keyboard.NextTabGroupKey = Key.F6;
+App.Keyboard.PrevTabGroupKey = Key.F6.WithShift;
 
 // Set tab behavior
 view.CanFocus = true;
@@ -612,8 +612,8 @@ private bool HandleAccept ()
 ```
 
 **Configurable Keys:**
-- [Application.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
-- [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
+- [IKeyboard.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
+- [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
 - Navigation keys (Tab, F6, arrows)
 
 ### Mouse API

@@ -24,7 +24,7 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _nextTabGroupKey;
             _nextTabGroupKey = value;
-            NextTabGroupKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _nextTabGroupKey));
+            NextTabGroupKeyChanged?.Invoke (null, new (oldValue, _nextTabGroupKey));
         }
     }
 
@@ -42,7 +42,7 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _nextTabKey;
             _nextTabKey = value;
-            NextTabKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _nextTabKey));
+            NextTabKeyChanged?.Invoke (null, new (oldValue, _nextTabKey));
         }
     }
 
@@ -60,7 +60,7 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _prevTabGroupKey;
             _prevTabGroupKey = value;
-            PrevTabGroupKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _prevTabGroupKey));
+            PrevTabGroupKeyChanged?.Invoke (null, new (oldValue, _prevTabGroupKey));
         }
     }
 
@@ -78,7 +78,7 @@ public static partial class Application // Navigation stuff
         {
             Key oldValue = _prevTabKey;
             _prevTabKey = value;
-            PrevTabKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, _prevTabKey));
+            PrevTabKeyChanged?.Invoke (null, new (oldValue, _prevTabKey));
         }
     }
 

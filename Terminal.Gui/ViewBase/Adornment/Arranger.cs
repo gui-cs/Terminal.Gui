@@ -38,7 +38,7 @@ internal sealed class Arranger : IDisposable
     ///     or keyboard.
     /// </summary>
     /// <remarks>
-    ///     Arrange Mode is exited by the user pressing <see cref="Application.ArrangeKey"/>, <see cref="Key.Esc"/>, or by
+    ///     Arrange Mode is exited by the user pressing <see cref="IKeyboard.ArrangeKey"/>, <see cref="Key.Esc"/>, or by
     ///     clicking the mouse out of the <see cref="Adornment.Parent"/>'s Frame.
     /// </remarks>
     /// <returns></returns>
@@ -58,7 +58,10 @@ internal sealed class Arranger : IDisposable
         bool mouseMode = _border.App is { } && _border.App.Mouse.MouseGrabView == _border;
 
         _border.HotKeyBindings.Add (Key.Esc, Command.Quit);
-        _border.HotKeyBindings.Add (_border.App!.Keyboard.ArrangeKey, Command.Quit);
+        if (_border.App?.Keyboard.ArrangeKey is { })
+        {
+            _border.HotKeyBindings.Add (_border.App.Keyboard.ArrangeKey, Command.Quit);
+        }
         _border.HotKeyBindings.Add (Key.CursorUp, Command.Up);
         _border.HotKeyBindings.Add (Key.CursorDown, Command.Down);
         _border.HotKeyBindings.Add (Key.CursorLeft, Command.Left);

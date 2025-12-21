@@ -489,10 +489,10 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
   "Application.Force16Colors": false,
   "Application.IsMouseDisabled": false,
   "Application.ArrangeKey": "Ctrl+F5",
-  "Application.NextTabKey": "Tab",
-  "Application.PrevTabKey": "Shift+Tab",
-  "Application.NextTabGroupKey": "F6",
-  "Application.PrevTabGroupKey": "Shift+F6",
+  "IKeyboard.NextTabKey": "Tab",
+  "IKeyboard.PrevTabKey": "Shift+Tab",
+  "IKeyboard.NextTabGroupKey": "F6",
+  "IKeyboard.PrevTabGroupKey": "Shift+F6",
   "Key.Separator": "+"
 }
 ```

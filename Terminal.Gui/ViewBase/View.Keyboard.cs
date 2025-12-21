@@ -272,7 +272,7 @@ public partial class View // Keyboard APIs
     ///     <para>
     ///         Calling this method for a key bound to the view via an Application-scoped keybinding will have no effect.
     ///         Instead,
-    ///         use <see cref="Application.RaiseKeyDownEvent"/>.
+    ///         use <see cref="IKeyboard.RaiseKeyDownEvent"/>.
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>

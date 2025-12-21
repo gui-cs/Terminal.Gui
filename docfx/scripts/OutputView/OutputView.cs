@@ -90,7 +90,7 @@ else
 }
 
 // Defines a top-level window with border and title
-public class ViewDemoWindow : Window
+internal class ViewDemoWindow : Window
 {
     public static string? ViewName { get; set; }
 

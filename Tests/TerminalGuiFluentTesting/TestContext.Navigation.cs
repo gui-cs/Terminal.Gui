@@ -62,7 +62,7 @@ public partial class TestContext
             }
 
             // No, try tab to the next (or first)
-            KeyDown (Terminal.Gui.App.Application.NextTabKey);
+            KeyDown (App!.Keyboard.NextTabKey);
             WaitIteration ();
 
             next = t.MostFocused;
