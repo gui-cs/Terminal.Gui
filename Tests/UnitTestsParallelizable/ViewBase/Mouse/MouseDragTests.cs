@@ -593,7 +593,7 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Try to drag far to the right (making width very small)
-        Terminal.Gui.Input.Mouse dragEvent = new ()
+        Mouse dragEvent = new ()
         {
             Position = new (8, 5), // Drag 8 units right, would make width 2
             ScreenPosition = new (18, 15),
@@ -601,10 +601,10 @@ public class MouseDragTests
         };
 
         // Act
-        resizableView.Border!.HandleDragOperation (dragEvent);
+        resizableView.Border!.Arranger.HandleDragOperation (dragEvent);
 
         // Assert - Width should be constrained to minimum
-        // Minimum width = border thickness + margin right
+        // width = border thickness + margin right
         int expectedMinWidth = resizableView.Border!.Thickness.Horizontal + resizableView.Margin!.Thickness.Right;
         Assert.True (resizableView.Frame.Width >= expectedMinWidth);
 
@@ -644,7 +644,7 @@ public class MouseDragTests
         app.Begin (runnable);
 
         // Try to drag far down (making height very small)
-        Terminal.Gui.Input.Mouse dragEvent = new ()
+        Mouse dragEvent = new ()
         {
             Position = new (5, 8), // Drag 8 units down, would make height 2
             ScreenPosition = new (15, 18),
@@ -652,7 +652,7 @@ public class MouseDragTests
         };
 
         // Act
-        resizableView.Border!.HandleDragOperation (dragEvent);
+        resizableView.Border!.Arranger.HandleDragOperation (dragEvent);
 
         // Assert - Height should be constrained to minimum
         int expectedMinHeight = resizableView.Border!.Thickness.Vertical + resizableView.Margin!.Thickness.Bottom;

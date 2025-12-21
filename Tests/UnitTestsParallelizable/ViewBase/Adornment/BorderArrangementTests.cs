@@ -57,10 +57,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              🍎◊──┐
+                                              🍎◊↕─┐
+                                              🍎↔  ↔
                                               🍎│  │
-                                              🍎│  │
-                                              🍎└──↘
+                                              🍎└↕─↘
                                               🍎🍎🍎
                                               """,
                                               output,
@@ -72,10 +72,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �◊──┐
+                                              �◊↕─┐
+                                              �↔  ↔
                                               �│  │
-                                              �│  │
-                                              �└──↘
+                                              �└↕─↘
                                               🍎🍎🍎
                                               """,
                                               output,
@@ -87,10 +87,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              ◊──┐🍎
+                                              ◊↕─┐🍎
+                                              ↔  ↔🍎
                                               │  │🍎
-                                              │  │🍎
-                                              └──↘🍎
+                                              └↕─↘🍎
                                               🍎🍎🍎
                                               """,
                                               output,
@@ -182,12 +182,12 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              🍎◊i
+                                              🍎◊i↕
+                                              🍎
+                                              🍎↔    ↔
                                               🍎
                                               🍎
-                                              🍎
-                                              🍎
-                                              🍎     ↘
+                                              🍎  ↕  ↘
                                               🍎🍎🍎🍎
                                               """,
                                               output,
@@ -213,12 +213,12 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �◊i
+                                              �◊i↕
+                                              �
+                                              �↔    ↔
                                               �
                                               �
-                                              �
-                                              �
-                                              �     ↘
+                                              �  ↕  ↘
                                               🍎🍎🍎🍎
                                               """,
                                               output,
@@ -244,12 +244,12 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              ◊i    🦮
+                                              ◊i↕   🦮
+                                                    🍎
+                                              ↔    ↔🍎
                                                     🍎
                                                     🍎
-                                                    🍎
-                                                    🍎
-                                                   ↘🍎
+                                                ↕  ↘🍎
                                               🍎🍎🍎🍎
                                               """,
                                               output,

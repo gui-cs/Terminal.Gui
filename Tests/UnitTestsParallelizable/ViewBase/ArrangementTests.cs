@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace ViewBaseTests.Arrangement;
+namespace ViewBaseTests.Adornments;
 
 
 public class ArrangementTests (ITestOutputHelper output)
