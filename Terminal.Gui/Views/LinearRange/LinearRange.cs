@@ -115,7 +115,7 @@ public class LinearRange<T> : View, IOrientation
             SetInitialProperties (
                                   options.Select (e =>
                                                   {
-                                                      string? legend = e?.ToString ();
+                                                      var legend = e?.ToString ();
 
                                                       return new LinearRangeOption<T>
                                                       {
@@ -142,8 +142,7 @@ public class LinearRange<T> : View, IOrientation
     public override string Text
     {
         // Return labels as a CSV string
-        get => _options is null or { Count: 0 } ? string.Empty :
-                   string.Join (",", _options);
+        get => _options is null or { Count: 0 } ? string.Empty : string.Join (",", _options);
         set
         {
             if (string.IsNullOrEmpty (value))
@@ -895,7 +894,6 @@ public class LinearRange<T> : View, IOrientation
         Move (position.x, position.y);
 
         return new (position.x, position.y);
-
     }
 
     #endregion Cursor and Position
@@ -1273,9 +1271,7 @@ public class LinearRange<T> : View, IOrientation
 
             // Text || Abbreviation
 
-            string text = (_config._showLegendsAbbr ?
-                               _options [i].LegendAbbr.ToString () :
-                               _options [i].Legend)!;
+            string text = (_config._showLegendsAbbr ? _options [i].LegendAbbr.ToString () : _options [i].Legend)!;
 
             switch (_config._linearRangeOrientation)
             {
@@ -1409,10 +1405,10 @@ public class LinearRange<T> : View, IOrientation
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
-              || mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-              || mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)
-              || mouseEvent.Flags.HasFlag (MouseFlags.Button1Released)))
+        if (!(mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+              || mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed)
+              || mouse.Flags.HasFlag (MouseFlags.PositionReport)
+              || mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased)))
         {
             return false;
         }
@@ -1424,7 +1420,7 @@ public class LinearRange<T> : View, IOrientation
             if (mouse.Flags.HasFlag (MouseFlags.PositionReport))
             {
                 _dragPosition = mouse.Position;
-                _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
+                _moveRenderPosition = ClampMovePosition ((Point)_dragPosition!);
                 App?.Mouse.GrabMouse (this);
             }
 
@@ -1442,7 +1438,7 @@ public class LinearRange<T> : View, IOrientation
         {
             // Continue Drag
             _dragPosition = mouse.Position;
-            _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
+            _moveRenderPosition = ClampMovePosition ((Point)_dragPosition!);
 
             // how far has user dragged from original location?
             if (Orientation == Orientation.Horizontal)
@@ -1467,12 +1463,10 @@ public class LinearRange<T> : View, IOrientation
             return true;
         }
 
-        if ((!_dragPosition.HasValue || !mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
-            && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         if ((_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
             || mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            return mouseEvent.Handled;
+            return mouse.Handled;
         }
 
         // End Drag
@@ -1483,11 +1477,11 @@ public class LinearRange<T> : View, IOrientation
         switch (Orientation)
         {
             case Orientation.Horizontal:
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (mouse.Position!.Value.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
 
                 break;
             default:
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+                success = TryGetOptionByPosition (0, mouse.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
 
                 break;
         }
@@ -1502,9 +1496,9 @@ public class LinearRange<T> : View, IOrientation
 
         SetNeedsDraw ();
 
-        mouseEvent.Handled = true;
+        mouse.Handled = true;
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
 
         Point ClampMovePosition (Point position)
         {
@@ -1585,10 +1579,7 @@ public class LinearRange<T> : View, IOrientation
         KeyBindings.Add (Key.Space, Command.Activate);
     }
 
-    private Dictionary<int, LinearRangeOption<T>> GetSetOptionDictionary ()
-    {
-        return _setOptions.ToDictionary (e => e, e => _options! [e]);
-    }
+    private Dictionary<int, LinearRangeOption<T>> GetSetOptionDictionary () { return _setOptions.ToDictionary (e => e, e => _options! [e]); }
 
     /// <summary>
     ///     Sets or unsets <paramref name="optionIndex"/> based on <paramref name="set"/>.
