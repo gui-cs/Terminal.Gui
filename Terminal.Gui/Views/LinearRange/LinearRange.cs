@@ -47,7 +47,7 @@ public class LinearRange<T> : View, IOrientation
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
-        _options = options ?? [];
+        _options = options;
 
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = _config._linearRangeOrientation = orientation;
@@ -620,7 +620,7 @@ public class LinearRange<T> : View, IOrientation
                 maxLegend = 1;
             }
 
-            int minSizeThatFitsLegends = _options!.Count == 1 ? maxLegend : _options.Sum (o => o.Legend.GetColumns ());
+            int minSizeThatFitsLegends = _options!.Count == 1 ? maxLegend : _options.Sum (o => o.Legend!.GetColumns ());
 
             string? first;
             string? last;
@@ -1273,9 +1273,9 @@ public class LinearRange<T> : View, IOrientation
 
             // Text || Abbreviation
 
-            string? text = _config._showLegendsAbbr ?
+            string text = (_config._showLegendsAbbr ?
                                _options [i].LegendAbbr.ToString () :
-                               _options [i].Legend;
+                               _options [i].Legend)!;
 
             switch (_config._linearRangeOrientation)
             {
