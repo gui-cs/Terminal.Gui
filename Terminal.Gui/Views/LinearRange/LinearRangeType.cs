@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui.Views;
 
-/// <summary><see cref="Slider{T}"/>  Types</summary>
-public enum SliderType
+/// <summary><see cref="LinearRange{T}"/>  Types</summary>
+public enum LinearRangeType
 {
     /// <summary>
     ///     <code>

@@ -1,46 +1,44 @@
-#nullable disable
-﻿using System.Transactions;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a slider control letting the user navigate from a set of typed options in a linear manner using the
+///     Provides a linear range control letting the user navigate from a set of typed options in a linear manner using the
 ///     keyboard or mouse.
 /// </summary>
-public class Slider : Slider<object>
+public class LinearRange : LinearRange<object>
 {
-    /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
-    public Slider () { }
+    /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
+    public LinearRange () { }
 
-    /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
-    /// <param name="options">Initial slider options.</param>
-    /// <param name="orientation">Initial slider options.</param>
-    public Slider (List<object> options, Orientation orientation = Orientation.Horizontal) :
+    /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
+    /// <param name="options">Initial options.</param>
+    /// <param name="orientation">Initial orientation.</param>
+    public LinearRange (List<object> options, Orientation orientation = Orientation.Horizontal) :
         base (options, orientation)
     { }
 }
 
 /// <summary>
-///     Provides a tpe-safe slider control letting the user navigate from a set of typed options in a linear manner using the
+///     Provides a type-safe linear range control letting the user navigate from a set of typed options in a linear manner
+///     using the
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class Slider<T> : View, IOrientation
+public class LinearRange<T> : View, IOrientation
 {
-    private readonly SliderConfiguration _config = new ();
+    private readonly LinearRangeConfiguration _config = new ();
 
     // List of the current set options.
-    private readonly List<int> _setOptions = new ();
+    private readonly List<int> _setOptions = [];
 
     // Options
-    private List<SliderOption<T>> _options;
+    private List<LinearRangeOption<T>>? _options;
 
-    private OrientationHelper _orientationHelper;
+    private OrientationHelper? _orientationHelper;
 
     #region Initialize
 
     private void SetInitialProperties (
-        List<SliderOption<T>> options,
+        List<LinearRangeOption<T>> options,
         Orientation orientation = Orientation.Horizontal
     )
     {
@@ -49,19 +47,16 @@ public class Slider<T> : View, IOrientation
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
-        _options = options ?? new List<SliderOption<T>> ();
+        _options = options;
 
         _orientationHelper = new (this); // Do not use object initializer!
-        _orientationHelper.Orientation = _config._sliderOrientation = orientation;
+        _orientationHelper.Orientation = _config._linearRangeOrientation = orientation;
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         SetDefaultStyle ();
         SetCommands ();
         SetContentSize ();
-
-        // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
-        Initialized += (s, e) => { SetContentSize (); };
 
         SubViewLayout += (s, e) => { SetContentSize (); };
     }
@@ -71,7 +66,7 @@ public class Slider<T> : View, IOrientation
     {
         _config._showLegends = true;
 
-        switch (_config._sliderOrientation)
+        switch (_config._linearRangeOrientation)
         {
             case Orientation.Horizontal:
                 Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () }; // '─'
@@ -85,63 +80,44 @@ public class Slider<T> : View, IOrientation
                 break;
         }
 
-        // TODO(jmperricone) Wide Vertical ???
-        /*
-         │
-         │
-         ┼─ 40
-         │
-         │
-        ███ 30
-        ▒▒▒
-        ▒▒▒
-        ▒▒▒ 20
-        ▒▒▒
-        ▒▒▒
-        ███ 10
-         │
-         │
-        ─●─ 0
-        */
-
-        _config._legendsOrientation = _config._sliderOrientation;
+        _config._legendsOrientation = _config._linearRangeOrientation;
         Style.EmptyChar = new () { Grapheme = " " };
         Style.SetChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () }; // ■
         Style.RangeChar = new () { Grapheme = Glyphs.Stipple.ToString () }; // ░ ▒ ▓   // Medium shade not blinking on curses.
         Style.StartRangeChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
         Style.EndRangeChar = new () { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
         Style.DragChar = new () { Grapheme = Glyphs.Diamond.ToString () };
-
-        // TODO: Support left & right (top/bottom)
-        // First = '├',
-        // Last = '┤',
     }
 
     #endregion
 
     #region Constructors
 
-    /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
-    public Slider () : this (new ()) { }
+    /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
+    public LinearRange () : this (new ()) { }
 
-    /// <summary>Initializes a new instance of the <see cref="Slider"/> class.</summary>
-    /// <param name="options">Initial slider options.</param>
-    /// <param name="orientation">Initial slider orientation.</param>
-    public Slider (List<T> options, Orientation orientation = Orientation.Horizontal)
+    /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
+    /// <param name="options">Initial options.</param>
+    /// <param name="orientation">Initial orientation.</param>
+    public LinearRange (List<T>? options, Orientation orientation = Orientation.Horizontal)
     {
         if (options is null)
         {
-            SetInitialProperties (null, orientation);
+            return;
+        }
+
+        if (options is { Count: 0 })
+        {
+            SetInitialProperties ([], orientation);
         }
         else
         {
             SetInitialProperties (
-                                  options.Select (
-                                                  e =>
+                                  options.Select (e =>
                                                   {
-                                                      var legend = e.ToString ();
+                                                      string? legend = e?.ToString ();
 
-                                                      return new SliderOption<T>
+                                                      return new LinearRangeOption<T>
                                                       {
                                                           Data = e,
                                                           Legend = legend,
@@ -161,20 +137,13 @@ public class Slider<T> : View, IOrientation
     #region Properties
 
     /// <summary>
-    ///     Setting the Text of a slider is a shortcut to setting options. The text is a CSV string of the options.
+    ///     Setting the Text of a linear range is a shortcut to setting options. The text is a CSV string of the options.
     /// </summary>
     public override string Text
     {
-        get
-        {
-            if (_options.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            // Return labels as a CSV string
-            return string.Join (",", _options);
-        }
+        // Return labels as a CSV string
+        get => _options is null or { Count: 0 } ? string.Empty :
+                   string.Join (",", _options);
         set
         {
             if (string.IsNullOrEmpty (value))
@@ -184,7 +153,7 @@ public class Slider<T> : View, IOrientation
             else
             {
                 IEnumerable<string> list = value.Split (',').Select (x => x.Trim ());
-                Options = list.Select (x => new SliderOption<T> { Legend = x }).ToList ();
+                Options = list.Select (x => new LinearRangeOption<T> { Legend = x }).ToList ();
             }
         }
     }
@@ -197,7 +166,7 @@ public class Slider<T> : View, IOrientation
         {
             _config._allowEmpty = value;
 
-            if (!value && _options.Count > 0 && _setOptions.Count == 0)
+            if (!value && _options!.Count > 0 && _setOptions.Count == 0)
             {
                 SetOption (0);
             }
@@ -210,50 +179,102 @@ public class Slider<T> : View, IOrientation
         get => _config._minInnerSpacing;
         set
         {
-            _config._minInnerSpacing = value;
+            int current = _config._minInnerSpacing;
 
-            SetContentSize ();
+            CWPPropertyHelper.ChangeProperty (
+                                              this,
+                                              ref current,
+                                              value,
+                                              OnMinimumInnerSpacingChanging,
+                                              MinimumInnerSpacingChanging,
+                                              newValue =>
+                                              {
+                                                  _config._minInnerSpacing = newValue;
+                                                  SetContentSize ();
+                                              },
+                                              OnMinimumInnerSpacingChanged,
+                                              MinimumInnerSpacingChanged,
+                                              out int _
+                                             );
         }
     }
 
-    /// <summary>Slider Type. <see cref="SliderType"></see></summary>
-    public SliderType Type
+    /// <summary>Event raised before the <see cref="MinimumInnerSpacing"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<int>>? MinimumInnerSpacingChanging;
+
+    /// <summary>Event raised after the <see cref="MinimumInnerSpacing"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<int>>? MinimumInnerSpacingChanged;
+
+    /// <summary>Called before <see cref="MinimumInnerSpacing"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnMinimumInnerSpacingChanging (ValueChangingEventArgs<int> args) => false;
+
+    /// <summary>Called after <see cref="MinimumInnerSpacing"/> has changed.</summary>
+    protected virtual void OnMinimumInnerSpacingChanged (ValueChangedEventArgs<int> args) { }
+
+    /// <summary>LinearRange Type. <see cref="LinearRangeType"></see></summary>
+    public LinearRangeType Type
     {
         get => _config._type;
         set
         {
-            _config._type = value;
+            LinearRangeType current = _config._type;
 
-            // Todo: Custom logic to preserve options.
-            _setOptions.Clear ();
-            SetNeedsDraw ();
+            CWPPropertyHelper.ChangeProperty (
+                                              this,
+                                              ref current,
+                                              value,
+                                              OnTypeChanging,
+                                              TypeChanging,
+                                              newValue =>
+                                              {
+                                                  _config._type = newValue;
+
+                                                  // Todo: Custom logic to preserve options.
+                                                  _setOptions.Clear ();
+                                                  SetNeedsDraw ();
+                                              },
+                                              OnTypeChanged,
+                                              TypeChanged,
+                                              out LinearRangeType _
+                                             );
         }
     }
 
+    /// <summary>Event raised before the <see cref="Type"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<LinearRangeType>>? TypeChanging;
+
+    /// <summary>Event raised after the <see cref="Type"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<LinearRangeType>>? TypeChanged;
+
+    /// <summary>Called before <see cref="Type"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnTypeChanging (ValueChangingEventArgs<LinearRangeType> args) => false;
+
+    /// <summary>Called after <see cref="Type"/> has changed.</summary>
+    protected virtual void OnTypeChanged (ValueChangedEventArgs<LinearRangeType> args) { }
 
     /// <summary>
     ///     Gets or sets the <see cref="Orientation"/>. The default is <see cref="Orientation.Horizontal"/>.
     /// </summary>
     public Orientation Orientation
     {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
+        get => _orientationHelper!.Orientation;
+        set => _orientationHelper!.Orientation = value;
     }
 
     #region IOrientation members
 
-    /// <inheritdoc />
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    /// <inheritdoc/>
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
-    /// <inheritdoc />
-    public event EventHandler<EventArgs<Orientation>> OrientationChanged;
+    /// <inheritdoc/>
+    public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void OnOrientationChanged (Orientation newOrientation)
     {
-        _config._sliderOrientation = newOrientation;
+        _config._linearRangeOrientation = newOrientation;
 
-        switch (_config._sliderOrientation)
+        switch (_config._linearRangeOrientation)
         {
             case Orientation.Horizontal:
                 Style.SpaceChar = new () { Grapheme = Glyphs.HLine.ToString () }; // '─'
@@ -268,6 +289,7 @@ public class Slider<T> : View, IOrientation
         SetKeyBindings ();
         SetContentSize ();
     }
+
     #endregion
 
     /// <summary>Legends Orientation. <see cref="ViewBase.Orientation"></see></summary>
@@ -276,20 +298,45 @@ public class Slider<T> : View, IOrientation
         get => _config._legendsOrientation;
         set
         {
-            _config._legendsOrientation = value;
+            Orientation current = _config._legendsOrientation;
 
-            SetContentSize ();
+            CWPPropertyHelper.ChangeProperty (
+                                              this,
+                                              ref current,
+                                              value,
+                                              OnLegendsOrientationChanging,
+                                              LegendsOrientationChanging,
+                                              newValue =>
+                                              {
+                                                  _config._legendsOrientation = newValue;
+                                                  SetContentSize ();
+                                              },
+                                              OnLegendsOrientationChanged,
+                                              LegendsOrientationChanged,
+                                              out Orientation _
+                                             );
         }
     }
 
-    /// <summary>Slider styles. <see cref="SliderStyle"></see></summary>
-    public SliderStyle Style { get; set; } = new ();
+    /// <summary>Event raised before the <see cref="LegendsOrientation"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<Orientation>>? LegendsOrientationChanging;
 
-    /// <summary>Set the slider options.</summary>
-    public List<SliderOption<T>> Options
+    /// <summary>Event raised after the <see cref="LegendsOrientation"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<Orientation>>? LegendsOrientationChanged;
+
+    /// <summary>Called before <see cref="LegendsOrientation"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnLegendsOrientationChanging (ValueChangingEventArgs<Orientation> args) => false;
+
+    /// <summary>Called after <see cref="LegendsOrientation"/> has changed.</summary>
+    protected virtual void OnLegendsOrientationChanged (ValueChangedEventArgs<Orientation> args) { }
+
+    /// <summary>LinearRange styles. <see cref="LinearRangeStyle"></see></summary>
+    public LinearRangeStyle Style { get; set; } = new ();
+
+    /// <summary>Set the linear range options.</summary>
+    public List<LinearRangeOption<T>> Options
     {
-        get =>
-            _options;
+        get => _options ?? [];
         set
         {
             // _options should never be null
@@ -317,10 +364,37 @@ public class Slider<T> : View, IOrientation
         get => _config._showEndSpacing;
         set
         {
-            _config._showEndSpacing = value;
-            SetContentSize ();
+            bool current = _config._showEndSpacing;
+
+            CWPPropertyHelper.ChangeProperty (
+                                              this,
+                                              ref current,
+                                              value,
+                                              OnShowEndSpacingChanging,
+                                              ShowEndSpacingChanging,
+                                              newValue =>
+                                              {
+                                                  _config._showEndSpacing = newValue;
+                                                  SetContentSize ();
+                                              },
+                                              OnShowEndSpacingChanged,
+                                              ShowEndSpacingChanged,
+                                              out bool _
+                                             );
         }
     }
+
+    /// <summary>Event raised before the <see cref="ShowEndSpacing"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<bool>>? ShowEndSpacingChanging;
+
+    /// <summary>Event raised after the <see cref="ShowEndSpacing"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<bool>>? ShowEndSpacingChanged;
+
+    /// <summary>Called before <see cref="ShowEndSpacing"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnShowEndSpacingChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>Called after <see cref="ShowEndSpacing"/> has changed.</summary>
+    protected virtual void OnShowEndSpacingChanged (ValueChangedEventArgs<bool> args) { }
 
     /// <summary>Show/Hide the options legends.</summary>
     public bool ShowLegends
@@ -328,32 +402,89 @@ public class Slider<T> : View, IOrientation
         get => _config._showLegends;
         set
         {
-            _config._showLegends = value;
-            SetContentSize ();
+            bool current = _config._showLegends;
+
+            CWPPropertyHelper.ChangeProperty (
+                                              this,
+                                              ref current,
+                                              value,
+                                              OnShowLegendsChanging,
+                                              ShowLegendsChanging,
+                                              newValue =>
+                                              {
+                                                  _config._showLegends = newValue;
+                                                  SetContentSize ();
+                                              },
+                                              OnShowLegendsChanged,
+                                              ShowLegendsChanged,
+                                              out bool _
+                                             );
         }
     }
 
+    /// <summary>Event raised before the <see cref="ShowLegends"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<bool>>? ShowLegendsChanging;
+
+    /// <summary>Event raised after the <see cref="ShowLegends"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<bool>>? ShowLegendsChanged;
+
+    /// <summary>Called before <see cref="ShowLegends"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnShowLegendsChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>Called after <see cref="ShowLegends"/> has changed.</summary>
+    protected virtual void OnShowLegendsChanged (ValueChangedEventArgs<bool> args) { }
+
     /// <summary>
-    ///     Gets or sets whether the minimum or ideal size will be used when calculating the size of the slider.
+    ///     Gets or sets whether the minimum or ideal size will be used when calculating the size of the linear range.
     /// </summary>
     public bool UseMinimumSize
     {
         get => _config._useMinimumSize;
         set
         {
-            _config._useMinimumSize = value;
-            SetContentSize ();
+            bool current = _config._useMinimumSize;
+
+            CWPPropertyHelper.ChangeProperty (
+                                              this,
+                                              ref current,
+                                              value,
+                                              OnUseMinimumSizeChanging,
+                                              UseMinimumSizeChanging,
+                                              newValue =>
+                                              {
+                                                  _config._useMinimumSize = newValue;
+                                                  SetContentSize ();
+                                              },
+                                              OnUseMinimumSizeChanged,
+                                              UseMinimumSizeChanged,
+                                              out bool _
+                                             );
         }
     }
+
+    /// <summary>Event raised before the <see cref="UseMinimumSize"/> property changes. Can be cancelled.</summary>
+    public event EventHandler<ValueChangingEventArgs<bool>>? UseMinimumSizeChanging;
+
+    /// <summary>Event raised after the <see cref="UseMinimumSize"/> property has changed.</summary>
+    public event EventHandler<ValueChangedEventArgs<bool>>? UseMinimumSizeChanged;
+
+    /// <summary>Called before <see cref="UseMinimumSize"/> changes. Return true to cancel the change.</summary>
+    protected virtual bool OnUseMinimumSizeChanging (ValueChangingEventArgs<bool> args) => false;
+
+    /// <summary>Called after <see cref="UseMinimumSize"/> has changed.</summary>
+    protected virtual void OnUseMinimumSizeChanged (ValueChangedEventArgs<bool> args) { }
 
     #endregion
 
     #region Events
 
-    /// <summary>Event raised when the slider option/s changed. The dictionary contains: key = option index, value = T</summary>
-    public event EventHandler<SliderEventArgs<T>> OptionsChanged;
+    /// <summary>Event raised when the linear range option/s changed. The dictionary contains: key = option index, value = T</summary>
+    public event EventHandler<LinearRangeEventArgs<T>>? OptionsChanged;
 
-    /// <summary>Overridable method called when the slider options have changed. Raises the <see cref="OptionsChanged"/> event.</summary>
+    /// <summary>
+    ///     Overridable method called when the linear range options have changed. Raises the <see cref="OptionsChanged"/>
+    ///     event.
+    /// </summary>
     public virtual void OnOptionsChanged ()
     {
         OptionsChanged?.Invoke (this, new (GetSetOptionDictionary ()));
@@ -361,7 +492,7 @@ public class Slider<T> : View, IOrientation
     }
 
     /// <summary>Event raised When the option is hovered with the keys or the mouse.</summary>
-    public event EventHandler<SliderEventArgs<T>> OptionFocused;
+    public event EventHandler<LinearRangeEventArgs<T>>? OptionFocused;
 
     private int
         _lastFocusedOption; // for Range type; the most recently focused option. Used to determine shrink direction
@@ -370,9 +501,9 @@ public class Slider<T> : View, IOrientation
     /// <param name="args"></param>
     /// <returns><see langword="true"/> if the focus change was cancelled.</returns>
     /// <param name="newFocusedOption"></param>
-    public virtual bool OnOptionFocused (int newFocusedOption, SliderEventArgs<T> args)
+    public virtual bool OnOptionFocused (int newFocusedOption, LinearRangeEventArgs<T> args)
     {
-        if (newFocusedOption > _options.Count - 1 || newFocusedOption < 0)
+        if (newFocusedOption > _options!.Count - 1 || newFocusedOption < 0)
         {
             return true;
         }
@@ -383,8 +514,6 @@ public class Slider<T> : View, IOrientation
         {
             _lastFocusedOption = FocusedOption;
             FocusedOption = newFocusedOption;
-
-            //PositionCursor ();
         }
 
         return args.Cancel;
@@ -403,7 +532,7 @@ public class Slider<T> : View, IOrientation
         // TODO: Handle range type.
         // Note: Maybe return false only when optionIndex doesn't exist, otherwise true.
 
-        if (!_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options.Count)
+        if (!_setOptions.Contains (optionIndex) && optionIndex >= 0 && optionIndex < _options!.Count)
         {
             FocusedOption = optionIndex;
             SetFocusedOption ();
@@ -451,15 +580,15 @@ public class Slider<T> : View, IOrientation
         AddStr (str);
     }
 
-    /// <summary>Sets the dimensions of the Slider to the ideal values.</summary>
+    /// <summary>Sets the dimensions of the LinearRange to the ideal values.</summary>
     private void SetContentSize ()
     {
-        if (_options.Count == 0)
+        if (_options is { Count: 0 })
         {
             return;
         }
 
-        bool horizontal = _config._sliderOrientation == Orientation.Horizontal;
+        bool horizontal = _config._linearRangeOrientation == Orientation.Horizontal;
 
         if (UseMinimumSize)
         {
@@ -482,29 +611,29 @@ public class Slider<T> : View, IOrientation
 
             int maxLegend; // Because the legends are centered, the longest one determines inner spacing
 
-            if (_config._sliderOrientation == _config._legendsOrientation)
+            if (_config._linearRangeOrientation == _config._legendsOrientation)
             {
-                maxLegend = int.Max (_options.Max (s => s.Legend?.GetColumns () ?? 1), 1);
+                maxLegend = int.Max (_options!.Max (s => s.Legend?.GetColumns () ?? 1), 1);
             }
             else
             {
                 maxLegend = 1;
             }
 
-            int minSizeThatFitsLegends = _options.Count == 1 ? maxLegend : _options.Sum (o => o.Legend.GetColumns ());
+            int minSizeThatFitsLegends = _options!.Count == 1 ? maxLegend : _options.Sum (o => o.Legend!.GetColumns ());
 
-            string first;
-            string last;
+            string? first;
+            string? last;
+
+            _config._showLegendsAbbr = false;
 
             if (minSizeThatFitsLegends > size)
             {
-                _config._showLegendsAbbr = false;
-
-                if (_config._sliderOrientation == _config._legendsOrientation)
+                if (_config._linearRangeOrientation == _config._legendsOrientation)
                 {
                     _config._showLegendsAbbr = true;
 
-                    foreach (SliderOption<T> o in _options.Where (op => op.LegendAbbr == default (Rune)))
+                    foreach (LinearRangeOption<T> o in _options.Where (op => op.LegendAbbr == default (Rune)))
                     {
                         o.LegendAbbr = (Rune)(o.Legend?.GetColumns () > 0 ? o.Legend [0] : ' ');
                     }
@@ -515,7 +644,6 @@ public class Slider<T> : View, IOrientation
             }
             else
             {
-                _config._showLegendsAbbr = false;
                 first = _options.First ().Legend;
                 last = _options.Last ().Legend;
             }
@@ -524,10 +652,10 @@ public class Slider<T> : View, IOrientation
             // Hello
             // Left = He
             // Right = lo
-            int firstLeft = (first.Length - 1) / 2; // Chars count of the first option to the left.
-            int lastRight = last.Length / 2; // Chars count of the last option to the right.
+            int firstLeft = (first!.Length - 1) / 2; // Chars count of the first option to the left.
+            int lastRight = last!.Length / 2; // Chars count of the last option to the right.
 
-            if (_config._sliderOrientation != _config._legendsOrientation)
+            if (_config._linearRangeOrientation != _config._legendsOrientation)
             {
                 firstLeft = 0;
                 lastRight = 0;
@@ -557,21 +685,22 @@ public class Slider<T> : View, IOrientation
     /// <returns></returns>
     private int CalcMinLength ()
     {
-        if (_options.Count == 0)
+        if (_options is { Count: 0 })
         {
             return 0;
         }
 
         var length = 0;
         length += _config._startSpacing + _config._endSpacing;
-        length += _options.Count;
+        length += _options!.Count;
         length += (_options.Count - 1) * _config._minInnerSpacing;
 
         return length;
     }
 
     /// <summary>
-    ///     Gets the ideal width of the slider. The ideal width is the minimum width required to display all options and inner
+    ///     Gets the ideal width of the linear range. The ideal width is the minimum width required to display all options and
+    ///     inner
     ///     spacing.
     /// </summary>
     /// <returns></returns>
@@ -586,7 +715,8 @@ public class Slider<T> : View, IOrientation
     }
 
     /// <summary>
-    ///     Gets the ideal height of the slider. The ideal height is the minimum height required to display all options and
+    ///     Gets the ideal height of the linear range. The ideal height is the minimum height required to display all options
+    ///     and
     ///     inner spacing.
     /// </summary>
     /// <returns></returns>
@@ -607,58 +737,53 @@ public class Slider<T> : View, IOrientation
     /// <returns></returns>
     private int CalcIdealLength ()
     {
-        if (_options.Count == 0)
+        if (_options is { Count: 0 })
         {
             return 0;
         }
 
-        bool isVertical = Orientation == Orientation.Vertical;
         var length = 0;
 
-        if (_config._showLegends)
+        if (!_config._showLegends)
         {
-            if (_config._legendsOrientation == _config._sliderOrientation && _options.Count > 0)
-            {
-                // Each legend should be centered in a space the width of the longest legend, with one space between.
-                // Calculate the total length required for all legends.
-                //if (!isVertical)
-                {
-                    int maxLegend = int.Max (_options.Max (s => s.Legend?.GetColumns () ?? 1), 1);
-                    length = maxLegend * _options.Count + (_options.Count - 1);
-                }
+            return Math.Max (length, CalcMinLength ());
+        }
 
-                //
-                //{
-                //    length = CalcMinLength ();
-                //}
-            }
-            else
-            {
-                length = CalcMinLength ();
-            }
+        if (_config._legendsOrientation == _config._linearRangeOrientation && _options!.Count > 0)
+        {
+            // Each legend should be centered in a space the width of the longest legend, with one space between.
+            // Calculate the total length required for all legends.
+            int maxLegend = int.Max (_options.Max (s => s.Legend?.GetColumns () ?? 1), 1);
+            length = maxLegend * _options.Count + (_options.Count - 1);
+        }
+        else
+        {
+            length = CalcMinLength ();
         }
 
         return Math.Max (length, CalcMinLength ());
     }
 
     /// <summary>
-    ///     Calculates the minimum dimension required for the slider and legends.
+    ///     Calculates the minimum dimension required for the linear range and legends.
     /// </summary>
     /// <returns></returns>
     private int CalcIdealThickness ()
     {
-        var thickness = 1; // Always show the slider.
+        var thickness = 1; // Always show the linear range.
 
-        if (_config._showLegends)
+        if (!_config._showLegends)
         {
-            if (_config._legendsOrientation != _config._sliderOrientation && _options.Count > 0)
-            {
-                thickness += _options.Max (s => s.Legend?.GetColumns () ?? 0);
-            }
-            else
-            {
-                thickness += 1;
-            }
+            return thickness;
+        }
+
+        if (_config._legendsOrientation != _config._linearRangeOrientation && _options!.Count > 0)
+        {
+            thickness += _options.Max (s => s.Legend?.GetColumns () ?? 0);
+        }
+        else
+        {
+            thickness += 1;
         }
 
         return thickness;
@@ -672,7 +797,7 @@ public class Slider<T> : View, IOrientation
     {
         position = (-1, -1);
 
-        if (option < 0 || option >= _options.Count ())
+        if (option < 0 || option >= _options!.Count ())
         {
             return false;
         }
@@ -681,7 +806,7 @@ public class Slider<T> : View, IOrientation
         offset += _config._startSpacing;
         offset += option * (_config._cachedInnerSpacing + 1);
 
-        if (_config._sliderOrientation == Orientation.Vertical)
+        if (_config._linearRangeOrientation == Orientation.Vertical)
         {
             position = (0, offset);
         }
@@ -701,7 +826,6 @@ public class Slider<T> : View, IOrientation
     /// <returns></returns>
     internal bool TryGetOptionByPosition (int x, int y, int threshold, out int optionIdx)
     {
-        // Fix(jmperricone): Not working.
         optionIdx = -1;
 
         if (Orientation == Orientation.Horizontal)
@@ -719,7 +843,7 @@ public class Slider<T> : View, IOrientation
                 int option = cx / (_config._cachedInnerSpacing + 1);
                 bool valid = cx % (_config._cachedInnerSpacing + 1) == 0;
 
-                if (!valid || option < 0 || option > _options.Count - 1)
+                if (!valid || option < 0 || option > _options!.Count - 1)
                 {
                     continue;
                 }
@@ -744,7 +868,7 @@ public class Slider<T> : View, IOrientation
                 int option = cy / (_config._cachedInnerSpacing + 1);
                 bool valid = cy % (_config._cachedInnerSpacing + 1) == 0;
 
-                if (!valid || option < 0 || option > _options.Count - 1)
+                if (!valid || option < 0 || option > _options!.Count - 1)
                 {
                     continue;
                 }
@@ -761,17 +885,17 @@ public class Slider<T> : View, IOrientation
     /// <inheritdoc/>
     public override Point? PositionCursor ()
     {
-        if (TryGetPositionByOption (FocusedOption, out (int x, int y) position))
+        if (!TryGetPositionByOption (FocusedOption, out (int x, int y) position)
+            || !IsInitialized
+            || !Viewport.Contains (position.x, position.y))
         {
-            if (IsInitialized && Viewport.Contains (position.x, position.y))
-            {
-                Move (position.x, position.y);
-
-                return new (position.x, position.y);
-            }
+            return base.PositionCursor ();
         }
 
-        return base.PositionCursor ();
+        Move (position.x, position.y);
+
+        return new (position.x, position.y);
+
     }
 
     #endregion Cursor and Position
@@ -779,7 +903,7 @@ public class Slider<T> : View, IOrientation
     #region Drawing
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent (DrawContext context)
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         // TODO: make this more surgical to reduce repaint
 
@@ -788,8 +912,8 @@ public class Slider<T> : View, IOrientation
             return true;
         }
 
-        // Draw Slider
-        DrawSlider ();
+        // Draw LinearRange
+        DrawLinearRange ();
 
         // Draw Legends.
         if (_config._showLegends)
@@ -805,9 +929,9 @@ public class Slider<T> : View, IOrientation
         return true;
     }
 
-    private string AlignText (string text, int width, Alignment alignment)
+    private static string AlignText (string? text, int width, Alignment alignment)
     {
-        if (text is null)
+        if (string.IsNullOrEmpty (text))
         {
             return "";
         }
@@ -842,13 +966,12 @@ public class Slider<T> : View, IOrientation
         }
     }
 
-    private void DrawSlider ()
+    private void DrawLinearRange ()
     {
         // TODO: be more surgical on clear
-        ClearViewport (null);
+        ClearViewport ();
 
         // Attributes
-
         var normalAttr = new Attribute (Color.White, Color.Black);
         var setAttr = new Attribute (Color.Black, Color.White);
 
@@ -858,9 +981,7 @@ public class Slider<T> : View, IOrientation
             setAttr = Style.SetChar.Attribute ?? GetAttributeForRole (VisualRole.HotNormal);
         }
 
-        bool isVertical = _config._sliderOrientation == Orientation.Vertical;
-        bool isLegendsVertical = _config._legendsOrientation == Orientation.Vertical;
-        bool isReverse = _config._sliderOrientation != _config._legendsOrientation;
+        bool isVertical = _config._linearRangeOrientation == Orientation.Vertical;
 
         var x = 0;
         var y = 0;
@@ -868,14 +989,14 @@ public class Slider<T> : View, IOrientation
         bool isSet = _setOptions.Count > 0;
 
         // Left Spacing
-        if (_config._showEndSpacing && _config._startSpacing > 0)
+        if (_config is { _showEndSpacing: true, _startSpacing: > 0 })
         {
             SetAttribute (
-                                  isSet && _config._type == SliderType.LeftRange
-                                      ? Style.RangeChar.Attribute ?? normalAttr
-                                      : Style.SpaceChar.Attribute ?? normalAttr
-                                 );
-            string text = isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
+                          isSet && _config._type == LinearRangeType.LeftRange
+                              ? Style.RangeChar.Attribute ?? normalAttr
+                              : Style.SpaceChar.Attribute ?? normalAttr
+                         );
+            string text = isSet && _config._type == LinearRangeType.LeftRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
 
             for (var i = 0; i < _config._startSpacing; i++)
             {
@@ -911,7 +1032,7 @@ public class Slider<T> : View, IOrientation
         }
 
         // Slider
-        if (_options.Count > 0)
+        if (_options!.Count > 0)
         {
             for (var i = 0; i < _options.Count; i++)
             {
@@ -921,19 +1042,19 @@ public class Slider<T> : View, IOrientation
                 {
                     switch (_config._type)
                     {
-                        case SliderType.LeftRange when i <= _setOptions [0]:
+                        case LinearRangeType.LeftRange when i <= _setOptions [0]:
                             drawRange = i < _setOptions [0];
 
                             break;
-                        case SliderType.RightRange when i >= _setOptions [0]:
+                        case LinearRangeType.RightRange when i >= _setOptions [0]:
                             drawRange = i >= _setOptions [0];
 
                             break;
-                        case SliderType.Range when _setOptions.Count == 1:
+                        case LinearRangeType.Range when _setOptions.Count == 1:
                             drawRange = false;
 
                             break;
-                        case SliderType.Range when _setOptions.Count == 2:
+                        case LinearRangeType.Range when _setOptions.Count == 2:
                             if ((i >= _setOptions [0] && i <= _setOptions [1])
                                 || (i >= _setOptions [1] && i <= _setOptions [0]))
                             {
@@ -947,9 +1068,9 @@ public class Slider<T> : View, IOrientation
 
                 // Draw Option
                 SetAttribute (
-                                      isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAttr :
-                                      drawRange ? Style.RangeChar.Attribute ?? setAttr : Style.OptionChar.Attribute ?? normalAttr
-                                     );
+                              isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAttr :
+                              drawRange ? Style.RangeChar.Attribute ?? setAttr : Style.OptionChar.Attribute ?? normalAttr
+                             );
 
                 string text = drawRange ? Style.RangeChar.Grapheme : Style.OptionChar.Grapheme;
 
@@ -981,27 +1102,29 @@ public class Slider<T> : View, IOrientation
                 }
 
                 // Draw Spacing
-                if (_config._showEndSpacing || i < _options.Count - 1)
+                if (!_config._showEndSpacing && i >= _options.Count - 1)
                 {
-                    // Skip if is the Last Spacing.
-                    SetAttribute (
-                                          drawRange && isSet
-                                              ? Style.RangeChar.Attribute ?? setAttr
-                                              : Style.SpaceChar.Attribute ?? normalAttr
-                                         );
+                    continue;
+                }
 
-                    for (var s = 0; s < _config._cachedInnerSpacing; s++)
+                // Skip if is the Last Spacing.
+                SetAttribute (
+                              drawRange && isSet
+                                  ? Style.RangeChar.Attribute ?? setAttr
+                                  : Style.SpaceChar.Attribute ?? normalAttr
+                             );
+
+                for (var s = 0; s < _config._cachedInnerSpacing; s++)
+                {
+                    MoveAndAdd (x, y, drawRange && isSet ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme);
+
+                    if (isVertical)
                     {
-                        MoveAndAdd (x, y, drawRange && isSet ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme);
-
-                        if (isVertical)
-                        {
-                            y++;
-                        }
-                        else
-                        {
-                            x++;
-                        }
+                        y++;
+                    }
+                    else
+                    {
+                        x++;
                     }
                 }
             }
@@ -1013,11 +1136,11 @@ public class Slider<T> : View, IOrientation
         if (_config._showEndSpacing)
         {
             SetAttribute (
-                                  isSet && _config._type == SliderType.RightRange
-                                      ? Style.RangeChar.Attribute ?? normalAttr
-                                      : Style.SpaceChar.Attribute ?? normalAttr
-                                 );
-            string text = isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
+                          isSet && _config._type == LinearRangeType.RightRange
+                              ? Style.RangeChar.Attribute ?? normalAttr
+                              : Style.SpaceChar.Attribute ?? normalAttr
+                         );
+            string text = isSet && _config._type == LinearRangeType.RightRange ? Style.RangeChar.Grapheme : Style.SpaceChar.Grapheme;
 
             for (var i = 0; i < remaining; i++)
             {
@@ -1075,19 +1198,21 @@ public class Slider<T> : View, IOrientation
 
         Move (x, y);
 
-        if (_config._sliderOrientation == Orientation.Horizontal
-            && _config._legendsOrientation == Orientation.Vertical)
+        switch (_config._linearRangeOrientation)
         {
-            x += _config._startSpacing;
+            case Orientation.Horizontal
+                when _config._legendsOrientation == Orientation.Vertical:
+                x += _config._startSpacing;
+
+                break;
+            case Orientation.Vertical
+                when _config._legendsOrientation == Orientation.Horizontal:
+                y += _config._startSpacing;
+
+                break;
         }
 
-        if (_config._sliderOrientation == Orientation.Vertical
-            && _config._legendsOrientation == Orientation.Horizontal)
-        {
-            y += _config._startSpacing;
-        }
-
-        if (_config._sliderOrientation == Orientation.Horizontal)
+        if (_config._linearRangeOrientation == Orientation.Horizontal)
         {
             y += 1;
         }
@@ -1097,43 +1222,43 @@ public class Slider<T> : View, IOrientation
             x += 1;
         }
 
-        for (var i = 0; i < _options.Count; i++)
+        for (var i = 0; i < _options!.Count; i++)
         {
             var isOptionSet = false;
 
             // Check if the Option is Set.
             switch (_config._type)
             {
-                case SliderType.Single:
-                case SliderType.Multiple:
+                case LinearRangeType.Single:
+                case LinearRangeType.Multiple:
                     if (isSet && _setOptions.Contains (i))
                     {
                         isOptionSet = true;
                     }
 
                     break;
-                case SliderType.LeftRange:
+                case LinearRangeType.LeftRange:
                     if (isSet && i <= _setOptions [0])
                     {
                         isOptionSet = true;
                     }
 
                     break;
-                case SliderType.RightRange:
+                case LinearRangeType.RightRange:
                     if (isSet && i >= _setOptions [0])
                     {
                         isOptionSet = true;
                     }
 
                     break;
-                case SliderType.Range when _setOptions.Count == 1:
+                case LinearRangeType.Range when _setOptions.Count == 1:
                     if (isSet && i == _setOptions [0])
                     {
                         isOptionSet = true;
                     }
 
                     break;
-                case SliderType.Range:
+                case LinearRangeType.Range:
                     if (isSet
                         && ((i >= _setOptions [0] && i <= _setOptions [1])
                             || (i >= _setOptions [1] && i <= _setOptions [0])))
@@ -1142,21 +1267,17 @@ public class Slider<T> : View, IOrientation
                     }
 
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException ();
             }
 
             // Text || Abbreviation
-            var text = string.Empty;
 
-            if (_config._showLegendsAbbr)
-            {
-                text = _options [i].LegendAbbr.ToString () ?? new Rune (_options [i].Legend.First ()).ToString ();
-            }
-            else
-            {
-                text = _options [i].Legend;
-            }
+            string text = (_config._showLegendsAbbr ?
+                               _options [i].LegendAbbr.ToString () :
+                               _options [i].Legend)!;
 
-            switch (_config._sliderOrientation)
+            switch (_config._linearRangeOrientation)
             {
                 case Orientation.Horizontal:
                     switch (_config._legendsOrientation)
@@ -1193,21 +1314,19 @@ public class Slider<T> : View, IOrientation
             int legendRightSpacesCount = text.Reverse ().TakeWhile (e => e == ' ').Count ();
             text = text.Trim ();
 
-            // TODO(jmperricone): Improve the Orientation check.
-
             // Calculate Start Spacing
-            if (_config._sliderOrientation == _config._legendsOrientation)
+            if (_config._linearRangeOrientation == _config._legendsOrientation)
             {
                 if (i == 0)
                 {
-                    // The spacing for the slider use the StartSpacing but...
+                    // The spacing for the linear range use the StartSpacing but...
                     // The spacing for the legends is the StartSpacing MINUS the total chars to the left of the first options.
                     //    ●────●────●
                     //  Hello Bye World
                     //
                     // chars_left is 2 for Hello => (5 - 1) / 2
                     //
-                    // then the spacing is 2 for the slider but 0 for the legends.
+                    // then the spacing is 2 for the linear range but 0 for the legends.
 
                     int charsLeft = (text.Length - 1) / 2;
                     legendLeftSpacesCount = _config._startSpacing - charsLeft;
@@ -1222,8 +1341,6 @@ public class Slider<T> : View, IOrientation
                 {
                     x += legendLeftSpacesCount;
                 }
-
-                //Move (x, y);
             }
 
             // Legend
@@ -1233,7 +1350,6 @@ public class Slider<T> : View, IOrientation
             {
                 MoveAndAdd (x, y, c);
 
-                //Driver.AddRune (c);
                 if (isTextVertical)
                 {
                     y += 1;
@@ -1245,7 +1361,7 @@ public class Slider<T> : View, IOrientation
             }
 
             // Calculate End Spacing
-            if (i == _options.Count () - 1)
+            if (i == _options.Count - 1)
             {
                 // See Start Spacing explanation.
                 int charsRight = text.Length / 2;
@@ -1264,15 +1380,18 @@ public class Slider<T> : View, IOrientation
                 x += legendRightSpacesCount;
             }
 
-            if (_config._sliderOrientation == Orientation.Horizontal
-                && _config._legendsOrientation == Orientation.Vertical)
+            switch (_config._linearRangeOrientation)
             {
-                x += _config._cachedInnerSpacing + 1;
-            }
-            else if (_config._sliderOrientation == Orientation.Vertical
-                     && _config._legendsOrientation == Orientation.Horizontal)
-            {
-                y += _config._cachedInnerSpacing + 1;
+                case Orientation.Horizontal
+                    when _config._legendsOrientation == Orientation.Vertical:
+                    x += _config._cachedInnerSpacing + 1;
+
+                    break;
+                case Orientation.Vertical
+                    when _config._legendsOrientation == Orientation.Horizontal:
+                    y += _config._cachedInnerSpacing + 1;
+
+                    break;
             }
         }
     }
@@ -1290,12 +1409,6 @@ public class Slider<T> : View, IOrientation
     /// <inheritdoc/>
     protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
-        // Note(jmperricone): Maybe we click to focus the cursor, and on next click we set the option.
-        //                    That will make OptionFocused Event more relevant.
-        // (tig: I don't think so. Maybe an option if someone really wants it, but for now that
-        //       adds too much friction to UI.
-        // TODO(jmperricone): Make Range Type work with mouse.
-
         if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)
               || mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
               || mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)
@@ -1320,6 +1433,9 @@ public class Slider<T> : View, IOrientation
             return true;
         }
 
+        bool success;
+        int option;
+
         if (_dragPosition.HasValue
             && mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition)
             && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
@@ -1327,9 +1443,6 @@ public class Slider<T> : View, IOrientation
             // Continue Drag
             _dragPosition = mouseEvent.Position;
             _moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
-
-            var success = false;
-            var option = 0;
 
             // how far has user dragged from original location?
             if (Orientation == Orientation.Horizontal)
@@ -1354,51 +1467,49 @@ public class Slider<T> : View, IOrientation
             return true;
         }
 
-        if ((_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
-            || mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if ((!_dragPosition.HasValue || !mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))
+            && !mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
         {
-            // End Drag
-            App?.Mouse.UngrabMouse ();
-            _dragPosition = null;
-            _moveRenderPosition = null;
-
-            // TODO: Add func to calc distance between options to use as the MouseClickXOptionThreshold
-            var success = false;
-            var option = 0;
-
-            if (Orientation == Orientation.Horizontal)
-            {
-                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
-            }
-            else
-            {
-                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
-            }
-
-            if (success)
-            {
-                if (!OnOptionFocused (option, new (GetSetOptionDictionary (), FocusedOption)))
-                {
-                    SetFocusedOption ();
-                }
-            }
-
-            SetNeedsDraw ();
-
-            mouseEvent.Handled = true;
-
+            return mouseEvent.Handled;
         }
+
+        // End Drag
+        App?.Mouse.UngrabMouse ();
+        _dragPosition = null;
+        _moveRenderPosition = null;
+
+        switch (Orientation)
+        {
+            case Orientation.Horizontal:
+                success = TryGetOptionByPosition (mouseEvent.Position.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+
+                break;
+            default:
+                success = TryGetOptionByPosition (0, mouseEvent.Position.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
+
+                break;
+        }
+
+        if (success)
+        {
+            if (!OnOptionFocused (option, new (GetSetOptionDictionary (), FocusedOption)))
+            {
+                SetFocusedOption ();
+            }
+        }
+
+        SetNeedsDraw ();
+
+        mouseEvent.Handled = true;
 
         return mouseEvent.Handled;
 
         Point ClampMovePosition (Point position)
         {
-            int Clamp (int value, int min, int max) { return Math.Max (min, Math.Min (max, value)); }
-
             if (Orientation == Orientation.Horizontal)
             {
                 int left = _config._startSpacing;
-                int width = _options.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
+                int width = _options!.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
                 int right = left + width - 1;
                 int clampedX = Clamp (position.X, left, right);
                 position = new (clampedX, 0);
@@ -1406,13 +1517,15 @@ public class Slider<T> : View, IOrientation
             else
             {
                 int top = _config._startSpacing;
-                int height = _options.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
+                int height = _options!.Count + (_options.Count - 1) * _config._cachedInnerSpacing;
                 int bottom = top + height - 1;
                 int clampedY = Clamp (position.Y, top, bottom);
                 position = new (0, clampedY);
             }
 
             return position;
+
+            static int Clamp (int value, int min, int max) { return Math.Max (min, Math.Min (max, value)); }
         }
     }
 
@@ -1427,7 +1540,7 @@ public class Slider<T> : View, IOrientation
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
         AddCommand (Command.Activate, () => Select ());
-        AddCommand (Command.Accept, (ctx) => Accept (ctx));
+        AddCommand (Command.Accept, ctx => Accept (ctx));
 
         SetKeyBindings ();
     }
@@ -1435,7 +1548,7 @@ public class Slider<T> : View, IOrientation
     // This is called during initialization and anytime orientation changes
     private void SetKeyBindings ()
     {
-        if (_config._sliderOrientation == Orientation.Horizontal)
+        if (_config._linearRangeOrientation == Orientation.Horizontal)
         {
             KeyBindings.Add (Key.CursorRight, Command.Right);
             KeyBindings.Remove (Key.CursorDown);
@@ -1470,10 +1583,13 @@ public class Slider<T> : View, IOrientation
         KeyBindings.Add (Key.Space, Command.Activate);
     }
 
-    private Dictionary<int, SliderOption<T>> GetSetOptionDictionary () { return _setOptions.ToDictionary (e => e, e => _options [e]); }
+    private Dictionary<int, LinearRangeOption<T>> GetSetOptionDictionary ()
+    {
+        return _setOptions.ToDictionary (e => e, e => _options! [e]);
+    }
 
     /// <summary>
-    /// Sets or unsets <paramref name="optionIndex"/> based on <paramref name="set"/>.
+    ///     Sets or unsets <paramref name="optionIndex"/> based on <paramref name="set"/>.
     /// </summary>
     /// <param name="optionIndex">The option to change.</param>
     /// <param name="set">If <see langword="true"/>, sets the option. Unsets it otherwise.</param>
@@ -1484,7 +1600,8 @@ public class Slider<T> : View, IOrientation
             if (!_setOptions.Contains (optionIndex))
             {
                 _setOptions.Add (optionIndex);
-                _options [optionIndex].OnSet ();
+
+                _options? [optionIndex].OnSet ();
             }
         }
         else
@@ -1492,7 +1609,8 @@ public class Slider<T> : View, IOrientation
             if (_setOptions.Contains (optionIndex))
             {
                 _setOptions.Remove (optionIndex);
-                _options [optionIndex].OnUnSet ();
+
+                _options? [optionIndex].OnUnSet ();
             }
         }
 
@@ -1502,16 +1620,18 @@ public class Slider<T> : View, IOrientation
 
     private bool SetFocusedOption ()
     {
-        if (_options.Count == 0)
+        if (_options is null or { Count: 0 })
         {
             return false;
         }
-        bool changed = false;
+
+        var changed = false;
+
         switch (_config._type)
         {
-            case SliderType.Single:
-            case SliderType.LeftRange:
-            case SliderType.RightRange:
+            case LinearRangeType.Single:
+            case LinearRangeType.LeftRange:
+            case LinearRangeType.RightRange:
 
                 if (_setOptions.Count == 1)
                 {
@@ -1542,7 +1662,7 @@ public class Slider<T> : View, IOrientation
                 changed = true;
 
                 break;
-            case SliderType.Multiple:
+            case LinearRangeType.Multiple:
                 if (_setOptions.Contains (FocusedOption))
                 {
                     if (!_config._allowEmpty && _setOptions.Count () == 1)
@@ -1564,7 +1684,7 @@ public class Slider<T> : View, IOrientation
 
                 break;
 
-            case SliderType.Range:
+            case LinearRangeType.Range:
                 if (_config._rangeAllowSingle)
                 {
                     if (_setOptions.Count == 1)
@@ -1692,7 +1812,7 @@ public class Slider<T> : View, IOrientation
                     }
                 }
 
-                // Raise Slider Option Changed Event.
+                // Raise LinearRange Option Changed Event.
                 OnOptionsChanged ();
                 changed = true;
 
@@ -1706,7 +1826,7 @@ public class Slider<T> : View, IOrientation
 
     internal bool ExtendPlus ()
     {
-        int next = FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption;
+        int next = _options is { } && FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption;
 
         if (next != FocusedOption
             && !OnOptionFocused (
@@ -1721,48 +1841,6 @@ public class Slider<T> : View, IOrientation
         }
 
         return true;
-
-        //// TODO: Support RangeMultiple
-        //if (_setOptions.Contains (FocusedOption)) {
-        //	var next = FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption;
-        //	if (!_setOptions.Contains (next)) {
-        //		if (_config._type == SliderType.Range) {
-        //			if (_setOptions.Count == 1) {
-        //				if (!OnOptionFocused (next, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption))) {
-        //					_setOptions.Add (FocusedOption);
-        //					_setOptions.Sort (); // Range Type
-        //					OnOptionsChanged ();
-        //				}
-        //			} else if (_setOptions.Count == 2) {
-        //				if (!OnOptionFocused (next, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption))) {
-        //					_setOptions [1] = FocusedOption;
-        //					_setOptions.Sort (); // Range Type
-        //					OnOptionsChanged ();
-        //				}
-        //			}
-        //		} else {
-        //			_setOptions.Remove (FocusedOption);
-        //			// Note(jmperricone): We are setting the option here, do we send the OptionFocused Event too ?
-
-        //			if (!OnOptionFocused (next, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption))) {
-        //				_setOptions.Add (FocusedOption);
-        //				_setOptions.Sort (); // Range Type
-        //				OnOptionsChanged ();
-        //			}
-        //		}
-        //	} else {
-        //		if (_config._type == SliderType.Range) {
-        //			if (!OnOptionFocused (next, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption))) {
-        //				_setOptions.Clear();
-        //				_setOptions.Add (FocusedOption);
-        //				OnOptionsChanged ();
-        //			}
-        //		} else if (/*_settingRange == true ||*/ !AllowEmpty) {
-        //			SetFocusedOption ();
-        //		}
-        //	}
-        //}
-        //return true;
     }
 
     internal bool ExtendMinus ()
@@ -1784,12 +1862,9 @@ public class Slider<T> : View, IOrientation
         return true;
     }
 
-    internal bool Select ()
-    {
-        return SetFocusedOption ();
-    }
+    internal bool Select () => SetFocusedOption ();
 
-    internal bool Accept (ICommandContext commandContext)
+    internal bool Accept (ICommandContext? commandContext)
     {
         SetFocusedOption ();
 
@@ -1853,7 +1928,7 @@ public class Slider<T> : View, IOrientation
 
     internal bool MoveEnd ()
     {
-        if (OnOptionFocused (_options.Count - 1, new (GetSetOptionDictionary (), FocusedOption)))
+        if (OnOptionFocused (_options!.Count - 1, new (GetSetOptionDictionary (), FocusedOption)))
         {
             return false;
         }
