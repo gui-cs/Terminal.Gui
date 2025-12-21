@@ -1,16 +1,13 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Represents a basic step that is displayed in a <see cref="Wizard"/>. The <see cref="WizardStep"/> fills the
-///     Wizard's content area. <see cref="View"/>s can be added to the step's content area. Help text can be displayed
-///     in the right <see cref="Padding"/> by setting <see cref="WizardStep.HelpText"/>. If the help text is empty, the
-///     right padding will not be shown and content will fill the entire step.
+///     A single step in a <see cref="Wizard"/>. Can contain arbitrary <see cref="View"/>s and display help text
+///     in the right <see cref="Padding"/>.
 /// </summary>
 /// <remarks>
-///     If <see cref="Button"/>s are added, do not set <see cref="Button.IsDefault"/> to true as this will conflict
-///     with the Next button of the Wizard. Subscribe to the <see cref="View.VisibleChanged"/> event to be notified when
-///     the step is active; see also: <see cref="Wizard.StepChanged"/>. To enable or disable a step from being shown to the
-///     user, set <see cref="View.Enabled"/>.
+///     Do not set <see cref="Button.IsDefault"/> on added buttons (conflicts with Wizard navigation).
+///     Use <see cref="View.VisibleChanged"/> or <see cref="Wizard.StepChanged"/> to detect when this step becomes active.
+///     Set <see cref="View.Enabled"/> to control whether the step is shown.
 /// </remarks>
 public class WizardStep : View, IDesignable
 {
@@ -29,7 +26,7 @@ public class WizardStep : View, IDesignable
     };
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Wizard"/> class.
+    ///     Initializes a new instance of the <see cref="WizardStep"/> class.
     /// </summary>
     public WizardStep ()
     {
@@ -54,8 +51,7 @@ public class WizardStep : View, IDesignable
         base.EndInit ();
     }
 
-    /// <summary>Sets or gets the text for the back button. The back button will only be visible on steps after the first step.</summary>
-    /// <remarks>The default text is "Back"</remarks>
+    /// <summary>The text for the Back button. Defaults to "Back".</summary>
     public string BackButtonText { get; set; } = string.Empty;
 
     /// <summary>Calculates the width for the help text padding based on the current frame width.</summary>
@@ -75,8 +71,8 @@ public class WizardStep : View, IDesignable
     }
 
     /// <summary>
-    ///     Sets or gets help text for the <see cref="WizardStep"/>.If <see cref="WizardStep.HelpText"/> is empty the help
-    ///     pane will not be visible and the content will fill the entire WizardStep.
+    ///     The help text displayed in the right <see cref="Padding"/>.
+    ///     If empty, the right padding is hidden and content fills the entire step.
     /// </summary>
     /// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
     public string HelpText
@@ -90,8 +86,7 @@ public class WizardStep : View, IDesignable
         }
     }
 
-    /// <summary>Sets or gets the text for the next/finish button.</summary>
-    /// <remarks>The default text is "Next..." if the Pane is not the last pane. Otherwise, it is "Finish"</remarks>
+    /// <summary>The text for the Next/Finish button. Defaults to "Next..." or "Finish" based on position.</summary>
     public string NextButtonText { get; set; } = string.Empty;
 
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>
