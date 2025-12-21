@@ -484,7 +484,7 @@ public class LinearRangeTests : FakeDriverBase
         LinearRange<int> slider = new ();
 
         // Act/Assert
-        Assert.Throws<ArgumentNullException> (() => slider.Options = null);
+        Assert.Throws<ArgumentNullException> (() => slider.Options = []);
     }
 
     [Fact]
@@ -494,7 +494,7 @@ public class LinearRangeTests : FakeDriverBase
         LinearRange<int> slider = new ();
 
         // Act/Assert
-        Assert.Throws<ArgumentNullException> (() => slider.Options = null);
+        Assert.Throws<ArgumentNullException> (() => slider.Options = []);
     }
 
     [Fact]
