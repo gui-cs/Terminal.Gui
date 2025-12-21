@@ -179,20 +179,20 @@ public class DimAutoDemo : Scenario
     {
         var sliderFrameView = new FrameView
         {
-            Title = "Slider - Example of a DimAuto View",
+            Title = "LinearRange - Example of a DimAuto View",
         };
 
         List<object> options = new () { "One", "Two", "Three", "Four" };
-        Slider slider = new (options)
+        LinearRange linearRange = new (options)
         {
             X = 0,
             Y = 0,
-            Type = SliderType.Multiple,
+            Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
-            Title = "_Slider"
+            Title = "_LinearRange"
         };
-        sliderFrameView.Add (slider);
+        sliderFrameView.Add (linearRange);
 
         return sliderFrameView;
     }
