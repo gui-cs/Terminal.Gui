@@ -64,31 +64,22 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         // Add direct SubViews
         result.AddRange (InternalSubViews);
 
-        if (includeMargin)
+        if (includeMargin && Margin is { SubViews: { Count: > 0 } } && Margin.Thickness != Thickness.Empty)
         {
             // Add Margin SubViews
-            if (Margin is { SubViews: { Count: > 0 } } && Margin.Thickness != Thickness.Empty)
-            {
-                result.AddRange (Margin.SubViews);
-            }
+            result.AddRange (Margin.SubViews);
         }
 
-        if (includeBorder)
+        if (includeBorder && Border is { SubViews: { Count: > 0 } } && Border.Thickness != Thickness.Empty)
         {
             // Add Border SubViews
-            if (Border is { SubViews: { Count: > 0 } } && Border.Thickness != Thickness.Empty)
-            {
-                result.AddRange (Border.SubViews);
-            }
+            result.AddRange (Border.SubViews);
         }
 
-        if (includePadding)
+        if (includePadding && Padding is { SubViews: { Count: > 0 } } && Padding.Thickness != Thickness.Empty)
         {
             // Add Padding SubViews
-            if (Padding is { SubViews: { Count: > 0 } } && Padding.Thickness != Thickness.Empty)
-            {
-                result.AddRange (Padding.SubViews);
-            }
+            result.AddRange (Padding.SubViews);
         }
 
         return result.AsReadOnly ();
