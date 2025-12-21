@@ -98,7 +98,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             receivedPosition = args.Position;
         };
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (viewRelativeX, viewRelativeY),
             Flags = MouseFlags.LeftButtonClicked
@@ -267,7 +267,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
             }
         };
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = flags
@@ -299,7 +299,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
 
         view.MouseEvent += (_, a) => clickCount += a.IsSingleDoubleOrTripleClicked ? 1 : 0;
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = clickFlag
@@ -332,7 +332,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool eventCalled = false;
         view.MouseEvent += (_, _) => { eventCalled = true; };
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.LeftButtonClicked
@@ -361,7 +361,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         bool selectingCalled = false;
         view.Activating += (_, _) => { selectingCalled = true; };
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (5, 5),
             Flags = MouseFlags.LeftButtonClicked
@@ -399,7 +399,7 @@ public class MouseEventRoutingTests (ITestOutputHelper output)
         superView.Add (subView);
         superView.SetFocus (); // Give superView focus first
 
-        Terminal.Gui.Input.Mouse mouse = new ()
+        Mouse mouse = new ()
         {
             Position = new (2, 2),
             Flags = MouseFlags.LeftButtonClicked

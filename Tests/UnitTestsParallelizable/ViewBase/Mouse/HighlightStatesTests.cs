@@ -9,7 +9,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
     public void HighlightStates_SubView_With_Single_Runnable_WorkAsExpected ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init ("ansi");
 
         app.Driver?.SetScreenSize (6, 1);
 
@@ -47,7 +47,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
     public void HighlightStates_SubView_With_Multiple_Runnable_WorkAsExpected ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init ("ansi");
 
         app.Driver?.SetScreenSize (9, 5);
 

@@ -88,7 +88,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         // Arrange
         MouseImpl mouse = new ();
         var eventFired = false;
-        Terminal.Gui.Input.Mouse? capturedArgs = null;
+        Mouse? capturedArgs = null;
 
         mouse.MouseEvent += (sender, args) =>
                             {
@@ -96,7 +96,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
                                 capturedArgs = args;
                             };
 
-        Terminal.Gui.Input.Mouse testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (5, 10),
             Flags = MouseFlags.LeftButtonPressed
@@ -119,11 +119,11 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         MouseImpl mouse = new ();
         var eventCount = 0;
 
-        void Handler (object? sender, Terminal.Gui.Input.Mouse args) { eventCount++; }
+        void Handler (object? sender, Mouse args) { eventCount++; }
 
         mouse.MouseEvent += Handler;
 
-        Terminal.Gui.Input.Mouse testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
             Flags = MouseFlags.LeftButtonPressed
@@ -153,7 +153,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse.MouseEvent += (sender, args) => { eventFired = true; };
         mouse.IsMouseDisabled = true;
 
-        Terminal.Gui.Input.Mouse testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
             Flags = MouseFlags.LeftButtonPressed
@@ -181,7 +181,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         mouse.MouseEvent += (sender, args) => { capturedFlags = args.Flags; };
 
-        Terminal.Gui.Input.Mouse testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (5, 5),
             Flags = flags
@@ -227,7 +227,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         mouse.MouseEvent += (sender, args) => eventCount++;
 
-        Terminal.Gui.Input.Mouse testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
             Flags = MouseFlags.LeftButtonPressed
@@ -296,7 +296,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse1.MouseEvent += (sender, args) => mouse1EventCount++;
         mouse2.MouseEvent += (sender, args) => mouse2EventCount++;
 
-        Terminal.Gui.Input.Mouse testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
             Flags = MouseFlags.LeftButtonPressed

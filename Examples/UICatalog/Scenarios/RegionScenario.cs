@@ -51,35 +51,36 @@ public class RegionScenario : Scenario
 
         // Add drag handling to window
         appWindow.MouseEvent += (s, e) =>
-                          {
-                              if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
-                              {
-                                  if (!e.Flags.HasFlag (MouseFlags.PositionReport))
-                                  { // Start drag
-                                      _dragStart = e.ScreenPosition;
-                                      _isDragging = true;
-                                  }
-                                  else
-                                  {
-                                      // Drag
-                                      if (_isDragging && _dragStart.HasValue)
-                                      {
-                                          appWindow.SetNeedsDraw ();
-                                      }
-                                  }
-                              }
+                                {
+                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+                                    {
+                                        if (!e.Flags.HasFlag (MouseFlags.PositionReport))
+                                        { // Start drag
+                                            _dragStart = e.ScreenPosition;
+                                            _isDragging = true;
+                                        }
+                                        else
+                                        {
+                                            // Drag
+                                            if (_isDragging && _dragStart.HasValue)
+                                            {
+                                                appWindow.SetNeedsDraw ();
+                                            }
+                                        }
+                                    }
 
-                              if (e.Flags.HasFlag (MouseFlags.LeftButtonReleased))
-                              {
-                                  if (_isDragging && _dragStart.HasValue)
-                                  {
-                                      // Add the new region
-                                      AddRectangleFromPoints (_dragStart.Value, e.ScreenPosition, _regionOp);
-                                      _isDragging = false;
-                                      _dragStart = null;
-                                  }
+                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+                                    {
+                                        if (_isDragging && _dragStart.HasValue)
+                                        {
+                                            // Add the new region
+                                            AddRectangleFromPoints (_dragStart.Value, e.ScreenPosition, _regionOp);
+                                            _isDragging = false;
+                                            _dragStart = null;
+                                        }
 
-                                    appWindow.SetNeedsDraw ();
+                                        appWindow.SetNeedsDraw ();
+                                    }
                                 };
 
         // Draw the regions
@@ -319,7 +320,7 @@ internal class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {

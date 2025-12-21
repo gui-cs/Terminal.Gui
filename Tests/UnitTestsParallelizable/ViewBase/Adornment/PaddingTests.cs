@@ -1,10 +1,6 @@
-﻿#nullable enable
-using UnitTests;
-using Xunit.Abstractions;
+﻿namespace ViewBaseTests.Adornments;
 
-namespace ViewBaseTests.Adornments;
-
-public class PaddingTests (ITestOutputHelper output)
+public class PaddingTests
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -21,5 +17,4 @@ public class PaddingTests (ITestOutputHelper output)
         View view = new () { Height = 3, Width = 3 };
         Assert.Equal (Thickness.Empty, view.Padding!.Thickness);
     }
-
 }

@@ -280,7 +280,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         }
 
         view.Enabled = false;
-        var me = new Terminal.Gui.Input.Mouse () { Timestamp = DateTime.Now };
+        var me = new Mouse () { Timestamp = DateTime.Now };
         view.NewMouseEvent (me);
         Assert.False (me.Handled);
         view.Dispose ();
@@ -301,7 +301,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         view.Enabled = false;
 
-        var me = new Terminal.Gui.Input.Mouse
+        var me = new Mouse
         {
             Timestamp = DateTime.Now,
             Flags = MouseFlags.LeftButtonClicked

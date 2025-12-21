@@ -536,7 +536,7 @@ public class AnsiInputTestableTests
         AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
-        List<Terminal.Gui.Input.Mouse> receivedEvents = [];
+        List<Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a complete click: press → release
@@ -582,7 +582,7 @@ public class AnsiInputTestableTests
         AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
-        List<Terminal.Gui.Input.Mouse> receivedEvents = [];
+        List<Mouse> receivedEvents = [];
         processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
 
         // Act - Simulate a wheel event
@@ -604,7 +604,7 @@ public class AnsiInputTestableTests
         // Note: ANSI codes 68 and 69 (horizontal wheel) always include Shift flag per ANSI spec
         if (wheelEvent is MouseFlags.WheeledLeft or MouseFlags.WheeledRight)
         {
-            Terminal.Gui.Input.Mouse wheelEventReceived = receivedEvents.First (e => e.Flags.HasFlag (wheelEvent));
+            Mouse wheelEventReceived = receivedEvents.First (e => e.Flags.HasFlag (wheelEvent));
             Assert.True (wheelEventReceived.Flags.HasFlag (MouseFlags.Shift),
                         $"Horizontal wheel events should include Shift flag, got: {wheelEventReceived.Flags}");
         }

@@ -104,7 +104,7 @@ public class WindowsInputProcessorTests
 
         var processor = new WindowsInputProcessor (queue, null);
 
-        List<Terminal.Gui.Input.Mouse> mouseEvents = [];
+        List<Mouse> mouseEvents = [];
 
         processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
@@ -112,7 +112,7 @@ public class WindowsInputProcessorTests
 
         processor.ProcessQueue ();
 
-        Terminal.Gui.Input.Mouse s = Assert.Single (mouseEvents);
+        Mouse s = Assert.Single (mouseEvents);
         Assert.Equal (MouseFlags.PositionReport, s.Flags);
         Assert.Equal (s.ScreenPosition, new (32, 31));
     }
@@ -141,7 +141,7 @@ public class WindowsInputProcessorTests
 
         var processor = new WindowsInputProcessor (queue, null);
 
-        List<Terminal.Gui.Input.Mouse> mouseEvents = [];
+        List<Mouse> mouseEvents = [];
 
         processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
@@ -149,7 +149,7 @@ public class WindowsInputProcessorTests
 
         processor.ProcessQueue ();
 
-        Terminal.Gui.Input.Mouse s = Assert.Single (mouseEvents);
+        Mouse s = Assert.Single (mouseEvents);
         Assert.Equal (s.Flags, MouseFlags.PositionReport | expectedFlag);
         Assert.Equal (s.ScreenPosition, new (32, 31));
     }
@@ -176,7 +176,7 @@ public class WindowsInputProcessorTests
 
         var processor = new WindowsInputProcessor (queue, null);
 
-        List<Terminal.Gui.Input.Mouse> mouseEvents = [];
+        List<Mouse> mouseEvents = [];
 
         processor.SyntheticMouseEvent += (s, e) => { mouseEvents.Add (e); };
 
@@ -184,7 +184,7 @@ public class WindowsInputProcessorTests
 
         processor.ProcessQueue ();
 
-        Terminal.Gui.Input.Mouse s = Assert.Single (mouseEvents);
+        Mouse s = Assert.Single (mouseEvents);
         Assert.Equal (s.Flags, expectedFlag);
         Assert.Equal (s.ScreenPosition, new (32, 31));
     }
@@ -478,7 +478,7 @@ public class WindowsInputProcessorTests
         foreach (Tuple<ButtonState, EventFlags, ControlKeyState, MouseFlags> pair in inputOutputPairs)
         {
             var mockEvent = new MouseEventRecord { ButtonState = pair.Item1, EventFlags = pair.Item2, ControlKeyState = pair.Item3 };
-            Terminal.Gui.Input.Mouse result = processor.ToMouseEvent (mockEvent);
+            Mouse result = processor.ToMouseEvent (mockEvent);
 
             Assert.Equal (pair.Item4, result.Flags);
         }

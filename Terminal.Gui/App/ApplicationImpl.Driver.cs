@@ -42,6 +42,10 @@ internal partial class ApplicationImpl
         }
         else
         {
+            if (!string.IsNullOrEmpty (driverName) && !DriverRegistry.TryGetDriver (driverName, out _))
+            {
+                throw new ArgumentException ($"Driver '{driverName}' is not registered in DriverRegistry.");
+            }
             // Determine which driver to use
             if (!string.IsNullOrEmpty (driverName) && DriverRegistry.TryGetDriver (driverName, out DriverRegistry.DriverDescriptor? descriptor))
             {

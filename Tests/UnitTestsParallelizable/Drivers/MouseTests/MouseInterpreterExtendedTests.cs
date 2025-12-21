@@ -22,19 +22,19 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonPressed }; // Different position
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonReleased };
+        Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Mouse press2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonPressed }; // Different position
+        Mouse release2 = new () { ScreenPosition = new (20, 20), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         _ = interpreter.Process (press1).ToList (); // Discard - just need to process the press
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events2 = interpreter.Process (release1).ToList ();
+        List<Mouse> events2 = interpreter.Process (release1).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
         _ = interpreter.Process (press2).ToList (); // Discard - just need to process the press
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events4 = interpreter.Process (release2).ToList ();
+        List<Mouse> events4 = interpreter.Process (release2).ToList ();
 
         // Assert
         Assert.Equal (2, events2.Count); // Original release + Button1Clicked
@@ -57,19 +57,19 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed };
-        Terminal.Gui.Input.Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
-        Terminal.Gui.Input.Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased };
+        Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed };
+        Mouse release1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Mouse release2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased };
 
         // Act
-        List<Terminal.Gui.Input.Mouse> events1 = interpreter.Process (press1).ToList ();
+        List<Mouse> events1 = interpreter.Process (press1).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events2 = interpreter.Process (press2).ToList ();
+        List<Mouse> events2 = interpreter.Process (press2).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events3 = interpreter.Process (release1).ToList ();
+        List<Mouse> events3 = interpreter.Process (release1).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events4 = interpreter.Process (release2).ToList ();
+        List<Mouse> events4 = interpreter.Process (release2).ToList ();
 
         // Assert
         Assert.Single (events1); // Just Button1Pressed
@@ -99,30 +99,30 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
         // Act - Double-click Button1, then double-click Button2
-        List<Terminal.Gui.Input.Mouse> allEvents = [];
+        List<Mouse> allEvents = [];
 
         // Button1 first click
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button1 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button2 first click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Button2 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Assert
         Assert.Contains (allEvents, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
@@ -141,10 +141,10 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
-        List<Terminal.Gui.Input.Mouse> events = interpreter.Process (release).ToList ();
+        List<Mouse> events = interpreter.Process (release).ToList ();
 
         // Assert
         Assert.Single (events); // Only the original release event
@@ -160,16 +160,16 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
-        Terminal.Gui.Input.Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Mouse press1 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Mouse press2 = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
-        List<Terminal.Gui.Input.Mouse> events1 = interpreter.Process (press1).ToList ();
+        List<Mouse> events1 = interpreter.Process (press1).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events2 = interpreter.Process (press2).ToList ();
+        List<Mouse> events2 = interpreter.Process (press2).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events3 = interpreter.Process (release).ToList ();
+        List<Mouse> events3 = interpreter.Process (release).ToList ();
 
         // Assert
         Assert.Single (events1); // Just Button1Pressed
@@ -195,17 +195,17 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed | modifier };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased | modifier };
+        Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed | modifier };
+        Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased | modifier };
 
         // Act
         _ = interpreter.Process (press).ToList (); // Discard - just need to process the press
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events2 = interpreter.Process (release).ToList ();
+        List<Mouse> events2 = interpreter.Process (release).ToList ();
 
         // Assert
         Assert.Equal (2, events2.Count); // Release + Clicked
-        Terminal.Gui.Input.Mouse? clickEvent = events2.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
+        Mouse? clickEvent = events2.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked));
         Assert.NotNull (clickEvent);
 
         // NOTE: This documents a known limitation - MouseInterpreter's CreateClickEvent method
@@ -230,19 +230,19 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         MouseFlags modifiedReleased = MouseFlags.LeftButtonReleased | MouseFlags.Shift;
 
         // Act - Double-click with Shift held
-        List<Terminal.Gui.Input.Mouse> allEvents = [];
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
+        List<Mouse> allEvents = [];
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Terminal.Gui.Input.Mouse { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
 
         // Assert
-        Terminal.Gui.Input.Mouse? singleClick =
+        Mouse? singleClick =
             allEvents.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonClicked) && !e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked));
-        Terminal.Gui.Input.Mouse? doubleClick = allEvents.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked));
+        Mouse? doubleClick = allEvents.FirstOrDefault (e => e.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked));
 
         Assert.NotNull (singleClick);
         Assert.NotNull (doubleClick);
@@ -269,19 +269,19 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = new (2025, 1, 1, 12, 0, 0);
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act - First click at T=0
         _ = interpreter.Process (press).ToList (); // Discard - just need to process the press
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events2 = interpreter.Process (release).ToList ();
+        List<Mouse> events2 = interpreter.Process (release).ToList ();
 
         // Second click at T=600 (beyond 500ms threshold)
         currentTime = currentTime.AddMilliseconds (600);
         _ = interpreter.Process (press).ToList (); // Discard - just need to process the press
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events4 = interpreter.Process (release).ToList ();
+        List<Mouse> events4 = interpreter.Process (release).ToList ();
 
         // Assert
         Assert.Contains (events2, e => e.Flags == MouseFlags.LeftButtonClicked);
@@ -298,19 +298,19 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         TimeSpan threshold = TimeSpan.FromMilliseconds (500);
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), threshold);
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act - First click
         interpreter.Process (press).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events1 = interpreter.Process (release).ToList ();
+        List<Mouse> events1 = interpreter.Process (release).ToList ();
 
         // Second click exactly at threshold + 1ms
         currentTime = currentTime.Add (threshold).AddMilliseconds (1);
         interpreter.Process (press).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> events2 = interpreter.Process (release).ToList ();
+        List<Mouse> events2 = interpreter.Process (release).ToList ();
 
         // Assert - Should be single click, not double (threshold exceeded)
         Assert.Contains (events2, e => e.Flags == MouseFlags.LeftButtonClicked);
@@ -329,13 +329,13 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
-        Terminal.Gui.Input.Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
+        Mouse press = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed };
+        Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
-        List<Terminal.Gui.Input.Mouse> pressEvents = interpreter.Process (press).ToList ();
+        List<Mouse> pressEvents = interpreter.Process (press).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Terminal.Gui.Input.Mouse> releaseEvents = interpreter.Process (release).ToList ();
+        List<Mouse> releaseEvents = interpreter.Process (release).ToList ();
 
         // Assert - First event should always be the original
         Assert.True (pressEvents.Count >= 1);
@@ -358,10 +358,10 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         DateTime currentTime = DateTime.Now;
         MouseInterpreter interpreter = new (new FuncTimeProvider (() => currentTime), TimeSpan.FromMilliseconds (500));
 
-        Terminal.Gui.Input.Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = flags };
+        Mouse mouse = new () { ScreenPosition = new (10, 10), Flags = flags };
 
         // Act
-        List<Terminal.Gui.Input.Mouse> events = interpreter.Process (mouse).ToList ();
+        List<Mouse> events = interpreter.Process (mouse).ToList ();
 
         // Assert - Should only yield the original event, no synthetic events
         Assert.Single (events);

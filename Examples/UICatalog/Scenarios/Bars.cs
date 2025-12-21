@@ -174,23 +174,6 @@ public class Bars : Scenario
 
         menuLikeExamples.MouseEvent += MenuLikeExamplesMouseEvent;
 
-        void MenuLikeExamplesMouseEvent (object _, Mouse mouse)
-        {
-            if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
-            {
-                popOverMenu.X = mouse.Position!.Value.X;
-                popOverMenu.Y = mouse.Position!.Value.Y;
-                popOverMenu.Visible = true;
-                //popOverMenu.Enabled = popOverMenu.Visible;
-                popOverMenu.SetFocus ();
-            }
-            else
-            {
-                popOverMenu.Visible = false;
-                //popOverMenu.Enabled = popOverMenu.Visible;
-            }
-        }
-
         FrameView statusBarLikeExamples = new ()
         {
             Title = "StatusBar-Like Examples",
@@ -257,21 +240,20 @@ public class Bars : Scenario
 
         return;
 
-        void MenuLikeExamplesMouseEvent (object _, MouseEventArgs mouse)
-        {
-            if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
-            {
-                popOverMenu.X = mouse.Position.X;
-                popOverMenu.Y = mouse.Position.Y;
-                popOverMenu.Visible = true;
 
+        void MenuLikeExamplesMouseEvent (object _, Mouse mouse)
+        {
+            if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
+            {
+                popOverMenu.X = mouse.Position!.Value.X;
+                popOverMenu.Y = mouse.Position!.Value.Y;
+                popOverMenu.Visible = true;
                 //popOverMenu.Enabled = popOverMenu.Visible;
                 popOverMenu.SetFocus ();
             }
             else
             {
                 popOverMenu.Visible = false;
-
                 //popOverMenu.Enabled = popOverMenu.Visible;
             }
         }

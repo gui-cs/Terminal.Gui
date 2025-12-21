@@ -127,7 +127,7 @@ public abstract class EditorBase : View
         ViewToEdit = App!.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, Terminal.Gui.Input.Mouse mouse)
+    private void ApplicationOnMouseEvent (object? sender, Mouse mouse)
     {
         if (mouse.Flags != MouseFlags.LeftButtonClicked || !AutoSelectViewToEdit)
         {

@@ -51,7 +51,7 @@ public class ApplicationMouseEnterLeaveTests
         var mousePosition = new Point (1, 1);
         List<View?> currentViewsUnderMouse = [view];
 
-        var mouse = new Terminal.Gui.Input.Mouse
+        var mouse = new Mouse
         {
             Position = mousePosition,
             ScreenPosition = mousePosition
@@ -86,7 +86,7 @@ public class ApplicationMouseEnterLeaveTests
         runnable.Add (view);
         var mousePosition = new Point (0, 0);
         List<View?> currentViewsUnderMouse = new ();
-        var mouse = new Terminal.Gui.Input.Mouse ();
+        var mouse = new Mouse ();
 
         app.Mouse.CachedViewsUnderMouse.Clear ();
         app.Mouse.CachedViewsUnderMouse.Add (view);
@@ -196,7 +196,7 @@ public class ApplicationMouseEnterLeaveTests
         runnable.Add (view);
         var mousePosition = new Point (0, 0);
         List<View?> currentViewsUnderMouse = new ();
-        var mouse = new Terminal.Gui.Input.Mouse ();
+        var mouse = new Mouse ();
 
         app.Mouse.CachedViewsUnderMouse.Clear ();
 

@@ -63,7 +63,7 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouse = new Terminal.Gui.Input.Mouse ();
+        var mouse = new Mouse ();
 
         var eventArgs = new CancelEventArgs ();
 
@@ -136,7 +136,7 @@ public class MouseEnterLeaveTests
             Enabled = true, Visible = true
         };
 
-        var mouse = new Terminal.Gui.Input.Mouse ();
+        var mouse = new Mouse ();
 
         // Act
         view.NewMouseLeaveEvent ();
@@ -159,7 +159,7 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouse = new Terminal.Gui.Input.Mouse ();
+        var mouse = new Mouse ();
 
         // Act
         view.NewMouseLeaveEvent ();
@@ -256,7 +256,7 @@ public class MouseEnterLeaveTests
             Visible = true
         };
 
-        var mouse = new Terminal.Gui.Input.Mouse ();
+        var mouse = new Mouse ();
 
         // Act
         view.NewMouseLeaveEvent ();
@@ -279,7 +279,7 @@ public class MouseEnterLeaveTests
             Visible = false
         };
 
-        var mouse = new Terminal.Gui.Input.Mouse ();
+        var mouse = new Mouse ();
 
         // Act
         view.NewMouseLeaveEvent ();

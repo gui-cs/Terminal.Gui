@@ -114,6 +114,14 @@ public class InitTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void Init_Invalid_DriverName_Throws ()
+    {
+        using IApplication app = Application.Create ();
+        Assert.Throws<ArgumentException> (() => app.Init ("nonexistent_driver"));
+        Assert.Throws<ArgumentException> (() => app.Init ("fake"));
+    }
+
+    [Fact]
     public void Init_Dispose_Resets_Instance_Properties ()
     {
         IApplication app = Application.Create ();
