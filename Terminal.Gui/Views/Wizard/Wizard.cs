@@ -61,10 +61,14 @@ public class Wizard : Runnable, IDesignable
     /// </remarks>
     public Wizard ()
     {
+        TabStop = TabBehavior.TabGroup;
         X = Pos.Center ();
         Y = Pos.Center ();
         Width = Dim.Auto (minimumContentDim: Dim.Percent (80), maximumContentDim: Dim.Percent (90));
         Height = Dim.Auto (minimumContentDim: Dim.Percent (10), maximumContentDim: Dim.Percent (90));
+
+        SetStyle ();
+
 
         BackButton = new ()
         {
@@ -80,7 +84,7 @@ public class Wizard : Runnable, IDesignable
             X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd ()
         };
-        NextFinishButton.FrameChanged += (_, _) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height }; };
+        NextFinishButton.FrameChanged += (_, _) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height}; };
 
         AddCommand (Command.Quit, QuitHandler);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
@@ -97,6 +101,27 @@ public class Wizard : Runnable, IDesignable
         }
     }
 
+    private void SetStyle ()
+    {
+        if (IsRunning)
+        {
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Base));
+            BorderStyle = Dialog.DefaultBorderStyle;
+            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
+            base.ShadowStyle = Dialog.DefaultShadow;
+        }
+        else
+        {
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
+            BorderStyle = LineStyle.Dotted;
+            // strip out movable and resizable
+            Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
+            base.ShadowStyle = ShadowStyle.None;
+        }
+    }
+
     /// <inheritdoc />
     protected override void OnTitleChanged ()
     {
@@ -109,27 +134,9 @@ public class Wizard : Runnable, IDesignable
     /// <inheritdoc/>
     public override void EndInit ()
     {
-        if (IsModal)
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            BorderStyle = LineStyle.Double;
-            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
-            base.ShadowStyle = Dialog.DefaultShadow;
-        }
-        else
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
-            BorderStyle = LineStyle.Single;
-            base.ShadowStyle = ShadowStyle.None;
-        }
-
         // Configure Padding
         if (Padding is { })
         {
-            Padding.SetScheme (SchemeManager.GetScheme (Schemes.Base));
-            Padding.CanFocus = true;
-            TabStop = TabBehavior.TabStop;
-
             // Add buttons to bottom Padding instead of using AddButton
             Padding?.Add (BackButton);
             Padding?.Add (NextFinishButton);
@@ -140,6 +147,14 @@ public class Wizard : Runnable, IDesignable
 
         CurrentStep = GetFirstStep ();
         base.EndInit ();
+    }
+
+    /// <inheritdoc />
+    protected override void OnIsModalChanged (bool newIsModal)
+    {
+        SetStyle ();
+
+        base.OnIsModalChanged (newIsModal);
     }
 
     /// <summary>
@@ -196,19 +211,13 @@ public class Wizard : Runnable, IDesignable
         _maxStepSize = new (
                             Math.Max (_maxStepSize.Width, newStep.Frame.Width),
                             Math.Max (_maxStepSize.Height, newStep.Frame.Height));
-
-        //newStep.BorderStyle = LineStyle.None;
-        //newStep.Border!.Thickness = new(0, 0, 0, 1);
-        //newStep.Padding!.Thickness = newStep.Padding!.Thickness with { Left = 1, Right = 1 };
-
-        // newStep.X = -1;
         newStep.Width = Dim.Fill ();
         newStep.Height = Dim.Fill ();
 
         newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
         newStep.LayoutSubViews ();
         Width = Dim.Auto (minimumContentDim: _maxStepSize.Width + 2);
-        Height = Dim.Auto (minimumContentDim: _maxStepSize.Height + NextFinishButton.Frame.Height + 3);
+        Height = Dim.Auto (minimumContentDim: _maxStepSize.Height + NextFinishButton.Frame.Height );
 
         UpdateButtonsAndTitle ();
     }

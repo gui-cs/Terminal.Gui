@@ -18,7 +18,7 @@ public class WizardStep : View, IDesignable
     {
         CanFocus = true,
         TabStop = TabBehavior.TabStop,
-        //ReadOnly = true,
+        ReadOnly = true,
         WordWrap = true,
         AllowsTab = false,
         X = Pos.AnchorEnd () + 1,
@@ -35,12 +35,8 @@ public class WizardStep : View, IDesignable
     {
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
-        BorderStyle = LineStyle.Dotted;
-
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-
-        Arrangement = ViewArrangement.Movable | ViewArrangement.RightResizable | ViewArrangement.BottomResizable;
     }
 
     /// <inheritdoc/>

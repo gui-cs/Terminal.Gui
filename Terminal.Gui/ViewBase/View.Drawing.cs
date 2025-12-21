@@ -29,7 +29,7 @@ public partial class View // Drawing APIs
         }
 
         // Draw Transparent margins last to ensure they are drawn on top of the content.
-        Margin.DrawTransparentMargins (viewsArray);
+        Margin.DrawMargins (viewsArray);
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)

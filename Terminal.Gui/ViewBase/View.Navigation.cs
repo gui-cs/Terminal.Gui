@@ -97,12 +97,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
                     return false;
                 }
 
-                // TabGroup is special-cased. 
+                // TabGroup is special-cased.
                 if (focused?.TabStop == TabBehavior.TabGroup)
                 {
-                    if (SuperView?.GetFocusChain (direction, TabBehavior.TabGroup)?.Length > 0)
+                    if (SuperView?.GetFocusChain (direction, TabBehavior.TabGroup).Length > 0)
                     {
-                        // Our superview has a TabGroup subview; signal we couldn't move so we nav out to it
+                        // Our superview has a TabGroup subview; signal we couldn't move so nav out to it
                         return false;
                     }
                 }
@@ -348,7 +348,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         get
         {
-            View? focused = GetSubViews (includeAdornments: true).FirstOrDefault (v => v.HasFocus);
+            View? focused = GetSubViews (includePadding: true).FirstOrDefault (v => v.HasFocus);
 
             if (focused is { })
             {
@@ -841,7 +841,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 // Temporarily ensure this view can't get focus
                 bool prevCanFocus = _canFocus;
                 _canFocus = false;
-                bool restoredFocus = applicationFocused!.RestoreFocus ();
+                bool restoredFocus = applicationFocused.RestoreFocus ();
                 _canFocus = prevCanFocus;
 
                 if (restoredFocus)
@@ -922,9 +922,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return;
         }
 
-        // Get whatever peer has focus, if any so we can update our superview's _previouslyMostFocused
-        View? focusedPeer = superViewOrParent?.Focused;
-
         // Set HasFocus false
         _hasFocus = false;
 
@@ -987,7 +984,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         This event cannot be cancelled.
     ///     </para>
     /// </remarks>
+#pragma warning disable CS0067 // Event is never used
     public event EventHandler<HasFocusEventArgs>? HasFocusChanged;
+#pragma warning restore CS0067 // Event is never used
 
     #endregion HasFocus
 
@@ -1007,35 +1006,28 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (behavior.HasValue)
         {
-            filteredSubViews = GetSubViews (includeAdornments: true)?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includePadding: true)
+                .Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            filteredSubViews = GetSubViews (includeAdornments: true)?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includePadding: true)
+                .Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
-        // How about in Adornments? 
-        if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior)
+        if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior && Padding.Thickness != Thickness.Empty)
         {
-            filteredSubViews = filteredSubViews?.Append (Padding);
+            filteredSubViews = filteredSubViews.Append (Padding);
         }
 
-        if (Border is { CanFocus: true, Visible: true, Enabled: true } && Border.TabStop == behavior)
-        {
-            filteredSubViews = filteredSubViews?.Append (Border);
-        }
-
-        if (Margin is { CanFocus: true, Visible: true, Enabled: true } && Margin.TabStop == behavior)
-        {
-            filteredSubViews = filteredSubViews?.Append (Margin);
-        }
+        // Border and Margin do not participate in focus chain navigation.
 
         if (direction == NavigationDirection.Backward)
         {
             filteredSubViews = filteredSubViews?.Reverse ();
         }
 
-        return filteredSubViews?.ToArray () ?? Array.Empty<View> ();
+        return filteredSubViews?.ToArray () ?? [];
     }
 
     private TabBehavior? _tabStop;

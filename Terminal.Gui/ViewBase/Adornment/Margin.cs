@@ -75,7 +75,7 @@ public class Margin : Adornment
     /// </remarks>
     /// <param name="views"></param>
     /// <returns><see langword="true"/></returns>
-    internal static bool DrawTransparentMargins(IEnumerable<View> views)
+    internal static bool DrawMargins(IEnumerable<View> views)
     {
         Stack<View> stack = new(views);
 
@@ -96,8 +96,9 @@ public class Margin : Adornment
                 margin.ClearCachedClip();
             }
 
-            foreach (View subview in view.GetSubViews(includeAdornments: true)
-                                         .OrderBy(v => v.HasFocus && v.ShadowStyle != ShadowStyle.None)
+            // Do not include Margin views of subviews; not supported
+            foreach (View subview in view.GetSubViews(includeMargin: false, includePadding: true, includeBorder: true)
+                                         .OrderBy(v => v.ShadowStyle != ShadowStyle.None)
                                          .Reverse())
             {
                 stack.Push(subview);
@@ -143,7 +144,6 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Don't clear where the shadow goes
-            screen = Rectangle.Inflate(screen, -ShadowSize.Width, -ShadowSize.Height);
         }
 
         return true;

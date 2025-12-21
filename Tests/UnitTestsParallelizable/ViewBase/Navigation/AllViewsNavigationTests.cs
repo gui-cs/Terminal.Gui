@@ -25,6 +25,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
 
             return;
         }
+
         if (view is IDesignable designable)
         {
             designable.EnableForDesign ();
@@ -115,6 +116,11 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
             output.WriteLine ($"Ignoring {viewType} - It's an IRunnable");
 
             return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
         }
 
         IApplication app = Application.Create ();
