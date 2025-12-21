@@ -4766,6 +4766,10 @@ public class TextView : View, IDesignable
                It supports word wrap and history for undo.
                """;
 
+        // This enables AllViews_HasFocus_Changed_Event to pass since it requires
+        // tab navigation to work
+        AllowsTab = false;
+
         return true;
     }
 

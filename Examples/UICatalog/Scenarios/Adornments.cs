@@ -1,4 +1,7 @@
-﻿using System;
+﻿#nullable enable
+// ReSharper disable AccessToDisposedClosure
+
+// ReSharper disable AssignNullToNotNullAttribute
 
 namespace UICatalog.Scenarios;
 
@@ -10,12 +13,11 @@ public class Adornments : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.BorderStyle = LineStyle.None;
 
         var editor = new AdornmentsEditor
         {
@@ -31,7 +33,7 @@ public class Adornments : Scenario
 
         appWindow.Add (editor);
 
-        var window = new Window
+        Window window = new ()
         {
             Title = "The _Window",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable,
@@ -41,29 +43,29 @@ public class Adornments : Scenario
         };
         appWindow.Add (window);
 
-        var tf1 = new TextField { Width = 10, Text = "TextField" };
-        var color = new ColorPicker16 { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
+        TextField tf1 = new () { Width = 10, Text = "TextField" };
+        ColorPicker16 color = new () { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
         color.BorderStyle = LineStyle.RoundedDotted;
 
-        color.ColorChanged += (s, e) =>
+        color.ColorChanged += (_, e) =>
                               {
                                   color.SuperView!.SetScheme (
-                                                             new (color.SuperView.GetScheme ())
-                                                             {
-                                                                 Normal = new (
-                                                                               color.SuperView.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                               e.Result,
-                                                                               color.SuperView.GetAttributeForRole (VisualRole.Normal).Style
-                                                                              )
-                                                             });
+                                                              new (color.SuperView.GetScheme ())
+                                                              {
+                                                                  Normal = new (
+                                                                                color.SuperView.GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                                e.Result,
+                                                                                color.SuperView.GetAttributeForRole (VisualRole.Normal).Style
+                                                                               )
+                                                              });
                               };
 
-        var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
+        Button button = new () { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
-        button.Accepting += (s, e) =>
-                             MessageBox.Query (appWindow.App, 20, 7, "Hi", $"Am I a {window.GetType ().Name}?", "Yes", "No");
+        button.Accepting += (_, _) =>
+                                MessageBox.Query (appWindow.App!, 20, 7, "Hi", $"Am I a {window.GetType ().Name}?", "Yes", "No");
 
-        var label = new TextView
+        TextView label = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (button),
@@ -74,9 +76,9 @@ public class Adornments : Scenario
         };
         label.Border!.Thickness = new (1, 3, 1, 1);
 
-        var btnButtonInWindow = new Button { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
+        Button btnButtonInWindow = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
 
-        var labelAnchorEnd = new Label
+        Label labelAnchorEnd = new ()
         {
             Y = Pos.AnchorEnd (),
             Width = 40,
@@ -87,68 +89,76 @@ public class Adornments : Scenario
 
         window.Margin!.Data = "Margin";
         window.Margin!.Text = "Margin Text";
-        window.Margin!.Thickness = new (0);
+        window.Margin!.Thickness = new (3);
 
         window.Border!.Data = "Border";
         window.Border!.Text = "Border Text";
-        window.Border!.Thickness = new (0);
+        window.Border!.Thickness = new (5);
+        window.Border!.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
-        window.Padding.Data = "Padding";
+        window.Padding!.Data = "Padding";
         window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
-        window.Padding.Thickness = new (3);
-        window.Padding.SchemeName = "Error";
+        window.Padding.Thickness = new (4);
+        window.Padding!.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
         window.Padding.CanFocus = true;
 
-        var longLabel = new Label
+        Label longLabel = new ()
         {
             X = 40, Y = 5, Title = "This is long text (in a label) that should clip."
         };
         longLabel.TextFormatter.WordWrap = true;
         window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
 
-        window.Initialized += (s, e) =>
+        window.Initialized += (_, _) =>
                               {
                                   editor.ViewToEdit = window;
 
                                   editor.ShowViewIdentifier = true;
 
-                                  var labelInPadding = new Label { X = 0, Y = 1, Title = "_Text:" };
-                                  window.Padding.Add (labelInPadding);
+                                  // NOTE: Adding SubViews to Margin is not supported
 
-                                  var textFieldInPadding = new TextField
-                                  {
-                                      X = Pos.Right (labelInPadding) + 1,
-                                      Y = Pos.Top (labelInPadding), Width = 10,
-                                      Text = "text (Y = 1)",
-                                      CanFocus = true
-                                  };
-                                  textFieldInPadding.Accepting += (s, e) => MessageBox.Query (appWindow.App, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
-                                  window.Padding.Add (textFieldInPadding);
-
-                                  var btnButtonInPadding = new Button
+                                  Button btnButtonInBorder = new ()
                                   {
                                       X = Pos.Center (),
                                       Y = 1,
-                                      Text = "_Button in Padding Y = 1",
-                                      CanFocus = true,
-                                      HighlightStates = MouseState.None,
+                                      Text = "_Button in Border Y = 1"
                                   };
-                                  btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (appWindow.App, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
-                                  btnButtonInPadding.BorderStyle = LineStyle.Dashed;
-                                  btnButtonInPadding.Border!.Thickness = new (1, 1, 1, 1);
+                                  btnButtonInBorder.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Border Pressed!", "Ok");
+                                  window.Border.Add (btnButtonInBorder);
+
+                                  Label labelInPadding = new () { X = 0, Y = 1, Title = "_Text:" };
+                                  window.Padding.Add (labelInPadding);
+
+                                  TextField textFieldInPadding = new ()
+                                  {
+                                      X = Pos.Right (labelInPadding) + 1,
+                                      Y = Pos.Top (labelInPadding), Width = 10,
+                                      Text = "text (Y = 1)"
+                                  };
+
+                                  textFieldInPadding.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
+                                  window.Padding.Add (textFieldInPadding);
+
+                                  Button btnButtonInPadding = new ()
+                                  {
+                                      X = Pos.Center (),
+                                      Y = 1,
+                                      Text = "_Button in Padding Y = 1"
+                                  };
+                                  btnButtonInPadding.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
                                 btnButtonInPadding.Border!.CloseButton.Visible = true;
 
                                 view.Border!.CloseButton.Visible = true;
-                                view.Border!.CloseButton.Accept += (s, e) =>
+                                view.Border!.CloseButton.Accept += (_, _) =>
                                                                   {
                                                                       MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
                                                                       e.Handled = true;
                                                                   };
 
-                                view.Accept += (s, e) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
+                                view.Accept += (_, _) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
 #endif
                               };
 
@@ -156,9 +166,6 @@ public class Adornments : Scenario
         editor.AutoSelectSuperView = window;
         editor.AutoSelectAdornments = true;
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 }
