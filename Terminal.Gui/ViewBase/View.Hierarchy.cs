@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -18,6 +17,73 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     Use <see cref="Add(View?)"/> and <see cref="Remove(View?)"/> to add or remove subviews.
     /// </remarks>
     public IReadOnlyCollection<View> SubViews => InternalSubViews?.AsReadOnly () ?? _empty;
+
+    /// <summary>
+    ///     Gets all SubViews of this View, optionally including SubViews of the View's Adornments
+    ///     (Margin, Border, and Padding).
+    /// </summary>
+    /// <param name="includeMargin">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Margin"/>. If <see langword="false"/> (default),
+    ///     returns only the direct SubViews
+    ///     of this View.
+    /// </param>
+    /// <param name="includeBorder">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Border"/>. If <see langword="false"/> (default),
+    ///     returns only the direct SubViews
+    ///     of this View.
+    /// </param>
+    /// <param name="includePadding">
+    ///     If <see langword="true"/>, includes SubViews from <see cref="Padding"/>. If <see langword="false"/> (default),
+    ///     returns only the direct SubViews
+    ///     of this View.
+    /// </param>
+    /// <returns>
+    ///     A read-only collection containing all SubViews. If <paramref name="includeMargin"/> is
+    ///     <see langword="true"/>, the collection includes SubViews from this View's direct SubViews as well
+    ///     as SubViews from the Margin, Border, and Padding adornments.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method returns a snapshot of the SubViews at the time of the call. The collection is
+    ///         safe to iterate even if SubViews are added or removed during iteration.
+    ///     </para>
+    ///     <para>
+    ///         The order of SubViews in the returned collection is:
+    ///         <list type="number">
+    ///             <item>Direct SubViews of this View</item>
+    ///             <item>SubViews of Margin (if <paramref name="includeMargin"/> is <see langword="true"/>)</item>
+    ///             <item>SubViews of Border (if <paramref name="includeBorder"/> is <see langword="true"/>)</item>
+    ///             <item>SubViews of Padding (if <paramref name="includePadding"/> is <see langword="true"/>)</item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
+    public virtual IReadOnlyCollection<View> GetSubViews (bool includeMargin = false, bool includeBorder = false, bool includePadding = false)
+    {
+        List<View> result = [];
+
+        // Add direct SubViews
+        result.AddRange (InternalSubViews);
+
+        if (includeMargin && Margin is { SubViews: { Count: > 0 } } && Margin.Thickness != Thickness.Empty)
+        {
+            // Add Margin SubViews
+            result.AddRange (Margin.SubViews);
+        }
+
+        if (includeBorder && Border is { SubViews: { Count: > 0 } } && Border.Thickness != Thickness.Empty)
+        {
+            // Add Border SubViews
+            result.AddRange (Border.SubViews);
+        }
+
+        if (includePadding && Padding is { SubViews: { Count: > 0 } } && Padding.Thickness != Thickness.Empty)
+        {
+            // Add Padding SubViews
+            result.AddRange (Padding.SubViews);
+        }
+
+        return result.AsReadOnly ();
+    }
 
     private View? _superView;
 
@@ -40,7 +106,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     {
         if (_superView == value)
         {
-           return true;
+            return true;
         }
 
         return CWPPropertyHelper.ChangeProperty (
@@ -87,7 +153,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     #region AddRemove
 
-    // TODO: Make this non-virtual once WizardStep is refactored to use events
     /// <summary>Adds a SubView (child) to this view.</summary>
     /// <remarks>
     ///     <para>
@@ -117,7 +182,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
-    public virtual View? Add (View? view)
+    public View? Add (View? view)
     {
         if (view is null)
         {
@@ -136,6 +201,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             Logging.Warning ($"{view} has already been Added to {this}.");
         }
 
+        // TODO: Add AddingSubView event
+        if (this is Margin)
+        {
+            if (view is not ShadowView)
+            {
+                throw new InvalidOperationException ("SubViews of Margin are not supported.");
+            }
+        }
+
         // TODO: Make this thread safe
         InternalSubViews.Add (view);
 
@@ -143,6 +217,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         if (!view.SetSuperView (this))
         {
             InternalSubViews.Remove (view);
+
             // The change was cancelled
             return null;
         }
@@ -226,7 +301,6 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </remarks>
     public event EventHandler<SuperViewChangedEventArgs>? SubViewAdded;
 
-    // TODO: Make this non-virtual once WizardStep is refactored to use events
     /// <summary>Removes a SubView added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
     ///     <para>
@@ -253,7 +327,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
-    public virtual View? Remove (View? view)
+    public View? Remove (View? view)
     {
         if (view is null)
         {
@@ -308,7 +382,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return null;
         }
 
-        Debug.Assert(view.SuperView is null);
+        Debug.Assert (view.SuperView is null);
         InternalSubViews.Remove (view);
 
         // Clean up focus stuff
