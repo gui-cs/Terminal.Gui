@@ -1,13 +1,12 @@
-#nullable disable
 ﻿namespace Terminal.Gui.Views;
 
-/// <summary><see cref="EventArgs"/> for <see cref="Slider{T}"/> events.</summary>
-public class SliderEventArgs<T> : EventArgs
+/// <summary><see cref="EventArgs"/> for <see cref="LinearRange{T}"/> events.</summary>
+public class LinearRangeEventArgs<T> : EventArgs
 {
-    /// <summary>Initializes a new instance of <see cref="SliderEventArgs{T}"/></summary>
+    /// <summary>Initializes a new instance of <see cref="LinearRangeEventArgs{T}"/></summary>
     /// <param name="options">The current options.</param>
     /// <param name="focused">Index of the option that is focused. -1 if no option has the focus.</param>
-    public SliderEventArgs (Dictionary<int, SliderOption<T>> options, int focused = -1)
+    public LinearRangeEventArgs (Dictionary<int, LinearRangeOption<T>> options, int focused = -1)
     {
         Options = options;
         Focused = focused;
@@ -21,5 +20,5 @@ public class SliderEventArgs<T> : EventArgs
     public int Focused { get; set; }
 
     /// <summary>Gets/sets whether the option is set or not.</summary>
-    public Dictionary<int, SliderOption<T>> Options { get; set; }
+    public Dictionary<int, LinearRangeOption<T>> Options { get; set; }
 }

@@ -1,8 +1,7 @@
-
 namespace Terminal.Gui.Views;
 
-/// <summary>All <see cref="Slider{T}"/> configuration are grouped in this class.</summary>
-internal class SliderConfiguration
+/// <summary>All <see cref="LinearRange{T}"/> configuration are grouped in this class.</summary>
+internal class LinearRangeConfiguration
 {
     internal bool _allowEmpty;
     internal int _endSpacing;
@@ -13,8 +12,8 @@ internal class SliderConfiguration
     internal bool _showEndSpacing;
     internal bool _showLegends;
     internal bool _showLegendsAbbr;
-    internal Orientation _sliderOrientation = Orientation.Horizontal;
+    internal Orientation _linearRangeOrientation = Orientation.Horizontal;
     internal int _startSpacing;
-    internal SliderType _type = SliderType.Single;
+    internal LinearRangeType _type = LinearRangeType.Single;
     internal bool _useMinimumSize;
 }
