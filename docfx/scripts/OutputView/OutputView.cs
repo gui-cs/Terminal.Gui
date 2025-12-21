@@ -30,6 +30,8 @@ string? viewName = null;
 string? outputFile = null;
 
 string [] commandArgs = Environment.GetCommandLineArgs ();
+bool ansi = false;
+bool addBorderFrame = false;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -49,6 +51,14 @@ for (var i = 0; i < commandArgs.Length; i++)
     {
         outputFile = commandArgs [i + 1];
     }
+    else if (commandArgs [i] == "--frame" || commandArgs [i] == "-f")
+    {
+        addBorderFrame = true;
+    }
+    else if (commandArgs [i] == "--ansi" || commandArgs [i] == "-a")
+    {
+        ansi = true;
+    }
 }
 
 if (string.IsNullOrEmpty (viewName))
@@ -59,24 +69,41 @@ if (string.IsNullOrEmpty (viewName))
 }
 
 ViewDemoWindow.ViewName = viewName;
+ViewDemoWindow.AddBorderFrame = addBorderFrame;
 
 IApplication app = Application.Create ();
 app.Init (DriverRegistry.Names.ANSI);
 
 // Force 16 colors and end after first iteration
 app.StopAfterFirstIteration = true;
-app.Driver!.Force16Colors = true;
+app.Driver!.Force16Colors = !ansi;
+app.Driver!.SetScreenSize (80, 20);
 
-app.Run<ViewDemoWindow> ();
-app.LayoutAndDraw ();
-string output = app.ToString ().Trim ();
+string? result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+if (result is { })
+{
+    Console.WriteLine (result);
+
+    return;
+}
+
+// Run it again, since it set the Screen size to just fit
+result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
 app.Dispose ();
 
-if (string.IsNullOrEmpty(output))
+if (string.IsNullOrEmpty (output))
 {
     Console.WriteLine (@"No output was generated.");
 
     return;
+}
+
+if (ansi)
+{
+    output = AnsiConsoleToHtml.AnsiConsole.ToHtml (output);
 }
 
 // Write to file or console
@@ -90,7 +117,7 @@ else
 }
 
 // Defines a top-level window with border and title
-internal class ViewDemoWindow : Window
+internal class ViewDemoWindow : Runnable<string>
 {
     public static string? ViewName { get; set; }
 
@@ -103,13 +130,26 @@ internal class ViewDemoWindow : Window
         // Use only white on black
         SetScheme (new (new Attribute (ColorName16.White, ColorName16.Black)));
         BorderStyle = LineStyle.None;
+    }
+
+    public static bool AddBorderFrame { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnIsRunningChanged (bool newIsRunning)
+    {
+        base.OnIsRunningChanged (newIsRunning);
+
+        if (!newIsRunning)
+        {
+            return;
+        }
 
         // Convert ViewName to type that's in the Terminal.Gui assembly:
         Type? type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
 
         if (type is null)
         {
-            Console.WriteLine (@$"View {ViewName} type is invalid.");
+            Result = @$"`{ViewName}` type is not a valid Terminal.Gui View type.";
 
             return;
         }
@@ -119,7 +159,7 @@ internal class ViewDemoWindow : Window
 
         if (view is null)
         {
-            Console.WriteLine (@$"View {ViewName} could not be created.");
+            Result = @$"`{ViewName}` could not be created.";
 
             return;
         }
@@ -128,6 +168,9 @@ internal class ViewDemoWindow : Window
         view.Initialized += ViewInitialized;
 
         Add (view);
+
+        Layout ();
+        App?.Driver?.SetScreenSize (view.Frame.Width, view.Frame.Height);
     }
 
     private static View? CreateView (Type type)
@@ -175,7 +218,7 @@ internal class ViewDemoWindow : Window
         {
             view.Text = "This is some demo text.";
         }
-        view.Title = $"View: {type.Name}";
+        //view.Title = $"View: {type.Name}";
 
         return view;
     }
@@ -200,7 +243,7 @@ internal class ViewDemoWindow : Window
         view.X = 0;
         view.Y = 0;
 
-        if (view.BorderStyle == LineStyle.None)
+        if (AddBorderFrame && view.BorderStyle == LineStyle.None)
         {
             view.BorderStyle = LineStyle.Dotted;
         }

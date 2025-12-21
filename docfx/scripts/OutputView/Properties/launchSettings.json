@@ -7,6 +7,10 @@
     "OutputView ": {
       "commandName": "Project",
       "commandLineArgs": "--view=GraphView"
+    },
+    "OutputView --ansi": {
+      "commandName": "Project",
+      "commandLineArgs": "--view=ColorPicker --ansi --output=\"ColorPIcker.html\"\r\n"
     }
   }
 }
