@@ -211,7 +211,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         // TODO: Add AddingSubView event
-        if (this is Margin margin)
+        if (this is Margin)
         {
             if (view is not ShadowView)
             {
