@@ -652,8 +652,8 @@ public class LinearRange<T> : View, IOrientation
             // Hello
             // Left = He
             // Right = lo
-            int firstLeft = (first.Length - 1) / 2; // Chars count of the first option to the left.
-            int lastRight = last.Length / 2; // Chars count of the last option to the right.
+            int firstLeft = (first!.Length - 1) / 2; // Chars count of the first option to the left.
+            int lastRight = last!.Length / 2; // Chars count of the last option to the right.
 
             if (_config._linearRangeOrientation != _config._legendsOrientation)
             {
