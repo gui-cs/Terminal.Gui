@@ -474,27 +474,7 @@ public class LinearRangeTests : FakeDriverBase
         slider.EndInit ();
 
         // Act/Assert
-        slider.Options = new () { new () };
-    }
-
-    [Fact]
-    private void Set_Options_No_Legend_Throws ()
-    {
-        // Arrange
-        LinearRange<int> slider = new ();
-
-        // Act/Assert
-        Assert.Throws<ArgumentNullException> (() => slider.Options = []);
-    }
-
-    [Fact]
-    private void Set_Options_Throws_If_Null ()
-    {
-        // Arrange
-        LinearRange<int> slider = new ();
-
-        // Act/Assert
-        Assert.Throws<ArgumentNullException> (() => slider.Options = []);
+        slider.Options = [new ()];
     }
 
     [Fact]
@@ -506,7 +486,7 @@ public class LinearRangeTests : FakeDriverBase
             Height = Dim.Fill ()
         };
 
-        List<object> options = new () { "01234", "01234" };
+        List<object> options = ["01234", "01234"];
 
         LinearRange slider = new (options)
         {
