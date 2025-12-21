@@ -614,7 +614,7 @@ public class ScrollBar : View, IOrientation, IDesignable
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        OrientationChanged += (sender, args) =>
+        OrientationChanged += (_, args) =>
                               {
                                   if (args.Value == Orientation.Vertical)
                                   {
