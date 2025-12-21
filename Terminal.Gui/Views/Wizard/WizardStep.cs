@@ -59,7 +59,7 @@ public class WizardStep : View, IDesignable
     public string BackButtonText { get; set; } = string.Empty;
 
     /// <summary>Calculates the width for the help text padding based on the current frame width.</summary>
-    private int CalculateHelpPaddingWidth () { return 25; }
+    private int CalculateHelpPaddingWidth () => 25;
 
     /// <inheritdoc/>
     protected override void OnFrameChanged (in Rectangle frame)
@@ -106,14 +106,12 @@ public class WizardStep : View, IDesignable
         if (_helpTextView.Text.Length > 0)
         {
             // Configure Padding
-            if (Padding is { })
-            {
-                Padding.CanFocus = true;
-                Padding.TabStop = TabBehavior.TabStop;
 
-                // Help text goes in right Padding - set thickness based on current frame width
-                Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
-            }
+            Padding.CanFocus = true;
+            Padding.TabStop = TabBehavior.TabStop;
+
+            // Help text goes in right Padding - set thickness based on current frame width
+            Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
 
             _helpTextView.Visible = true;
             _helpTextView.Enabled = true;
@@ -121,13 +119,11 @@ public class WizardStep : View, IDesignable
         else
         {
             // Configure Padding
-            if (Padding is { })
-            {
-                Padding.CanFocus = false;
 
-                // No help text - no right padding needed
-                Padding.Thickness = Padding.Thickness with { Right = 0 };
-            }
+            Padding.CanFocus = false;
+
+            // No help text - no right padding needed
+            Padding.Thickness = Padding.Thickness with { Right = 0 };
 
             _helpTextView.Visible = false;
             _helpTextView.Enabled = false;

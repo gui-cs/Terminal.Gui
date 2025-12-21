@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>The Padding for a <see cref="View"/>. Accessed via <see cref="View.Padding"/></summary>
@@ -23,12 +21,12 @@ public class Padding : Adornment
 
     /// <summary>Called when a mouse event occurs within the Padding.</summary>
     /// <remarks>
-    /// <para>
-    /// The coordinates are relative to <see cref="View.Viewport"/>.
-    /// </para>
-    /// <para>
-    /// A mouse click on the Padding will cause the Parent to focus.
-    /// </para>
+    ///     <para>
+    ///         The coordinates are relative to <see cref="View.Viewport"/>.
+    ///     </para>
+    ///     <para>
+    ///         A mouse click on the Padding will cause the Parent to focus.
+    ///     </para>
     /// </remarks>
     /// <param name="mouseEvent"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
@@ -45,6 +43,7 @@ public class Padding : Adornment
             {
                 Parent.SetFocus ();
                 Parent.SetNeedsDraw ();
+
                 return mouseEvent.Handled = true;
             }
         }
@@ -52,12 +51,11 @@ public class Padding : Adornment
         return false;
     }
 
-
     /// <summary>
     ///     Gets all SubViews of this Padding, optionally including SubViews of the Padding's Parent.
     /// </summary>
     /// <param name="includeMargin">
-    ///    Ignored.
+    ///     Ignored.
     /// </param>
     /// <param name="includeBorder">
     ///     Ignored.
@@ -87,13 +85,15 @@ public class Padding : Adornment
     /// </remarks>
     public override IReadOnlyCollection<View> GetSubViews (bool includeMargin = false, bool includeBorder = false, bool includePadding = false)
     {
-        List<View> subViewsOfThisAdornment = new (base.GetSubViews (includeMargin: false, includeBorder: false, includePadding: includePadding));
+        List<View> subViewsOfThisAdornment = new (base.GetSubViews (false, false, includePadding));
+
         if (includePadding && Parent is { })
         {
             // Include SubViews from Parent. Since we are a Padding of Parent do not
             // request Adornments again to avoid infinite recursion.
-            subViewsOfThisAdornment.AddRange (Parent.GetSubViews (includeMargin: false, includeBorder: false, includePadding: false));
+            subViewsOfThisAdornment.AddRange (Parent.GetSubViews (false, false, false));
         }
+
         return subViewsOfThisAdornment;
     }
 }

@@ -128,7 +128,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </summary>
     /// <param name="args">Hold the new SuperView that will be set, or <see langword="null"/> if being removed.</param>
     /// <returns><see langword="true"/> to cancel the change; <see langword="false"/> to allow it.</returns>
-    protected virtual bool OnSuperViewChanging (ValueChangingEventArgs<View?> args) { return false; }
+    protected virtual bool OnSuperViewChanging (ValueChangingEventArgs<View?> args) => false;
 
     /// <summary>
     ///     Raised when the SuperView of this View is about to be changed. This is raised before the SuperView property

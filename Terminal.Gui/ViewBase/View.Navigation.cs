@@ -1,6 +1,5 @@
 using System.Diagnostics;
 
-
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Focus and cross-view navigation management (TabStop, TabIndex, etc...)
@@ -244,7 +243,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <see langword="true"/>, if the focus advance is to be cancelled, <see langword="false"/>
     ///     otherwise.
     /// </returns>
-    protected virtual bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior) { return false; }
+    protected virtual bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior) => false;
 
     /// <summary>
     ///     Raised when <see cref="View.AdvanceFocus"/> is about to advance focus.
@@ -755,7 +754,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     <see langword="true"/>, if the change to <see cref="View.HasFocus"/> is to be cancelled, <see langword="false"/>
     ///     otherwise.
     /// </returns>
-    protected virtual bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused) { return false; }
+    protected virtual bool OnHasFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused) => false;
 
     /// <summary>
     ///     Raised when <see cref="View.HasFocus"/> is about to change.

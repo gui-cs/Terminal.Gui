@@ -69,7 +69,6 @@ public class Wizard : Runnable, IDesignable
 
         SetStyle ();
 
-
         BackButton = new ()
         {
             Text = Strings.wzBack,
@@ -84,7 +83,7 @@ public class Wizard : Runnable, IDesignable
             X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd ()
         };
-        NextFinishButton.FrameChanged += (_, _) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height}; };
+        NextFinishButton.FrameChanged += (_, _) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height }; };
 
         AddCommand (Command.Quit, QuitHandler);
         KeyBindings.Add (Application.QuitKey, Command.Quit);
@@ -116,13 +115,14 @@ public class Wizard : Runnable, IDesignable
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
             Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
             BorderStyle = LineStyle.Dotted;
+
             // strip out movable and resizable
             Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
             base.ShadowStyle = ShadowStyle.None;
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnTitleChanged ()
     {
         if (string.IsNullOrEmpty (_wizardTitle))
@@ -149,7 +149,7 @@ public class Wizard : Runnable, IDesignable
         base.EndInit ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnIsModalChanged (bool newIsModal)
     {
         SetStyle ();
@@ -217,7 +217,7 @@ public class Wizard : Runnable, IDesignable
         newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
         newStep.LayoutSubViews ();
         Width = Dim.Auto (minimumContentDim: _maxStepSize.Width + 2);
-        Height = Dim.Auto (minimumContentDim: _maxStepSize.Height + NextFinishButton.Frame.Height );
+        Height = Dim.Auto (minimumContentDim: _maxStepSize.Height + NextFinishButton.Frame.Height);
 
         UpdateButtonsAndTitle ();
     }
@@ -400,7 +400,7 @@ public class Wizard : Runnable, IDesignable
     ///     <see cref="StepChanging"/> event.
     /// </summary>
     /// <returns>True if the change is to be cancelled.</returns>
-    protected virtual bool OnStepChanging (ValueChangingEventArgs<WizardStep?> args) { return false; }
+    protected virtual bool OnStepChanging (ValueChangingEventArgs<WizardStep?> args) => false;
 
     /// <summary>
     ///     This event is raised when the current <see cref="CurrentStep"/>) is about to change. Use
@@ -422,7 +422,13 @@ public class Wizard : Runnable, IDesignable
         var args = new CancelEventArgs ();
         MovingBack?.Invoke (this, args);
 
-        e.Handled = args.Cancel || GoBack ();
+        if (args.Cancel)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        GoBack ();
     }
 
     private void NextFinishBtnOnAccepting (object? sender, CommandEventArgs e)
