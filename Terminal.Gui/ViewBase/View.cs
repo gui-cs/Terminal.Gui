@@ -512,7 +512,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 return;
             }
 
-            string old = _title;
             _title = value;
             TitleTextFormatter.Text = _title;
 
