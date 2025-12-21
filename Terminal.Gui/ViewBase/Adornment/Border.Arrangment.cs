@@ -371,7 +371,7 @@ public partial class Border
                     });
 
         AddCommand (
-                    Command.Tab,
+                    Command.NextTabStop,
                     () =>
                     {
                         // BUGBUG: If an arrangeable view has only arrangeable subviews, it's not possible to activate
@@ -386,7 +386,7 @@ public partial class Border
                     });
 
         AddCommand (
-                    Command.BackTab,
+                    Command.PreviousTabStop,
                     () =>
                     {
                         AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
@@ -396,14 +396,17 @@ public partial class Border
                     });
 
         HotKeyBindings.Add (Key.Esc, Command.Quit);
-        HotKeyBindings.Add (Application.ArrangeKey, Command.Quit);
+        HotKeyBindings.Add (App!.Keyboard.ArrangeKey, Command.Quit);
         HotKeyBindings.Add (Key.CursorUp, Command.Up);
         HotKeyBindings.Add (Key.CursorDown, Command.Down);
         HotKeyBindings.Add (Key.CursorLeft, Command.Left);
         HotKeyBindings.Add (Key.CursorRight, Command.Right);
 
-        HotKeyBindings.Add (Key.Tab, Command.Tab);
-        HotKeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
+        KeyBindings.Remove (App!.Keyboard.NextTabKey);
+        KeyBindings.Remove (App!.Keyboard.PrevTabKey);
+
+        HotKeyBindings.Add (App!.Keyboard.NextTabKey, Command.NextTabStop);
+        HotKeyBindings.Add (App!.Keyboard.PrevTabKey, Command.PreviousTabStop);
     }
 
     private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
