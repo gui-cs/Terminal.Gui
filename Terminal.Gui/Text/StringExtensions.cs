@@ -55,7 +55,7 @@ public static class StringExtensions
     /// <param name="str">The string to measure.</param>
     /// <param name="ignoreLessThanZero">Indicates whether to ignore values ​​less than zero, such as control keys.</param>
     /// <returns></returns>
-    public static int GetColumns (this string? str, bool ignoreLessThanZero = true)
+    public static int GetColumns (this string str, bool ignoreLessThanZero = true)
     {
         if (string.IsNullOrEmpty (str))
         {
