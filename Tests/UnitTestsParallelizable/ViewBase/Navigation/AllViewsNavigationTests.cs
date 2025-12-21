@@ -26,6 +26,11 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
         IApplication app = Application.Create ();
         app.Begin (new Runnable<bool> () { CanFocus = true });
 
@@ -45,7 +50,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
 
         if (view.TabStop == TabBehavior.TabGroup)
         {
-            navKeys = new [] { Key.F6, Key.F6.WithShift };
+            navKeys = [Key.F6, Key.F6.WithShift];
         }
 
         var left = false;
@@ -111,6 +116,11 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
             output.WriteLine ($"Ignoring {viewType} - It's an IRunnable");
 
             return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
         }
 
         IApplication app = Application.Create ();
