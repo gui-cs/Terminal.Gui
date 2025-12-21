@@ -1833,7 +1833,7 @@ public class TextViewTests
     [Fact]
     public void Space_Key_Types_Space ()
     {
-        var view = new TextView ();
+        TextView view = new ();
 
         view.NewKeyDownEvent (Key.Space);
 

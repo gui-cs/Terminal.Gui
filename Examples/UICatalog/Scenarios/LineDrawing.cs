@@ -4,7 +4,7 @@ namespace UICatalog.Scenarios;
 
 public interface ITool
 {
-    void OnMouseEvent (DrawingArea area, Terminal.Gui.Input.Mouse mouse);
+    void OnMouseEvent (DrawingArea area, Mouse mouse);
 }
 
 internal class DrawLineTool : ITool
@@ -13,13 +13,13 @@ internal class DrawLineTool : ITool
     public LineStyle LineStyle { get; set; } = LineStyle.Single;
 
     /// <inheritdoc/>
-    public void OnMouseEvent (DrawingArea area, Terminal.Gui.Input.Mouse mouse)
+    public void OnMouseEvent (DrawingArea area, Mouse mouse)
     {
         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (_currentLine == null)
             {
-                // Mouse pressed down
+                // MouseEventArgs pressed down
                 _currentLine = new (
                                     mouse.Position!.Value,
                                     0,
@@ -32,7 +32,7 @@ internal class DrawLineTool : ITool
             }
             else
             {
-                // Mouse dragged
+                // MouseEventArgs dragged
                 Point start = _currentLine.Start;
                 Point end = mouse.Position!.Value;
                 var orientation = Orientation.Vertical;
@@ -62,7 +62,7 @@ internal class DrawLineTool : ITool
         }
         else
         {
-            // Mouse released
+            // MouseEventArgs released
             if (_currentLine != null)
             {
                 if (_currentLine.Length == 0)
@@ -325,7 +325,7 @@ public class DrawingArea : View
         return false;
     }
 
-    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         CurrentTool.OnMouseEvent (this, mouse);
 
@@ -432,7 +432,7 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Terminal.Gui.Input.Mouse mouse)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {

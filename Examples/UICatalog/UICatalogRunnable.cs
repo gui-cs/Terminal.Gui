@@ -322,7 +322,7 @@ public class UICatalogRunnable : Runnable
 
             _disableMouseCb = new ()
             {
-                Title = "_Disable Mouse",
+                Title = "_Disable MouseEventArgs",
                 CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
@@ -340,7 +340,7 @@ public class UICatalogRunnable : Runnable
                            new MenuItem
                            {
                                CommandView = _disableMouseCb,
-                               HelpText = "Disable Mouse"
+                               HelpText = "Disable MouseEventArgs"
                            });
 
             return menuItems.ToArray ();
