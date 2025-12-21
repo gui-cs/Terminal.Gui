@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using Terminal.Gui.App;
+using Terminal.Gui.Drivers;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
@@ -15,7 +16,7 @@ ConfigurationManager.RuntimeConfig = """
                                                      "Window.DefaultShadow": "None",
                                                      "Dialog.DefaultShadow": "None",
                                                      "Button.DefaultShadow": "None",
-                                                     "Menuv2.DefaultBorderStyle": "Single"
+                                                     "Menu.DefaultBorderStyle": "Single"
                                                  }
                                              }
                                          ]
@@ -59,17 +60,19 @@ if (string.IsNullOrEmpty (viewName))
 
 ViewDemoWindow.ViewName = viewName;
 
+IApplication app = Application.Create ();
+app.Init (DriverRegistry.Names.ANSI);
+
 // Force 16 colors and end after first iteration
-Application.StopAfterFirstIteration = true;
+app.StopAfterFirstIteration = true;
+app.Driver!.Force16Colors = true;
 
-var demoWindow = Application.Run<ViewDemoWindow> ();
-string? output = demoWindow.Output?.Trim ();
-demoWindow.Dispose ();
+app.Run<ViewDemoWindow> ();
+app.LayoutAndDraw ();
+string output = app.ToString ().Trim ();
+app.Dispose ();
 
-// Before the application exits, reset Terminal.Gui for clean shutdown
-Application.Shutdown ();
-
-if (output is null)
+if (string.IsNullOrEmpty(output))
 {
     Console.WriteLine (@"No output was generated.");
 
@@ -90,12 +93,11 @@ else
 public class ViewDemoWindow : Window
 {
     public static string? ViewName { get; set; }
-    public string? Output { get; set; }
 
     public ViewDemoWindow ()
     {
-        // Limit the size of the window to 50x20, which works good for most views
-        Width = 50;
+        // Limit the size of the window to 80x20, which works good for most views
+        Width = 80;
         Height = 20;
 
         // Use only white on black
@@ -103,7 +105,7 @@ public class ViewDemoWindow : Window
         BorderStyle = LineStyle.None;
 
         // Convert ViewName to type that's in the Terminal.Gui assembly:
-        var type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
+        Type? type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
 
         if (type is null)
         {
@@ -113,7 +115,7 @@ public class ViewDemoWindow : Window
         }
 
         // Create the view
-        View? view = CreateView (type!);
+        View? view = CreateView (type);
 
         if (view is null)
         {
@@ -125,16 +127,7 @@ public class ViewDemoWindow : Window
         // Initialize the view
         view.Initialized += ViewInitialized;
 
-        base.Add (view);
-
-        // In normal apps, each iteration would call Application.LayoutAndDraw()
-        // but since we set Application.EndAfterFirstIteration = true, we need to
-        // call it manually here and capture the output
-        Application.Iteration += (sender, args) =>
-                                 {
-                                     Application.LayoutAndDraw ();
-                                     Output = Application.ToString ();
-                                 };
+        Add (view);
     }
 
     private static View? CreateView (Type type)
@@ -175,14 +168,14 @@ public class ViewDemoWindow : Window
 
         if (view is IDesignable designable)
         {
-            var settingsEditorDemoText = "Demo Text";
-            designable.EnableForDesign (ref settingsEditorDemoText);
+            var demoText = "This is some demo text.";
+            designable.EnableForDesign (ref demoText);
         }
         else
         {
-            view.Text = "Demo Text";
-            view.Title = "_Demo Title";
+            view.Text = "This is some demo text.";
         }
+        view.Title = $"View: {type.Name}";
 
         return view;
     }
@@ -194,17 +187,22 @@ public class ViewDemoWindow : Window
             return;
         }
 
-        if (view.Width == Dim.Absolute (0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == Dim.Absolute (0) || view.Height is null)
+        if (view.Height == Dim.Absolute (0))
         {
             view.Height = Dim.Fill ();
         }
 
         view.X = 0;
         view.Y = 0;
+
+        if (view.BorderStyle == LineStyle.None)
+        {
+            view.BorderStyle = LineStyle.Dotted;
+        }
     }
 }

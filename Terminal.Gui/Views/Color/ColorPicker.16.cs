@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>

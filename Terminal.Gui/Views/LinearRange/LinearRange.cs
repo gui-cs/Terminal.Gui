@@ -1029,7 +1029,7 @@ public class LinearRange<T> : View, IOrientation
             }
         }
 
-        // Slider
+        // LinearRange
         if (_options!.Count > 0)
         {
             for (var i = 0; i < _options.Count; i++)

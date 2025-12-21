@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "OutputView": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "OutputView ": {
       "commandName": "Project",
-      "commandLineArgs": "--view=FileDialog"
+      "commandLineArgs": "--view=GraphView"
     }
   }
 }

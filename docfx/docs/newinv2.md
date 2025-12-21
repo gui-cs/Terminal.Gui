@@ -557,7 +557,7 @@ See the [Views Overview](views.md) for a complete catalog.
 - **[NumericUpDown<T>](~/api/Terminal.Gui.Views.NumericUpDown-1.yml)** - Type-safe numeric input
 - **[OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml)** - Mutually-exclusive option selection
 - **[Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)** - Command display with key bindings
-- **[Slider](~/api/Terminal.Gui.Views.Slider.yml)** - Sophisticated range selection control
+- **[LinearRange](~/api/Terminal.Gui.Views.LinearRange.yml)** - Sophisticated range selection control
 - **[SpinnerView](~/api/Terminal.Gui.Views.SpinnerView.yml)** - Animated progress indicators
 
 ### Significantly Improved Views

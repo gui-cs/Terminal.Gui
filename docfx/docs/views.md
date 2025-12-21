@@ -14,7 +14,9 @@ using Application.ToString to capture the view's rendered output.
 Provides a horizontally or vertically oriented container for [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s to be used as a menu, toolbar, or status bar.
 
 ```text
-Quit  Quit  Ctrl+Z  Help  Help Text  F1  ☐ Check
+┌┤View: Bar├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊ Quit  Quit  Ctrl+Z  Help  Help Text  F1  ☐ Check  Czech  F9 ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [Button](~/api/Terminal.Gui.Views.Button.yml)
@@ -22,7 +24,9 @@ Quit  Quit  Ctrl+Z  Help  Help Text  F1  ☐ Check
 A button View that can be pressed with the mouse or keyboard.
 
 ```text
-⟦ Button ⟧
+┌┤View: Button├┄┄┐
+┊⟦ View: Button ⟧┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [CharMap](~/api/Terminal.Gui.Views.CharMap.yml)
@@ -30,26 +34,26 @@ A button View that can be pressed with the mouse or keyboard.
 A scrollable map of the Unicode codepoints.
 
 ```text
-0  1  2  3  4  5  6  7  8  9  a  b  c  d
-U+00000_ ␀  ␁  ␂  ␃  ␄  ␅  ␆  ␇  ␈  ␉  ␊  ␋  ␌  ␍▲
-U+00001_ ␐  ␑  ␒  ␓  ␔  ␕  ␖  ␗  ␘  ␙  ␚  ␛  ␜  ␝█
-U+00002_    !  "  #  $  %  &  '  (  )  *  +  ,  -░
-U+00003_ 0  1  2  3  4  5  6  7  8  9  :  ;  <  =░
-U+00004_ @  A  B  C  D  E  F  G  H  I  J  K  L  M░
-U+00005_ P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]░
-U+00006_ `  a  b  c  d  e  f  g  h  i  j  k  l  m░
-U+00007_ p  q  r  s  t  u  v  w  x  y  z  {  |  }░
-U+00008_ ⒀  ⒁  ⒂  ⒃  ⒄  ⒅  ⒆  ⒇  ⒈  ⒉  ⒊  ⒋  ⒌  ⒍░
-U+00009_ ⒐  ⒑  ⒒  ⒓  ⒔  ⒕  ⒖  ⒗  ⒘  ⒙  ⒚  ⒛  ⒜  ⒝░
-U+0000a_    ¡  ¢  £  ¤  ¥  ¦  §  ¨  ©  ª  «  ¬  F░
-U+0000b_ °  ±  ²  ³  ´  µ  ¶  ·  ¸  ¹  º  »  ¼  ½░
-U+0000c_ À  Á  Â  Ã  Ä  Å  Æ  Ç  È  É  Ê  Ë  Ì  Í░
-U+0000d_ Ð  Ñ  Ò  Ó  Ô  Õ  Ö  ×  Ø  Ù  Ú  Û  Ü  Ý░
-U+0000e_ à  á  â  ã  ä  å  æ  ç  è  é  ê  ë  ì  í░
-U+0000f_ ð  ñ  ò  ó  ô  õ  ö  ÷  ø  ù  ú  û  ü  ý░
-U+00010_ Ā  ā  Ă  ă  Ą  ą  Ć  ć  Ĉ  ĉ  Ċ  ċ  Č  č░
-U+00011_ Đ  đ  Ē  ē  Ĕ  ĕ  Ė  ė  Ę  ę  Ě  ě  Ĝ  ĝ▼
-        ◄████████████████████████████░░░░░░░░░░░►
+┌┤View: CharMap├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊         0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f                       ┊
+┊U+00000_ ␀  ␁  ␂  ␃  ␄  ␅  ␆  ␇  ␈  ␉  ␊  ␋  ␌  ␍  ␎  ␏                      ▲┊
+┊U+00001_ ␐  ␑  ␒  ␓  ␔  ␕  ␖  ␗  ␘  ␙  ␚  ␛  ␜  ␝  ␞  ␟                      █┊
+┊U+00002_    !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /                      ░┊
+┊U+00003_ 0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?                      ░┊
+┊U+00004_ @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O                      ░┊
+┊U+00005_ P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _                      ░┊
+┊U+00006_ `  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o                      ░┊
+┊U+00007_ p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~  ⑿                      ░┊
+┊U+00008_ ⒀  ⒁  ⒂  ⒃  ⒄  ⒅  ⒆  ⒇  ⒈  ⒉  ⒊  ⒋  ⒌  ⒍  ⒎  ⒏                      ░┊
+┊U+00009_ ⒐  ⒑  ⒒  ⒓  ⒔  ⒕  ⒖  ⒗  ⒘  ⒙  ⒚  ⒛  ⒜  ⒝  ⒞  ⒟                      ░┊
+┊U+0000a_    ¡  ¢  £  ¤  ¥  ¦  §  ¨  ©  ª  «  ¬  F  ®  ¯                      ░┊
+┊U+0000b_ °  ±  ²  ³  ´  µ  ¶  ·  ¸  ¹  º  »  ¼  ½  ¾  ¿                      ░┊
+┊U+0000c_ À  Á  Â  Ã  Ä  Å  Æ  Ç  È  É  Ê  Ë  Ì  Í  Î  Ï                      ░┊
+┊U+0000d_ Ð  Ñ  Ò  Ó  Ô  Õ  Ö  ×  Ø  Ù  Ú  Û  Ü  Ý  Þ  ß                      ░┊
+┊U+0000e_ à  á  â  ã  ä  å  æ  ç  è  é  ê  ë  ì  í  î  ï                      ░┊
+┊U+0000f_ ð  ñ  ò  ó  ô  õ  ö  ÷  ø  ù  ú  û  ü  ý  þ  ÿ                      ░┊
+┊U+00010_ Ā  ā  Ă  ă  Ą  ą  Ć  ć  Ĉ  ĉ  Ċ  ċ  Č  č  Ď  ď                      ▼┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [CheckBox](~/api/Terminal.Gui.Views.CheckBox.yml)
@@ -57,7 +61,9 @@ U+00011_ Đ  đ  Ē  ē  Ĕ  ĕ  Ė  ė  Ę  ę  Ě  ě  Ĝ  ĝ▼
 Shows a checkbox that can be cycled between two or three states.
 
 ```text
-☐ Demo Title
+┌┤View: CheckBox├┐
+┊☐ View: CheckBox┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [ColorPicker](~/api/Terminal.Gui.Views.ColorPicker.yml)
@@ -65,10 +71,12 @@ Shows a checkbox that can be cycled between two or three states.
 Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the [IColorNameResolver](~/api/Terminal.Gui.Drawing.IColorNameResolver.yml).
 
 ```text
-H:                         ▲355
-S:                  ▲       70
-V:                       ▲  91
-Hex:#E74856  ■
+┌┤View: ColorPicker├┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊H:                         ▲355 ┊
+┊S:                  ▲       70  ┊
+┊V:                       ▲  91  ┊
+┊Hex:#E74856  ■                  ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [ColorPicker16](~/api/Terminal.Gui.Views.ColorPicker16.yml)
@@ -76,8 +84,12 @@ Hex:#E74856  ■
 A sinple color picker that supports the legacy 16 ANSI colors
 
 ```text
-┌┄┄┐
-└┄┄┘
+┌┤View: ColorPicker16├┄┄┄┄┄┄┄┄┄┄┄┐
+┊┌┄┄┐                            ┊
+┊└┄┄┘                            ┊
+┊                                ┊
+┊                                ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [ComboBox](~/api/Terminal.Gui.Views.ComboBox.yml)
@@ -85,7 +97,13 @@ A sinple color picker that supports the legacy 16 ANSI colors
 Provides a drop-down list of items the user can select from.
 
 ```text
-▼
+┌┤View: ComboBox├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊                                                                             ▼┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [DateField](~/api/Terminal.Gui.Views.DateField.yml)
@@ -93,7 +111,9 @@ Provides a drop-down list of items the user can select from.
 Provides date editing functionality with mouse support.
 
 ```text
-01/01/0001
+┌┤View: Da├┐
+┊ 01/01/000┊
+└┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml)
@@ -101,16 +121,16 @@ Provides date editing functionality with mouse support.
 Lets the user pick a date from a visual calendar.
 
 ```text
-┌┤Demo Title├────────────────┐
-│Date:  10/31/2025           │
+┌┤View: DatePicker├──────────┐
+│Date:  12/21/2025           │
 │┌───┬───┬───┬───┬───┬───┬──┐│
 ││Sun│Mon│Tue│Wed│Thu│Fri│Sa││
 │├───┼───┼───┼───┼───┼───┼──┤│
-││-  │-  │-  │1  │2  │3  │4 ││
-││5  │6  │7  │8  │9  │10 │11││
-││12 │13 │14 │15 │16 │17 │18││
-││19 │20 │21 │22 │23 │24 │25││
-││26 │27 │28 │29 │30 │31 │- ││
+││-  │1  │2  │3  │4  │5  │6 ││
+││7  │8  │9  │10 │11 │12 │13││
+││14 │15 │16 │17 │18 │19 │20││
+││21 │22 │23 │24 │25 │26 │27││
+││28 │29 │30 │31 │-  │-  │- ││
 ││-  │-  │-  │-  │-  │-  │- ││
 │└───┴───┴───┴───┴───┴───┴──┘│
 │           ◄◄  ►►           │
@@ -119,27 +139,27 @@ Lets the user pick a date from a visual calendar.
 
 ## [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
 
-A [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.Modal.yml) [Window](~/api/Terminal.Gui.Views.Window.yml). Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
+A [Toplevel.Modal](~/api/Terminal.Gui.Views.Toplevel.Modal.yml) [Window](~/api/Terminal.Gui.Views.Window.yml). Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
 
 ```text
-┏┥Demo Title┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃Demo Text                               ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┃                                        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┏┥View: Dialog┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃This is some demo text.                                         ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┃                                                                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
 ## [FileDialog](~/api/Terminal.Gui.Views.FileDialog.yml)
@@ -147,22 +167,22 @@ A [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.Modal.yml) [Window](~/api/T
 The base-class for [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) and [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml)
 
 ```text
-┏┥Open┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃C:\Users\Tig\s\gui-cs\Terminal.Gui\doc┃
-┃⟦▲⟧                                   ┃
-┃┌────────────────────┬───────────────┐┃
-┃│Filename (▲)        │Size           │┃
-┃├────────────────────┼───────────────►┃
-┃│..                  │               │┃
-┃│\_exported_templates│               │┃
-┃│\_site              │               │┃
-┃│\api                │               │┃
-┃│\apispec            │               │┃
-┃│\docs               │               │┃
-┃│\images             │               │┃
-┃Find                                  ┃
-┃⟦►Tree⟧            ⟦► OK ◄⟧ ⟦ Cancel ⟧┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┏┥View: FileDialog┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx                      ┃
+┃⟦▲⟧                                                           ┃
+┃┌────────────────────┬───────────────────────────────────────┐┃
+┃│Filename (▲)        │Size                                   │┃
+┃├────────────────────┼───────────────────────────────────────►┃
+┃│..                  │                                       │┃
+┃│\_exported_templates│                                       │┃
+┃│\_site              │                                       │┃
+┃│\api                │                                       │┃
+┃│\apispec            │                                       │┃
+┃│\docs               │                                       │┃
+┃│\images             │                                       │┃
+┃Find                                                          ┃
+┃⟦►Tree⟧                                    ⟦► OK ◄⟧ ⟦ Cancel ⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
 ## [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml)
@@ -170,12 +190,14 @@ The base-class for [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) and [Sa
 Provides a user interface for displaying and selecting non-mutually-exclusive flags. Flags can be set from a dictionary or directly from an enum type.
 
 ```text
-☒ No Style
-☐ Show None Value Style
-☐ ShowAllFlag
-☐ Show Value Editor Style
-☐ All Styles
-0
+┌┤View: FlagSelector├┄┄┄┄┄┐
+┊☒ No Style               ┊
+┊☐ Show None Value Style  ┊
+┊☐ ShowAllFlag            ┊
+┊☐ Show Value Editor Style┊
+┊☐ All Styles             ┊
+┊0                        ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [FlagSelector\<T\>](~/api/Terminal.Gui.Views.FlagSelector-1.yml)
@@ -189,26 +211,26 @@ Provides a user interface for displaying and selecting non-mutually-exclusive fl
 A non-overlapped container for other views with a border and optional title.
 
 ```text
-╭┤Demo Title├────────────────────────────────────╮
-│Demo Text                                       │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-╰────────────────────────────────────────────────╯
+╭┤View: FrameView├─────────────────────────────────────────────────────────────╮
+│This is some demo text.                                                       │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ## [GraphView](~/api/Terminal.Gui.Views.GraphView.yml)
@@ -216,26 +238,26 @@ A non-overlapped container for other views with a border and optional title.
 Displays graphs (bar, scatter, etc.) with flexible labels, scaling, and scrolling
 
 ```text
-│        .
-                            │      ..
-                        0.60┤     .
-                            ┤    ∙
-                            │   .
-                            │ ..
-                        0.20┤.
-   ┬────┬────┬────┬────┬────∙────┬────┬────┬────┬─
- -2.50     -1.50     -0.50 .│  0.50      1.50
-↑                         . │
-Y                      -0.20┤
-..                      .   │
-  .                    ∙    ┤
-   ∙                  .     │
-    .               .. -0.60┤
-     ..            .        │
-       .        ..∙         ┤
-        ∙....∙..       -1.00┤
-
-                        X →
+┌┤View: GraphView├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊                            │     .                  ∙                        ┊
+┊                            ┤    ∙                    .                       ┊
+┊                            │   .                      ..                     ┊
+┊                            │ ..                         .                    ┊
+┊                        0.20┤.                            ∙                   ┊
+┊   ┬────┬────┬────┬────┬────∙────┬────┬────┬────┬────┬────┬────┬────┬────┬────┊
+┊ -2.50     -1.50     -0.50 .│  0.50      1.50      2.50     .3.50      4.50   ┊
+┊                          . │                                .                ┊
+┊↑                      -0.20┤                                 .               ┊
+┊Y.                      .   │                                  ∙              ┊
+┊  .                    ∙    ┤                                   .             ┊
+┊   ∙                  .     │                                    ..           ┊
+┊    .               .. -0.60┤                                      .          ┊
+┊     ..            .        │                                       ∙.        ┊
+┊       .        ..∙         ┤                                         ..      ┊
+┊        ∙....∙..       -1.00┤                                           .∙....┊
+┊                                                                              ┊
+┊                                      X →                                     ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [HexView](~/api/Terminal.Gui.Views.HexView.yml)
@@ -243,26 +265,26 @@ Y                      -0.20┤
 Provides a hex editor with the left side showing the hex values of the bytes in a `Stream` and the right side showing the contents (filtered to printable Unicode glyphs).
 
 ```text
-00000000 48 65 78 56 ┊ 69 65 77 20  HexView
-00000008 64 61 74 61 ┊ 20 77 69 74  data wit
-00000010 68 20 77 69 ┊ 64 65 20 63  h wide c
-00000018 6f 64 65 70 ┊ 6f 69 6e 74  odepoint
-00000020 73 3a 20 f0 ┊ 9d 94 b9 41  s: ����A
-00000028 e2 84 9d f0 ┊ 9d 94 bd 21  �������!
-00000030             ┊
-00000038             ┊
-00000040             ┊
-00000048             ┊
-00000050             ┊
-00000058             ┊
-00000060             ┊
-00000068             ┊
-00000070             ┊
-00000078             ┊
-00000080             ┊
-00000088             ┊
-00000090             ┊
-00000098             ┊
+┌┤View: HexView├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊00000000 48 65 78 56 ┊ 69 65 77 20 ┊ 64 61 74 61  HexView data                ┊
+┊0000000c 20 77 69 74 ┊ 68 20 77 69 ┊ 64 65 20 63   with wide c                ┊
+┊00000018 6f 64 65 70 ┊ 6f 69 6e 74 ┊ 73 3a 20 f0  odepoints: �                ┊
+┊00000024 9d 94 b9 41 ┊ e2 84 9d f0 ┊ 9d 94 bd 21  ���A�������!                ┊
+┊00000030             ┊             ┊                                          ┊
+┊0000003c             ┊             ┊                                          ┊
+┊00000048             ┊             ┊                                          ┊
+┊00000054             ┊             ┊                                          ┊
+┊00000060             ┊             ┊                                          ┊
+┊0000006c             ┊             ┊                                          ┊
+┊00000078             ┊             ┊                                          ┊
+┊00000084             ┊             ┊                                          ┊
+┊00000090             ┊             ┊                                          ┊
+┊0000009c             ┊             ┊                                          ┊
+┊000000a8             ┊             ┊                                          ┊
+┊000000b4             ┊             ┊                                          ┊
+┊000000c0             ┊             ┊                                          ┊
+┊000000cc             ┊             ┊                                          ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [Label](~/api/Terminal.Gui.Views.Label.yml)
@@ -270,7 +292,9 @@ Provides a hex editor with the left side showing the hex values of the bytes in 
 Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When the user presses a hotkey that matches the [View.HotKey](~/api/Terminal.Gui.ViewBase.View.HotKey.yml) of the Label, the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml) will be activated.
 
 ```text
-Label
+┌┤View: Lab├┐
+┊View: Label┊
+└┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [LegendAnnotation](~/api/Terminal.Gui.Views.LegendAnnotation.yml)
@@ -278,26 +302,26 @@ Label
 Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol definitions in a graph, e.g. colors and their meanings
 
 ```text
-┌┤Demo Title├────────────────────────────────────┐
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-└────────────────────────────────────────────────┘
+┌┤View: LegendAnnotation├──────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## [Line](~/api/Terminal.Gui.Views.Line.yml)
@@ -305,7 +329,8 @@ Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol defi
 Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) specified by [View.BorderStyle](~/api/Terminal.Gui.ViewBase.View.BorderStyle.yml).
 
 ```text
-──────────────────────────────────────────────────
+┄┤View: Line├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+ ───────────────────────────────────────────────────────────────────────────────
 ```
 
 ## [LineView](~/api/Terminal.Gui.Views.LineView.yml)
@@ -319,62 +344,68 @@ A straight line control either horizontal or vertical
 Provides a scrollable list of data where each item can be activated to perform an action.
 
 ```text
-List Item 1
-List Item two
-List Item Quattro
-Last List Item
+┌┤View: ListView├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊List Item 1                                                                   ┊
+┊List Item two                                                                 ┊
+┊List Item Quattro                                                             ┊
+┊Last List Item                                                                ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml)
 
-Provides a menu bar that spans the top of a [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) View with drop-down and cascading menus.  By default, any sub-sub-menus (sub-menus of the [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)s added to [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting [MenuBar.UseSubMenusSingleFrame](~/api/Terminal.Gui.Views.MenuBar.UseSubMenusSingleFrame.yml) to true, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar. 
+Provides a menu bar that spans the top of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) View with drop-down and cascading menus.  By default, any sub-sub-menus (sub-menus of the [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)s added to [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s) are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame (either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting [MenuBar.UseSubMenusSingleFrame](~/api/Terminal.Gui.Views.MenuBar.UseSubMenusSingleFrame.yml) to true, this behavior can be changed such that all sub-sub-menus are drawn within a single frame below the MenuBar. 
 
 ```text
-File  Edit  About (Top-Level)
+File  Edit  Help
 ```
 
 ## [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml)
 
 A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as items in a [MenuBarv2](~/api/Terminal.Gui.Views.MenuBarv2.yml). MenuBarItems hold a [MenuBarItemv2.PopoverMenu](~/api/Terminal.Gui.Views.MenuBarItemv2.PopoverMenu.yml) instead of a [MenuBarItemv2.SubMenu](~/api/Terminal.Gui.Views.MenuBarItemv2.SubMenu.yml).
 
-```text
-Shortcut  Shortcut help  F1
-```
+
 
 ## [MenuBarv2](~/api/Terminal.Gui.Views.MenuBarv2.yml)
 
 A horizontal list of [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml)s. Each [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml) can have a [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml) that is shown when the [MenuBarItemv2](~/api/Terminal.Gui.Views.MenuBarItemv2.yml) is selected.
 
-```text
-File  Edit  Help
-```
+
 
 ## [MenuItemv2](~/api/Terminal.Gui.Views.MenuItemv2.yml)
 
 A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as a menu item in a [Menuv2](~/api/Terminal.Gui.Views.Menuv2.yml). Has title, an A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as a menu item in a [Menuv2](~/api/Terminal.Gui.Views.Menuv2.yml). Has title, an associated help text, and an action to execute on activation.
 
-```text
-Shortcut  Shortcut help  F1
-```
+
 
 ## [Menuv2](~/api/Terminal.Gui.Views.Menuv2.yml)
 
 A [Bar](~/api/Terminal.Gui.Views.Bar.yml)-derived object to be used as a vertically-oriented menu. Each subview is a [MenuItemv2](~/api/Terminal.Gui.Views.MenuItemv2.yml).
 
-```text
-┌─────────────────────────┐
-│ Quit       Quit  Ctrl+Z │
-│ Help  Help Text      F1 │
-│ ☐ Check   Czech      F9 │
-└─────────────────────────┘
-```
+
 
 ## [NumericUpDown](~/api/Terminal.Gui.Views.NumericUpDown.yml)
 
 Enables the user to increase or decrease an int by clicking on the up or down buttons.
 
 ```text
-▼0▲
+┌┤V├┐
+┊▼0▲┊
+└┄┄┄┘
 ```
 
 ## [NumericUpDown\<T\>](~/api/Terminal.Gui.Views.NumericUpDown-1.yml)
@@ -388,22 +419,22 @@ Enables the user to increase or decrease a value with the mouse or keyboard in t
 Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for selecting files or directories for opening
 
 ```text
-┏┥Open┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃C:\Users\Tig\s\gui-cs\Terminal.Gui\doc┃
-┃⟦▲⟧                                   ┃
-┃┌────────────────────┬───────────────┐┃
-┃│Filename (▲)        │Size           │┃
-┃├────────────────────┼───────────────►┃
-┃│..                  │               │┃
-┃│\_exported_templates│               │┃
-┃│\_site              │               │┃
-┃│\api                │               │┃
-┃│\apispec            │               │┃
-┃│\docs               │               │┃
-┃│\images             │               │┃
-┃Find                                  ┃
-┃⟦►Tree⟧            ⟦► OK ◄⟧ ⟦ Cancel ⟧┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┏┥View: OpenDialog┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx                      ┃
+┃⟦▲⟧                                                           ┃
+┃┌────────────────────┬───────────────────────────────────────┐┃
+┃│Filename (▲)        │Size                                   │┃
+┃├────────────────────┼───────────────────────────────────────►┃
+┃│..                  │                                       │┃
+┃│\_exported_templates│                                       │┃
+┃│\_site              │                                       │┃
+┃│\api                │                                       │┃
+┃│\apispec            │                                       │┃
+┃│\docs               │                                       │┃
+┃│\images             │                                       │┃
+┃Find                                                          ┃
+┃⟦►Tree⟧                                    ⟦► OK ◄⟧ ⟦ Cancel ⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
 ## [OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml)
@@ -411,10 +442,12 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time.
 
 ```text
-◉ Option 1
-○ Option 2
-○ Third Option
-○ Option Quattro
+┌┤View: OptionSe├┐
+┊◉ Option 1      ┊
+┊○ Option 2      ┊
+┊○ Third Option  ┊
+┊○ Option Quattro┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml)
@@ -428,7 +461,9 @@ Provides a cascading menu that pops over all other content. Can be used as a con
 A Progress Bar view that can indicate progress of an activity visually.
 
 ```text
-▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌
+┌┤View: ProgressBar├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌                    ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [RadioGroup](~/api/Terminal.Gui.Views.RadioGroup.yml)
@@ -442,22 +477,22 @@ Displays a list of mutually-exclusive items. Each items can have its own hotkey.
 Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for selecting files or directories for saving
 
 ```text
-┏┥Save┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃C:\Users\Tig\s\gui-cs\Terminal.Gui\doc┃
-┃⟦▲⟧                                   ┃
-┃┌────────────────────┬───────────────┐┃
-┃│Filename (▲)        │Size           │┃
-┃├────────────────────┼───────────────►┃
-┃│..                  │               │┃
-┃│\_exported_templates│               │┃
-┃│\_site              │               │┃
-┃│\api                │               │┃
-┃│\apispec            │               │┃
-┃│\docs               │               │┃
-┃│\images             │               │┃
-┃Find                                  ┃
-┃⟦►Tree⟧          ⟦► Save ◄⟧ ⟦ Cancel ⟧┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┏┥View: SaveDialog┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx                      ┃
+┃⟦▲⟧                                                           ┃
+┃┌────────────────────┬───────────────────────────────────────┐┃
+┃│Filename (▲)        │Size                                   │┃
+┃├────────────────────┼───────────────────────────────────────►┃
+┃│..                  │                                       │┃
+┃│\_exported_templates│                                       │┃
+┃│\_site              │                                       │┃
+┃│\api                │                                       │┃
+┃│\apispec            │                                       │┃
+┃│\docs               │                                       │┃
+┃│\images             │                                       │┃
+┃Find                                                          ┃
+┃⟦►Tree⟧                                  ⟦► Save ◄⟧ ⟦ Cancel ⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
 ## [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml)
@@ -465,26 +500,26 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.View.Viewport.yml).
 
 ```text
-▲
-█
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-░
-▼
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
+┊
 ```
 
 ## [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml)
@@ -492,11 +527,11 @@ Indicates the size of scrollable content and controls the position of the visibl
 Represents the proportion of the visible content to the Viewport in a [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml). Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be oriented either vertically or horizontally.
 
 ```text
-██████████████████████████████████████████████████
-██████████████████████████████████████████████████
-██████████████████████████████████████████████████
-██████████████████████████████████████████████████
-██████████████████████████████████████████████████
+┌┤View: ScrollSlider├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊██████████████████████████████████████████████████████████████████████████████┊
+┊██████████████████████████████████████████████████████████████████████████████┊
+┊██████████████████████████████████████████████████████████████████████████████┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)
@@ -504,21 +539,20 @@ Represents the proportion of the visible content to the Viewport in a [ScrollBar
 Displays a command, help text, and a key binding. When the key specified by [Shortcut.Key](~/api/Terminal.Gui.Views.Shortcut.Key.yml) is pressed, the command will be invoked. Useful for displaying a command in [Bar](~/api/Terminal.Gui.Views.Bar.yml) such as a menu, toolbar, or status bar.
 
 ```text
-Shortcut  Shortcut help  F1
+┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊ View: Shortcut  Shortcut help  F1 ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [Slider](~/api/Terminal.Gui.Views.Slider.yml)
 
 Provides a slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
-```text
-●
-Demo Text
-```
+
 
 ## [Slider\<T\>](~/api/Terminal.Gui.Views.Slider-1.yml)
 
-Provides a type-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
+Provides a tpe-safe slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
 
 
@@ -527,15 +561,17 @@ Provides a type-safe slider control letting the user navigate from a set of type
 Displays a spinning glyph or combinations of glyphs to indicate progress or activity
 
 ```text
-●∙∙
+┌┄┐
+┊●┊
+└┄┘
 ```
 
 ## [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml)
 
-A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of a [Runnable](~/api/Terminal.Gui.Views.Runnable.yml) displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
+A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of a [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
 
 ```text
-Ctrl+Z  Quit  Quit │ F1  Help Text  Help │ F10  ☐
+Ctrl+Z  Quit  Quit │ F1  Help Text  Help │ F10  ☐ Show/Hide │⟦ I'll Hide ⟧│Focu
 ```
 
 ## [Tab](~/api/Terminal.Gui.Views.Tab.yml)
@@ -543,26 +579,26 @@ Ctrl+Z  Quit  Quit │ F1  Help Text  Help │ F10  ☐
 A single tab in a [TabView](~/api/Terminal.Gui.Views.TabView.yml).
 
 ```text
-╭┤Demo Title├────────────────────────────────────╮
-│Demo Text                                       │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-╰────────────────────────────────────────────────╯
+╭┤View: Tab├───────────────────────────────────────────────────────────────────╮
+│This is some demo text.                                                       │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ## [TableView](~/api/Terminal.Gui.Views.TableView.yml)
@@ -570,14 +606,26 @@ A single tab in a [TabView](~/api/Terminal.Gui.Views.TabView.yml).
 Displays and enables infinite scrolling through tabular data based on a [ITableSource](~/api/Terminal.Gui.Views.ITableSource.yml). See the TableView Deep Dive for more.
 
 ```text
-┌──────────────────┬──────────────────────┬──────┐
-│StrCol            │DateCol               │IntCol│
-├──────────────────┼──────────────────────┼──────►
-│Demo text in row 0│12/25/2000 12:00:00 AM│0     │
-│Demo text in row 1│12/25/2001 12:00:00 AM│0     │
-│Demo text in row 2│12/25/2002 12:00:00 AM│0     │
-│Demo text in row 3│12/25/2003 12:00:00 AM│2     │
-│Demo text in row 4│12/25/2004 12:00:00 AM│1     │
+┌┤View: TableView├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊┌──────────────────┬──────────────────────┬──────┬───────────────────────────┐┊
+┊│StrCol            │DateCol               │IntCol│DoubleCol                  │┊
+┊├──────────────────┼──────────────────────┼──────┼───────────────────────────►┊
+┊│Demo text in row 0│12/25/2000 12:00:00 AM│0     │-0.5                       │┊
+┊│Demo text in row 1│12/25/2001 12:00:00 AM│0     │0.40245424998107093        │┊
+┊│Demo text in row 2│12/25/2002 12:00:00 AM│0     │1.3973309257520972         │┊
+┊│Demo text in row 3│12/25/2003 12:00:00 AM│2     │1.3318544644079424         │┊
+┊│Demo text in row 4│12/25/2004 12:00:00 AM│1     │0.09525688765349649        │┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [TabView](~/api/Terminal.Gui.Views.TabView.yml)
@@ -585,23 +633,26 @@ Displays and enables infinite scrolling through tabular data based on a [ITableS
 Control that hosts multiple sub views, presenting a single one at once.
 
 ```text
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-└────────────────────────────────────────────────┘
+┌┤View: TabView├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊│                                                                            │┊
+┊└────────────────────────────────────────────────────────────────────────────┘┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [TextField](~/api/Terminal.Gui.Views.TextField.yml)
@@ -609,7 +660,9 @@ Control that hosts multiple sub views, presenting a single one at once.
 Single-line text editor.
 
 ```text
-This is a test.
+┌┤View: TextField├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊This is a test.                                                               ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [TextValidateField](~/api/Terminal.Gui.Views.TextValidateField.yml)
@@ -617,9 +670,9 @@ This is a test.
 Masked text editor that validates input through a [ITextValidateProvider](~/api/Terminal.Gui.Views.ITextValidateProvider.yml)
 
 ```text
-┌┤^([0-9]?[0-9]?[0-9]|1000)$├────────────────────┐
-│999                                             │
-└────────────────────────────────────────────────┘
+┌┤View: TextValidateField├─────────────────────────────────────────────────────┐
+│999                                                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## [TextView](~/api/Terminal.Gui.Views.TextView.yml)
@@ -627,8 +680,26 @@ Masked text editor that validates input through a [ITextValidateProvider](~/api/
 Fully featured multi-line text editor
 
 ```text
-TextView provides a fully featured multi-line text
-It supports word wrap and history for undo.
+┌┤View: TextView├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊TextView provides a fully featured multi-line text editor.                    ┊
+┊It supports word wrap and history for undo.                                   ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [TileView](~/api/Terminal.Gui.Views.TileView.yml)
@@ -642,28 +713,42 @@ A [View](~/api/Terminal.Gui.ViewBase.View.yml) consisting of a moveable bar that
 Provides time editing functionality with mouse support
 
 ```text
-02:48:05
+┌┤View: ├┐
+┊ 02:48:0┊
+└┄┄┄┄┄┄┄┄┘
 ```
 
-## [Runnable](~/api/Terminal.Gui.Views.Runnable.yml)
+## [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml)
 
-Runnable views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as [Dialog](~/api/Terminal.Gui.Views.Dialog.yml), [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml), and [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)).
+Toplevel views are used for both an application's main view (filling the entire screen and for modal (pop-up) views such as [Dialog](~/api/Terminal.Gui.Views.Dialog.yml), [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml), and [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)).
 
-```text
-Demo Text
-```
+
 
 ## [TreeView](~/api/Terminal.Gui.Views.TreeView.yml)
 
 Convenience implementation of generic [TreeView%601](~/api/Terminal.Gui.Views.TreeView%601.yml) for any tree were all nodes implement [ITreeNode](~/api/Terminal.Gui.Views.ITreeNode.yml). See TreeView Deep Dive for more information.
 
 ```text
-├-Root1
-│ ├─Child1.1
-│ └─Child1.2
-└-Root2
-  ├─Child2.1
-  └─Child2.2
+┌┤View: TreeView├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊├-Root1                                                                       ┊
+┊│ ├─Child1.1                                                                  ┊
+┊│ └─Child1.2                                                                  ┊
+┊└-Root2                                                                       ┊
+┊  ├─Child2.1                                                                  ┊
+┊  └─Child2.2                                                                  ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [TreeView\<T\>](~/api/Terminal.Gui.Views.TreeView-1.yml)
@@ -677,26 +762,26 @@ Hierarchical tree view with expandable branches. Branch objects are dynamically 
 An overlapped container for other views with a border and optional title.
 
 ```text
-┌┤Demo Title├────────────────────────────────────┐
-│Demo Text                                       │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-│                                                │
-└────────────────────────────────────────────────┘
+┌┤View: Window├────────────────────────────────────────────────────────────────┐
+│This is some demo text.                                                       │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)
@@ -704,28 +789,45 @@ An overlapped container for other views with a border and optional title.
 Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step ( [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml)) can host arbitrary [View](~/api/Terminal.Gui.ViewBase.View.yml)s, much like a [Dialog](~/api/Terminal.Gui.Views.Dialog.yml). Each step also has a pane for help text. Along the bottom of the Wizard view are customizable buttons enabling the user to navigate forward and backward through the Wizard.
 
 ```text
-╔╡Demo Title╞════════════════════════════╗
-║Demo Text                               ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-║                                        ║
-╟────────────────────────────────────────╢
-║⟦ Back ⟧                    ⟦► Finish ◄⟧║
-╚════════════════════════════════════════╝
+┌┤Wizard Title - Example Step├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊Enter Text:                                         This is some help text  ┊
+┊                                                    for the WizardStep.     ┊
+┊    A List: ┌╌╌╌╌╌╌╌╌┐                              You can provide         ┊
+┊            ┆Item 1  ┆                              instructions or         ┊
+┊            ┆Item 2  ┆                              information to guide the┊
+┊            ┆Item 3  ┆                              user through this step  ┊
+┊            ┆Item 4  ┆                              of the wizard.          ┊
+┊            ┆Item 5  ┆                                                      ┊
+┊            └╌╌╌╌╌╌╌╌┘                                                      ┊
+┊                                                                            ┊
+┊                                                                            ┊
+┊                                                               ⟦► Next... ◄⟧┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 ```
 
 ## [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml)
 
 Represents a basic step that is displayed in a [Wizard](~/api/Terminal.Gui.Views.Wizard.yml). The [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml) view is divided horizontally in two. On the left is the content view where [View](~/api/Terminal.Gui.ViewBase.View.yml)s can be added, On the right is the help for the step. Set [WizardStep.HelpText](~/api/Terminal.Gui.Views.WizardStep.HelpText.yml) to set the help text. If the help text is empty the help pane will not be shown. If there are no Views added to the WizardStep the [WizardStep.HelpText](~/api/Terminal.Gui.Views.WizardStep.HelpText.yml) (if not empty) will fill the wizard step.
 
-
+```text
+┌┤View: WizardStep├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊Enter Text:                                           This is some help text  ┊
+┊                                                      for the WizardStep.     ┊
+┊    A List: ┌╌╌╌╌╌╌╌╌┐                                You can provide         ┊
+┊            ┆Item 1  ┆                                instructions or         ┊
+┊            ┆Item 2  ┆                                information to guide the┊
+┊            ┆Item 3  ┆                                user through this step  ┊
+┊            ┆Item 4  ┆                                of the wizard.          ┊
+┊            ┆Item 5  ┆                                                        ┊
+┊            └╌╌╌╌╌╌╌╌┘                                                        ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+```

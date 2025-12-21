@@ -449,7 +449,7 @@ The following table summarizes how built-in views respond to various input metho
 | **Button** | 1 | No | Yes | 1 | OnSelect | Focus+OnAccept | Focus+OnAccept | HotKey | - | Select | No |
 | **CheckBox** | 3 | No | No | 1 | OnSelect+Advance | OnAccept | OnAccept | Select | - | Select | No |
 | **OptionSelector** | >1 | No | No | 2+ | Advance | SetValue+OnAccept | Focus+SetValue | SetFocus+SetCursor | - | SetFocus+SetCursor | No |
-| **Slider** | >1 | No | No | 1 | SetFocusedOption | SetFocusedOption+OnAccept | Focus | SetFocus+SetOption | - | SetFocus+SetOption | Yes |
+| **LinearRange** | >1 | No | No | 1 | SetFocusedOption | SetFocusedOption+OnAccept | Focus | SetFocus+SetOption | - | SetFocus+SetOption | Yes |
 | **ListView** | >1 | No | No | 1 | MarkUnMarkRow | OpenSelected+OnAccept | OnAccept | SetMark+OnSelectedChanged | OpenSelected+OnAccept | - | No |
 | **TextField** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | SelectAll | ContextMenu | No |
 | **TextView** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | - | ContextMenu | Yes |
