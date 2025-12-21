@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
 using Timer = System.Timers.Timer;
 
 namespace UICatalog.Scenarios;
@@ -14,36 +14,29 @@ public class Arrangement : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        Window mainWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            TabStop = TabBehavior.TabGroup,
-            ShadowStyle = ShadowStyle.None
-        };
+        using Window mainWindow = new ();
+        mainWindow.Title = GetQuitKeyAndName ();
+        mainWindow.TabStop = TabBehavior.TabGroup;
+        mainWindow.ShadowStyle = ShadowStyle.None;
 
-        var adornmentsEditor = new AdornmentsEditor
+        AdornmentsEditor adornmentsEditor = new ()
         {
-            X = 0,
-            Y = 0,
             AutoSelectViewToEdit = true,
             TabStop = TabBehavior.NoStop,
             ShowViewIdentifier = true
         };
 
-        mainWindow.Add (adornmentsEditor);
+        adornmentsEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
 
-        adornmentsEditor!.ExpanderButton!.Orientation = Orientation.Horizontal;
-
-        //  adornmentsEditor.ExpanderButton!.Collapsed = true;
-
-        var arrangementEditor = new ArrangementEditor
+        ArrangementEditor arrangementEditor = new ()
         {
             Y = Pos.Bottom (adornmentsEditor) + 1,
             AutoSelectViewToEdit = true,
             TabStop = TabBehavior.NoStop
         };
-        mainWindow.Add (arrangementEditor);
+        mainWindow.Add (adornmentsEditor, arrangementEditor);
 
         FrameView testFrame = new ()
         {
@@ -88,6 +81,7 @@ public class Arrangement : Scenario
         tiledSubView = CreateTiledView (5, Pos.Right (tiledSubView), Pos.Top (tiledSubView));
         tiledSubView.Arrangement = ViewArrangement.Fixed;
         movableSizeableWithProgress.Add (tiledSubView);
+
         ProgressBar progressBar = new ()
         {
             Y = Pos.AnchorEnd (),
@@ -95,18 +89,21 @@ public class Arrangement : Scenario
             Id = "progressBar"
         };
         movableSizeableWithProgress.Add (progressBar);
+
         Timer timer = new (10)
         {
             AutoReset = true
         };
+
         timer.Elapsed += (_, _) =>
-        {
-            if (Math.Abs (progressBar.Fraction - 1f) < 0.001)
-            {
-                progressBar.Fraction = 0;
-            }
-            progressBar.Fraction += 0.01f;
-        };
+                         {
+                             if (Math.Abs (progressBar.Fraction - 1f) < 0.001)
+                             {
+                                 progressBar.Fraction = 0;
+                             }
+
+                             progressBar.Fraction += 0.01f;
+                         };
         timer.Start ();
 
         View overlappedView2 = CreateOverlappedView (3, 10, 12);
@@ -118,6 +115,7 @@ public class Arrangement : Scenario
         overlappedView2.Add (overlappedInOverlapped2);
 
         StatusBar statusBar = new ();
+
         statusBar.Add (
                        new Shortcut
                        {
@@ -125,11 +123,11 @@ public class Arrangement : Scenario
                            Text = "Hotkey",
                            Key = Key.F4,
                            Action = () =>
-                           {
-                               // TODO: move this logic into `View.ShowHide()` or similar
-                               overlappedView2.Visible = false;
-                               overlappedView2.Enabled = overlappedView2.Visible;
-                           }
+                                    {
+                                        // TODO: move this logic into `View.ShowHide()` or similar
+                                        overlappedView2.Visible = false;
+                                        overlappedView2.Enabled = overlappedView2.Visible;
+                                    }
                        });
 
         statusBar.Add (
@@ -140,16 +138,16 @@ public class Arrangement : Scenario
                            BindKeyToApplication = true,
                            Key = Key.F4.WithCtrl,
                            Action = () =>
-                           {
-                               // TODO: move this logic into `View.ShowHide()` or similar
-                               overlappedView2.Visible = !overlappedView2.Visible;
-                               overlappedView2.Enabled = overlappedView2.Visible;
+                                    {
+                                        // TODO: move this logic into `View.ShowHide()` or similar
+                                        overlappedView2.Visible = !overlappedView2.Visible;
+                                        overlappedView2.Enabled = overlappedView2.Visible;
 
-                               if (overlappedView2.Visible)
-                               {
-                                   overlappedView2.SetFocus ();
-                               }
-                           }
+                                        if (overlappedView2.Visible)
+                                        {
+                                            overlappedView2.SetFocus ();
+                                        }
+                                    }
                        });
         overlappedView2.Add (statusBar);
 
@@ -183,11 +181,12 @@ public class Arrangement : Scenario
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
 
-        datePicker.SetScheme (new Scheme (
-                                          new Attribute (
-                                                         SchemeManager.GetScheme (Schemes.Runnable).Normal.Foreground.GetBrighterColor (),
-                                                         SchemeManager.GetScheme (Schemes.Runnable).Normal.Background.GetBrighterColor (),
-                                                         SchemeManager.GetScheme (Schemes.Runnable).Normal.Style)));
+        datePicker.SetScheme (
+                              new (
+                                   new Attribute (
+                                                  SchemeManager.GetScheme (Schemes.Runnable).Normal.Foreground.GetBrighterColor (),
+                                                  SchemeManager.GetScheme (Schemes.Runnable).Normal.Background.GetBrighterColor (),
+                                                  SchemeManager.GetScheme (Schemes.Runnable).Normal.Style)));
 
         TransparentView transparentView = new ()
         {
@@ -204,27 +203,25 @@ public class Arrangement : Scenario
         testFrame.Add (movableSizeableWithProgress);
         testFrame.Add (transparentView);
 
-
-        testFrame.Add (new TransparentView ()
-        {
-            X = 50,
-            Y = 25,
-            Width = 35,
-            Height = 15,
-            Title = "Transparent|TransparentMouse",
-            ViewportSettings = ViewportSettingsFlags.TransparentMouse | ViewportSettingsFlags.Transparent
-        });
+        testFrame.Add (
+                       new TransparentView
+                       {
+                           X = 50,
+                           Y = 25,
+                           Width = 35,
+                           Height = 15,
+                           Title = "Transparent|TransparentMouse",
+                           ViewportSettings = ViewportSettingsFlags.TransparentMouse | ViewportSettingsFlags.Transparent
+                       });
 
         mainWindow.Initialized += OnMainWindowInitialized;
 
-        Application.Run (mainWindow);
+        app.Run (mainWindow);
         timer.Close ();
-        mainWindow.Dispose ();
-        Application.Shutdown ();
 
         return;
 
-        void OnMainWindowInitialized (object sender, EventArgs e)
+        void OnMainWindowInitialized (object? sender, EventArgs e)
         {
             adornmentsEditor.AutoSelectSuperView = testFrame;
             arrangementEditor.AutoSelectSuperView = testFrame;
@@ -233,17 +230,15 @@ public class Arrangement : Scenario
             movableSizeableWithProgress.SetFocus ();
         }
 
-        void ColorPickerColorChanged (object sender, ResultEventArgs<Color> e)
+        void ColorPickerColorChanged (object? sender, ResultEventArgs<Color> e)
         {
             testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
         }
     }
 
-
-
     private View CreateOverlappedView (int id, Pos x, Pos y)
     {
-        var overlapped = new View
+        View overlapped = new ()
         {
             X = x,
             Y = y,
@@ -264,7 +259,7 @@ public class Arrangement : Scenario
 
     private View CreateTiledView (int id, Pos x, Pos y)
     {
-        var tiled = new View
+        View tiled = new ()
         {
             X = x,
             Y = y,
@@ -281,53 +276,54 @@ public class Arrangement : Scenario
         return tiled;
     }
 
-    private char GetNextHotKey () { return (char)('A' + _hotkeyCount++); }
+    private char GetNextHotKey () => (char)('A' + _hotkeyCount++);
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
-        var keys = new List<Key> ();
+        List<Key> keys =
+        [
+            '&',
+            app!.Keyboard.ArrangeKey
+        ];
 
         // Select view with progress bar
-        keys.Add ((Key)'&');
 
-        keys.Add (Application.ArrangeKey);
-
-        for (int i = 0; i < 8; i++)
+        for (var i = 0; i < 8; i++)
         {
             keys.Add (Key.CursorUp);
         }
 
-        for (int i = 0; i < 25; i++)
+        for (var i = 0; i < 25; i++)
         {
             keys.Add (Key.CursorRight);
         }
 
-        keys.Add (Application.ArrangeKey);
+        keys.Add (app.Keyboard.ArrangeKey);
 
         keys.Add (Key.S);
 
-        keys.Add (Application.ArrangeKey);
+        keys.Add (app.Keyboard.ArrangeKey);
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             keys.Add (Key.CursorUp);
         }
 
-        for (int i = 0; i < 25; i++)
+        for (var i = 0; i < 25; i++)
         {
             keys.Add (Key.CursorLeft);
         }
 
-        keys.Add (Application.ArrangeKey);
+        keys.Add (app.Keyboard.ArrangeKey);
 
         // Select view with progress bar
-        keys.Add ((Key)'&');
+        keys.Add ('&');
 
-        keys.Add (Application.ArrangeKey);
+        keys.Add (app.Keyboard.ArrangeKey);
 
         keys.Add (Key.Tab);
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             keys.Add (Key.CursorRight);
             keys.Add (Key.CursorDown);
@@ -349,10 +345,10 @@ public class Arrangement : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
 
-            Padding!.Thickness = new Thickness (1);
+            Padding!.Thickness = new (1);
 
             Add (
-                 new Button ()
+                 new Button
                  {
                      Title = "_Hi",
                      X = Pos.Center (),
@@ -361,4 +357,3 @@ public class Arrangement : Scenario
         }
     }
 }
-

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿#nullable enable
+using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
 
@@ -116,8 +117,6 @@ public class MouseTester : Scenario
         demo.Padding!.Add (demoInPadding);
 
         demo.Padding!.Initialized += DemoPaddingOnInitialized;
-
-        void DemoPaddingOnInitialized (object o, EventArgs eventArgs) { demo.Padding!.Thickness = demo.Padding.Thickness with { Top = 5 }; }
 
         MouseEventDemoView sub1 = new ()
         {
@@ -458,8 +457,10 @@ public class MouseTester : Scenario
                                     };
 
         app.Run (runnable);
-        runnable.Dispose ();
-        app.Dispose ();
+
+        return;
+
+        void DemoPaddingOnInitialized (object? o, EventArgs eventArgs) { demo.Padding!.Thickness = demo.Padding.Thickness with { Top = 5 }; }
     }
 
     public class MouseEventDemoView : View
@@ -521,7 +522,7 @@ public class MouseTester : Scenario
 internal enum DemoMouseFlags
 {
     /// <summary>
-    ///     No mouse event. This is the default value for <see cref="MouseEventArgs.Flags"/> when no mouse event is being
+    ///     No mouse event. This is the default value for <see cref="Mouse.Flags"/> when no mouse event is being
     ///     No mouse event. This is the default value for <see cref="Mouse.Flags"/> when no mouse event is being
     ///     reported.
     /// </summary>

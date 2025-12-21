@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace UICatalog.Scenarios;
+﻿namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Dialogs", "Demonstrates how to the Dialog class")]
 [ScenarioCategory ("Dialogs")]
@@ -182,20 +178,20 @@ public class Dialogs : Scenario
         };
 
         app.Accepting += (s, e) =>
-                                   {
-                                       Dialog dlg = CreateDemoDialog (
-                                                                      widthEdit,
-                                                                      heightEdit,
-                                                                      titleEdit,
-                                                                      numButtonsEdit,
-                                                                      glyphsNotWords,
-                                                                      alignmentOptionSelector,
-                                                                      buttonPressedLabel
-                                                                     );
-                                       Application.Run (dlg);
-                                       dlg.Dispose ();
-                                       e.Handled = true;
-                                   };
+                         {
+                             Dialog dlg = CreateDemoDialog (
+                                                            widthEdit,
+                                                            heightEdit,
+                                                            titleEdit,
+                                                            numButtonsEdit,
+                                                            glyphsNotWords,
+                                                            alignmentOptionSelector,
+                                                            buttonPressedLabel
+                                                           );
+                             Application.Run (dlg);
+                             dlg.Dispose ();
+                             e.Handled = true;
+                         };
 
         app.Add (showDialogButton);
 
@@ -252,11 +248,11 @@ public class Dialogs : Scenario
                 }
 
                 button.Accepting += (s, e) =>
-                                 {
-                                     clicked = buttonId;
-                                     e.Handled = true;
-                                     Application.RequestStop ();
-                                 };
+                                    {
+                                        clicked = buttonId;
+                                        e.Handled = true;
+                                        Application.RequestStop ();
+                                    };
                 buttons.Add (button);
             }
 
@@ -266,7 +262,7 @@ public class Dialogs : Scenario
             {
                 Title = titleEdit.Text,
                 Text = "Dialog Text",
-                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [(int)alignmentGroup.Value!.Value] [0..]),
+                ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [alignmentGroup.Value!.Value] [..]),
 
                 Buttons = buttons.ToArray ()
             };
@@ -275,6 +271,7 @@ public class Dialogs : Scenario
             {
                 dialog.Width = width;
             }
+
             if (height != 0)
             {
                 dialog.Height = height;
@@ -288,38 +285,38 @@ public class Dialogs : Scenario
             };
 
             add.Accepting += (s, e) =>
-                          {
-                              int buttonId = buttons.Count;
-                              Button button;
+                             {
+                                 int buttonId = buttons.Count;
+                                 Button button;
 
-                              if (glyphsNotWords.CheckedState == CheckState.Checked)
-                              {
-                                  button = new ()
-                                  {
-                                      Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
-                                      IsDefault = buttonId == 0
-                                  };
-                              }
-                              else
-                              {
-                                  button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
-                              }
+                                 if (glyphsNotWords.CheckedState == CheckState.Checked)
+                                 {
+                                     button = new ()
+                                     {
+                                         Text = "_" + NumberToWords.Convert (buttonId) + " " + char.ConvertFromUtf32 (buttonId + CODE_POINT),
+                                         IsDefault = buttonId == 0
+                                     };
+                                 }
+                                 else
+                                 {
+                                     button = new () { Text = "_" + NumberToWords.Convert (buttonId), IsDefault = buttonId == 0 };
+                                 }
 
-                              button.Accepting += (s, e) =>
-                                               {
-                                                   clicked = buttonId;
-                                                   Application.RequestStop ();
-                                                   e.Handled = true;
-                                               };
-                              buttons.Add (button);
-                              dialog.AddButton (button);
+                                 button.Accepting += (s, e) =>
+                                                     {
+                                                         clicked = buttonId;
+                                                         Application.RequestStop ();
+                                                         e.Handled = true;
+                                                     };
+                                 buttons.Add (button);
+                                 dialog.AddButton (button);
 
-                              //if (buttons.Count > 1)
-                              //{
-                              //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
-                              //}
-                              e.Handled = true;
-                          };
+                                 //if (buttons.Count > 1)
+                                 //{
+                                 //    button.TabIndex = buttons [buttons.Count - 2].TabIndex + 1;
+                                 //}
+                                 e.Handled = true;
+                             };
             dialog.Add (add);
 
             var addChar = new Button
@@ -330,14 +327,14 @@ public class Dialogs : Scenario
             };
 
             addChar.Accepting += (s, e) =>
-                              {
-                                  foreach (Button button in buttons)
-                                  {
-                                      button.Text += char.ConvertFromUtf32 (CODE_POINT);
-                                  }
+                                 {
+                                     foreach (Button button in buttons)
+                                     {
+                                         button.Text += char.ConvertFromUtf32 (CODE_POINT);
+                                     }
 
-                                  e.Handled = true;
-                              };
+                                     e.Handled = true;
+                                 };
             dialog.Add (addChar);
 
             dialog.IsRunningChanged += (s, e) =>
@@ -356,9 +353,9 @@ public class Dialogs : Scenario
         return dialog;
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication app)
     {
-        var keys = new List<Key> ();
+        List<Key> keys = new ();
 
         keys.Add (Key.D6);
         keys.Add (Key.D5);
@@ -368,42 +365,52 @@ public class Dialogs : Scenario
         keys.Add (Key.D0);
 
         keys.Add (Key.Enter);
-        for (int i = 0; i < 5; i++)
+
+        for (var i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
+
         keys.Add (Key.Enter);
 
         keys.Add (Key.S.WithAlt);
         keys.Add (Key.Enter);
-        for (int i = 0; i < 5; i++)
+
+        for (var i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
+
         keys.Add (Key.Enter);
 
         keys.Add (Key.E.WithAlt);
         keys.Add (Key.Enter);
-        for (int i = 0; i < 5; i++)
+
+        for (var i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
+
         keys.Add (Key.Enter);
 
         keys.Add (Key.C.WithAlt);
         keys.Add (Key.Enter);
-        for (int i = 0; i < 5; i++)
+
+        for (var i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
+
         keys.Add (Key.Enter);
 
         keys.Add (Key.F.WithAlt);
         keys.Add (Key.Enter);
-        for (int i = 0; i < 5; i++)
+
+        for (var i = 0; i < 5; i++)
         {
             keys.Add (Key.A);
         }
+
         keys.Add (Key.Enter);
 
         return keys;

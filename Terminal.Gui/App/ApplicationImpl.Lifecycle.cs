@@ -59,13 +59,9 @@ internal partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        // Debug.Assert (Navigation is null);
-        // Navigation = new ();
-
-        //Debug.Assert (Popover is null);
-        //Popover = new ();
-
         // Preserve existing keyboard settings if they exist
+        // BUGBUG: These should not be needed; KeyboardImpl subscribes to Application static property changes
+        // BUGBUG: and should set these automatically.
         bool hasExistingKeyboard = _keyboard is { };
         Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
         Key existingArrangeKey = _keyboard?.ArrangeKey ?? Application.ArrangeKey;

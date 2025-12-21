@@ -1,6 +1,6 @@
 ﻿#nullable enable
 using System.Globalization;
-using JetBrains.Annotations;
+
 // ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
@@ -45,7 +45,6 @@ public class ContextMenus : Scenario
 
         void AppWindowOnInitialized (object? sender, EventArgs e)
         {
-
             var text = "Context Menu";
             var width = 20;
 
@@ -84,11 +83,14 @@ public class ContextMenus : Scenario
             _appWindow.Activating += OnAppWindowOnActivating;
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
-            _appWindow.IsRunningChanged += (_, e) => {
+
+            _appWindow.IsRunningChanged += (_, e) =>
+                                           {
                                                if (!e.Value)
                                                {
                                                    Thread.CurrentThread.CurrentUICulture = originalCulture;
-                                               } };
+                                               }
+                                           };
         }
 
         void OnAppWindowOnActivating (object? s, CommandEventArgs e)
@@ -122,14 +124,15 @@ public class ContextMenus : Scenario
                                    new MenuItem
                                    {
                                        Title = "C_ultures",
-                                       SubMenu = GetSupportedCultureMenu (),
+                                       SubMenu = GetSupportedCultureMenu ()
                                    },
                                    new Line (),
                                    new MenuItem
                                    {
                                        Title = "_Configuration...",
                                        HelpText = "Show configuration",
-                                       Action = () => MessageBox.Query (app!,
+                                       Action = () => MessageBox.Query (
+                                                                        app!,
                                                                         50,
                                                                         10,
                                                                         "Configuration",
@@ -147,7 +150,8 @@ public class ContextMenus : Scenario
                                                               Title = "_Setup...",
                                                               HelpText = "Perform setup",
                                                               Action = () => MessageBox
-                                                                           .Query (app!,
+                                                                           .Query (
+                                                                                   app!,
                                                                                    50,
                                                                                    10,
                                                                                    "Setup",
@@ -161,7 +165,8 @@ public class ContextMenus : Scenario
                                                               Title = "_Maintenance...",
                                                               HelpText = "Maintenance mode",
                                                               Action = () => MessageBox
-                                                                           .Query (app!,
+                                                                           .Query (
+                                                                                   app!,
                                                                                    50,
                                                                                    10,
                                                                                    "Maintenance",
@@ -241,7 +246,7 @@ public class ContextMenus : Scenario
         }
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         List<Key> keys =
         [

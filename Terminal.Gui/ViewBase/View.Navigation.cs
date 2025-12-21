@@ -499,7 +499,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     </para>
     ///     <para>
     ///         Setting this property to <see langword="true"/> will cause the subview furthest down the hierarchy that is
-    ///         focusable to also gain focus (as long as <see cref="TabStop"/>
+    ///         focusable to also gain focus (as long as <see cref="TabStop"/> is set to <see langword="true"/>).
     ///     </para>
     ///     <para>
     ///         Setting this property to <see langword="false"/> will cause <see cref="AdvanceFocus"/> to set
@@ -778,7 +778,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </param>
     /// <param name="traversingDown">
     ///     Set to true to traverse down the focus
-    ///     chain only. If false, the method will attempt to AdvanceFocus on the superview or restorefocus on
+    ///     chain only. If false, the method will attempt to AdvanceFocus on the superview or restore focus on
     ///     Application.Navigation.GetFocused().
     /// </param>
     /// <exception cref="InvalidOperationException"></exception>
@@ -1035,13 +1035,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     Gets or sets the behavior of <see cref="AdvanceFocus"/> for keyboard navigation.
     /// </summary>
     /// <remarks>
-    ///     <remarks>
-    ///         <para>
-    ///             See the View Navigation Deep Dive for more information:
-    ///             <see href="https://gui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
-    ///         </para>
-    ///     </remarks>
-    ///     ///
+    ///     <para>
+    ///         See the View Navigation Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
+    ///     </para>
     ///     <para>
     ///         If <see langword="null"/> the tab stop has not been set and setting <see cref="CanFocus"/> to true will set it
     ///         to

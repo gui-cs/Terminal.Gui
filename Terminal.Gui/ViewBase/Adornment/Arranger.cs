@@ -58,7 +58,7 @@ internal sealed class Arranger : IDisposable
         bool mouseMode = _border.App is { } && _border.App.Mouse.MouseGrabView == _border;
 
         _border.HotKeyBindings.Add (Key.Esc, Command.Quit);
-        _border.HotKeyBindings.Add (Application.ArrangeKey, Command.Quit);
+        _border.HotKeyBindings.Add (_border.App!.Keyboard.ArrangeKey, Command.Quit);
         _border.HotKeyBindings.Add (Key.CursorUp, Command.Up);
         _border.HotKeyBindings.Add (Key.CursorDown, Command.Down);
         _border.HotKeyBindings.Add (Key.CursorLeft, Command.Left);

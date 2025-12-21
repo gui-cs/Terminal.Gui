@@ -292,7 +292,7 @@ public class ColorPickers : Scenario
                              });
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication app)
     {
         List<Key> keys =
         [

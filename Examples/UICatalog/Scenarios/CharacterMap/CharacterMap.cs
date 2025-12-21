@@ -23,7 +23,7 @@ public class CharacterMap : Scenario
     private CharMap? _charMap;
     private OptionSelector? _unicodeCategorySelector;
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         List<Key> keys = [];
 

@@ -343,7 +343,7 @@ public class AllViewsTester : Scenario
         UpdateHostTitle (view);
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         var keys = new List<Key> ();
 

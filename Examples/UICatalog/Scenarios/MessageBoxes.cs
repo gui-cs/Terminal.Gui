@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace UICatalog.Scenarios;
+﻿namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("MessageBoxes", "Demonstrates how to use the MessageBox class.")]
 [ScenarioCategory ("Controls")]
@@ -15,7 +11,7 @@ public class MessageBoxes : Scenario
 
         Window app = new ()
         {
-            Title = GetQuitKeyAndName (),
+            Title = GetQuitKeyAndName ()
         };
 
         var frame = new FrameView
@@ -25,7 +21,6 @@ public class MessageBoxes : Scenario
             Width = Dim.Percent (75),
             Height = Dim.Auto (DimAutoStyle.Content),
             Title = "MessageBox Options"
-
         };
         app.Add (frame);
 
@@ -182,7 +177,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var styleOptionSelector = new OptionSelector ()
+        var styleOptionSelector = new OptionSelector
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -201,11 +196,12 @@ public class MessageBoxes : Scenario
             TextAlignment = Alignment.End,
             Text = "Wra_p:"
         };
+
         var ckbWrapMessage = new CheckBox
         {
             X = Pos.Right (label) + 1, Y = Pos.Bottom (styleOptionSelector),
             CheckedState = CheckState.Checked,
-            Text = "_Wrap Message",
+            Text = "_Wrap Message"
         };
         frame.Add (label, ckbWrapMessage);
 
@@ -232,55 +228,55 @@ public class MessageBoxes : Scenario
         };
 
         app.Accepting += (s, e) =>
-                                       {
-                                           try
-                                           {
-                                               int width = int.Parse (widthEdit.Text);
-                                               int height = int.Parse (heightEdit.Text);
-                                               int numButtons = int.Parse (numButtonsEdit.Text);
-                                               int defaultButton = int.Parse (defaultButtonEdit.Text);
+                         {
+                             try
+                             {
+                                 int width = int.Parse (widthEdit.Text);
+                                 int height = int.Parse (heightEdit.Text);
+                                 int numButtons = int.Parse (numButtonsEdit.Text);
+                                 int defaultButton = int.Parse (defaultButtonEdit.Text);
 
-                                               List<string> btns = new ();
+                                 List<string> btns = new ();
 
-                                               for (var i = 0; i < numButtons; i++)
-                                               {
-                                                   btns.Add ($"_{NumberToWords.Convert (i)}");
-                                               }
+                                 for (var i = 0; i < numButtons; i++)
+                                 {
+                                     btns.Add ($"_{NumberToWords.Convert (i)}");
+                                 }
 
-                                               if (styleOptionSelector.Value == 0)
-                                               {
-                                                   buttonPressedLabel.Text =
-                                                       $"{MessageBox.Query (
-                                                                            Application.Instance, width,
-                                                                             height,
-                                                                             titleEdit.Text,
-                                                                             messageEdit.Text,
-                                                                             defaultButton,
-                                                                             ckbWrapMessage.CheckedState == CheckState.Checked,
-                                                                             btns.ToArray ()
-                                                                            )}";
-                                               }
-                                               else
-                                               {
-                                                   buttonPressedLabel.Text =
-                                                       $"{MessageBox.ErrorQuery (Application.Instance,
-                                                                                 width,
-                                                                                 height,
-                                                                                 titleEdit.Text,
-                                                                                 messageEdit.Text,
-                                                                                 defaultButton,
-                                                                                 ckbWrapMessage.CheckedState == CheckState.Checked,
-                                                                                 btns.ToArray ()
-                                                                                 )}";
-                                               }
-                                           }
-                                           catch (FormatException)
-                                           {
-                                               buttonPressedLabel.Text = "Invalid Options";
-                                           }
+                                 if (styleOptionSelector.Value == 0)
+                                 {
+                                     buttonPressedLabel.Text =
+                                         $"{MessageBox.Query (
+                                                              Application.Instance, width,
+                                                              height,
+                                                              titleEdit.Text,
+                                                              messageEdit.Text,
+                                                              defaultButton,
+                                                              ckbWrapMessage.CheckedState == CheckState.Checked,
+                                                              btns.ToArray ()
+                                                             )}";
+                                 }
+                                 else
+                                 {
+                                     buttonPressedLabel.Text =
+                                         $"{MessageBox.ErrorQuery (Application.Instance,
+                                                                   width,
+                                                                   height,
+                                                                   titleEdit.Text,
+                                                                   messageEdit.Text,
+                                                                   defaultButton,
+                                                                   ckbWrapMessage.CheckedState == CheckState.Checked,
+                                                                   btns.ToArray ()
+                                                                  )}";
+                                 }
+                             }
+                             catch (FormatException)
+                             {
+                                 buttonPressedLabel.Text = "Invalid Options";
+                             }
 
-                                           e.Handled = true;
-                                       };
+                             e.Handled = true;
+                         };
         app.Add (showMessageBoxButton);
 
         app.Add (buttonPressedLabel);
@@ -291,10 +287,9 @@ public class MessageBoxes : Scenario
         Application.Shutdown ();
     }
 
-
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication app)
     {
-        var keys = new List<Key> ();
+        List<Key> keys = new ();
 
         keys.Add (Key.S.WithAlt);
         keys.Add (Key.Esc);
@@ -316,29 +311,31 @@ public class MessageBoxes : Scenario
         keys.AddRange (GetKeysFromText ("This is a long,\nmulti-line message.\nThis is a test of the emergency\nbroadcast\nsystem."));
         keys.Add (Key.S.WithAlt);
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             keys.Add (Key.Tab);
         }
+
         keys.Add (Key.Enter);
 
         keys.Add (Key.W.WithAlt);
         keys.Add (Key.S.WithAlt);
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             keys.Add (Key.Tab);
         }
+
         keys.Add (Key.Enter);
 
         return keys;
     }
 
-    List<Key> GetKeysFromText (string text)
+    private List<Key> GetKeysFromText (string text)
     {
         List<Key> keys = new ();
 
-        foreach (var r in text)
+        foreach (char r in text)
         {
             keys.Add (r);
         }

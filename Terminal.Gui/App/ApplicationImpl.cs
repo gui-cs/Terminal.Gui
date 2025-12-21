@@ -21,7 +21,7 @@ internal partial class ApplicationImpl : IApplication
     {
         _timeProvider = timeProvider;
         _testMode = testMode;
-        
+
         // Initialize TimedEvents with the time provider for testable timing
         _timedEvents = new TimedEvents (timeProvider);
 
