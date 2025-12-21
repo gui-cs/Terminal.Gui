@@ -63,8 +63,8 @@ internal sealed class Arranger : IDisposable
         _border.HotKeyBindings.Add (Key.CursorDown, Command.Down);
         _border.HotKeyBindings.Add (Key.CursorLeft, Command.Left);
         _border.HotKeyBindings.Add (Key.CursorRight, Command.Right);
-        _border.HotKeyBindings.Add (Key.Tab, Command.Tab);
-        _border.HotKeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
+        _border.HotKeyBindings.Add (Key.Tab, Command.NextTabStop);
+        _border.HotKeyBindings.Add (Key.Tab.WithShift, Command.PreviousTabStop);
 
         CreateArrangementButtons ();
 

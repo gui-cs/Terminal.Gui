@@ -472,8 +472,8 @@ public class TextView : View, IDesignable
                         return true;
                     }
                    );
-        AddCommand (Command.Tab, () => ProcessTab ());
-        AddCommand (Command.BackTab, () => ProcessBackTab ());
+        AddCommand (Command.NextTabStop, () => ProcessTab ());
+        AddCommand (Command.PreviousTabStop, () => ProcessBackTab ());
 
         AddCommand (
                     Command.Undo,
@@ -603,8 +603,8 @@ public class TextView : View, IDesignable
         KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
-        KeyBindings.Add (Key.Tab, Command.Tab);
-        KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
+        KeyBindings.Add (Key.Tab, Command.NextTabStop);
+        KeyBindings.Add (Key.Tab.WithShift, Command.PreviousTabStop);
 
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
         KeyBindings.Add (Key.R.WithCtrl, Command.Redo);

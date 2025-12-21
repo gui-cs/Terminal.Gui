@@ -28,8 +28,8 @@ public partial class Border
         AddCommand (Command.Down, () => _arranger?.HandleArrangeModeDown ());
         AddCommand (Command.Left, () => _arranger?.HandleArrangeModeLeft ());
         AddCommand (Command.Right, () => _arranger?.HandleArrangeModeRight ());
-        AddCommand (Command.Tab, () => _arranger?.HandleArrangeModeTab ());
-        AddCommand (Command.BackTab, () => _arranger?.HandleArrangeModeBackTab ());
+        AddCommand (Command.NextTabStop, () => _arranger?.HandleArrangeModeTab ());
+        AddCommand (Command.PreviousTabStop, () => _arranger?.HandleArrangeModeBackTab ());
 
         return arranger;
     }
