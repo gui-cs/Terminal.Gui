@@ -144,7 +144,6 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Don't clear where the shadow goes
-            screen = Rectangle.Inflate(screen, -ShadowSize.Width, -ShadowSize.Height);
         }
 
         return true;
