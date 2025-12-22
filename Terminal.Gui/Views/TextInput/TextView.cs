@@ -120,8 +120,6 @@ public class TextView : View, IDesignable
 
         Initialized += TextView_Initialized!;
 
-        SuperViewChanged += TextView_SuperViewChanged!;
-
         SubViewsLaidOut += TextView_LayoutComplete;
 
         // Things this view knows how to do
@@ -4626,9 +4624,12 @@ public class TextView : View, IDesignable
         return Encoding.Unicode.GetString (encoded, 0, offset);
     }
 
-    private void TextView_SuperViewChanged (object sender, SuperViewChangedEventArgs e)
+
+    /// <inheritdoc />
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> args)
     {
-        if (e.SuperView is { })
+        base.OnSuperViewChanged (args);
+        if (SuperView is { })
         {
             if (Autocomplete.HostControl is null)
             {
@@ -4764,6 +4765,10 @@ public class TextView : View, IDesignable
                TextView provides a fully featured multi-line text editor.
                It supports word wrap and history for undo.
                """;
+
+        // This enables AllViews_HasFocus_Changed_Event to pass since it requires
+        // tab navigation to work
+        AllowsTab = false;
 
         return true;
     }

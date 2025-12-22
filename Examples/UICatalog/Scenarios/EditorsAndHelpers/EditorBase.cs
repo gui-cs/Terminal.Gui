@@ -127,20 +127,20 @@ public abstract class EditorBase : View
         ViewToEdit = App!.Navigation!.GetFocused ();
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
+    private void ApplicationOnMouseEvent (object? sender, Terminal.Gui.Input.MouseEventArgs mouse)
     {
-        if (e.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
+        if (mouse.Flags != MouseFlags.Button1Clicked || !AutoSelectViewToEdit)
         {
             return;
         }
 
-        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (e.Position))
-            || FrameToScreen ().Contains (e.Position))
+        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position))
+            || FrameToScreen ().Contains (mouse.Position))
         {
             return;
         }
 
-        View? view = e.View;
+        View? view = mouse.View;
 
         if (view is null)
         {
@@ -158,14 +158,23 @@ public abstract class EditorBase : View
     }
 
     /// <inheritdoc />
-    protected override void Dispose (bool disposing)
+    protected override bool OnSuperViewChanging (ValueChangingEventArgs<View?> args)
     {
-        if (disposing && App is {})
+        // Clean up event handlers before SuperView is set to null
+        // This ensures App is still accessible for proper cleanup
+        if (App is {})
         {
             App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
             App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
         }
 
+        return base.OnSuperViewChanging (args);
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        // Event handlers are now cleaned up in OnSuperViewChanging
         base.Dispose (disposing);
     }
 }

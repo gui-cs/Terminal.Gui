@@ -53,7 +53,7 @@ public class ViewportSettings : Scenario
             MouseEvent += VirtualDemoView_MouseEvent;
         }
 
-        private void VirtualDemoView_MouseEvent (object sender, MouseEventArgs e)
+        private void VirtualDemoView_MouseEvent (object sender, Terminal.Gui.Input.MouseEventArgs e)
         {
             if (e.Flags == MouseFlags.WheeledDown)
             {
@@ -201,17 +201,17 @@ public class ViewportSettings : Scenario
 
         List<object> options = new () { "Option 1", "Option 2", "Option 3" };
 
-        Slider slider = new (options)
+        LinearRange linearRange = new (options)
         {
             X = 0,
             Y = Pos.Bottom (textField) + 1,
             Orientation = Orientation.Vertical,
-            Type = SliderType.Multiple,
+            Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
-            Title = "_Slider"
+            Title = "_LinearRange"
         };
-        view.Add (slider);
+        view.Add (linearRange);
 
         adornmentsEditor.Initialized += (s, e) =>
                               {

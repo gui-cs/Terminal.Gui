@@ -47,7 +47,7 @@ public sealed class Transparent : Scenario
         };
         appButton.Accepting += (sender, args) =>
                                {
-                                   MessageBox.Query ((sender as View)?.App, "AppButton", "Transparency is cool!", "_Ok");
+                                   MessageBox.Query ((sender as View)?.App!, "AppButton", "Transparency is cool!", "_Ok");
                                    args.Handled = true;
                                };
         appWindow.Add (appButton);
@@ -112,7 +112,7 @@ public sealed class Transparent : Scenario
             };
             button.Accepting += (sender, args) =>
                                 {
-                                    MessageBox.Query (App, "Clicked!", "Button in Transparent View", "_Ok");
+                                    MessageBox.Query (App!, "Clicked!", "Button in Transparent View", "_Ok");
                                     args.Handled = true;
                                 };
 
@@ -232,7 +232,7 @@ public sealed class Transparent : Scenario
         protected override bool OnClearingViewport () { return false; }
 
         /// <inheritdoc />
-        protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
+        protected override bool OnMouseEvent (Terminal.Gui.Input.MouseEventArgs mouse) { return false; }
 
 
         /// <summary>

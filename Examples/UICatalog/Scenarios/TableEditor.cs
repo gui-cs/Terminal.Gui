@@ -618,24 +618,24 @@ public class TableEditor : Scenario
                                      }
 
                                      // Only handle mouse clicks
-                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
                                      {
                                          return;
                                      }
 
-                                     _tableView!.ScreenToCell (mouseArgs.Position, out int? clickedCol);
+                                     _tableView!.ScreenToCell (mouse.Position, out int? clickedCol);
 
                                      if (clickedCol != null)
                                      {
-                                         if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                         if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
                                          {
                                              // left click in a header
                                              SortColumn (clickedCol.Value);
                                          }
-                                         else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                         else if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
                                          {
                                              // right click in a header
-                                             ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
+                                             ShowHeaderContextMenu (clickedCol.Value, mouse);
                                          }
                                      }
                                  };
@@ -1032,7 +1032,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery ((sender as View)?.App, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery ((sender as View)?.App!, 60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1171,7 +1171,7 @@ public class TableEditor : Scenario
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery (_tableView?.App, "Could not find local drives", e.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView?.App!, "Could not find local drives", e.Message, "Ok");
         }
 
         _tableView!.Table = source;
@@ -1235,7 +1235,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (_tableView.App, 60, 20, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView.App!, 60, 20, "Failed to set", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1380,7 +1380,7 @@ public class TableEditor : Scenario
         _tableView!.Update ();
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, Terminal.Gui.Input.MouseEventArgs e)
     {
         if (HasCheckboxes () && clickedCol == 0)
         {
