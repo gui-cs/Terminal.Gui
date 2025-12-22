@@ -10,35 +10,46 @@ public sealed class Generic : Scenario
     {
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.BorderStyle = LineStyle.None;
 
-        var button = new Button ()
+        View button = new ()
         {
+            //CanFocus = true,
             X = Pos.Center (),
             Y = 1,
-            Title = "_Button",
+            Height = Dim.Auto(),
+            Width = Dim.Auto (),
+            Text = "_Button",
+            MouseHighlightStates = MouseState.In | MouseState.Pressed
         };
 
         button.Accepting += (s, e) =>
                             {
                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
                                 e.Handled = true;
-                                MessageBox.ErrorQuery (Application.Instance, "Error", "You pressed the button!", "_Ok");
+                                MessageBox.ErrorQuery ((s as View)!.App!, "Error", "You pressed the button!", "_Ok");
                             };
 
         appWindow.Add (button);
 
-        // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
+        View second = new ()
+        {
+            //CanFocus = true,
+            X = Pos.Center (),
+            Y = Pos.Bottom (button) + 1,
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            Text = "_Second",
+            MouseHighlightStates = MouseState.In
+        };
+        appWindow.Add (second);
 
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        // Run - Start the application.
+        app.Run (appWindow);
     }
 }

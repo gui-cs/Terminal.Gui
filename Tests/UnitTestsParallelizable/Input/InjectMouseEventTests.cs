@@ -60,66 +60,7 @@ public class InjectMouseEventTests (ITestOutputHelper output)
 
     #endregion
 
-    #region Thread Safety Tests
-
-    [Fact (Skip = "Thread safety test has race conditions - needs investigation")]
-    public void InjectMouseEvent_IsThreadSafe ()
-    {
-        // Arrange
-        AnsiInput ansiInput = new ();
-        ConcurrentQueue<char> queue = new ();
-        ansiInput.Initialize (queue);
-
-        AnsiInputProcessor processor = new (queue);
-        processor.InputImpl = ansiInput;
-
-        ConcurrentBag<Mouse> receivedEvents = [];
-        processor.SyntheticMouseEvent += (_, e) => receivedEvents.Add (e);
-
-        const int THREAD_COUNT = 10;
-        const int EVENTS_PER_THREAD = 100;
-        Thread [] threads = new Thread [THREAD_COUNT];
-
-        // Act - Enqueue mouse events from multiple threads
-        for (var t = 0; t < THREAD_COUNT; t++)
-        {
-            int threadId = t;
-
-            threads [t] = new (() =>
-                               {
-                                   for (var i = 0; i < EVENTS_PER_THREAD; i++)
-                                   {
-                                       processor.InjectMouseEvent (
-                                                                    null,
-                                                                    new ()
-                                                                    {
-                                                                        Timestamp = DateTime.Now,
-                                                                        ScreenPosition = new (threadId, i),
-                                                                        Flags = MouseFlags.LeftButtonPressed
-                                                                    });
-                                   }
-                               });
-            threads [t].Start ();
-        }
-
-        // Wait for all threads to complete
-        foreach (Thread thread in threads)
-        {
-            thread.Join ();
-        }
-
-        SimulateInputThread (ansiInput, queue);
-        processor.ProcessQueue ();
-
-        // Assert
-        // Note: This test has race conditions between enqueueing and processing
-        // The ANSIInput queue may not have all events when SimulateInputThread runs
-        Assert.Equal (THREAD_COUNT * EVENTS_PER_THREAD, receivedEvents.Count);
-    }
-
-    #endregion
-
-    #region Helper Methods
+   #region Helper Methods
 
     /// <summary>
     ///     Simulates the input thread by manually draining ANSIInput's internal queue

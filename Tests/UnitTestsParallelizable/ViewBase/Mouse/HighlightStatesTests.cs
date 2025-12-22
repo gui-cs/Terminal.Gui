@@ -5,11 +5,89 @@ namespace ViewBaseTests.MouseTests;
 
 public class HighlightStatesTests (ITestOutputHelper output)
 {
+    [Theory]
+    [CombinatorialData]
+    public void View_MouseEvent_With_Press_Release_Gets_3 (MouseState mouseState)
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable runnable = new ();
+        View view = new () { X = 0, Y = 0, Width = 10, Height = 10, MouseHighlightStates = mouseState };
+
+        List<MouseFlags> receivedFlags = [];
+        view.MouseEvent += MouseEventHandler;
+
+        runnable.Add (view);
+        app.Begin (runnable);
+
+        // Act
+        // Use Direct mode to bypass ANSI encoding which cannot preserve timestamps
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+
+        IInputInjector injector = app.GetInputInjector ();
+
+        // First click at T+0
+        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (
+                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+                              options);
+
+        // Assert
+        Assert.Equal (3, receivedFlags.Count);
+        Assert.Equal (MouseFlags.LeftButtonPressed, receivedFlags [0]);
+        Assert.Equal (MouseFlags.LeftButtonReleased, receivedFlags [1]);
+        Assert.Equal (MouseFlags.LeftButtonClicked, receivedFlags [2]);
+
+        view.MouseEvent -= MouseEventHandler;
+
+        return;
+
+        void MouseEventHandler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public void View_MouseEvent_With_Press_Release_Raises_Activate (MouseState mouseState)
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable runnable = new ();
+        View view = new () { X = 0, Y = 0, Width = 10, Height = 10, MouseHighlightStates = mouseState };
+
+        int activateCount = 0;
+        view.Activating += (_, _) => activateCount++;
+
+        runnable.Add (view);
+        app.Begin (runnable);
+
+        // Act
+        // Use Direct mode to bypass ANSI encoding which cannot preserve timestamps
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+
+        IInputInjector injector = app.GetInputInjector ();
+
+        // First click at T+0
+        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (
+                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+                              options);
+
+        // Assert
+        Assert.Equal (1, activateCount);
+
+    }
+
     [Fact]
-    public void HighlightStates_SubView_With_Single_Runnable_WorkAsExpected ()
+    public void SubView_With_Single_Runnable_WorkAsExpected ()
     {
         IApplication app = Application.Create ();
-        app.Init ("ansi");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (6, 1);
 
@@ -44,10 +122,10 @@ public class HighlightStatesTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void HighlightStates_SubView_With_Multiple_Runnable_WorkAsExpected ()
+    public void SubView_With_Multiple_Runnable_WorkAsExpected ()
     {
         IApplication app = Application.Create ();
-        app.Init ("ansi");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (9, 5);
 
@@ -114,4 +192,5 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         app.Dispose ();
     }
+
 }

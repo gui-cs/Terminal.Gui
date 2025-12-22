@@ -401,7 +401,10 @@ public partial class View // Mouse APIs
             }
             else if (mouse.IsReleased)
             {
-                HandleAutoGrabRelease (mouse);
+                if (HandleAutoGrabRelease (mouse))
+                {
+                    return true;
+                };
             }
             else if (mouse.IsSingleDoubleOrTripleClicked)
             {
@@ -549,28 +552,35 @@ public partial class View // Mouse APIs
         // Update MouseState based on position
         UpdateMouseStateOnPress (mouse.Position);
 
-        // Allow command invocation to proceed
-        return false;
+        if (MouseHoldRepeat)
+        {
+            // Allow command invocation to proceed
+            return false;
+        }
+
+        return InvokeCommandsBoundToMouse (mouse) is true;
     }
 
     /// <summary>
     ///     Handles the released event when auto-grab is enabled. Updates <see cref="MouseState"/>.
     /// </summary>
     /// <param name="mouse">The mouse event.</param>
-    private void HandleAutoGrabRelease (Mouse mouse)
+    private bool HandleAutoGrabRelease (Mouse mouse)
     {
         if (!mouse.IsReleased)
         {
-            return;
+            return false;
         }
 
         if (App is null || App.Mouse.MouseGrabView != this)
         {
-            return;
+            return false;
         }
 
         // Update MouseState
         UpdateMouseStateOnRelease ();
+
+        return !MouseHoldRepeat;
     }
 
     /// <summary>

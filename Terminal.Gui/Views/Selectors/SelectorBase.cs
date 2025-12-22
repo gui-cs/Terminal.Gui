@@ -7,6 +7,22 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public abstract class SelectorBase : View, IOrientation
 {
+#if !MOUSEHIGHLIGHTSTATES_FIXED
+    private static MouseState _defaultHighlightStates = MouseState.In; // Resources/config.json overrides
+#else
+    private static MouseState _defaultHighlightStates = MouseState.None;
+#endif
+
+    /// <summary>
+    ///     Gets or sets the default Highlight Style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static MouseState DefaultMouseHighlightStates
+    {
+        get => _defaultHighlightStates;
+        set => _defaultHighlightStates = value;
+    }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="SelectorBase"/> class.
     /// </summary>
@@ -327,7 +343,7 @@ public abstract class SelectorBase : View, IOrientation
             Title = label,
             Id = label,
             Data = value,
-            MouseHighlightStates = MouseState.In,
+            MouseHighlightStates = DefaultMouseHighlightStates,
         };
 
         return checkbox;

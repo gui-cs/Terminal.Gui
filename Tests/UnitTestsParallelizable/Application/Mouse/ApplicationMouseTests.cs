@@ -1,4 +1,6 @@
-﻿namespace ApplicationTests.MouseTests;
+﻿using UnitTests;
+
+namespace ApplicationTests.MouseTests;
 
 /// <summary>
 ///     Tests for <see cref="IApplication.Mouse"/> proving the integration between
@@ -15,16 +17,17 @@
 ///     - This means injecting one event may generate multiple output events
 /// </remarks>
 [Trait ("Category", "Mouse")]
-public class ApplicationMouseTests
+public class ApplicationMouseTests : TestDriverBase
 {
     #region InjectMouseEvent → RaiseMouseEvent Integration Tests
 
-    [Fact]
-    public void InjectMouseEvent_RaisesMouseEvent ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_RaisesMouseEvent (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init (driverName);
 
         var mouseEventRaised = false;
         Mouse? receivedMouse = null;
@@ -51,13 +54,13 @@ public class ApplicationMouseTests
         Assert.True (receivedMouse.Flags.HasFlag (MouseFlags.LeftButtonPressed));
     }
 
-    [Fact]
-    public void InjectMouseEvent_WithDifferentFlags_RaisesMouseEvent ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_WithDifferentFlags_RaisesMouseEvent (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
+        app.Init (driverName);
         // The MouseInterpreter generates additional events (e.g., Clicked from Press+Release)
         // So we test each flag individually and verify we receive at least the injected flag
         MouseFlags [] flagsToTest =
@@ -75,9 +78,7 @@ public class ApplicationMouseTests
         {
             List<MouseFlags> receivedFlags = [];
 
-            void handler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
-
-            app.Mouse.MouseEvent += handler;
+            app.Mouse.MouseEvent += MouseEventHandler;
 
             app.InjectMouse (new () { ScreenPosition = new (0, 0), Flags = flags });
 
@@ -85,17 +86,21 @@ public class ApplicationMouseTests
             Assert.True (receivedFlags.Count > 0, $"Should receive at least one event for {flags}");
             Assert.True (receivedFlags.Any (f => f.HasFlag (flags)), $"Should receive event with {flags}");
 
-            app.Mouse.MouseEvent -= handler;
+            app.Mouse.MouseEvent -= MouseEventHandler;
+
+            continue;
+
+            void MouseEventHandler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
         }
     }
 
-    [Fact]
-    public void InjectMouseEvent_MultipleEvents_RaisesForEach ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_MultipleEvents_RaisesForEach (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
+        app.Init (driverName);
         List<Point> receivedPositions = [];
 
         app.Mouse.MouseEvent += (s, e) => receivedPositions.Add (e.ScreenPosition);
@@ -238,13 +243,13 @@ public class ApplicationMouseTests
         top.Dispose ();
     }
 
-    [Fact]
-    public void InjectMouseEvent_ApplicationMouseEvent_FiredBeforeViewProcessing ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_ApplicationMouseEvent_FiredBeforeViewProcessing (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
+        app.Init (driverName);
         var applicationMouseEventFired = false;
         var viewMouseEventFired = false;
         List<string> fireOrder = [];
@@ -289,13 +294,13 @@ public class ApplicationMouseTests
         top.Dispose ();
     }
 
-    [Fact]
-    public void InjectMouseEvent_HandledAtApplicationLevel_DoesNotRouteToView ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_HandledAtApplicationLevel_DoesNotRouteToView (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
+        app.Init (driverName);
         var viewMouseEventFired = false;
 
         app.Mouse.MouseEvent += (s, e) =>
@@ -539,12 +544,13 @@ public class ApplicationMouseTests
 
     #region Specific Mouse Event Tests
 
-    [Fact]
-    public void InjectMouseEvent_LeftButtonPressed_RaisesMouseEvent ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_LeftButtonPressed_RaisesMouseEvent (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
+        app.Init (driverName);
 
         var mouseEventRaised = false;
 
@@ -575,6 +581,49 @@ public class ApplicationMouseTests
 
         app.End (token!);
         top.Dispose ();
+    }
+
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_LeftButtonPressed_LeftButtonReleased_Raises_Correct_MouseEvents (string driverName)
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (driverName);
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        List<MouseFlags> receivedFlags = [];
+        app.Mouse.MouseEvent += MouseEventHandler;
+
+        // Act
+        // Use Direct mode to bypass ANSI encoding which cannot preserve timestamps
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+
+        IInputInjector injector = app.GetInputInjector ();
+
+        // First click at T+0
+        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (
+                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+                              options);
+
+
+        // Assert
+        Assert.Equal (MouseFlags.LeftButtonPressed, receivedFlags [0]);
+        Assert.Equal (MouseFlags.LeftButtonReleased, receivedFlags [1]);
+        Assert.Equal (MouseFlags.LeftButtonClicked, receivedFlags [2]);
+        Assert.Equal (3, receivedFlags.Count);
+
+        app.Mouse.MouseEvent -= MouseEventHandler;
+
+        return;
+
+        void MouseEventHandler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
+
     }
 
     [Fact]
@@ -619,13 +668,13 @@ public class ApplicationMouseTests
         top.Dispose ();
     }
 
-    [Fact]
-    public void InjectMouseEvent_DoubleClick_DetectedCorrectly ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouseEvent_DoubleClick_DetectedCorrectly (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
+        app.Init (driverName);
         var doubleClickRaised = false;
 
         View view = new ()
@@ -696,15 +745,15 @@ public class ApplicationMouseTests
         Assert.Same (app, app.Mouse.App);
     }
 
-    [Fact]
-    public void Multiple_Applications_Have_Independent_Mouse ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Multiple_Applications_Have_Independent_Mouse (string driverName)
     {
         // Arrange
         using IApplication app1 = Application.Create ();
-        app1.Init (DriverRegistry.Names.ANSI);
-
+        app1.Init (driverName);
         using IApplication app2 = Application.Create ();
-        app2.Init (DriverRegistry.Names.ANSI);
+        app2.Init (driverName);
 
         var app1MouseEventCount = 0;
         var app2MouseEventCount = 0;
@@ -749,13 +798,13 @@ public class ApplicationMouseTests
     ///     Tests that timestamp-based spacing using Direct mode (bypassing ANSI encoding)
     ///     correctly prevents double-click detection when clicks are spaced >500ms apart.
     /// </summary>
-    [Fact]
-    public void InjectMouse_DirectMode_WithTimestamps_PreventsDoubleClickWhenSpaced ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouse_DirectMode_WithTimestamps_PreventsDoubleClickWhenSpaced (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
+        app.Init (driverName);
         using Runnable runnable = new ();
         app.Begin (runnable);
 
@@ -801,13 +850,13 @@ public class ApplicationMouseTests
     ///     Tests that timestamp-based spacing using Direct mode (bypassing ANSI encoding)
     ///     allows double-click detection when clicks are within the 500ms threshold.
     /// </summary>
-    [Fact]
-    public void InjectMouse_DirectMode_WithTimestamps_AllowsDoubleClickWhenClose ()
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void InjectMouse_DirectMode_WithTimestamps_AllowsDoubleClickWhenClose (string driverName)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
+        app.Init (driverName);
         using Runnable runnable = new ();
         app.Begin (runnable);
 

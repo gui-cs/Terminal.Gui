@@ -80,7 +80,7 @@ public class Button : View, IDesignable
         TitleChanged += Button_TitleChanged;
 
         base.ShadowStyle = DefaultShadow;
-        //MouseHighlightStates = DefaultMouseHighlightStates;
+        MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
     /// <inheritdoc/>

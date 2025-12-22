@@ -307,8 +307,10 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
 
     #region Input Injection Tests (Application Level)
 
-    [Fact]
-    public void MouseHoldRepeat_True_AppInjection_Press_Release_Raises_Activating_Once ()
+
+    [Theory]
+    [CombinatorialData]
+    public void MouseHoldRepeat_True_AppInjection_Press_Release_Raises_Activating_Once (MouseState mouseState)
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -320,6 +322,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
+            MouseHighlightStates = mouseState,
             MouseHoldRepeat = true
         };
         (runnable as View)?.Add (view);
@@ -421,8 +424,9 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         (runnable as View)?.Dispose ();
     }
 
-    [Fact]
-    public void MouseHoldRepeat_True_AppInjection_Press_Wait_Release_Raises_Activating_Multiple_Times ()
+    [Theory]
+    [CombinatorialData]
+    public void MouseHoldRepeat_True_AppInjection_Press_Wait_Release_Raises_Activating_Multiple_Times (MouseState mouseState)
     {
         // Arrange
         const int TIME_OUT_INTERVAL = 100;
@@ -435,6 +439,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
+            MouseHighlightStates = mouseState,
             MouseHoldRepeat = true
         };
         (runnable as View)?.Add (view);
