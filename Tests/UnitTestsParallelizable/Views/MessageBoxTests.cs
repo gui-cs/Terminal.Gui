@@ -361,7 +361,7 @@ public class MessageBoxTests (ITestOutputHelper output)
   ║ff ff ff ff ff║
   ║ff ff ff ff ff║
   ║ff ff ff ff ff║
-  ║    ff ff     ║
+  ║              ║
   ║     ⟦► btn ◄⟧║
   ╚══════════════╝",
                                                                    output,
@@ -382,7 +382,8 @@ public class MessageBoxTests (ITestOutputHelper output)
  ║ffffffffffffffff║
  ║ffffffffffffffff║
  ║ffffffffffffffff║
- ║fffffff⟦► btn ◄⟧║
+ ║                ║
+ ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
                                                                    output,
                                                                    app.Driver);

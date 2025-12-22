@@ -49,6 +49,7 @@ public class Dialog : Window
     }
 
     private readonly List<Button> _buttons = [];
+    private bool _endInitCalled;
 
     private bool _canceled;
 
@@ -63,8 +64,26 @@ public class Dialog : Window
         button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
         button.Y = Pos.AnchorEnd ();
 
+        // Subscribe to FrameChanged to update padding dynamically
+        button.FrameChanged += Button_FrameChanged;
+
         _buttons.Add (button);
-        Add (button);
+
+        // Add to Padding if it exists and EndInit has been called, otherwise add to the Dialog
+        if (Padding is { } && _endInitCalled)
+        {
+            Padding.Add (button);
+            UpdatePaddingBottom ();
+        }
+        else
+        {
+            Add (button);
+        }
+    }
+
+    private void Button_FrameChanged (object? sender, EventArgs e)
+    {
+        UpdatePaddingBottom ();
     }
 
     // TODO: Update button.X = Pos.Justify when alignment changes
@@ -196,5 +215,53 @@ public class Dialog : Window
         }
 
         return false;
+    }
+
+    /// <inheritdoc/>
+    public override void EndInit ()
+    {
+        // Move buttons from the Dialog to the Padding
+        if (Padding is { })
+        {
+            foreach (Button button in _buttons)
+            {
+                // Remove from Dialog if it was added there
+                Remove (button);
+
+                // Add to Padding
+                Padding.Add (button);
+            }
+
+            UpdatePaddingBottom ();
+        }
+
+        _endInitCalled = true;
+        base.EndInit ();
+    }
+
+    private void UpdatePaddingBottom ()
+    {
+        if (Padding is null || _buttons.Count == 0)
+        {
+            return;
+        }
+
+        // Find the maximum button height
+        var maxHeight = 0;
+
+        foreach (Button button in _buttons)
+        {
+            if (button.Frame.Height > maxHeight)
+            {
+                maxHeight = button.Frame.Height;
+            }
+        }
+
+        // Set the bottom padding to match button height
+        // Use at least 1 as a minimum if buttons haven't been laid out yet
+        if (maxHeight > 0 || Padding.Thickness.Bottom == 0)
+        {
+            Padding.Thickness = Padding.Thickness with { Bottom = Math.Max (1, maxHeight) };
+        }
     }
 }
