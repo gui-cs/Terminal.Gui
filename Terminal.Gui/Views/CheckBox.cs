@@ -8,11 +8,7 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class CheckBox : View
 {
-#if !MOUSEHIGHLIGHTSTATES_FIXED
     private static MouseState _defaultHighlightStates = MouseState.PressedOutside | MouseState.Pressed | MouseState.In; // Resources/config.json overrides
-#else
-    private static MouseState _defaultHighlightStates = MouseState.None;
-#endif
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.

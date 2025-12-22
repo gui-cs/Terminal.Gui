@@ -78,7 +78,7 @@ public class MouseTester : Scenario
             BorderStyle = LineStyle.Dotted,
             Title = "_Highlight States",
             Y = Pos.Bottom (lastViewEvent),
-            Width = 20,
+            Width = 20
         };
         runnable.Add (mouseHighlightStates);
 

@@ -184,7 +184,7 @@ public class InjectMouseEventTests (ITestOutputHelper output)
         ConcurrentQueue<char> queue = new ();
         ansiInput.Initialize (queue);
 
-        var processor = new AnsiInputProcessor (queue, null);
+        AnsiInputProcessor processor = new (queue);
         processor.InputImpl = ansiInput;
 
         Mouse mouse = new ()
@@ -251,7 +251,7 @@ public class InjectMouseEventTests (ITestOutputHelper output)
     // Note: Shift modifier encoding in ANSI mouse protocol is complex and doesn't always round-trip correctly
     // The AnsiMouseEncoder uses approximations for Shift combinations that may not match the parser exactly
     // [InlineData (MouseFlags.Shift)] // Known limitation
-    // [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)] // Known limitation 
+    // [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)] // Known limitation
     // [InlineData (MouseFlags.Shift | MouseFlags.Alt)] // Known limitation
     // [InlineData (MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)] // Known limitation
     public void InjectMouseEvent_PreservesModifiers (MouseFlags modifiers)

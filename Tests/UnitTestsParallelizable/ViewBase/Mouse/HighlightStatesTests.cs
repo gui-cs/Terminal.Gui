@@ -229,7 +229,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
             Text = "View2",
             MouseHighlightStates = MouseState.In
         };
-        view2.MouseStateChanged += (s, e) => view2States.Add (e.Value);
+        view2.MouseStateChanged += (_, e) => view2States.Add (e.Value);
 
         runnable.Add (view1, view2);
         app.Begin (runnable);
@@ -245,15 +245,278 @@ public class HighlightStatesTests (ITestOutputHelper output)
         Assert.True (view1.MouseState.HasFlag (MouseState.Pressed));
         Assert.Equal (MouseState.None, view2.MouseState);
 
+        // Clear state tracking to focus on what happens next
+        view2States.Clear ();
+
         // Move mouse over view2 while still holding the button down
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
 
-        // CRITICAL: view2 should NOT change to MouseState.In because the mouse button is still pressed
-        // from the original press on view1. This assertion should fail with current implementation.
+        // view2 should NOT be highlighted
+        Assert.Equal (MouseState.None, view2.MouseState);
+        Assert.Empty (view2States);
+
+        // Move mouse within view2 to a different position (still holding button)
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (20, 1), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
+        Assert.Equal (MouseState.None, view2.MouseState);
+        Assert.Empty (view2States);
+
+        // Move mouse out of view2 (into empty space)
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 2), Flags = MouseFlags.PositionReport });
+
+        // view2 should still be None
+        Assert.Equal (MouseState.None, view2.MouseState);
+        Assert.Empty (view2States);
+
+        // Move back into view2 at different position (still holding button)
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (25, 2), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
         Assert.Equal (MouseState.None, view2.MouseState);
 
-        // view2 should have had NO state changes
+        // view2 should have had NO state changes throughout the entire drag operation
         Assert.Empty (view2States);
+
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void PressAndHold_Drag_Into_And_Within_AnotherView_Should_Not_Highlight_SecondView ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        app.Driver?.SetScreenSize (30, 3);
+
+        Runnable runnable = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        List<MouseState> view2States = [];
+
+        // First view with MouseHighlightStates In and Pressed
+        View view1 = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            Text = "View1",
+            MouseHighlightStates = MouseState.In | MouseState.Pressed
+        };
+
+        // Second view with MouseHighlightStates In
+        View view2 = new ()
+        {
+            X = 10,
+            Y = 0,
+            Width = 20,
+            Height = 3,
+            Text = "View2",
+            MouseHighlightStates = MouseState.In
+        };
+        view2.MouseStateChanged += (_, e) => view2States.Add (e.Value);
+
+        runnable.Add (view1, view2);
+        app.Begin (runnable);
+
+        // Initially both views should have MouseState.None
+        Assert.Equal (MouseState.None, view1.MouseState);
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // Press mouse button on view1
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+
+        // view1 should have Pressed state (may also have In)
+        Assert.True (view1.MouseState.HasFlag (MouseState.Pressed));
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // Clear state tracking to focus on what happens next
+        view2States.Clear ();
+
+        // Move mouse over view2 while still holding the button down
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+
+        // view2 should NOT be highlighted
+        Assert.Equal (MouseState.None, view2.MouseState);
+        Assert.Empty (view2States);
+
+        // Move mouse within view2 to a different position (still holding button)
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (20, 1), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
+        Assert.Equal (MouseState.None, view2.MouseState);
+        Assert.Empty (view2States);
+
+        // Move mouse out of view2 (into empty space)
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 2), Flags = MouseFlags.PositionReport });
+
+        // view2 should still be None
+        Assert.Equal (MouseState.None, view2.MouseState);
+        Assert.Empty (view2States);
+
+        // Move back into view2 at different position (still holding button)
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (25, 2), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should STILL not be highlighted - this will fail with current implementation
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // view2 should have had NO state changes throughout the entire drag operation
+        Assert.Empty (view2States);
+
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void PressOnView1_DragToView2_Release_Should_Not_Affect_View2_Until_After_Release ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        app.Driver?.SetScreenSize (20, 1);
+
+        Runnable runnable = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        List<MouseState> view2States = [];
+
+        // First view with MouseHighlightStates In and Pressed
+        View view1 = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            Text = "View1",
+            MouseHighlightStates = MouseState.In | MouseState.Pressed
+        };
+
+        // Second view with MouseHighlightStates In
+        View view2 = new ()
+        {
+            X = 10,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            Text = "View2",
+            MouseHighlightStates = MouseState.In
+        };
+        view2.MouseStateChanged += (_, e) => view2States.Add (e.Value);
+
+        runnable.Add (view1, view2);
+        app.Begin (runnable);
+
+        // Press on view1
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+
+        // Drag to view2
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+
+        // view2 should not be highlighted during drag
+        Assert.Equal (MouseState.None, view2.MouseState);
+        Assert.Empty (view2States);
+
+        // Release button while over view2
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.LeftButtonReleased });
+
+        // Send Clicked event (this is what triggers ungrab)
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.LeftButtonClicked });
+
+        // After clicked (which ungrabs), view2 should get MouseState.In (mouse is now over it and no button is pressed)
+        Assert.Equal (MouseState.In, view2.MouseState);
+        Assert.Single (view2States);
+        Assert.Equal (MouseState.In, view2States [0]);
+
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void PressOnView1_DragToView2_MoveWithinView2_Should_Not_Change_View2_State ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        app.Driver?.SetScreenSize (20, 2);
+
+        Runnable runnable = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        List<string> view2Events = [];
+        var view2EnterCalled = false;
+
+        // First view with MouseHighlightStates In and Pressed
+        View view1 = new ()
+        {
+            Id = "view1",
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            Text = "View1",
+            MouseHighlightStates = MouseState.In | MouseState.Pressed
+        };
+
+        // Second view with MouseHighlightStates In
+        View view2 = new ()
+        {
+            Id = "view2",
+            X = 10,
+            Y = 0,
+            Width = 10,
+            Height = 2,
+            Text = "View2",
+            MouseHighlightStates = MouseState.In
+        };
+        view2.MouseStateChanged += (_, e) => { view2Events.Add ($"StateChanged: {e.Value}"); };
+
+        view2.MouseEnter += (_, _) =>
+                            {
+                                view2EnterCalled = true;
+                                view2Events.Add ("MouseEnter");
+                            };
+        view2.MouseLeave += (_, _) => view2Events.Add ("MouseLeave");
+
+        runnable.Add (view1, view2);
+        app.Begin (runnable);
+
+        // Press on view1
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+
+        // Verify view1 grabbed the mouse
+        Assert.Equal (view1, app.Mouse.MouseGrabView);
+
+        // Clear tracking
+        view2Events.Clear ();
+        view2EnterCalled = false;
+
+        // Drag to view2 position (15, 0) - button still held
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should NOT receive MouseEnter event
+        Assert.False (view2EnterCalled, "view2 received MouseEnter event during drag from view1");
+        Assert.Empty (view2Events);
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // Move WITHIN view2 to position (15, 1) - still holding button
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 1), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should STILL not receive any events
+        Assert.False (view2EnterCalled, "view2 received MouseEnter event while dragging within it");
+        Assert.Empty (view2Events);
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // Move OUT of view2 back to view1 area - still holding button
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.PositionReport });
+
+        // view2 should still have no events (it was never "in" so no "leave")
+        Assert.False (view2EnterCalled);
+        Assert.Empty (view2Events);
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // Move BACK into view2 - still holding button
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should STILL not receive any events
+        Assert.False (view2EnterCalled, "view2 received MouseEnter event when re-entering during drag");
+        Assert.Empty (view2Events);
+        Assert.Equal (MouseState.None, view2.MouseState);
 
         app.Dispose ();
     }

@@ -7,11 +7,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public abstract class SelectorBase : View, IOrientation
 {
-#if !MOUSEHIGHLIGHTSTATES_FIXED
     private static MouseState _defaultHighlightStates = MouseState.In; // Resources/config.json overrides
-#else
-    private static MouseState _defaultHighlightStates = MouseState.None;
-#endif
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
@@ -41,13 +37,6 @@ public abstract class SelectorBase : View, IOrientation
         //AddCommand (Command.HotKey, HandleHotKeyCommand);
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
         //CreateSubViews ();
-    }
-
-    /// <inheritdoc />
-    protected override bool OnClearingViewport ()
-    {
-        //SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
-        return base.OnClearingViewport ();
     }
 
     private SelectorStyles _styles;
@@ -101,12 +90,6 @@ public abstract class SelectorBase : View, IOrientation
         return base.OnHandlingHotKey (args);
     }
 
-    /// <inheritdoc />
-    protected override bool OnActivating (CommandEventArgs args)
-    {
-        return base.OnActivating (args);
-    }
-
     private int? _value;
 
     /// <summary>
@@ -117,7 +100,7 @@ public abstract class SelectorBase : View, IOrientation
         get => _value;
         set
         {
-            if (value is { } && Values is { } && !Values.Contains (value ?? -1))
+            if (value is { } && Values is { } && !Values.Contains ((int)value))
             {
                 throw new ArgumentOutOfRangeException (nameof (value), @$"Value must be one of the following: {string.Join (", ", Values)}");
             }
@@ -361,7 +344,7 @@ public abstract class SelectorBase : View, IOrientation
 
         foreach (View subView in SubViews)
         {
-            string label = subView.Title ?? string.Empty;
+            string label = subView.Title;
 
             // Check if there's already a hotkey defined
             if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key existingHotKey))
@@ -424,7 +407,7 @@ public abstract class SelectorBase : View, IOrientation
                 SetLayout ();
                 // Pos.Align requires extra layout; good practice to call
                 // Layout to ensure Pos.Align gets updated
-                // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+                // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will
                 // TODO: negate need for this hack
                 Layout ();
             }
@@ -436,7 +419,7 @@ public abstract class SelectorBase : View, IOrientation
         int maxNaturalCheckBoxWidth = 0;
         if (Values?.Count > 0 && Orientation == Orientation.Vertical)
         {
-            // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will 
+            // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will
             // TODO: negate need for this hack
             maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ().Max (
                                                              v =>
@@ -460,7 +443,7 @@ public abstract class SelectorBase : View, IOrientation
             {
                 SubViews.ElementAt (i).X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 SubViews.ElementAt (i).Y = 0;
-                SubViews.ElementAt (i).Margin!.Thickness = new (0, 0, (i < SubViews.Count - 1) ? _horizontalSpace : 0, 0);
+                SubViews.ElementAt (i).Margin!.Thickness = new (0, 0, i < SubViews.Count - 1 ? _horizontalSpace : 0, 0);
                 SubViews.ElementAt (i).Width = Dim.Auto ();
             }
         }
