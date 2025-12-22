@@ -14,21 +14,49 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class Dialog : Window
 {
-    private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
-    private static Alignment _defaultButtonAlignment = Alignment.End; // Resources/config.json overrides
-    private static AlignmentModes _defaultButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems; // Resources/config.json overrides
-    private static int _defaultMinimumHeight = 80; // Resources/config.json overrides
-    private static int _defaultMinimumWidth = 80; // Resources/config.json overrides
-    private static ShadowStyle _defaultShadow = ShadowStyle.Transparent; // Resources/config.json overrides
+    /// <summary>
+    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
+
+    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+
+    /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
+    /// <remarks>This property can be set in a Theme.</remarks>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+
+    /// <summary>
+    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumHeight { get; set; } = 80;
+
+    /// <summary>
+    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
+    ///     <see cref="ConfigurationManager"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static int DefaultMinimumWidth { get; set; } = 80;
+
+    /// <summary>
+    ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
     /// </summary>
     /// <remarks>
-    ///     By default, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> are
-    ///     set
-    ///     such that the <see cref="Dialog"/> will be centered in, and no larger than 90% of <see cref="IApplication.TopRunnableView"/>, if
-    ///     there is one. Otherwise,
+    ///     By default, the <see cref="Dialog"/> will be centered in, and no larger than 90% of
+    ///     <see cref="IApplication.TopRunnableView"/>, if there is one. Otherwise,
     ///     it will be bound by the screen dimensions.
     /// </remarks>
     public Dialog ()
@@ -49,7 +77,6 @@ public class Dialog : Window
     }
 
     private readonly List<Button> _buttons = [];
-    private bool _endInitCalled;
 
     private bool _canceled;
 
@@ -65,26 +92,18 @@ public class Dialog : Window
         button.Y = Pos.AnchorEnd ();
 
         // Subscribe to FrameChanged to update padding dynamically
-        button.FrameChanged += Button_FrameChanged;
+        button.FrameChanged += ButtonFrameChanged;
 
         _buttons.Add (button);
 
         // Add to Padding if it exists and EndInit has been called, otherwise add to the Dialog
-        if (Padding is { } && _endInitCalled)
+        if (Padding is { })
         {
             Padding.Add (button);
             UpdatePaddingBottom ();
         }
-        else
-        {
-            Add (button);
-        }
     }
-
-    private void Button_FrameChanged (object? sender, EventArgs e)
-    {
-        UpdatePaddingBottom ();
-    }
+    private void ButtonFrameChanged (object? sender, EventArgs e) { UpdatePaddingBottom (); }
 
     // TODO: Update button.X = Pos.Justify when alignment changes
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
@@ -125,133 +144,34 @@ public class Dialog : Window
         }
     }
 
-    /// <summary>
-    ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle
-    {
-        get => _defaultBorderStyle;
-        set => _defaultBorderStyle = value;
-    }
-
-    /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment
-    {
-        get => _defaultButtonAlignment;
-        set => _defaultButtonAlignment = value;
-    }
-
-    /// <summary>The default <see cref="AlignmentModes"/> for <see cref="Dialog"/>.</summary>
-    /// <remarks>This property can be set in a Theme.</remarks>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static AlignmentModes DefaultButtonAlignmentModes
-    {
-        get => _defaultButtonAlignmentModes;
-        set => _defaultButtonAlignmentModes = value;
-    }
-
-    /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight
-    {
-        get => _defaultMinimumHeight;
-        set => _defaultMinimumHeight = value;
-    }
-
-    /// <summary>
-    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth
-    {
-        get => _defaultMinimumWidth;
-        set => _defaultMinimumWidth = value;
-    }
-
-    /// <summary>
-    ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static ShadowStyle DefaultShadow
-    {
-        get => _defaultShadow;
-        set => _defaultShadow = value;
-    }
-
-
     // Dialogs are Modal and Focus is indicated by their Border. The following code ensures the
-    // Text of the dialog (e.g. for a MessageBox) is always drawn using the Normal Attribute.
+    // Text of the dialog (e.g. for a MessageBox) is always drawn using the Normal Attribute
+    // instead of the Focus attribute.
     private bool _drawingText;
 
     /// <inheritdoc/>
     protected override bool OnDrawingText ()
     {
         _drawingText = true;
+
         return false;
     }
 
     /// <inheritdoc/>
-    protected override void OnDrewText ()
-    {
-        _drawingText = false;
-    }
+    protected override void OnDrewText () { _drawingText = false; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        if (_drawingText && role is VisualRole.Focus && Border?.Thickness != Thickness.Empty)
+        if (!_drawingText || role is not VisualRole.Focus || Border?.Thickness == Thickness.Empty)
         {
-            currentAttribute = GetScheme ().Normal;
-            return true;
+            return false;
         }
 
-        return false;
-    }
+        currentAttribute = GetScheme ().Normal;
 
-    /// <inheritdoc/>
-    public override void EndInit ()
-    {
-        // Move buttons from the Dialog to the Padding
-        if (Padding is { })
-        {
-            foreach (Button button in _buttons)
-            {
-                // Remove from Dialog if it was added there
-                Remove (button);
+        return true;
 
-                // Add to Padding
-                Padding.Add (button);
-            }
-
-            UpdatePaddingBottom ();
-        }
-
-        _endInitCalled = true;
-        base.EndInit ();
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            // Unsubscribe from button events to prevent memory leaks
-            foreach (Button button in _buttons)
-            {
-                button.FrameChanged -= Button_FrameChanged;
-            }
-        }
-
-        base.Dispose (disposing);
     }
 
     private void UpdatePaddingBottom ()
@@ -264,12 +184,9 @@ public class Dialog : Window
         // Find the maximum button height
         var maxHeight = 1; // Default to minimum height of 1 for buttons
 
-        foreach (Button button in _buttons)
+        foreach (Button button in _buttons.Where (b => b.Frame.Height > maxHeight))
         {
-            if (button.Frame.Height > maxHeight)
-            {
-                maxHeight = button.Frame.Height;
-            }
+            maxHeight = button.Frame.Height;
         }
 
         // Set the bottom padding to match button height
@@ -278,5 +195,20 @@ public class Dialog : Window
         {
             Padding.Thickness = Padding.Thickness with { Bottom = maxHeight };
         }
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            // Unsubscribe from button events to prevent memory leaks
+            foreach (Button button in _buttons)
+            {
+                button.FrameChanged -= ButtonFrameChanged;
+            }
+        }
+
+        base.Dispose (disposing);
     }
 }
