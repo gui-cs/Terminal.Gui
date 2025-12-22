@@ -1,5 +1,3 @@
-
-
 using System.ComponentModel;
 
 namespace Terminal.Gui.Views;
@@ -81,6 +79,8 @@ public class ScrollBar : View, IOrientation, IDesignable
 
         // This sets the width/height etc...
         OnOrientationChanged (Orientation);
+
+        MouseHoldRepeat = true;
 
         return;
 
@@ -515,18 +515,11 @@ public class ScrollBar : View, IOrientation, IDesignable
         return true;
     }
 
-    // TODO: Change this to work OnMouseEvent with MouseHoldRepeat
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
         if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
-        {
-            return base.OnActivating (args);
-        }
-
-        // Check if the mouse click is a single click
-        if (!mouse.IsSingleClicked)
         {
             return base.OnActivating (args);
         }
