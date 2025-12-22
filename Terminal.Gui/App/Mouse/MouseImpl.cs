@@ -58,8 +58,6 @@ internal class MouseImpl : IMouse, IDisposable
         //Debug.Assert (mouse.Position == mouse.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
-        Logging.Debug ($"{mouseEvent.Flags} at {mouseEvent.ScreenPosition}");
-
         List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
 
         View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();

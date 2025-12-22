@@ -117,19 +117,19 @@ public class Menus : Scenario
             MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
             KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-            AddCommand (
-                        Command.Cancel,
-                        ctx =>
-                        {
-                            if (App?.Popover?.GetActivePopover () as PopoverMenu is { Visible: true } visiblePopover)
-                            {
-                                visiblePopover.Visible = false;
-                            }
+            //AddCommand (
+            //            Command.Cancel,
+            //            ctx =>
+            //            {
+            //                if (App?.Popover?.GetActivePopover () as PopoverMenu is { Visible: true } visiblePopover)
+            //                {
+            //                    visiblePopover.Visible = false;
+            //                }
 
-                            return true;
-                        });
+            //                return true;
+            //            });
 
-            MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Cancel);
+            //MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Cancel);
 
             Label lastCommandLabel = new ()
             {

@@ -472,7 +472,7 @@ public class Shortcut : View, IOrientation, IDesignable
                     || e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
-                    InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
+                    InvokeCommand (Command.Activate, e);
                 }
 
                 e.Handled = true;

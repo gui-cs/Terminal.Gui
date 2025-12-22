@@ -39,8 +39,6 @@ public partial class View // Mouse APIs
     /// </returns>
     internal bool? NewMouseEnterEvent (CancelEventArgs eventArgs)
     {
-        Logging.Debug ($"{Id}");
-
         // Pre-conditions
         if (!CanBeVisible (this))
         {
@@ -141,8 +139,6 @@ public partial class View // Mouse APIs
     /// </remarks>
     internal void NewMouseLeaveEvent ()
     {
-        Logging.Debug ($"{Id}");
-
         // Non-cancellable event
         OnMouseLeave ();
 
@@ -341,14 +337,8 @@ public partial class View // Mouse APIs
     /// <seealso cref="MouseHighlightStates"/>
     public bool? NewMouseEvent (Mouse mouse)
     {
-        Logging.Debug ($"{Id} - {mouse.Flags} at {mouse.Position}");
-
         // 1. Pre-conditions
-        if (mouse.Position is null)
-        {
-            // Support unit tests that don't set Position
-            mouse.Position = mouse.ScreenPosition;
-        }
+        mouse.Position ??= mouse.ScreenPosition;
 
         if (!Enabled)
         {
@@ -430,13 +420,9 @@ public partial class View // Mouse APIs
         if (MouseHoldRepeat)
         {
             // Only invoke commands on Release - ignore everything else (Press, Click, DoubleClick, TripleClick)
-            if (mouse.IsReleased)
-            {
-                return RaiseCommandsBoundToButtonFlags (mouse);
-            }
+            return mouse.IsReleased && RaiseCommandsBoundToButtonFlags (mouse);
 
             // Ignore all other events when MouseHoldRepeat is true
-            return false;
         }
 
         // Normal behavior: Use Clicked events (or Pressed if not auto-grab)
@@ -447,12 +433,7 @@ public partial class View // Mouse APIs
             return RaiseCommandsBoundToButtonFlags (mouse);
         }
 
-        if (mouse.IsWheel)
-        {
-            return RaiseCommandsBoundToWheelFlags (mouse);
-        }
-
-        return false;
+        return mouse.IsWheel && RaiseCommandsBoundToWheelFlags (mouse);
     }
 
     /// <summary>
@@ -506,7 +487,6 @@ public partial class View // Mouse APIs
     {
         e.NewValue.Flags = MouseFlags.LeftButtonReleased;
 
-        //Logging.Trace ($"MouseHoldRepeater tick - raising commands bound {e.NewValue.Flags}");
         e.NewValue.ScreenPosition = App?.Mouse.LastMousePosition ?? e.NewValue.ScreenPosition;
         /*e.Cancel = */
         RaiseCommandsBoundToButtonFlags (e.NewValue);
@@ -812,8 +792,6 @@ public partial class View // Mouse APIs
     /// <param name="args"></param>
     private void RaiseMouseStateChanged (EventArgs<MouseState> args)
     {
-        //Logging.Debug ($"{Id} - {args.Value} -> {args.Value}");
-
         OnMouseStateChanged (args);
 
         MouseStateChanged?.Invoke (this, args);
