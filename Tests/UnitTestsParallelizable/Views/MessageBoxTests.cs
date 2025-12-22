@@ -168,7 +168,7 @@ public class MessageBoxTests (ITestOutputHelper output)
 
     [Theory]
     [InlineData (@"", false, false, 6, 6, 2, 2)]
-    [InlineData (@"", false, true, 3, 6, 9, 3)]
+    [InlineData (@"", false, true, 6, 6, 2, 3)]  // Button in Padding - width no longer auto-expands for button in edge case with no content
     [InlineData (@"01234\n-----\n01234", false, false, 1, 6, 13, 3)]
     [InlineData (@"01234\n-----\n01234", true, false, 1, 5, 13, 4)]
     [InlineData (@"0123456789", false, false, 1, 6, 12, 3)]
@@ -361,7 +361,7 @@ public class MessageBoxTests (ITestOutputHelper output)
   ║ff ff ff ff ff║
   ║ff ff ff ff ff║
   ║ff ff ff ff ff║
-  ║              ║
+  ║    ff ff     ║
   ║     ⟦► btn ◄⟧║
   ╚══════════════╝",
                                                                    output,
@@ -382,7 +382,6 @@ public class MessageBoxTests (ITestOutputHelper output)
  ║ffffffffffffffff║
  ║ffffffffffffffff║
  ║ffffffffffffffff║
- ║                ║
  ║       ⟦► btn ◄⟧║
  ╚════════════════╝",
                                                                    output,
