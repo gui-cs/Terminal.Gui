@@ -239,6 +239,21 @@ public class Dialog : Window
         base.EndInit ();
     }
 
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            // Unsubscribe from button events to prevent memory leaks
+            foreach (Button button in _buttons)
+            {
+                button.FrameChanged -= Button_FrameChanged;
+            }
+        }
+
+        base.Dispose (disposing);
+    }
+
     private void UpdatePaddingBottom ()
     {
         if (Padding is null || _buttons.Count == 0)
@@ -247,7 +262,7 @@ public class Dialog : Window
         }
 
         // Find the maximum button height
-        var maxHeight = 0;
+        var maxHeight = 1; // Default to minimum height of 1 for buttons
 
         foreach (Button button in _buttons)
         {
@@ -258,10 +273,10 @@ public class Dialog : Window
         }
 
         // Set the bottom padding to match button height
-        // Use at least 1 as a minimum if buttons haven't been laid out yet
-        if (maxHeight > 0 || Padding.Thickness.Bottom == 0)
+        // Update padding if buttons have been laid out (maxHeight > 1) or if padding hasn't been initialized yet
+        if (maxHeight > 1 || Padding.Thickness.Bottom == 0)
         {
-            Padding.Thickness = Padding.Thickness with { Bottom = Math.Max (1, maxHeight) };
+            Padding.Thickness = Padding.Thickness with { Bottom = maxHeight };
         }
     }
 }
