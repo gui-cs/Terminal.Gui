@@ -328,7 +328,7 @@ public void MouseClick_SetsFocus_If_CanFocus()
 ```
 
 **Tasks**:
-- [ ] Search all test projects for `Skip = "Broken in #4474"`
+- [ ] Search all test projects for `#4474`
 - [ ] Catalog all skipped tests
 - [ ] Analyze each test's expectations
 - [ ] Update tests to match new behavior (if spec changed)
@@ -337,7 +337,7 @@ public void MouseClick_SetsFocus_If_CanFocus()
 - [ ] Verify all tests pass
 
 **Acceptance Criteria**:
-- No tests marked `Skip = "Broken in #4474"`
+- No tests marked `#4474`
 - All mouse-related tests pass
 - Test coverage maintained or improved
 
