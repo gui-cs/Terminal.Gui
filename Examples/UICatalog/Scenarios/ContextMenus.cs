@@ -21,6 +21,9 @@ public class ContextMenus : Scenario
         // Init
         Application.Init ();
 
+        // Prepping for modern app model
+        using IApplication app = Application.Instance;
+
         // Setup - Create a top-level application window and configure it.
         _appWindow = new ()
         {
@@ -29,17 +32,24 @@ public class ContextMenus : Scenario
             SchemeName = "Runnable"
         };
 
+        // Changing the key-bindings of a View is not allowed, however,
+        // by default, Runnable doesn't bind to Command.Context, so
+        // we can take advantage of the CommandNotBound event to handle it
+        // 
+        // An alternative implementation would be to create a Runnable subclass that
+        // calls AddCommand/KeyBindings.Add in the constructor. See the Snake game scenario
+        // for an example.
+        _appWindow.CommandNotBound += HandleCommandNotBound;
+
+        _appWindow.KeyBindings.Add (_winContextMenuKey, Command.Context);
+        _appWindow.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
+
         _appWindow.Initialized += AppWindowOnInitialized;
 
         // Run - Start the application.
-        Application.Run (_appWindow);
+        app.Run (_appWindow);
         _appWindow.Dispose ();
-        _appWindow.KeyDown -= OnAppWindowOnKeyDown;
-        _appWindow.Activating -= OnAppWindowOnActivating;
         _winContextMenu?.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
 
         return;
 
@@ -48,7 +58,7 @@ public class ContextMenus : Scenario
             var text = "Context Menu";
             var width = 20;
 
-            CreateWinContextMenu (Application.Instance);
+            CreateWinContextMenu ((sender as Window)!.App);
 
             var label = new Label
             {
@@ -79,9 +89,6 @@ public class ContextMenus : Scenario
             _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
             _appWindow.Add (_tfBottomRight);
 
-            _appWindow.KeyDown += OnAppWindowOnKeyDown;
-            _appWindow.Activating += OnAppWindowOnActivating;
-
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
 
             _appWindow.IsRunningChanged += (_, e) =>
@@ -92,28 +99,22 @@ public class ContextMenus : Scenario
                                                }
                                            };
         }
+    }
 
-        void OnAppWindowOnActivating (object? s, CommandEventArgs e)
+    private void HandleCommandNotBound (object? sender, CommandEventArgs e)
+    {
+        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
         {
-            if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
-            {
-                if (mouseArgs.Flags == MouseFlags.RightButtonClicked)
-                {
-                    // ReSharper disable once AccessToDisposedClosure
-                    _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
-                    e.Handled = true;
-                }
-            }
+            // ReSharper disable once AccessToDisposedClosure
+            _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
+            e.Handled = true;
         }
 
-        void OnAppWindowOnKeyDown (object? s, Key e)
+        if (e.Context is CommandContext<KeyBinding> { Binding.Key: var key } && key == _winContextMenuKey)
         {
-            if (e == _winContextMenuKey)
-            {
-                // ReSharper disable once AccessToDisposedClosure
-                _winContextMenu?.MakeVisible ();
-                e.Handled = true;
-            }
+            // ReSharper disable once AccessToDisposedClosure
+            _winContextMenu?.MakeVisible ();
+            e.Handled = true;
         }
     }
 
@@ -180,13 +181,13 @@ public class ContextMenus : Scenario
                                    new MenuItem
                                    {
                                        Title = "_Quit",
-                                       Action = () => Application.RequestStop ()
+                                       Action = () => app!.RequestStop ()
                                    }
                                ])
         {
             Key = _winContextMenuKey
         };
-        Application.Popover?.Register (_winContextMenu);
+        app!.Popover?.Register (_winContextMenu);
     }
 
     private Menu GetSupportedCultureMenu ()

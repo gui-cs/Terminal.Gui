@@ -243,6 +243,13 @@ public class FileDialog : Dialog, IDesignable
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
         _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
 
+        // Changing the key-bindings of a View is not allowed, however,
+        // by default, Runnable doesn't bind to Command.Context, so
+        // we can take advantage of the CommandNotBound event to handle it
+        _tableView.CommandNotBound += TableViewHandleCommandNotBound;
+        _tableView.KeyBindings.Add (Key.Space.WithCtrl, Command.Context);
+        _tableView.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
+
         _tbFind = new ()
         {
             X = 0,
@@ -297,6 +304,47 @@ public class FileDialog : Dialog, IDesignable
 
         // Default: Tree hidden and splitter hidden
         SetTreeVisible (false);
+    }
+
+    private void TableViewHandleCommandNotBound (object? sender, CommandEventArgs e)
+    {
+        if (e.Context!.Command != Command.Context)
+        {
+            return;
+        }
+
+        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+        {
+            Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
+
+            if (clickedCol is { })
+            {
+                // right click in a header
+                ShowHeaderContextMenu (clickedCol.Value, mouse);
+            }
+            else if (clickedCell is { })
+            {
+                // right click in rest of table
+                ShowCellContextMenu (clickedCell, mouse);
+            }
+        }
+
+        if (e.Context is CommandContext<KeyBinding>)
+        {
+            PopoverMenu? contextMenu = new (
+                                            [
+                                                new (Strings.fdCtxNew, string.Empty, New),
+                                                new (Strings.fdCtxRename, string.Empty, () => Rename (App)),
+                                                new (Strings.fdCtxDelete, string.Empty, Delete)
+                                            ]);
+
+            // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+            // and the context menu is disposed when it is closed.
+            App!.Popover?.Register (contextMenu);
+
+            Point pos = new Point (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight());
+            contextMenu?.MakeVisible (pos);
+        }
     }
 
     /// <summary>
@@ -1038,11 +1086,8 @@ public class FileDialog : Dialog, IDesignable
         {
             IFileSystemInfo created = FileOperationsHandler.New (App, _fileSystem!, State!.Directory);
 
-            if (created is { })
-            {
-                RefreshState ();
-                RestoreSelection (created);
-            }
+            RefreshState ();
+            RestoreSelection (created);
         }
     }
 
@@ -1054,7 +1099,7 @@ public class FileDialog : Dialog, IDesignable
             return;
         }
 
-        Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
+        _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
@@ -1062,19 +1107,6 @@ public class FileDialog : Dialog, IDesignable
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
-            }
-            else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
-            {
-                // right click in a header
-                ShowHeaderContextMenu (clickedCol.Value, mouse);
-            }
-        }
-        else
-        {
-            if (clickedCell is { } && mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
-            {
-                // right click in rest of table
-                ShowCellContextMenu (clickedCell, mouse);
             }
         }
     }
