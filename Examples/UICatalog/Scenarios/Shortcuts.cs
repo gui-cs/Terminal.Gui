@@ -229,8 +229,8 @@ public class Shortcuts : Scenario
             X = 0,
             Y = Pos.Bottom (optionSelectorShortcut),
             Width = Dim.Fill ()! - Dim.Width (eventLog),
-            HelpText = "Sliders work!",
-            CommandView = new Slider<string>
+            HelpText = "LinearRanges work!",
+            CommandView = new LinearRange<string>
             {
                 Orientation = Orientation.Horizontal,
                 AllowEmpty = true
@@ -238,13 +238,13 @@ public class Shortcuts : Scenario
             Key = Key.F5
         };
 
-        ((Slider<string>)sliderShortcut.CommandView).Options = [new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" }];
-        ((Slider<string>)sliderShortcut.CommandView).SetOption (0);
+        ((LinearRange<string>)sliderShortcut.CommandView).Options = [new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" }];
+        ((LinearRange<string>)sliderShortcut.CommandView).SetOption (0);
 
-        ((Slider<string>)sliderShortcut.CommandView).OptionsChanged += (o, args) =>
+        ((LinearRange<string>)sliderShortcut.CommandView).OptionsChanged += (o, args) =>
                                                                        {
                                                                            eventSource.Add (
-                                                                                            $"OptionsChanged: {o?.GetType ().Name} - {string.Join (",", ((Slider<string>)o!)!.GetSetOptions ())}");
+                                                                                            $"OptionsChanged: {o?.GetType ().Name} - {string.Join (",", ((LinearRange<string>)o!)!.GetSetOptions ())}");
                                                                            eventLog.MoveDown ();
                                                                        };
 
