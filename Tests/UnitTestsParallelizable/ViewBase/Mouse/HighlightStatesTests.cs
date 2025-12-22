@@ -58,7 +58,7 @@ public class HighlightStatesTests (ITestOutputHelper output)
         using Runnable runnable = new ();
         View view = new () { X = 0, Y = 0, Width = 10, Height = 10, MouseHighlightStates = mouseState };
 
-        int activateCount = 0;
+        var activateCount = 0;
         view.Activating += (_, _) => activateCount++;
 
         runnable.Add (view);
@@ -80,7 +80,6 @@ public class HighlightStatesTests (ITestOutputHelper output)
 
         // Assert
         Assert.Equal (1, activateCount);
-
     }
 
     [Fact]
@@ -159,14 +158,16 @@ public class HighlightStatesTests (ITestOutputHelper output)
             Assert.Equal (normal, app.Driver.Contents? [2, i].Attribute);
         }
 
-        DriverAssert.AssertDriverContentsAre ("""
+        DriverAssert.AssertDriverContentsAre (
+                                              """
                                               | Hi |
                                               ┌───────┐
                                               │| Hey |│
                                               │       │
                                               └───────┘
-                                              """
-                                              , output, app.Driver);
+                                              """,
+                                              output,
+                                              app.Driver);
 
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 2), Flags = MouseFlags.PositionReport });
         app.LayoutAndDraw ();
@@ -181,16 +182,79 @@ public class HighlightStatesTests (ITestOutputHelper output)
             Assert.Equal (highlight2, app.Driver?.Contents? [2, i].Attribute);
         }
 
-        DriverAssert.AssertDriverContentsAre ("""
+        DriverAssert.AssertDriverContentsAre (
+                                              """
                                               | Hi |
                                               ┌───────┐
                                               │| Hey |│
                                               │       │
                                               └───────┘
                                               """,
-                                              output, app.Driver);
+                                              output,
+                                              app.Driver);
 
         app.Dispose ();
     }
 
+    [Fact]
+    public void PressAndHold_Then_MoveOver_AnotherView_Should_Not_Highlight_SecondView ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        app.Driver?.SetScreenSize (20, 1);
+
+        Runnable runnable = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        List<MouseState> view2States = [];
+
+        // First view with MouseHighlightStates In and Pressed
+        View view1 = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            Text = "View1",
+            MouseHighlightStates = MouseState.In | MouseState.Pressed
+        };
+
+        // Second view with MouseHighlightStates In
+        View view2 = new ()
+        {
+            X = 10,
+            Y = 0,
+            Width = 10,
+            Height = 1,
+            Text = "View2",
+            MouseHighlightStates = MouseState.In
+        };
+        view2.MouseStateChanged += (s, e) => view2States.Add (e.Value);
+
+        runnable.Add (view1, view2);
+        app.Begin (runnable);
+
+        // Initially both views should have MouseState.None
+        Assert.Equal (MouseState.None, view1.MouseState);
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // Press mouse button on view1
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (5, 0), Flags = MouseFlags.LeftButtonPressed });
+
+        // view1 should have Pressed state (may also have In)
+        Assert.True (view1.MouseState.HasFlag (MouseState.Pressed));
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // Move mouse over view2 while still holding the button down
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (15, 0), Flags = MouseFlags.PositionReport });
+
+        // CRITICAL: view2 should NOT change to MouseState.In because the mouse button is still pressed
+        // from the original press on view1. This assertion should fail with current implementation.
+        Assert.Equal (MouseState.None, view2.MouseState);
+
+        // view2 should have had NO state changes
+        Assert.Empty (view2States);
+
+        app.Dispose ();
+    }
 }

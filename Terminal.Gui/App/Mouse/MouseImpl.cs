@@ -216,6 +216,14 @@ internal class MouseImpl : IMouse, IDisposable
                 continue;
             }
 
+            // BUGFIX: If the mouse is grabbed by another view, don't send MouseEnter events to other views.
+            // This prevents views from highlighting when the user drags the mouse over them while holding
+            // a button down on a different view.
+            if (MouseGrabView is { } && view != MouseGrabView)
+            {
+                continue;
+            }
+
             CachedViewsUnderMouse.Add (view);
             bool raise;
 
