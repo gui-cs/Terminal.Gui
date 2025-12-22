@@ -140,7 +140,7 @@ public class MouseTester : Scenario
         runnable.Add (demo);
 
         mouseHighlightStates.Value = demo.MouseHighlightStates;
-        mouseHighlightStates.ValueChanged += (sender, e) =>
+        mouseHighlightStates.ValueChanged += (sender, _) =>
                                              {
                                                  if (sender is FlagSelector<MouseState> optionSelector)
                                                  {
@@ -158,7 +158,7 @@ public class MouseTester : Scenario
 
         cbRepeatOnHold.CheckedStateChanging += (_, _) =>
                                                {
-                                                   demo.MouseHoldRepeat = !demo.MouseHoldRepeat;
+                                                   demo.MouseHoldRepeat = demo.MouseHoldRepeat is null ? MouseFlags.LeftButtonPressed : null;
 
                                                    foreach (View subview in demo.SubViews)
                                                    {

@@ -91,9 +91,9 @@ public class ContextMenus : Scenario
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
 
-            _appWindow.IsRunningChanged += (_, e) =>
+            _appWindow.IsRunningChanged += (_, args) =>
                                            {
-                                               if (!e.Value)
+                                               if (!args.Value)
                                                {
                                                    Thread.CurrentThread.CurrentUICulture = originalCulture;
                                                }
@@ -110,7 +110,7 @@ public class ContextMenus : Scenario
             e.Handled = true;
         }
 
-        if (e.Context is CommandContext<KeyBinding> { Binding.Key: var key } && key == _winContextMenuKey)
+        if (e.Context is CommandContext<KeyBinding> { Binding.Key: var key } && key! == _winContextMenuKey)
         {
             // ReSharper disable once AccessToDisposedClosure
             _winContextMenu?.MakeVisible ();

@@ -50,7 +50,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
@@ -67,7 +67,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, _slider, _increaseButton);
@@ -80,7 +80,7 @@ public class ScrollBar : View, IOrientation, IDesignable
         // This sets the width/height etc...
         OnOrientationChanged (Orientation);
 
-        MouseHoldRepeat = true;
+        MouseHoldRepeat = MouseFlags.LeftButtonReleased;
 
         return;
 

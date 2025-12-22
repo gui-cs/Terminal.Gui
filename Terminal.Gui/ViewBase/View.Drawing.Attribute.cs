@@ -46,7 +46,7 @@ public partial class View
         }
         else
         {
-            schemeAttribute = GetScheme ()!.GetAttributeForRole (role);
+            schemeAttribute = GetScheme ().GetAttributeForRole (role);
         }
 
         if (OnGettingAttributeForRole (role, ref schemeAttribute))
@@ -123,7 +123,6 @@ public partial class View
     public Attribute? SetAttributeForRole (VisualRole role)
     {
         Attribute schemeAttribute = GetAttributeForRole (role);
-        Attribute currentAttribute = GetCurrentAttribute ();
         return SetAttribute (schemeAttribute);
     }
 

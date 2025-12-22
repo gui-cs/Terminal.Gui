@@ -69,7 +69,7 @@ public partial class View // Command APIs
     {
         CommandEventArgs args = new () { Context = ctx };
 
-        // For robustness' sake, even if the virtual method returns true, if the args 
+        // For robustness' sake, even if the virtual method returns true, if the args
         // indicate the event should be cancelled, we honor that.
         if (OnCommandNotBound (args) || args.Handled)
         {
@@ -403,7 +403,7 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, Func<bool?> impl) { _commandImplementations [command] = ctx => impl (); }
+    protected void AddCommand (Command command, Func<bool?> impl) { _commandImplementations [command] = _ => impl (); }
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>
     /// <returns></returns>

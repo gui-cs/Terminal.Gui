@@ -718,7 +718,7 @@ public class ButtonTests
     }
 
     /// <summary>
-    ///     Tests Button.MouseHoldRepeat = true behavior with quick single click.
+    ///     Tests Button.MouseHoldRepeat = MouseFlags.LeftButtonReleased behavior with quick single click.
     ///     Per spec: Quick click (press + immediate release within 100ms) should fire Accept once.
     ///     Uses Direct mode to bypass ANSI encoding and control timing precisely.
     /// </summary>
@@ -738,7 +738,7 @@ public class ButtonTests
             Y = 0,
             Width = 10,
             Height = 3,
-            MouseHoldRepeat = true // Enable hold-repeat behavior
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased // Enable hold-repeat behavior
         };
         runnable.Add (button);
         runnable.Layout ();
@@ -781,7 +781,7 @@ public class ButtonTests
             Width = 10,
             Height = 3,
             Text = "Click Me",
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         Runnable top = new () { App = app };
@@ -865,7 +865,7 @@ public class ButtonTests
             Width = 10,
             Height = 3,
             Text = "Click Me",
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         Runnable top = new () { App = app };
@@ -950,7 +950,7 @@ public class ButtonTests
     }
 
     /// <summary>
-    ///     Tests Button.MouseHoldRepeat = true with spaced clicks (not a multi-click sequence).
+    ///     Tests Button.MouseHoldRepeat = MouseFlags.LeftButtonReleased with spaced clicks (not a multi-click sequence).
     ///     Per spec: Clicks spaced >500ms apart should each fire Accept once independently.
     ///     Uses Direct mode to bypass ANSI encoding and control timing precisely.
     /// </summary>
@@ -970,7 +970,7 @@ public class ButtonTests
             Y = 0,
             Width = 10,
             Height = 3,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         runnable.Add (button);
         runnable.Layout ();
@@ -1022,7 +1022,7 @@ public class ButtonTests
         {
             Width = 1,
             Height = 1,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         var activatingCount = 0;
@@ -1070,7 +1070,7 @@ public class ButtonTests
         {
             Width = 1,
             Height = 1,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         var acceptedCount = 0;

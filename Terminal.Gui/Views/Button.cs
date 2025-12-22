@@ -84,31 +84,32 @@ public class Button : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<bool> args)
+    protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<MouseFlags?> args)
     {
         SetMouseBindings (args.NewValue);
     }
 
-    private void SetMouseBindings (bool mouseHoldRepeat)
+    private void SetMouseBindings (MouseFlags? mouseHoldRepeat)
     {
-        if (mouseHoldRepeat)
+        if (mouseHoldRepeat.HasValue)
         {
-            // MouseHoldRepeat enabled: Remove ALL Click/Release bindings, add only Released→HotKey
+            // MouseHoldRepeat enabled: Remove ALL Click/Release/Press bindings, add only configured event→HotKey
+            MouseBindings.Remove (MouseFlags.LeftButtonPressed);
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonDoubleClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonTripleClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
-            // Add Released→HotKey bindings
-            MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.HotKey);
+            // Add configured mouse event→HotKey binding
+            MouseBindings.Add (mouseHoldRepeat.Value, Command.HotKey);
         }
         else
         {
-            // MouseHoldRepeat disabled: Remove ALL Click/Release bindings, add only Clicked→HotKey
+            // MouseHoldRepeat disabled: Remove ALL Click/Release/Press bindings, add only Clicked→HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
-            // Add Clicked→HotKey bindings
+            // Add Clicked→HotKey bindings (default behavior)
             MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.HotKey);
             MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.HotKey);
             MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.HotKey);
@@ -133,7 +134,6 @@ public class Button : View, IDesignable
         {
             return true;
         }
-
 
         // TODO: If `IsDefault` were a property on `View` *any* View could work this way. That's theoretical as
         // TODO: no use-case has been identified for any View other than Button to act like this.

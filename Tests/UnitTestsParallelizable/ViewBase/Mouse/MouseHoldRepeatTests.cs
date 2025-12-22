@@ -23,7 +23,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -61,7 +61,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -105,7 +105,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = false // false is the default; here for clarity
+            MouseHoldRepeat = null // false is the default; here for clarity
         };
 
         TimedEvents timedEvents = new ();
@@ -170,8 +170,8 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         // Act - Enable MouseHoldRepeat then disable it
-        view.MouseHoldRepeat = true;
-        view.MouseHoldRepeat = false;
+        view.MouseHoldRepeat = MouseFlags.LeftButtonReleased;
+        view.MouseHoldRepeat = null;
 
         // Now press
         view.NewMouseEvent (mouse);
@@ -196,7 +196,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -249,7 +249,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -316,7 +316,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
             Width = 10,
             Height = 10,
             MouseHighlightStates = mouseState,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
@@ -368,7 +368,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
@@ -437,7 +437,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
             Width = 10,
             Height = 10,
             MouseHighlightStates = mouseState,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
@@ -509,7 +509,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = false // Default behavior
+            MouseHoldRepeat = null // Default behavior
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
