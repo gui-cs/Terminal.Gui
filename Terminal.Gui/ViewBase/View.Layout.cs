@@ -1114,7 +1114,7 @@ public partial class View // Layout APIs
     ///     the SuperView's <see cref="GetContentSize ()"/>) or the screen size if there's no SuperView.
     /// </summary>
     /// <returns></returns>
-    private Size GetContainerSize ()
+    public Size GetContainerSize ()
     {
         // TODO: Get rid of refs to Top
         Size superViewContentSize = SuperView?.GetContentSize ()

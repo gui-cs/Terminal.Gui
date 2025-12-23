@@ -57,8 +57,8 @@ public static class MessageBox
 {
     private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
     private static Alignment _defaultButtonAlignment = Alignment.Center; // Resources/config.json overrides
-    private static int _defaultMinimumWidth = 0; // Resources/config.json overrides
-    private static int _defaultMinimumHeight = 0; // Resources/config.json overrides
+    private static int _defaultMinimumWidth = 10; // Resources/config.json overrides
+    private static int _defaultMinimumHeight = 10; // Resources/config.json overrides
 
     /// <summary>
     ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
@@ -92,7 +92,7 @@ public static class MessageBox
     }
 
     /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the screen width. Can be configured via
+    ///     Defines the default minimum Dialog height, as a percentage of the screen height. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
@@ -622,16 +622,8 @@ public static class MessageBox
             Buttons = buttonList.ToArray ()
         };
 
-        // ReSharper disable AccessToDisposedClosure
-        dialog.Width = Dim.Auto (
-                                 DimAutoStyle.Auto,
-                                 Dim.Func (_ => (int)((app.Screen.Width - dialog.GetAdornmentsThickness ().Horizontal) * (DefaultMinimumWidth / 100f))),
-                                 Dim.Func (_ => (int)((app.Screen.Width - dialog.GetAdornmentsThickness ().Horizontal) * 0.9f)));
-
-        dialog.Height = Dim.Auto (
-                             DimAutoStyle.Auto,
-                             Dim.Func (_ => (int)((app.Screen.Height - dialog.GetAdornmentsThickness ().Vertical) * (DefaultMinimumHeight / 100f))),
-                             Dim.Func (_ => (int)((app.Screen.Height - dialog.GetAdornmentsThickness ().Vertical) * 0.9f)));
+        dialog.Width = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumWidth).GetAnchor (dialog.GetContainerSize ().Width), dialog.GetWidthRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
+        dialog.Height = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumHeight).GetAnchor (dialog.GetContainerSize ().Height), dialog.GetHeightRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
 
         if (width != 0)
         {
