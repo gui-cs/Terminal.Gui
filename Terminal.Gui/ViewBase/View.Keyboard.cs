@@ -477,11 +477,6 @@ public partial class View // Keyboard APIs
             return true;
         }
 
-        if (adornment?.InternalSubViews is null)
-        {
-            return false;
-        }
-
         foreach (View subview in adornment.InternalSubViews)
         {
             bool? subViewHandled = subview.InvokeCommands (key);

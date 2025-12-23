@@ -18,7 +18,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
 
         testView = new ()
         {
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         Assert.Contains (MouseFlags.LeftButtonPressed, testView.MouseBindings.GetAllFromCommands (Command.Activate));

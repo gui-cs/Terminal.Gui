@@ -144,8 +144,7 @@ public class Adornments : Scenario
                                       X = Pos.Center (),
                                       Y = 1,
                                       Text = "_Button in Padding Y = 1",
-                                      CanFocus = true,
-                                      MouseHighlightStates = MouseState.None,
+                                      CanFocus = true
                                   };
                                   btnButtonInPadding.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   window.Padding.Add (btnButtonInPadding);

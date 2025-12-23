@@ -55,7 +55,7 @@ Tenets higher in the list have precedence over tenets lower in the list.
 | Triple-click or faster multi-click (MouseHoldRepeat = **false**)            | Same rule                                                 | One `Accept` per release inside → 3 Accepts on triple-click                          | Never                           | No coalescing for normal buttons |
 | Triple-click or faster multi-click (MouseHoldRepeat = **true**)            | Same rule                                                 | **Exactly 3** (one per release inside) – Click/DoubleClick/TripleClick events are ignored; only Press/Release matter                          | Never                           | MouseHoldRepeat uses Press/Release only |
 
-**Key Point for MouseHoldRepeat:** When `MouseHoldRepeat = true`, the View's behavior is based entirely on **Press and Release events**, not on Click/DoubleClick/TripleClick synthesized events. Each Press starts the timer (which fires Accept repeatedly), and each Release stops the timer and fires one final Accept (if released inside). This ensures that rapid clicking (double-click, triple-click, etc.) fires Accept once per click, matching user expectations for repeat buttons like scrollbar arrows.
+**Key Point for MouseHoldRepeat:** When `MouseHoldRepeat = MouseFlags.LeftButtonReleased`, the View's behavior is based entirely on **Press and Release events**, not on Click/DoubleClick/TripleClick synthesized events. Each Press starts the timer (which fires Accept repeatedly), and each Release stops the timer and fires one final Accept (if released inside). This ensures that rapid clicking (double-click, triple-click, etc.) fires Accept once per click, matching user expectations for repeat buttons like scrollbar arrows.
 
 This behavior matches Qt QPushButton, GTK Button, Win32 BUTTON, WPF Button, NSButton, Flutter ElevatedButton, Android Button, etc. – all established since the 1990s.
 
@@ -348,7 +348,7 @@ Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled automatically **g
 When `MouseHoldRepeat` is set to `true`, the view receives repeated click events while the button is held down:
 
 ```cs
-view.MouseHoldRepeat = true;
+view.MouseHoldRepeat = MouseFlags.LeftButtonReleased;
 
 view.Activating += (s, e) =>
 {

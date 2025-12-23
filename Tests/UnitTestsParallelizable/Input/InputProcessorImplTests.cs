@@ -580,7 +580,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         Assert.Single (receivedKeys);
         Assert.Equal (testKey, receivedKeys [0]);
     }
-    
+
     [Fact]
     public void RaiseKeyDownEvent_MultipleKeys_RaisesAllEvents ()
     {
@@ -623,7 +623,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         // Assert - Should have injected into testable input
         Assert.Single (testableInput.InjectedInput);
     }
-    
+
     #endregion
 
     #region ProcessQueue Tests

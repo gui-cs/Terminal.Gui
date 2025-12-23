@@ -237,7 +237,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
         BeginInitAdornments ();
 
-        if (InternalSubViews?.Count > 0)
+        if (InternalSubViews.Count > 0)
         {
             foreach (View view in InternalSubViews)
             {

@@ -1,5 +1,5 @@
 #nullable disable
-﻿//
+//
 // ComboBox.cs: ComboBox control
 //
 // Authors:
@@ -831,7 +831,11 @@ public class ComboBox : View, IDesignable
         public bool HideDropdownListOnClick
         {
             get => _hideDropdownListOnClick;
-            set => _hideDropdownListOnClick = MouseHoldRepeat = value;
+            set
+            {
+                _hideDropdownListOnClick = value;
+                MouseHoldRepeat = value ? MouseFlags.LeftButtonReleased : null;
+            }
         }
 
         protected override bool OnMouseEvent (Mouse me)

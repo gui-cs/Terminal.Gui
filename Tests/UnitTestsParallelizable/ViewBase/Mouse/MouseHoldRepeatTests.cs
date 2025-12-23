@@ -1,9 +1,4 @@
-﻿using System;
-using Terminal.Gui.App;
-using Terminal.Gui.Time;
-using Terminal.Gui.ViewBase;
-using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 using Timeout = Terminal.Gui.App.Timeout;
 
 namespace ViewBaseTests.MouseTests;
@@ -13,6 +8,7 @@ namespace ViewBaseTests.MouseTests;
 ///     These tests verify that when MouseHoldRepeat is true, views correctly handle
 ///     press/release cycles with timer-based repetition.
 /// </summary>
+
 // CoPilot - GitHub Copilot Workspace
 [Trait ("Category", "Input")]
 public class MouseHoldRepeatTests (ITestOutputHelper output)
@@ -27,7 +23,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -65,7 +61,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -75,10 +71,10 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         var activatingCount = 0;
 
         view.Activating += (_, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
+                           {
+                               activatingCount++;
+                               e.Handled = true;
+                           };
 
         Mouse mouse = new ()
         {
@@ -101,7 +97,6 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         view.Dispose ();
     }
 
-
     [Fact]
     public void MouseHoldRepeat_False_Press_Release_Raises_Activating_Once ()
     {
@@ -110,7 +105,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = false // false is the default; here for clarity
+            MouseHoldRepeat = null // false is the default; here for clarity
         };
 
         TimedEvents timedEvents = new ();
@@ -146,7 +141,6 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         view.Dispose ();
     }
 
-
     [Fact]
     public void MouseHoldRepeat_True_Then_False_Press_Release_Raises_Activating_Once ()
     {
@@ -154,7 +148,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         View view = new ()
         {
             Width = 10,
-            Height = 10,
+            Height = 10
         };
 
         TimedEvents timedEvents = new ();
@@ -176,8 +170,8 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         // Act - Enable MouseHoldRepeat then disable it
-        view.MouseHoldRepeat = true;
-        view.MouseHoldRepeat = false;
+        view.MouseHoldRepeat = MouseFlags.LeftButtonReleased;
+        view.MouseHoldRepeat = null;
 
         // Now press
         view.NewMouseEvent (mouse);
@@ -202,7 +196,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -212,11 +206,10 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         var activatingCount = 0;
 
         view.Activating += (_, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
-
+                           {
+                               activatingCount++;
+                               e.Handled = true;
+                           };
 
         Mouse mouse = new ()
         {
@@ -256,7 +249,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         TimedEvents timedEvents = new ();
@@ -266,10 +259,10 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         var activatingCount = 0;
 
         view.Activating += (_, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
+                           {
+                               activatingCount++;
+                               e.Handled = true;
+                           };
 
         Mouse mouse = new ()
         {
@@ -307,8 +300,9 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
 
     #region Input Injection Tests (Application Level)
 
-    [Fact]
-    public void MouseHoldRepeat_True_AppInjection_Press_Release_Raises_Activating_Once ()
+    [Theory]
+    [CombinatorialData]
+    public void MouseHoldRepeat_True_AppInjection_Press_Release_Raises_Activating_Once (MouseState mouseState)
     {
         // Arrange
         VirtualTimeProvider time = new ();
@@ -316,21 +310,24 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable runnable = new Runnable ();
+
         View view = new ()
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHighlightStates = mouseState,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
         var activatingCount = 0;
+
         view.Activating += (_, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
+                           {
+                               activatingCount++;
+                               e.Handled = true;
+                           };
 
         // Act - Press at (0, 0)
         app.InjectMouse (
@@ -366,21 +363,23 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable runnable = new Runnable ();
+
         View view = new ()
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
         var activatingCount = 0;
+
         view.Activating += (_, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
+                           {
+                               activatingCount++;
+                               e.Handled = true;
+                           };
 
         // Act - First press/release cycle
         app.InjectMouse (
@@ -421,8 +420,9 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         (runnable as View)?.Dispose ();
     }
 
-    [Fact]
-    public void MouseHoldRepeat_True_AppInjection_Press_Wait_Release_Raises_Activating_Multiple_Times ()
+    [Theory]
+    [CombinatorialData]
+    public void MouseHoldRepeat_True_AppInjection_Press_Wait_Release_Raises_Activating_Multiple_Times (MouseState mouseState)
     {
         // Arrange
         const int TIME_OUT_INTERVAL = 100;
@@ -431,11 +431,13 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable runnable = new Runnable ();
+
         View view = new ()
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = true
+            MouseHighlightStates = mouseState,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
@@ -451,11 +453,12 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         };
 
         var activatingCount = 0;
+
         view.Activating += (_, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
+                           {
+                               activatingCount++;
+                               e.Handled = true;
+                           };
 
         // Act - Press button
         app.InjectMouse (
@@ -468,7 +471,7 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         Assert.Equal (0, activatingCount); // Should not fire on press
 
         // With a simple 100ms repeating timeout, we can precisely control timing
-        // Advance time and trigger 5 timer ticks (5 ensure no triple-click logic 
+        // Advance time and trigger 5 timer ticks (5 ensure no triple-click logic
         // is involved.
         for (var i = 1; i <= 5; i++)
         {
@@ -501,21 +504,23 @@ public class MouseHoldRepeatTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable runnable = new Runnable ();
+
         View view = new ()
         {
             Width = 10,
             Height = 10,
-            MouseHoldRepeat = false // Default behavior
+            MouseHoldRepeat = null // Default behavior
         };
         (runnable as View)?.Add (view);
         app.Begin (runnable);
 
         var activatingCount = 0;
+
         view.Activating += (_, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
+                           {
+                               activatingCount++;
+                               e.Handled = true;
+                           };
 
         // Act - Press at (0, 0)
         app.InjectMouse (

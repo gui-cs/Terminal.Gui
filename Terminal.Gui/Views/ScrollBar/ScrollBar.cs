@@ -1,5 +1,3 @@
-
-
 using System.ComponentModel;
 
 namespace Terminal.Gui.Views;
@@ -52,7 +50,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
@@ -69,7 +67,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, _slider, _increaseButton);
@@ -81,6 +79,8 @@ public class ScrollBar : View, IOrientation, IDesignable
 
         // This sets the width/height etc...
         OnOrientationChanged (Orientation);
+
+        MouseHoldRepeat = MouseFlags.LeftButtonReleased;
 
         return;
 
@@ -515,18 +515,11 @@ public class ScrollBar : View, IOrientation, IDesignable
         return true;
     }
 
-    // TODO: Change this to work OnMouseEvent with MouseHoldRepeat
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
         if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
-        {
-            return base.OnActivating (args);
-        }
-
-        // Check if the mouse click is a single click
-        if (!mouse.IsSingleClicked)
         {
             return base.OnActivating (args);
         }

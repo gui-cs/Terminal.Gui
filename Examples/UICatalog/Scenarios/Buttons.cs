@@ -350,7 +350,7 @@ public class Buttons : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accepting Count: {noRepeatAcceptCount}",
-            MouseHoldRepeat = false
+            MouseHoldRepeat = null
         };
 
         noRepeatButton.Accepting += (_, e) =>
@@ -374,7 +374,7 @@ public class Buttons : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accepting Count: {noRepeatNoHighlightAcceptCount}",
-            MouseHoldRepeat = false,
+            MouseHoldRepeat = null,
             MouseHighlightStates = MouseState.None
         };
 
@@ -401,7 +401,7 @@ public class Buttons : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accepting Co_unt: {repeatButtonAcceptingCount}",
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         repeatButton.Accepting += (_, e) =>

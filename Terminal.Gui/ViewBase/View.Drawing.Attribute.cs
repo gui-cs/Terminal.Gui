@@ -46,7 +46,7 @@ public partial class View
         }
         else
         {
-            schemeAttribute = GetScheme ()!.GetAttributeForRole (role);
+            schemeAttribute = GetScheme ().GetAttributeForRole (role);
         }
 
         if (OnGettingAttributeForRole (role, ref schemeAttribute))
@@ -69,7 +69,7 @@ public partial class View
             // The default behavior for MouseHighlightStates of MouseState.Over is to use the Highlight role
             if (((MouseHighlightStates.HasFlag (MouseState.In) && MouseState.HasFlag (MouseState.In))
                  || (MouseHighlightStates.HasFlag (MouseState.Pressed) && MouseState.HasFlag (MouseState.Pressed)))
-                 && role != VisualRole.Highlight && !HasFocus)
+                 && role != VisualRole.Highlight)
             {
                 schemeAttribute = GetAttributeForRole (VisualRole.Highlight);
             }
@@ -123,7 +123,6 @@ public partial class View
     public Attribute? SetAttributeForRole (VisualRole role)
     {
         Attribute schemeAttribute = GetAttributeForRole (role);
-        Attribute currentAttribute = GetCurrentAttribute ();
         return SetAttribute (schemeAttribute);
     }
 

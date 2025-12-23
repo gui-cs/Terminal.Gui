@@ -1,5 +1,5 @@
-﻿#nullable enable
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
+
 // ReSharper disable AccessToModifiedClosure
 #pragma warning disable CS9113 // Parameter is unread
 
@@ -73,7 +73,7 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Assert
         Assert.Single (events1); // Just Button1Pressed
-        Assert.Equal (MouseFlags.LeftButtonPressed, events1[0].Flags);
+        Assert.Equal (MouseFlags.LeftButtonPressed, events1 [0].Flags);
 
         // NOTE: This test demonstrates the quirk documented in MouseButtonClickTrackerTests:
         // When Button2 is pressed (Button1 not in flags), Button1's tracker sees: Pressed→Released
@@ -102,27 +102,27 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         List<Mouse> allEvents = [];
 
         // Button1 first click
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button1 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased }));
 
         // Button2 first click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Button2 second click
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = MouseFlags.MiddleButtonReleased }));
 
         // Assert
         Assert.Contains (allEvents, e => e.Flags == MouseFlags.LeftButtonDoubleClicked);
@@ -231,13 +231,13 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 
         // Act - Double-click with Shift held
         List<Mouse> allEvents = [];
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedPressed }));
         currentTime = currentTime.AddMilliseconds (50);
-        allEvents.AddRange (interpreter.Process (new Mouse { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
+        allEvents.AddRange (interpreter.Process (new() { ScreenPosition = new (10, 10), Flags = modifiedReleased }));
 
         // Assert
         Mouse? singleClick =
@@ -302,13 +302,13 @@ public class MouseInterpreterExtendedTests (ITestOutputHelper output)
         Mouse release = new () { ScreenPosition = new (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act - First click
-        interpreter.Process (press).ToList ();
+        _ = interpreter.Process (press).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
-        List<Mouse> events1 = interpreter.Process (release).ToList ();
+        _ = interpreter.Process (release).ToList ();
 
         // Second click exactly at threshold + 1ms
         currentTime = currentTime.Add (threshold).AddMilliseconds (1);
-        interpreter.Process (press).ToList ();
+        _ = interpreter.Process (press).ToList ();
         currentTime = currentTime.AddMilliseconds (50);
         List<Mouse> events2 = interpreter.Process (release).ToList ();
 

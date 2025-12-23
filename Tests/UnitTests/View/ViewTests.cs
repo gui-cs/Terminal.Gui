@@ -219,7 +219,7 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.MouseHoldRepeat);
+        Assert.Null (r.MouseHoldRepeat);
         Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
@@ -245,7 +245,7 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.MouseHoldRepeat);
+        Assert.Null (r.MouseHoldRepeat);
         Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
@@ -271,7 +271,7 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.MouseHoldRepeat);
+        Assert.Null (r.MouseHoldRepeat);
         Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
@@ -302,7 +302,7 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Equal (string.Empty, r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.MouseHoldRepeat);
+        Assert.Null (r.MouseHoldRepeat);
         Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);

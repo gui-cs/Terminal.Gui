@@ -69,7 +69,7 @@ public class MouseTests : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            MouseHoldRepeat = false
+            MouseHoldRepeat = null
         };
 
         var clickedCount = 0;
@@ -114,7 +114,7 @@ public class MouseTests : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            MouseHoldRepeat = true,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             MousePositionTracking  = true
         };
 
@@ -174,7 +174,7 @@ public class MouseTests : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            MouseHoldRepeat = true,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             MousePositionTracking  = true
         };
 
@@ -230,7 +230,7 @@ public class MouseTests : TestsAllViews
         {
             Width = 1,
             Height = 1,
-            MouseHoldRepeat = true,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             MousePositionTracking  = true
         };
 
@@ -461,7 +461,7 @@ public class MouseTests : TestsAllViews
         MouseEventTestView testView = new ()
         {
             MouseHighlightStates = MouseState.PressedOutside,
-            MouseHoldRepeat = false
+            MouseHoldRepeat = null
         };
 
         bool inViewport = testView.Viewport.Contains (x, 0);
@@ -524,7 +524,7 @@ public class MouseTests : TestsAllViews
         MouseEventTestView testView = new ()
         {
             MouseHighlightStates = MouseState.PressedOutside,
-            MouseHoldRepeat = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         bool inViewport = testView.Viewport.Contains (x, 0);
