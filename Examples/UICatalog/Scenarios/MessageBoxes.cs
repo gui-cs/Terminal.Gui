@@ -236,7 +236,7 @@ public class MessageBoxes : Scenario
                                  int numButtons = int.Parse (numButtonsEdit.Text);
                                  int defaultButton = int.Parse (defaultButtonEdit.Text);
 
-                                 List<string> btns = new ();
+                                               List<string> btns = [];
 
                                  for (var i = 0; i < numButtons; i++)
                                  {

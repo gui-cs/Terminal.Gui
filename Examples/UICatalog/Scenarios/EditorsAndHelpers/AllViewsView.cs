@@ -17,7 +17,7 @@ public class AllViewsView : View
                            {
                                if (sender is View sendingView)
                                {
-                                   sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
+                                  sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
                                }
                            };
 

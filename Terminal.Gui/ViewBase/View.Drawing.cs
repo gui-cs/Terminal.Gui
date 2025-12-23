@@ -490,7 +490,7 @@ public partial class View // Drawing APIs
     /// <param name="context">The draw context to report drawn areas to.</param>
     public void DrawText (DrawContext? context = null)
     {
-        var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
+        Rectangle drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
 
         // Use GetDrawRegion to get precise drawn areas
         Region textRegion = TextFormatter.GetDrawRegion (drawRect);
