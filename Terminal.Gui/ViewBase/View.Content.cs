@@ -88,7 +88,7 @@ public partial class View
         int max = GetContentSize ().Width;
 
         // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
-        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        if (!ContentSizeTracksViewport && GetSubViews (includePadding: true).Count == 0)
         {
             return max;
         }
@@ -117,7 +117,7 @@ public partial class View
         int max = GetContentSize ().Height;
 
         // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
-        if (!ContentSizeTracksViewport && InternalSubViews.Count == 0)
+        if (!ContentSizeTracksViewport && GetSubViews (includePadding: true).Count == 0)
         {
             return max;
         }
@@ -128,7 +128,7 @@ public partial class View
         }
 
         // Iterate through all subviews to calculate the maximum height
-        foreach (View subView in InternalSubViews)
+        foreach (View subView in GetSubViews (includePadding: true))
         {
             max = Math.Max (max, subView.Y.GetAnchor (0) + subView.Height.Calculate (0, max, subView, Dimension.Height));
         }

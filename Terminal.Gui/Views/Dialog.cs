@@ -232,7 +232,7 @@ public class Dialog : Window, IDesignable
         // Update padding if buttons have been laid out (maxHeight > 1)
         if (maxHeight > 1 || Padding.Thickness.Bottom == 0)
         {
-            Padding.Thickness = Padding.Thickness with { Bottom = maxHeight };
+           Padding.Thickness = Padding.Thickness with { Bottom = maxHeight };
         }
     }
 
