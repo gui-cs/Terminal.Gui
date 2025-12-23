@@ -55,9 +55,15 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             {
                 if (us.TextFormatter.ConstrainToHeight is null)
                 {
+                    int width = int.Min (autoMax, screenX4);
+                    if (us.TextFormatter.ConstrainToWidth is null)
+                    {
+                        width = us.TextFormatter.FormatAndGetSize (new (us.Viewport.Width, screenX4)).Width;
+                    }
+
                     // Set just the height. It is assumed that the width has already been set.
                     // TODO: There may be cases where the width is not set. We may need to set it here.
-                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.ConstrainToWidth ?? screenX4, int.Min (autoMax, screenX4))).Height;
+                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.ConstrainToWidth ?? width, screenX4)).Height;
                     us.TextFormatter.ConstrainToHeight = textSize;
                 }
                 else
