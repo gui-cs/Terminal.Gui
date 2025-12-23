@@ -184,9 +184,12 @@ public class Dialog : Window
         // Find the maximum button height
         var maxHeight = 1; // Default to minimum height of 1 for buttons
 
-        foreach (Button button in _buttons.Where (b => b.Frame.Height > maxHeight))
+        foreach (Button button in _buttons)
         {
-            maxHeight = button.Frame.Height;
+            if (button.Frame.Height > maxHeight)
+            {
+                maxHeight = button.Frame.Height;
+            }
         }
 
         // Set the bottom padding to match button height
