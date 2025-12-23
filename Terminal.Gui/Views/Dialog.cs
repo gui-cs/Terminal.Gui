@@ -12,7 +12,7 @@ namespace Terminal.Gui.Views;
 ///     or when one of the views or buttons added to the dialog calls
 ///     <see cref="IApplication.RequestStop()"/>.
 /// </remarks>
-public class Dialog : Window
+public class Dialog : Window, IDesignable
 {
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
@@ -36,14 +36,14 @@ public class Dialog : Window
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 80;
+    public static int DefaultMinimumHeight { get; set; } = 50;
 
     /// <summary>
     ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 80;
+    public static int DefaultMinimumWidth { get; set; } = 50;
 
     /// <summary>
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
@@ -61,19 +61,16 @@ public class Dialog : Window
     /// </remarks>
     public Dialog ()
     {
-        Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped;
-        base.ShadowStyle = DefaultShadow;
-        BorderStyle = DefaultBorderStyle;
 
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumWidth), Dim.Percent (90));
-        Height = Dim.Auto (DimAutoStyle.Auto, Dim.Percent (DefaultMinimumHeight), Dim.Percent (90));
-
-        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumWidth).GetAnchor(GetContainerSize().Width), GetWidthRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height), GetHeightRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
+
+        SetStyle ();
     }
 
     private readonly List<Button> _buttons = [];
@@ -81,8 +78,10 @@ public class Dialog : Window
     private bool _canceled;
 
     /// <summary>
-    ///     Adds a <see cref="Button"/> to the <see cref="Dialog"/>, its layout will be controlled by the
-    ///     <see cref="Dialog"/>
+    ///     Adds a <see cref="Button"/> to the bottom of the <see cref="Dialog"/>. The lifetime and layout will be controlled by the
+    ///     <see cref="Dialog"/>. The added buttons will be aligned according to the <see cref="ButtonAlignment"/> and
+    ///     <see cref="ButtonAlignmentModes"/>. The last button to be added will be the right-most button and will be treated as
+    ///     the default (<see cref="Button.IsDefault"/> will be set to true).
     /// </summary>
     /// <param name="button">Button to add.</param>
     public void AddButton (Button button)
@@ -91,18 +90,20 @@ public class Dialog : Window
         button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
         button.Y = Pos.AnchorEnd ();
 
+        _buttons.Add (button);
+
+        foreach (Button b in _buttons)
+        {
+            b.IsDefault = false;
+        }
+        button.IsDefault = true;
+
         // Subscribe to FrameChanged to update padding dynamically
         button.FrameChanged += ButtonFrameChanged;
 
-        _buttons.Add (button);
-
-        // Add to Padding if it exists and EndInit has been called, otherwise add to the Dialog
-        if (Padding is { })
-        {
-            Padding.Add (button);
-            UpdatePaddingBottom ();
-        }
+        Padding!.Add (button);
     }
+
     private void ButtonFrameChanged (object? sender, EventArgs e) { UpdatePaddingBottom (); }
 
     // TODO: Update button.X = Pos.Justify when alignment changes
@@ -144,6 +145,36 @@ public class Dialog : Window
         }
     }
 
+    /// <inheritdoc/>
+    protected override void OnIsRunningChanged (bool newIsModal)
+    {
+        SetStyle ();
+
+        base.OnIsRunningChanged (newIsModal);
+    }
+
+    private void SetStyle ()
+    {
+        if (IsRunning)
+        {
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Base));
+            BorderStyle = DefaultBorderStyle;
+            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
+            base.ShadowStyle = DefaultShadow;
+        }
+        else
+        {
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
+            BorderStyle = LineStyle.Dotted;
+
+            // strip out movable and resizable
+            Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
+            base.ShadowStyle = ShadowStyle.None;
+        }
+    }
+
     // Dialogs are Modal and Focus is indicated by their Border. The following code ensures the
     // Text of the dialog (e.g. for a MessageBox) is always drawn using the Normal Attribute
     // instead of the Focus attribute.
@@ -163,6 +194,11 @@ public class Dialog : Window
     /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
+        if (!IsRunning)
+        {
+            return false;
+        }
+
         if (!_drawingText || role is not VisualRole.Focus || Border?.Thickness == Thickness.Empty)
         {
             return false;
@@ -182,7 +218,7 @@ public class Dialog : Window
         }
 
         // Find the maximum button height
-        var maxHeight = 1; // Default to minimum height of 1 for buttons
+        var maxHeight = 1; // Default to minimum height of 1 for buttons (assuming no shadow)
 
         foreach (Button button in _buttons)
         {
@@ -193,11 +229,55 @@ public class Dialog : Window
         }
 
         // Set the bottom padding to match button height
-        // Update padding if buttons have been laid out (maxHeight > 1) or if padding hasn't been initialized yet
+        // Update padding if buttons have been laid out (maxHeight > 1)
         if (maxHeight > 1 || Padding.Thickness.Bottom == 0)
         {
             Padding.Thickness = Padding.Thickness with { Bottom = maxHeight };
         }
+    }
+
+    bool IDesignable.EnableForDesign ()
+    {
+        Title = "Dialog Title";
+
+        Button btnCancel = new ()
+        {
+            Title = Strings.btnCancel,
+        };
+
+        btnCancel.Accepting += (s, e) =>
+                              {
+                                  if (!IsRunning)
+                                  {
+                                      return;
+                                  }
+                                  (s as View)!.App?.RequestStop ();
+                                  e.Handled = true;
+                              };
+
+        AddButton (btnCancel);
+
+        AddButton (new ()
+        {
+            Title = Strings.btnOk,
+            // Dialog will automatically set IsDefault to the last button added
+        });
+
+        // Add some example content to the dialog
+        Label infoLabel = new ()
+        {
+            Text = "_Example:"
+        };
+        TextField info = new ()
+        {
+            X = Pos.Right (infoLabel) + 1,
+            Y = Pos.Top (infoLabel),
+            Text = "Type and press ENTER to accept.",
+            Width = 40
+        };
+        Add (infoLabel, info);
+
+        return true;
     }
 
     /// <inheritdoc/>
