@@ -55,9 +55,15 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             {
                 if (us.TextFormatter.ConstrainToHeight is null)
                 {
+                    int width = int.Min (autoMax, screenX4);
+                    if (us.TextFormatter.ConstrainToWidth is null)
+                    {
+                        width = us.TextFormatter.FormatAndGetSize (new (us.Viewport.Width, screenX4)).Width;
+                    }
+
                     // Set just the height. It is assumed that the width has already been set.
                     // TODO: There may be cases where the width is not set. We may need to set it here.
-                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.ConstrainToWidth ?? screenX4, int.Min (autoMax, screenX4))).Height;
+                    textSize = us.TextFormatter.FormatAndGetSize (new (us.TextFormatter.ConstrainToWidth ?? width, screenX4)).Height;
                     us.TextFormatter.ConstrainToHeight = textSize;
                 }
                 else
@@ -73,7 +79,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         {
             maxCalculatedSize = textSize;
 
-            if (us is { ContentSizeTracksViewport: false, InternalSubViews.Count: 0 })
+            if (us is { ContentSizeTracksViewport: false, } && us.GetSubViews (includePadding: true).Count == 0)
             {
                 // ContentSize was explicitly set. Use `us.ContentSize` to determine size.
                 maxCalculatedSize = dimension == Dimension.Width ? us.GetContentSize ().Width : us.GetContentSize ().Height;
@@ -82,7 +88,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             {
                 // TOOD: All the below is a naive implementation. It may be possible to optimize this.
 
-                List<View> includedSubViews = us.SubViews.Snapshot ().ToList ();
+                List<View> includedSubViews = us.GetSubViews (includePadding: true).ToList ();
 
                 // If [x] it can cause `us.ContentSize` to change.
                 // If [ ] it doesn't need special processing for us to determine `us.ContentSize`.
@@ -130,11 +136,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 if (dimension == Dimension.Width)
                 {
                     notDependentSubViews = includedSubViews.Where (
-                                                                   v => v.Width is { }
-                                                                        && (v.X is PosAbsolute or PosFunc
-                                                                            || v.Width is DimAuto
-                                                                                          or DimAbsolute
-                                                                                          or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
+                                                                   v => (v.X is PosAbsolute or PosFunc
+                                                                         || v.Width is DimAuto
+                                                                                       or DimAbsolute
+                                                                                       or DimFunc) // BUGBUG: We should use v.X.Has and v.Width.Has?
                                                                         && !v.X.Has<PosAnchorEnd> (out _)
                                                                         && !v.X.Has<PosAlign> (out _)
                                                                         && !v.X.Has<PosCenter> (out _)
@@ -146,11 +151,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 else
                 {
                     notDependentSubViews = includedSubViews.Where (
-                                                                   v => v.Height is { }
-                                                                        && (v.Y is PosAbsolute or PosFunc
-                                                                            || v.Height is DimAuto
-                                                                                           or DimAbsolute
-                                                                                           or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
+                                                                   v => (v.Y is PosAbsolute or PosFunc
+                                                                         || v.Height is DimAuto
+                                                                                        or DimAbsolute
+                                                                                        or DimFunc) // BUGBUG: We should use v.Y.Has and v.Height.Has?
                                                                         && !v.Y.Has<PosAnchorEnd> (out _)
                                                                         && !v.Y.Has<PosAlign> (out _)
                                                                         && !v.Y.Has<PosCenter> (out _)
@@ -198,11 +202,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    centeredSubViews = us.InternalSubViews.Where (v => v.X.Has<PosCenter> (out _)).ToList ();
+                    centeredSubViews = us.GetSubViews (includePadding: true).Where (v => v.X.Has<PosCenter> (out _)).ToList ();
                 }
                 else
                 {
-                    centeredSubViews = us.InternalSubViews.Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
+                    centeredSubViews = us.GetSubViews (includePadding: true).Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (centeredSubViews);

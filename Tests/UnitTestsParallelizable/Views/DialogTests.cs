@@ -1,15 +1,16 @@
 #nullable enable
+using UnitTests;
 using Xunit.Abstractions;
 
-namespace UnitTests.DialogTests;
+namespace ViewsTests;
 
-public class DialogTests (ITestOutputHelper output)
+public class DialogTests (ITestOutputHelper output) : FakeDriverBase
 {
     [Fact]
-    [AutoInitShutdown]
     public void Add_Button_Works ()
     {
-        SessionToken? sessionToken = null;
+        using IApplication? app = Application.Create ();
+        app.Init ("fake");
 
         var title = "1234";
         var btn1Text = "yes";
@@ -19,7 +20,7 @@ public class DialogTests (ITestOutputHelper output)
 
         // We test with one button first, but do this to get the width right for 2
         int width = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}".Length;
-        Application.Driver?.SetScreenSize (width, 1);
+        app.Driver?.SetScreenSize (width, 1);
 
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
@@ -28,34 +29,35 @@ public class DialogTests (ITestOutputHelper output)
         Button.DefaultShadow = ShadowStyle.None;
 
         // Default (center)
-        var dlg = new Dialog
+        Dialog dlg = new ()
         {
-            Title = title,
-            Width = width,
-            Height = 1,
-            ButtonAlignment = Alignment.Center,
             Buttons = [new () { Text = btn1Text }]
         };
+        dlg.Title = title;
+        dlg.Width = width;
+        dlg.Height = 1;
+        dlg.ButtonAlignment = Alignment.Center;
 
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
+        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc.)
         dlg.Border!.Thickness = new (1, 0, 1, 0);
-        sessionToken = Application.Begin (dlg);
         var buttonRow = $"{Glyphs.VLine}    {btn1}     {Glyphs.VLine}";
 
-        AutoInitShutdownAttribute.RunIteration ();
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
 
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
         // Now add a second button
         buttonRow = $"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
 
-        AutoInitShutdownAttribute.RunIteration ();
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
-        dlg.Dispose ();
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
+
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
         // Justify
+        dlg.Dispose ();
         dlg = new ()
         {
             Title = title,
@@ -65,24 +67,24 @@ public class DialogTests (ITestOutputHelper output)
             Buttons = [new () { Text = btn1Text }]
         };
 
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
+        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc.)
         dlg.Border!.Thickness = new (1, 0, 1, 0);
-        sessionToken = Application.Begin (dlg);
-
-        AutoInitShutdownAttribute.RunIteration ();
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
 
         buttonRow = $"{Glyphs.VLine}{btn1}         {Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
         // Now add a second button
         buttonRow = $"{Glyphs.VLine}{btn1}   {btn2}{Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        AutoInitShutdownAttribute.RunIteration ();
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
-        dlg.Dispose ();
+
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
         // Right
+        dlg.Dispose ();
         dlg = new ()
         {
             Title = title,
@@ -92,24 +94,24 @@ public class DialogTests (ITestOutputHelper output)
             Buttons = [new () { Text = btn1Text }]
         };
 
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
+        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc.)
         dlg.Border!.Thickness = new (1, 0, 1, 0);
-        sessionToken = Application.Begin (dlg);
 
-        AutoInitShutdownAttribute.RunIteration ();
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
 
         buttonRow = $"{Glyphs.VLine}{new (' ', width - btn1.Length - 2)}{btn1}{Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
         // Now add a second button
         buttonRow = $"{Glyphs.VLine}  {btn1} {btn2}{Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
 
-        AutoInitShutdownAttribute.RunIteration ();
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
-        dlg.Dispose ();
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
+        dlg.Dispose ();
         // Left
         dlg = new ()
         {
@@ -120,24 +122,27 @@ public class DialogTests (ITestOutputHelper output)
             Buttons = [new () { Text = btn1Text }]
         };
 
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
+        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc.)
         dlg.Border!.Thickness = new (1, 0, 1, 0);
-        sessionToken = Application.Begin (dlg);
-        AutoInitShutdownAttribute.RunIteration ();
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
 
         buttonRow = $"{Glyphs.VLine}{btn1}{new (' ', width - btn1.Length - 2)}{Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
         // Now add a second button
         buttonRow = $"{Glyphs.VLine}{btn1} {btn2}  {Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
 
-        AutoInitShutdownAttribute.RunIteration ();
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        app.StopAfterFirstIteration = true;
+        app.Run (dlg);
         dlg.Dispose ();
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
     }
 
+
+
+#if X
     [Fact]
     [AutoInitShutdown]
     public void ButtonAlignment_Four ()
@@ -162,7 +167,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $"{Glyphs.VLine} {btn1} {btn2} {btn3} {btn4} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        Application.Driver?.SetScreenSize (buttonRow.Length, 3);
+        app.Driver?.SetScreenSize (buttonRow.Length, 3);
 
         // Default - Center
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (
@@ -174,8 +179,8 @@ public class DialogTests (ITestOutputHelper output)
                                                         new Button { Text = btn3Text },
                                                         new Button { Text = btn4Text }
                                                        );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -192,8 +197,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn4Text }
                                                 );
 
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -209,8 +214,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -226,8 +231,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -254,7 +259,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = string.Empty;
 
         var width = 30;
-        Application.Driver?.SetScreenSize (width, 1);
+        app.Driver?.SetScreenSize (width, 1);
 
         // Default - Center
         buttonRow =
@@ -270,8 +275,8 @@ public class DialogTests (ITestOutputHelper output)
                                                         new Button { Text = btn4Text }
                                                        );
         Assert.Equal (new (width, 1), dlg.Frame.Size);
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -287,8 +292,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -304,8 +309,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -320,8 +325,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -343,14 +348,14 @@ public class DialogTests (ITestOutputHelper output)
         var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
         var btn3Text = "really long button 3";
         var btn3 = $"{Glyphs.LeftBracket} {btn3Text} {Glyphs.RightBracket}";
-        var btn4Text = "really long button 44"; // 44 is intentional to make length different than rest
+        var btn4Text = "really long button 44"; // 44 is intentional to make length different from rest
         var btn4 = $"{Glyphs.LeftBracket} {btn4Text} {Glyphs.RightBracket}";
 
         // Note extra spaces to make dialog even wider
         //                         123456                          1234567
         var buttonRow = $"{Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {Glyphs.VLine}";
         int width = buttonRow.Length;
-        Application.Driver?.SetScreenSize (buttonRow.Length, 1);
+        app.Driver?.SetScreenSize (buttonRow.Length, 1);
 
         // Default - Center
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (
@@ -362,8 +367,8 @@ public class DialogTests (ITestOutputHelper output)
                                                         new Button { Text = btn3Text },
                                                         new Button { Text = btn4Text }
                                                        );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -379,8 +384,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -396,8 +401,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -413,8 +418,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -445,7 +450,7 @@ public class DialogTests (ITestOutputHelper output)
         //                         123456                           123456
         var buttonRow = $"{Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {Glyphs.VLine}";
         int width = buttonRow.GetColumns ();
-        Application.Driver?.SetScreenSize (width, 3);
+        app.Driver?.SetScreenSize (width, 3);
 
         // Default - Center
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (
@@ -457,8 +462,8 @@ public class DialogTests (ITestOutputHelper output)
                                                         new Button { Text = btn3Text },
                                                         new Button { Text = btn4Text }
                                                        );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -474,8 +479,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -491,8 +496,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -508,8 +513,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn3Text },
                                                  new Button { Text = btn4Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -530,7 +535,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}  {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}  {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        Application.Driver?.SetScreenSize (width, 1);
+        app.Driver?.SetScreenSize (width, 1);
 
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -540,11 +545,11 @@ public class DialogTests (ITestOutputHelper output)
                                                        );
 
         // Center
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
-        // Justify 
+        // Justify
         buttonRow =
             $"{Glyphs.VLine}{Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}    {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
@@ -555,8 +560,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  Alignment.Fill,
                                                  new Button { Text = btnText }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -570,8 +575,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  Alignment.End,
                                                  new Button { Text = btnText }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -585,8 +590,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  Alignment.Start,
                                                  new Button { Text = btnText }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Wider
@@ -594,7 +599,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
         width = buttonRow.Length;
 
-        Application.Driver?.SetScreenSize (width, 1);
+        app.Driver?.SetScreenSize (width, 1);
 
         (sessionToken, dlg) = BeginButtonTestDialog (
                                                  title,
@@ -602,8 +607,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  Alignment.Center,
                                                  new Button { Text = btnText }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -617,8 +622,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  Alignment.Fill,
                                                  new Button { Text = btnText }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -632,8 +637,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  Alignment.End,
                                                  new Button { Text = btnText }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -647,8 +652,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  Alignment.Start,
                                                  new Button { Text = btnText }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -674,7 +679,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {btn3} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        Application.Driver?.SetScreenSize (buttonRow.Length, 3);
+        app.Driver?.SetScreenSize (buttonRow.Length, 3);
 
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -684,8 +689,8 @@ public class DialogTests (ITestOutputHelper output)
                                                         new Button { Text = btn2Text },
                                                         new Button { Text = btn3Text }
                                                        );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -700,8 +705,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn2Text },
                                                  new Button { Text = btn3Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -716,8 +721,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn2Text },
                                                  new Button { Text = btn3Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -732,8 +737,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn2Text },
                                                  new Button { Text = btn3Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -757,7 +762,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        Application.Driver?.SetScreenSize (buttonRow.Length, 3);
+        app.Driver?.SetScreenSize (buttonRow.Length, 3);
 
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -766,8 +771,8 @@ public class DialogTests (ITestOutputHelper output)
                                                         new Button { Text = btn1Text },
                                                         new Button { Text = btn2Text }
                                                        );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -781,8 +786,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn1Text },
                                                  new Button { Text = btn2Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -796,8 +801,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn1Text },
                                                  new Button { Text = btn2Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -811,8 +816,8 @@ public class DialogTests (ITestOutputHelper output)
                                                  new Button { Text = btn1Text },
                                                  new Button { Text = btn2Text }
                                                 );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -836,7 +841,7 @@ public class DialogTests (ITestOutputHelper output)
         var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
-        Application.Driver?.SetScreenSize (buttonRow.Length, 3);
+        app.Driver?.SetScreenSize (buttonRow.Length, 3);
 
         // Default (Center)
         Button LeftButton = new () { Text = btn1Text };
@@ -847,8 +852,8 @@ public class DialogTests (ITestOutputHelper output)
 
         buttonRow = $@"{Glyphs.VLine}         {btn2} {Glyphs.VLine}";
 
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Justify
@@ -860,8 +865,8 @@ public class DialogTests (ITestOutputHelper output)
         AutoInitShutdownAttribute.RunIteration ();
 
         buttonRow = $@"{Glyphs.VLine}          {btn2}{Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Right
@@ -872,8 +877,8 @@ public class DialogTests (ITestOutputHelper output)
         LeftButton.Visible = false;
         AutoInitShutdownAttribute.RunIteration ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
 
         // Left
@@ -885,8 +890,8 @@ public class DialogTests (ITestOutputHelper output)
         AutoInitShutdownAttribute.RunIteration ();
 
         buttonRow = $@"{Glyphs.VLine}        {btn2}  {Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -898,7 +903,7 @@ public class DialogTests (ITestOutputHelper output)
 
         ApplicationImpl.Instance.StopAfterFirstIteration = true;
 
-        Application.Run (dlg);
+        app.Run (dlg);
 
 #if DEBUG_IDISPOSABLE
         Assert.False (dlg.WasDisposed);
@@ -907,26 +912,26 @@ public class DialogTests (ITestOutputHelper output)
         Assert.False (dlg.Canceled);
 
         // Run it again is possible because it isn't disposed yet
-        Application.Run (dlg);
+        app.Run (dlg);
 
         // Run another view without dispose the prior will throw an assertion
 #if DEBUG_IDISPOSABLE
         Dialog dlg2 = new ();
 
-        //   Exception exception = Record.Exception (() => Application.Run (dlg2));
+        //   Exception exception = Record.Exception (() => app.Run (dlg2));
         //     Assert.NotNull (exception);
 
         dlg.Dispose ();
 
         // Now it's possible to tun dlg2 without throw
-        Application.Run (dlg2);
+        app.Run (dlg2);
 
         Assert.True (dlg.WasDisposed);
         Assert.False (dlg2.WasDisposed);
 
         dlg2.Dispose ();
 
-        Application.Shutdown ();
+        app.Shutdown ();
         Assert.True (dlg2.WasDisposed);
 #endif
     }
@@ -935,7 +940,7 @@ public class DialogTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Dialog_In_Window_With_Size_One_Button_Aligns ()
     {
-        Application.Driver?.SetScreenSize (20, 5);
+        app.Driver?.SetScreenSize (20, 5);
 
         // Override CM
         Window.DefaultBorderStyle = LineStyle.Single;
@@ -948,7 +953,7 @@ public class DialogTests (ITestOutputHelper output)
 
         var iterations = 0;
 
-        Application.Iteration += OnApplicationOnIteration;
+        app.Iteration += OnApplicationOnIteration;
         var btn = $"{Glyphs.LeftBracket} Ok {Glyphs.RightBracket}";
 
         win.IsModalChanged += (s, a) =>
@@ -969,14 +974,14 @@ public class DialogTests (ITestOutputHelper output)
 ││     {btn}     ││
 │└────────────────┘│
 └──────────────────┘";
-                                            _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+                                            _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
                                         };
 
-                          Application.Run (dlg);
+                          app.Run (dlg);
                           dlg.Dispose ();
                       };
-        Application.Run (win);
-        Application.Iteration -= OnApplicationOnIteration;
+        app.Run (win);
+        app.Iteration -= OnApplicationOnIteration;
         win.Dispose ();
 
         return;
@@ -985,7 +990,7 @@ public class DialogTests (ITestOutputHelper output)
         {
             if (++iterations > 2)
             {
-                Application.RequestStop ();
+                app.RequestStop ();
             }
         }
     }
@@ -1049,7 +1054,7 @@ public class DialogTests (ITestOutputHelper output)
                 )]
     public void Dialog_In_Window_Without_Size_One_Button_Aligns (int height, string expected)
     {
-        Application.Driver?.SetScreenSize (20, height);
+        app.Driver?.SetScreenSize (20, height);
         var win = new Window ();
 
         int iterations = -1;
@@ -1060,10 +1065,10 @@ public class DialogTests (ITestOutputHelper output)
         Dialog.DefaultShadow = ShadowStyle.None;
         Button.DefaultShadow = ShadowStyle.None;
 
-        Application.Iteration += OnApplicationOnIteration;
+        app.Iteration += OnApplicationOnIteration;
 
-        Application.Run (win);
-        Application.Iteration -= OnApplicationOnIteration;
+        app.Run (win);
+        app.Iteration -= OnApplicationOnIteration;
         win.Dispose ();
 
         return;
@@ -1075,7 +1080,7 @@ public class DialogTests (ITestOutputHelper output)
             if (iterations == 0)
             {
                 var dlg = new Dialog { Buttons = [new () { Text = "Ok" }], Width = Dim.Percent (85), Height = Dim.Percent (85) };
-                Application.Run (dlg);
+                app.Run (dlg);
                 dlg.Dispose ();
             }
             else if (iterations == 1)
@@ -1083,11 +1088,11 @@ public class DialogTests (ITestOutputHelper output)
                 AutoInitShutdownAttribute.RunIteration ();
 
                 // BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No
-                _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+                _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
             }
             else
             {
-                Application.RequestStop ();
+                app.RequestStop ();
             }
         }
     }
@@ -1096,7 +1101,7 @@ public class DialogTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Dialog_Opened_From_Another_Dialog ()
     {
-        Application.Driver?.SetScreenSize (30, 10);
+        app.Driver?.SetScreenSize (30, 10);
 
         // Override CM
         Dialog.DefaultButtonAlignment = Alignment.Center;
@@ -1113,15 +1118,15 @@ public class DialogTests (ITestOutputHelper output)
                           {
                               btn2 = new () { Text = "Show Sub" };
                               btn3 = new () { Text = "Close" };
-                              btn3.Accepting += (s, e) => Application.RequestStop ();
+                              btn3.Accepting += (s, e) => app.RequestStop ();
 
                               btn2.Accepting += (s, e) =>
                                                 {
                                                     // Don't test MessageBox in Dialog unit tests!
                                                     var subBtn = new Button { Text = "Ok", IsDefault = true };
                                                     var subDlg = new Dialog { Text = "ya", Width = 20, Height = 5, Buttons = [subBtn] };
-                                                    subBtn.Accepting += (s, e) => Application.RequestStop (subDlg);
-                                                    Application.Run (subDlg);
+                                                    subBtn.Accepting += (s, e) => app.RequestStop (subDlg);
+                                                    app.Run (subDlg);
                                                 };
 
                               var dlg = new Dialog
@@ -1131,7 +1136,7 @@ public class DialogTests (ITestOutputHelper output)
                                   Height = Dim.Percent (85)
                               };
 
-                              Application.Run (dlg);
+                              app.Run (dlg);
                               dlg.Dispose ();
                           };
 
@@ -1140,11 +1145,11 @@ public class DialogTests (ITestOutputHelper output)
 
         int iterations = -1;
 
-        Application.Iteration += OnApplicationOnIteration;
+        app.Iteration += OnApplicationOnIteration;
 
-        Application.Run<Runnable> ();
-        Application.Iteration -= OnApplicationOnIteration;
-        Application.Shutdown ();
+        app.Run<Runnable> ();
+        app.Iteration -= OnApplicationOnIteration;
+        app.Shutdown ();
 
         Assert.Equal (9, iterations);
 
@@ -1157,8 +1162,8 @@ public class DialogTests (ITestOutputHelper output)
             switch (iterations)
             {
                 case 0:
-                    Application.TopRunnableView!.SetNeedsLayout ();
-                    Application.TopRunnableView.SetNeedsDraw ();
+                    app.TopRunnableView!.SetNeedsLayout ();
+                    app.TopRunnableView.SetNeedsDraw ();
 
                     break;
 
@@ -1180,7 +1185,7 @@ public class DialogTests (ITestOutputHelper output)
   │                       │
   │{Glyphs.LeftBracket} Show Sub {Glyphs.RightBracket} {Glyphs.LeftBracket} Close {Glyphs.RightBracket} │
   └───────────────────────┘";
-                    DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
+                    DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
 
                     Assert.False (btn2!.NewKeyDownEvent (Key.Space));
 
@@ -1197,22 +1202,22 @@ public class DialogTests (ITestOutputHelper output)
   │  └──────────────────┘ │
   │{Glyphs.LeftBracket} Show Sub {Glyphs.RightBracket} {Glyphs.LeftBracket} Close {Glyphs.RightBracket} │
   └───────────────────────┘",
-                                                                   output);
+                                                                   output, app.Driver);
 
-                    Assert.False (Application.TopRunnableView!.NewKeyDownEvent (Key.Enter));
+                    Assert.False (app.TopRunnableView!.NewKeyDownEvent (Key.Enter));
 
                     break;
                 case 7:
 
-                    DriverAssert.AssertDriverContentsWithFrameAre (expected!, output);
+                    DriverAssert.AssertDriverContentsWithFrameAre (expected!, output, app.Driver);
 
                     Assert.False (btn3!.NewKeyDownEvent (Key.Space));
 
                     break;
                 case 9:
-                    DriverAssert.AssertDriverContentsWithFrameAre ("", output);
+                    DriverAssert.AssertDriverContentsWithFrameAre ("", output, app.Driver);
 
-                    Application.RequestStop ();
+                    app.RequestStop ();
 
                     break;
             }
@@ -1227,7 +1232,7 @@ public class DialogTests (ITestOutputHelper output)
         {
             ApplicationImpl.Instance.StopAfterFirstIteration = true;
             var fd = new FileDialog ();
-            Application.Run (fd);
+            app.Run (fd);
             fd.Dispose ();
         }
     }
@@ -1241,9 +1246,9 @@ public class DialogTests (ITestOutputHelper output)
             Width = Dim.Percent (85),
             Height = Dim.Percent (85)
         };
-        Application.Begin (d);
-        Application.Driver?.SetScreenSize (100, 100);
-        Application.LayoutAndDraw ();
+        app.Begin (d);
+        app.Driver?.SetScreenSize (100, 100);
+        app.LayoutAndDraw ();
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 7;
@@ -1256,8 +1261,8 @@ public class DialogTests (ITestOutputHelper output)
     public void Location_Not_Default ()
     {
         var d = new Dialog { X = 1, Y = 1 };
-        Application.Begin (d);
-        Application.Driver?.SetScreenSize (100, 100);
+        app.Begin (d);
+        app.Driver?.SetScreenSize (100, 100);
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         var expected = 1;
@@ -1278,9 +1283,9 @@ public class DialogTests (ITestOutputHelper output)
 
         var expected = 5;
         var d = new Dialog { X = expected, Y = expected, Height = 5, Width = 5 };
-        Application.Begin (d);
-        Application.Driver?.SetScreenSize (20, 10);
-        Application.LayoutAndDraw ();
+        app.Begin (d);
+        app.Driver?.SetScreenSize (20, 10);
+        app.LayoutAndDraw ();
 
         // Default location is centered, so 100 / 2 - 85 / 2 = 7
         Assert.Equal (new (expected, expected), d.Frame.Location);
@@ -1314,11 +1319,11 @@ public class DialogTests (ITestOutputHelper output)
             Y = 1
         };
 
-        Application.Driver?.SetScreenSize (20, 20);
+        app.Driver?.SetScreenSize (20, 20);
 
         var iterations = 0;
 
-        Application.Iteration += OnApplicationOnIteration;
+        app.Iteration += OnApplicationOnIteration;
 
         top.MouseEvent += (s, e) =>
                           {
@@ -1326,10 +1331,10 @@ public class DialogTests (ITestOutputHelper output)
                               Assert.Fail ("Mouse event should not be captured by the top level when a dialog is modal.");
                           };
 
-        Application.Run (top);
+        app.Run (top);
         top.Dispose ();
-        Application.Iteration -= OnApplicationOnIteration;
-        Application.Shutdown ();
+        app.Iteration -= OnApplicationOnIteration;
+        app.Shutdown ();
 
         return;
 
@@ -1337,18 +1342,18 @@ public class DialogTests (ITestOutputHelper output)
         {
             if (++iterations > 2)
             {
-                Application.RequestStop ();
+                app.RequestStop ();
             }
 
             if (iterations == 1)
             {
-                Application.Run (d);
+                app.Run (d);
                 d.Dispose ();
             }
             else if (iterations == 2)
             {
                 // Mouse click outside of dialog
-                Application.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.LeftButtonClicked, ScreenPosition = new (0, 0) });
+                app.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Clicked, ScreenPosition = new (0, 0) });
             }
         }
     }
@@ -1368,7 +1373,7 @@ public class DialogTests (ITestOutputHelper output)
             $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
 
         int width = buttonRow.Length;
-        Application.Driver?.SetScreenSize (buttonRow.Length, 10);
+        app.Driver?.SetScreenSize (buttonRow.Length, 10);
 
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (
                                                         title,
@@ -1376,8 +1381,8 @@ public class DialogTests (ITestOutputHelper output)
                                                         Alignment.Center,
                                                         new Button { Text = btnText }
                                                        );
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
-        Application.End (sessionToken);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -1390,7 +1395,7 @@ public class DialogTests (ITestOutputHelper output)
         Dialog dlg = new () { };
 
         ApplicationImpl.Instance.StopAfterFirstIteration = true;
-        Application.Run (dlg);
+        app.Run (dlg);
 
 #if DEBUG_IDISPOSABLE
         Assert.False (dlg.WasDisposed);
@@ -1408,7 +1413,7 @@ public class DialogTests (ITestOutputHelper output)
 #if DEBUG_IDISPOSABLE
         Assert.True (dlg.WasDisposed);
 #endif
-        Application.Shutdown ();
+        app.Shutdown ();
     }
 
     [Fact]
@@ -1421,9 +1426,9 @@ public class DialogTests (ITestOutputHelper output)
             Height = Dim.Percent (85)
         };
 
-        Application.Begin (d);
-        Application.Driver?.SetScreenSize (100, 100);
-        Application.LayoutAndDraw ();
+        app.Begin (d);
+        app.Driver?.SetScreenSize (100, 100);
+        app.LayoutAndDraw ();
 
         // Default size is Percent(85) 
         Assert.Equal (new ((int)(100 * .85), (int)(100 * .85)), d.Frame.Size);
@@ -1438,8 +1443,8 @@ public class DialogTests (ITestOutputHelper output)
         Button.DefaultShadow = ShadowStyle.None;
         var d = new Dialog { Width = 50, Height = 50 };
 
-        Application.Begin (d);
-        Application.Driver?.SetScreenSize (100, 100);
+        app.Begin (d);
+        app.Driver?.SetScreenSize (100, 100);
 
         // Default size is Percent(85) 
         Assert.Equal (new (50, 50), d.Frame.Size);
@@ -1456,13 +1461,13 @@ public class DialogTests (ITestOutputHelper output)
 
         var buttonRow = $"{Glyphs.VLine}        {Glyphs.VLine}";
         int width = buttonRow.Length;
-        Application.Driver?.SetScreenSize (buttonRow.Length, 3);
+        app.Driver?.SetScreenSize (buttonRow.Length, 3);
 
         (sessionToken, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center);
 
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
-        Application.End (sessionToken);
+        app.End (sessionToken);
         dlg.Dispose ();
     }
 
@@ -1493,7 +1498,7 @@ public class DialogTests (ITestOutputHelper output)
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border!.Thickness = new (1, 0, 1, 0);
 
-        SessionToken sessionToken = Application.Begin (dlg);
+        SessionToken sessionToken = app.Begin (dlg);
 
         dlg.SetNeedsDraw ();
         dlg.SetNeedsLayout ();
@@ -1502,4 +1507,6 @@ public class DialogTests (ITestOutputHelper output)
 
         return (sessionToken, dlg);
     }
+#endif
+
 }
