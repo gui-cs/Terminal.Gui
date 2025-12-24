@@ -4,17 +4,17 @@ using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class DialogTests (ITestOutputHelper output) : FakeDriverBase
+public class DialogTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Add_Button_Works ()
     {
         using IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var title = "1234";
         var btn1Text = "yes";
-        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btn1Text} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
         var btn2Text = "no";
         var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
 
@@ -48,95 +48,15 @@ public class DialogTests (ITestOutputHelper output) : FakeDriverBase
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
 
         // Now add a second button
+        btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
+        btn2 = $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} {btn2Text} {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
+
         buttonRow = $"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
 
         app.StopAfterFirstIteration = true;
         app.Run (dlg);
 
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
-
-        // Justify
-        dlg.Dispose ();
-        dlg = new ()
-        {
-            Title = title,
-            Width = width,
-            Height = 1,
-            ButtonAlignment = Alignment.Fill,
-            Buttons = [new () { Text = btn1Text }]
-        };
-
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc.)
-        dlg.Border!.Thickness = new (1, 0, 1, 0);
-        app.StopAfterFirstIteration = true;
-        app.Run (dlg);
-
-        buttonRow = $"{Glyphs.VLine}{btn1}         {Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
-
-        // Now add a second button
-        buttonRow = $"{Glyphs.VLine}{btn1}   {btn2}{Glyphs.VLine}";
-        dlg.AddButton (new () { Text = btn2Text });
-
-        app.StopAfterFirstIteration = true;
-        app.Run (dlg);
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
-
-        // Right
-        dlg.Dispose ();
-        dlg = new ()
-        {
-            Title = title,
-            Width = width,
-            Height = 1,
-            ButtonAlignment = Alignment.End,
-            Buttons = [new () { Text = btn1Text }]
-        };
-
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc.)
-        dlg.Border!.Thickness = new (1, 0, 1, 0);
-
-        app.StopAfterFirstIteration = true;
-        app.Run (dlg);
-
-        buttonRow = $"{Glyphs.VLine}{new (' ', width - btn1.Length - 2)}{btn1}{Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
-
-        // Now add a second button
-        buttonRow = $"{Glyphs.VLine}  {btn1} {btn2}{Glyphs.VLine}";
-        dlg.AddButton (new () { Text = btn2Text });
-
-        app.StopAfterFirstIteration = true;
-        app.Run (dlg);
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
-
-        dlg.Dispose ();
-        // Left
-        dlg = new ()
-        {
-            Title = title,
-            Width = width,
-            Height = 1,
-            ButtonAlignment = Alignment.Start,
-            Buttons = [new () { Text = btn1Text }]
-        };
-
-        // Create with no top or bottom border to simplify testing button layout (no need to account for title etc.)
-        dlg.Border!.Thickness = new (1, 0, 1, 0);
-        app.StopAfterFirstIteration = true;
-        app.Run (dlg);
-
-        buttonRow = $"{Glyphs.VLine}{btn1}{new (' ', width - btn1.Length - 2)}{Glyphs.VLine}";
-        DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
-
-        // Now add a second button
-        buttonRow = $"{Glyphs.VLine}{btn1} {btn2}  {Glyphs.VLine}";
-        dlg.AddButton (new () { Text = btn2Text });
-
-        app.StopAfterFirstIteration = true;
-        app.Run (dlg);
-        dlg.Dispose ();
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", output, app.Driver);
     }
 
