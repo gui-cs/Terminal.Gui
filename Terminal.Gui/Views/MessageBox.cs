@@ -587,26 +587,14 @@ public static class MessageBox
                     Data = count
                 };
 
-                if (count == defaultButton)
-                {
-                    b.IsDefault = true;
+                b.Accepting += (s, e) =>
+                               {
+                                   Button? button = s as Button;
+                                   Clicked = (int)button!.Data!;
+                                   e.Handled = true;
 
-                    b.Accepting += (s, e) =>
-                                   {
-                                       if (e.Context?.Source is Button button)
-                                       {
-                                           Clicked = (int)button.Data!;
-                                       }
-                                       else
-                                       {
-                                           Clicked = defaultButton;
-                                       }
-
-                                       e.Handled = true;
-
-                                       (s as View)?.App?.RequestStop ();
-                                   };
-                }
+                                   button.App?.RequestStop ();
+                               };
 
                 buttonList.Add (b);
                 count++;
@@ -622,8 +610,10 @@ public static class MessageBox
             Buttons = buttonList.ToArray ()
         };
 
-        dialog.Width = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumWidth).GetAnchor (dialog.GetContainerSize ().Width), dialog.GetWidthRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
-        dialog.Height = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumHeight).GetAnchor (dialog.GetContainerSize ().Height), dialog.GetHeightRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
+        dialog.Width = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumWidth).GetAnchor (dialog.GetContainerSize ().Width), dialog.GetWidthRequiredForSubViews ())),
+                                 maximumContentDim: Dim.Percent (90));
+        dialog.Height = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumHeight).GetAnchor (dialog.GetContainerSize ().Height), dialog.GetHeightRequiredForSubViews ())),
+                                  maximumContentDim: Dim.Percent (90));
 
         if (width != 0)
         {

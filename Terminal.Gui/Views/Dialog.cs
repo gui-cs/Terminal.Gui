@@ -70,6 +70,9 @@ public class Dialog : Window, IDesignable
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
 
+        BorderStyle = DefaultBorderStyle;
+        base.ShadowStyle = DefaultShadow;
+
         SetStyle ();
     }
 
@@ -159,19 +162,15 @@ public class Dialog : Window, IDesignable
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
             Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Base));
-            BorderStyle = DefaultBorderStyle;
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
-            base.ShadowStyle = DefaultShadow;
         }
         else
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
             Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
-            BorderStyle = LineStyle.Dotted;
 
             // strip out movable and resizable
             Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
-            base.ShadowStyle = ShadowStyle.None;
         }
     }
 

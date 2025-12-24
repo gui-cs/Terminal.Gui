@@ -4,6 +4,6 @@ using Xunit.Abstractions;
 
 namespace IntegrationTests;
 
-public class DialogTests (ITestOutputHelper output)
+public class DialogTests
 {
 }
