@@ -180,7 +180,7 @@ public class Dialogs : Scenario
 
         mainWindow.Accepting += (s, e) =>
                                    {
-                                       Dialog? dlg = CreateDemoDialog (
+                                       using Dialog? dlg = CreateDemoDialog (
                                                                        widthEdit,
                                                                        heightEdit,
                                                                        titleEdit,
@@ -196,8 +196,15 @@ public class Dialogs : Scenario
                                        }
                                        else
                                        {
-                                           app.Run (dlg);
-                                           dlg.Dispose ();
+                                           if (app.Run (dlg) is int result)
+                                           {
+                                               buttonPressedLabel.Text = $"Button {(int?)result} pressed.";
+                                           }
+                                           else
+                                           {
+                                               buttonPressedLabel.Text = "Dialog canceled.";
+                                           }
+
                                        }
 
                                        e.Handled = true;
@@ -227,7 +234,6 @@ public class Dialogs : Scenario
 
         // Add the buttons that go on the bottom of the dialog
         List<Button> dlgButtons = [];
-        int clicked = -1;
 
         for (var i = 0; i < numButtons; i++)
         {
@@ -248,12 +254,6 @@ public class Dialogs : Scenario
                 button = new () { Text = "_" + NumberToWords.Convert (buttonId) };
             }
 
-            button.Accepting += (s, e) =>
-                                {
-                                    clicked = buttonId;
-                                    e.Handled = true;
-                                    (s as View)!.App?.RequestStop ();
-                                };
             dlgButtons.Add (button);
         }
 
@@ -262,11 +262,25 @@ public class Dialogs : Scenario
         Dialog dialog = new ()
         {
             Title = titleEdit.Text,
-            Text = "Dialog Text - Test",
             ButtonAlignment = (Alignment)Enum.Parse (typeof (Alignment), alignmentGroup.Labels! [alignmentGroup.Value!.Value] [0..]),
-
             Buttons = dlgButtons.ToArray ()
         };
+
+        Label label = new ()
+        {
+            Title = "_Enter text:"
+        };
+        dialog.Add (label);
+
+        TextView textView = new ()
+        {
+            Title = "Text View",
+            Y = Pos.Bottom (label),
+            Height = Dim.Fill (),
+            Width = Dim.Fill (),
+            Text = "This is a demo dialog.\n\nPress a button or ESC to cancel."
+        };
+        dialog.Add (textView);
 
         if (width != 0)
         {
@@ -277,20 +291,10 @@ public class Dialogs : Scenario
             dialog.Height = height;
         }
 
-
-        dialog.IsRunningChanged += (_, e) =>
-                                   {
-                                       if (!e.Value)
-                                       {
-                                           buttonPressedLabel.Text = $"{clicked}";
-                                       }
-                                   };
-
-
         return dialog;
     }
 
-    public override List<Key> GetDemoKeyStrokes (IApplication app)
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         List<Key> keys =
         [

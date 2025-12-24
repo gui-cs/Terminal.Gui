@@ -333,7 +333,7 @@ public class ListColumns : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (Application.Instance, 60, 20, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (Application.Instance, "Failed to set", ex.Message, "Ok");
             }
         }
     }

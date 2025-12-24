@@ -24,65 +24,11 @@ public class MessageBoxes : Scenario
         };
         app.Add (frame);
 
-        // TODO: Use Pos.Align her to demo aligning labels and fields
-        var label = new Label { X = 0, Y = 0, Width = 15, TextAlignment = Alignment.End, Text = "W_idth:" };
-        frame.Add (label);
-
-        var widthEdit = new TextField
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = 5,
-            Height = 1,
-            Text = "0"
-        };
-        frame.Add (widthEdit);
-
-        label = new ()
+        Label label = new ()
         {
             X = 0,
-            Y = Pos.Bottom (label),
-            Width = Dim.Width (label),
-            Height = 1,
-            TextAlignment = Alignment.End,
-            Text = "_Height:"
-        };
-        frame.Add (label);
+            Y = 0,
 
-        var heightEdit = new TextField
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = 5,
-            Height = 1,
-            Text = "0"
-        };
-        frame.Add (heightEdit);
-
-        frame.Add (
-                   new Label
-                   {
-                       X = Pos.Right (widthEdit) + 2,
-                       Y = Pos.Top (widthEdit),
-                       Text = $"If width is 0, the dimension will be greater than {MessageBox.DefaultMinimumWidth}%."
-                   }
-                  );
-
-        frame.Add (
-                   new Label
-                   {
-                       X = Pos.Right (heightEdit) + 2,
-                       Y = Pos.Top (heightEdit),
-                       Text = $"If height is 0, the dimension will be greater than {MessageBox.DefaultMinimumHeight}%."
-                   }
-                  );
-
-        label = new ()
-        {
-            X = 0,
-            Y = Pos.Bottom (label),
-
-            Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
             Text = "_Title:"
@@ -231,42 +177,37 @@ public class MessageBoxes : Scenario
                          {
                              try
                              {
-                                 int width = int.Parse (widthEdit.Text);
-                                 int height = int.Parse (heightEdit.Text);
                                  int numButtons = int.Parse (numButtonsEdit.Text);
                                  int defaultButton = int.Parse (defaultButtonEdit.Text);
 
-                                               List<string> btns = [];
+                                 List<string> messageBoxButtons = [];
 
                                  for (var i = 0; i < numButtons; i++)
                                  {
-                                     btns.Add ($"_{NumberToWords.Convert (i)}");
+                                     messageBoxButtons.Add ($"_{NumberToWords.Convert (i)}");
                                  }
 
                                  if (styleOptionSelector.Value == 0)
                                  {
                                      buttonPressedLabel.Text =
                                          $"{MessageBox.Query (
-                                                              Application.Instance, width,
-                                                              height,
+                                                              Application.Instance,
                                                               titleEdit.Text,
                                                               messageEdit.Text,
                                                               defaultButton,
                                                               ckbWrapMessage.CheckedState == CheckState.Checked,
-                                                              btns.ToArray ()
+                                                              messageBoxButtons.ToArray ()
                                                              )}";
                                  }
                                  else
                                  {
                                      buttonPressedLabel.Text =
                                          $"{MessageBox.ErrorQuery (Application.Instance,
-                                                                   width,
-                                                                   height,
                                                                    titleEdit.Text,
                                                                    messageEdit.Text,
                                                                    defaultButton,
                                                                    ckbWrapMessage.CheckedState == CheckState.Checked,
-                                                                   btns.ToArray ()
+                                                                   messageBoxButtons.ToArray ()
                                                                   )}";
                                  }
                              }

@@ -1,25 +1,24 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Supports a simple API for adding <see cref="Button"/>s
-///     across the bottom. By default, the <see cref="Dialog"/> is centered and used the <see cref="Schemes.Dialog"/>
+///     Provides a modal dialog window with buttons across the bottom. When accepted, the <see cref="IRunnable.Result"/> will be the index of the button pressed.
+///     By default, the <see cref="Dialog"/> is centered and used the <see cref="Schemes.Dialog"/>
 ///     scheme.
 /// </summary>
 /// <remarks>
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
 ///     <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will execute the dialog until
 ///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
-///     or when one of the views or buttons added to the dialog calls
-///     <see cref="IApplication.RequestStop()"/>.
+///     or when one of its buttons is pressed, which sets the <see cref="IRunnable.Result"/> to the index of the button pressed.
 /// </remarks>
-public class Dialog : Window, IDesignable
+public class Dialog : Runnable<int?>, IDesignable
 {
     /// <summary>
     ///     Defines the default border styling for <see cref="Dialog"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
@@ -49,7 +48,7 @@ public class Dialog : Window, IDesignable
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
@@ -61,11 +60,12 @@ public class Dialog : Window, IDesignable
     /// </remarks>
     public Dialog ()
     {
+        _getMinimumWidthFunc = GetMinimumDialogWidth;
 
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumWidth).GetAnchor(GetContainerSize().Width), GetWidthRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
-        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => Math.Max (Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height), GetHeightRequiredForSubViews ())), maximumContentDim: Dim.Percent (90));
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumWidthFunc?.Invoke () ?? GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (90));
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumHeightFunc?.Invoke () ?? GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90));
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
@@ -76,9 +76,60 @@ public class Dialog : Window, IDesignable
         SetStyle ();
     }
 
-    private readonly List<Button> _buttons = [];
+    /// <summary>
+    ///     Sets a function that returns the minimum width for the <see cref="Dialog"/>. If not set, the
+    ///     default minimum width function will be used.
+    /// </summary>
+    /// <remarks>
+    ///     The default minimum width function returns the greater of:
+    ///         <c>Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width)</c> and
+    ///         <c>Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Width, Padding, Dimension.Width)</c>.
+    /// </remarks>
+    /// <param name="fn">The function that returns the minimum width.</param>
+    public void SetMinimumWidthFunc (Func<int>? fn)
+    {
+        _getMinimumWidthFunc = fn;
+    }
 
-    private bool _canceled;
+    private int GetMinimumDialogWidth ()
+    {
+        int minSize = Math.Max (
+                                Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width),
+                                Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Width, Padding, Dimension.Width)
+                              /*  - GetAdornmentsThickness().Horizontal*/);
+
+        return minSize;
+    }
+    private Func<int>? _getMinimumWidthFunc;
+
+    /// <summary>
+    ///     Sets a function that returns the minimum height for the <see cref="Dialog"/>. If not set, the
+    ///     default minimum height function will be used.
+    /// </summary>
+    /// <remarks>
+    ///     The default minimum height function returns the greater of:
+    ///         <c>Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height)</c> and
+    ///         <c>Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Height, Padding, Dimension.Height)</c>.
+    /// </remarks>
+    /// <param name="fn">The function that returns the minimum height.</param>
+    public void SetMinimumHeightFunc (Func<int>? fn)
+    {
+        _getMinimumHeightFunc = fn;
+    }
+
+    private int GetMinimumDialogHeight ()
+    {
+        int minSize = Math.Max (
+                                Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height),
+                                Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height)
+                                /*- GetAdornmentsThickness().Vertical*/);
+        return minSize;
+    }
+
+    private Func<int>? _getMinimumHeightFunc;
+
+
+    private readonly List<Button> _buttons = [];
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the bottom of the <see cref="Dialog"/>. The lifetime and layout will be controlled by the
@@ -98,16 +149,21 @@ public class Dialog : Window, IDesignable
         foreach (Button b in _buttons)
         {
             b.IsDefault = false;
+            b.Accepting += (s, e) =>
+                           {
+                               e.Handled = true;
+                               Result = Padding!.SubViews.IndexOf (s);
+                               RequestStop ();
+                           };
         }
         button.IsDefault = true;
 
-        // Subscribe to FrameChanged to update padding dynamically
-        button.FrameChanged += ButtonFrameChanged;
-
         Padding!.Add (button);
+        // Update the bottom padding to accommodate the new button
+        Padding!.Thickness = Padding!.Thickness with { Bottom = Padding!.GetHeightRequiredForSubViews () };
     }
 
-    private void ButtonFrameChanged (object? sender, EventArgs e) { UpdatePaddingBottom (); }
+    // private void ButtonFrameChanged (object? sender, EventArgs e) { UpdatePaddingBottom (); }
 
     // TODO: Update button.X = Pos.Justify when alignment changes
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
@@ -122,7 +178,7 @@ public class Dialog : Window, IDesignable
     public Button [] Buttons
     {
         get => _buttons.ToArray ();
-        init
+        set
         {
             foreach (Button b in value)
             {
@@ -132,21 +188,7 @@ public class Dialog : Window, IDesignable
     }
 
     /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    /// <remarks>The default value is <see langword="true"/>.</remarks>
-    public bool Canceled
-    {
-        get { return _canceled; }
-        set
-        {
-#if DEBUG_IDISPOSABLE
-            if (EnableDebugIDisposableAsserts && WasDisposed)
-            {
-                throw new ObjectDisposedException (GetType ().FullName);
-            }
-#endif
-            _canceled = value;
-        }
-    }
+    public bool Canceled => Result is null;
 
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)
@@ -161,13 +203,11 @@ public class Dialog : Window, IDesignable
         if (IsRunning)
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Base));
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
         }
         else
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
-            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
             // strip out movable and resizable
             Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
@@ -207,32 +247,6 @@ public class Dialog : Window, IDesignable
 
         return true;
 
-    }
-
-    private void UpdatePaddingBottom ()
-    {
-        if (Padding is null || _buttons.Count == 0)
-        {
-            return;
-        }
-
-        // Find the maximum button height
-        var maxHeight = 1; // Default to minimum height of 1 for buttons (assuming no shadow)
-
-        foreach (Button button in _buttons)
-        {
-            if (button.Frame.Height > maxHeight)
-            {
-                maxHeight = button.Frame.Height;
-            }
-        }
-
-        // Set the bottom padding to match button height
-        // Update padding if buttons have been laid out (maxHeight > 1)
-        if (maxHeight > 1 || Padding.Thickness.Bottom == 0)
-        {
-           Padding.Thickness = Padding.Thickness with { Bottom = maxHeight };
-        }
     }
 
     bool IDesignable.EnableForDesign ()
@@ -279,18 +293,4 @@ public class Dialog : Window, IDesignable
         return true;
     }
 
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            // Unsubscribe from button events to prevent memory leaks
-            foreach (Button button in _buttons)
-            {
-                button.FrameChanged -= ButtonFrameChanged;
-            }
-        }
-
-        base.Dispose (disposing);
-    }
 }

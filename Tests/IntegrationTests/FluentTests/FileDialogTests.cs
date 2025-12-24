@@ -266,7 +266,8 @@ public class FileDialogTests : TestsAllDrivers
                                   .AssertDoesNotContain ("hello", sd!.Path)
                                   .KeyDown (Key.Enter)
                                   .AssertFalse (sd!.Canceled)
-                                  .AssertContains ("empty-dir", sd!.FileName);
+                                  .AssertContains ("empty-dir", sd!.FileName)
+                                  ;
     }
 
 

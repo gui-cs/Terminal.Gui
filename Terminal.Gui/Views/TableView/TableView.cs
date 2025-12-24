@@ -1274,6 +1274,7 @@ public class TableView : View, IDesignable
         SetNeedsDraw ();
     }
 
+    // TODO: Update this to follow CWP.
     /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> if the CellActivated event was raised.</returns>

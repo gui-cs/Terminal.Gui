@@ -82,7 +82,7 @@ public class ViewportSettings : Scenario
         };
 
         charMap.Accepting += (s, _) =>
-                                 MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
+                                 MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "_No", "_Yes");
 
         Button buttonAnchored = new ()
         {
