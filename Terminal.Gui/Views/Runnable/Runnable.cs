@@ -129,7 +129,7 @@ public class Runnable : View, IRunnable
     ///         // Check if user wants to save first
     ///         if (HasUnsavedChanges ())
     ///         {
-    ///             int result = MessageBox.Query (App, "Save?", "Save changes?", "Yes", "No", "Cancel");
+    ///             int result = MessageBox.Query (App, "Save?", "Save changes?", "_No", "_Yes", "Cancel");
     ///             if (result == 2) return true;  // Cancel stopping
     ///             if (result == 0) Save ();
     ///         }

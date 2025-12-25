@@ -102,7 +102,7 @@ public class Buttons : Scenario
 
         button.Accepting += (s, e) =>
                             {
-                                MessageBox.Query ((s as View)?.App!, "Message", "Is There A Question?", "Yes", "No");
+                                MessageBox.Query ((s as View)?.App!, "Message", "Is There A Question?", "_No", "_Yes");
                                 e.Handled = true;
                             };
 
@@ -443,7 +443,7 @@ public class Buttons : Scenario
         {
             button.Accepting += (s, e) =>
                                 {
-                                    MessageBox.Query ((s as View)?.App!, "Message", $"Did you click {txt}?", "Yes", "No");
+                                    MessageBox.Query ((s as View)?.App!, "Message", $"Did you click {txt}?", "_No", "_Yes");
                                     e.Handled = true;
                                 };
         }

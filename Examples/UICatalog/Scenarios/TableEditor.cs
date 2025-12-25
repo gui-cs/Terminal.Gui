@@ -1032,7 +1032,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery ((sender as View)?.App!, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery ((sender as View)?.App!, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1235,7 +1235,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (_tableView.App!, 60, 20, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView.App!, "Failed to set", ex.Message, "Ok");
             }
 
             _tableView!.Update ();

@@ -342,7 +342,7 @@ public class CsvEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (Application.Instance, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery (Application.Instance, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView.Update ();

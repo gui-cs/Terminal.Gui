@@ -425,31 +425,12 @@ public class CharMap : View, IDesignable
 
         var title = $"{ToCamelCase (name!)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
 
-        Button? copyGlyph = new () { Text = Strings.charMapCopyGlyph };
-        Button? copyCodepoint = new () { Text = Strings.charMapCopyCP };
-        Button? cancel = new () { Text = Strings.btnCancel };
+        Button copyGlyph = new () { Text = Strings.charMapCopyGlyph };
+        Button copyCodepoint = new () { Text = Strings.charMapCopyCP };
+        Button cancel = new () { Text = Strings.btnCancel };
 
-        var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCodepoint, cancel] };
-
-        copyGlyph.Accepting += (s, a) =>
-                               {
-                                   CopyGlyph ();
-                                   dlg!.RequestStop ();
-                                   a.Handled = true;
-                               };
-
-        copyCodepoint.Accepting += (s, a) =>
-                                   {
-                                       CopyCodePoint ();
-                                       dlg!.RequestStop ();
-                                       a.Handled = true;
-                                   };
-
-        cancel.Accepting += (s, a) =>
-                            {
-                                dlg!.RequestStop ();
-                                a.Handled = true;
-                            };
+        using Dialog dlg = new () { Buttons = [copyGlyph, copyCodepoint, cancel] };
+        dlg.Title = title;
 
         var rune = (Rune)SelectedCodePoint;
         var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
@@ -520,15 +501,26 @@ public class CharMap : View, IDesignable
             X = 0,
             Y = Pos.Bottom (label),
             Width = Dim.Fill (),
-            Height = Dim.Fill (2),
+            Height = Dim.Fill (),
             ReadOnly = true,
             Text = decResponse
         };
 
         dlg.Add (json);
 
-        App?.Run (dlg);
-        dlg.Dispose ();
+        int? result = App?.Run (dlg) as int?;
+        switch (result!)
+        {
+            case 0:
+                CopyGlyph ();
+
+                break;
+
+            case 1:
+                CopyCodePoint ();
+
+                break;
+        }
     }
 
     #endregion Details Dialog

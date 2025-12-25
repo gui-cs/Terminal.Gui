@@ -65,9 +65,6 @@ public class FileDialog : Dialog, IDesignable
         Height = Dim.Percent (80);
         Width = Dim.Percent (80);
 
-        // Assume canceled
-        Canceled = true;
-
         _fileSystem = fileSystem;
         Style = new (fileSystem);
 
@@ -75,7 +72,7 @@ public class FileDialog : Dialog, IDesignable
         {
             X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
             Y = Pos.AnchorEnd (),
-            IsDefault = true, Text = Style.OkButtonText
+            Text = Style.OkButtonText
         };
 
         _btnOk.Accepting += (s, e) =>
@@ -95,21 +92,6 @@ public class FileDialog : Dialog, IDesignable
             Y = Pos.AnchorEnd (),
             Text = Strings.btnCancel
         };
-
-        _btnCancel.Accepting += (s, e) =>
-                                {
-                                    if (e.Handled)
-                                    {
-                                        return;
-                                    }
-
-                                    e.Handled = true;
-
-                                    if (IsModal)
-                                    {
-                                        (s as View)?.App?.RequestStop ();
-                                    }
-                                };
 
         // Tree toggle button - shares alignment group with OK/Cancel
         _btnTreeToggle = new ()
@@ -299,8 +281,9 @@ public class FileDialog : Dialog, IDesignable
 
         // Add the toggle along with OK/Cancel so they align as a group
         base.Add (_btnTreeToggle);
-        base.Add (_btnOk);
-        base.Add (_btnCancel);
+
+        AddButton (_btnCancel);
+        AddButton (_btnOk);
 
         // Default: Tree hidden and splitter hidden
         SetTreeVisible (false);
@@ -920,7 +903,8 @@ public class FileDialog : Dialog, IDesignable
                                 : new List<string> { Path }.AsReadOnly ();
         }
 
-        Canceled = false;
+        // TODO: TableView should not always return true from OnCellActivated.
+        Result = 1;
 
         if (IsModal)
         {

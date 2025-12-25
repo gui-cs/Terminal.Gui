@@ -99,7 +99,7 @@ public class WindowsAndFrameViews : Scenario
             };
 
             pressMeButton.Accepting += (s, e) =>
-                                        MessageBox.ErrorQuery ((s as View)?.App, loopWin.Title, "Neat?", "Yes", "No");
+                                        MessageBox.ErrorQuery ((s as View)?.App, loopWin.Title, "Neat?", "_No", "_Yes");
             loopWin.Add (pressMeButton);
 
             var subWin = new Window

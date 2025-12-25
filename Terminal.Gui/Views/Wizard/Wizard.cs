@@ -93,7 +93,6 @@ public class Wizard : Runnable, IDesignable
         if (IsRunning)
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Base));
             BorderStyle = Dialog.DefaultBorderStyle;
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
             base.ShadowStyle = Dialog.DefaultShadow;
@@ -101,7 +100,6 @@ public class Wizard : Runnable, IDesignable
         else
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
-            Padding?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
             BorderStyle = LineStyle.Dotted;
 
             // strip out movable and resizable

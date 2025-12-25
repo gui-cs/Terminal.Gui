@@ -302,7 +302,7 @@ protected override bool OnIsRunningChanging (bool oldValue, bool newValue)
         // Optionally cancel stop (e.g., unsaved changes)
         if (HasUnsavedChanges ())
         {
-            int response = MessageBox.Query ("Save?", "Save changes?", "Yes", "No", "Cancel");
+            int response = MessageBox.Query ("Save?", "Save changes?", "_No", "_Yes", "Cancel");
             
             if (response == 2)
             {
