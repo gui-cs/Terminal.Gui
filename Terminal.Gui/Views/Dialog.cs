@@ -95,31 +95,28 @@ public class Dialog : Runnable<int?>, IDesignable
         HorizontalScrollBar.AutoShow = true;
 
         SetStyle ();
+
+        AddCommand (Command.Accept, (ctx) =>
+                                   {
+                                       View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+
+                                       if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+                                       {
+                                           bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
+
+                                           if (handled == true)
+                                           {
+                                               return true;
+                                           }
+                                       }
+                                       return RaiseAccepting (ctx);
+                                   });
     }
 
     /// <inheritdoc />
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         SetContentSize (new Size (GetContentSize ().Width, GetHeightRequiredForSubViews ()));
-    }
-
-    /// <inheritdoc />
-    protected override bool OnAccepting (CommandEventArgs args)
-    {
-        // If there's an IsDefault peer view in SubViews, try it
-        View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
-
-        if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
-        {
-            bool? handled = isDefaultView.InvokeCommand (Command.Accept, args.Context);
-
-            if (handled == true)
-            {
-                return true;
-            }
-        }
-
-        return base.OnAccepting (args);
     }
 
     /// <summary>
@@ -197,7 +194,7 @@ public class Dialog : Runnable<int?>, IDesignable
             b.IsDefault = false;
             b.Accepting += (s, e) =>
                            {
-                               e.Handled = true;
+                               e.Handled = IsRunning;
                                Result = _buttonContainer!.SubViews.IndexOf (s);
                                RequestStop ();
                            };
