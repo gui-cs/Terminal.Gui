@@ -164,13 +164,13 @@ public class Wizards : Scenario
                                 }
                             };
 
-        wizard.Cancelled += (s, args) =>
-                            {
-                                _actionLabel!.Text = "Cancelled";
+        //wizard.Cancelled += (s, args) =>
+        //                    {
+        //                        _actionLabel!.Text = "Cancelled";
 
-                                int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "_No", "_Yes");
-                                args.Cancel = btn is not 1;
-                            };
+        //                        int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "_No", "_Yes");
+        //                        args.Cancel = btn is not 1;
+        //                    };
 
         ((IDesignable)wizard).EnableForDesign ();
 

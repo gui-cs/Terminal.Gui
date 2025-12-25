@@ -40,7 +40,7 @@ namespace Terminal.Gui.Views;
 /// app.Run (wizard);
 /// </code>
 /// </example>
-public class Wizard : Runnable, IDesignable
+public class Wizard : Dialog, IDesignable
 {
     private string _wizardTitle = string.Empty;
 
@@ -52,8 +52,8 @@ public class Wizard : Runnable, IDesignable
         TabStop = TabBehavior.TabGroup;
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (minimumContentDim: Dim.Percent (80), maximumContentDim: Dim.Percent (90));
-        Height = Dim.Auto (minimumContentDim: Dim.Percent (10), maximumContentDim: Dim.Percent (90));
+
+        ButtonAlignment = Alignment.Fill;
 
         SetStyle ();
 
@@ -71,21 +71,12 @@ public class Wizard : Runnable, IDesignable
             X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd ()
         };
-        NextFinishButton.FrameChanged += (_, _) => { Padding!.Thickness = Padding.Thickness with { Bottom = NextFinishButton.Frame.Height }; };
 
-        AddCommand (Command.Quit, QuitHandler);
-        KeyBindings.Add (Application.QuitKey, Command.Quit);
+        BackButton.Accepting += BackBtnOnAccepting;
+        NextFinishButton.Accepting += NextFinishBtnOnAccepting;
 
-        return;
-
-        // Add key binding for Esc when not modal - fires Cancelled event
-        bool? QuitHandler (ICommandContext? ctx)
-        {
-            CancelEventArgs args = new ();
-            Cancelled?.Invoke (this, args);
-
-            return args.Cancel;
-        }
+        AddButton (BackButton);
+        AddButton (NextFinishButton);
     }
 
     private void SetStyle ()
@@ -93,9 +84,7 @@ public class Wizard : Runnable, IDesignable
         if (IsRunning)
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            BorderStyle = Dialog.DefaultBorderStyle;
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
-            base.ShadowStyle = Dialog.DefaultShadow;
         }
         else
         {
@@ -120,17 +109,6 @@ public class Wizard : Runnable, IDesignable
     /// <inheritdoc/>
     public override void EndInit ()
     {
-        // Configure Padding
-        if (Padding is { })
-        {
-            // Add buttons to bottom Padding instead of using AddButton
-            Padding?.Add (BackButton);
-            Padding?.Add (NextFinishButton);
-        }
-
-        BackButton.Accepting += BackBtnOnAccepting;
-        NextFinishButton.Accepting += NextFinishBtnOnAccepting;
-
         CurrentStep = GetFirstStep ();
         base.EndInit ();
     }
@@ -198,9 +176,6 @@ public class Wizard : Runnable, IDesignable
 
         UpdateButtonsAndTitle ();
     }
-
-    /// <summary>Raised when the user cancels the wizard by pressing the Esc key.</summary>
-    public event EventHandler<CancelEventArgs>? Cancelled;
 
     /// <summary>Returns the first enabled step.</summary>
     public WizardStep? GetFirstStep () { return _steps.FirstOrDefault (s => s.Enabled); }
