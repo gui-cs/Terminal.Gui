@@ -50,7 +50,7 @@ public class Dialog : Runnable<int?>, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
 
-    private View? _buttonContainer;
+    private readonly View? _buttonContainer;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
@@ -137,9 +137,9 @@ public class Dialog : Runnable<int?>, IDesignable
     private int GetMinimumDialogWidth ()
     {
         int minSize = Math.Max (
-                                Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
-                                Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Width, Padding, Dimension.Width)
-                                - GetAdornmentsThickness ().Horizontal);
+                                0,//Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
+                                Dim.Auto ().Calculate (0, GetContainerSize ().Width, _buttonContainer, Dimension.Width)
+                                + GetAdornmentsThickness ().Horizontal);
 
         return minSize;
     }
@@ -165,7 +165,7 @@ public class Dialog : Runnable<int?>, IDesignable
         int minSize = Math.Max (
                                 Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height) - GetAdornmentsThickness ().Vertical,
                                 Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height)
-                                - GetAdornmentsThickness ().Vertical);
+                                + GetAdornmentsThickness ().Vertical);
         return minSize;
     }
 
@@ -189,24 +189,28 @@ public class Dialog : Runnable<int?>, IDesignable
 
         _buttons.Add (button);
 
-        foreach (Button b in _buttons)
+        foreach (Button dialogButton in _buttons)
         {
-            b.IsDefault = false;
-            b.Accepting += (s, e) =>
-                           {
-                               e.Handled = IsRunning;
-                               Result = _buttonContainer!.SubViews.IndexOf (s);
-                               RequestStop ();
-                           };
+            dialogButton.IsDefault = false;
+            dialogButton.Accepting += OnDialogButtonOnAccepting;
         }
         button.IsDefault = true;
 
         _buttonContainer?.Add (button);
     }
 
-    // private void ButtonFrameChanged (object? sender, EventArgs e) { UpdatePaddingBottom (); }
+    private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
+    {
+        if (e.Handled || !IsRunning)
+        {
+            return;
+        }
 
-    // TODO: Update button.X = Pos.Justify when alignment changes
+        e.Handled = IsRunning;
+        Result = _buttonContainer!.SubViews.IndexOf (s);
+        RequestStop ();
+    }
+
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
     public Alignment ButtonAlignment { get; set; }
 

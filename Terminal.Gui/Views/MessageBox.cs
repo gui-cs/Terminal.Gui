@@ -54,7 +54,7 @@ public static class MessageBox
 {
     private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
     private static Alignment _defaultButtonAlignment = Alignment.Center; // Resources/config.json overrides
-    private static int _defaultMinimumWidth = 10; // Resources/config.json overrides
+    private static int _defaultMinimumWidth = 15; // Resources/config.json overrides
     private static int _defaultMinimumHeight = 10; // Resources/config.json overrides
 
     /// <summary>
@@ -325,9 +325,9 @@ public static class MessageBox
         int GetMinimumMessageBoxWidth ()
         {
             int minSize = Math.Max (
-                                    Dim.Percent (DefaultMinimumWidth).GetAnchor (dialog.GetContainerSize ().Width),
-                                    Dim.Auto ().Calculate (0, dialog.GetContainerSize ().Width, dialog.Padding, Dimension.Width)
-                                    /*- dialog.GetAdornmentsThickness ().Horizontal*/);
+                                    Dim.Percent (DefaultMinimumWidth).GetAnchor (dialog.GetContainerSize ().Width) - dialog.GetAdornmentsThickness ().Horizontal,
+                                    Dim.Auto ().Calculate (0, dialog.Padding!.GetContainerSize ().Width, dialog.Padding, Dimension.Width)
+                                    - dialog.GetAdornmentsThickness ().Horizontal);
 
             return minSize;
         }
@@ -335,9 +335,9 @@ public static class MessageBox
         int GetMinimumMessageBoxHeight ()
         {
             int minSize = Math.Max (
-                                    Dim.Percent (DefaultMinimumHeight).GetAnchor (dialog.GetContainerSize ().Height),
-                                    Dim.Auto ().Calculate (0, dialog.GetContainerSize ().Height, dialog.Padding, Dimension.Height)
-                                    - dialog.GetAdornmentsThickness().Vertical);
+                                    Dim.Percent (DefaultMinimumHeight).GetAnchor (dialog.GetContainerSize ().Height) - dialog.GetAdornmentsThickness ().Vertical,
+                                    Dim.Auto ().Calculate (0, dialog.Padding!.GetContainerSize ().Height, dialog, Dimension.Height)
+                                    - dialog.GetAdornmentsThickness ().Vertical);
             return minSize;
         }
     }
