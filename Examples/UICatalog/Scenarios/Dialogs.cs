@@ -296,6 +296,25 @@ public class Dialogs : Scenario
         };
         dialog.Add (optionSelector);
 
+        Button addButtonButton = new ()
+        {
+            Title = "_Add Button",
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+        };
+        dialog.Add (addButtonButton);
+        addButtonButton.Accepting += (s, e) =>
+        {
+            int newButtonId = dialog.Buttons.Length;
+            Button newButton = new ()
+            {
+                Text = "_" + NumberToWords.Convert (newButtonId)
+            };
+            List<Button> buttons = dialog.Buttons.ToList ();
+            dialog.AddButton (newButton);
+            e.Handled = true;
+        };
+
         if (width != 0)
         {
             dialog.Width = width;

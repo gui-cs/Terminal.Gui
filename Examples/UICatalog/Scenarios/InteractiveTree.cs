@@ -16,7 +16,7 @@ public class InteractiveTree : Scenario
         Window appWindow = new ()
         {
             Title = GetName (),
-            BorderStyle = LineStyle.None    
+            BorderStyle = LineStyle.None
         };
 
         // MenuBar
@@ -97,16 +97,9 @@ public class InteractiveTree : Scenario
     {
         var okPressed = false;
 
-        Button ok = new () { Text = "Ok", IsDefault = true };
-
-        ok.Accepting += (s, e) =>
-                        {
-                            okPressed = true;
-                            Application.RequestStop ();
-                        };
-        Button cancel = new () { Text = "Cancel" };
-        cancel.Accepting += (s, e) => Application.RequestStop ();
-        Dialog d = new () { Title = title, Buttons = [ok, cancel] };
+        Button ok = new () { Text = "_Ok" };
+        Button cancel = new () { Text = "_Cancel" };
+        Dialog d = new () { Title = title, Buttons = [cancel, ok] };
 
         Label lbl = new () { X = 0, Y = 1, Text = label };
 
@@ -116,6 +109,8 @@ public class InteractiveTree : Scenario
         tf.SetFocus ();
 
         Application.Run (d);
+        okPressed = d.Result is 1;
+
         d.Dispose ();
 
         enteredText = okPressed ? tf.Text : string.Empty;

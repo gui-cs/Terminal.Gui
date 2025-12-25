@@ -445,20 +445,20 @@ public partial class View // Keyboard APIs
             return handled;
         }
 
-        if (Margin is { } && InvokeCommandsBoundToKeyOnAdornment (Margin, key, ref handled))
-        {
-            return true;
-        }
+        //if (Margin is { } && InvokeCommandsBoundToKeyOnAdornment (Margin, key, ref handled))
+        //{
+        //    return true;
+        //}
 
-        if (Padding is { } && InvokeCommandsBoundToKeyOnAdornment (Padding, key, ref handled))
-        {
-            return true;
-        }
+        //if (Padding is { } && InvokeCommandsBoundToKeyOnAdornment (Padding, key, ref handled))
+        //{
+        //    return true;
+        //}
 
-        if (Border is { } && InvokeCommandsBoundToKeyOnAdornment (Border, key, ref handled))
-        {
-            return true;
-        }
+        //if (Border is { } && InvokeCommandsBoundToKeyOnAdornment (Border, key, ref handled))
+        //{
+        //    return true;
+        //}
 
         return handled;
     }
@@ -495,7 +495,6 @@ public partial class View // Keyboard APIs
         return false;
     }
 
-    // BUGBUG: This will miss any hotkeys in subviews of Adornments.
     /// <summary>
     ///     Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
     /// </summary>
@@ -530,7 +529,7 @@ public partial class View // Keyboard APIs
         }
 
         // Now, process any HotKey bindings in the subviews
-        foreach (View subview in InternalSubViews.ToList())
+        foreach (View subview in GetSubViews (includePadding: true, includeBorder: true))
         {
             if (subview == Focused)
             {
@@ -568,7 +567,7 @@ public partial class View // Keyboard APIs
         }
 
         // TODO: Should we set binding.Key = key if it's not set?
-        if (binding is {} && (binding.Key is null || !binding.Key.IsValid))
+        if (binding is { } && (binding.Key is null || !binding.Key.IsValid))
         {
             binding.Key = key;
         }

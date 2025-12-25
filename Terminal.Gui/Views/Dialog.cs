@@ -103,6 +103,25 @@ public class Dialog : Runnable<int?>, IDesignable
         SetContentSize (new Size (GetContentSize ().Width, GetHeightRequiredForSubViews ()));
     }
 
+    /// <inheritdoc />
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        // If there's an IsDefault peer view in SubViews, try it
+        View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+
+        if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+        {
+            bool? handled = isDefaultView.InvokeCommand (Command.Accept, args.Context);
+
+            if (handled == true)
+            {
+                return true;
+            }
+        }
+
+        return base.OnAccepting (args);
+    }
+
     /// <summary>
     ///     Sets a function that returns the minimum width for the <see cref="Dialog"/>. If not set, the
     ///     default minimum width function will be used.
@@ -179,7 +198,7 @@ public class Dialog : Runnable<int?>, IDesignable
             b.Accepting += (s, e) =>
                            {
                                e.Handled = true;
-                               Result = Padding!.SubViews.IndexOf (s);
+                               Result = _buttonContainer!.SubViews.IndexOf (s);
                                RequestStop ();
                            };
         }
