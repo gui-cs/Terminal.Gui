@@ -137,9 +137,9 @@ public class Dialog : Runnable<int?>, IDesignable
     private int GetMinimumDialogWidth ()
     {
         int minSize = Math.Max (
-                                Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
-                                Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Width, Padding, Dimension.Width)
-                                - GetAdornmentsThickness ().Horizontal);
+                                0,//Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
+                                Dim.Auto ().Calculate (0, GetContainerSize ().Width, _buttonContainer, Dimension.Width)
+                                + GetAdornmentsThickness ().Horizontal);
 
         return minSize;
     }
@@ -165,7 +165,7 @@ public class Dialog : Runnable<int?>, IDesignable
         int minSize = Math.Max (
                                 Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height) - GetAdornmentsThickness ().Vertical,
                                 Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height)
-                                - GetAdornmentsThickness ().Vertical);
+                                + GetAdornmentsThickness ().Vertical);
         return minSize;
     }
 
