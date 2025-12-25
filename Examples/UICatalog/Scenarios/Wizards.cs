@@ -168,8 +168,8 @@ public class Wizards : Scenario
                             {
                                 _actionLabel!.Text = "Cancelled";
 
-                                int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "_Yes", "_No");
-                                args.Cancel = btn is not 0;
+                                int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "_No", "_Yes");
+                                args.Cancel = btn is not 1;
                             };
 
         ((IDesignable)wizard).EnableForDesign ();

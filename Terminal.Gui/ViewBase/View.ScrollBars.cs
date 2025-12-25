@@ -68,19 +68,9 @@ public partial class View
 
     private void ConfigureVerticalScrollBar (ScrollBar scrollBar)
     {
-        scrollBar.X = Pos.AnchorEnd ();
+        scrollBar.X = Pos.AnchorEnd () - Padding!.Thickness.Right;
 
-        scrollBar.Height = Dim.Fill (
-                                     Dim.Func (
-                                               _ =>
-                                               {
-                                                   if (_horizontalScrollBar.IsValueCreated)
-                                                   {
-                                                       return _horizontalScrollBar.Value.Visible ? 1 : 0;
-                                                   }
-
-                                                   return 0;
-                                               }));
+        scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding.Thickness.Bottom));
         scrollBar.ScrollableContentSize = GetContentSize ().Height;
 
         ViewportChanged += (_, _) =>
@@ -93,19 +83,9 @@ public partial class View
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
     {
-        scrollBar.Y = Pos.AnchorEnd ();
+        scrollBar.Y = Pos.AnchorEnd () - Padding!.Thickness.Bottom;
 
-        scrollBar.Width = Dim.Fill (
-                                    Dim.Func (
-                                              _ =>
-                                              {
-                                                  if (_verticalScrollBar.IsValueCreated)
-                                                  {
-                                                      return _verticalScrollBar.Value.Visible ? 1 : 0;
-                                                  }
-
-                                                  return 0;
-                                              }));
+        scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding.Thickness.Right));
         scrollBar.ScrollableContentSize = GetContentSize ().Width;
 
         ViewportChanged += (_, _) =>

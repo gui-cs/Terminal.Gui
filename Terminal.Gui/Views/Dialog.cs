@@ -50,6 +50,8 @@ public class Dialog : Runnable<int?>, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
 
+    private View? _buttonContainer;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog"/> class with no <see cref="Button"/>s.
     /// </summary>
@@ -61,11 +63,12 @@ public class Dialog : Runnable<int?>, IDesignable
     public Dialog ()
     {
         _getMinimumWidthFunc = GetMinimumDialogWidth;
+        _getMinimumHeightFunc = GetMinimumDialogHeight;
 
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumWidthFunc?.Invoke () ?? GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (90));
-        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumHeightFunc?.Invoke () ?? GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90));
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumWidthFunc?.Invoke () ?? GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Horizontal);
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumHeightFunc?.Invoke () ?? GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Vertical);
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
@@ -73,7 +76,47 @@ public class Dialog : Runnable<int?>, IDesignable
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
 
+        _buttonContainer = new View ()
+        {
+            CanFocus = true,
+            X = Pos.Func (_ => Padding!.Thickness.Left),
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Fill (Padding!.Thickness.Vertical),
+            Height = Dim.Auto (),
+        };
+        Padding!.Add (_buttonContainer);
+
+        // Add a temporary button to calculate the required height
+        _buttonContainer.Add (new Button ());
+        Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () + 1 };
+        _buttonContainer.RemoveAll ();
+
+        VerticalScrollBar.AutoShow = true;
+        HorizontalScrollBar.AutoShow = true;
+
         SetStyle ();
+
+        AddCommand (Command.Accept, (ctx) =>
+                                   {
+                                       View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+
+                                       if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+                                       {
+                                           bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
+
+                                           if (handled == true)
+                                           {
+                                               return true;
+                                           }
+                                       }
+                                       return RaiseAccepting (ctx);
+                                   });
+    }
+
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    {
+        SetContentSize (new Size (GetContentSize ().Width, GetHeightRequiredForSubViews ()));
     }
 
     /// <summary>
@@ -94,9 +137,9 @@ public class Dialog : Runnable<int?>, IDesignable
     private int GetMinimumDialogWidth ()
     {
         int minSize = Math.Max (
-                                Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width),
+                                Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
                                 Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Width, Padding, Dimension.Width)
-                              /*  - GetAdornmentsThickness().Horizontal*/);
+                                - GetAdornmentsThickness ().Horizontal);
 
         return minSize;
     }
@@ -120,9 +163,9 @@ public class Dialog : Runnable<int?>, IDesignable
     private int GetMinimumDialogHeight ()
     {
         int minSize = Math.Max (
-                                Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height),
+                                Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height) - GetAdornmentsThickness ().Vertical,
                                 Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height)
-                                /*- GetAdornmentsThickness().Vertical*/);
+                                - GetAdornmentsThickness ().Vertical);
         return minSize;
     }
 
@@ -142,7 +185,7 @@ public class Dialog : Runnable<int?>, IDesignable
     {
         // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
         button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
-        button.Y = Pos.AnchorEnd ();
+        button.Y = 1;
 
         _buttons.Add (button);
 
@@ -151,16 +194,14 @@ public class Dialog : Runnable<int?>, IDesignable
             b.IsDefault = false;
             b.Accepting += (s, e) =>
                            {
-                               e.Handled = true;
-                               Result = Padding!.SubViews.IndexOf (s);
+                               e.Handled = IsRunning;
+                               Result = _buttonContainer!.SubViews.IndexOf (s);
                                RequestStop ();
                            };
         }
         button.IsDefault = true;
 
-        Padding!.Add (button);
-        // Update the bottom padding to accommodate the new button
-        Padding!.Thickness = Padding!.Thickness with { Bottom = Padding!.GetHeightRequiredForSubViews () };
+        _buttonContainer?.Add (button);
     }
 
     // private void ButtonFrameChanged (object? sender, EventArgs e) { UpdatePaddingBottom (); }
@@ -193,7 +234,10 @@ public class Dialog : Runnable<int?>, IDesignable
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)
     {
-        SetStyle ();
+        if (newIsModal)
+        {
+            SetStyle ();
+        }
 
         base.OnIsRunningChanged (newIsModal);
     }
@@ -203,6 +247,7 @@ public class Dialog : Runnable<int?>, IDesignable
         if (IsRunning)
         {
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            Padding!.SetScheme (SchemeManager.GetScheme (Schemes.Base));
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
         }
         else

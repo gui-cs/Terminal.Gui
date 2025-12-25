@@ -47,7 +47,6 @@ public class AnsiKeyboardParserTests
         yield return ["\u001b[1;8D", Key.CursorLeft.WithCtrl.WithAlt.WithShift];
 
         // Invalid inputs
-        yield return ["\u001b[Z", null!];
         yield return ["\u001b[invalid", null!];
         yield return ["\u001b[1", null!];
         yield return ["\u001b[AB", null!];
@@ -62,6 +61,7 @@ public class AnsiKeyboardParserTests
         yield return ["\u001b[2~", Key.InsertChar];
         yield return ["\u001b[5~", Key.PageUp];
         yield return ["\u001b[6~", Key.PageDown];
+        yield return ["\u001b[Z", Key.Tab.WithShift];
 
         // Home, End with modifiers
         yield return ["\u001b[1;2H", Key.Home.WithShift];

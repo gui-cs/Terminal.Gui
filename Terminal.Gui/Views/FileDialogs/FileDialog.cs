@@ -65,6 +65,11 @@ public class FileDialog : Dialog, IDesignable
         Height = Dim.Percent (80);
         Width = Dim.Percent (80);
 
+        HorizontalScrollBar.AutoShow = false;
+        HorizontalScrollBar.Visible = false;
+        VerticalScrollBar.AutoShow = false;
+        VerticalScrollBar.Visible = false;
+
         _fileSystem = fileSystem;
         Style = new (fileSystem);
 

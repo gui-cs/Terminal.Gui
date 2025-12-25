@@ -154,8 +154,8 @@ public class FileDialogExamples : Scenario
         {
             if (File.Exists (e.Dialog.Path))
             {
-                int? result = MessageBox.Query (Application.Instance, "Overwrite?", "File already exists", "_Yes", "_No");
-                e.Cancel = result == 1;
+                int? result = MessageBox.Query (Application.Instance, "Overwrite?", "File already exists", "_No", "_Yes");
+                e.Cancel = result is 0 or null;
             }
         }
     }

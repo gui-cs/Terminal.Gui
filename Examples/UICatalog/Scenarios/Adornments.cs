@@ -121,9 +121,13 @@ public class Adornments : Scenario
                                   {
                                       X = Pos.Center (),
                                       Y = 1,
-                                      Text = "_Button in Border Y = 1"
+                                      Text = "Button in Border _Y = 1"
                                   };
-                                  btnButtonInBorder.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Border Pressed!", "Ok");
+                                  btnButtonInBorder.Accepting += (_, args) =>
+                                                                 {
+                                                                     MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Border Pressed!", "Ok");
+                                                                     args.Handled = true;
+                                                                 };
                                   window.Border.Add (btnButtonInBorder);
 
                                   Label labelInPadding = new () { X = 0, Y = 1, Title = "_Text:" };
@@ -146,7 +150,11 @@ public class Adornments : Scenario
                                       Text = "_Button in Padding Y = 1",
                                       CanFocus = true
                                   };
-                                  btnButtonInPadding.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                  btnButtonInPadding.Accepting += (_, args) =>
+                                                                  {
+                                                                      MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                                                      args.Handled = true;
+                                                                  };
                                   window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
