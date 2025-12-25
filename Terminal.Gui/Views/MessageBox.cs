@@ -29,7 +29,7 @@ namespace Terminal.Gui.Views;
 ///     app.Init();
 ///     
 ///     int? result = MessageBox.Query(app, "Quit Demo", "Are you sure you want to quit?", "_No", "_Yes");
-///     if (result == 0) // User clicked "Yes"
+///     if (result == 1) // User clicked "Yes"
 ///         app.RequestStop();
 ///     else if (result == null) // User pressed Esc
 ///         // Handle cancellation
@@ -43,7 +43,7 @@ namespace Terminal.Gui.Views;
 ///     Application.Init();
 ///     
 ///     int? result = MessageBox.Query(ApplicationImpl.Instance, "Quit Demo", "Are you sure?", "_No", "_Yes");
-///     if (result == 0) // User clicked "Yes"
+///     if (result == 1) // User clicked "Yes"
 ///         Application.RequestStop();
 ///     
 ///     Application.Shutdown();

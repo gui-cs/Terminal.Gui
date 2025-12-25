@@ -115,7 +115,7 @@ public partial class View
     /// <returns></returns>
     public int GetHeightRequiredForSubViews ()
     {
-        return Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height);
+        //return Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height);
         int max = GetContentSize ().Height;
 
         // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize

@@ -272,15 +272,29 @@ public class Dialogs : Scenario
         };
         dialog.Add (label);
 
-        TextView textView = new ()
+        TextField textField = new ()
         {
-            Title = "Text View",
             Y = Pos.Bottom (label),
-            Height = Dim.Fill (),
             Width = Dim.Fill (),
-            Text = "This is a demo dialog.\n\nPress a button or ESC to cancel."
+            Text = "This is a demo dialog."
         };
-        dialog.Add (textView);
+        dialog.Add (textField);
+
+        CheckBox checkBox = new ()
+        {
+            Title = "_Check Me",
+            Y = Pos.Bottom (textField),
+            CheckedState = CheckState.UnChecked
+        };
+        dialog.Add (checkBox);
+
+        OptionSelector<Schemes> optionSelector = new ()
+        {
+            Y = Pos.Bottom (checkBox),
+            Value = Schemes.Error,
+            AssignHotKeys = true,
+        };
+        dialog.Add (optionSelector);
 
         if (width != 0)
         {
