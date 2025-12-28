@@ -174,6 +174,78 @@ public partial class DimAutoTests
         Assert.Equal (10, calculatedHeight);
     }
 
+    [Fact]
+    public void With_SubView_Using_DimFill_With_MinimumContentDim_On_Fill ()
+    {
+        // This test verifies that DimFill with minimumContentDim contributes to Dim.Auto SuperView sizing
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        View fillView = new () { X = 0, Y = 0, Width = Dim.Fill (0, minimumContentDim: 40), Height = Dim.Fill (0, minimumContentDim: 20) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // The fill view's minimum should make the auto view at least that size
+        Assert.Equal (40, calculatedWidth);
+        Assert.Equal (20, calculatedHeight);
+    }
+
+    [Theory]
+    [InlineData (0, 40, 20, 40, 20)]
+    [InlineData (5, 40, 20, 45, 25)]
+    [InlineData (10, 30, 15, 40, 25)]
+    public void With_SubView_Using_DimFill_With_MinimumContentDim_And_Position (int x, int minW, int minH, int expectedW, int expectedH)
+    {
+        // Verify that position offset is added to minimum when calculating auto size
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        View fillView = new () { X = x, Y = x, Width = Dim.Fill (0, minimumContentDim: minW), Height = Dim.Fill (0, minimumContentDim: minH) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        Assert.Equal (expectedW, calculatedWidth);
+        Assert.Equal (expectedH, calculatedHeight);
+    }
+
+    [Fact]
+    public void With_SubView_Using_DimFill_With_MinimumContentDim_And_Other_SubViews ()
+    {
+        // Verify that DimFill minimum and other subviews both contribute
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto () };
+        View absView = new () { X = 0, Y = 0, Width = 30, Height = 15 };
+        view.Add (absView);
+
+        View fillView = new () { X = 0, Y = 0, Width = Dim.Fill (0, minimumContentDim: 50), Height = Dim.Fill (0, minimumContentDim: 25) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // Should use the larger of the two
+        Assert.Equal (50, calculatedWidth);
+        Assert.Equal (25, calculatedHeight);
+    }
+
+    [Theory]
+    [InlineData (0, 0, 40, 20, 40, 20)]
+    [InlineData (50, 30, 40, 20, 50, 30)]
+    [InlineData (40, 20, 40, 20, 40, 20)]
+    public void With_SubView_Using_DimFill_MinimumContentDim_Respects_SuperView_Min (int superMin, int superMinH, int fillMin, int fillMinH, int expectedW, int expectedH)
+    {
+        // Verify interaction between SuperView minimumContentDim and DimFill minimumContentDim
+        View view = new () { Width = Dim.Auto (minimumContentDim: superMin), Height = Dim.Auto (minimumContentDim: superMinH) };
+        View fillView = new () { X = 0, Y = 0, Width = Dim.Fill (0, minimumContentDim: fillMin), Height = Dim.Fill (0, minimumContentDim: fillMinH) };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // Should use the larger of SuperView min or Fill min
+        Assert.Equal (expectedW, calculatedWidth);
+        Assert.Equal (expectedH, calculatedHeight);
+    }
+
     #endregion
 
     #region DimFunc

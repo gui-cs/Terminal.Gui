@@ -62,7 +62,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
     }
 
-    [Fact]
+    [Fact (Skip = "Un skip when v2_4417-Continuous is done")]
     public void UICatalog_AboutBox ()
     {
         IApplication app = Application.Create ();

@@ -78,17 +78,19 @@ public class Dialog : Runnable<int?>, IDesignable
 
         _buttonContainer = new View ()
         {
+            Id = "Dialog.ButtonContainer",
             CanFocus = true,
             X = Pos.Func (_ => Padding!.Thickness.Left),
             Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Vertical / 2)),
+            Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Horizontal / 2)),
             Height = Dim.Auto (),
             SchemeName = "Menu"
         };
         Padding!.Add (_buttonContainer);
 
         // Add a temporary button to calculate the required height
-        _buttonContainer.Add (new Button ());
+        Button tempButton = new Button ();
+        _buttonContainer.Add (tempButton);
         Padding!.Thickness = Padding!.Thickness with
         {
             // Add 3 to padding just for testing
@@ -98,6 +100,7 @@ public class Dialog : Runnable<int?>, IDesignable
             Bottom = _buttonContainer!.GetHeightRequiredForSubViews() + 1
         };
         _buttonContainer.RemoveAll ();
+        tempButton.Dispose ();
 
         VerticalScrollBar.AutoShow = true;
         HorizontalScrollBar.AutoShow = true;
@@ -135,17 +138,23 @@ public class Dialog : Runnable<int?>, IDesignable
     {
         base.EndInit ();
 
+    }
+
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs args)
+    {
+
         int naturalWidth = GetWidthRequiredForSubViews ();
         int naturalButtonWidth = _buttonContainer!.GetWidthRequiredForSubViews ();
 
         int naturalHeight = GetHeightRequiredForSubViews ();
         int naturalButtonHeight = _buttonContainer.GetHeightRequiredForSubViews ();
 
-        SetContentSize(new Size (
-                                 Math.Max (naturalWidth, 0),
-                                 Math.Max (naturalHeight, 0)));
+        SetContentSize (new Size (
+                                  Math.Max (naturalWidth, 0),
+                                  Math.Max (naturalHeight, 0)));
+        base.OnSubViewLayout (args);
     }
-
 
     /// <summary>
     ///     Sets a function that returns the minimum width for the <see cref="Dialog"/>. If not set, the
@@ -166,8 +175,7 @@ public class Dialog : Runnable<int?>, IDesignable
     {
         int minSize = Math.Max (
                                 0,//Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
-                                Dim.Auto ().Calculate (0, GetContainerSize ().Width, _buttonContainer, Dimension.Width)
-                                + (GetAdornmentsThickness ().Horizontal - Padding.Thickness.Horizontal)
+                                _buttonContainer!.GetWidthRequiredForSubViews ()
                                    );
 
         return minSize;
@@ -192,9 +200,9 @@ public class Dialog : Runnable<int?>, IDesignable
     private int GetMinimumDialogHeight ()
     {
         int minSize = Math.Max (
-                                Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height) - GetAdornmentsThickness ().Vertical,
-                                Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height)
-                                - GetAdornmentsThickness ().Vertical);
+                                0,//Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
+                                _buttonContainer!.GetHeightRequiredForSubViews ()
+                               );
         return minSize;
     }
 
@@ -333,6 +341,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
         Button btnCancel = new ()
         {
+            Id = "btnCancel",
             Title = Strings.btnCancel,
         };
 
@@ -350,6 +359,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
         AddButton (new ()
         {
+            Id = "btnOk",
             Title = Strings.btnOk,
             // Dialog will automatically set IsDefault to the last button added
         });
@@ -357,10 +367,12 @@ public class Dialog : Runnable<int?>, IDesignable
         // Add some example content to the dialog
         Label infoLabel = new ()
         {
+            Id = "infoLabel",
             Text = "_Example:"
         };
         TextField info = new ()
         {
+            Id = "info",
             X = Pos.Right (infoLabel) + 1,
             Y = Pos.Top (infoLabel),
             Text = "Type and press ENTER to accept.",

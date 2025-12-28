@@ -664,7 +664,7 @@ public class UICatalog
         foreach (View? inst in View.Instances)
         {
             //Debug.Assert (inst.WasDisposed);
-            Logging.Error ($"View instance not disposed: {inst}");
+            Logging.Error ($"View instance not disposed: {inst}:{inst.Title}");
         }
 
         View.Instances.Clear ();
