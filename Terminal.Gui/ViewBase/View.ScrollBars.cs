@@ -70,7 +70,7 @@ public partial class View
     {
         scrollBar.X = Pos.AnchorEnd () - Padding!.Thickness.Right;
 
-        scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding.Thickness.Bottom));
+        scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Bottom));
         scrollBar.ScrollableContentSize = GetContentSize ().Height;
 
         ViewportChanged += (_, _) =>
@@ -85,7 +85,7 @@ public partial class View
     {
         scrollBar.Y = Pos.AnchorEnd () - Padding!.Thickness.Bottom;
 
-        scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding.Thickness.Right));
+        scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Right));
         scrollBar.ScrollableContentSize = GetContentSize ().Width;
 
         ViewportChanged += (_, _) =>

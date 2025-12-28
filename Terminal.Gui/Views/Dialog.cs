@@ -81,14 +81,22 @@ public class Dialog : Runnable<int?>, IDesignable
             CanFocus = true,
             X = Pos.Func (_ => Padding!.Thickness.Left),
             Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (Padding!.Thickness.Vertical),
+            Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Vertical / 2)),
             Height = Dim.Auto (),
+            SchemeName = "Menu"
         };
         Padding!.Add (_buttonContainer);
 
         // Add a temporary button to calculate the required height
         _buttonContainer.Add (new Button ());
-        Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () + 1 };
+        Padding!.Thickness = Padding!.Thickness with
+        {
+            // Add 3 to padding just for testing
+            //Right = Padding!.Thickness.Right + 3,
+            //Left = Padding!.Thickness.Left + 3,
+            //Top = Padding!.Thickness.Top + 3,
+            Bottom = _buttonContainer!.GetHeightRequiredForSubViews() + 1
+        };
         _buttonContainer.RemoveAll ();
 
         VerticalScrollBar.AutoShow = true;
@@ -113,11 +121,31 @@ public class Dialog : Runnable<int?>, IDesignable
                                    });
     }
 
+    ///// <inheritdoc />
+    //protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    //{
+    //    SetContentSize (new Size (
+    //        Dim.Auto ().Calculate (0, , this, Dimension.Width) - GetAdornmentsThickness ().Horizontal,
+    //        GetHeightRequiredForSubViews ()));
+    //}
+
+
     /// <inheritdoc />
-    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    public override void EndInit ()
     {
-        SetContentSize (new Size (GetContentSize ().Width, GetHeightRequiredForSubViews ()));
+        base.EndInit ();
+
+        int naturalWidth = GetWidthRequiredForSubViews ();
+        int naturalButtonWidth = _buttonContainer!.GetWidthRequiredForSubViews ();
+
+        int naturalHeight = GetHeightRequiredForSubViews ();
+        int naturalButtonHeight = _buttonContainer.GetHeightRequiredForSubViews ();
+
+        SetContentSize(new Size (
+                                 Math.Max (naturalWidth, 0),
+                                 Math.Max (naturalHeight, 0)));
     }
+
 
     /// <summary>
     ///     Sets a function that returns the minimum width for the <see cref="Dialog"/>. If not set, the
@@ -139,7 +167,8 @@ public class Dialog : Runnable<int?>, IDesignable
         int minSize = Math.Max (
                                 0,//Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
                                 Dim.Auto ().Calculate (0, GetContainerSize ().Width, _buttonContainer, Dimension.Width)
-                                + GetAdornmentsThickness ().Horizontal);
+                                + (GetAdornmentsThickness ().Horizontal - Padding.Thickness.Horizontal)
+                                   );
 
         return minSize;
     }
@@ -165,7 +194,7 @@ public class Dialog : Runnable<int?>, IDesignable
         int minSize = Math.Max (
                                 Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height) - GetAdornmentsThickness ().Vertical,
                                 Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height)
-                                + GetAdornmentsThickness ().Vertical);
+                                - GetAdornmentsThickness ().Vertical);
         return minSize;
     }
 

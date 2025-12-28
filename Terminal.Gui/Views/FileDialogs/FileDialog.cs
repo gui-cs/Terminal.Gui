@@ -88,7 +88,7 @@ public class FileDialog : Dialog, IDesignable
                                 }
 
                                 Accept (true);
-                                e.Handled = true;
+                               // e.Handled = true;
                             };
 
         _btnCancel = new ()

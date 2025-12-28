@@ -85,7 +85,7 @@ public partial class View
     /// <returns></returns>
     public int GetWidthRequiredForSubViews ()
     {
-        int max = Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width); ;//GetContentSize ().Width;
+        int max = Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width) - GetAdornmentsThickness().Horizontal; ;//GetContentSize ().Width;
         return max;
 
         // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize

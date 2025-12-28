@@ -129,12 +129,27 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving no margin.
     /// </summary>
+    /// <remarks>
+    ///     The view will fill from its position to the end of the SuperView's content area.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var view = new View { X = 5, Y = 0, Width = Dim.Fill(), Height = 1 };
+    /// // If SuperView width is 80, view width will be 75 (80 - 5)
+    /// </code>
+    /// </example>
     /// <returns>The Fill dimension.</returns>
     public static Dim Fill () { return new DimFill (0); }
 
     /// <summary>
     ///     Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified margin.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// var view = new View { X = 0, Y = 0, Width = Dim.Fill(2), Height = 1 };
+    /// // If SuperView width is 80, view width will be 78 (80 - 2)
+    /// </code>
+    /// </example>
     /// <returns>The Fill dimension.</returns>
     /// <param name="margin">Margin to use.</param>
     public static Dim Fill (Dim margin) { return new DimFill (margin); }

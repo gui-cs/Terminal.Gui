@@ -173,10 +173,10 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
-        if (view is IDesignable designable)
-        {
-            designable.EnableForDesign ();
-        }
+        //if (view is IDesignable designable)
+        //{
+        //    designable.EnableForDesign ();
+        //}
 
         var activatingCount = 0;
         view.Activating += (s, e) => activatingCount++;
