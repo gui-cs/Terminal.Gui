@@ -32,8 +32,8 @@ public class DimAutoDemo : Scenario
         FrameView dimAutoFrameView = new ()
         {
             Title = "Type to make View grow",
-            X = Pos.Center (),
-            Y = Pos.Center (),
+            //X = Pos.Center (),
+            //Y = Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
             Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10)
         };
@@ -120,14 +120,14 @@ public class DimAutoDemo : Scenario
                                         bothAuto.Text = textEdit.Text;
                                     };
 
-        //var movingButton = new Button
-        //{
-        //    Text = "_Click\nTo Move\nDown",
-        //    X = Pos.Right (vlabel),
-        //    Y = Pos.Bottom (vlabel)
-        //};
-        //movingButton.Accept += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
-        //dimAutoFrameView.Add (movingButton);
+        Button movingButton = new ()
+        {
+            Text = "_Move",
+            X = Pos.Right (vlabel),
+            Y = Pos.Bottom (vlabel)
+        };
+        movingButton.Accepting += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
+        dimAutoFrameView.Add (movingButton);
 
         Button resetButton = new ()
         {
@@ -138,8 +138,8 @@ public class DimAutoDemo : Scenario
 
         resetButton.Accepting += (s, e) =>
         {
-            //movingButton.Y = Pos.Bottom (hlabel);
-            //movingButton.X = 0;
+            movingButton.Y = Pos.Bottom (hlabel);
+            movingButton.X = 0;
         };
         dimAutoFrameView.Add (resetButton);
 
@@ -156,10 +156,10 @@ public class DimAutoDemo : Scenario
         FrameView fillFrame = new ()
         {
             Title = "_Fill View",
-            X = Pos.Right (optionSelector) + 1,
-            Y = Pos.Top (optionSelector),
-            //Width = Dim.Fill (),
-            //Height = Dim.Fill ()
+            X = Pos.Right (optionSelector),
+            Y = Pos.Bottom (vlabel),
+            Width = Dim.Fill (Dim.Width (resetButton)),
+            Height = Dim.Fill ()
         };
         dimAutoFrameView.Add (fillFrame);
         return dimAutoFrameView;

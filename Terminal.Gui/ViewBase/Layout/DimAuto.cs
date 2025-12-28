@@ -420,39 +420,21 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 #region DimFill
 
-                //// [ ] DimFill      - Dimension is internally calculated
+                // DimFill subviews don't contribute to auto-sizing - they fill available space
+                // Skip them entirely to avoid the bug where they cause SuperView to expand to SuperSuperView size
+                List<View> dimFillSubViews;
 
-                //List<View> DimFillSubViews;
+                if (dimension == Dimension.Width)
+                {
+                    dimFillSubViews = includedSubViews.Where (v => v.Width.Has<DimFill> (out _)).ToList ();
+                }
+                else
+                {
+                    dimFillSubViews = includedSubViews.Where (v => v.Height.Has<DimFill> (out _)).ToList ();
+                }
 
-                //if (dimension == Dimension.Width)
-                //{
-                //    DimFillSubViews = includedSubViews.Where (v => v.Width is { } && v.Width.Has<DimFill> (out _)).ToList ();
-                //}
-                //else
-                //{
-                //    DimFillSubViews = includedSubViews.Where (v => v.Height is { } && v.Height.Has<DimFill> (out _)).ToList ();
-                //}
-
-                //for (var i = 0; i < DimFillSubViews.Count; i++)
-                //{
-                //    View v = DimFillSubViews [i];
-
-                //    if (dimension == Dimension.Width)
-                //    {
-                //        v.SetRelativeLayout (new (maxCalculatedSize, 0));
-                //    }
-                //    else
-                //    {
-                //        v.SetRelativeLayout (new (0, maxCalculatedSize));
-                //    }
-
-                //    int maxDimFill = dimension == Dimension.Width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height;
-
-                //    if (maxDimFill > maxCalculatedSize)
-                //    {
-                //        maxCalculatedSize = maxDimFill;
-                //    }
-                //}
+                // Remove DimFill subviews from includedSubViews so they don't get processed later
+                includedSubViews = includedSubViews.Except (dimFillSubViews).ToList ();
 
                 #endregion
             }

@@ -21,7 +21,7 @@ public class WizardTests
         Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Resizable));
     }
 
-    [Fact (Skip = "Disabled in v2_44417-Continuous until Dialog sizing is figured out"))]
+    [Fact(Skip = "Disabled in v2_44417-Continuous until Dialog sizing is figured out")]
     public void Constructor_Sets_Button_Properties ()
     {
         // Arrange & Act

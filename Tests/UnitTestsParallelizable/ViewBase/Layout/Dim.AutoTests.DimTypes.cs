@@ -1,4 +1,4 @@
-﻿namespace ViewBaseTests;
+﻿namespace ViewBaseTests.Layout;
 
 public partial class DimAutoTests
 {
@@ -12,19 +12,11 @@ public partial class DimAutoTests
     [InlineData (-1, 15, 14)]
     public void With_SubView_Using_DimAbsolute (int subViewOffset, int dimAbsoluteSize, int expectedSize)
     {
-        var view = new View ();
-
-        var subview = new View
-        {
-            X = subViewOffset,
-            Y = subViewOffset,
-            Width = Dim.Absolute (dimAbsoluteSize),
-            Height = Dim.Absolute (dimAbsoluteSize)
-        };
+        View view = new ();
+        View subview = new () { X = subViewOffset, Y = subViewOffset, Width = Dim.Absolute (dimAbsoluteSize), Height = Dim.Absolute (dimAbsoluteSize) };
         view.Add (subview);
 
         Dim dim = Dim.Auto (DimAutoStyle.Content);
-
         int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
         int calculatedHeight = dim.Calculate (0, 100, view, Dimension.Height);
 
@@ -52,19 +44,12 @@ public partial class DimAutoTests
         int expectedHeight
     )
     {
-        var view = new View
+        View view = new ()
         {
             Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
             Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
         };
-
-        var subview = new View
-        {
-            X = subViewOffset,
-            Y = subViewOffset,
-            Width = Dim.Percent (percent),
-            Height = Dim.Percent (percent)
-        };
+        View subview = new () { X = subViewOffset, Y = subViewOffset, Width = Dim.Percent (percent), Height = Dim.Percent (percent) };
         view.Add (subview);
 
         // Assuming the calculation is done after layout
@@ -84,6 +69,7 @@ public partial class DimAutoTests
         Assert.Equal (expectedWidth * (percent / 100f), subview.Viewport.Width);
         Assert.Equal (expectedHeight * (percent / 100f), subview.Viewport.Height);
     }
+
     #endregion DimPercent
 
     #region DimFill
@@ -97,19 +83,12 @@ public partial class DimAutoTests
     [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_SubView_Using_DimFill (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
-        var view = new View
+        View view = new ()
         {
             Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
             Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
         };
-
-        var subview = new View
-        {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        View subview = new () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
         view.Add (subview);
 
         // Assuming the calculation is done after layout
@@ -120,7 +99,6 @@ public partial class DimAutoTests
 
         Assert.Equal (expectedWidth, calculatedWidth);
         Assert.Equal (expectedHeight, calculatedHeight);
-
         Assert.Equal (0, calculatedX);
         Assert.Equal (0, calculatedY);
     }
@@ -134,28 +112,15 @@ public partial class DimAutoTests
     [InlineData (21, 21, 11, 11, 21, 11)]
     public void With_SubView_Using_DimFill_And_Another_SubView (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
     {
-        var view = new View
+        View view = new ()
         {
             Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
             Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
         };
-
-        var absView = new View
-        {
-            X = 1,
-            Y = 2,
-            Width = 1,
-            Height = 2
-        };
+        View absView = new () { X = 1, Y = 2, Width = 1, Height = 2 };
         view.Add (absView);
 
-        var subview = new View
-        {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        View subview = new () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
         view.Add (subview);
 
         // Assuming the calculation is done after layout
@@ -166,9 +131,47 @@ public partial class DimAutoTests
 
         Assert.Equal (expectedWidth, calculatedWidth);
         Assert.Equal (expectedHeight, calculatedHeight);
-
         Assert.Equal (0, calculatedX);
         Assert.Equal (0, calculatedY);
+    }
+
+    [Fact]
+    public void With_SubView_Using_DimFill_Does_Not_Expand_SuperView_To_SuperSuperView_Size ()
+    {
+        // This test verifies the bug fix where DimFill subviews were causing
+        // their Dim.Auto SuperView to expand to the SuperSuperView's size
+        View superSuperView = new () { Width = 100, Height = 50 };
+        View autoView = new () { X = 0, Y = 0, Width = Dim.Auto (), Height = Dim.Auto () };
+        superSuperView.Add (autoView);
+
+        View fillView = new () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        autoView.Add (fillView);
+
+        // Calculate the auto size
+        int calculatedWidth = autoView.Width.Calculate (0, 100, autoView, Dimension.Width);
+        int calculatedHeight = autoView.Height.Calculate (0, 50, autoView, Dimension.Height);
+
+        // The autoView should NOT expand to superSuperView size (100x50)
+        // It should be 0x0 since DimFill doesn't contribute to auto-sizing
+        Assert.Equal (0, calculatedWidth);
+        Assert.Equal (0, calculatedHeight);
+    }
+
+    [Fact]
+    public void With_SubView_Using_DimFill_With_MinimumContentDim_Respects_Minimum ()
+    {
+        // This test verifies that when minimumContentDim is set on the Dim.Auto SuperView,
+        // the minimum is respected even when only DimFill subviews are present
+        View view = new () { Width = Dim.Auto (minimumContentDim: 20), Height = Dim.Auto (minimumContentDim: 10) };
+        View fillView = new () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        view.Add (fillView);
+
+        int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+        int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+        // Should respect the minimum even with only DimFill subviews
+        Assert.Equal (20, calculatedWidth);
+        Assert.Equal (10, calculatedHeight);
     }
 
     #endregion
@@ -178,14 +181,13 @@ public partial class DimAutoTests
     [Fact]
     public void With_SubView_Using_DimFunc ()
     {
-        var view = new View ();
-        var subview = new View { Width = Dim.Func (_ => 20), Height = Dim.Func (_ => 25) };
+        View view = new ();
+        View subview = new () { Width = Dim.Func (_ => 20), Height = Dim.Func (_ => 25) };
         view.Add (subview);
 
         subview.SetRelativeLayout (new (100, 100));
 
         Dim dim = Dim.Auto (DimAutoStyle.Content);
-
         int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
         int calculatedHeight = dim.Calculate (0, 100, view, Dimension.Height);
 
@@ -200,16 +202,15 @@ public partial class DimAutoTests
     [Fact]
     public void With_SubView_Using_DimView ()
     {
-        var view = new View ();
-        var subview = new View { Width = 30, Height = 40 };
-        var subSubView = new View { Width = Dim.Width (subview), Height = Dim.Height (subview) };
+        View view = new ();
+        View subview = new () { Width = 30, Height = 40 };
+        View subSubView = new () { Width = Dim.Width (subview), Height = Dim.Height (subview) };
         view.Add (subview);
         view.Add (subSubView);
 
         subview.SetRelativeLayout (new (100, 100));
 
         Dim dim = Dim.Auto (DimAutoStyle.Content);
-
         int calculatedWidth = dim.Calculate (0, 100, view, Dimension.Width);
         int calculatedHeight = dim.Calculate (0, 100, view, Dimension.Height);
 
@@ -221,6 +222,8 @@ public partial class DimAutoTests
     #endregion DimView
 
     #region DimCombine
+
     // TODO: Need DimCombine tests
+
     #endregion DimCombine
 }
