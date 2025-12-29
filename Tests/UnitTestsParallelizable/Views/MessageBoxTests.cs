@@ -1,8 +1,4 @@
-﻿#nullable enable
-using System.Text;
-using UICatalog;
-using UnitTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace ViewsTests;
 

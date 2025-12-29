@@ -83,6 +83,7 @@ public partial class View
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
     {
+        scrollBar.X = Padding!.Thickness.Left;
         scrollBar.Y = Pos.AnchorEnd () - Padding!.Thickness.Bottom;
 
         scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Right));
@@ -128,6 +129,12 @@ public partial class View
                                         {
                                             Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right - 1
                                         };
+                                        Viewport = Viewport with { Y = 0 };
+                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout where NeedsLayout is not
+                                        // BUGBUG: being preserved correctly. We are called here from within the Layout loop
+                                        // BUGBUG: and setting the Padding.Thickness above sets NeedsLayout correctly, but when
+                                        // BUGBUG: we leave Layout it's cleared.
+                                        Layout ();
                                     };
     }
 
@@ -149,6 +156,13 @@ public partial class View
                                         {
                                             Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom - 1
                                         };
+                                        Viewport = Viewport with { X = 0 };
+
+                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout where NeedsLayout is not
+                                        // BUGBUG: being preserved correctly. We are called here from within the Layout loop
+                                        // BUGBUG: and setting the Padding.Thickness above sets NeedsLayout correctly, but when
+                                        // BUGBUG: we leave Layout it's cleared.
+                                        Layout ();
                                     };
     }
 
