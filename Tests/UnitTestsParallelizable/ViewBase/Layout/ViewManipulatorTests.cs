@@ -1,4 +1,4 @@
-namespace ViewBaseTests.LayoutTests;
+namespace ViewBaseTests.Layout;
 
 /// <summary>
 ///     Comprehensive tests for ViewManipulator class.

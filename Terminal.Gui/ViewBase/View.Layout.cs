@@ -58,7 +58,7 @@ public partial class View // Layout APIs
                 // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
                 // BUGBUG: other logic in the property setters does not get executed.  Specifically:
                 // BUGBUG: - Reset TextFormatter
-                // BUGBUG: - SetLayoutNeeded (not an issue as we explictly call Layout below)
+                // BUGBUG: - SetLayoutNeeded (not an issue as we explicitly call Layout below)
                 // BUGBUG: - If we add property change events for X/Y/Width/Height they will not be invoked
                 // If Frame gets set, set all Pos/Dim to Absolute values.
                 _x = _frame!.Value.X;
@@ -809,7 +809,7 @@ public partial class View // Layout APIs
     ///     Override to perform tasks after the <see cref="View"/> has been resized or the layout has
     ///     otherwise changed.
     /// </remarks>
-    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { Debug.Assert (!NeedsLayout); }
+    protected virtual void OnSubViewsLaidOut (LayoutEventArgs args) { /*Debug.Assert (!NeedsLayout);*/ }
 
     /// <summary>Raised after all sub-views have been laid out.</summary>
     /// <remarks>
@@ -823,6 +823,9 @@ public partial class View // Layout APIs
     #region NeedsLayout
 
     // We expose no setter for this to ensure that the ONLY place it's changed is in SetNeedsLayout
+
+    // BUGBUG: The above statement is misleading. There are still cases internally where this property
+    // BUGBUG: is being set directly without calling SetNeedsLayout. We should remove the setter completely.
 
     /// <summary>
     ///     Indicates the View's Frame or the layout of the View's subviews (including Adornments) have

@@ -301,8 +301,8 @@ public static class MessageBox
         dialog.ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
         dialog.BorderStyle = DefaultBorderStyle;
 
-        dialog.SetMinimumWidthFunc (GetMinimumMessageBoxWidth);
-        dialog.SetMinimumHeightFunc (GetMinimumMessageBoxHeight);
+        //dialog.SetMinimumWidthFunc (GetMinimumMessageBoxWidth);
+        //dialog.SetMinimumHeightFunc (GetMinimumMessageBoxHeight);
 
         dialog.SchemeName = useErrorScheme ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
@@ -321,24 +321,5 @@ public static class MessageBox
         int? result = app.Run (dialog) as int?;
 
         return result;
-
-        int GetMinimumMessageBoxWidth ()
-        {
-            int minSize = Math.Max (
-                                    Dim.Percent (DefaultMinimumWidth).GetAnchor (dialog.GetContainerSize ().Width) - dialog.GetAdornmentsThickness ().Horizontal,
-                                    Dim.Auto ().Calculate (0, dialog.Padding!.GetContainerSize ().Width, dialog.Padding, Dimension.Width)
-                                    - dialog.GetAdornmentsThickness ().Horizontal);
-
-            return minSize;
-        }
-
-        int GetMinimumMessageBoxHeight ()
-        {
-            int minSize = Math.Max (
-                                    Dim.Percent (DefaultMinimumHeight).GetAnchor (dialog.GetContainerSize ().Height) - dialog.GetAdornmentsThickness ().Vertical,
-                                    Dim.Auto ().Calculate (0, dialog.Padding!.GetContainerSize ().Height, dialog, Dimension.Height)
-                                    - dialog.GetAdornmentsThickness ().Vertical);
-            return minSize;
-        }
     }
 }

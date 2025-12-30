@@ -407,8 +407,8 @@ public abstract class SelectorBase : View, IOrientation
                 SetLayout ();
                 // Pos.Align requires extra layout; good practice to call
                 // Layout to ensure Pos.Align gets updated
-                // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will
-                // TODO: negate need for this hack
+                // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+                // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
                 Layout ();
             }
         }
@@ -419,15 +419,15 @@ public abstract class SelectorBase : View, IOrientation
         int maxNaturalCheckBoxWidth = 0;
         if (Values?.Count > 0 && Orientation == Orientation.Vertical)
         {
-            // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will
-            // TODO: negate need for this hack
+            // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+            // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
             maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ().Max (
-                                                             v =>
-                                                             {
-                                                                 v.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
-                                                                 v.Layout ();
-                                                                 return v.Frame.Width;
-                                                             });
+                                                                        v =>
+                                                                        {
+                                                                            v.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
+                                                                            v.Layout ();
+                                                                            return v.Frame.Width;
+                                                                        });
         }
 
         for (var i = 0; i < SubViews.Count; i++)
@@ -498,8 +498,8 @@ public abstract class SelectorBase : View, IOrientation
         SetLayout ();
         // Pos.Align requires extra layout; good practice to call
         // Layout to ensure Pos.Align gets updated
-        // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/3951 which, if fixed, will
-        // TODO: negate need for this hack
+        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
         Layout ();
     }
 

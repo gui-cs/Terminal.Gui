@@ -62,13 +62,10 @@ public class Dialog : Runnable<int?>, IDesignable
     /// </remarks>
     public Dialog ()
     {
-        _getMinimumWidthFunc = GetMinimumDialogWidth;
-        _getMinimumHeightFunc = GetMinimumDialogHeight;
-
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumWidthFunc?.Invoke () ?? GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Horizontal);
-        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => _getMinimumHeightFunc?.Invoke () ?? GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Vertical);
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent(100) - 2);
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Horizontal);
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
@@ -78,18 +75,15 @@ public class Dialog : Runnable<int?>, IDesignable
 
         _buttonContainer = new View ()
         {
+            Id = "Dialog.ButtonContainer",
             CanFocus = true,
             X = Pos.Func (_ => Padding!.Thickness.Left),
             Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (Padding!.Thickness.Vertical),
+            Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Horizontal / 2)),
             Height = Dim.Auto (),
+            SchemeName = "Menu"
         };
         Padding!.Add (_buttonContainer);
-
-        // Add a temporary button to calculate the required height
-        _buttonContainer.Add (new Button ());
-        Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () + 1 };
-        _buttonContainer.RemoveAll ();
 
         VerticalScrollBar.AutoShow = true;
         HorizontalScrollBar.AutoShow = true;
@@ -114,63 +108,35 @@ public class Dialog : Runnable<int?>, IDesignable
     }
 
     /// <inheritdoc />
-    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-        SetContentSize (new Size (GetContentSize ().Width, GetHeightRequiredForSubViews ()));
-    }
 
-    /// <summary>
-    ///     Sets a function that returns the minimum width for the <see cref="Dialog"/>. If not set, the
-    ///     default minimum width function will be used.
-    /// </summary>
-    /// <remarks>
-    ///     The default minimum width function returns the greater of:
-    ///         <c>Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width)</c> and
-    ///         <c>Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Width, Padding, Dimension.Width)</c>.
-    /// </remarks>
-    /// <param name="fn">The function that returns the minimum width.</param>
-    public void SetMinimumWidthFunc (Func<int>? fn)
-    {
-        _getMinimumWidthFunc = fn;
+        int naturalWidth = GetWidthRequiredForSubViews ();
+        int naturalButtonWidth = _buttonContainer!.GetWidthRequiredForSubViews ();
+        int naturalHeight = GetHeightRequiredForSubViews ();
+
+        SetContentSize (new Size (Math.Max (naturalButtonWidth, naturalWidth), naturalHeight));
+        base.OnSubViewLayout (args);
     }
 
     private int GetMinimumDialogWidth ()
     {
         int minSize = Math.Max (
-                                0,//Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
-                                Dim.Auto ().Calculate (0, GetContainerSize ().Width, _buttonContainer, Dimension.Width)
-                                + GetAdornmentsThickness ().Horizontal);
+                                Title.GetColumns() + 4,
+                                _buttonContainer!.GetWidthRequiredForSubViews ()
+                                   );
 
         return minSize;
-    }
-    private Func<int>? _getMinimumWidthFunc;
-
-    /// <summary>
-    ///     Sets a function that returns the minimum height for the <see cref="Dialog"/>. If not set, the
-    ///     default minimum height function will be used.
-    /// </summary>
-    /// <remarks>
-    ///     The default minimum height function returns the greater of:
-    ///         <c>Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height)</c> and
-    ///         <c>Dim.Auto ().Calculate (0, Padding!.GetContainerSize ().Height, Padding, Dimension.Height)</c>.
-    /// </remarks>
-    /// <param name="fn">The function that returns the minimum height.</param>
-    public void SetMinimumHeightFunc (Func<int>? fn)
-    {
-        _getMinimumHeightFunc = fn;
     }
 
     private int GetMinimumDialogHeight ()
     {
         int minSize = Math.Max (
-                                Dim.Percent (DefaultMinimumHeight).GetAnchor (GetContainerSize ().Height) - GetAdornmentsThickness ().Vertical,
-                                Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height)
-                                + GetAdornmentsThickness ().Vertical);
+                               0,// Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
+                                _buttonContainer!.GetHeightRequiredForSubViews ()
+                               );
         return minSize;
     }
-
-    private Func<int>? _getMinimumHeightFunc;
-
 
     private readonly List<Button> _buttons = [];
 
@@ -194,9 +160,19 @@ public class Dialog : Runnable<int?>, IDesignable
             dialogButton.IsDefault = false;
             dialogButton.Accepting += OnDialogButtonOnAccepting;
         }
+
         button.IsDefault = true;
 
         _buttonContainer?.Add (button);
+
+        Padding!.Thickness = Padding!.Thickness with
+        {
+            // Add 3 to padding just for testing
+           // Right = Padding!.Thickness.Right + 2,
+           // Left = Padding!.Thickness.Left + 2,
+           // Top = Padding!.Thickness.Top + 2,
+            Bottom = _buttonContainer!.GetHeightRequiredForSubViews ()
+        };
     }
 
     private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
@@ -304,6 +280,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
         Button btnCancel = new ()
         {
+            Id = "btnCancel",
             Title = Strings.btnCancel,
         };
 
@@ -321,6 +298,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
         AddButton (new ()
         {
+            Id = "btnOk",
             Title = Strings.btnOk,
             // Dialog will automatically set IsDefault to the last button added
         });
@@ -328,10 +306,12 @@ public class Dialog : Runnable<int?>, IDesignable
         // Add some example content to the dialog
         Label infoLabel = new ()
         {
+            Id = "infoLabel",
             Text = "_Example:"
         };
         TextField info = new ()
         {
+            Id = "info",
             X = Pos.Right (infoLabel) + 1,
             Y = Pos.Top (infoLabel),
             Text = "Type and press ENTER to accept.",

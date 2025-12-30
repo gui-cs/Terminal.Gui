@@ -275,7 +275,7 @@ public class Dialogs : Scenario
         TextField textField = new ()
         {
             Y = Pos.Bottom (label),
-            Width = Dim.Fill (),
+            Width = Dim.Fill (0, minimumContentDim: 60),
             Text = "This is a demo dialog."
         };
         dialog.Add (textField);
