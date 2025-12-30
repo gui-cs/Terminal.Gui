@@ -333,7 +333,8 @@ public class ScrollBarDemo : Scenario
         {
             X = Pos.AnchorEnd (),
             Y = 0,
-            Height = Dim.Fill (),
+            Height = 10,//Dim.Fill (),
+            Width = 30,
             BorderStyle = LineStyle.Single,
             ViewToLog = scrollBar
         };

@@ -299,22 +299,22 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 for (var i = 0; i < anchoredSubViews.Count; i++)
                 {
-                    View v = anchoredSubViews [i];
+                    View anchoredSubView = anchoredSubViews [i];
 
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
                     // TODO: Figure out a way to not have to calculate change the state of subviews (calling SRL).
                     if (dimension == Dimension.Width)
                     {
-                        v.SetRelativeLayout (new (maxCalculatedSize, screenX4));
+                        anchoredSubView.SetRelativeLayout (new (maxCalculatedSize, screenX4));
                     }
                     else
                     {
-                        v.SetRelativeLayout (new (screenX4, maxCalculatedSize));
+                        anchoredSubView.SetRelativeLayout (new (screenX4, maxCalculatedSize));
                     }
 
                     maxAnchorEnd = dimension == Dimension.Width
-                                       ? v.X.GetAnchor (maxCalculatedSize + v.Frame.Width)
-                                       : v.Y.GetAnchor (maxCalculatedSize + v.Frame.Height);
+                                       ? anchoredSubView.X.GetAnchor (maxCalculatedSize + anchoredSubView.Frame.Width)
+                                       : anchoredSubView.Y.GetAnchor (maxCalculatedSize + anchoredSubView.Frame.Height);
                 }
 
                 maxCalculatedSize = Math.Max (maxCalculatedSize, maxAnchorEnd);
@@ -436,8 +436,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 for (int i = 0; i < dimFillSubViews.Count; i++)
                 {
                     View v = dimFillSubViews [i];
-                    DimFill? dimFill = dimension == Dimension.Width 
-                        ? v.Width as DimFill 
+                    DimFill? dimFill = dimension == Dimension.Width
+                        ? v.Width as DimFill
                         : v.Height as DimFill;
 
                     if (dimFill?.MinimumContentDim is { })

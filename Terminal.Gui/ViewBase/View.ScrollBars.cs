@@ -68,7 +68,11 @@ public partial class View
 
     private void ConfigureVerticalScrollBar (ScrollBar scrollBar)
     {
-        scrollBar.X = Pos.AnchorEnd () - Padding!.Thickness.Right;
+        // Use dynamic Func to set the location & size. Note the -1 for X is to subtract
+        // the Padding we add for the scrollbar. The Func is only called if the ScrollBar is
+        // visible.
+        scrollBar.X = Pos.AnchorEnd () - Pos.Func (_ => Padding!.Thickness.Right - 1);
+        scrollBar.Y = Pos.Func (_ => Padding!.Thickness.Top);
 
         scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Bottom));
         scrollBar.ScrollableContentSize = GetContentSize ().Height;
@@ -83,8 +87,11 @@ public partial class View
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
     {
-        scrollBar.X = Padding!.Thickness.Left;
-        scrollBar.Y = Pos.AnchorEnd () - Padding!.Thickness.Bottom;
+        // Use dynamic Func to set the location & size. Note the -1 for Y is to subtract
+        // the Padding we add for the scrollbar. The Func is only called if the ScrollBar is
+        // visible.
+        scrollBar.X = Pos.Func (_ => Padding!.Thickness.Left);
+        scrollBar.Y = Pos.AnchorEnd () - Pos.Func (_ => Padding!.Thickness.Bottom - 1);
 
         scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Right));
         scrollBar.ScrollableContentSize = GetContentSize ().Width;
@@ -129,11 +136,11 @@ public partial class View
                                         {
                                             Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right - 1
                                         };
+                                        // Reset scrolling
                                         Viewport = Viewport with { Y = 0 };
-                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout where NeedsLayout is not
-                                        // BUGBUG: being preserved correctly. We are called here from within the Layout loop
-                                        // BUGBUG: and setting the Padding.Thickness above sets NeedsLayout correctly, but when
-                                        // BUGBUG: we leave Layout it's cleared.
+
+                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+                                        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
                                         Layout ();
                                     };
     }
@@ -156,12 +163,11 @@ public partial class View
                                         {
                                             Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom - 1
                                         };
+                                        // Reset scrolling
                                         Viewport = Viewport with { X = 0 };
 
-                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout where NeedsLayout is not
-                                        // BUGBUG: being preserved correctly. We are called here from within the Layout loop
-                                        // BUGBUG: and setting the Padding.Thickness above sets NeedsLayout correctly, but when
-                                        // BUGBUG: we leave Layout it's cleared.
+                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+                                        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
                                         Layout ();
                                     };
     }

@@ -64,8 +64,8 @@ public class Dialog : Runnable<int?>, IDesignable
     {
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Horizontal);
-        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Vertical);
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent(100) - 2);
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Horizontal);
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
@@ -84,20 +84,6 @@ public class Dialog : Runnable<int?>, IDesignable
             SchemeName = "Menu"
         };
         Padding!.Add (_buttonContainer);
-
-        //// Add a temporary button to calculate the required height
-        //Button tempButton = new Button ();
-        //_buttonContainer.Add (tempButton);
-        //Padding!.Thickness = Padding!.Thickness with
-        //{
-        //    // Add 3 to padding just for testing
-        //    //Right = Padding!.Thickness.Right + 3,
-        //    //Left = Padding!.Thickness.Left + 3,
-        //    //Top = Padding!.Thickness.Top + 3,
-        //    Bottom = _buttonContainer!.GetHeightRequiredForSubViews() + 1
-        //};
-        //_buttonContainer.RemoveAll ();
-        //tempButton.Dispose ();
 
         VerticalScrollBar.AutoShow = true;
         HorizontalScrollBar.AutoShow = true;
@@ -130,14 +116,13 @@ public class Dialog : Runnable<int?>, IDesignable
         int naturalHeight = GetHeightRequiredForSubViews ();
 
         SetContentSize (new Size (Math.Max (naturalButtonWidth, naturalWidth), naturalHeight));
-        (SubViews.ElementAt (1) as TextField)!.Text = $"Content Size: {GetContentSize ()}";
         base.OnSubViewLayout (args);
     }
 
     private int GetMinimumDialogWidth ()
     {
         int minSize = Math.Max (
-                                0,//Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
+                                Title.GetColumns() + 4,
                                 _buttonContainer!.GetWidthRequiredForSubViews ()
                                    );
 
@@ -183,9 +168,9 @@ public class Dialog : Runnable<int?>, IDesignable
         Padding!.Thickness = Padding!.Thickness with
         {
             // Add 3 to padding just for testing
-            //Right = Padding!.Thickness.Right + 3,
-            //Left = Padding!.Thickness.Left + 3,
-            //Top = Padding!.Thickness.Top + 3,
+           // Right = Padding!.Thickness.Right + 2,
+           // Left = Padding!.Thickness.Left + 2,
+           // Top = Padding!.Thickness.Top + 2,
             Bottom = _buttonContainer!.GetHeightRequiredForSubViews ()
         };
     }
