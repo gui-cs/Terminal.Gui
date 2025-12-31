@@ -9,10 +9,9 @@ public class MouseTester : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
-
         // Prepping for modern app model
         using IApplication app = Application.Instance;
+        app.Init ();
 
         using Runnable runnable = new ()
         {
