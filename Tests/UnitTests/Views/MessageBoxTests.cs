@@ -8,61 +8,7 @@ namespace ViewsTests;
 
 public class MessageBoxTests (ITestOutputHelper output)
 {
-    [Theory (Skip = "Needs to be updated")]
-    [InlineData (@"", false, false, 6, 6, 2, 2)]
-    [InlineData (@"", false, true, 6, 6, 2, 3)]  // Button in Padding - width no longer auto-expands for button in edge case with no content
-    [InlineData (@"01234\n-----\n01234", false, false, 1, 6, 13, 3)]
-    [InlineData (@"01234\n-----\n01234", true, false, 1, 5, 13, 4)]
-    [InlineData (@"0123456789", false, false, 1, 6, 12, 3)]
-    [InlineData (@"0123456789", false, true, 1, 5, 12, 4)]
-    [InlineData (@"01234567890123456789", false, true, 1, 5, 13, 4)]
-    [InlineData (@"01234567890123456789", true, true, 1, 5, 13, 5)]
-    [InlineData (@"01234567890123456789\n01234567890123456789", false, true, 1, 5, 13, 4)]
-    [InlineData (@"01234567890123456789\n01234567890123456789", true, true, 1, 4, 13, 7)]
-    public void Location_And_Size_Correct (string message, bool wrapMessage, bool hasButton, int expectedX, int expectedY, int expectedW, int expectedH)
-    {
-        IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        try
-        {
-            int iterations = -1;
-
-            app.Driver!.SetScreenSize (15, 15); // 15 x 15 gives us enough room for a button with one char (9x1)
-            Dialog.DefaultShadow = ShadowStyle.None;
-            Button.DefaultShadow = ShadowStyle.None;
-
-            var mbFrame = Rectangle.Empty;
-
-            app.Iteration += OnApplicationOnIteration;
-            app.Run<Runnable<bool>> ();
-            app.Iteration -= OnApplicationOnIteration;
-
-            Assert.Equal (new (expectedX, expectedY, expectedW, expectedH), mbFrame);
-
-            void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
-            {
-                iterations++;
-
-                if (iterations == 0)
-                {
-                    MessageBox.Query (app, string.Empty, message, 0, wrapMessage, hasButton ? ["0"] : []);
-                    app.RequestStop ();
-                }
-                else if (iterations == 1)
-                {
-                    mbFrame = app.TopRunnableView!.Frame;
-                    app.RequestStop ();
-                }
-            }
-        }
-        finally
-        {
-            app.Dispose ();
-        }
-    }
-
-    [Fact (Skip = "Un skip when v2_4417-Continuous is done")]
+    [Fact]
     public void UICatalog_AboutBox ()
     {
         IApplication app = Application.Create ();
@@ -76,7 +22,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             // Override CM
             MessageBox.DefaultButtonAlignment = Alignment.End;
             MessageBox.DefaultBorderStyle = LineStyle.Double;
-            Dialog.DefaultShadow = ShadowStyle.None;
+            Dialog.DefaultShadow = ShadowStyle.None; 
             Button.DefaultShadow = ShadowStyle.None;
 
             app.Iteration += OnApplicationOnIteration;

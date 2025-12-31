@@ -176,7 +176,7 @@ public class Dialog : Runnable<int?>, IDesignable
     private int GetMinimumDialogHeight ()
     {
         int minSize = Math.Max (
-                                3,
+                                0,
                                 _buttonContainer!.GetHeightRequiredForSubViews () - Border!.Thickness.Vertical - Margin!.Thickness.Vertical
                                );
 
