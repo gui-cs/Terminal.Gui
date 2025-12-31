@@ -15,7 +15,7 @@ public class Navigation : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
@@ -29,7 +29,7 @@ public class Navigation : Scenario
             ShowViewIdentifier = true,
             TabStop = TabBehavior.NoStop
         };
-        app.Add (adornmentsEditor);
+        window.Add (adornmentsEditor);
 
         var arrangementEditor = new ArrangementEditor ()
         {
@@ -39,7 +39,7 @@ public class Navigation : Scenario
             AutoSelectViewToEdit = true,
             TabStop = TabBehavior.NoStop
         };
-        app.Add (arrangementEditor);
+        window.Add (arrangementEditor);
 
         FrameView testFrame = new ()
         {
@@ -51,7 +51,7 @@ public class Navigation : Scenario
         };
 
 
-        app.Add (testFrame);
+        window.Add (testFrame);
 
         Button button = new ()
         {
@@ -202,10 +202,10 @@ public class Navigation : Scenario
         arrangementEditor.AutoSelectSuperView = testFrame;
 
         testFrame.SetFocus ();
-        Application.Run (app);
+        Application.Run (window);
         Application.Iteration -= OnApplicationIteration;
         // timer.Close ();
-        app.Dispose ();
+        window.Dispose ();
         Application.Shutdown ();
 
         return;

@@ -9,7 +9,7 @@ public class MessageBoxes : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -22,7 +22,7 @@ public class MessageBoxes : Scenario
             Height = Dim.Auto (DimAutoStyle.Content),
             Title = "MessageBox Options"
         };
-        app.Add (frame);
+        window.Add (frame);
 
         Label label = new ()
         {
@@ -157,7 +157,7 @@ public class MessageBoxes : Scenario
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, TextAlignment = Alignment.End, Text = "Button Pressed:"
         };
-        app.Add (label);
+        window.Add (label);
 
         var buttonPressedLabel = new Label
         {
@@ -173,7 +173,7 @@ public class MessageBoxes : Scenario
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
         };
 
-        app.Accepting += (s, e) =>
+        window.Accepting += (s, e) =>
                          {
                              try
                              {
@@ -218,12 +218,12 @@ public class MessageBoxes : Scenario
 
                              e.Handled = true;
                          };
-        app.Add (showMessageBoxButton);
+        window.Add (showMessageBoxButton);
 
-        app.Add (buttonPressedLabel);
+        window.Add (buttonPressedLabel);
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
 
         Application.Shutdown ();
     }

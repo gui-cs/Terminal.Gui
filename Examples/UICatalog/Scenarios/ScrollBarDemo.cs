@@ -10,7 +10,7 @@ public class ScrollBarDemo : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
             Arrangement = ViewArrangement.Fixed
@@ -27,7 +27,7 @@ public class ScrollBarDemo : Scenario
         };
         demoFrame!.Padding!.Thickness = new (1);
         demoFrame.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        app.Add (demoFrame);
+        window.Add (demoFrame);
 
         var scrollBar = new ScrollBar
         {
@@ -338,9 +338,9 @@ public class ScrollBarDemo : Scenario
             BorderStyle = LineStyle.Single,
             ViewToLog = scrollBar
         };
-        app.Add (eventLog);
+        window.Add (eventLog);
 
-        app.Initialized += AppOnInitialized;
+        window.Initialized += AppOnInitialized;
 
         void AppOnInitialized (object sender, EventArgs e)
         {
@@ -382,8 +382,8 @@ public class ScrollBarDemo : Scenario
                                               };
         }
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
     }
 }

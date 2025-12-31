@@ -13,7 +13,7 @@ public class ViewExperiments : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
@@ -27,7 +27,7 @@ public class ViewExperiments : Scenario
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true
         };
-        app.Add (editor);
+        window.Add (editor);
 
         FrameView testFrame = new ()
         {
@@ -37,7 +37,7 @@ public class ViewExperiments : Scenario
             Height = Dim.Fill (),
         };
 
-        app.Add (testFrame);
+        window.Add (testFrame);
 
         Button button = new ()
         {
@@ -106,9 +106,9 @@ public class ViewExperiments : Scenario
         editor.AutoSelectSuperView = testFrame;
         editor.AutoSelectAdornments = true;
 
-        Application.Run (app);
+        Application.Run (window);
         popoverView.Dispose ();
-        app.Dispose ();
+        window.Dispose ();
 
         Application.Shutdown ();
 

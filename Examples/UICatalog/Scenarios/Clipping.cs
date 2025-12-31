@@ -16,16 +16,16 @@ public class Clipping : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             Title = GetQuitKeyAndName ()
 
             //BorderStyle = LineStyle.None
         };
 
-        app.DrawingContent += (s, e) =>
+        window.DrawingContent += (s, e) =>
                               {
-                                  app!.FillRect (app!.Viewport, Glyphs.Dot);
+                                  window!.FillRect (window!.Viewport, Glyphs.Dot);
                                   e.Cancel = true;
                               };
 
@@ -35,7 +35,7 @@ public class Clipping : Scenario
             Y = 0,
             AutoSelectViewToEdit = true
         };
-        app.Add (arrangementEditor);
+        window.Add (arrangementEditor);
 
         View tiledView1 = CreateTiledView (1, 0, 0);
 
@@ -66,11 +66,11 @@ public class Clipping : Scenario
         };
         tiledView2.Add (tiledProgressBar2);
 
-        app.Add (tiledView1);
-        app.Add (tiledView2);
+        window.Add (tiledView1);
+        window.Add (tiledView2);
 
         View tiledView3 = CreateTiledView (3, 8, 4);
-        app.Add (tiledView3);
+        window.Add (tiledView3);
 
         // View overlappedView1 = CreateOverlappedView (1, 30, 2);
 
@@ -103,9 +103,9 @@ public class Clipping : Scenario
                                  };
 
         progressTimer.Start ();
-        Application.Run (app);
+        Application.Run (window);
         progressTimer.Stop ();
-        app.Dispose ();
+        window.Dispose ();
         Application.Shutdown ();
     }
 
