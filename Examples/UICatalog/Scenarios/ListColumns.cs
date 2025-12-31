@@ -60,7 +60,7 @@ public class ListColumns : Scenario
 
         _listColView = new ()
         {
-            Y = Pos.Bottom(menuBar),
+            Y = Pos.Bottom (menuBar),
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
             Style = new ()
@@ -306,23 +306,19 @@ public class ListColumns : Scenario
         }
 
         var accepted = false;
-        Button ok = new () { Text = "Ok", IsDefault = true };
+        Dialog d = new Dialog
+        {
+            Title = prompt,
+            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
+        };
 
-        ok.Accepting += (s, e) =>
-                        {
-                            accepted = true;
-                            Application.RequestStop ();
-                        };
-        Button cancel = new () { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
-        Dialog d = new () { Title = prompt, Buttons = [ok, cancel] };
-
-        TextField tf = new () { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill () };
+        TextField tf = new () { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (tf);
         tf.SetFocus ();
 
         Application.Run (d);
+        accepted = d.Result == 1;
         d.Dispose ();
 
         if (accepted)

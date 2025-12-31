@@ -1002,25 +1002,17 @@ public class TableEditor : Scenario
         var oldValue = _currentTable.Rows [e.Row] [tableCol].ToString ();
         var okPressed = false;
 
-        var ok = new Button { Text = "Ok", IsDefault = true };
-
-        ok.Accepting += (s, e) =>
-                        {
-                            okPressed = true;
-                            Application.RequestStop ();
-                        };
-        var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
-
+        var ok = new Button { Text = "_Ok" };
+        var cancel = new Button { Text = "_Cancel" };
+        var d = new Dialog { Title = title, Buttons = [cancel, ok] };
         var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table.ColumnNames [e.Col] };
-
-        var tf = new TextField { Text = oldValue, X = 0, Y = 2, Width = Dim.Fill () };
+        var tf = new TextField { Text = oldValue, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
 
         Application.Run (d);
+        okPressed = d.Result == 1;
         d.Dispose ();
 
         if (okPressed)
@@ -1200,20 +1192,10 @@ public class TableEditor : Scenario
         }
 
         var accepted = false;
-        var ok = new Button { Text = "Ok", IsDefault = true };
-
-        ok.Accepting += (s, e) =>
-                        {
-                            accepted = true;
-                            (s as View)?.App?.RequestStop ();
-                        };
-        var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { (s as View)?.App?.RequestStop (); };
-
         var d = new Dialog
         {
             Title = prompt,
-            Buttons = [ok, cancel]
+            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
         };
 
         ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Value);
@@ -1225,6 +1207,7 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         _tableView.App?.Run (d);
+        accepted = d.Result == 1;
         d.Dispose ();
 
         if (accepted)

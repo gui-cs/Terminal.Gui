@@ -130,48 +130,11 @@ public class LineDrawing : Scenario
     {
         var accept = false;
 
-        var d = new Dialog
+        Dialog d = new Dialog
         {
             Title = title,
-            Width = Driver.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
-            Height = 10
+            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
         };
-
-        var btnOk = new Button
-        {
-            X = Pos.Center () - 5,
-            Y = Driver.Force16Colors ? 6 : 4,
-            Text = "Ok",
-            Width = Dim.Auto (),
-            IsDefault = true
-        };
-
-        btnOk.Accepting += (s, e) =>
-                        {
-                            accept = true;
-                            e.Handled = true;
-                            Application.RequestStop ();
-                        };
-
-        var btnCancel = new Button
-        {
-            X = Pos.Center () + 5,
-            Y = 4,
-            Text = "Cancel",
-            Width = Dim.Auto ()
-        };
-
-        btnCancel.Accepting += (s, e) =>
-                            {
-                                e.Handled = true;
-                                Application.RequestStop ();
-                            };
-
-        d.Add (btnOk);
-        d.Add (btnCancel);
-
-        d.AddButton (btnOk);
-        d.AddButton (btnCancel);
 
         View cp;
         if (Driver.Force16Colors)
@@ -187,7 +150,7 @@ public class LineDrawing : Scenario
             cp = new ColorPicker
             {
                 SelectedColor = current,
-                Width = Dim.Fill (),
+                Width = Dim.Fill (0, minimumContentDim: 50),
                 Style = new () { ShowColorName = true, ShowTextFields = true }
             };
             ((ColorPicker)cp).ApplyStyleChanges ();
@@ -196,6 +159,7 @@ public class LineDrawing : Scenario
         d.Add (cp);
 
         Application.Run (d);
+        accept = d.Result == 1;
         d.Dispose ();
         newColor = Driver.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 

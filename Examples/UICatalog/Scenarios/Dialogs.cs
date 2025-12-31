@@ -110,7 +110,7 @@ public class Dialogs : Scenario
             Y = Pos.Top (label),
             Width = Dim.Fill (),
             Height = 1,
-            Text = "Title"
+            Title = "Dialog Title"
         };
         frame.Add (titleEdit);
 
@@ -275,8 +275,8 @@ public class Dialogs : Scenario
         TextField textField = new ()
         {
             Y = Pos.Bottom (label),
-            Width = 60,//Dim.Fill (0, minimumContentDim: 60),
-            Text = "This is a demo dialog."
+            Width = Dim.Fill (0, minimumContentDim: 60),
+            Text = new string ("0123456789").Repeat (6)
         };
         dialog.Add (textField);
 

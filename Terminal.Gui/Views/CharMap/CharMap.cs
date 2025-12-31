@@ -349,10 +349,6 @@ public class CharMap : View, IDesignable
         Dialog? waitIndicator = new ()
         {
             Title = Strings.charMapCPInfoDlgTitle,
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            Width = 40,
-            Height = 10,
             Buttons = [new () { Text = Strings.btnCancel }]
         };
 
@@ -361,8 +357,6 @@ public class CharMap : View, IDesignable
             Text = UcdApiClient.BaseUrl,
             X = 0,
             Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (3),
             TextAlignment = Alignment.Center
         };
 
@@ -500,9 +494,10 @@ public class CharMap : View, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (label),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            Width = Dim.Fill (0, minimumContentDim: 60),
+            Height = Dim.Fill (0, minimumContentDim: 5),
             ReadOnly = true,
+            WordWrap = true,
             Text = decResponse
         };
 

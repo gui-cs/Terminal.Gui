@@ -79,13 +79,13 @@ public class Dialog : Runnable<int?>, IDesignable
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
 
-        _buttonContainer = new()
+        _buttonContainer = new ()
         {
             Id = "Dialog.ButtonContainer",
             CanFocus = true,
-            X = Pos.Func (_ => Padding!.Thickness.Left),
+            X = 0,
             Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Horizontal / 2)),
+            Width = Dim.Func (_=> Padding!.Frame.Width),
             Height = Dim.Auto (),
             SchemeName = "Menu"
         };
@@ -102,7 +102,7 @@ public class Dialog : Runnable<int?>, IDesignable
                     {
                         View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
 
-                        if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
+                        if (isDefaultView != this && isDefaultView is Button { IsDefault: true })
                         {
                             bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
 
@@ -116,49 +116,68 @@ public class Dialog : Runnable<int?>, IDesignable
                     });
     }
 
-    private int _naturalWidth;
-    private int _naturalHeight;
+    private int _naturalSubViewsWidth;
+    private int _naturalSubViewsHeight;
 
     /// <inheritdoc />
     public override void EndInit ()
     {
-        _naturalWidth = GetWidthRequiredForSubViews ();
-        _naturalHeight = GetHeightRequiredForSubViews ();
-        SetContentSize (new Size (Math.Max (_naturalButtonWidth, _naturalWidth), _naturalHeight));
+        UpdateSizes ();
         base.EndInit ();
     }
 
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
-        _naturalWidth = GetWidthRequiredForSubViews ();
-        _naturalHeight = GetHeightRequiredForSubViews ();
-        SetContentSize (new Size (Math.Max (_naturalButtonWidth, _naturalWidth), _naturalHeight));
+        UpdateSizes ();
         base.OnSubViewAdded (view);
     }
 
+    private void UpdateSizes ()
+    {
+        _naturalSubViewsWidth = GetWidthRequiredForSubViews ();
+        _naturalSubViewsHeight = GetHeightRequiredForSubViews ();
+        _naturalButtonsWidth = _buttonContainer!.GetWidthRequiredForSubViews ();
+
+        // This is primarily to support MessageBox where there are no subviews but
+        // Text is used.
+        if (SubViews.Count == 0 && TextFormatter.WordWrap)
+        {
+            return;
+        }
+
+        SetContentSize (new Size (Math.Max (_naturalButtonsWidth, _naturalSubViewsWidth), _naturalSubViewsHeight));
+    }
+
     /// <summary>
-    ///     INTERNAL: Gets the minimum width required for the <see cref="Dialog"/> based on its content.
+    ///     INTERNAL: Gets the minimum width required for the <see cref="Dialog"/>. This takes into account
+    ///     the width required for the title, the buttons, and any subviews.
     /// </summary>
     /// <returns></returns>
     private int GetMinimumDialogWidth ()
     {
         int minSize = Math.Max (
                                 Math.Max (
-                                          _naturalWidth,
+                                          _naturalSubViewsWidth,
+                                          // Ensure space for title + borders
                                           Title.GetColumns () + 4
                                          ),
-                                _naturalButtonWidth + GetAdornmentsThickness ().Horizontal
+                                _naturalButtonsWidth
                                );
 
         return minSize;
     }
 
+    /// <summary>
+    ///     INTERNAL: Gets the minimum height required for the <see cref="Dialog"/>. This takes into account
+    ///     the height required for the buttons.
+    /// </summary>
+    /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
         int minSize = Math.Max (
-                                4,
-                                _buttonContainer!.GetHeightRequiredForSubViews ()
+                                3,
+                                _buttonContainer!.GetHeightRequiredForSubViews () - Border!.Thickness.Vertical - Margin!.Thickness.Vertical
                                );
 
         return minSize;
@@ -166,7 +185,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
     private readonly List<Button> _buttons = [];
 
-    private int _naturalButtonWidth;
+    private int _naturalButtonsWidth;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the bottom of the <see cref="Dialog"/>. The lifetime and layout will be controlled
@@ -198,14 +217,13 @@ public class Dialog : Runnable<int?>, IDesignable
         Padding!.Thickness = Padding!.Thickness with
         {
             // Add 3 to padding just for testing
-            // Right = Padding!.Thickness.Right + 2,
-            // Left = Padding!.Thickness.Left + 2,
-            // Top = Padding!.Thickness.Top + 2,
+            //Right = Padding!.Thickness.Right + 2,
+            //Left = Padding!.Thickness.Left + 2,
+            //Top = Padding!.Thickness.Top + 2,
             Bottom = _buttonContainer!.GetHeightRequiredForSubViews ()
         };
 
-        _naturalButtonWidth = _buttonContainer!.GetWidthRequiredForSubViews ();
-        SetContentSize (new Size (Math.Max (_naturalButtonWidth, _naturalWidth), _naturalHeight));
+        UpdateSizes ();
     }
 
     private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)

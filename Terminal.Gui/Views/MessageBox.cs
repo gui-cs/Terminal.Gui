@@ -54,8 +54,6 @@ public static class MessageBox
 {
     private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
     private static Alignment _defaultButtonAlignment = Alignment.Center; // Resources/config.json overrides
-    private static int _defaultMinimumWidth = 15; // Resources/config.json overrides
-    private static int _defaultMinimumHeight = 10; // Resources/config.json overrides
 
     /// <summary>
     ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
@@ -75,28 +73,6 @@ public static class MessageBox
     {
         get => _defaultButtonAlignment;
         set => _defaultButtonAlignment = value;
-    }
-
-    /// <summary>
-    ///     Defines the default minimum MessageBox width, as a percentage of the screen width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth
-    {
-        get => _defaultMinimumWidth;
-        set => _defaultMinimumWidth = value;
-    }
-
-    /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the screen height. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight
-    {
-        get => _defaultMinimumHeight;
-        set => _defaultMinimumHeight = value;
     }
 
     /// <summary>
@@ -298,18 +274,14 @@ public static class MessageBox
         using Dialog dialog = new ();
         dialog.Title = title;
         dialog.ButtonAlignment = DefaultButtonAlignment;
-        dialog.ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
         dialog.BorderStyle = DefaultBorderStyle;
-
-        //dialog.SetMinimumWidthFunc (GetMinimumMessageBoxWidth);
-        //dialog.SetMinimumHeightFunc (GetMinimumMessageBoxHeight);
 
         dialog.SchemeName = useErrorScheme ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
         dialog.HotKeySpecifier = new ('\xFFFF');
         dialog.Text = message;
         dialog.TextAlignment = Alignment.Center;
-        dialog.VerticalTextAlignment = Alignment.Start;
+        dialog.VerticalTextAlignment = Alignment.Center;
         dialog.TextFormatter.WordWrap = wrapMessage;
         dialog.TextFormatter.MultiLine = !wrapMessage;
 

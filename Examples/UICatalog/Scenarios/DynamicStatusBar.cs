@@ -200,10 +200,10 @@ public class DynamicStatusBar : Scenario
                                       TextTitle.Text = string.Empty;
                                       Application.RequestStop ();
                                   };
-            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 17, App?.Screen.Height) };
+            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel] };
 
-            Width = Dim.Fill ();
-            Height = Dim.Fill () - 2;
+            Width = Dim.Fill (0, minimumContentDim: 50);
+            Height = Dim.Fill (0, minimumContentDim: 10) - 2;
             dialog.Add (this);
             TextTitle.SetFocus ();
             TextTitle.CursorPosition = TextTitle.Text.Length;

@@ -85,6 +85,8 @@ public partial class View
     /// <returns></returns>
     public int GetWidthRequiredForSubViews ()
     {
+        // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
+        // we want the content size only.
         return Dim.Auto ().Calculate (0, GetContentSize ().Width, this, Dimension.Width) - GetAdornmentsThickness().Horizontal;
 
         // NOTE: These methods semi-duplicate what DimAuto.Calculate does; the key difference is they
@@ -120,6 +122,8 @@ public partial class View
     /// <returns></returns>
     public int GetHeightRequiredForSubViews ()
     {
+        // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
+        // we want the content size only.
         return Dim.Auto ().Calculate (0, GetContentSize ().Height, this, Dimension.Height) - GetAdornmentsThickness().Vertical;
 
         // NOTE: These methods semi-duplicate what DimAuto.Calculate does; the key difference is they
