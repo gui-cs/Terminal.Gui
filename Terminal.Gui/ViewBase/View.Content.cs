@@ -80,18 +80,20 @@ public partial class View
     public Size GetContentSize () => _contentSize ?? Viewport.Size;
 
     /// <summary>
-    ///     Gets the minimum number of columns required for all the View's SubViews.
+    ///     Gets the minimum number of columns required for all the View's SubViews to fit in the content area.
     /// </summary>
     /// <returns></returns>
     public int GetWidthRequiredForSubViews ()
     {
+        return Dim.Auto ().Calculate (0, GetContentSize ().Width, this, Dimension.Width) - GetAdornmentsThickness().Horizontal;
+
         // NOTE: These methods semi-duplicate what DimAuto.Calculate does; the key difference is they
         // NOTE: ignore all the Dim types and their impact on Auto. The net result is they return the
         // NOTE: minimum dim required.
-        int max = GetContentSize ().Height;
+        int max = GetContentSize ().Width;
 
         // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
-        if (!ContentSizeTracksViewport && GetSubViews (includePadding: true).Count == 0)
+        if (!ContentSizeTracksViewport && GetSubViews ().Count == 0)
         {
             return max;
         }
@@ -102,9 +104,10 @@ public partial class View
         }
 
         // Iterate through all subviews to calculate the maximum width
-        foreach (View subView in GetSubViews (includePadding: true))
+        foreach (View subView in GetSubViews ())
         {
-            max = Math.Max (max, subView.X.GetAnchor (0) + subView.Width.Calculate (0, max, subView, Dimension.Width));
+            Logging.Trace($"{subView.Text}:{subView.X.Calculate (max, subView.Width, subView, Dimension.Width)}+{subView.Width.Calculate (0, max, subView, Dimension.Width)}");
+            max = Math.Max (max, subView.X.Calculate (max, subView.Width, subView, Dimension.Width) + subView.Width.Calculate (0, max, subView, Dimension.Width));
         }
 
         // Return the calculated maximum content size
@@ -112,18 +115,20 @@ public partial class View
     }
 
     /// <summary>
-    ///     Gets the minimum number of rows required for all the View's SubViews.
+    ///     Gets the minimum number of rows required for all the View's SubViews to fit in the content area.
     /// </summary>
     /// <returns></returns>
     public int GetHeightRequiredForSubViews ()
     {
+        return Dim.Auto ().Calculate (0, GetContentSize ().Height, this, Dimension.Height) - GetAdornmentsThickness().Vertical;
+
         // NOTE: These methods semi-duplicate what DimAuto.Calculate does; the key difference is they
         // NOTE: ignore all the Dim types and their impact on Auto. The net result is they return the
         // NOTE: minimum dim required.
         int max = GetContentSize ().Height;
 
         // If ContentSizeTracksViewport is false and there are no subviews, use the explicitly set ContentSize
-        if (!ContentSizeTracksViewport && GetSubViews (includePadding: true).Count == 0)
+        if (!ContentSizeTracksViewport && GetSubViews ().Count == 0)
         {
             return max;
         }
@@ -134,7 +139,7 @@ public partial class View
         }
 
         // Iterate through all subviews to calculate the maximum height
-        foreach (View subView in GetSubViews (includePadding: true))
+        foreach (View subView in GetSubViews ())
         {
             max = Math.Max (max, subView.Y.GetAnchor (0) + subView.Height.Calculate (0, max, subView, Dimension.Height));
         }

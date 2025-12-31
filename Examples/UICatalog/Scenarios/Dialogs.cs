@@ -275,7 +275,7 @@ public class Dialogs : Scenario
         TextField textField = new ()
         {
             Y = Pos.Bottom (label),
-            Width = Dim.Fill (0, minimumContentDim: 60),
+            Width = 60,//Dim.Fill (0, minimumContentDim: 60),
             Text = "This is a demo dialog."
         };
         dialog.Add (textField);
@@ -296,24 +296,24 @@ public class Dialogs : Scenario
         };
         dialog.Add (optionSelector);
 
-        Button addButtonButton = new ()
-        {
-            Title = "_Add Button",
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-        };
-        dialog.Add (addButtonButton);
-        addButtonButton.Accepting += (s, e) =>
-        {
-            int newButtonId = dialog.Buttons.Length;
-            Button newButton = new ()
-            {
-                Text = "_" + NumberToWords.Convert (newButtonId)
-            };
-            List<Button> buttons = dialog.Buttons.ToList ();
-            dialog.AddButton (newButton);
-            e.Handled = true;
-        };
+        //Button addButtonButton = new ()
+        //{
+        //    Title = "_Add Button",
+        //    X = Pos.AnchorEnd (),
+        //    Y = Pos.AnchorEnd (),
+        //};
+        //dialog.Add (addButtonButton);
+        //addButtonButton.Accepting += (s, e) =>
+        //{
+        //    int newButtonId = dialog.Buttons.Length;
+        //    Button newButton = new ()
+        //    {
+        //        Text = "_" + NumberToWords.Convert (newButtonId)
+        //    };
+        //    List<Button> buttons = dialog.Buttons.ToList ();
+        //    dialog.AddButton (newButton);
+        //    e.Handled = true;
+        //};
 
         if (width != 0)
         {
