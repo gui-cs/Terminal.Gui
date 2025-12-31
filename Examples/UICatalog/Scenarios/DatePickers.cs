@@ -10,6 +10,7 @@ public class DatePickers : Scenario
     public override void Main ()
     {
         using IApplication? app = Application.Instance;
+        app.Init ();
 
         using Window window = new ();
         window.Title = GetQuitKeyAndName ();
