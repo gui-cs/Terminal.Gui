@@ -11,9 +11,11 @@ public class ScrollBarDemo : Scenario
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        using Window appWindow = new ();
-        appWindow.Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
-        appWindow.Arrangement = ViewArrangement.Fixed;
+        Window window = new ()
+        {
+            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
+            Arrangement = ViewArrangement.Fixed
+        };
 
         FrameView demoFrame = new ()
         {
@@ -26,7 +28,7 @@ public class ScrollBarDemo : Scenario
         };
         demoFrame.Padding!.Thickness = new (1);
         demoFrame.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        appWindow.Add (demoFrame);
+        window.Add (demoFrame);
 
         ScrollBar scrollBar = new ()
         {
@@ -337,9 +339,9 @@ public class ScrollBarDemo : Scenario
             BorderStyle = LineStyle.Single,
             ViewToLog = scrollBar
         };
-        appWindow.Add (eventLog);
+        window.Add (eventLog);
 
-        appWindow.Initialized += AppOnInitialized;
+        window.Initialized += AppOnInitialized;
 
         void AppOnInitialized (object? sender, EventArgs e)
         {
@@ -381,6 +383,6 @@ public class ScrollBarDemo : Scenario
                                               };
         }
 
-        app.Run (appWindow);
+        app.Run (window);
     }
 }

@@ -13,12 +13,12 @@ public class Shortcuts : Scenario
     {
         Application.Init ();
         var quitKey = Application.QuitKey;
-        Window app = new ();
+        Window window = new ();
 
-        app.IsModalChanged += App_Loaded;
+        window.IsModalChanged += App_Loaded;
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
         Application.QuitKey = quitKey;
     }

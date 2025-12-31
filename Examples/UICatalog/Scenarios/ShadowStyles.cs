@@ -15,7 +15,7 @@ public class ShadowStyles : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             Id = "app",
             Title = GetQuitKeyAndName ()
@@ -30,7 +30,7 @@ public class ShadowStyles : Scenario
         };
         editor.Initialized += (sender, args) => editor.MarginEditor.ExpanderButton.Collapsed = false;
 
-        app.Add (editor);
+        window.Add (editor);
 
         Window shadowWindow = new ()
         {
@@ -46,9 +46,9 @@ public class ShadowStyles : Scenario
             ShadowStyle = ShadowStyle.Transparent,
         };
 
-        app.DrawingContent += (s, e) =>
+        window.DrawingContent += (s, e) =>
                            {
-                               app!.FillRect (app!.Viewport, Glyphs.Dot);
+                               window!.FillRect (window!.Viewport, Glyphs.Dot);
                                e.Cancel = true;
                            };
 
@@ -60,7 +60,7 @@ public class ShadowStyles : Scenario
             ShadowStyle = ShadowStyle.Opaque
         };
         shadowWindow.Add (buttonInWin);
-        app.Add (shadowWindow);
+        window.Add (shadowWindow);
 
         Window shadowWindow2 = new ()
         {
@@ -75,7 +75,7 @@ public class ShadowStyles : Scenario
             BorderStyle = LineStyle.Double,
             ShadowStyle = ShadowStyle.Transparent,
         };
-        app.Add (shadowWindow2);
+        window.Add (shadowWindow2);
 
 
         var button = new Button
@@ -98,17 +98,17 @@ public class ShadowStyles : Scenario
         };
         colorPicker.ColorChanged += (sender, args) =>
                                     {
-                                        var normal = app.GetScheme ().Normal;
-                                        app.SetScheme (app.GetScheme () with { Normal = new Attribute (normal.Foreground, args.Result) });
+                                        var normal = window.GetScheme ().Normal;
+                                        window.SetScheme (window.GetScheme () with { Normal = new Attribute (normal.Foreground, args.Result) });
                                     };
-        app.Add (button, colorPicker);
+        window.Add (button, colorPicker);
 
         editor.AutoSelectViewToEdit = true;
-        editor.AutoSelectSuperView = app;
+        editor.AutoSelectSuperView = window;
         editor.AutoSelectAdornments = false;
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
 
         Application.Shutdown ();
 

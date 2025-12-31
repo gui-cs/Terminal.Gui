@@ -10,8 +10,8 @@ public class ViewportSettings : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
         using IApplication app = Application.Instance;
+        app.Init ();
 
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName (); // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious

@@ -11,7 +11,7 @@ public class LineCanvasExperiment : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -32,7 +32,7 @@ public class LineCanvasExperiment : Scenario
 
         //View.Diagnostics ^= DiagnosticFlags.FrameRuler;
 
-        app.Add (frame1);
+        window.Add (frame1);
 
         var win1 = new Window
         {
@@ -136,8 +136,8 @@ public class LineCanvasExperiment : Scenario
 
         //frame1.Add (marginWindow);
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
     }
 }
