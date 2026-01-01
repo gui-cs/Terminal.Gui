@@ -887,7 +887,7 @@ public class FileDialog : Dialog, IDesignable
         }
 
         // TODO: TableView should not always return true from OnCellActivated.
-        Result = 1;
+        Result = 2; // Ok button index
 
         if (IsModal)
         {

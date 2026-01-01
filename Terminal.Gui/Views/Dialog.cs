@@ -271,7 +271,7 @@ public class Dialog : Runnable<int?>, IDesignable
     }
 
     /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    public bool Canceled => Result is null or 1;
+    public bool Canceled => Result is null or 1; // Cancel button is index 1
 
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)

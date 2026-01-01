@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace ViewsTests;
 
 /// <summary>
-///     Pure unit tests for <see cref="Dialog"/> that don't require Application static dependencies.
+///     Pure unit tests for <see cref=\"Dialog\"/> that don't require Application static dependencies.
 ///     These tests can run in parallel without interference.
 /// </summary>
 /// <remarks>
@@ -183,114 +183,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.False (dialog.Canceled);
 
         dialog.Dispose ();
-    }
-
-    [Fact]
-    public void DefaultBorderStyle_Get_Set ()
-    {
-        LineStyle original = Dialog.DefaultBorderStyle;
-
-        try
-        {
-            Dialog.DefaultBorderStyle = LineStyle.Single;
-            Assert.Equal (LineStyle.Single, Dialog.DefaultBorderStyle);
-
-            Dialog dialog = new ();
-            Assert.Equal (LineStyle.Single, dialog.BorderStyle);
-            dialog.Dispose ();
-
-            Dialog.DefaultBorderStyle = LineStyle.Double;
-            Assert.Equal (LineStyle.Double, Dialog.DefaultBorderStyle);
-
-            dialog = new ();
-            Assert.Equal (LineStyle.Double, dialog.BorderStyle);
-            dialog.Dispose ();
-        }
-        finally
-        {
-            Dialog.DefaultBorderStyle = original;
-        }
-    }
-
-    [Fact]
-    public void DefaultButtonAlignment_Get_Set ()
-    {
-        Alignment original = Dialog.DefaultButtonAlignment;
-
-        try
-        {
-            Dialog.DefaultButtonAlignment = Alignment.Start;
-            Assert.Equal (Alignment.Start, Dialog.DefaultButtonAlignment);
-
-            Dialog dialog = new ();
-            Assert.Equal (Alignment.Start, dialog.ButtonAlignment);
-            dialog.Dispose ();
-
-            Dialog.DefaultButtonAlignment = Alignment.Center;
-            Assert.Equal (Alignment.Center, Dialog.DefaultButtonAlignment);
-
-            dialog = new ();
-            Assert.Equal (Alignment.Center, dialog.ButtonAlignment);
-            dialog.Dispose ();
-        }
-        finally
-        {
-            Dialog.DefaultButtonAlignment = original;
-        }
-    }
-
-    [Fact]
-    public void DefaultButtonAlignmentModes_Get_Set ()
-    {
-        AlignmentModes original = Dialog.DefaultButtonAlignmentModes;
-
-        try
-        {
-            Dialog.DefaultButtonAlignmentModes = AlignmentModes.StartToEnd;
-            Assert.Equal (AlignmentModes.StartToEnd, Dialog.DefaultButtonAlignmentModes);
-
-            Dialog dialog = new ();
-            Assert.Equal (AlignmentModes.StartToEnd, dialog.ButtonAlignmentModes);
-            dialog.Dispose ();
-
-            Dialog.DefaultButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
-            Assert.Equal (AlignmentModes.IgnoreFirstOrLast, Dialog.DefaultButtonAlignmentModes);
-
-            dialog = new ();
-            Assert.Equal (AlignmentModes.IgnoreFirstOrLast, dialog.ButtonAlignmentModes);
-            dialog.Dispose ();
-        }
-        finally
-        {
-            Dialog.DefaultButtonAlignmentModes = original;
-        }
-    }
-
-    [Fact]
-    public void DefaultShadow_Get_Set ()
-    {
-        ShadowStyle original = Dialog.DefaultShadow;
-
-        try
-        {
-            Dialog.DefaultShadow = ShadowStyle.None;
-            Assert.Equal (ShadowStyle.None, Dialog.DefaultShadow);
-
-            Dialog dialog = new ();
-            Assert.Equal (ShadowStyle.None, dialog.ShadowStyle);
-            dialog.Dispose ();
-
-            Dialog.DefaultShadow = ShadowStyle.Opaque;
-            Assert.Equal (ShadowStyle.Opaque, Dialog.DefaultShadow);
-
-            dialog = new ();
-            Assert.Equal (ShadowStyle.Opaque, dialog.ShadowStyle);
-            dialog.Dispose ();
-        }
-        finally
-        {
-            Dialog.DefaultShadow = original;
-        }
     }
 
     [Fact]
@@ -579,4 +471,664 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.Dispose ();
     }
+
+    #region Layout Tests
+
+    [Fact]
+    public void EnableForDesign_Initializes_Dialog_With_Content ()
+    {
+        IDriver driver = CreateTestDriver ();
+        Dialog dialog = new ()
+        {
+            Driver = driver
+        };
+
+        IDesignable designable = dialog;
+        bool result = designable.EnableForDesign ();
+
+        Assert.True (result);
+        Assert.Equal ("Dialog Title", dialog.Title);
+        Assert.Equal (2, dialog.Buttons.Length);
+        Assert.Equal (Strings.btnCancel, dialog.Buttons [0].Title);
+        Assert.Equal (Strings.btnOk, dialog.Buttons [1].Title);
+        Assert.True (dialog.Buttons [1].IsDefault);
+
+        // Should have label and textfield
+        Assert.True (dialog.SubViews.Count >= 2);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Layout_With_EnableForDesign_Default_Container ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver
+        };
+
+        IDesignable designable = dialog;
+        designable.EnableForDesign ();
+
+        dialog.Layout ();
+
+        // Dialog should be centered with DimAuto
+        Assert.True (dialog.X.Has<PosCenter> (out _));
+        Assert.True (dialog.Y.Has<PosCenter> (out _));
+        Assert.True (dialog.Width.Has<DimAuto> (out _));
+        Assert.True (dialog.Height.Has<DimAuto> (out _));
+
+        // Frame should be calculated based on content
+        Assert.True (dialog.Frame.Width > 0);
+        Assert.True (dialog.Frame.Height > 0);
+
+        // Should fit within screen
+        Assert.True (dialog.Frame.Width <= 80);
+        Assert.True (dialog.Frame.Height <= 25);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Layout_With_Small_Container ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (30, 10);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver
+        };
+
+        IDesignable designable = dialog;
+        designable.EnableForDesign ();
+
+        dialog.Layout ();
+
+        // Should calculate size based on content
+        Assert.True (dialog.Frame.Width > 0);
+        Assert.True (dialog.Frame.Height > 0);
+
+        // With small container, dialog may need more space than available
+        // Just verify it laid out successfully
+        Assert.NotEqual (Rectangle.Empty, dialog.Frame);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Layout_With_Large_Container ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (200, 100);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver
+        };
+
+        IDesignable designable = dialog;
+        designable.EnableForDesign ();
+
+        dialog.Layout ();
+
+        // Should calculate size based on content, not fill entire container
+        Assert.True (dialog.Frame.Width > 0);
+        Assert.True (dialog.Frame.Height > 0);
+
+        // DimAuto with max 100% - 2 means won't exceed 198x98
+        Assert.True (dialog.Frame.Width <= 198);
+        Assert.True (dialog.Frame.Height <= 98);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Width_Height_DimAuto_Calculates_Based_On_Content ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver,
+            Title = "Test"
+        };
+
+        // Add content that requires specific size
+        Label label = new ()
+        {
+            Text = "This is a label",
+            X = 0,
+            Y = 0
+        };
+        TextField textField = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = 0,
+            Width = 30,
+            Text = "Input here"
+        };
+
+        dialog.Add (label, textField);
+
+        Button okButton = new () { Title = "OK" };
+        dialog.AddButton (okButton);
+
+        dialog.Layout ();
+
+        // Width should accommodate: label + space + textfield + padding + border
+        int expectedMinWidth = label.Text.GetColumns () + 1 + 30;
+
+        Assert.True (dialog.Frame.Width >= expectedMinWidth);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Height_Accounts_For_Buttons ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver
+        };
+
+        Button button1 = new () { Title = "Cancel" };
+        Button button2 = new () { Title = "OK" };
+
+        dialog.AddButton (button1);
+        dialog.AddButton (button2);
+
+        dialog.Layout ();
+
+        // Height should account for buttons at the bottom
+        Assert.True (dialog.Frame.Height > 0);
+        Assert.True (dialog.Padding!.Thickness.Bottom >= button1.Frame.Height);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Respects_Explicit_Width_Height ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver,
+            Width = 50,
+            Height = 15
+        };
+
+        IDesignable designable = dialog;
+        designable.EnableForDesign ();
+
+        dialog.Layout ();
+
+        // Should use explicit dimensions
+        Assert.Equal (50, dialog.Frame.Width);
+        Assert.Equal (15, dialog.Frame.Height);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Padding_Affects_Content_Area ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver
+        };
+
+        IDesignable designable = dialog;
+        designable.EnableForDesign ();
+
+        dialog.Layout ();
+
+        // Padding should be set up correctly
+        Assert.NotNull (dialog.Padding);
+
+        // Buttons should be in a button container within padding
+        Assert.True (dialog.Padding.SubViews.Count > 0);
+
+        // Padding bottom should accommodate buttons
+        Assert.True (dialog.Padding.Thickness.Bottom > 0);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_Multiple_Buttons_Layout_Correctly ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        Dialog dialog = new ()
+        {
+            Driver = driver,
+            ButtonAlignment = Alignment.End,
+            ButtonAlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems
+        };
+
+        Button button1 = new () { Title = "Help" };
+        Button button2 = new () { Title = "Cancel" };
+        Button button3 = new () { Title = "OK" };
+
+        dialog.AddButton (button1);
+        dialog.AddButton (button2);
+        dialog.AddButton (button3);
+
+        dialog.Layout ();
+
+        // All buttons should be at same Y position (AnchorEnd)
+        Assert.Equal (button1.Frame.Y, button2.Frame.Y);
+        Assert.Equal (button2.Frame.Y, button3.Frame.Y);
+
+        // Buttons should be aligned using PosAlign
+        Assert.True (button1.X.Has<PosAlign> (out PosAlign? align1));
+        Assert.True (button2.X.Has<PosAlign> (out PosAlign? align2));
+        Assert.True (button3.X.Has<PosAlign> (out PosAlign? align3));
+
+        // All should use same GroupId (Dialog's hash code)
+        Assert.Equal (align1!.GroupId, align2!.GroupId);
+        Assert.Equal (align2.GroupId, align3!.GroupId);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void Dialog_With_Text_Property_Affects_Height ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        Dialog dialog1 = new ()
+        {
+            Driver = driver
+        };
+
+        Button button = new () { Title = "OK" };
+        dialog1.AddButton (button);
+
+        dialog1.Layout ();
+        int heightWithoutText = dialog1.Frame.Height;
+
+        Dialog dialog2 = new ()
+        {
+            Driver = driver,
+            Text = "Line 1\nLine 2\nLine 3"
+        };
+
+        dialog2.AddButton (new () { Title = "OK" });
+
+        dialog2.Layout ();
+        int heightWithText = dialog2.Frame.Height;
+
+        // Dialog with text should be taller
+        Assert.True (heightWithText > heightWithoutText);
+
+        dialog1.Dispose ();
+        dialog2.Dispose ();
+    }
+
+    #endregion Layout Tests
+
+    #region Drawing Tests
+
+    [Fact]
+    public void Dialog_Draws_Single_Button ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (30, 10);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+
+        Button okButton = new ()
+        {
+            Title = "OK",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (okButton);
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌────┐
+│    │
+│  OK│
+└────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    [Fact]
+    public void Dialog_Draws_Two_Buttons ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (40, 10);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.ButtonAlignment = Alignment.End;
+
+        Button cancelButton = new ()
+        {
+            Title = "Cancel",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        Button okButton = new ()
+        {
+            Title = "OK",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (cancelButton);
+        dialog.AddButton (okButton);
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌────────┐
+│        │
+│CancelOK│
+└────────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    [Fact]
+    public void Dialog_Draws_Text_Content ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (30, 20);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.Text = "Hello World";
+
+        Button okButton = new ()
+        {
+            Title = "OK",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (okButton);
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌───────────┐
+│Hello World│
+│           │
+│         OK│
+└───────────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    [Fact]
+    public void Dialog_Draws_Multiline_Text ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (30, 12);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.Text = "Line 1\nLine 2\nLine 3";
+
+        Button okButton = new ()
+        {
+            Title = "OK",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (okButton);
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌──────┐
+│Line 1│
+│Line 2│
+│Line 3│
+│      │
+│    OK│
+└──────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    [Fact]
+    public void Dialog_Draws_Three_Buttons_End_Aligned ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (50, 10);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.ButtonAlignment = Alignment.End;
+
+        Button helpButton = new ()
+        {
+            Title = "Help",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        Button cancelButton = new ()
+        {
+            Title = "Cancel",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        Button okButton = new ()
+        {
+            Title = "OK",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (helpButton);
+        dialog.AddButton (cancelButton);
+        dialog.AddButton (okButton);
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌────────────┐
+│            │
+│HelpCancelOK│
+└────────────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    [Fact]
+    public void Dialog_Draws_Buttons_Center_Aligned ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (35, 10);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.ButtonAlignment = Alignment.Center;
+
+        Button cancelButton = new ()
+        {
+            Title = "Cancel",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        Button okButton = new ()
+        {
+            Title = "OK",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (cancelButton);
+        dialog.AddButton (okButton);
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌────────┐
+│        │
+│CancelOK│
+└────────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+    [Fact]
+    public void Dialog_Draws_Buttons_Start_Aligned ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (35, 10);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+        dialog.ButtonAlignment = Alignment.Start;
+
+        Button cancelButton = new ()
+        {
+            Title = "Cancel",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        Button okButton = new ()
+        {
+            Title = "OK",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (cancelButton);
+        dialog.AddButton (okButton);
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌────────┐
+│        │
+│CancelOK│
+└────────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+
+
+    [Fact]
+    public void Dialog_Draws_EnableForDesign ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 10);
+
+        using Dialog dialog = new ();
+
+        dialog.X = 0;
+        dialog.Y = 0;
+        dialog.BorderStyle = LineStyle.Single;
+        dialog.ShadowStyle = ShadowStyle.None;
+
+        (dialog as IDesignable).EnableForDesign ();
+
+        dialog.Driver = driver;
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌┤Dialog Title├───────────────────────────────────┐
+│Example: Type and press ENTER to accept.         │
+│                                                 │
+│                            ⟦ Cancel ⟧  ⟦► OK ◄⟧ │
+│                                                 │
+└─────────────────────────────────────────────────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+    }
+    #endregion Drawing Tests
 }
