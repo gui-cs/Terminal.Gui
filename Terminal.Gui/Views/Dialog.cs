@@ -33,20 +33,6 @@ public class Dialog : Runnable<int?>, IDesignable
     public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
 
     /// <summary>
-    ///     Defines the default minimum Dialog height, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumHeight { get; set; } = 50;
-
-    /// <summary>
-    ///     Defines the default minimum Dialog width, as a percentage of the container width. Can be configured via
-    ///     <see cref="ConfigurationManager"/>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static int DefaultMinimumWidth { get; set; } = 50;
-
-    /// <summary>
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
