@@ -297,24 +297,34 @@ public class Dialogs : Scenario
         };
         dialog.Add (optionSelector);
 
-        //Button addButtonButton = new ()
-        //{
-        //    Title = "_Add Button",
-        //    X = Pos.AnchorEnd (),
-        //    Y = Pos.AnchorEnd (),
-        //};
-        //dialog.Add (addButtonButton);
-        //addButtonButton.Accepting += (s, e) =>
-        //{
-        //    int newButtonId = dialog.Buttons.Length;
-        //    Button newButton = new ()
-        //    {
-        //        Text = "_" + NumberToWords.Convert (newButtonId)
-        //    };
-        //    List<Button> buttons = dialog.Buttons.ToList ();
-        //    dialog.AddButton (newButton);
-        //    e.Handled = true;
-        //};
+        FrameView frame = new ()
+        {
+            Title = "Frame (Fill)",
+            X = Pos.Right(checkBox) +1,
+            Y = Pos.Bottom (textField),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (0, minimumContentDim: 1)
+        };
+        dialog.Add (frame);
+
+        Button addButtonButton = new ()
+        {
+            Title = "_Add Button",
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+        };
+        dialog.Add (addButtonButton);
+        addButtonButton.Accepting += (s, e) =>
+        {
+            int newButtonId = dialog.Buttons.Length;
+            Button newButton = new ()
+            {
+                Text = "_" + NumberToWords.Convert (newButtonId)
+            };
+            List<Button> buttons = dialog.Buttons.ToList ();
+            dialog.AddButton (newButton);
+            e.Handled = true;
+        };
 
         if (width != 0)
         {

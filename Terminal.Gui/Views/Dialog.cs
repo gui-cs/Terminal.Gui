@@ -69,10 +69,13 @@ public class Dialog : Runnable<int?>, IDesignable
 
         // Set automatic width and height, with minimums based on content size. Also, subtract
         // Padding thickness in case the scrollbar is visible
-        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (100) - 2)
-                - Dim.Func (_ => VerticalScrollBar.Visible ? 1 : 0);
-        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (100) - 2)
-                 - Dim.Func (_ => HorizontalScrollBar.Visible ? 1 : 0);
+        Width = Dim.Auto (
+                          minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth () - (VerticalScrollBar.Visible ? 1 : 0)),
+                          maximumContentDim: Dim.Percent (100) - 2);
+
+        Height = Dim.Auto (
+                           minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight () - _minimumButtonsSize.Height - (HorizontalScrollBar.Visible ? 1 : 0)),
+                           maximumContentDim: Dim.Percent (100) - 2);
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
@@ -116,11 +119,11 @@ public class Dialog : Runnable<int?>, IDesignable
 
     private Size _minimumSubViewsSize;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
-        UpdateSizes ();
         base.EndInit ();
+        UpdateSizes ();
     }
 
     /// <inheritdoc/>
@@ -131,7 +134,7 @@ public class Dialog : Runnable<int?>, IDesignable
         base.OnSubViewAdded (view);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
         // HACK: Ensure scrollbars are shown as needed before calculating sizes
@@ -143,7 +146,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
     private void UpdateSizes ()
     {
-        if (SubViews.Count == 0 && TextFormatter.WordWrap)
+        if (SubViews.Count == 0)
         {
             // This is primarily to support MessageBox where there are no subviews but
             // Text is used.
@@ -151,18 +154,23 @@ public class Dialog : Runnable<int?>, IDesignable
         }
 
         int subViewsWidth = _minimumSubViewsSize.Width;
+
         if (!Width.Has<DimAuto> (out _))
         {
             subViewsWidth = Math.Max (subViewsWidth, Viewport.Width);
         }
 
         int subViewsHeight = _minimumSubViewsSize.Height;
+
         if (!Height.Has<DimAuto> (out _))
         {
             subViewsHeight = Math.Max (subViewsHeight, Viewport.Height);
         }
 
-        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
+        SetContentSize (
+                        new Size (
+                                  Math.Max (_minimumButtonsSize.Width, subViewsWidth),
+                                  Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
     }
 
     /// <summary>
@@ -175,6 +183,7 @@ public class Dialog : Runnable<int?>, IDesignable
         int minSize = Math.Max (
                                 Math.Max (
                                           _minimumSubViewsSize.Width,
+
                                           // Ensure space for title + borders
                                           Title.GetColumns () + 4
                                          ),

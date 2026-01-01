@@ -435,16 +435,16 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 // Process DimFill views with MinimumContentDim
                 for (int i = 0; i < dimFillSubViews.Count; i++)
                 {
-                    View v = dimFillSubViews [i];
+                    View dimFillSubView = dimFillSubViews [i];
                     DimFill? dimFill = dimension == Dimension.Width
-                        ? v.Width as DimFill
-                        : v.Height as DimFill;
+                        ? dimFillSubView.Width as DimFill
+                        : dimFillSubView.Height as DimFill;
 
                     if (dimFill?.MinimumContentDim is { })
                     {
                         // This DimFill has a minimum - it contributes to auto-sizing
-                        int minSize = dimFill.MinimumContentDim.Calculate (0, maxCalculatedSize, v, dimension);
-                        int positionOffset = dimension == Dimension.Width ? v.Frame.X : v.Frame.Y;
+                        int minSize = dimFill.MinimumContentDim.Calculate (0, maxCalculatedSize, dimFillSubView, dimension);
+                        int positionOffset = dimension == Dimension.Width ? dimFillSubView.Frame.X : dimFillSubView.Frame.Y;
                         int totalSize = positionOffset + minSize;
 
                         if (totalSize > maxCalculatedSize)
