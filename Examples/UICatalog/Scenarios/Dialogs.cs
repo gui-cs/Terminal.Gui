@@ -23,7 +23,8 @@ public class Dialogs : Scenario
             Y = 1,
             Width = Dim.Percent (75),
             Height = Dim.Auto (DimAutoStyle.Content),
-            Title = "Dialog Options"
+            Title = "Dialog Options",
+            Arrangement = ViewArrangement.Resizable
         };
 
         Label numButtonsLabel = new ()
@@ -110,7 +111,7 @@ public class Dialogs : Scenario
             Y = Pos.Top (label),
             Width = Dim.Fill (),
             Height = 1,
-            Text = "Title"
+            Text = "Dialog Title"
         };
         frame.Add (titleEdit);
 
@@ -276,7 +277,7 @@ public class Dialogs : Scenario
         {
             Y = Pos.Bottom (label),
             Width = Dim.Fill (0, minimumContentDim: 60),
-            Text = "This is a demo dialog."
+            Text = new string ("0123456789").Repeat (6)
         };
         dialog.Add (textField);
 
@@ -296,24 +297,24 @@ public class Dialogs : Scenario
         };
         dialog.Add (optionSelector);
 
-        Button addButtonButton = new ()
-        {
-            Title = "_Add Button",
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-        };
-        dialog.Add (addButtonButton);
-        addButtonButton.Accepting += (s, e) =>
-        {
-            int newButtonId = dialog.Buttons.Length;
-            Button newButton = new ()
-            {
-                Text = "_" + NumberToWords.Convert (newButtonId)
-            };
-            List<Button> buttons = dialog.Buttons.ToList ();
-            dialog.AddButton (newButton);
-            e.Handled = true;
-        };
+        //Button addButtonButton = new ()
+        //{
+        //    Title = "_Add Button",
+        //    X = Pos.AnchorEnd (),
+        //    Y = Pos.AnchorEnd (),
+        //};
+        //dialog.Add (addButtonButton);
+        //addButtonButton.Accepting += (s, e) =>
+        //{
+        //    int newButtonId = dialog.Buttons.Length;
+        //    Button newButton = new ()
+        //    {
+        //        Text = "_" + NumberToWords.Convert (newButtonId)
+        //    };
+        //    List<Button> buttons = dialog.Buttons.ToList ();
+        //    dialog.AddButton (newButton);
+        //    e.Handled = true;
+        //};
 
         if (width != 0)
         {

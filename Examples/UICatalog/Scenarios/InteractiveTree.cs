@@ -97,13 +97,15 @@ public class InteractiveTree : Scenario
     {
         var okPressed = false;
 
-        Button ok = new () { Text = "_Ok" };
-        Button cancel = new () { Text = "_Cancel" };
-        Dialog d = new () { Title = title, Buttons = [cancel, ok] };
+        Dialog d = new Dialog
+        {
+            Title = title,
+            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
+        };
 
         Label lbl = new () { X = 0, Y = 1, Text = label };
 
-        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
+        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();

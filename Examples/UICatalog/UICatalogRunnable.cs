@@ -746,7 +746,7 @@ public class UICatalogRunnable : Runnable
         msg.AppendLine ();
         msg.AppendLine ("v2 - Pre-Alpha");
         msg.AppendLine ();
-        msg.AppendLine ("https://github.com/gui-cs/Terminal.Gui");
+        msg.Append ("https://github.com/gui-cs/Terminal.Gui");
 
         return msg.ToString ();
     }

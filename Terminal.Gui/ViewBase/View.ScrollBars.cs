@@ -82,7 +82,10 @@ public partial class View
                                scrollBar.Position = Viewport.Y;
                            };
 
-        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+        ContentSizeChanged += (_, _) =>
+                              {
+                                  scrollBar.ScrollableContentSize = GetContentSize ().Height;
+                              };
     }
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
@@ -132,16 +135,20 @@ public partial class View
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {
+                                        // Reset scrolling
+                                        if (!scrollBar.Visible)
+                                        {
+                                            Viewport = Viewport with { Y = 0 };
+                                        }
+
                                         Padding.Thickness = Padding.Thickness with
                                         {
                                             Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right - 1
                                         };
-                                        // Reset scrolling
-                                        Viewport = Viewport with { Y = 0 };
 
                                         // BUGBUG: This Layout call is a hack to work around some bug in Layout.
                                         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                        Layout ();
+                                        // Layout ();
                                     };
     }
 
@@ -159,16 +166,20 @@ public partial class View
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {
+                                        // Reset scrolling
+                                        if (!scrollBar.Visible)
+                                        {
+                                            Viewport = Viewport with { X = 0 };
+                                        }
+
                                         Padding.Thickness = Padding.Thickness with
                                         {
                                             Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom - 1
                                         };
-                                        // Reset scrolling
-                                        Viewport = Viewport with { X = 0 };
 
                                         // BUGBUG: This Layout call is a hack to work around some bug in Layout.
                                         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                        Layout ();
+                                        // Layout ();
                                     };
     }
 

@@ -90,7 +90,7 @@ public class Images : Scenario
         };
         _win.Add (cbSupportsTrueColor);
 
-        _cbSupportsSixel = new()
+        _cbSupportsSixel = new ()
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 1,
@@ -569,22 +569,15 @@ public class Images : Scenario
 
         var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
 
-        var dlg = new Dialog
+        Dialog dlg = new ()
         {
-            Title = "Palette (Esc to close)",
-            Width = Dim.Fill (2),
-            Height = Dim.Fill (1)
+            Title = "Palette",
+            Buttons = [new () { Title = "_Cancel" }]
         };
 
-        var btn = new Button
-        {
-            Text = "Ok"
-        };
-
-        btn.Accepting += (s, e) => Application.RequestStop ();
         dlg.Add (pv);
-        dlg.AddButton (btn);
         Application.Run (dlg);
+
         dlg.Dispose ();
 
         return encoded;
@@ -682,8 +675,8 @@ public class Images : Scenario
         public PaletteView (List<Color> palette)
         {
             _palette = palette ?? new List<Color> ();
-            Width = Dim.Fill ();
-            Height = Dim.Fill ();
+            Width = Dim.Fill (0, minimumContentDim: 50);
+            Height = Dim.Fill (0, minimumContentDim: 10);
         }
 
         // Automatically calculates rows and columns based on the available bounds

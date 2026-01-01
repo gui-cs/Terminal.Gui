@@ -1,7 +1,8 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Provides a modal dialog window with buttons across the bottom. When accepted, the <see cref="IRunnable.Result"/> will be the index of the button pressed.
+///     Provides a modal dialog window with buttons across the bottom. When accepted, the <see cref="IRunnable.Result"/>
+///     will be the index of the button pressed.
 ///     By default, the <see cref="Dialog"/> is centered and used the <see cref="Schemes.Dialog"/>
 ///     scheme.
 /// </summary>
@@ -9,7 +10,8 @@ namespace Terminal.Gui.Views;
 ///     To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to
 ///     <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will execute the dialog until
 ///     it terminates via the <see cref="Application.QuitKey"/> (`Esc` by default),
-///     or when one of its buttons is pressed, which sets the <see cref="IRunnable.Result"/> to the index of the button pressed.
+///     or when one of its buttons is pressed, which sets the <see cref="IRunnable.Result"/> to the index of the button
+///     pressed.
 /// </remarks>
 public class Dialog : Runnable<int?>, IDesignable
 {
@@ -64,8 +66,13 @@ public class Dialog : Runnable<int?>, IDesignable
     {
         X = Pos.Center ();
         Y = Pos.Center ();
-        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent(100) - 2);
-        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (90) - GetAdornmentsThickness ().Horizontal);
+
+        // Set automatic width and height, with minimums based on content size. Also, subtract
+        // Padding thickness in case the scrollbar is visible
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (100) - 2)
+                - Dim.Func (_ => VerticalScrollBar.Visible ? 1 : 0);
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (100) - 2)
+                 - Dim.Func (_ => HorizontalScrollBar.Visible ? 1 : 0);
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
@@ -73,77 +80,135 @@ public class Dialog : Runnable<int?>, IDesignable
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
 
-        _buttonContainer = new View ()
+        _buttonContainer = new ()
         {
             Id = "Dialog.ButtonContainer",
             CanFocus = true,
-            X = Pos.Func (_ => Padding!.Thickness.Left),
+            X = 0,
             Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Horizontal / 2)),
+            Width = Dim.Fill (),
             Height = Dim.Auto (),
             SchemeName = "Menu"
         };
         Padding!.Add (_buttonContainer);
 
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
-
         SetStyle ();
 
-        AddCommand (Command.Accept, (ctx) =>
-                                   {
-                                       View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+        AddCommand (
+                    Command.Accept,
+                    ctx =>
+                    {
+                        View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
 
-                                       if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
-                                       {
-                                           bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
+                        if (isDefaultView != this && isDefaultView is Button { IsDefault: true })
+                        {
+                            bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
 
-                                           if (handled == true)
-                                           {
-                                               return true;
-                                           }
-                                       }
-                                       return RaiseAccepting (ctx);
-                                   });
+                            if (handled == true)
+                            {
+                                return true;
+                            }
+                        }
+
+                        return RaiseAccepting (ctx);
+                    });
+    }
+
+    private Size _minimumSubViewsSize;
+
+    /// <inheritdoc />
+    public override void EndInit ()
+    {
+        UpdateSizes ();
+        base.EndInit ();
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSubViewAdded (View view)
+    {
+        _minimumSubViewsSize = new (GetWidthRequiredForSubViews (), GetHeightRequiredForSubViews ());
+        UpdateSizes ();
+        base.OnSubViewAdded (view);
     }
 
     /// <inheritdoc />
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-
-        int naturalWidth = GetWidthRequiredForSubViews ();
-        int naturalButtonWidth = _buttonContainer!.GetWidthRequiredForSubViews ();
-        int naturalHeight = GetHeightRequiredForSubViews ();
-
-        SetContentSize (new Size (Math.Max (naturalButtonWidth, naturalWidth), naturalHeight));
+        // HACK: Ensure scrollbars are shown as needed before calculating sizes
+        VerticalScrollBar.AutoShow = true;
+        HorizontalScrollBar.AutoShow = true;
+        UpdateSizes ();
         base.OnSubViewLayout (args);
     }
 
+    private void UpdateSizes ()
+    {
+        if (SubViews.Count == 0 && TextFormatter.WordWrap)
+        {
+            // This is primarily to support MessageBox where there are no subviews but
+            // Text is used.
+            return;
+        }
+
+        int subViewsWidth = _minimumSubViewsSize.Width;
+        if (!Width.Has<DimAuto> (out _))
+        {
+            subViewsWidth = Math.Max (subViewsWidth, Viewport.Width);
+        }
+
+        int subViewsHeight = _minimumSubViewsSize.Height;
+        if (!Height.Has<DimAuto> (out _))
+        {
+            subViewsHeight = Math.Max (subViewsHeight, Viewport.Height);
+        }
+
+        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
+    }
+
+    /// <summary>
+    ///     INTERNAL: Gets the minimum width required for the <see cref="Dialog"/>. This takes into account
+    ///     the width required for the title, the buttons, and any subviews.
+    /// </summary>
+    /// <returns></returns>
     private int GetMinimumDialogWidth ()
     {
         int minSize = Math.Max (
-                                Title.GetColumns() + 4,
-                                _buttonContainer!.GetWidthRequiredForSubViews ()
-                                   );
+                                Math.Max (
+                                          _minimumSubViewsSize.Width,
+                                          // Ensure space for title + borders
+                                          Title.GetColumns () + 4
+                                         ),
+                                _minimumButtonsSize.Width
+                               );
 
         return minSize;
     }
 
+    /// <summary>
+    ///     INTERNAL: Gets the minimum height required for the <see cref="Dialog"/>. This takes into account
+    ///     the height required for the buttons.
+    /// </summary>
+    /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
         int minSize = Math.Max (
-                               0,// Dim.Percent (DefaultMinimumWidth).GetAnchor (GetContainerSize ().Width) - GetAdornmentsThickness ().Horizontal,
-                                _buttonContainer!.GetHeightRequiredForSubViews ()
+                                _minimumSubViewsSize.Height,
+                                _minimumButtonsSize.Height - Border!.Thickness.Vertical - Margin!.Thickness.Vertical
                                );
+
         return minSize;
     }
 
     private readonly List<Button> _buttons = [];
 
+    private Size _minimumButtonsSize;
+
     /// <summary>
-    ///     Adds a <see cref="Button"/> to the bottom of the <see cref="Dialog"/>. The lifetime and layout will be controlled by the
+    ///     Adds a <see cref="Button"/> to the bottom of the <see cref="Dialog"/>. The lifetime and layout will be controlled
+    ///     by the
     ///     <see cref="Dialog"/>. The added buttons will be aligned according to the <see cref="ButtonAlignment"/> and
-    ///     <see cref="ButtonAlignmentModes"/>. The last button to be added will be the right-most button and will be treated as
+    ///     <see cref="ButtonAlignmentModes"/>. The last button to be added will be the right-most button and will be treated
+    ///     as
     ///     the default (<see cref="Button.IsDefault"/> will be set to true).
     /// </summary>
     /// <param name="button">Button to add.</param>
@@ -168,11 +233,13 @@ public class Dialog : Runnable<int?>, IDesignable
         Padding!.Thickness = Padding!.Thickness with
         {
             // Add 3 to padding just for testing
-           // Right = Padding!.Thickness.Right + 2,
-           // Left = Padding!.Thickness.Left + 2,
-           // Top = Padding!.Thickness.Top + 2,
+            //Right = Padding!.Thickness.Right + 2,
+            //Left = Padding!.Thickness.Left + 2,
+            //Top = Padding!.Thickness.Top + 2,
             Bottom = _buttonContainer!.GetHeightRequiredForSubViews ()
         };
+
+        _minimumButtonsSize = new (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
     private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
@@ -209,7 +276,7 @@ public class Dialog : Runnable<int?>, IDesignable
     }
 
     /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    public bool Canceled => Result is null;
+    public bool Canceled => Result is null or 1;
 
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)
@@ -271,7 +338,6 @@ public class Dialog : Runnable<int?>, IDesignable
         currentAttribute = GetScheme ().Normal;
 
         return true;
-
     }
 
     bool IDesignable.EnableForDesign ()
@@ -281,27 +347,30 @@ public class Dialog : Runnable<int?>, IDesignable
         Button btnCancel = new ()
         {
             Id = "btnCancel",
-            Title = Strings.btnCancel,
+            Title = Strings.btnCancel
         };
 
         btnCancel.Accepting += (s, e) =>
-                              {
-                                  if (!IsRunning)
-                                  {
-                                      return;
-                                  }
-                                  (s as View)!.App?.RequestStop ();
-                                  e.Handled = true;
-                              };
+                               {
+                                   if (!IsRunning)
+                                   {
+                                       return;
+                                   }
+
+                                   (s as View)!.App?.RequestStop ();
+                                   e.Handled = true;
+                               };
 
         AddButton (btnCancel);
 
-        AddButton (new ()
-        {
-            Id = "btnOk",
-            Title = Strings.btnOk,
-            // Dialog will automatically set IsDefault to the last button added
-        });
+        AddButton (
+                   new ()
+                   {
+                       Id = "btnOk",
+                       Title = Strings.btnOk
+
+                       // Dialog will automatically set IsDefault to the last button added
+                   });
 
         // Add some example content to the dialog
         Label infoLabel = new ()
@@ -309,6 +378,7 @@ public class Dialog : Runnable<int?>, IDesignable
             Id = "infoLabel",
             Text = "_Example:"
         };
+
         TextField info = new ()
         {
             Id = "info",
@@ -321,5 +391,4 @@ public class Dialog : Runnable<int?>, IDesignable
 
         return true;
     }
-
 }

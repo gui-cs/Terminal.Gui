@@ -62,9 +62,6 @@ public class FileDialog : Dialog, IDesignable
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem? fileSystem)
     {
-        Height = Dim.Percent (80);
-        Width = Dim.Percent (80);
-
         HorizontalScrollBar.AutoShow = false;
         HorizontalScrollBar.Visible = false;
         VerticalScrollBar.AutoShow = false;
@@ -73,38 +70,25 @@ public class FileDialog : Dialog, IDesignable
         _fileSystem = fileSystem;
         Style = new (fileSystem);
 
-        _btnOk = new ()
-        {
-            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
-            Y = Pos.AnchorEnd (),
-            Text = Style.OkButtonText
-        };
-
-        _btnOk.Accepting += (s, e) =>
-                            {
-                                if (e.Handled)
-                                {
-                                    return;
-                                }
-
-                                Accept (true);
-                               // e.Handled = true;
-                            };
+        ButtonAlignment = Alignment.End;
+        ButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
 
         _btnCancel = new ()
         {
-            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
-            Y = Pos.AnchorEnd (),
             Text = Strings.btnCancel
         };
 
-        // Tree toggle button - shares alignment group with OK/Cancel
+        _btnOk = new ()
+        {
+            Text = Style.OkButtonText
+        };
+
+        // Tree toggle button - Goes in Dialog Button Area
         _btnTreeToggle = new ()
         {
-            X = 0,//Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
-            Y = Pos.AnchorEnd (),
             NoPadding = true
         };
+
         _btnTreeToggle.Accepting += (s, e) =>
         {
             e.Handled = true;
@@ -135,7 +119,7 @@ public class FileDialog : Dialog, IDesignable
                                      e.Handled = true;
                                  };
 
-        _tbPath = new () { Width = Dim.Fill () };
+        _tbPath = new () { Width = Dim.Fill (0, minimumContentDim: 60) };
 
         _tbPath.KeyDown += (s, k) =>
                            {
@@ -154,8 +138,8 @@ public class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30)),
-            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
+            Width = Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30),
+            Height = Dim.Func (_ => _tableViewContainer?.Frame.Height ?? 0),
             Visible = false
         };
 
@@ -164,8 +148,8 @@ public class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
+            Width = Dim.Fill (0, minimumContentDim: 50),
+            Height = Dim.Fill (0, minimumContentDim: 15),
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Dashed,
             SuperViewRendersLineCanvas = true,
@@ -240,7 +224,7 @@ public class FileDialog : Dialog, IDesignable
         _tbFind = new ()
         {
             X = 0,
-            Width = Dim.Fill (),
+            Width = Dim.Width (_tableView),
             Y = Pos.AnchorEnd (),
             Id = "_tbFind",
         };
@@ -275,18 +259,17 @@ public class FileDialog : Dialog, IDesignable
 
         UpdateNavigationVisibility ();
 
-        base.Add (_tbPath);
-        base.Add (_btnUp);
-        base.Add (_btnBack);
-        base.Add (_btnForward);
-        base.Add (_treeView);
-        base.Add (_tableViewContainer);
+        Add (_tbPath);
+        Add (_btnUp);
+        Add (_btnBack);
+        Add (_btnForward);
+        Add (_treeView);
+        Add (_tableViewContainer);
         _tableViewContainer.Add (_tbFind);
         _tableViewContainer.Add (_spinnerView);
 
         // Add the toggle along with OK/Cancel so they align as a group
-        base.Add (_btnTreeToggle);
-
+        AddButton (_btnTreeToggle);
         AddButton (_btnCancel);
         AddButton (_btnOk);
 
@@ -330,7 +313,7 @@ public class FileDialog : Dialog, IDesignable
             // and the context menu is disposed when it is closed.
             App!.Popover?.Register (contextMenu);
 
-            Point pos = new Point (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight());
+            Point pos = new Point (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight ());
             contextMenu?.MakeVisible (pos);
         }
     }
@@ -563,13 +546,6 @@ public class FileDialog : Dialog, IDesignable
         if (string.IsNullOrEmpty (Title))
         {
             Title = GetDefaultTitle ();
-        }
-
-        if (Style.FlipOkCancelButtonLayoutOrder)
-        {
-            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
-            _btnOk.X = Pos.Right (_btnCancel) + 1;
-            MoveSubViewTowardsStart (_btnCancel);
         }
 
         // Ensure toggle button text matches current state after sizing

@@ -18,8 +18,8 @@ public class MessageBoxes : Scenario
         {
             X = Pos.Center (),
             Y = 1,
-            Width = Dim.Percent (75),
-            Height = Dim.Auto (DimAutoStyle.Content),
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             Title = "MessageBox Options"
         };
         window.Add (frame);
@@ -30,6 +30,7 @@ public class MessageBoxes : Scenario
             Y = 0,
 
             Height = 1,
+            Width = 15,
             TextAlignment = Alignment.End,
             Text = "_Title:"
         };
@@ -39,7 +40,7 @@ public class MessageBoxes : Scenario
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = Dim.Fill (),
+            Width = Dim.Fill (0, minimumContentDim: 50),
             Height = 1,
             Text = "The title"
         };
@@ -62,8 +63,9 @@ public class MessageBoxes : Scenario
             Text = "Message line 1.\nMessage line two. This is a really long line to force wordwrap. It needs to be long for it to work.",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
-            Width = Dim.Fill (),
-            Height = 5
+            Width = Dim.Fill (0, minimumContentDim: 50),
+            Height = 5,
+            WordWrap = true
         };
         frame.Add (messageEdit);
 
