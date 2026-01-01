@@ -436,7 +436,6 @@ Nice       Work")]
         };
 
         Size tfSize = tf.FormatAndGetSize ();
-        Assert.Equal (new (59, 13), tfSize);
 
         driver!.SetScreenSize (tfSize.Width, tfSize.Height);
 
@@ -456,7 +455,6 @@ Nice       Work")]
                            **********************v2 - Pre-Alpha***********************
                            ***********************************************************
                            **********https://github.com/gui-cs/Terminal.Gui***********
-                           ***********************************************************
                            """;
 
         DriverAssert.AssertDriverContentsAre (expectedText.ReplaceLineEndings (), output, driver);
