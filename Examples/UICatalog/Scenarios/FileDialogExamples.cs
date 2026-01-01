@@ -12,7 +12,6 @@ public class FileDialogExamples : Scenario
     private CheckBox _cbCaseSensitive;
     private CheckBox _cbDrivesOnlyInTree;
     private CheckBox _cbPreserveFilenameOnDirectoryChanges;
-    private CheckBox _cbFlipButtonOrder;
     private CheckBox _cbMustExist;
     private CheckBox _cbShowTreeBranchLines;
     private CheckBox _cbUseColors;
@@ -37,7 +36,7 @@ public class FileDialogExamples : Scenario
         win.Add (_cbMustExist);
 
         _cbUseColors = new ()
-            { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
+        { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
         win.Add (_cbUseColors);
 
         _cbCaseSensitive = new () { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Case Sensitive Search" };
@@ -123,9 +122,6 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x, Y = y++, Text = "_Cancel Text:" });
         _tbCancelButton = new () { X = x, Y = y++, Width = 12 };
         win.Add (_tbCancelButton);
-        _cbFlipButtonOrder = new () { X = x, Y = y++, Text = "Flip Ord_er" };
-        win.Add (_cbFlipButtonOrder);
-
         var btn = new Button { X = 1, Y = 9, IsDefault = true, Text = "Run Dialog" };
 
         win.Accepting += (s, e) =>
@@ -232,17 +228,12 @@ public class FileDialogExamples : Scenario
                 fd.Style.CancelButtonText = _tbCancelButton.Text;
             }
 
-            if (_cbFlipButtonOrder.CheckedState == CheckState.Checked)
-            {
-                fd.Style.FlipOkCancelButtonLayoutOrder = true;
-            }
-
             var result = app.Run (fd) as int?;
 
             IReadOnlyList<string> multiSelected = fd.MultiSelected;
             string path = fd.Path;
 
-            if (result is null or 0)
+            if (result is null or 1)
             {
                 MessageBox.Query (
                                   app,

@@ -53,7 +53,7 @@ public partial class TestContext
 
     private T? FindRecursive<T> (View current, Func<T, bool> evaluator) where T : View
     {
-        foreach (View subview in current.SubViews)
+        foreach (View subview in current.GetSubViews(includePadding:true))
         {
             if (subview is T match && evaluator (match))
             {

@@ -87,7 +87,7 @@ public partial class View
     {
         // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
         // we want the content size only.
-        return Dim.Auto ().Calculate (0, GetContentSize ().Width, this, Dimension.Width) - GetAdornmentsThickness().Horizontal;
+        return Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width) - GetAdornmentsThickness ().Horizontal;
 
         // NOTE: These methods semi-duplicate what DimAuto.Calculate does; the key difference is they
         // NOTE: ignore all the Dim types and their impact on Auto. The net result is they return the
@@ -108,7 +108,7 @@ public partial class View
         // Iterate through all subviews to calculate the maximum width
         foreach (View subView in GetSubViews ())
         {
-            Logging.Trace($"{subView.Text}:{subView.X.Calculate (max, subView.Width, subView, Dimension.Width)}+{subView.Width.Calculate (0, max, subView, Dimension.Width)}");
+            Logging.Trace ($"{subView.Text}:{subView.X.Calculate (max, subView.Width, subView, Dimension.Width)}+{subView.Width.Calculate (0, max, subView, Dimension.Width)}");
             max = Math.Max (max, subView.X.Calculate (max, subView.Width, subView, Dimension.Width) + subView.Width.Calculate (0, max, subView, Dimension.Width));
         }
 
@@ -124,7 +124,7 @@ public partial class View
     {
         // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
         // we want the content size only.
-        return Dim.Auto ().Calculate (0, GetContentSize ().Height, this, Dimension.Height) - GetAdornmentsThickness().Vertical;
+        return Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height) - GetAdornmentsThickness ().Vertical;
 
         // NOTE: These methods semi-duplicate what DimAuto.Calculate does; the key difference is they
         // NOTE: ignore all the Dim types and their impact on Auto. The net result is they return the

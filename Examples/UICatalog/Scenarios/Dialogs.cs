@@ -23,7 +23,8 @@ public class Dialogs : Scenario
             Y = 1,
             Width = Dim.Percent (75),
             Height = Dim.Auto (DimAutoStyle.Content),
-            Title = "Dialog Options"
+            Title = "Dialog Options",
+            Arrangement = ViewArrangement.Resizable
         };
 
         Label numButtonsLabel = new ()
@@ -110,7 +111,7 @@ public class Dialogs : Scenario
             Y = Pos.Top (label),
             Width = Dim.Fill (),
             Height = 1,
-            Title = "Dialog Title"
+            Text = "Dialog Title"
         };
         frame.Add (titleEdit);
 

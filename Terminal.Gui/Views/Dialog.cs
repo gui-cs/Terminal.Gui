@@ -67,11 +67,12 @@ public class Dialog : Runnable<int?>, IDesignable
         X = Pos.Center ();
         Y = Pos.Center ();
 
-        // Set automatic width, with minimums based on content size. Also, subtract
-        // Padding thickness in case the Vertical scrollbar is visible
+        // Set automatic width and height, with minimums based on content size. Also, subtract
+        // Padding thickness in case the scrollbar is visible
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth ()), maximumContentDim: Dim.Percent (100) - 2)
-                - Dim.Func (_ => VerticalScrollBar.Visible ? Padding!.Thickness.Horizontal : 0);
-        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (100) - 2);
+                - Dim.Func (_ => VerticalScrollBar.Visible ? 1 : 0);
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight ()), maximumContentDim: Dim.Percent (100) - 2)
+                 - Dim.Func (_ => HorizontalScrollBar.Visible ? 1 : 0);
 
         ButtonAlignment = DefaultButtonAlignment;
         ButtonAlignmentModes = DefaultButtonAlignmentModes;
@@ -85,14 +86,11 @@ public class Dialog : Runnable<int?>, IDesignable
             CanFocus = true,
             X = 0,
             Y = Pos.AnchorEnd (),
-            Width = Dim.Func (_=> Padding!.Frame.Width),
+            Width = Dim.Fill (),
             Height = Dim.Auto (),
             SchemeName = "Menu"
         };
         Padding!.Add (_buttonContainer);
-
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
 
         SetStyle ();
 
@@ -116,8 +114,7 @@ public class Dialog : Runnable<int?>, IDesignable
                     });
     }
 
-    private int _naturalSubViewsWidth;
-    private int _naturalSubViewsHeight;
+    private Size _minimumSubViewsSize;
 
     /// <inheritdoc />
     public override void EndInit ()
@@ -129,24 +126,43 @@ public class Dialog : Runnable<int?>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
+        _minimumSubViewsSize = new (GetWidthRequiredForSubViews (), GetHeightRequiredForSubViews ());
         UpdateSizes ();
         base.OnSubViewAdded (view);
     }
 
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs args)
+    {
+        // HACK: Ensure scrollbars are shown as needed before calculating sizes
+        VerticalScrollBar.AutoShow = true;
+        HorizontalScrollBar.AutoShow = true;
+        UpdateSizes ();
+        base.OnSubViewLayout (args);
+    }
+
     private void UpdateSizes ()
     {
-        _naturalSubViewsWidth = GetWidthRequiredForSubViews ();
-        _naturalSubViewsHeight = GetHeightRequiredForSubViews ();
-        _naturalButtonsWidth = _buttonContainer!.GetWidthRequiredForSubViews ();
-
-        // This is primarily to support MessageBox where there are no subviews but
-        // Text is used.
         if (SubViews.Count == 0 && TextFormatter.WordWrap)
         {
+            // This is primarily to support MessageBox where there are no subviews but
+            // Text is used.
             return;
         }
 
-        SetContentSize (new Size (Math.Max (_naturalButtonsWidth, _naturalSubViewsWidth), _naturalSubViewsHeight));
+        int subViewsWidth = _minimumSubViewsSize.Width;
+        if (!Width.Has<DimAuto> (out _))
+        {
+            subViewsWidth = Math.Max (subViewsWidth, Viewport.Width);
+        }
+
+        int subViewsHeight = _minimumSubViewsSize.Height;
+        if (!Height.Has<DimAuto> (out _))
+        {
+            subViewsHeight = Math.Max (subViewsHeight, Viewport.Height);
+        }
+
+        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
     }
 
     /// <summary>
@@ -158,11 +174,11 @@ public class Dialog : Runnable<int?>, IDesignable
     {
         int minSize = Math.Max (
                                 Math.Max (
-                                          _naturalSubViewsWidth,
+                                          _minimumSubViewsSize.Width,
                                           // Ensure space for title + borders
                                           Title.GetColumns () + 4
                                          ),
-                                _naturalButtonsWidth
+                                _minimumButtonsSize.Width
                                );
 
         return minSize;
@@ -176,8 +192,8 @@ public class Dialog : Runnable<int?>, IDesignable
     private int GetMinimumDialogHeight ()
     {
         int minSize = Math.Max (
-                                0,
-                                _buttonContainer!.GetHeightRequiredForSubViews () - Border!.Thickness.Vertical - Margin!.Thickness.Vertical
+                                _minimumSubViewsSize.Height,
+                                _minimumButtonsSize.Height - Border!.Thickness.Vertical - Margin!.Thickness.Vertical
                                );
 
         return minSize;
@@ -185,7 +201,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
     private readonly List<Button> _buttons = [];
 
-    private int _naturalButtonsWidth;
+    private Size _minimumButtonsSize;
 
     /// <summary>
     ///     Adds a <see cref="Button"/> to the bottom of the <see cref="Dialog"/>. The lifetime and layout will be controlled
@@ -223,7 +239,7 @@ public class Dialog : Runnable<int?>, IDesignable
             Bottom = _buttonContainer!.GetHeightRequiredForSubViews ()
         };
 
-        UpdateSizes ();
+        _minimumButtonsSize = new (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
     private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
@@ -260,7 +276,7 @@ public class Dialog : Runnable<int?>, IDesignable
     }
 
     /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    public bool Canceled => Result is null;
+    public bool Canceled => Result is null or 1;
 
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)

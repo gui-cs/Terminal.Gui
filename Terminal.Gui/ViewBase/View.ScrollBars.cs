@@ -82,7 +82,10 @@ public partial class View
                                scrollBar.Position = Viewport.Y;
                            };
 
-        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+        ContentSizeChanged += (_, _) =>
+                              {
+                                  scrollBar.ScrollableContentSize = GetContentSize ().Height;
+                              };
     }
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
@@ -145,7 +148,7 @@ public partial class View
 
                                         // BUGBUG: This Layout call is a hack to work around some bug in Layout.
                                         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                       // Layout ();
+                                        // Layout ();
                                     };
     }
 
@@ -155,7 +158,6 @@ public partial class View
 
         scrollBar.PositionChanged += (_, args) =>
                                      {
-
                                          Viewport = Viewport with
                                          {
                                              X = Math.Min (args.Value, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
@@ -177,7 +179,7 @@ public partial class View
 
                                         // BUGBUG: This Layout call is a hack to work around some bug in Layout.
                                         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                       // Layout ();
+                                        // Layout ();
                                     };
     }
 
