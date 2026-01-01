@@ -8,8 +8,6 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class FileDialog : Dialog, IDesignable
 {
-    private const int ALIGNMENT_GROUP_COMPLETE = 55;
-
     /// <summary>Gets the Path separators for the operating system</summary>
     // ReSharper disable once InconsistentNaming
     internal static char [] Separators =
@@ -119,7 +117,11 @@ public class FileDialog : Dialog, IDesignable
                                      e.Handled = true;
                                  };
 
-        _tbPath = new () { Width = Dim.Fill (0, minimumContentDim: 60) };
+        _tbPath = new ()
+        {
+            // This sets the default width of the FileDialog as it is the widest subview
+            Width = Dim.Fill (0, minimumContentDim: 75),
+        };
 
         _tbPath.KeyDown += (s, k) =>
                            {
@@ -148,7 +150,7 @@ public class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (0, minimumContentDim: 50),
+            Width = Dim.Fill (),
             Height = Dim.Fill (0, minimumContentDim: 15),
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Dashed,
@@ -225,7 +227,7 @@ public class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Width = Dim.Width (_tableView),
-            Y = Pos.AnchorEnd (),
+            Y = Pos.Bottom (_tableView),
             Id = "_tbFind",
         };
 
@@ -259,6 +261,11 @@ public class FileDialog : Dialog, IDesignable
 
         UpdateNavigationVisibility ();
 
+        // Add the toggle along with OK/Cancel so they align as a group
+        AddButton (_btnTreeToggle);
+        AddButton (_btnCancel);
+        AddButton (_btnOk);
+
         Add (_tbPath);
         Add (_btnUp);
         Add (_btnBack);
@@ -267,11 +274,6 @@ public class FileDialog : Dialog, IDesignable
         Add (_tableViewContainer);
         _tableViewContainer.Add (_tbFind);
         _tableViewContainer.Add (_spinnerView);
-
-        // Add the toggle along with OK/Cancel so they align as a group
-        AddButton (_btnTreeToggle);
-        AddButton (_btnCancel);
-        AddButton (_btnOk);
 
         // Default: Tree hidden and splitter hidden
         SetTreeVisible (false);
@@ -1487,7 +1489,7 @@ public class FileDialog : Dialog, IDesignable
             _tableViewContainer.X = 0;
             _tableViewContainer.Width = Dim.Fill ();
             _tableViewContainer.Arrangement = ViewArrangement.Fixed;
-            _tableViewContainer.Border!.Thickness = new (0, 0, 0, 0);
+            _tableViewContainer.Border!.Thickness = new (0);
         }
         _btnTreeToggle.Text = GetTreeToggleText (visible);
 
