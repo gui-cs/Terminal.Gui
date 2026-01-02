@@ -129,6 +129,62 @@ public class Line : View, IOrientation
         }
     }
 
+    /// <summary>
+    ///     Gets or sets the width dimension of the view.
+    /// </summary>
+    /// <remarks>
+    ///     For horizontal lines, this controls the length of the line.
+    ///     For vertical lines, this is always 1.
+    /// </remarks>
+    public new Dim Width
+    {
+        get => base.Width;
+        set
+        {
+            // Update _length to preserve the value for when orientation might change
+            // EXCEPT when setting perpendicular dimension to 1 (which is just maintaining the constraint)
+            if (Orientation == Orientation.Horizontal || value.GetAnchor(0) != 1)
+            {
+                _length = value;
+            }
+            
+            // For vertical lines, override the value to keep width at 1
+            if (Orientation == Orientation.Vertical)
+            {
+                value = 1;
+            }
+            base.Width = value;
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the height dimension of the view.
+    /// </summary>
+    /// <remarks>
+    ///     For vertical lines, this controls the length of the line.
+    ///     For horizontal lines, this is always 1.
+    /// </remarks>
+    public new Dim Height
+    {
+        get => base.Height;
+        set
+        {
+            // Update _length to preserve the value for when orientation might change
+            // EXCEPT when setting perpendicular dimension to 1 (which is just maintaining the constraint)
+            if (Orientation == Orientation.Vertical || value.GetAnchor(0) != 1)
+            {
+                _length = value;
+            }
+            
+            // For horizontal lines, override the value to keep height at 1
+            if (Orientation == Orientation.Horizontal)
+            {
+                value = 1;
+            }
+            base.Height = value;
+        }
+    }
+
     #region IOrientation members
 
     /// <summary>
@@ -167,47 +223,19 @@ public class Line : View, IOrientation
         // Set dimensions based on new orientation:
         // - Primary dimension (along orientation) = Length
         // - Perpendicular dimension = 1
+        // 
+        // Use base.Width and base.Height to avoid triggering our overridden setters
+        // which would update _length incorrectly
         if (newOrientation == Orientation.Horizontal)
         {
-            Width = _length;
-            Height = 1;
+            base.Width = _length;
+            base.Height = 1;
         }
         else
         {
-            Height = _length;
-            Width = 1;
+            base.Height = _length;
+            base.Width = 1;
         }
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnWidthChanging (ValueChangingEventArgs<Dim> e)
-    {
-        // If horizontal, allow width changes and update _length
-        _length = e.NewValue;
-        if (Orientation == Orientation.Horizontal)
-        {
-            return base.OnWidthChanging (e);
-        }
-
-        // If vertical, keep width at 1 (don't allow changes to perpendicular dimension)
-        e.NewValue = 1;
-
-        return base.OnWidthChanging (e);
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnHeightChanging (ValueChangingEventArgs<Dim> e)
-    {
-        // If vertical, allow height changes and update _length
-        _length = e.NewValue;
-        if (Orientation == Orientation.Vertical)
-        {
-            return base.OnHeightChanging (e);
-        }
-
-        e.NewValue = 1;
-
-        return base.OnHeightChanging (e);
     }
 
     #endregion
