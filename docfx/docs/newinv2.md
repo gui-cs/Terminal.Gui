@@ -502,7 +502,7 @@ See the [Arrangement Deep Dive](arrangement.md) for complete details.
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -529,10 +529,10 @@ v2 decouples navigation concepts:
 
 ```csharp
 // Configure navigation keys
-Application.NextTabStopKey = Key.Tab;
-Application.PrevTabStopKey = Key.Tab.WithShift;
-Application.NextTabGroupKey = Key.F6;
-Application.PrevTabGroupKey = Key.F6.WithShift;
+App.Keyboard.NextTabStopKey = Key.Tab;
+App.Keyboard.PrevTabStopKey = Key.Tab.WithShift;
+App.Keyboard.NextTabGroupKey = Key.F6;
+App.Keyboard.PrevTabGroupKey = Key.F6.WithShift;
 
 // Set tab behavior
 view.CanFocus = true;
@@ -557,7 +557,7 @@ See the [Views Overview](views.md) for a complete catalog.
 - **[NumericUpDown<T>](~/api/Terminal.Gui.Views.NumericUpDown-1.yml)** - Type-safe numeric input
 - **[OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml)** - Mutually-exclusive option selection
 - **[Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)** - Command display with key bindings
-- **[Slider](~/api/Terminal.Gui.Views.Slider.yml)** - Sophisticated range selection control
+- **[LinearRange](~/api/Terminal.Gui.Views.LinearRange.yml)** - Sophisticated range selection control
 - **[SpinnerView](~/api/Terminal.Gui.Views.SpinnerView.yml)** - Animated progress indicators
 
 ### Significantly Improved Views
@@ -612,8 +612,8 @@ private bool HandleAccept ()
 ```
 
 **Configurable Keys:**
-- [Application.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
-- [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
+- [IKeyboard.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
+- [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
 - Navigation keys (Tab, F6, arrows)
 
 ### Mouse API
@@ -631,21 +631,10 @@ See the [Mouse Deep Dive](mouse.md) for complete details.
 - Mouse movement tracking
 - Viewport-relative coordinates (not screen-relative)
 
-**Highlight and Continuous Presses:**
-- [View.Highlight](~/api/Terminal.Gui.ViewBase.View.yml) - Visual feedback on hover/click
-- [View.HighlightStyle](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HighlightStyle) - Configure highlight appearance
-- [View.WantContinuousButtonPresses](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_WantContinuousButtonPresses) - Repeat [Command.Accept](~/api/Terminal.Gui.Input.Command.yml) during button hold
-
-```csharp
-// Highlight on hover
-view.Highlight += (s, e) => { /* Visual feedback */ };
-view.HighlightStyle = HighlightStyle.Hover;
-
-// Continuous button presses
-view.WantContinuousButtonPresses = true;
-```
-
----
+**Highlight and Repeat on Hold:**
+- [View.MouseHighlightStates](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHighlightStates) - Allows views to provide visual feedback on hover/click.
+- [View.MouseState](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseState) - Indicates whether the mouse is pressed, hovered, or outside.
+- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHoldRepeat) - Enables or disables whether mouse click events will be repeated when the user holds the mouse down
 
 ## Configuration and Persistence
 

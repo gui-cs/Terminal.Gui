@@ -246,14 +246,17 @@ public class MenuBar : Menu, IDesignable
             _active = value;
             // Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
+            // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
+            // it won't be to the MenuBar
+            CanFocus = value;
+            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+
             if (!_active)
             {
                 // Hide open Popovers
                 HideActiveItem ();
             }
 
-            CanFocus = value;
-            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
         }
     }
 
@@ -665,12 +668,12 @@ public class MenuBar : Menu, IDesignable
                                     new MenuItem
                                     {
                                         Title = "_Online Help...",
-                                        Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", "Ok")
+                                        Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk)
                                     },
                                     new MenuItem
                                     {
                                         Title = "About...",
-                                        Action = () => MessageBox.Query (App!, "About", "Something About Mary.", "Ok")
+                                        Action = () => MessageBox.Query (App!, "About", "Something About Mary.", Strings.btnOk)
                                     }
                                 ]
                                )

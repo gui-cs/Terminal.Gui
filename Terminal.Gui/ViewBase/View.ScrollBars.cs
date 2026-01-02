@@ -68,19 +68,13 @@ public partial class View
 
     private void ConfigureVerticalScrollBar (ScrollBar scrollBar)
     {
-        scrollBar.X = Pos.AnchorEnd ();
+        // Use dynamic Func to set the location & size. Note the -1 for X is to subtract
+        // the Padding we add for the scrollbar. The Func is only called if the ScrollBar is
+        // visible.
+        scrollBar.X = Pos.AnchorEnd () - Pos.Func (_ => Padding!.Thickness.Right - 1);
+        scrollBar.Y = Pos.Func (_ => Padding!.Thickness.Top);
 
-        scrollBar.Height = Dim.Fill (
-                                     Dim.Func (
-                                               _ =>
-                                               {
-                                                   if (_horizontalScrollBar.IsValueCreated)
-                                                   {
-                                                       return _horizontalScrollBar.Value.Visible ? 1 : 0;
-                                                   }
-
-                                                   return 0;
-                                               }));
+        scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Bottom));
         scrollBar.ScrollableContentSize = GetContentSize ().Height;
 
         ViewportChanged += (_, _) =>
@@ -88,24 +82,21 @@ public partial class View
                                scrollBar.Position = Viewport.Y;
                            };
 
-        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+        ContentSizeChanged += (_, _) =>
+                              {
+                                  scrollBar.ScrollableContentSize = GetContentSize ().Height;
+                              };
     }
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
     {
-        scrollBar.Y = Pos.AnchorEnd ();
+        // Use dynamic Func to set the location & size. Note the -1 for Y is to subtract
+        // the Padding we add for the scrollbar. The Func is only called if the ScrollBar is
+        // visible.
+        scrollBar.X = Pos.Func (_ => Padding!.Thickness.Left);
+        scrollBar.Y = Pos.AnchorEnd () - Pos.Func (_ => Padding!.Thickness.Bottom - 1);
 
-        scrollBar.Width = Dim.Fill (
-                                    Dim.Func (
-                                              _ =>
-                                              {
-                                                  if (_verticalScrollBar.IsValueCreated)
-                                                  {
-                                                      return _verticalScrollBar.Value.Visible ? 1 : 0;
-                                                  }
-
-                                                  return 0;
-                                              }));
+        scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Right));
         scrollBar.ScrollableContentSize = GetContentSize ().Width;
 
         ViewportChanged += (_, _) =>
@@ -144,6 +135,12 @@ public partial class View
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {
+                                        // Reset scrolling
+                                        if (!scrollBar.Visible)
+                                        {
+                                            Viewport = Viewport with { Y = 0 };
+                                        }
+
                                         Padding.Thickness = Padding.Thickness with
                                         {
                                             Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right - 1
@@ -165,6 +162,12 @@ public partial class View
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {
+                                        // Reset scrolling
+                                        if (!scrollBar.Visible)
+                                        {
+                                            Viewport = Viewport with { X = 0 };
+                                        }
+
                                         Padding.Thickness = Padding.Thickness with
                                         {
                                             Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom - 1

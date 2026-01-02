@@ -10,7 +10,7 @@ public class MarginTests (ITestOutputHelper output)
     public void Margin_Is_Transparent ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
@@ -43,7 +43,7 @@ public class MarginTests (ITestOutputHelper output)
     public void Margin_ViewPortSettings_Not_Transparent_Is_NotTransparent ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };

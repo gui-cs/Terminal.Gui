@@ -3,12 +3,12 @@ using TerminalGuiFluentTesting;
 using TerminalGuiFluentTestingXunit;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests;
 
 /// <summary>
 ///     Tests for the PopoverMenu class
 /// </summary>
-public class PopoverMenuTests
+public class PopoverMenuTests : TestsAllDrivers
 {
     private readonly TextWriter _out;
 
@@ -19,10 +19,10 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void EnableForDesign_CreatesMenuItems (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void EnableForDesign_CreatesMenuItems (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d)
+        using TestContext c = With.A<Window> (80, 25, d)
                                      .Then ((app) =>
                                             {
                                                 PopoverMenu popoverMenu = new ();
@@ -49,13 +49,13 @@ public class PopoverMenuTests
     private static readonly object o = new ();
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Activate_Sets_Application_Navigation_Correctly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Activate_Sets_Application_Navigation_Correctly (string d)
     {
         lock (o)
         {
             IApplication? app = null;
-            using GuiTestContext c = With.A<Window> (50, 20, d)
+            using TestContext c = With.A<Window> (50, 20, d)
                                          .Then ((a) =>
                                                 {
                                                     app = a;
@@ -96,11 +96,11 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void QuitKey_Hides (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void QuitKey_Hides (string d)
     {
         IApplication? app = null;
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using TestContext c = With.A<Window> (50, 20, d)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -135,7 +135,7 @@ public class PopoverMenuTests
                                      .Then ((_) => app?.Popover!.Show (app?.Popover.Popovers.First ()))
                                      .ScreenShot ("After Show", _out)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
-                                     .EnqueueKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover!.Popovers.Cast<PopoverMenu> ().FirstOrDefault ()!.Visible)
                                      .AssertNull (app?.Popover!.GetActivePopover ())
@@ -143,11 +143,11 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void QuitKey_Restores_Focus_Correctly (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void QuitKey_Restores_Focus_Correctly (string d)
     {
         IApplication? app = null;
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using TestContext c = With.A<Window> (50, 20, d)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -184,19 +184,19 @@ public class PopoverMenuTests
                                      .ScreenShot ("After Show", _out)
                                      .AssertTrue (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertIsType<MenuItem> (app?.Navigation!.GetFocused ())
-                                     .EnqueueKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ());
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void MenuBarItem_With_QuitKey_Open_QuitKey_Does_Not_Quit_App (string d)
     {
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using TestContext c = With.A<Window> (50, 20, d)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -232,15 +232,15 @@ public class PopoverMenuTests
                                      .ScreenShot ("PopoverMenu after Show", _out)
                                      .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
                                      .AssertTrue (app?.TopRunnable!.IsRunning)
-                                     .EnqueueKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .ScreenShot ($"After {Application.QuitKey}", _out)
                                      .AssertFalse (app?.Popover?.GetActivePopover () is PopoverMenu)
                                      .AssertTrue (app?.TopRunnable!.IsRunning);
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Not_Active_DoesNotEat_Space (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Not_Active_DoesNotEat_Space (string d)
     {
         var spaceKeyDownCount = 0;
 
@@ -259,7 +259,7 @@ public class PopoverMenuTests
                             };
 
         IApplication? app = null;
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using TestContext c = With.A<Window> (50, 20, d)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -273,13 +273,13 @@ public class PopoverMenuTests
                                             })
                                      .Add (testView)
                                      .Focus (testView)
-                                     .EnqueueKeyEvent (Key.Space)
+                                     .KeyDown (Key.Space)
                                      .AssertEqual (1, spaceKeyDownCount);
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Not_Active_DoesNotEat_Enter (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Not_Active_DoesNotEat_Enter (string d)
     {
         var enterKeyDownCount = 0;
 
@@ -299,7 +299,7 @@ public class PopoverMenuTests
 
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using TestContext c = With.A<Window> (50, 20, d)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -313,13 +313,13 @@ public class PopoverMenuTests
                                             })
                                      .Add (testView)
                                      .Focus (testView)
-                                     .EnqueueKeyEvent (Key.Enter)
+                                     .KeyDown (Key.Enter)
                                      .AssertEqual (1, enterKeyDownCount);
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void Not_Active_DoesNotEat_QuitKey (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void Not_Active_DoesNotEat_QuitKey (string d)
     {
         var quitKeyDownCount = 0;
 
@@ -338,7 +338,7 @@ public class PopoverMenuTests
                             };
 
         IApplication? app = null;
-        using GuiTestContext c = With.A<Window> (50, 20, d)
+        using TestContext c = With.A<Window> (50, 20, d)
                                      .Then ((a) =>
                                             {
                                                 app = a;
@@ -351,20 +351,20 @@ public class PopoverMenuTests
                                                 app?.Popover!.Register (popoverMenu);
                                             })
                                      .Add (testView)
-                                     .EnqueueKeyEvent (Application.QuitKey)
+                                     .KeyDown (Application.QuitKey)
                                      .AssertEqual (1, quitKeyDownCount);
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ContextMenu_CrashesOnRight (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void ContextMenu_CrashesOnRight (string d)
     {
         var clicked = false;
 
         MenuItem [] menuItems = [new ("_New File", string.Empty, () => { clicked = true; })];
 
         IApplication? app = null;
-        using GuiTestContext c = With.A<Window> (40, 10, d, _out)
+        using TestContext c = With.A<Window> (40, 10, d,  _out)
                                      .Then ((a) => app = a)
                                      .WithContextMenu (new (menuItems) { App = app })
                                      .ScreenShot ("Before open menu", _out)
@@ -385,8 +385,8 @@ public class PopoverMenuTests
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void ContextMenu_OpenSubmenu (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void ContextMenu_OpenSubmenu (string d)
     {
         var clicked = false;
 
@@ -414,7 +414,7 @@ public class PopoverMenuTests
 
         IApplication? app = null;
 
-        using GuiTestContext c = With.A<Window> (40, 10, d)
+        using TestContext c = With.A<Window> (40, 10, d)
                                      .Then ((a) => app = a)
                                      .WithContextMenu (new (menuItems) { App = app })
                                      .ScreenShot ("Before open menu", _out)
@@ -422,13 +422,13 @@ public class PopoverMenuTests
                                      // Click in main area inside border
                                      .RightClick (1, 1)
                                      .ScreenShot ("After open menu", _out)
-                                     .EnqueueKeyEvent (Key.CursorDown)
-                                     .EnqueueKeyEvent (Key.CursorDown)
-                                     .EnqueueKeyEvent (Key.CursorDown)
-                                     .EnqueueKeyEvent (Key.CursorRight)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.CursorRight)
                                      .ScreenShot ("After open submenu", _out)
-                                     .EnqueueKeyEvent (Key.CursorDown)
-                                     .EnqueueKeyEvent (Key.Enter)
+                                     .KeyDown (Key.CursorDown)
+                                     .KeyDown (Key.Enter)
                                      .ScreenShot ("Menu should be closed after selecting", _out);
         Assert.True (clicked);
     }

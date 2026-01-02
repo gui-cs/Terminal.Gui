@@ -95,7 +95,7 @@ public class DefaultFileOperations : IFileOperations
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, ex.Message, "Ok");
+                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, ex.Message, Strings.btnOk);
                 }
             }
         }
@@ -122,7 +122,7 @@ public class DefaultFileOperations : IFileOperations
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.ErrorQuery (app, Strings.fdNewFailed, ex.Message, "Ok");
+                    MessageBox.ErrorQuery (app, Strings.fdNewFailed, ex.Message, Strings.btnOk);
                 }
             }
         }

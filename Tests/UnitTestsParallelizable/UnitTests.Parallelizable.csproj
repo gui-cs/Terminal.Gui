@@ -30,7 +30,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\UnitTests\DriverAssert.cs" Link="DriverAssert.cs" />
 		<Compile Include="..\UnitTests\OutputAssert.cs" Link="OutputAssert.cs" />
 	</ItemGroup>
 

@@ -31,14 +31,14 @@ public class AllViewsTester : Scenario
         // Don't create a sub-win (Scenario.Win); just use Application.TopRunnable
         Application.Init ();
 
-        var app = new Window
+        var window = new Window
         {
             Title = GetQuitKeyAndName (),
         };
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
-        app.Border!.LineStyle = LineStyle.Heavy;
-        app.Border!.Thickness = new (0);
+        window.Border!.LineStyle = LineStyle.Heavy;
+        window.Border!.Thickness = new (0);
 
 
         _viewClasses = GetAllViewClassesCollection ()
@@ -175,6 +175,8 @@ public class AllViewsTester : Scenario
                                                           // We have two choices:
                                                           // 1) Call Layout explicitly
                                                           // 2) Throw LayoutException so Layout tries again
+                                                          // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+                                                          // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
                                                           _eventLog.Layout ();
                                                           //throw new LayoutException ("_eventLog");
                                                       }
@@ -195,17 +197,17 @@ public class AllViewsTester : Scenario
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border!.SetScheme (app.GetScheme ());
+        _hostPane.Border!.SetScheme (window.GetScheme ());
         _hostPane.Padding!.Thickness = new (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.SetScheme (app.GetScheme ());
+        _hostPane.Padding.SetScheme (window.GetScheme ());
 
-        app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _propertiesEditor, _eventLog, _hostPane);
+        window.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _propertiesEditor, _eventLog, _hostPane);
 
-        app.Initialized += App_Initialized;
+        window.Initialized += App_Initialized;
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
     }
 
@@ -343,7 +345,7 @@ public class AllViewsTester : Scenario
         UpdateHostTitle (view);
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         var keys = new List<Key> ();
 

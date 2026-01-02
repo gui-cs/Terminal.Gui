@@ -219,8 +219,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -245,8 +245,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -271,8 +271,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Empty (r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
@@ -302,8 +302,8 @@ public class ViewTests
         Assert.False (r.IsCurrentTop);
         Assert.Equal (string.Empty, r.Id);
         Assert.Empty (r.SubViews);
-        Assert.False (r.WantContinuousButtonPressed);
-        Assert.False (r.WantMousePositionReports);
+        Assert.Null (r.MouseHoldRepeat);
+        Assert.False (r.MousePositionTracking );
         Assert.Null (r.SuperView);
         Assert.Null (r.MostFocused);
         Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
@@ -318,8 +318,6 @@ public class ViewTests
 
         Assert.False (r.NewKeyDownEvent (Key.Empty));
 
-        //Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-        Assert.False (r.NewKeyUpEvent (Key.Empty));
         Assert.False (r.NewMouseEvent (new () { Flags = MouseFlags.AllEvents }));
 
         r.Dispose ();

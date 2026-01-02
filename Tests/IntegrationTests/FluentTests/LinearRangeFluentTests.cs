@@ -1,60 +1,60 @@
 using TerminalGuiFluentTesting;
 using Xunit.Abstractions;
 
-namespace IntegrationTests.FluentTests;
+namespace IntegrationTests;
 
-public class LinearRangeFluentTests (ITestOutputHelper outputHelper)
+public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
     private readonly TextWriter _out = new TestOutputWriter (outputHelper);
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void LinearRange_CanCreateAndRender (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void LinearRange_CanCreateAndRender (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
-                                     .Add (
-                                           new LinearRange<int> (new() { 0, 10, 20, 30, 40, 50 })
-                                           {
-                                               X = 2,
-                                               Y = 2,
-                                               Type = LinearRangeType.Single
-                                           })
-                                     .Focus<LinearRange<int>> ()
-                                     .WaitIteration ()
-                                     .ScreenShot ("LinearRange initial render", _out)
-                                     .Stop ();
+        using TestContext c = With.A<Window> (30, 10, d, _out)
+                                  .Add (
+                                        new LinearRange<int> ([0, 10, 20, 30, 40, 50])
+                                        {
+                                            X = 2,
+                                            Y = 2,
+                                            Type = LinearRangeType.Single
+                                        })
+                                  .Focus<LinearRange<int>> ()
+                                  .WaitIteration ()
+                                  .ScreenShot ("LinearRange initial render", _out)
+                                  .Stop ();
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void LinearRange_CanNavigateWithArrowKeys (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void LinearRange_CanNavigateWithArrowKeys (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
-                                     .Add (
-                                           new LinearRange<int> (new() { 0, 10, 20, 30 })
-                                           {
-                                               X = 2,
-                                               Y = 2,
-                                               Type = LinearRangeType.Single,
-                                               AllowEmpty = false
-                                           })
-                                     .Focus<LinearRange<int>> ()
-                                     .WaitIteration ()
-                                     .ScreenShot ("Initial state", _out)
-                                     .EnqueueKeyEvent (Key.CursorRight)
-                                     .WaitIteration ()
-                                     .ScreenShot ("After right arrow", _out)
-                                     .EnqueueKeyEvent (Key.CursorRight)
-                                     .WaitIteration ()
-                                     .ScreenShot ("After second right arrow", _out)
-                                     .Stop ();
+        using TestContext c = With.A<Window> (30, 10, d, _out)
+                                  .Add (
+                                        new LinearRange<int> ([0, 10, 20, 30])
+                                        {
+                                            X = 2,
+                                            Y = 2,
+                                            Type = LinearRangeType.Single,
+                                            AllowEmpty = false
+                                        })
+                                  .Focus<LinearRange<int>> ()
+                                  .WaitIteration ()
+                                  .ScreenShot ("Initial state", _out)
+                                  .KeyDown (Key.CursorRight)
+                                  .WaitIteration ()
+                                  .ScreenShot ("After right arrow", _out)
+                                  .KeyDown (Key.CursorRight)
+                                  .WaitIteration ()
+                                  .ScreenShot ("After second right arrow", _out)
+                                  .Stop ();
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void LinearRange_TypeChange_TriggersEvents (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void LinearRange_TypeChange_TriggersEvents (string d)
     {
-        LinearRange<int> linearRange = new (new() { 0, 10, 20, 30 })
+        LinearRange<int> linearRange = new ([0, 10, 20, 30])
         {
             X = 2,
             Y = 2,
@@ -81,12 +81,12 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper)
         // Change the type before adding to window
         linearRange.Type = LinearRangeType.Range;
 
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
-                                     .Add (linearRange)
-                                     .Focus<LinearRange<int>> ()
-                                     .WaitIteration ()
-                                     .ScreenShot ("After type change to Range", _out)
-                                     .Stop ();
+        using TestContext c = With.A<Window> (30, 10, d, _out)
+                                  .Add (linearRange)
+                                  .Focus<LinearRange<int>> ()
+                                  .WaitIteration ()
+                                  .ScreenShot ("After type change to Range", _out)
+                                  .Stop ();
 
         Assert.True (changingEventRaised);
         Assert.True (changedEventRaised);
@@ -94,51 +94,51 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper)
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void LinearRange_RangeType_CanSelectRange (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void LinearRange_RangeType_CanSelectRange (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
-                                     .Add (
-                                           new LinearRange<int> (new() { 0, 10, 20, 30, 40 })
-                                           {
-                                               X = 2,
-                                               Y = 2,
-                                               Type = LinearRangeType.Range,
-                                               AllowEmpty = false
-                                           })
-                                     .Focus<LinearRange<int>> ()
-                                     .WaitIteration ()
-                                     .ScreenShot ("Range type initial", _out)
-                                     .EnqueueKeyEvent (Key.Space)
-                                     .WaitIteration ()
-                                     .ScreenShot ("After first selection", _out)
-                                     .EnqueueKeyEvent (Key.CursorRight.WithCtrl)
-                                     .WaitIteration ()
-                                     .EnqueueKeyEvent (Key.CursorRight.WithCtrl)
-                                     .WaitIteration ()
-                                     .ScreenShot ("After extending range", _out)
-                                     .Stop ();
+        using TestContext c = With.A<Window> (30, 10, d, _out)
+                                  .Add (
+                                        new LinearRange<int> ([0, 10, 20, 30, 40])
+                                        {
+                                            X = 2,
+                                            Y = 2,
+                                            Type = LinearRangeType.Range,
+                                            AllowEmpty = false
+                                        })
+                                  .Focus<LinearRange<int>> ()
+                                  .WaitIteration ()
+                                  .ScreenShot ("Range type initial", _out)
+                                  .KeyDown (Key.Space)
+                                  .WaitIteration ()
+                                  .ScreenShot ("After first selection", _out)
+                                  .KeyDown (Key.CursorRight.WithCtrl)
+                                  .WaitIteration ()
+                                  .KeyDown (Key.CursorRight.WithCtrl)
+                                  .WaitIteration ()
+                                  .ScreenShot ("After extending range", _out)
+                                  .Stop ();
     }
 
     [Theory]
-    [ClassData (typeof (TestDrivers))]
-    public void LinearRange_VerticalOrientation_Renders (TestDriver d)
+    [MemberData (nameof (GetAllDriverNames))]
+    public void LinearRange_VerticalOrientation_Renders (string d)
     {
-        using GuiTestContext c = With.A<Window> (80, 25, d, _out)
-                                     .Add (
-                                           new LinearRange<int> (new() { 0, 10, 20, 30 })
-                                           {
-                                               X = 2,
-                                               Y = 2,
-                                               Orientation = Orientation.Vertical,
-                                               Type = LinearRangeType.Single
-                                           })
-                                     .Focus<LinearRange<int>> ()
-                                     .WaitIteration ()
-                                     .ScreenShot ("Vertical orientation", _out)
-                                     .EnqueueKeyEvent (Key.CursorDown)
-                                     .WaitIteration ()
-                                     .ScreenShot ("After down arrow", _out)
-                                     .Stop ();
+        using TestContext c = With.A<Window> (10, 15, d, _out)
+                                  .Add (
+                                        new LinearRange<int> ([0, 10, 20, 30])
+                                        {
+                                            X = 2,
+                                            Y = 2,
+                                            Orientation = Orientation.Vertical,
+                                            Type = LinearRangeType.Single
+                                        })
+                                  .Focus<LinearRange<int>> ()
+                                  .WaitIteration ()
+                                  .ScreenShot ("Vertical orientation", _out)
+                                  .KeyDown (Key.CursorDown)
+                                  .WaitIteration ()
+                                  .ScreenShot ("After down arrow", _out)
+                                  .Stop ();
     }
 }

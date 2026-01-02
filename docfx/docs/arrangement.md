@@ -123,7 +123,7 @@ var view2 = new View
 
 ## Arrange Mode (Interactive)
 
-**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)).
+**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)).
 
 ### Entering Arrange Mode
 
@@ -716,7 +716,7 @@ view.LayoutComplete += (s, e) =>
 - **[View Deep Dive](View.md)** - View base class
 - **[Multitasking Deep Dive](multitasking.md)** - Modal and runnable views
 - **[Drawing Deep Dive](drawing.md)** - LineCanvas and borders
-- **[Configuration Deep Dive](config.md)** - Configuring Application.ArrangeKey
+- **[Configuration Deep Dive](config.md)** - Configuring IKeyboard.ArrangeKey
 
 ### API Reference
 

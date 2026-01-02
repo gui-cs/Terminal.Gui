@@ -42,7 +42,7 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    private void OnMouseEvent (object? sender, MouseEventArgs e)
+    private void OnMouseEvent (object? sender, Mouse e)
     {
         NavigationDirection direction = NavigationDirection.Backward;
 

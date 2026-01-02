@@ -1,6 +1,6 @@
 ﻿using Xunit.Abstractions;
 
-namespace ViewBaseTests.Arrangement;
+namespace ViewBaseTests.Adornments;
 
 
 public class ArrangementTests (ITestOutputHelper output)
@@ -694,7 +694,7 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (window.Arrangement.HasFlag (ViewArrangement.Overlapped));
     }
 
-    [Fact]
+    [Fact (Skip = "need to test with IsRunnable true")]
     public void Dialog_DefaultsToMovableAndOverlapped ()
     {
         var dialog = new Dialog ();

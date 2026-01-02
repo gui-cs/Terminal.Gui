@@ -50,11 +50,11 @@ public class RegionScenario : Scenario
         appWindow.Add (tools);
 
         // Add drag handling to window
-        appWindow.MouseEvent += (_, e) =>
+        appWindow.MouseEvent += (s, e) =>
                                 {
-                                    if (e.Flags.HasFlag (MouseFlags.Button1Pressed))
+                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
                                     {
-                                        if (!e.Flags.HasFlag (MouseFlags.ReportMousePosition))
+                                        if (!e.Flags.HasFlag (MouseFlags.PositionReport))
                                         { // Start drag
                                             _dragStart = e.ScreenPosition;
                                             _isDragging = true;
@@ -69,20 +69,18 @@ public class RegionScenario : Scenario
                                         }
                                     }
 
-                                    if (!e.Flags.HasFlag (MouseFlags.Button1Released))
+                                    if (e.Flags.HasFlag (MouseFlags.LeftButtonReleased))
                                     {
-                                        return;
-                                    }
+                                        if (_isDragging && _dragStart.HasValue)
+                                        {
+                                            // Add the new region
+                                            AddRectangleFromPoints (_dragStart.Value, e.ScreenPosition, _regionOp);
+                                            _isDragging = false;
+                                            _dragStart = null;
+                                        }
 
-                                    if (_isDragging && _dragStart.HasValue)
-                                    {
-                                        // Add the new region
-                                        AddRectangleFromPoints (_dragStart.Value, e.ScreenPosition, _regionOp);
-                                        _isDragging = false;
-                                        _dragStart = null;
+                                        appWindow.SetNeedsDraw ();
                                     }
-
-                                    appWindow.SetNeedsDraw ();
                                 };
 
         // Draw the regions
@@ -322,15 +320,15 @@ internal class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouse)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouse.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            if (IsForegroundPoint (mouse.Position.X, mouse.Position.Y))
+            if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouse.Position.X, mouse.Position.Y))
+            else if (IsBackgroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }

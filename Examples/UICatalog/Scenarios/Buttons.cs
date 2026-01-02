@@ -102,7 +102,7 @@ public class Buttons : Scenario
 
         button.Accepting += (s, e) =>
                             {
-                                MessageBox.Query ((s as View)?.App!, "Message", "Is There A Question?", "Yes", "No");
+                                MessageBox.Query ((s as View)?.App!, "Message", "Is There A Question?", "_No", "_Yes");
                                 e.Handled = true;
                             };
 
@@ -350,7 +350,7 @@ public class Buttons : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accepting Count: {noRepeatAcceptCount}",
-            WantContinuousButtonPressed = false
+            MouseHoldRepeat = null
         };
 
         noRepeatButton.Accepting += (_, e) =>
@@ -374,8 +374,8 @@ public class Buttons : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accepting Count: {noRepeatNoHighlightAcceptCount}",
-            WantContinuousButtonPressed = false,
-            HighlightStates = MouseState.None
+            MouseHoldRepeat = null,
+            MouseHighlightStates = MouseState.None
         };
 
         noRepeatNoHighlight.Accepting += (_, e) =>
@@ -401,7 +401,7 @@ public class Buttons : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Title = $"Accepting Co_unt: {repeatButtonAcceptingCount}",
-            WantContinuousButtonPressed = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
 
         repeatButton.Accepting += (_, e) =>
@@ -443,7 +443,7 @@ public class Buttons : Scenario
         {
             button.Accepting += (s, e) =>
                                 {
-                                    MessageBox.Query ((s as View)?.App!, "Message", $"Did you click {txt}?", "Yes", "No");
+                                    MessageBox.Query ((s as View)?.App!, "Message", $"Did you click {txt}?", "_No", "_Yes");
                                     e.Handled = true;
                                 };
         }

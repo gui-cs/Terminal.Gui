@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Enable Nuget Source Link for github -->
+    <PackageVersion Include="AnsiConsoleToHtml" Version="0.2.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.11.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="4.11.0" />

@@ -108,7 +108,7 @@ public class AnsiRequestScheduler
 
     private void EvictStaleRequests ()
     {
-        foreach (string? stale in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
+        foreach (string stale in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
         {
             EvictStaleRequests (stale);
         }
