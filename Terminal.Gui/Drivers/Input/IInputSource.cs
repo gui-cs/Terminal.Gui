@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Source of input events. Production implementations read from console,

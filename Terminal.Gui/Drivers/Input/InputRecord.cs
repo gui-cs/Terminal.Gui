@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Platform-independent input event record base class for the input injection system.

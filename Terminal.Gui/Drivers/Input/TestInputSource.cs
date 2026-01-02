@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Test input source - provides pre-programmed input for testing.

@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.Testing;
+﻿using Terminal.Gui.Drivers;
+
+namespace Terminal.Gui.Testing;
 
 /// <summary>
 ///     Provides an API for injecting mouse and keyboard input into Terminal.Gui applications.
