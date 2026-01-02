@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using DriverTests.Input;
-using Terminal.Gui.Drivers;
 using Xunit.Abstractions;
 
 namespace InputTests;

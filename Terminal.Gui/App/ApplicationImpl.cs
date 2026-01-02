@@ -1,5 +1,3 @@
-using Terminal.Gui.Drivers;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
