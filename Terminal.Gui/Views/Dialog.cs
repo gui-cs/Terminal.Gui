@@ -244,6 +244,16 @@ public class Dialog : Runnable<int?>, IDesignable
             return;
         }
 
+        if (s is Button { IsDefault: true })
+        {
+            e.Handled = RaiseAccepting (e.Context) is true;
+
+            if (e.Handled)
+            {
+                return;
+            }
+        }
+
         e.Handled = IsRunning;
         Result = _buttonContainer!.SubViews.IndexOf (s);
         RequestStop ();
@@ -271,7 +281,7 @@ public class Dialog : Runnable<int?>, IDesignable
     }
 
     /// <summary>Gets a value indicating whether the <see cref="Dialog"/> was canceled.</summary>
-    public bool Canceled => Result is null or 1;
+    public bool Canceled => Result is null or 1; // Cancel button is index 1
 
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)

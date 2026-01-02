@@ -668,12 +668,12 @@ public class MenuBar : Menu, IDesignable
                                     new MenuItem
                                     {
                                         Title = "_Online Help...",
-                                        Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", "Ok")
+                                        Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk)
                                     },
                                     new MenuItem
                                     {
                                         Title = "About...",
-                                        Action = () => MessageBox.Query (App!, "About", "Something About Mary.", "Ok")
+                                        Action = () => MessageBox.Query (App!, "About", "Something About Mary.", Strings.btnOk)
                                     }
                                 ]
                                )

@@ -154,7 +154,6 @@ public class Wizard : Dialog, IDesignable
         newStep.EnabledChanged += (_, _) => UpdateButtonsAndTitle ();
         newStep.TitleChanged += (_, _) => UpdateButtonsAndTitle ();
         _steps.AddLast (newStep);
-        Add (newStep);
 
         // Find the step's natural size
         //newStep.SuperViewRendersLineCanvas = true;
@@ -166,13 +165,20 @@ public class Wizard : Dialog, IDesignable
         _maxStepSize = new (
                             Math.Max (_maxStepSize.Width, newStep.Frame.Width),
                             Math.Max (_maxStepSize.Height, newStep.Frame.Height));
-        newStep.Width = Dim.Fill ();
-        newStep.Height = Dim.Fill ();
 
-        newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
-        newStep.LayoutSubViews ();
-        Width = Dim.Auto (minimumContentDim: _maxStepSize.Width + 2);
-        Height = Dim.Auto (minimumContentDim: _maxStepSize.Height + NextFinishButton.Frame.Height);
+        // Go through all steps to ensure they are the same size
+        foreach (WizardStep step in _steps)
+        {
+            step.Width = Dim.Fill (0, minimumContentDim: _maxStepSize.Width);
+            step.Height = Dim.Fill (0, minimumContentDim: _maxStepSize.Height);
+        }
+
+        Add (newStep);
+
+        //newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
+        //newStep.LayoutSubViews ();
+        //Width = Dim.Auto (minimumContentDim: _maxStepSize.Width + 2);
+        //Height = Dim.Auto (minimumContentDim: _maxStepSize.Height);
 
         UpdateButtonsAndTitle ();
     }

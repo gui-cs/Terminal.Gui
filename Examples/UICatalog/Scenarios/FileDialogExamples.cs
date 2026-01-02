@@ -66,7 +66,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _osCaption = new () { X = x, Y = y };
-        _osCaption.Labels = ["_Ok", "O_pen", "_Save"];
+        _osCaption.Labels = ["_OK", "O_pen", "_Save"];
         win.Add (_osCaption);
 
         y = 0;
@@ -132,7 +132,7 @@ public class FileDialogExamples : Scenario
                              }
                              catch (Exception ex)
                              {
-                                 MessageBox.ErrorQuery (app, "Error", ex.ToString (), "_Ok");
+                                 MessageBox.ErrorQuery (app, "Error", ex.ToString (), "_OK");
                              }
                              finally
                              {
@@ -176,9 +176,7 @@ public class FileDialogExamples : Scenario
             fd.MustExist = _cbMustExist.CheckedState == CheckState.Checked;
             fd.AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked;
 
-            fd.Style.OkButtonText =
-                _osCaption.Labels.Select (l => TextFormatter.RemoveHotKeySpecifier (l, 0, _osCaption.HotKeySpecifier)).ToArray ()
-                    [_osCaption.Value!.Value];
+            fd.Style.OkButtonText = _osCaption.Labels.ElementAt (_osCaption.Value!.Value);
 
             // If Save style dialog then give them an overwrite prompt
             if (_osCaption.Value == 2)
@@ -239,16 +237,16 @@ public class FileDialogExamples : Scenario
                                   app,
                                   "Canceled",
                                   "You canceled navigation and did not pick anything",
-                                  "Ok"
+                                  "_OK"
                                  );
             }
             else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
             {
-                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)), "Ok");
+                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)), "_OK");
             }
             else
             {
-                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + path, "Ok");
+                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + path, "_OK");
             }
         }
     }
