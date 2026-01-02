@@ -53,7 +53,7 @@ public partial class View
                                           contentSize,
                                           OnContentSizeChanging,
                                           ContentSizeChanging,
-                                          newValue => { }, // doWork is empty because ref _contentSize is updated by CWPPropertyHelper
+                                          newValue => SetNeedsLayout (),
                                           OnContentSizeChanged,
                                           ContentSizeChanged,
                                           out Size? _);
@@ -181,10 +181,7 @@ public partial class View
     ///     Called after the content size has changed.
     /// </summary>
     /// <param name="args">The event arguments containing the old and new content size.</param>
-    protected virtual void OnContentSizeChanged (ValueChangedEventArgs<Size?> args)
-    {
-        SetNeedsLayout ();
-    }
+    protected virtual void OnContentSizeChanged (ValueChangedEventArgs<Size?> args) { }
 
     /// <summary>
     ///     Raised before the content size changes, allowing handlers to modify or cancel the change.
