@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Console input source - reads from actual console (production).
