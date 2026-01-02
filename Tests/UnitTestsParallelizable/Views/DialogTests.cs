@@ -403,8 +403,10 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.Dispose ();
 
+#if DEBUG_IDISPOSABLE
         // After disposal, buttons should be disposed through the dialog's disposal chain
         Assert.True (dialog.WasDisposed);
+#endif
     }
 
     [Fact]

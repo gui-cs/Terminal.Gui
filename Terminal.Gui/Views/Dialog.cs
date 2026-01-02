@@ -237,6 +237,7 @@ public class Dialog : Runnable<int?>, IDesignable
         _minimumButtonsSize = new (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
+#pragma warning disable TGUI001
     private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
     {
         if (e.Handled || !IsRunning)
@@ -258,6 +259,7 @@ public class Dialog : Runnable<int?>, IDesignable
         Result = _buttonContainer!.SubViews.IndexOf (s);
         RequestStop ();
     }
+#pragma warning restore
 
     /// <summary>Determines how the <see cref="Dialog"/> <see cref="Button"/>s are aligned along the bottom of the dialog.</summary>
     public Alignment ButtonAlignment { get; set; }
