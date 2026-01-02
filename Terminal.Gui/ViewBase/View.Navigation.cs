@@ -397,17 +397,22 @@ public partial class View // Focus and cross-view navigation management (TabStop
     public bool IsCurrentTop => App?.TopRunnableView == this;
 
     /// <summary>
-    ///     Returns the most focused SubView down the subview-hierarchy.
+    ///     Returns the most focused SubView down the subview-hierarchy, or this view if it has focus and no subview has focus.
     /// </summary>
-    /// <value>The most focused SubView, or <see langword="null"/> if no SubView is focused.</value>
+    /// <value>The most focused SubView, this view if it has focus and no subview has focus, or <see langword="null"/> if this view does not have focus.</value>
     public View? MostFocused
     {
         get
         {
             // TODO: Remove this API. It's duplicative of Application.Navigation.GetFocused.
-            if (Focused is null)
+            if (!HasFocus)
             {
                 return null;
+            }
+
+            if (Focused is null)
+            {
+                return this;
             }
 
             View? most = Focused.MostFocused;
