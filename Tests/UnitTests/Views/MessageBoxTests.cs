@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System.Text;
 using UICatalog;
 using UnitTests;
 using Xunit.Abstractions;
@@ -11,7 +10,8 @@ public class MessageBoxTests (ITestOutputHelper output)
     [Fact]
     public void UICatalog_AboutBox ()
     {
-        IApplication app = Application.Create ();
+        // Do not use modern Create here (non-parallel tests)
+        IApplication app = Application.Instance;
         app.Init (DriverRegistry.Names.ANSI);
 
         try
@@ -22,13 +22,14 @@ public class MessageBoxTests (ITestOutputHelper output)
             // Override CM
             MessageBox.DefaultButtonAlignment = Alignment.End;
             MessageBox.DefaultBorderStyle = LineStyle.Double;
-            Dialog.DefaultShadow = ShadowStyle.None; 
+            Dialog.DefaultShadow = ShadowStyle.None;
             Button.DefaultShadow = ShadowStyle.None;
 
             app.Iteration += OnApplicationOnIteration;
 
             var top = new Runnable ();
             top.BorderStyle = LineStyle.Single;
+
             try
             {
                 app.Run (top);
@@ -88,5 +89,4 @@ public class MessageBoxTests (ITestOutputHelper output)
             app.Dispose ();
         }
     }
-
 }
