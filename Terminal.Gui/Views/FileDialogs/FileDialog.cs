@@ -674,6 +674,12 @@ public class FileDialog : Dialog, IDesignable
         ApplySort ();
     }
 
+    /// <inheritdoc />
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        return Accept (true);
+    }
+
     private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
         if (!AllowsMultipleSelection)
@@ -713,11 +719,11 @@ public class FileDialog : Dialog, IDesignable
         FinishAccept ();
     }
 
-    private void Accept (bool allowMulti)
+    private bool Accept (bool allowMulti)
     {
         if (allowMulti && TryAcceptMulti ())
         {
-            return;
+            return false;
         }
 
         if (!IsCompatibleWithOpenMode (_tbPath.Text, out string reason))
@@ -725,10 +731,10 @@ public class FileDialog : Dialog, IDesignable
             _feedback = reason;
             SetNeedsDraw ();
 
-            return;
+            return false;
         }
 
-        FinishAccept ();
+        return FinishAccept ();
     }
 
     private void AcceptIf (Key key, KeyCode isKey)
@@ -779,22 +785,6 @@ public class FileDialog : Dialog, IDesignable
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
     }
 
-    private int CalculateOkButtonPosX (View? _)
-    {
-        if (!IsInitialized || !_btnOk.IsInitialized || !_btnCancel.IsInitialized)
-        {
-            return 0;
-        }
-
-        return Viewport.Width
-               - _btnOk.Viewport.Width
-               - _btnCancel.Viewport.Width
-               - 1
-
-               // TODO: Fiddle factor, seems the Viewport are wrong for someone
-               - 2;
-    }
-
     private bool CancelSearch ()
     {
         if (State is SearchState search)
@@ -831,7 +821,6 @@ public class FileDialog : Dialog, IDesignable
             Accept (f);
         }
     }
-
     private void ClearFeedback () { _feedback = null; }
 
     private Scheme ColorGetter (CellColorGetterArgs args)
@@ -866,7 +855,7 @@ public class FileDialog : Dialog, IDesignable
         }
     }
 
-    private void FinishAccept ()
+    private bool FinishAccept ()
     {
         var e = new FilesSelectedEventArgs (this);
 
@@ -874,7 +863,7 @@ public class FileDialog : Dialog, IDesignable
 
         if (e.Cancel)
         {
-            return;
+            return false;
         }
 
         // if user uses Path selection mode (e.g. Enter in text box)
@@ -892,7 +881,11 @@ public class FileDialog : Dialog, IDesignable
         if (IsModal)
         {
             App?.RequestStop ();
+
+            return true;
         }
+
+        return false;
     }
 
     private string GetBackButtonText () { return Glyphs.LeftArrow + "-"; }

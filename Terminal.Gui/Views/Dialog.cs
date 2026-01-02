@@ -244,6 +244,16 @@ public class Dialog : Runnable<int?>, IDesignable
             return;
         }
 
+        if (s is Button { IsDefault: true })
+        {
+            e.Handled = RaiseAccepting (e.Context) is true;
+
+            if (e.Handled)
+            {
+                return;
+            }
+        }
+
         e.Handled = IsRunning;
         Result = _buttonContainer!.SubViews.IndexOf (s);
         RequestStop ();

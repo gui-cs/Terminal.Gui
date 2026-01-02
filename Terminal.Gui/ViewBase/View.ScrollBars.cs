@@ -145,10 +145,6 @@ public partial class View
                                         {
                                             Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right - 1
                                         };
-
-                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-                                        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                        // Layout ();
                                     };
     }
 
@@ -176,10 +172,6 @@ public partial class View
                                         {
                                             Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom - 1
                                         };
-
-                                        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-                                        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-                                        // Layout ();
                                     };
     }
 

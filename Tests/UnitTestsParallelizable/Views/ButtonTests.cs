@@ -54,11 +54,9 @@ public class ButtonTests
     [InlineData ("0_12你", 10, 1, 10, 1)]
     public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
-        // Override CM
-        Button.DefaultShadow = ShadowStyle.None;
-
         var btn1 = new Button
         {
+            ShadowStyle = ShadowStyle.None,
             Text = text,
             Width = width,
             Height = height
@@ -81,10 +79,8 @@ public class ButtonTests
     [InlineData (10, 3, 10, 3)]
     public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
-        // Override CM
-        Button.DefaultShadow = ShadowStyle.None;
-
         var btn1 = new Button ();
+        btn1.ShadowStyle = ShadowStyle.None;
         btn1.Width = width;
         btn1.Height = height;
 
