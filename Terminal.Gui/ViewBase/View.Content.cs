@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ViewBase;
+﻿using Terminal.Gui.App;
+
+namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
@@ -31,7 +33,13 @@ public partial class View
     ///         <see cref="GetContentSize ()"/> to determine the size
     ///         of the view.
     ///     </para>
+    ///     <para>
+    ///         This method follows the Cancellable Work Pattern (CWP). The <see cref="ContentSizeChanging"/> event
+    ///         is raised before the change, and <see cref="ContentSizeChanged"/> is raised after.
+    ///     </para>
     /// </remarks>
+    /// <seealso cref="ContentSizeChanging"/>
+    /// <seealso cref="ContentSizeChanged"/>
     public void SetContentSize (Size? contentSize)
     {
         if (contentSize is { } && (contentSize.Value.Width < 0 || contentSize.Value.Height < 0))
@@ -39,13 +47,16 @@ public partial class View
             throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
         }
 
-        if (contentSize == _contentSize)
-        {
-            return;
-        }
-
-        _contentSize = contentSize;
-        OnContentSizeChanged (new (_contentSize));
+        CWPPropertyHelper.ChangeProperty (
+                                          this,
+                                          ref _contentSize,
+                                          contentSize,
+                                          OnContentSizeChanging,
+                                          ContentSizeChanging,
+                                          newValue => { }, // doWork is empty because ref _contentSize is updated by CWPPropertyHelper
+                                          OnContentSizeChanged,
+                                          ContentSizeChanged,
+                                          out Size? _);
     }
 
     /// <summary>
@@ -160,26 +171,72 @@ public partial class View
     }
 
     /// <summary>
-    ///     Called when <see cref="GetContentSize ()"/> has changed.
+    ///     Called before the content size changes, allowing subclasses to cancel or modify the change.
     /// </summary>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    protected bool? OnContentSizeChanged (SizeChangedEventArgs e)
+    /// <param name="args">The event arguments containing the current and proposed new content size.</param>
+    /// <returns>True to cancel the change, false to proceed.</returns>
+    protected virtual bool OnContentSizeChanging (ValueChangingEventArgs<Size?> args) { return false; }
+
+    /// <summary>
+    ///     Called after the content size has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing the old and new content size.</param>
+    protected virtual void OnContentSizeChanged (ValueChangedEventArgs<Size?> args)
     {
-        ContentSizeChanged?.Invoke (this, e);
-
-        if (!e.Cancel)
-        {
-            SetNeedsLayout ();
-        }
-
-        return e.Cancel;
+        SetNeedsLayout ();
     }
 
     /// <summary>
-    ///     Event raised when the <see cref="GetContentSize ()"/> changes.
+    ///     Raised before the content size changes, allowing handlers to modify or cancel the change.
     /// </summary>
-    public event EventHandler<SizeChangedEventArgs>? ContentSizeChanged;
+    /// <remarks>
+    ///     <para>
+    ///         Set <see cref="ValueChangingEventArgs{T}.Handled"/> to true to cancel the change or modify
+    ///         <see cref="ValueChangingEventArgs{T}.NewValue"/> to adjust the proposed value.
+    ///     </para>
+    ///     <para>
+    ///         This event follows the Cancellable Work Pattern (CWP). See the
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
+    ///         for more information.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///         view.ContentSizeChanging += (sender, args) =>
+    ///         {
+    ///             if (args.NewValue?.Width > 1000)
+    ///             {
+    ///                 args.Handled = true;
+    ///                 Console.WriteLine("Content size too large, change cancelled.");
+    ///             }
+    ///         };
+    ///     </code>
+    /// </example>
+    public event EventHandler<ValueChangingEventArgs<Size?>>? ContentSizeChanging;
+
+    /// <summary>
+    ///     Raised after the content size has changed, notifying handlers of the completed change.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Provides the old and new content size via <see cref="ValueChangedEventArgs{T}.OldValue"/> and
+    ///         <see cref="ValueChangedEventArgs{T}.NewValue"/>, which may be null.
+    ///     </para>
+    ///     <para>
+    ///         This event follows the Cancellable Work Pattern (CWP). See the
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
+    ///         for more information.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///         view.ContentSizeChanged += (sender, args) =>
+    ///         {
+    ///             Console.WriteLine($"Content size changed from {args.OldValue} to {args.NewValue}.");
+    ///         };
+    ///     </code>
+    /// </example>
+    public event EventHandler<ValueChangedEventArgs<Size?>>? ContentSizeChanged;
 
     /// <summary>
     ///     Converts a Content-relative location to a Screen-relative location.

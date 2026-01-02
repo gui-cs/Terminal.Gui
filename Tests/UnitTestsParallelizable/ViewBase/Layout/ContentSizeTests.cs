@@ -191,19 +191,24 @@ public class ContentSizeTests (ITestOutputHelper output)
         view.EndInit ();
 
         int eventCount = 0;
-        Size? capturedSize = null;
+        Size? capturedOldSize = Size.Empty; // Initialize to non-null to detect if it's set
+        Size? capturedNewSize = Size.Empty;
 
         view.ContentSizeChanged += (sender, e) =>
         {
             eventCount++;
-            capturedSize = e.Size;
+            capturedOldSize = e.OldValue;
+            capturedNewSize = e.NewValue;
         };
 
+        // When not set, _contentSize is null, even though GetContentSize() returns Viewport.Size
         Size newSize = new (50, 50);
         view.SetContentSize (newSize);
 
         Assert.Equal (1, eventCount);
-        Assert.Equal (newSize, capturedSize);
+        // OldValue should be null since _contentSize started as null
+        Assert.Null (capturedOldSize);
+        Assert.Equal (newSize, capturedNewSize);
     }
 
     [Fact]
@@ -232,12 +237,14 @@ public class ContentSizeTests (ITestOutputHelper output)
         view.EndInit ();
 
         int eventCount = 0;
-        List<Size?> capturedSizes = new ();
+        List<Size?> capturedOldValues = new ();
+        List<Size?> capturedNewValues = new ();
 
         view.ContentSizeChanged += (sender, e) =>
         {
             eventCount++;
-            capturedSizes.Add (e.Size);
+            capturedOldValues.Add (e.OldValue);
+            capturedNewValues.Add (e.NewValue);
         };
 
         view.SetContentSize (new Size (10, 10));
@@ -245,30 +252,151 @@ public class ContentSizeTests (ITestOutputHelper output)
         view.SetContentSize (new Size (30, 30));
 
         Assert.Equal (3, eventCount);
-        Assert.Equal (new Size (10, 10), capturedSizes [0]);
-        Assert.Equal (new Size (20, 20), capturedSizes [1]);
-        Assert.Equal (new Size (30, 30), capturedSizes [2]);
+        Assert.Equal (new Size (10, 10), capturedNewValues [0]);
+        Assert.Equal (new Size (20, 20), capturedNewValues [1]);
+        Assert.Equal (new Size (30, 30), capturedNewValues [2]);
     }
 
+    #endregion
+
+    #region ContentSizeChanging Event Tests
+
     [Fact]
-    public void ContentSizeChanged_Cancel_DoesNothing_CurrentImplementation ()
+    public void ContentSizeChanging_RaisedBeforeContentSizeChanges ()
     {
-        // Current implementation: Cancel flag exists but is not used
         View view = new ();
         view.BeginInit ();
         view.EndInit ();
 
-        view.ContentSizeChanged += (sender, e) =>
+        int changingEventCount = 0;
+        int changedEventCount = 0;
+
+        view.ContentSizeChanging += (sender, e) =>
         {
-            e.Cancel = true;
+            changingEventCount++;
+            // Changed event should not have been raised yet
+            Assert.Equal (0, changedEventCount);
         };
 
-        Size newSize = new (50, 50);
-        view.SetContentSize (newSize);
+        view.ContentSizeChanged += (sender, e) =>
+        {
+            changedEventCount++;
+            // Changing event should have been raised
+            Assert.Equal (1, changingEventCount);
+        };
 
-        // Current behavior: Change happens even when Cancel is set to true
-        Assert.Equal (newSize, view.GetContentSize ());
+        view.SetContentSize (new Size (50, 50));
+
+        Assert.Equal (1, changingEventCount);
+        Assert.Equal (1, changedEventCount);
     }
+
+    [Fact]
+    public void ContentSizeChanging_CanCancelChange ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        Size? originalSize = view.GetContentSize ();
+
+        view.ContentSizeChanging += (sender, e) =>
+        {
+            e.Handled = true;
+        };
+
+        view.SetContentSize (new Size (50, 50));
+
+        // Change should be cancelled
+        Assert.Equal (originalSize, view.GetContentSize ());
+    }
+
+    [Fact]
+    public void ContentSizeChanging_CanModifyNewValue ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.ContentSizeChanging += (sender, e) =>
+        {
+            // Modify the proposed value
+            e.NewValue = new Size (100, 100);
+        };
+
+        view.SetContentSize (new Size (50, 50));
+
+        // Should use the modified value
+        Assert.Equal (new Size (100, 100), view.GetContentSize ());
+    }
+
+    [Fact]
+    public void ContentSizeChanging_NotRaisedWhenSameValue ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        Size size = new (10, 10);
+        view.SetContentSize (size);
+
+        int eventCount = 0;
+        view.ContentSizeChanging += (_, _) => eventCount++;
+
+        view.SetContentSize (size);
+
+        Assert.Equal (0, eventCount);
+    }
+
+    [Fact]
+    public void OnContentSizeChanging_CanCancelChange ()
+    {
+        TestView view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        Size? originalSize = view.GetContentSize ();
+        view.CancelContentSizeChange = true;
+
+        view.SetContentSize (new Size (50, 50));
+
+        // Change should be cancelled
+        Assert.Equal (originalSize, view.GetContentSize ());
+    }
+
+    [Fact]
+    public void OnContentSizeChanged_CalledAfterChange ()
+    {
+        TestView view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.SetContentSize (new Size (50, 50));
+
+        Assert.True (view.OnContentSizeChangedCalled);
+    }
+
+    // Test view to verify virtual method calls
+    private class TestView : View
+    {
+        public bool CancelContentSizeChange { get; set; }
+        public bool OnContentSizeChangedCalled { get; set; }
+
+        protected override bool OnContentSizeChanging (ValueChangingEventArgs<Size?> args)
+        {
+            return CancelContentSizeChange;
+        }
+
+        protected override void OnContentSizeChanged (ValueChangedEventArgs<Size?> args)
+        {
+            OnContentSizeChangedCalled = true;
+            base.OnContentSizeChanged (args);
+        }
+    }
+
+    #endregion
+
+    #region Removed Old Tests
 
     [Fact]
     public void OnContentSizeChanged_TriggersSetNeedsLayout ()
