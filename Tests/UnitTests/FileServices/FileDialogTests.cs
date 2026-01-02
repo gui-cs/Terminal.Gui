@@ -185,7 +185,6 @@ public class FileDialogTests ()
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-
         var tv = GetTableView (dlg);
         tv.SetFocus ();
 
@@ -206,7 +205,7 @@ public class FileDialogTests ()
         }
         else
         {
-            Application.RaiseKeyDownEvent ('O');
+            Application.RaiseKeyDownEvent (Key.O.WithAlt);
         }
 
         Assert.False (dlg.Canceled);

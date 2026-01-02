@@ -8,7 +8,7 @@ namespace UnitTests;
 /// <summary>
 ///     Provides xUnit-style assertions for <see cref="IDriver"/> contents.
 /// </summary>
-internal partial class DriverAssert
+public partial class DriverAssert
 {
     private const char SPACE_CHAR = ' ';
     private static readonly Rune _spaceRune = (Rune)SPACE_CHAR;

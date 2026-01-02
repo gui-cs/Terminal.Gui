@@ -240,21 +240,20 @@ public class Bars : Scenario
 
         return;
 
-        void MenuLikeExamplesMouseEvent (object _, MouseEventArgs mouse)
-        {
-            if (mouse.Flags.HasFlag (MouseFlags.Button3Clicked))
-            {
-                popOverMenu.X = mouse.Position.X;
-                popOverMenu.Y = mouse.Position.Y;
-                popOverMenu.Visible = true;
 
+        void MenuLikeExamplesMouseEvent (object _, Mouse mouse)
+        {
+            if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
+            {
+                popOverMenu.X = mouse.Position!.Value.X;
+                popOverMenu.Y = mouse.Position!.Value.Y;
+                popOverMenu.Visible = true;
                 //popOverMenu.Enabled = popOverMenu.Visible;
                 popOverMenu.SetFocus ();
             }
             else
             {
                 popOverMenu.Visible = false;
-
                 //popOverMenu.Enabled = popOverMenu.Visible;
             }
         }
@@ -281,7 +280,7 @@ public class Bars : Scenario
 
     //private void ShowContextMenu (object s, MouseEventEventArgs e)
     //{
-    //    if (e.Flags != MouseFlags.Button3Clicked)
+    //    if (e.Flags != MouseFlags.RightButtonClicked)
     //    {
     //        return;
     //    }
@@ -398,7 +397,7 @@ public class Bars : Scenario
     //        // If user clicks outside of the menuWindow, close it
     //        if (!contextMenu.Frame.Contains (e.Position.X, e.Position.Y))
     //        {
-    //            if (e.Flags is (MouseFlags.Button1Clicked or MouseFlags.Button3Clicked))
+    //            if (e.Flags is (MouseFlags.LeftButtonClicked or MouseFlags.RightButtonClicked))
     //            {
     //                contextMenu.RequestStop ();
     //            }
@@ -420,7 +419,7 @@ public class Bars : Scenario
             Title = "_File",
             HelpText = "File Menu",
             Key = Key.D0.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         Shortcut editMenuBarItem = new ()
@@ -428,7 +427,7 @@ public class Bars : Scenario
             Title = "_Edit",
             HelpText = "Edit Menu",
             Key = Key.D1.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         Shortcut helpMenuBarItem = new ()
@@ -436,7 +435,7 @@ public class Bars : Scenario
             Title = "_Help",
             HelpText = "Halp Menu",
             Key = Key.D2.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         bar.Add (fileMenuBarItem, editMenuBarItem, helpMenuBarItem);
@@ -449,7 +448,7 @@ public class Bars : Scenario
             Title = "Z_igzag",
             Key = Key.I.WithCtrl,
             Text = "Gonna zig zag",
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         Shortcut shortcut2 = new ()
@@ -457,7 +456,7 @@ public class Bars : Scenario
             Title = "Za_G",
             Text = "Gonna zag",
             Key = Key.G.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         Shortcut shortcut3 = new ()
@@ -465,7 +464,7 @@ public class Bars : Scenario
             Title = "_Three",
             Text = "The 3rd item",
             Key = Key.D3.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         Line line = new ()
@@ -479,13 +478,13 @@ public class Bars : Scenario
             Title = "_Four",
             Text = "Below the line",
             Key = Key.D3.WithAlt,
-            HighlightStates = MouseState.In
+            MouseHighlightStates = MouseState.In
         };
 
         shortcut4.CommandView = new CheckBox
         {
             Title = shortcut4.Title,
-            HighlightStates = MouseState.None,
+            MouseHighlightStates = MouseState.None,
             CanFocus = false
         };
 

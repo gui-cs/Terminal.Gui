@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
+public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Cancel_TextChanging_ThenBackspace ()
@@ -332,12 +332,12 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     {
         var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEventArgs { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new Mouse { Position = new (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
 
-        ev = new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked };
+        ev = new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
@@ -404,14 +404,14 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         Assert.True (
                      tf.NewMouseEvent (
-                                       new () { Position = new (idx, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                       new () { Position = new (idx, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }
                                       )
                     );
         Assert.Equal ("movie", tf.SelectedText);
 
         Assert.True (
                      tf.NewMouseEvent (
-                                       new () { Position = new (idx + 1, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                       new () { Position = new (idx + 1, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }
                                       )
                     );
         Assert.Equal ("movie", tf.SelectedText);
@@ -560,7 +560,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var tf = new TextField { Width = 3, Text = "ắ" };
         tf.Driver = driver;
@@ -611,7 +611,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Adjust_First ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
         tf.Driver = driver;
@@ -636,7 +636,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void PositionCursor_Treat_Zero_Width_As_One_Column ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextField tf = new () { Width = 10, Text = "\u001B[" };
         tf.Driver = driver;

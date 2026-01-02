@@ -30,8 +30,8 @@ public class WindowTests ()
         Assert.Equal (Dim.Fill (), defaultWindow.Height);
         Assert.False (defaultWindow.IsCurrentTop);
         Assert.Empty (defaultWindow.Id);
-        Assert.False (defaultWindow.WantContinuousButtonPressed);
-        Assert.False (defaultWindow.WantMousePositionReports);
+        Assert.Null (defaultWindow.MouseHoldRepeat);
+        Assert.False (defaultWindow.MousePositionTracking );
         Assert.Null (defaultWindow.SuperView);
         Assert.Null (defaultWindow.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, defaultWindow.TextDirection);
@@ -52,8 +52,8 @@ public class WindowTests ()
         Assert.Equal (0, windowWithFrameRectEmpty.Width);
         Assert.Equal (0, windowWithFrameRectEmpty.Height);
         Assert.False (windowWithFrameRectEmpty.IsCurrentTop);
-        Assert.False (windowWithFrameRectEmpty.WantContinuousButtonPressed);
-        Assert.False (windowWithFrameRectEmpty.WantMousePositionReports);
+        Assert.Null (windowWithFrameRectEmpty.MouseHoldRepeat);
+        Assert.False (windowWithFrameRectEmpty.MousePositionTracking );
         Assert.Null (windowWithFrameRectEmpty.SuperView);
         Assert.Null (windowWithFrameRectEmpty.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrameRectEmpty.TextDirection);
@@ -76,8 +76,8 @@ public class WindowTests ()
         Assert.Equal (3, windowWithFrame1234.Width);
         Assert.Equal (4, windowWithFrame1234.Height);
         Assert.False (windowWithFrame1234.IsCurrentTop);
-        Assert.False (windowWithFrame1234.WantContinuousButtonPressed);
-        Assert.False (windowWithFrame1234.WantMousePositionReports);
+        Assert.Null (windowWithFrame1234.MouseHoldRepeat);
+        Assert.False (windowWithFrame1234.MousePositionTracking );
         Assert.Null (windowWithFrame1234.SuperView);
         Assert.Null (windowWithFrame1234.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, windowWithFrame1234.TextDirection);

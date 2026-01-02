@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -8,15 +6,34 @@ namespace Terminal.Gui.App;
 /// </summary>
 internal partial class ApplicationImpl : IApplication
 {
+    private readonly ITimeProvider _timeProvider;
+    private readonly bool _testMode;
+    private IInputInjector? _inputInjector;
+    private readonly ITimedEvents _timedEvents;
+
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend and subscribes to Application configuration property
     ///     events.
     /// </summary>
-    internal ApplicationImpl ()
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    /// <param name="testMode">If <see langword="true"/>, configures application for testing with TestInputSource.</param>
+    internal ApplicationImpl (ITimeProvider timeProvider, bool testMode)
     {
+        _timeProvider = timeProvider;
+        _testMode = testMode;
+
+        // Initialize TimedEvents with the time provider for testable timing
+        _timedEvents = new TimedEvents (timeProvider);
+
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;
     }
+
+    /// <summary>
+    ///     INTERNAL: Creates a new instance of the Application backend for legacy static model.
+    ///     Uses SystemTimeProvider and production mode by default.
+    /// </summary>
+    internal ApplicationImpl () : this (new SystemTimeProvider (), false) { }
 
     /// <summary>
     ///     INTERNAL: Creates a new instance of the Application backend.
@@ -24,10 +41,21 @@ internal partial class ApplicationImpl : IApplication
     /// <param name="componentFactory"></param>
     internal ApplicationImpl (IComponentFactory componentFactory) : this () { _componentFactory = componentFactory; }
 
+    /// <summary>
+    ///     INTERNAL: Creates a new instance of the Application backend for testing.
+    /// </summary>
+    /// <param name="componentFactory">The component factory.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    /// <param name="testMode">If <see langword="true"/>, configures application for testing with TestInputSource.</param>
+    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider, bool testMode) : this (timeProvider, testMode)
+    {
+        _componentFactory = componentFactory;
+    }
+
     private string? _driverName;
 
     /// <inheritdoc/>
-    public new string ToString () => Driver?.ToString () ?? string.Empty;
+    public new string ToString () { return Driver?.ToString () ?? string.Empty; }
 
     #region Singleton - Legacy Static Support
 
@@ -155,7 +183,24 @@ internal partial class ApplicationImpl : IApplication
 
     #endregion Screen and Driver
 
-    #region Keyboard
+    #region Input (Mouse/Keyboard)
+
+    /// <inheritdoc/>
+    public IInputInjector GetInputInjector ()
+    {
+        if (_inputInjector is null)
+        {
+            if (Driver is null)
+            {
+                throw new InvalidOperationException ("Driver not initialized. Call Init() first.");
+            }
+
+            IInputProcessor processor = Driver.GetInputProcessor ();
+            _inputInjector = new InputInjector (processor, _timeProvider);
+        }
+
+        return _inputInjector;
+    }
 
     private IKeyboard? _keyboard;
 
@@ -171,10 +216,6 @@ internal partial class ApplicationImpl : IApplication
         set => _keyboard = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion Keyboard
-
-    #region Mouse
-
     private IMouse? _mouse;
 
     /// <inheritdoc/>
@@ -189,7 +230,7 @@ internal partial class ApplicationImpl : IApplication
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
-    #endregion Mouse
+    #endregion Input (Mouse/Keyboard)
 
     #region Navigation and Popover
 

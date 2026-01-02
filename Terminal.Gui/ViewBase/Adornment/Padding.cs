@@ -28,23 +28,22 @@ public class Padding : Adornment
     ///         A mouse click on the Padding will cause the Parent to focus.
     ///     </para>
     /// </remarks>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         if (Parent is null)
         {
             return false;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             if (Parent.CanFocus && !Parent.HasFocus)
             {
                 Parent.SetFocus ();
                 Parent.SetNeedsDraw ();
-
-                return mouseEvent.Handled = true;
+                return mouse.Handled = true;
             }
         }
 

@@ -110,7 +110,7 @@ public class ColorPickerTests
         cp.Focused!.RaiseMouseEvent (
                                      new ()
                                      {
-                                         Flags = MouseFlags.Button1Pressed,
+                                         Flags = MouseFlags.LeftButtonPressed,
                                          Position = new (19, 0) // Assuming 0-based indexing
                                      });
 
@@ -143,7 +143,7 @@ public class ColorPickerTests
         cp.Focused!.RaiseMouseEvent (
                                      new ()
                                      {
-                                         Flags = MouseFlags.Button1Pressed,
+                                         Flags = MouseFlags.LeftButtonPressed,
                                          Position = new (21, 0) // Beyond the bar
                                      });
 
@@ -176,7 +176,7 @@ public class ColorPickerTests
         cp.App!.Mouse.RaiseMouseEvent (
                                        new ()
                                        {
-                                           Flags = MouseFlags.Button1Pressed,
+                                           Flags = MouseFlags.LeftButtonPressed,
                                            ScreenPosition = new (0, 1)
                                        });
 
@@ -185,7 +185,7 @@ public class ColorPickerTests
         //  .OnMouseEvent (
         //                 new ()
         //                 {
-        //                     Flags = MouseFlags.Button1Pressed,
+        //                     Flags = MouseFlags.LeftButtonPressed,
         //                     Position = new (0, 1)
         //                 });
 
@@ -197,7 +197,7 @@ public class ColorPickerTests
         cp.App!.Mouse.RaiseMouseEvent (
                                        new ()
                                        {
-                                           Flags = MouseFlags.Button1Pressed,
+                                           Flags = MouseFlags.LeftButtonPressed,
                                            ScreenPosition = new (0, 2)
                                        });
 
@@ -206,7 +206,7 @@ public class ColorPickerTests
         //  .OnMouseEvent (
         //                 new ()
         //                 {
-        //                     Flags = MouseFlags.Button1Pressed,
+        //                     Flags = MouseFlags.LeftButtonPressed,
         //                     Position = new (0, 2)
         //                 });
 
@@ -522,7 +522,7 @@ public class ColorPickerTests
         cp.Focused!.RaiseMouseEvent (
                                      new ()
                                      {
-                                         Flags = MouseFlags.Button1Pressed,
+                                         Flags = MouseFlags.LeftButtonPressed,
                                          Position = new (3, 0)
                                      });
 
@@ -534,7 +534,7 @@ public class ColorPickerTests
         cp.Focused.RaiseMouseEvent (
                                     new ()
                                     {
-                                        Flags = MouseFlags.Button1Pressed,
+                                        Flags = MouseFlags.LeftButtonPressed,
                                         Position = new (4, 0)
                                     });
 
@@ -817,7 +817,7 @@ public class ColorPickerTests
     private static ColorPicker GetColorPicker (ColorModel colorModel, bool showTextFields, bool showName = false)
     {
         IApplication? app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
         cp.Style.ColorModel = colorModel;

@@ -176,4 +176,38 @@ public class DimFillTests (ITestOutputHelper output)
         Assert.Equal (5, view.Frame.Height);
         top.Dispose ();
     }
+
+    [Theory]
+    [InlineData (100, 0, 40, 100)] // Fill size (100) > minimum (40) -> use fill size
+    [InlineData (100, 0, 150, 150)] // Fill size (100) < minimum (150) -> use minimum
+    [InlineData (100, 0, 100, 100)] // Fill size (100) == minimum (100) -> use either (same)
+    [InlineData (100, 10, 40, 90)] // Fill with margin: (100-10=90) > minimum (40) -> use 90
+    [InlineData (100, 10, 100, 100)] // Fill with margin: (100-10=90) < minimum (100) -> use minimum
+    public void DimFill_With_MinimumContentDim_Calculate (int superviewSize, int margin, int minimum, int expected)
+    {
+        View view = new () { Width = Dim.Fill (margin, minimumContentDim: minimum) };
+        View top = new () { Width = superviewSize };
+        top.Add (view);
+
+        int calculated = view.Width.Calculate (0, superviewSize, view, Dimension.Width);
+
+        Assert.Equal (expected, calculated);
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void DimFill_With_MinimumContentDim_ToString ()
+    {
+        Dim fill = Dim.Fill (5, minimumContentDim: 40);
+
+        Assert.Equal ("Fill(Absolute(5),min:Absolute(40))", fill.ToString ());
+    }
+
+    [Fact]
+    public void DimFill_Without_MinimumContentDim_ToString ()
+    {
+        Dim fill = Dim.Fill (5);
+
+        Assert.Equal ("Fill(Absolute(5))", fill.ToString ());
+    }
 }

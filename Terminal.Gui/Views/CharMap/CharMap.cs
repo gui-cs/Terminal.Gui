@@ -58,9 +58,10 @@ public class CharMap : View, IDesignable
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Context);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
@@ -348,10 +349,6 @@ public class CharMap : View, IDesignable
         Dialog? waitIndicator = new ()
         {
             Title = Strings.charMapCPInfoDlgTitle,
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            Width = 40,
-            Height = 10,
             Buttons = [new () { Text = Strings.btnCancel }]
         };
 
@@ -360,8 +357,6 @@ public class CharMap : View, IDesignable
             Text = UcdApiClient.BaseUrl,
             X = 0,
             Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (3),
             TextAlignment = Alignment.Center
         };
 
@@ -424,31 +419,12 @@ public class CharMap : View, IDesignable
 
         var title = $"{ToCamelCase (name!)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
 
-        Button? copyGlyph = new () { Text = Strings.charMapCopyGlyph };
-        Button? copyCodepoint = new () { Text = Strings.charMapCopyCP };
-        Button? cancel = new () { Text = Strings.btnCancel };
+        Button copyGlyph = new () { Text = Strings.charMapCopyGlyph };
+        Button copyCodepoint = new () { Text = Strings.charMapCopyCP };
+        Button cancel = new () { Text = Strings.btnCancel };
 
-        var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCodepoint, cancel] };
-
-        copyGlyph.Accepting += (s, a) =>
-                               {
-                                   CopyGlyph ();
-                                   dlg!.RequestStop ();
-                                   a.Handled = true;
-                               };
-
-        copyCodepoint.Accepting += (s, a) =>
-                                   {
-                                       CopyCodePoint ();
-                                       dlg!.RequestStop ();
-                                       a.Handled = true;
-                                   };
-
-        cancel.Accepting += (s, a) =>
-                            {
-                                dlg!.RequestStop ();
-                                a.Handled = true;
-                            };
+        using Dialog dlg = new () { Buttons = [copyGlyph, copyCodepoint, cancel] };
+        dlg.Title = title;
 
         var rune = (Rune)SelectedCodePoint;
         var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
@@ -518,16 +494,28 @@ public class CharMap : View, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (label),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (2),
+            Width = Dim.Fill (0, minimumContentDim: 60),
+            Height = Dim.Fill (0, minimumContentDim: 5),
             ReadOnly = true,
+            WordWrap = true,
             Text = decResponse
         };
 
         dlg.Add (json);
 
-        App?.Run (dlg);
-        dlg.Dispose ();
+        int? result = App?.Run (dlg) as int?;
+        switch (result!)
+        {
+            case 0:
+                CopyGlyph ();
+
+                break;
+
+            case 1:
+                CopyCodePoint ();
+
+                break;
+        }
     }
 
     #endregion Details Dialog
@@ -852,7 +840,7 @@ public class CharMap : View, IDesignable
         if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
             // If the mouse is clicked on the headers, map it to the first glyph of the row/col
-            position = mouseCommandContext.Binding.MouseEventArgs.Position;
+            position = mouseCommandContext.Binding.MouseEventArgs.Position!.Value;
 
             if (position.Y == 0)
             {
@@ -904,7 +892,7 @@ public class CharMap : View, IDesignable
                 SetFocus ();
             }
 
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out int cp))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out int cp))
             {
                 return false;
             }
@@ -923,7 +911,7 @@ public class CharMap : View, IDesignable
 
         if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out newCodePoint))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position!.Value, out newCodePoint))
             {
                 return false;
             }

@@ -168,15 +168,15 @@ public class TextInputControls : Scenario
                                     }
                                 };
 
-        Key keyTab = textView.KeyBindings.GetFirstFromCommands (Command.Tab);
-        Key keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.BackTab);
+        Key keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
+        Key keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
 
         chxCaptureTabs.CheckedStateChanging += (s, e) =>
                                   {
                                       if (e.Result == CheckState.Checked)
                                       {
-                                          textView.KeyBindings.Add (keyTab, Command.Tab);
-                                          textView.KeyBindings.Add (keyBackTab, Command.BackTab);
+                                          textView.KeyBindings.Add (keyTab, Command.NextTabStop);
+                                          textView.KeyBindings.Add (keyBackTab, Command.PreviousTabStop);
                                       }
                                       else
                                       {

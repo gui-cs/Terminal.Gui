@@ -10,7 +10,7 @@ public abstract partial class PopupAutocomplete
             _autoComplete = autoComplete;
             CanFocus = true;
             TabStop = TabBehavior.NoStop;
-            WantMousePositionReports = true;
+            MousePositionTracking  = true;
         }
 
         private readonly PopupAutocomplete _autoComplete;
@@ -27,6 +27,6 @@ public abstract partial class PopupAutocomplete
             return true;
         }
 
-        protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }
+        protected override bool OnMouseEvent (Mouse mouse) { return _autoComplete.OnMouseEvent (mouse); }
     }
 }

@@ -42,7 +42,7 @@ internal partial class ApplicationImpl
 
     #region Timeouts and Invoke
 
-    private readonly ITimedEvents _timedEvents = new TimedEvents ();
+    // _timedEvents is declared and initialized in ApplicationImpl.cs constructor
 
     /// <inheritdoc/>
     public ITimedEvents? TimedEvents => _timedEvents;

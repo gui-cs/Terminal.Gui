@@ -182,7 +182,7 @@ public class UICatalogRunnable : Runnable
                 CheckedState = Application.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
-                HighlightStates = MouseState.None
+                MouseHighlightStates = MouseState.None
             };
 
             _force16ColorsMenuItemCb.CheckedStateChanging += (sender, args) =>
@@ -215,7 +215,7 @@ public class UICatalogRunnable : Runnable
             {
                 _themesSelector = new ()
                 {
-                    // HighlightStates = MouseState.In,
+                    // MouseHighlightStates = MouseState.In,
                     CanFocus = true,
                     // InvertFocusAttribute = true
                 };
@@ -242,7 +242,7 @@ public class UICatalogRunnable : Runnable
 
                 _topSchemesSelector = new ()
                 {
-                    //  HighlightStates = MouseState.In,
+                    //  MouseHighlightStates = MouseState.In,
                 };
 
                 _topSchemesSelector.ValueChanged += (_, args) =>
@@ -326,7 +326,7 @@ public class UICatalogRunnable : Runnable
                 CheckedState = Application.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
-                HighlightStates = MouseState.None
+                MouseHighlightStates = MouseState.None
             };
 
             //_disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
@@ -357,7 +357,7 @@ public class UICatalogRunnable : Runnable
                 AssignHotKeys = true,
                 Labels = Enum.GetNames<LogLevel> (),
                 Value = logLevels.ToList ().IndexOf (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel)),
-                // HighlightStates = MouseState.In,
+                // MouseHighlightStates = MouseState.In,
             };
 
             _logLevelSelector.ValueChanged += (_, args) =>
@@ -746,7 +746,7 @@ public class UICatalogRunnable : Runnable
         msg.AppendLine ();
         msg.AppendLine ("v2 - Pre-Alpha");
         msg.AppendLine ();
-        msg.AppendLine ("https://github.com/gui-cs/Terminal.Gui");
+        msg.Append ("https://github.com/gui-cs/Terminal.Gui");
 
         return msg.ToString ();
     }

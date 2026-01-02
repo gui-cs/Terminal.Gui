@@ -219,10 +219,10 @@ public class HexEditor : Scenario
             if (MessageBox.ErrorQuery (Application.Instance,
                                        "Save",
                                        "The changes were not saved. Want to open without saving?",
-                                       "_Yes",
-                                       "_No"
+                                       "_No",
+                                       "_Yes"
                                       )
-                == 1)
+                == 0)
             {
                 return _hexView.Source;
             }

@@ -15,7 +15,7 @@ public static partial class XunitContextExtensions
     /// <param name="context"></param>
     /// <param name="expected"></param>
     /// <returns></returns>
-    public static GuiTestContext AssertCursorPosition (this GuiTestContext context, Point expected)
+    public static TestContext AssertCursorPosition (this TestContext context, Point expected)
     {
         try
         {

@@ -177,7 +177,7 @@ protected bool? RaiseAccepting(ICommandContext? ctx)
 - **Cancellation**: `OnAccepting` returning `true` or `args.Handled = true`.
 - **Context**: `ICommandContext` provides `Command`, `Source`, and `Binding`.
 - **Default Behavior**: Propagates to `SuperView` or default button if not handled.
-- **Use Case**: Allows customization of state changes (e.g., `CheckBox` toggling) or cancellation (e.g., preventing focus in `MenuItemv2`).
+- **Use Case**: Allows customization of state changes (e.g., `CheckBox` toggling) or cancellation (e.g., preventing focus in `MenuItem`).
 
 #### Propagation Challenge
 

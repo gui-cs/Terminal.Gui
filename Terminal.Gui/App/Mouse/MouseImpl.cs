@@ -12,7 +12,8 @@ namespace Terminal.Gui.App;
 internal class MouseImpl : IMouse, IDisposable
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MouseImpl"/> class and subscribes to Application configuration property events.
+    ///     Initializes a new instance of the <see cref="MouseImpl"/> class and subscribes to Application configuration
+    ///     property events.
     /// </summary>
     public MouseImpl ()
     {
@@ -29,31 +30,17 @@ internal class MouseImpl : IMouse, IDisposable
     /// <inheritdoc/>
     public bool IsMouseDisabled { get; set; }
 
+    // Event handler for Application static property changes
+    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e) { IsMouseDisabled = e.NewValue; }
+
     /// <inheritdoc/>
     public List<View?> CachedViewsUnderMouse { get; } = [];
 
     /// <inheritdoc/>
-    public event EventHandler<MouseEventArgs>? MouseEvent;
-
-    // Mouse grab functionality merged from MouseGrabHandler
+    public event EventHandler<Mouse>? MouseEvent;
 
     /// <inheritdoc/>
-    public View? MouseGrabView { get; private set; }
-
-    /// <inheritdoc/>
-    public event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
-
-    /// <inheritdoc/>
-    public event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
-
-    /// <inheritdoc/>
-    public event EventHandler<ViewEventArgs>? GrabbedMouse;
-
-    /// <inheritdoc/>
-    public event EventHandler<ViewEventArgs>? UnGrabbedMouse;
-
-    /// <inheritdoc/>
-    public void RaiseMouseEvent (MouseEventArgs mouseEvent)
+    public void RaiseMouseEvent (Mouse mouseEvent)
     {
         //Debug.Assert (App.Application.MainThreadId == Thread.CurrentThread.ManagedThreadId);
         if (App?.Initialized is true)
@@ -68,7 +55,7 @@ internal class MouseImpl : IMouse, IDisposable
         }
 
         // The position of the mouse is the same as the screen position at the application level.
-        //Debug.Assert (mouseEvent.Position == mouseEvent.ScreenPosition);
+        //Debug.Assert (mouse.Position == mouse.ScreenPosition);
         mouseEvent.Position = mouseEvent.ScreenPosition;
 
         List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
@@ -96,7 +83,7 @@ internal class MouseImpl : IMouse, IDisposable
         // Dismiss the Popover if the user presses mouse outside of it
         if (mouseEvent.IsPressed
             && App?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover
-            && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, includeAdornments: true) is false)
+            && View.IsInHierarchy (visiblePopover, deepestViewUnderMouse, true) is false)
         {
             ApplicationPopover.HideWithQuitCommand (visiblePopover);
 
@@ -120,13 +107,14 @@ internal class MouseImpl : IMouse, IDisposable
 
         // if the mouse is outside the Application.TopRunnable or Popover hierarchy, we don't want to
         // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true) && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
+        if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true)
+            && !View.IsInHierarchy (App?.Popover?.GetActivePopover () as View, deepestViewUnderMouse, true))
         {
             return;
         }
 
         // Create a view-relative mouse event to send to the view that is under the mouse.
-        MouseEventArgs viewMouseEvent;
+        Mouse viewMouseEvent;
 
         if (deepestViewUnderMouse is Adornment adornment)
         {
@@ -134,18 +122,21 @@ internal class MouseImpl : IMouse, IDisposable
 
             viewMouseEvent = new ()
             {
+                Timestamp = mouseEvent.Timestamp,
                 Position = frameLoc,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
                 View = deepestViewUnderMouse
             };
         }
-        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size }).Contains (mouseEvent.ScreenPosition))
+        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size })
+                                      .Contains (mouseEvent.ScreenPosition))
         {
             Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
 
             viewMouseEvent = new ()
             {
+                Timestamp = mouseEvent.Timestamp,
                 Position = viewportLocation,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
@@ -185,6 +176,7 @@ internal class MouseImpl : IMouse, IDisposable
 
             viewMouseEvent = new ()
             {
+                Timestamp = mouseEvent.Timestamp,
                 Position = boundsPoint,
                 Flags = mouseEvent.Flags,
                 ScreenPosition = mouseEvent.ScreenPosition,
@@ -223,8 +215,16 @@ internal class MouseImpl : IMouse, IDisposable
                 continue;
             }
 
+            // If the mouse is grabbed by another view, don't send MouseEnter events to other views.
+            // This prevents views from highlighting when the user drags the mouse over them while holding
+            // a button down on a different view.
+            if (MouseGrabView is { } && view != MouseGrabView)
+            {
+                continue;
+            }
+
             CachedViewsUnderMouse.Add (view);
-            var raise = false;
+            bool raise;
 
             if (view is Adornment { Parent: { } } adornmentView)
             {
@@ -242,7 +242,7 @@ internal class MouseImpl : IMouse, IDisposable
                 continue;
             }
 
-            CancelEventArgs eventArgs = new CancelEventArgs ();
+            var eventArgs = new CancelEventArgs ();
             bool? cancelled = view.NewMouseEnterEvent (eventArgs);
 
             if (cancelled is true || eventArgs.Cancel)
@@ -252,16 +252,22 @@ internal class MouseImpl : IMouse, IDisposable
         }
     }
 
-    /// <inheritdoc/>
-    public void ResetState ()
-    {
-        // Do not clear LastMousePosition; Popover's require it to stay set with last mouse pos.
-        CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
-        MouseGrabView = null;
-    }
+    #region IMouseGrabHandler Implementation
 
-    // Mouse grab functionality merged from MouseGrabHandler
+    /// <inheritdoc/>
+    public View? MouseGrabView { get; private set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<GrabMouseEventArgs>? GrabbingMouse;
+
+    /// <inheritdoc/>
+    public event EventHandler<GrabMouseEventArgs>? UnGrabbingMouse;
+
+    /// <inheritdoc/>
+    public event EventHandler<ViewEventArgs>? GrabbedMouse;
+
+    /// <inheritdoc/>
+    public event EventHandler<ViewEventArgs>? UnGrabbedMouse;
 
     /// <inheritdoc/>
     public void GrabMouse (View? view)
@@ -273,7 +279,8 @@ internal class MouseImpl : IMouse, IDisposable
 
         if (view is null)
         {
-            UngrabMouse();
+            UngrabMouse ();
+
             return;
         }
 
@@ -296,6 +303,18 @@ internal class MouseImpl : IMouse, IDisposable
             View view = MouseGrabView;
             MouseGrabView = null;
             RaiseUnGrabbedMouseEvent (view);
+
+            // After ungrabbing, immediately update enter/leave state for views under the current mouse position
+            // This ensures that if the mouse was released over a different view, that view receives MouseEnter
+            if (App?.Initialized is true && LastMousePosition is { } position)
+            {
+                List<View?>? currentViewsUnderMouse = App.TopRunnableView?.GetViewsUnderLocation (position, ViewportSettingsFlags.TransparentMouse);
+
+                if (currentViewsUnderMouse is { })
+                {
+                    RaiseMouseEnterLeaveEvents (position, currentViewsUnderMouse);
+                }
+            }
         }
     }
 
@@ -353,9 +372,9 @@ internal class MouseImpl : IMouse, IDisposable
     ///     Handles mouse grab logic for a mouse event.
     /// </summary>
     /// <param name="deepestViewUnderMouse">The deepest view under the mouse.</param>
-    /// <param name="mouseEvent">The mouse event to handle.</param>
+    /// <param name="mouse">The mouse event to handle.</param>
     /// <returns><see langword="true"/> if the event was handled by the grab handler; otherwise <see langword="false"/>.</returns>
-    public bool HandleMouseGrab (View? deepestViewUnderMouse, MouseEventArgs mouseEvent)
+    public bool HandleMouseGrab (View? deepestViewUnderMouse, Mouse mouse)
     {
         if (MouseGrabView is { })
         {
@@ -368,42 +387,46 @@ internal class MouseImpl : IMouse, IDisposable
 
             // If the mouse is grabbed, send the event to the view that grabbed it.
             // The coordinates are relative to the Bounds of the view that grabbed the mouse.
-            Point frameLoc = MouseGrabView.ScreenToViewport (mouseEvent.ScreenPosition);
+            Point frameLoc = MouseGrabView.ScreenToViewport (mouse.ScreenPosition);
 
-            MouseEventArgs viewRelativeMouseEvent = new ()
+            Mouse viewRelativeMouseEvent = new ()
             {
+                Timestamp = mouse.Timestamp,
                 Position = frameLoc,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.ScreenPosition,
+                Flags = mouse.Flags,
+                ScreenPosition = mouse.ScreenPosition,
                 View = MouseGrabView // Always set to the grab view. See Issue #4370
             };
 
             //System.Diagnostics.Debug.WriteLine ($"{nme.Flags};{nme.X};{nme.Y};{mouseGrabView}");
-            if (MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent) is true || viewRelativeMouseEvent.IsSingleClicked)
-            {
-                return true;
-            }
+            MouseGrabView?.NewMouseEvent (viewRelativeMouseEvent);
 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (MouseGrabView is null && deepestViewUnderMouse is Adornment)
-            {
-                // The view that grabbed the mouse has been disposed
-                return true;
-            }
+            // When the mouse is grabbed, always return true to prevent the event from propagating
+            // to other views, regardless of whether the grabbed view handled it or not.
+            // This ensures that during a drag operation starting on one view, other views don't
+            // receive Enter/Leave events or process the mouse event.
+            return true;
         }
 
         return false;
     }
 
-    // Event handler for Application static property changes
-    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e)
+    #endregion IMouseGrabHandler Implementation
+
+    /// <inheritdoc/>
+    public void ResetState ()
     {
-        IsMouseDisabled = e.NewValue;
+        // Do not clear LastMousePosition; Popovers require it to stay set with last mouse pos.
+        CachedViewsUnderMouse.Clear ();
+        MouseEvent = null;
+        MouseGrabView = null;
     }
 
     /// <inheritdoc/>
     public void Dispose ()
     {
+        ResetState ();
+
         // Unsubscribe from Application static property change events
         Application.IsMouseDisabledChanged -= OnIsMouseDisabledChanged;
     }

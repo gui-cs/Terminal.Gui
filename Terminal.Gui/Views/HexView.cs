@@ -101,8 +101,8 @@ public class HexView : View, IDesignable
         KeyBindings.Remove (Key.Enter);
 
         // The Activate handler deals with both single and double clicks
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Activate);
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 
@@ -373,7 +373,7 @@ public class HexView : View, IDesignable
             SetFocus ();
         }
 
-        if (mouseCommandContext.Binding.MouseEventArgs.Position.X < GetLeftSideStartColumn ())
+        if (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X < GetLeftSideStartColumn ())
         {
             return true;
         }
@@ -382,14 +382,14 @@ public class HexView : View, IDesignable
         int blocksSize = blocks * HEX_COLUMN_WIDTH;
         int blocksRightOffset = GetLeftSideStartColumn () + blocksSize - 1;
 
-        if (mouseCommandContext.Binding.MouseEventArgs.Position.X > blocksRightOffset + BytesPerLine - 1)
+        if (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X > blocksRightOffset + BytesPerLine - 1)
         {
             return true;
         }
 
-        bool clickIsOnLeftSide = mouseCommandContext.Binding.MouseEventArgs.Position.X >= blocksRightOffset;
-        long lineStart = mouseCommandContext.Binding.MouseEventArgs.Position.Y * BytesPerLine + Viewport.Y * BytesPerLine;
-        int x = mouseCommandContext.Binding.MouseEventArgs.Position.X - GetLeftSideStartColumn () + 1;
+        bool clickIsOnLeftSide = mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X >= blocksRightOffset;
+        long lineStart = mouseCommandContext.Binding.MouseEventArgs.Position!.Value.Y * BytesPerLine + Viewport.Y * BytesPerLine;
+        int x = mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X - GetLeftSideStartColumn () + 1;
         int block = x / HEX_COLUMN_WIDTH;
         x -= block * 2;
         int empty = x % 3;
@@ -404,14 +404,14 @@ public class HexView : View, IDesignable
 
         if (clickIsOnLeftSide)
         {
-            Address = Math.Min (lineStart + mouseCommandContext.Binding.MouseEventArgs.Position.X - blocksRightOffset, GetEditedSize ());
+            Address = Math.Min (lineStart + mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X - blocksRightOffset, GetEditedSize ());
         }
         else
         {
             Address = Math.Min (lineStart + item, GetEditedSize ());
         }
 
-        if (mouseCommandContext.Binding.MouseEventArgs.Flags == MouseFlags.Button1DoubleClicked)
+        if (mouseCommandContext.Binding.MouseEventArgs.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             _leftSideHasFocus = !clickIsOnLeftSide;
 
