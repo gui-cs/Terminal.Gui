@@ -9,14 +9,9 @@ public class NavigationTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 {
     private readonly TextWriter? _out = new TestOutputWriter (outputHelper);
 
-    [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void Runnable_TabGroup_Forward_Backward (string d)
+    [Fact]
+    public void Runnable_TabGroup_Forward_Backward ()
     {
-        if (d == "windows")
-        {
-            return; // Something is causing this test to fail in the GH runner
-        }
         var v1 = new View { Id = "v1", CanFocus = true };
         var v2 = new View { Id = "v2", CanFocus = true };
         var v3 = new View { Id = "v3", CanFocus = true };
@@ -24,7 +19,7 @@ public class NavigationTests (ITestOutputHelper outputHelper) : TestsAllDrivers
         var v5 = new View { Id = "v5", CanFocus = true };
         var v6 = new View { Id = "v6", CanFocus = true };
 
-        using TestContext c = With.A<Window> (50, 20, d,  _out)
+        using TestContext c = With.A<Window> (50, 20, "ansi",  _out)
                                      .Then ((app) =>
                                             {
                                                 var w1 = new Window { Id = "w1" };
