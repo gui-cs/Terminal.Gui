@@ -4,7 +4,7 @@ namespace ViewBaseTests.Layout;
 
 /// <summary>
 /// Tests for <see cref="View.SetContentSize"/>, <see cref="View.GetContentSize"/>, and related events.
-/// CoPilot - Claude 3.7 Sonnet
+/// Copilot - Claude 3.7 Sonnet
 /// </summary>
 public class ContentSizeTests (ITestOutputHelper output)
 {
