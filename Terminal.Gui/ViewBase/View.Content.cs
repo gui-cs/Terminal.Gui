@@ -1,6 +1,4 @@
-﻿using Terminal.Gui.App;
-
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
