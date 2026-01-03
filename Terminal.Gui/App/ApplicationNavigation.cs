@@ -14,9 +14,6 @@ public class ApplicationNavigation
     public ApplicationNavigation ()
     {
         // TODO: Move navigation key bindings here from KeyboardImpl
-        
-        // Subscribe to focus changes to trigger cursor updates
-        FocusedChanged += (sender, args) => _cursorNeedsUpdate = true;
     }
 
     /// <summary>
@@ -25,11 +22,6 @@ public class ApplicationNavigation
     public IApplication? App { get; set; }
 
     private View? _focused;
-
-    // Cursor caching fields
-    private bool _cursorNeedsUpdate = true;
-    private Point? _lastCursorPosition;
-    private CursorVisibility _lastCursorVisibility;
 
     /// <summary>
     ///     Raised when the most focused <see cref="View"/> in the application has changed.
@@ -45,20 +37,6 @@ public class ApplicationNavigation
     }
 
     /// <summary>
-    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
-    ///         changes but the view content does not need to be redrawn.
-    ///     </para>
-    /// </remarks>
-    public void SetCursorNeedsUpdate ()
-    {
-        _cursorNeedsUpdate = true;
-    }
-
-    /// <summary>
     ///     Updates the terminal cursor based on the currently focused view.
     /// </summary>
     /// <param name="output">The output driver to use for cursor positioning.</param>
@@ -67,39 +45,16 @@ public class ApplicationNavigation
     /// </remarks>
     public void UpdateCursor (IOutput output)
     {
-        View? mostFocused = _focused;
-
-        // Check if we need to update based on cached state
-        if (!_cursorNeedsUpdate && mostFocused == null && _lastCursorVisibility == CursorVisibility.Invisible)
-        {
-            // No focused view and cursor already invisible - no update needed
-            return;
-        }
+        // Use MostFocused from the view hierarchy to ensure we get the correct view
+        View? mostFocused = App?.TopRunnableView?.MostFocused;
 
         if (mostFocused == null)
         {
-            // Only update if visibility changed
-            if (_lastCursorVisibility != CursorVisibility.Invisible)
-            {
-                output.SetCursorVisibility (CursorVisibility.Invisible);
-                _lastCursorVisibility = CursorVisibility.Invisible;
-            }
-
-            _lastCursorPosition = null;
-            _cursorNeedsUpdate = false;
-
+            output.SetCursorVisibility (CursorVisibility.Invisible);
             return;
         }
 
         Point? to = mostFocused.PositionCursor ();
-
-        // Check if cursor position or visibility changed
-        if (to == _lastCursorPosition
-            && mostFocused.CursorVisibility == _lastCursorVisibility
-            && !_cursorNeedsUpdate)
-        {
-            return; // No changes
-        }
 
         if (to.HasValue)
         {
@@ -108,18 +63,11 @@ public class ApplicationNavigation
 
             output.SetCursorPosition (screenPos.X, screenPos.Y);
             output.SetCursorVisibility (mostFocused.CursorVisibility);
-
-            _lastCursorPosition = to;
-            _lastCursorVisibility = mostFocused.CursorVisibility;
         }
         else
         {
             output.SetCursorVisibility (CursorVisibility.Invisible);
-            _lastCursorPosition = null;
-            _lastCursorVisibility = CursorVisibility.Invisible;
         }
-
-        _cursorNeedsUpdate = false;
     }
 
     // BUGBUG: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
