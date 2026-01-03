@@ -27,6 +27,12 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     private AnsiRequestScheduler? _ansiRequestScheduler;
     private ISizeMonitor? _sizeMonitor;
 
+    // Cursor caching fields
+    private bool _cursorNeedsUpdate;
+    private View? _lastCursorView;
+    private Point? _lastCursorPosition;
+    private CursorVisibility _lastCursorVisibility;
+
     /// <inheritdoc/>
     public IApplication? App { get; private set; }
 
@@ -158,13 +164,39 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     {
         View? mostFocused = App?.TopRunnableView?.MostFocused;
 
+        // Check if we need to update based on cached state
+        if (!_cursorNeedsUpdate && mostFocused == _lastCursorView)
+        {
+            // Same view, cursor hasn't moved - no update needed
+            return;
+        }
+
         if (mostFocused == null)
         {
-            Output.SetCursorVisibility (CursorVisibility.Invisible);
+            // Only update if visibility changed
+            if (_lastCursorVisibility != CursorVisibility.Invisible)
+            {
+                Output.SetCursorVisibility (CursorVisibility.Invisible);
+                _lastCursorVisibility = CursorVisibility.Invisible;
+            }
+
+            _lastCursorView = null;
+            _lastCursorPosition = null;
+            _cursorNeedsUpdate = false;
+
             return;
         }
 
         Point? to = mostFocused.PositionCursor ();
+
+        // Check if cursor position or visibility changed
+        if (to == _lastCursorPosition
+            && mostFocused.CursorVisibility == _lastCursorVisibility
+            && mostFocused == _lastCursorView
+            && !_cursorNeedsUpdate)
+        {
+            return; // No changes
+        }
 
         if (to.HasValue)
         {
@@ -173,11 +205,25 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
             Output.SetCursorPosition (screenPos.X, screenPos.Y);
             Output.SetCursorVisibility (mostFocused.CursorVisibility);
+
+            _lastCursorPosition = to;
+            _lastCursorVisibility = mostFocused.CursorVisibility;
         }
         else
         {
             Output.SetCursorVisibility (CursorVisibility.Invisible);
+            _lastCursorPosition = null;
+            _lastCursorVisibility = CursorVisibility.Invisible;
         }
+
+        _lastCursorView = mostFocused;
+        _cursorNeedsUpdate = false;
+    }
+
+    /// <inheritdoc/>
+    public void SetCursorNeedsUpdate ()
+    {
+        _cursorNeedsUpdate = true;
     }
 
     /// <inheritdoc/>

@@ -10,26 +10,110 @@ public partial class View
     public CursorVisibility CursorVisibility { get; set; } = CursorVisibility.Invisible;
 
     /// <summary>
-    ///     Positions the cursor in the right position based on the currently focused view in the chain.
+    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Views that are focusable should override <see cref="PositionCursor()"/> to make sure that the cursor is
-    ///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
-    ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
-    ///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor()"/> will place the
-    ///         cursor at either the hotkey (if defined) or <c>0,0</c>.
+    ///         Call this method when the cursor position changes but the view content does not need to be redrawn.
+    ///         This is more efficient than calling <see cref="View.SetNeedsDraw"/> when only the cursor needs to move.
+    ///     </para>
+    ///     <para>
+    ///         Common use cases include:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item>User typing in a text field - cursor moves right after each character</item>
+    ///         <item>User presses arrow keys in a text view - cursor moves without content changing</item>
+    ///         <item>Programmatic cursor position changes</item>
+    ///     </list>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///     public class MyTextField : View
+    ///     {
+    ///         private int _cursorPosition;
+    ///         
+    ///         public int CursorPosition
+    ///         {
+    ///             get => _cursorPosition;
+    ///             set
+    ///             {
+    ///                 if (_cursorPosition != value)
+    ///                 {
+    ///                     _cursorPosition = value;
+    ///                     SetCursorNeedsUpdate();  // Update cursor without full redraw
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     </code>
+    /// </example>
+    public void SetCursorNeedsUpdate ()
+    {
+        // Access the main loop through the application instance
+        // The MainLoop property returns an object that we need to cast to the appropriate interface
+        if (App?.MainLoop is IApplicationMainLoop<ConsoleKeyInfo> netLoop)
+        {
+            netLoop.SetCursorNeedsUpdate ();
+        }
+        else if (App?.MainLoop is IApplicationMainLoop<WindowsConsole.InputRecord> winLoop)
+        {
+            winLoop.SetCursorNeedsUpdate ();
+        }
+        else if (App?.MainLoop is IApplicationMainLoop<char> unixLoop)
+        {
+            unixLoop.SetCursorNeedsUpdate ();
+        }
+    }
+
+    /// <summary>
+    ///     Calculates where the cursor should be positioned for this view.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is ONLY called on the most focused view in the application (the deepest view
+    ///         in the focus chain with <see cref="HasFocus"/> == <see langword="true"/>).
+    ///     </para>
+    ///     <para>
+    ///         <b>IMPORTANT:</b> Do NOT call <see cref="View.Move"/>, <see cref="View.AddRune"/>, or any drawing
+    ///         methods in this method. Those methods affect the "Draw Cursor" (where characters are rendered), not
+    ///         the Terminal Cursor (the visible cursor indicator). This method should only calculate and return a position.
+    ///     </para>
+    ///     <para>
+    ///         Return viewport-relative coordinates. The framework will convert to screen coordinates.
+    ///         Return <see langword="null"/> to hide the cursor.
+    ///     </para>
+    ///     <para>
+    ///         The base implementation returns <see langword="null"/> (cursor hidden). Override to position the cursor
+    ///         at the appropriate location for your view.
+    ///     </para>
+    ///     <para>
+    ///         Views that want the cursor visible should also set <see cref="CursorVisibility"/> to a value
+    ///         other than <see cref="Drivers.CursorVisibility.Invisible"/>.
     ///     </para>
     /// </remarks>
-    /// <returns>Viewport-relative cursor position. Return <see langword="null"/> to ensure the cursor is not visible.</returns>
+    /// <returns>
+    ///     Viewport-relative cursor position (col, row), or <see langword="null"/> to hide the cursor.
+    /// </returns>
+    /// <example>
+    ///     <code>
+    ///     public override Point? PositionCursor()
+    ///     {
+    ///         // Don't call base - it just returns null
+    ///         
+    ///         if (!CanFocus || !HasFocus)
+    ///             return null;  // Shouldn't happen, but be defensive
+    ///         
+    ///         // Calculate cursor position based on your view's state
+    ///         int visualColumn = CalculateVisualColumn();
+    ///         int visualRow = CalculateVisualRow();
+    ///         
+    ///         return new Point(visualColumn, visualRow);
+    ///     }
+    ///     </code>
+    /// </example>
     public virtual Point? PositionCursor ()
     {
-        if (IsInitialized && CanFocus && HasFocus)
-        {
-            // By default, position the cursor at the hotkey (if any) or 0, 0.
-            Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
-        }
-
+        // Base implementation: hide cursor
         // Returning null will hide the cursor.
         return null;
     }
