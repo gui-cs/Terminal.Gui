@@ -73,7 +73,7 @@ public class ScenarioTests : TestsAllViews
 
             Application.InitializedChanged += OnApplicationOnInitializedChanged;
 
-            Application.ForceDriver = "FakeDriver";
+            Application.ForceDriver = DriverRegistry.Names.ANSI;
             scenario!.Main ();
             Application.ForceDriver = string.Empty;
         }
@@ -203,7 +203,7 @@ public class ScenarioTests : TestsAllViews
         List<string> posNames = ["Percent", "AnchorEnd", "Center", "Absolute"];
         List<string> dimNames = ["Auto", "Percent", "Fill", "Absolute"];
 
-        Application.Init ("fake");
+        Application.Init (DriverRegistry.Names.ANSI);
 
         var top = new Runnable ();
 

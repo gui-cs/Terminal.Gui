@@ -50,7 +50,7 @@ public class ShadowTests (ITestOutputHelper output)
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             Text = "0123",
-            HighlightStates = MouseState.Pressed,
+            MouseHighlightStates = MouseState.Pressed,
             ShadowStyle = style,
             CanFocus = true
         };
@@ -192,7 +192,7 @@ public class ShadowTests (ITestOutputHelper output)
     public void ShadowStyle_Transparent_Handles_Wide_Glyphs_Correctly ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (6, 5);
 
@@ -267,12 +267,12 @@ public class ShadowTests (ITestOutputHelper output)
     public void ShadowStyle_Opaque_Change_Thickness_On_Mouse_Pressed_Released ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (10, 4);
 
         Runnable superview = new () { Width = Dim.Fill (), Height = Dim.Fill () };
-        View view = new () { Width = 7, Height = 2, ShadowStyle = ShadowStyle.Opaque, Text = "| Hi |", HighlightStates = MouseState.Pressed };
+        View view = new () { Width = 7, Height = 2, ShadowStyle = ShadowStyle.Opaque, Text = "| Hi |", MouseHighlightStates = MouseState.Pressed };
         superview.Add (view);
 
         app.Begin (superview);
@@ -285,7 +285,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               _output,
                                               app.Driver);
 
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.Button1Pressed });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.LeftButtonPressed });
         app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -295,7 +295,7 @@ public class ShadowTests (ITestOutputHelper output)
                                               _output,
                                               app.Driver);
 
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.Button1Released });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (2, 0), Flags = MouseFlags.LeftButtonReleased });
         app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -311,7 +311,7 @@ public class ShadowTests (ITestOutputHelper output)
     public void ShadowStyle_Transparent_Never_Throws_Navigating_Outside_Bounds ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (6, 5);
 
@@ -439,7 +439,7 @@ public class ShadowTests (ITestOutputHelper output)
     public void Runnable_View_Overlap_Other_Runnables ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (10, 5);
 
@@ -488,7 +488,7 @@ public class ShadowTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (2, 1);
         app.Driver.Force16Colors = true;
 
@@ -525,7 +525,7 @@ public class ShadowTests (ITestOutputHelper output)
         _output.WriteLine ("Actual driver contents:");
         _output.WriteLine (app.Driver.ToString ());
         _output.WriteLine ("\nActual driver output:");
-        string? output = app.Driver.GetOutput ().GetLastOutput ();
+        string output = app.Driver.GetOutput ().GetLastOutput ();
         _output.WriteLine (output);
 
         // Printed with bright black (dark gray) text on bright black (dark gray) background making it invisible
@@ -539,7 +539,7 @@ public class ShadowTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (2, 3);
         app.Driver.Force16Colors = true;
 
@@ -573,7 +573,7 @@ public class ShadowTests (ITestOutputHelper output)
         _output.WriteLine ("Actual driver contents:");
         _output.WriteLine (app.Driver.ToString ());
         _output.WriteLine ("\nActual driver output:");
-        string? output = app.Driver.GetOutput ().GetLastOutput ();
+        string output = app.Driver.GetOutput ().GetLastOutput ();
         _output.WriteLine (output);
 
         DriverAssert.AssertDriverOutputIs ("""

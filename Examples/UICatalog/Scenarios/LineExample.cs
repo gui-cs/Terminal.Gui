@@ -10,7 +10,7 @@ public class LineExample : Scenario
     {
         Application.Init ();
 
-        var app = new Window
+        var window = new Window
         {
             Title = GetQuitKeyAndName ()
         };
@@ -22,7 +22,7 @@ public class LineExample : Scenario
             Y = 0,
             Text = "Basic Lines:"
         };
-        app.Add (basicLabel);
+        window.Add (basicLabel);
 
         // Horizontal line
         var hLine = new Line
@@ -31,7 +31,7 @@ public class LineExample : Scenario
             Y = 1,
             Width = 30
         };
-        app.Add (hLine);
+        window.Add (hLine);
 
         // Vertical line
         var vLine = new Line
@@ -41,7 +41,7 @@ public class LineExample : Scenario
             Height = 10,
             Orientation = Orientation.Vertical
         };
-        app.Add (vLine);
+        window.Add (vLine);
 
         // Section 2: Different Line Styles
         var stylesLabel = new Label
@@ -50,7 +50,7 @@ public class LineExample : Scenario
             Y = 3,
             Text = "Line Styles:"
         };
-        app.Add (stylesLabel);
+        window.Add (stylesLabel);
 
         (LineStyle, string) [] styles = new []
         {
@@ -66,8 +66,8 @@ public class LineExample : Scenario
 
         foreach ((LineStyle style, string name) in styles)
         {
-            app.Add (new Label { X = 0, Y = yPos, Width = 15, Text = name + ":" });
-            app.Add (new Line { X = 16, Y = yPos, Width = 14, Style = style });
+            window.Add (new Label { X = 0, Y = yPos, Width = 15, Text = name + ":" });
+            window.Add (new Line { X = 16, Y = yPos, Width = 14, Style = style });
             yPos++;
         }
 
@@ -78,7 +78,7 @@ public class LineExample : Scenario
             Y = 3,
             Text = "Line Intersections:"
         };
-        app.Add (intersectionLabel);
+        window.Add (intersectionLabel);
 
         // Create a grid of intersecting lines
         var gridX = 35;
@@ -87,7 +87,7 @@ public class LineExample : Scenario
         // Horizontal lines in the grid
         for (var i = 0; i < 5; i++)
         {
-            app.Add (
+            window.Add (
                      new Line
                      {
                          X = gridX,
@@ -100,7 +100,7 @@ public class LineExample : Scenario
         // Vertical lines in the grid
         for (var i = 0; i < 5; i++)
         {
-            app.Add (
+            window.Add (
                      new Line
                      {
                          X = gridX + i * 5,
@@ -118,10 +118,10 @@ public class LineExample : Scenario
             Y = 3,
             Text = "Mixed Style Intersections:"
         };
-        app.Add (mixedLabel);
+        window.Add (mixedLabel);
 
         // Double horizontal
-        app.Add (
+        window.Add (
                  new Line
                  {
                      X = 60,
@@ -131,7 +131,7 @@ public class LineExample : Scenario
                  });
 
         // Single vertical through double horizontal
-        app.Add (
+        window.Add (
                  new Line
                  {
                      X = 70,
@@ -142,7 +142,7 @@ public class LineExample : Scenario
                  });
 
         // Heavy horizontal
-        app.Add (
+        window.Add (
                  new Line
                  {
                      X = 60,
@@ -152,7 +152,7 @@ public class LineExample : Scenario
                  });
 
         // Single vertical through heavy horizontal
-        app.Add (
+        window.Add (
                  new Line
                  {
                      X = 70,
@@ -169,7 +169,7 @@ public class LineExample : Scenario
             Y = 12,
             Text = "Lines with Borders:"
         };
-        app.Add (boxLabel);
+        window.Add (boxLabel);
 
         var framedView = new FrameView
         {
@@ -201,7 +201,7 @@ public class LineExample : Scenario
                             Style = LineStyle.Single
                         });
 
-        app.Add (framedView);
+        window.Add (framedView);
 
         // Add help text
         var helpLabel = new Label
@@ -210,10 +210,10 @@ public class LineExample : Scenario
             Y = Pos.AnchorEnd (1),
             Text = "Line integrates with LineCanvas for automatic intersection handling"
         };
-        app.Add (helpLabel);
+        window.Add (helpLabel);
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
     }
 }

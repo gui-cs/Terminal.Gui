@@ -101,7 +101,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (1, 4);
         app.Driver!.Force16Colors = true;
 
@@ -140,7 +140,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (1, 4);
         app.Driver!.Force16Colors = true;
 

@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace ViewBaseTests.Mouse;
+namespace ViewBaseTests.MouseTests;
 
 public class TransparentMouseTests
 {
@@ -8,7 +8,7 @@ public class TransparentMouseTests
     {
         public bool MouseEventReceived { get; private set; }
 
-        protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+        protected override bool OnMouseEvent (Mouse mouse)
         {
             MouseEventReceived = true;
             return true;
@@ -34,14 +34,14 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new MouseEventArgs
+        var mouse = new Mouse
         {
             ScreenPosition = new (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        app.Mouse.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouse);
 
         // Assert
         Assert.True (underlying.MouseEventReceived);
@@ -63,14 +63,14 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new MouseEventArgs
+        var mouse = new Mouse
         {
             ScreenPosition = new Point (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         // Act
-        app.Mouse.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouse);
 
         // Assert
         Assert.True (overlay.MouseEventReceived);
@@ -96,10 +96,10 @@ public class TransparentMouseTests
 
         top.Layout ();
 
-        var mouseEvent = new MouseEventArgs
+        var mouse = new Mouse
         {
             ScreenPosition = new Point (5, 5),
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         };
 
         bool topHandled = false;
@@ -110,7 +110,7 @@ public class TransparentMouseTests
                           };
 
         // Act
-        app.Mouse.RaiseMouseEvent (mouseEvent);
+        app.Mouse.RaiseMouseEvent (mouse);
 
         // Assert
         Assert.False (overlay.MouseEventReceived);

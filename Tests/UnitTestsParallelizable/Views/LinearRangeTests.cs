@@ -3,7 +3,7 @@ using UnitTests;
 
 namespace ViewsTests;
 
-public class LinearRangeOptionTests : FakeDriverBase
+public class LinearRangeOptionTests : TestDriverBase
 {
     [Fact]
     public void OnChanged_Should_Raise_ChangedEvent ()
@@ -95,7 +95,7 @@ public class LinearRangeOptionTests : FakeDriverBase
     }
 }
 
-public class LinearRangeEventArgsTests : FakeDriverBase
+public class LinearRangeEventArgsTests : TestDriverBase
 {
     [Fact]
     public void Constructor_Sets_Cancel_Default_To_False ()
@@ -139,7 +139,7 @@ public class LinearRangeEventArgsTests : FakeDriverBase
     }
 }
 
-public class LinearRangeTests : FakeDriverBase
+public class LinearRangeTests : TestDriverBase
 {
     [Fact]
     public void Constructor_Default ()
@@ -577,7 +577,7 @@ public class LinearRangeTests : FakeDriverBase
 
     // Add more tests for different scenarios and edge cases.
 }
-public class LinearRangeCWPTests : FakeDriverBase
+public class LinearRangeCWPTests : TestDriverBase
 {
     [Fact]
     public void Type_PropertyChange_RaisesChangingAndChangedEvents ()

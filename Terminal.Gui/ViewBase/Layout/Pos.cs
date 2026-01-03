@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -138,7 +137,7 @@ public abstract record Pos
     /// <summary>Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Pos"/>.</returns>
     /// <param name="position">The value to convert to the <see cref="Pos"/>.</param>
-    public static Pos Absolute (int position) { return new PosAbsolute (position); }
+    public static Pos Absolute (int position) => new PosAbsolute (position);
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that aligns a set of views according to the specified <see cref="Alignment"/>
@@ -151,9 +150,8 @@ public abstract record Pos
     ///     set of views in a SuperView is aligned, this parameter is optional.
     /// </param>
     /// <returns></returns>
-    public static Pos Align (Alignment alignment, AlignmentModes modes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0)
-    {
-        return new PosAlign
+    public static Pos Align (Alignment alignment, AlignmentModes modes = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, int groupId = 0) =>
+        new PosAlign
         {
             Aligner = new ()
             {
@@ -162,42 +160,96 @@ public abstract record Pos
             },
             GroupId = groupId
         };
-    }
 
     /// <summary>
-    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or
-    ///     bottom) of the SuperView's Content Area, minus the respective size of the View. This is equivalent to using
-    ///     <see cref="Pos.AnchorEnd(int)"/>,
-    ///     with an offset equivalent to the View's respective dimension.
-    /// </summary>
-    /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side) minus the View's dimension.</returns>
-    /// <example>
-    ///     This sample shows how align a <see cref="Button"/> to the bottom-right the SuperView.
-    ///     <code>
-    /// anchorButton.X = Pos.AnchorEnd ();
-    /// anchorButton.Y = Pos.AnchorEnd ();
-    /// </code>
-    /// </example>
-    public static Pos AnchorEnd () { return new PosAnchorEnd (); }
-
-    /// <summary>
-    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView's Content
-    ///     Area,
-    ///     useful to flush the layout from the right or bottom. See also <see cref="Pos.AnchorEnd()"/>, which uses the view
-    ///     dimension to ensure the view is fully visible.
+    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView's
+    ///     content area. The view will be positioned so its right/bottom edge aligns with the SuperView's right/bottom edge.
     /// </summary>
     /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
-    /// <param name="offset">The view will be shifted left or up by the amount specified.</param>
+    /// <remarks>
+    ///     <para>
+    ///         When used within a SuperView that has <see cref="Dim.Auto"/>, <see cref="Pos.AnchorEnd()"/> actively
+    ///         contributes to determining the SuperView's content size, ensuring the SuperView is large enough to
+    ///         accommodate the anchored view at the end position.
+    ///     </para>
+    ///     <para>
+    ///         This is equivalent to using <see cref="Pos.AnchorEnd(int)"/> with an offset equal to the view's
+    ///         width (for X) or height (for Y).
+    ///     </para>
+    /// </remarks>
     /// <example>
-    ///     This sample shows how align a 10 column wide <see cref="Button"/> to the bottom-right the SuperView.
+    ///     This sample shows how to align a <see cref="Button"/> to the bottom-right of the SuperView.
     ///     <code>
-    /// anchorButton.X = Pos.AnchorEnd (10);
-    /// anchorButton.Y = 1
-    /// </code>
+    ///     anchorButton.X = Pos.AnchorEnd ();
+    ///     anchorButton.Y = Pos.AnchorEnd ();
+    ///     </code>
+    /// </example>
+    /// <example>
+    ///     This sample shows how <see cref="Pos.AnchorEnd()"/> affects <see cref="Dim.Auto"/>:
+    ///     <code>
+    ///     View superView = new () { Width = Dim.Auto () };
+    ///     
+    ///     // Label contributes ~10 to width
+    ///     Label label = new () { Text = "Name:" };
+    ///     superView.Add (label);
+    ///     
+    ///     // Button forces SuperView to be wide enough to fit it at the end
+    ///     Button button = new ()
+    ///     {
+    ///         Text = "OK",
+    ///         X = Pos.AnchorEnd ()  // SuperView width = button position + button width
+    ///     };
+    ///     superView.Add (button);
+    ///     </code>
+    /// </example>
+    public static Pos AnchorEnd () => new PosAnchorEnd ();
+
+    /// <summary>
+    ///     Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the SuperView's
+    ///     content area, with a specified offset from the edge.
+    /// </summary>
+    /// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
+    /// <param name="offset">
+    ///     The number of columns (for X) or rows (for Y) from the right/bottom edge. The view will be positioned
+    ///     this many cells away from the edge, towards the start.
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         When used within a SuperView that has <see cref="Dim.Auto"/>, <see cref="Pos.AnchorEnd(int)"/> actively
+    ///         contributes to determining the SuperView's content size, ensuring the SuperView is large enough to
+    ///         accommodate the anchored view at the calculated position.
+    ///     </para>
+    ///     <para>
+    ///         See also <see cref="Pos.AnchorEnd()"/>, which uses the view's dimension to ensure the view is
+    ///         fully visible with its right/bottom edge aligned to the SuperView's edge.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     This sample shows how to position a <see cref="Button"/> 2 columns from the right edge.
+    ///     <code>
+    ///     // If SuperView width is 80, button will be at X = 80 - 2 = 78
+    ///     button.X = Pos.AnchorEnd (2);
+    ///     button.Y = 1;
+    ///     </code>
+    /// </example>
+    /// <example>
+    ///     This sample shows how <see cref="Pos.AnchorEnd(int)"/> affects <see cref="Dim.Auto"/>:
+    ///     <code>
+    ///     View superView = new () { Width = Dim.Auto () };
+    ///     
+    ///     // Button forces SuperView to be at least 12 columns wide (10 offset + 2 for margin)
+    ///     Button button = new ()
+    ///     {
+    ///         Text = "OK",
+    ///         Width = 2,
+    ///         X = Pos.AnchorEnd (10)  // SuperView width = 10 + some additional space
+    ///     };
+    ///     superView.Add (button);
+    ///     </code>
     /// </example>
     public static Pos AnchorEnd (int offset)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative (offset, nameof (offset));
+        ArgumentOutOfRangeException.ThrowIfNegative (offset);
 
         return new PosAnchorEnd (offset);
     }
@@ -216,7 +268,7 @@ public abstract record Pos
     ///  };
     ///  </code>
     /// </example>
-    public static Pos Center () { return new PosCenter (); }
+    public static Pos Center () => new PosCenter ();
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that computes the position based on the passed view and by executing the
@@ -226,7 +278,7 @@ public abstract record Pos
     /// <param name="function">The function to be executed.</param>
     /// <param name="view">The view where the data will be retrieved.</param>
     /// <returns>The <see cref="Pos"/> returned from the function.</returns>
-    public static Pos Func (Func<View?, int> function, View? view = null) { return new PosFunc (function, view); }
+    public static Pos Func (Func<View?, int> function, View? view = null) => new PosFunc (function, view);
 
     /// <summary>Creates a percentage <see cref="Pos"/> object</summary>
     /// <returns>The percent <see cref="Pos"/> object.</returns>
@@ -245,7 +297,7 @@ public abstract record Pos
     /// </example>
     public static Pos Percent (int percent)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative (percent, nameof (percent));
+        ArgumentOutOfRangeException.ThrowIfNegative (percent);
 
         return new PosPercent (percent);
     }
@@ -253,22 +305,22 @@ public abstract record Pos
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Top (View view) { return new PosView (view, Side.Top); }
+    public static Pos Top (View view) => new PosView (view, Side.Top);
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Y (View view) { return new PosView (view, Side.Top); }
+    public static Pos Y (View view) => new PosView (view, Side.Top);
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Left (View view) { return new PosView (view, Side.Left); }
+    public static Pos Left (View view) => new PosView (view, Side.Left);
 
     /// <summary>Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.</summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos X (View view) { return new PosView (view, Side.Left); }
+    public static Pos X (View view) => new PosView (view, Side.Left);
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified
@@ -276,7 +328,7 @@ public abstract record Pos
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Bottom (View view) { return new PosView (view, Side.Bottom); }
+    public static Pos Bottom (View view) => new PosView (view, Side.Bottom);
 
     /// <summary>
     ///     Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified
@@ -284,7 +336,7 @@ public abstract record Pos
     /// </summary>
     /// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
     /// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-    public static Pos Right (View view) { return new PosView (view, Side.Right); }
+    public static Pos Right (View view) => new PosView (view, Side.Right);
 
     #endregion static Pos creation methods
 
@@ -303,7 +355,7 @@ public abstract record Pos
     ///     subclass of Pos that is used. For example, PosAbsolute returns a fixed position, PosAnchorEnd returns a
     ///     position that is anchored to the end of the layout, and so on.
     /// </returns>
-    internal virtual int GetAnchor (int size) { return 0; }
+    internal virtual int GetAnchor (int size) => 0;
 
     /// <summary>
     ///     Calculates and returns the final position of a <see cref="View"/> object. It takes into account the dimension of
@@ -324,13 +376,13 @@ public abstract record Pos
     ///     that
     ///     is used.
     /// </returns>
-    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension) { return GetAnchor (superviewDimension); }
+    internal virtual int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension) => GetAnchor (superviewDimension);
 
     /// <summary>
     ///     Diagnostics API to determine if this Pos object references other views.
     /// </summary>
     /// <returns></returns>
-    internal virtual bool ReferencesOtherViews () { return false; }
+    internal virtual bool ReferencesOtherViews () => false;
 
     /// <summary>
     ///     Indicates whether the specified type <typeparamref name="TPos"/> is in the hierarchy of this Pos object.
@@ -343,7 +395,7 @@ public abstract record Pos
 
         return this switch
                {
-                   PosCombine combine => combine.Left.Has<TPos> (out pos) || combine.Right.Has<TPos> (out pos),
+                   PosCombine combine => combine.Left.Has (out pos) || combine.Right.Has (out pos),
                    TPos => true,
                    _ => false
                };
@@ -368,7 +420,7 @@ public abstract record Pos
 
         if (left is PosView view)
         {
-            view.Target?.SetNeedsLayout ();
+            view.Target.SetNeedsLayout ();
         }
 
         return newPos;
@@ -377,7 +429,7 @@ public abstract record Pos
     /// <summary>Creates an Absolute <see cref="Pos"/> from the specified integer value.</summary>
     /// <returns>The Absolute <see cref="Pos"/>.</returns>
     /// <param name="n">The value to convert to the <see cref="Pos"/> .</param>
-    public static implicit operator Pos (int n) { return new PosAbsolute (n); }
+    public static implicit operator Pos (int n) => new PosAbsolute (n);
 
     /// <summary>
     ///     Subtracts a <see cref="Pos"/> from a <see cref="Pos"/>, yielding a new
@@ -397,7 +449,7 @@ public abstract record Pos
 
         if (left is PosView view)
         {
-            view.Target?.SetNeedsLayout ();
+            view.Target.SetNeedsLayout ();
         }
 
         return newPos;

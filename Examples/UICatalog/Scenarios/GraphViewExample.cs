@@ -22,7 +22,7 @@ public class GraphViewExample : Scenario
     {
         Application.Init ();
 
-        Window app = new ()
+        Window window = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -212,14 +212,14 @@ public class GraphViewExample : Scenario
                  );
 
         // Add views in order of visual appearance
-        app.Add (menu, _graphView, frameRight, statusBar);
+        window.Add (menu, _graphView, frameRight, statusBar);
 
         _graphs [_currentGraph++ % _graphs.Length] ();
 
         _viewDiagnostics = View.Diagnostics;
-        Application.Run (app);
+        Application.Run (window);
         View.Diagnostics = _viewDiagnostics;
-        app.Dispose ();
+        window.Dispose ();
         Application.Shutdown ();
     }
 

@@ -19,7 +19,7 @@ public class KeyboardTests
 
         Assert.Empty (app.Keyboard.KeyBindings.GetBindings ());
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Assert.NotEmpty (app.Keyboard.KeyBindings.GetBindings ());
 
@@ -153,23 +153,6 @@ public class KeyboardTests
 
         // Act
         keyboard.KeyDown += (sender, key) =>
-        {
-            eventRaised = true;
-        };
-
-        // Assert - event subscription doesn't throw
-        Assert.False (eventRaised); // Event hasn't been raised yet
-    }
-
-    [Fact]
-    public void KeyUp_Event_CanBeSubscribed ()
-    {
-        // Arrange
-        var keyboard = new KeyboardImpl ();
-        bool eventRaised = false;
-
-        // Act
-        keyboard.KeyUp += (sender, key) =>
         {
             eventRaised = true;
         };

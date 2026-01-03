@@ -83,7 +83,6 @@ public class GlobalTestSetup : IDisposable
         //Assert.Null (Application.UnGrabbedMouse);
         //Assert.Null (Application.MouseEvent);
         //Assert.Null (Application.KeyDown);
-        //Assert.Null (Application.KeyUp);
     }
 
 }

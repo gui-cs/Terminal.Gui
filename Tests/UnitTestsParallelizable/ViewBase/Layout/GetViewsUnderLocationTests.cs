@@ -1,4 +1,6 @@
-﻿namespace ViewBaseTests.Mouse;
+#nullable enable
+
+namespace ViewBaseTests.MouseTests;
 
 [Trait ("Category", "Input")]
 public class GetViewsUnderLocationTests

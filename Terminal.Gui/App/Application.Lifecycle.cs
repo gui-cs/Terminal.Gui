@@ -1,10 +1,4 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using Microsoft.VisualBasic;
-using Terminal.Gui.App;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Views;
 
 namespace Terminal.Gui.App;
 
@@ -29,6 +23,12 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <summary>
     ///     Creates a new <see cref="IApplication"/> instance.
     /// </summary>
+    /// <param name="timeProvider">
+    ///     Optional time provider for controlling time in tests. If <see langword="null"/>, defaults to
+    ///     <see cref="SystemTimeProvider"/>.
+    ///     For production use, omit this parameter or pass <see langword="null"/>. For testing, pass a
+    ///     <see cref="VirtualTimeProvider"/>.
+    /// </param>
     /// <remarks>
     ///     The recommended pattern is for developers to call <c>Application.Create()</c> and then use the returned
     ///     <see cref="IApplication"/> instance for all subsequent application operations.
@@ -37,12 +37,12 @@ public static partial class Application // Lifecycle (Init/Shutdown)
     /// <exception cref="InvalidOperationException">
     ///     Thrown if the legacy static Application model has already been used in this process.
     /// </exception>
-    public static IApplication Create ()
+    public static IApplication Create (ITimeProvider? timeProvider = null)
     {
         //Debug.Fail ("Application.Create() called");
         ApplicationImpl.MarkInstanceBasedModelUsed ();
 
-        return new ApplicationImpl ();
+        return new ApplicationImpl (timeProvider ?? new SystemTimeProvider (), false);
     }
 
     /// <inheritdoc cref="IApplication.Init"/>
@@ -67,7 +67,7 @@ public static partial class Application // Lifecycle (Init/Shutdown)
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static void Shutdown () => ApplicationImpl.Instance.Dispose ();
+    public static void Shutdown () { ApplicationImpl.Instance.Dispose (); }
 
     /// <inheritdoc cref="IApplication.Initialized"/>
     [Obsolete ("The legacy static Application object is going away.")]

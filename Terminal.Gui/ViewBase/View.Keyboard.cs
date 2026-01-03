@@ -10,6 +10,8 @@ public partial class View // Keyboard APIs
     {
         KeyBindings = new (this);
         KeyBindings.Add (Key.Space, Command.Activate);
+
+        // QUESTION: Should subclasses be required to enable Accept?
         KeyBindings.Add (Key.Enter, Command.Accept);
 
         HotKeyBindings = new (this);
@@ -270,7 +272,7 @@ public partial class View // Keyboard APIs
     ///     <para>
     ///         Calling this method for a key bound to the view via an Application-scoped keybinding will have no effect.
     ///         Instead,
-    ///         use <see cref="Application.RaiseKeyDownEvent"/>.
+    ///         use <see cref="IKeyboard.RaiseKeyDownEvent"/>.
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
@@ -374,10 +376,6 @@ public partial class View // Keyboard APIs
     ///     stop the key from being processed further.
     /// </summary>
     /// <remarks>
-    ///     <para>
-    ///         Not all terminals support key distinct up notifications, Applications should avoid depending on distinct
-    ///         KeyUp events.
-    ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
     public event EventHandler<Key>? KeyDown;
@@ -386,10 +384,6 @@ public partial class View // Keyboard APIs
     ///     Called when the user has pressed key it wasn't handled by <see cref="KeyDown"/> and was not bound to a key binding.
     /// </summary>
     /// <remarks>
-    ///     <para>
-    ///         Not all terminals support distinct key up notifications; applications should avoid depending on distinct
-    ///         KeyUp events.
-    ///     </para>
     /// </remarks>
     /// <param name="key">Contains the details about the key that produced the event.</param>
     /// <returns>
@@ -411,95 +405,6 @@ public partial class View // Keyboard APIs
     public event EventHandler<Key>? KeyDownNotHandled;
 
     #endregion KeyDown Event
-
-    #region KeyUp Event
-
-    /// <summary>
-    ///     If the view is enabled, raises the related key up events on the view, and returns <see langword="true"/> if the
-    ///     event was
-    ///     handled.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on distinct
-    ///         KeyUp events.
-    ///     </para>
-    ///     <para>
-    ///         If the view has a sub view that is focused, <see cref="NewKeyUpEvent"/> will be called on the focused view
-    ///         first.
-    ///     </para>
-    ///     <para>
-    ///         If the focused sub view does not handle the key press, this method raises <see cref="OnKeyUp"/>/
-    ///         <see cref="KeyUp"/> to allow the
-    ///         view to pre-process the key press.
-    ///     </para>
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </remarks>
-    /// <param name="key"></param>
-    /// <returns><see langword="true"/> if the event was handled.</returns>
-    public bool NewKeyUpEvent (Key key)
-    {
-        if (!Enabled)
-        {
-            return false;
-        }
-
-        // Before
-        if (RaiseKeyUp (key) || key.Handled)
-        {
-            return true;
-        }
-
-        // During
-
-        // After
-
-        return false;
-
-        bool RaiseKeyUp (Key k)
-        {
-            // Before (fire the cancellable event)
-            if (OnKeyUp (k) || k.Handled)
-            {
-                return true;
-            }
-
-            // fire event
-            KeyUp?.Invoke (this, k);
-
-            return k.Handled;
-        }
-    }
-
-    /// <summary>Called when a key is released. This method is called from <see cref="NewKeyUpEvent"/>.</summary>
-    /// <param name="key">Contains the details about the key that produced the event.</param>
-    /// <returns>
-    ///     <see langword="false"/> if the keys up event was not handled. <see langword="true"/> if no other view should see
-    ///     it.
-    /// </returns>
-    /// <remarks>
-    ///     Not all terminals support key distinct down/up notifications, Applications should avoid depending on distinct KeyUp
-    ///     events.
-    ///     <para>
-    ///         Overrides must call into the base and return <see langword="true"/> if the base returns
-    ///         <see langword="true"/>.
-    ///     </para>
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </remarks>
-    public virtual bool OnKeyUp (Key key) { return false; }
-
-    /// <summary>
-    ///     Raised when a key is released. Set <see cref="Key.Handled"/> to true to stop the key up event from being processed
-    ///     by other views.
-    ///     <remarks>
-    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on
-    ///         distinct KeyDown and KeyUp events and instead should use <see cref="KeyDown"/>.
-    ///         <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    ///     </remarks>
-    /// </summary>
-    public event EventHandler<Key>? KeyUp;
-
-    #endregion KeyUp Event
 
     #endregion Low-level Key handling
 
@@ -540,20 +445,20 @@ public partial class View // Keyboard APIs
             return handled;
         }
 
-        if (Margin is { } && InvokeCommandsBoundToKeyOnAdornment (Margin, key, ref handled))
-        {
-            return true;
-        }
+        //if (Margin is { } && InvokeCommandsBoundToKeyOnAdornment (Margin, key, ref handled))
+        //{
+        //    return true;
+        //}
 
-        if (Padding is { } && InvokeCommandsBoundToKeyOnAdornment (Padding, key, ref handled))
-        {
-            return true;
-        }
+        //if (Padding is { } && InvokeCommandsBoundToKeyOnAdornment (Padding, key, ref handled))
+        //{
+        //    return true;
+        //}
 
-        if (Border is { } && InvokeCommandsBoundToKeyOnAdornment (Border, key, ref handled))
-        {
-            return true;
-        }
+        //if (Border is { } && InvokeCommandsBoundToKeyOnAdornment (Border, key, ref handled))
+        //{
+        //    return true;
+        //}
 
         return handled;
     }
@@ -570,11 +475,6 @@ public partial class View // Keyboard APIs
         if (adornmentHandled is true)
         {
             return true;
-        }
-
-        if (adornment?.InternalSubViews is null)
-        {
-            return false;
         }
 
         foreach (View subview in adornment.InternalSubViews)
@@ -595,7 +495,6 @@ public partial class View // Keyboard APIs
         return false;
     }
 
-    // BUGBUG: This will miss any hotkeys in subviews of Adornments.
     /// <summary>
     ///     Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
     /// </summary>
@@ -630,7 +529,7 @@ public partial class View // Keyboard APIs
         }
 
         // Now, process any HotKey bindings in the subviews
-        foreach (View subview in InternalSubViews.ToList())
+        foreach (View subview in GetSubViews (includePadding: true, includeBorder: true))
         {
             if (subview == Focused)
             {
@@ -668,7 +567,7 @@ public partial class View // Keyboard APIs
         }
 
         // TODO: Should we set binding.Key = key if it's not set?
-        if (binding is {} && (binding.Key is null || !binding.Key.IsValid))
+        if (binding is { } && (binding.Key is null || !binding.Key.IsValid))
         {
             binding.Key = key;
         }
