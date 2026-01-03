@@ -439,6 +439,14 @@ public interface IApplication : IDisposable
     IDriver? Driver { get; set; }
 
     /// <summary>
+    ///     INTERNAL: Gets the main loop instance for this application. Used by <see cref="View.SetCursorNeedsUpdate"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property is intended for internal framework use only. Applications should not access this directly.
+    /// </remarks>
+    internal object? MainLoop { get; }
+
+    /// <summary>
     ///     Gets the clipboard for this application instance.
     /// </summary>
     /// <remarks>

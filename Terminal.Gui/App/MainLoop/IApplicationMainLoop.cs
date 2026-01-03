@@ -112,4 +112,15 @@ public interface IApplicationMainLoop<TInputRecord> : IDisposable where TInputRe
     ///     of time, this method is designed to be run in a loop.
     /// </summary>
     public void Iteration ();
+
+    /// <summary>
+    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
+    ///         changes but the view content does not need to be redrawn.
+    ///     </para>
+    /// </remarks>
+    public void SetCursorNeedsUpdate ();
 }

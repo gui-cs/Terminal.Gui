@@ -127,6 +127,11 @@ internal partial class ApplicationImpl
     /// </remarks>
     internal IMainLoopCoordinator? Coordinator { get; private set; }
 
+    /// <inheritdoc/>
+    object? IApplication.MainLoop => _mainLoop;
+
+    private object? _mainLoop;
+
     /// <summary>
     ///     INTERNAL: Creates a <see cref="MainLoopCoordinator{TInputRecord}"/> with the appropriate component factory
     ///     for the specified input record type.
@@ -147,6 +152,7 @@ internal partial class ApplicationImpl
     {
         ConcurrentQueue<TInputRecord> inputQueue = new ();
         ApplicationMainLoop<TInputRecord> loop = new ();
+        _mainLoop = loop;  // Store reference for SetCursorNeedsUpdate
 
         IComponentFactory<TInputRecord> cf;
 
