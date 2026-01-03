@@ -23,6 +23,11 @@ public class ApplicationNavigation
 
     private View? _focused;
 
+    // Cursor caching fields
+    private bool _cursorNeedsUpdate;
+    private Point? _lastCursorPosition;
+    private CursorVisibility _lastCursorVisibility;
+
     /// <summary>
     ///     Raised when the most focused <see cref="View"/> in the application has changed.
     /// </summary>
@@ -37,6 +42,20 @@ public class ApplicationNavigation
     }
 
     /// <summary>
+    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
+    ///         changes but the view content does not need to be redrawn.
+    ///     </para>
+    /// </remarks>
+    public void SetCursorNeedsUpdate ()
+    {
+        _cursorNeedsUpdate = true;
+    }
+
+    /// <summary>
     ///     Updates the terminal cursor based on the currently focused view.
     /// </summary>
     /// <param name="output">The output driver to use for cursor positioning.</param>
@@ -45,15 +64,19 @@ public class ApplicationNavigation
     /// </remarks>
     public void UpdateCursor (IOutput output)
     {
-        // Use MostFocused from the view hierarchy to ensure we get the correct view
+        // Get the most focused view from the view hierarchy
+        // We use TopRunnableView.MostFocused instead of _focused because _focused may not be set yet
+        // during initial setup or in some edge cases
         View? mostFocused = App?.TopRunnableView?.MostFocused;
 
         if (mostFocused == null)
         {
             output.SetCursorVisibility (CursorVisibility.Invisible);
+            _cursorNeedsUpdate = false;
             return;
         }
 
+        // Always call PositionCursor() to get current position
         Point? to = mostFocused.PositionCursor ();
 
         if (to.HasValue)
@@ -68,6 +91,8 @@ public class ApplicationNavigation
         {
             output.SetCursorVisibility (CursorVisibility.Invisible);
         }
+
+        _cursorNeedsUpdate = false;
     }
 
     // BUGBUG: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
@@ -122,6 +147,9 @@ public class ApplicationNavigation
         Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
+        
+        // Cursor needs update when focus changes
+        _cursorNeedsUpdate = true;
 
         FocusedChanged?.Invoke (this, EventArgs.Empty);
     }

@@ -25,10 +25,6 @@ public partial class View
     ///         <item>User presses arrow keys in a text view - cursor moves without content changing</item>
     ///         <item>Programmatic cursor position changes</item>
     ///     </list>
-    ///     <para>
-    ///         NOTE: Current implementation updates cursor every iteration, so this is a no-op.
-    ///         Future optimization may implement cursor position caching.
-    ///     </para>
     /// </remarks>
     /// <example>
     ///     <code>
@@ -53,8 +49,8 @@ public partial class View
     /// </example>
     public void SetCursorNeedsUpdate ()
     {
-        // Currently a no-op since cursor is updated every iteration
-        // Future optimization may implement cursor position caching
+        // Delegate to ApplicationNavigation which manages cursor state
+        App?.Navigation?.SetCursorNeedsUpdate ();
     }
 
     /// <summary>
