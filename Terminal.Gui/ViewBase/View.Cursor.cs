@@ -49,20 +49,8 @@ public partial class View
     /// </example>
     public void SetCursorNeedsUpdate ()
     {
-        // Access the main loop through the application instance
-        // The MainLoop property returns an object that we need to cast to the appropriate interface
-        if (App?.MainLoop is IApplicationMainLoop<ConsoleKeyInfo> netLoop)
-        {
-            netLoop.SetCursorNeedsUpdate ();
-        }
-        else if (App?.MainLoop is IApplicationMainLoop<WindowsConsole.InputRecord> winLoop)
-        {
-            winLoop.SetCursorNeedsUpdate ();
-        }
-        else if (App?.MainLoop is IApplicationMainLoop<char> unixLoop)
-        {
-            unixLoop.SetCursorNeedsUpdate ();
-        }
+        // Delegate to ApplicationNavigation which manages cursor state
+        App?.Navigation?.SetCursorNeedsUpdate ();
     }
 
     /// <summary>
