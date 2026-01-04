@@ -60,13 +60,18 @@ public class ApplicationNavigation
     /// </summary>
     /// <param name="output">The output driver to use for cursor positioning.</param>
     /// <remarks>
-    ///     This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
+    ///     <para>
+    ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
+    ///     </para>
+    ///     <para>
+    ///         Note: Cursor position caching was attempted but disabled due to test failures.
+    ///         The caching infrastructure (SetCursorNeedsUpdate, _cursorNeedsUpdate flag) remains
+    ///         in place for future optimization work.
+    ///     </para>
     /// </remarks>
     public void UpdateCursor (IOutput output)
     {
         // Get the most focused view from the view hierarchy
-        // We use TopRunnableView.MostFocused instead of _focused because _focused may not be set yet
-        // during initial setup or in some edge cases
         View? mostFocused = App?.TopRunnableView?.MostFocused;
 
         if (mostFocused == null)
@@ -76,14 +81,15 @@ public class ApplicationNavigation
             return;
         }
 
-        // Always call PositionCursor() to get current position
-        Point? to = mostFocused.PositionCursor ();
+        // Always call PositionCursor() to get current viewport-relative position
+        Point? viewportPos = mostFocused.PositionCursor ();
 
-        if (to.HasValue)
+        if (viewportPos.HasValue)
         {
             // Translate to screen coordinates
-            Point screenPos = mostFocused.ViewportToScreen (to.Value);
+            Point screenPos = mostFocused.ViewportToScreen (viewportPos.Value);
 
+            // Always update driver (caching disabled - see remarks)
             output.SetCursorPosition (screenPos.X, screenPos.Y);
             output.SetCursorVisibility (mostFocused.CursorVisibility);
         }
