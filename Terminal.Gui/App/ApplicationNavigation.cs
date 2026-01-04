@@ -104,7 +104,6 @@ public class ApplicationNavigation
                 if (!viewportBounds.Contains (screenPos))
                 {
                     isWithinAllAncestors = false;
-                    Debug.WriteLine ($"UpdateCursor: Cursor {screenPos} outside {current.GetType().Name} viewport {viewportBounds}");
                     break;
                 }
 
@@ -121,7 +120,6 @@ public class ApplicationNavigation
             else
             {
                 // Cursor is outside at least one ancestor viewport - hide it
-                Debug.WriteLine ($"UpdateCursor: Hiding cursor - outside ancestor viewport");
                 output.SetCursorVisibility (CursorVisibility.Invisible);
             }
         }
