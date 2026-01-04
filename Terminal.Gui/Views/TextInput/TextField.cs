@@ -435,6 +435,8 @@ public class TextField : View, IDesignable
         get => _cursorPosition;
         set
         {
+            int oldPosition = _cursorPosition;
+            
             if (value < 0)
             {
                 _cursorPosition = 0;
@@ -449,6 +451,12 @@ public class TextField : View, IDesignable
             }
 
             PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+            
+            // Signal cursor position changed without requiring full redraw
+            if (_cursorPosition != oldPosition)
+            {
+                SetCursorNeedsUpdate ();
+            }
         }
     }
 

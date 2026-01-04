@@ -722,6 +722,8 @@ public class TextView : View, IDesignable
         get => new (CurrentColumn, CurrentRow);
         set
         {
+            Point oldPosition = new (CurrentColumn, CurrentRow);
+            
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
 
             CurrentColumn = value.X < 0 ? 0 :
@@ -731,6 +733,13 @@ public class TextView : View, IDesignable
                          value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
             SetNeedsDraw ();
             Adjust ();
+            
+            // Signal cursor position changed without requiring additional redraw
+            Point newPosition = new (CurrentColumn, CurrentRow);
+            if (newPosition != oldPosition)
+            {
+                SetCursorNeedsUpdate ();
+            }
         }
     }
 

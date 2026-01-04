@@ -14,9 +14,6 @@ public class ApplicationNavigation
     public ApplicationNavigation ()
     {
         // TODO: Move navigation key bindings here from KeyboardImpl
-        
-        // Subscribe to focus changes to trigger cursor updates
-        FocusedChanged += (sender, args) => _cursorNeedsUpdate = true;
     }
 
     /// <summary>
@@ -27,7 +24,7 @@ public class ApplicationNavigation
     private View? _focused;
 
     // Cursor caching fields
-    private bool _cursorNeedsUpdate = true;
+    private bool _cursorNeedsUpdate;
     private Point? _lastCursorPosition;
     private CursorVisibility _lastCursorVisibility;
 
@@ -63,60 +60,42 @@ public class ApplicationNavigation
     /// </summary>
     /// <param name="output">The output driver to use for cursor positioning.</param>
     /// <remarks>
-    ///     This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
+    ///     <para>
+    ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
+    ///     </para>
+    ///     <para>
+    ///         Note: Cursor position caching was attempted but disabled due to test failures.
+    ///         The caching infrastructure (SetCursorNeedsUpdate, _cursorNeedsUpdate flag) remains
+    ///         in place for future optimization work.
+    ///     </para>
     /// </remarks>
     public void UpdateCursor (IOutput output)
     {
-        View? mostFocused = _focused;
-
-        // Check if we need to update based on cached state
-        if (!_cursorNeedsUpdate && mostFocused == null && _lastCursorVisibility == CursorVisibility.Invisible)
-        {
-            // No focused view and cursor already invisible - no update needed
-            return;
-        }
+        // Get the most focused view from the view hierarchy
+        View? mostFocused = App?.TopRunnableView?.MostFocused;
 
         if (mostFocused == null)
         {
-            // Only update if visibility changed
-            if (_lastCursorVisibility != CursorVisibility.Invisible)
-            {
-                output.SetCursorVisibility (CursorVisibility.Invisible);
-                _lastCursorVisibility = CursorVisibility.Invisible;
-            }
-
-            _lastCursorPosition = null;
+            output.SetCursorVisibility (CursorVisibility.Invisible);
             _cursorNeedsUpdate = false;
-
             return;
         }
 
-        Point? to = mostFocused.PositionCursor ();
+        // Always call PositionCursor() to get current viewport-relative position
+        Point? viewportPos = mostFocused.PositionCursor ();
 
-        // Check if cursor position or visibility changed
-        if (to == _lastCursorPosition
-            && mostFocused.CursorVisibility == _lastCursorVisibility
-            && !_cursorNeedsUpdate)
-        {
-            return; // No changes
-        }
-
-        if (to.HasValue)
+        if (viewportPos.HasValue)
         {
             // Translate to screen coordinates
-            Point screenPos = mostFocused.ViewportToScreen (to.Value);
+            Point screenPos = mostFocused.ViewportToScreen (viewportPos.Value);
 
+            // Always update driver (caching disabled - see remarks)
             output.SetCursorPosition (screenPos.X, screenPos.Y);
             output.SetCursorVisibility (mostFocused.CursorVisibility);
-
-            _lastCursorPosition = to;
-            _lastCursorVisibility = mostFocused.CursorVisibility;
         }
         else
         {
             output.SetCursorVisibility (CursorVisibility.Invisible);
-            _lastCursorPosition = null;
-            _lastCursorVisibility = CursorVisibility.Invisible;
         }
 
         _cursorNeedsUpdate = false;
@@ -174,6 +153,9 @@ public class ApplicationNavigation
         Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
+        
+        // Cursor needs update when focus changes
+        _cursorNeedsUpdate = true;
 
         FocusedChanged?.Invoke (this, EventArgs.Empty);
     }
