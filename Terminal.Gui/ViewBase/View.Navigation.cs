@@ -399,7 +399,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <summary>
     ///     Returns the most focused SubView down the subview-hierarchy, or this view if it has focus and no subview has focus.
     /// </summary>
-    /// <value>The most focused SubView, this view if it has focus and no subview has focus, or <see langword="null"/> if this view does not have focus.</value>
+    /// <value>
+    ///     The most focused SubView, this view if it has focus and no subview has focus, or <see langword="null"/> if this
+    ///     view does not have focus.
+    /// </value>
     public View? MostFocused
     {
         get

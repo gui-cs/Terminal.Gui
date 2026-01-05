@@ -2,11 +2,9 @@
 
 namespace UnitTests.ApplicationTests;
 
-public class CursorTests
+public class CursorTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public CursorTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper _output = output;
 
     private class TestView : View
     {
@@ -18,15 +16,13 @@ public class CursorTests
             if (TestLocation.HasValue && HasFocus)
             {
                 // Check if cursor is within viewport bounds
-                if (TestLocation.Value.X >= 0 &&
-                    TestLocation.Value.X < Viewport.Width &&
-                    TestLocation.Value.Y >= 0 &&
-                    TestLocation.Value.Y < Viewport.Height)
+                if (TestLocation.Value.X >= 0 && TestLocation.Value.X < Viewport.Width && TestLocation.Value.Y >= 0 && TestLocation.Value.Y < Viewport.Height)
                 {
                     Driver?.SetCursorVisibility (CursorVisibility.Default);
+
                     return TestLocation;
                 }
-                
+
                 // Cursor outside viewport - hide it
                 return null;
             }
@@ -39,7 +35,7 @@ public class CursorTests
     [AutoInitShutdown]
     public void PositionCursor_No_Focus_Returns_False ()
     {
-        Application.Navigation.SetFocused (null);
+        Application.Navigation?.SetFocused (null);
 
         Assert.False (Application.PositionCursor ());
 
@@ -207,7 +203,7 @@ public class CursorTests
         cursorPos = view.PositionCursor ();
 
         Assert.NotNull (cursorPos);
-        Assert.Equal (new Point (5, 2), cursorPos.Value);
+        Assert.Equal (new (5, 2), cursorPos.Value);
     }
 
     // This test documents the expected behavior for Issue #3444:
@@ -246,7 +242,7 @@ public class CursorTests
             Height = 5
         };
 
-        // Child view that positions cursor (simulating TextField)  
+        // Child view that positions cursor (simulating TextField)
         var child = new TestView
         {
             X = 0,
@@ -259,10 +255,10 @@ public class CursorTests
 
         grandparent.Add (parent);
         parent.Add (child);
-        
+
         // Set focus through Application.Navigation
         Application.Navigation.SetFocused (child);
-        
+
         // Verify child has focus and returns cursor position
         Assert.True (child.HasFocus, "Child should have focus");
         Point? cursorPos = child.PositionCursor ();
@@ -272,26 +268,26 @@ public class CursorTests
         // Convert to screen coordinates
         Point screenPos = child.ViewportToScreen (cursorPos.Value);
         _output.WriteLine ($"Cursor screen pos: {screenPos}");
-        
+
         // Get grandparent's screen viewport bounds
         Rectangle grandparentViewport = new Rectangle (
             grandparent.ViewportToScreen (Point.Empty),
             grandparent.Viewport.Size);
         _output.WriteLine ($"Grandparent viewport: {grandparentViewport}");
-        
+
         // Cursor screen position should be outside grandparent viewport
         bool isWithinGrandparent = grandparentViewport.Contains (screenPos);
-        Assert.False (isWithinGrandparent, 
+        Assert.False (isWithinGrandparent,
             $"Cursor at screen {screenPos} should be outside grandparent viewport {grandparentViewport}");
 
         // Verify the fix by checking that UpdateCursor detects cursor outside ancestor viewport
         View? mostFocused = child.MostFocused;
         _output.WriteLine ($"child.HasFocus={child.HasFocus}, child.MostFocused={mostFocused}");
-        
+
         // With our MostFocused fix, this should be child since child has focus but no subviews
         Assert.NotNull (mostFocused);
         Assert.Equal (child, mostFocused);
-        
+
         // Manually verify the viewport check logic that UpdateCursor should use
         bool shouldBeVisible = true;
         View? current = mostFocused;
@@ -300,7 +296,7 @@ public class CursorTests
             Rectangle viewportBounds = current.ViewportToScreen (
                 new Rectangle (Point.Empty, current.Viewport.Size));
             _output.WriteLine ($"Checking {current.GetType().Name}: viewport={viewportBounds}, contains cursor={viewportBounds.Contains(screenPos)}");
-            
+
             if (!viewportBounds.Contains (screenPos))
             {
                 shouldBeVisible = false;
@@ -309,13 +305,13 @@ public class CursorTests
             }
             current = current.SuperView;
         }
-        
+
         // Cursor should NOT be visible because it's outside grandparent viewport
         Assert.False (shouldBeVisible, "Cursor should not be visible - it's outside grandparent viewport");
-        
+
         // Now test that UpdateCursor actually hides it
         Application.Navigation.UpdateCursor (Application.Driver!.GetOutput());
-        
+
         _output.WriteLine ("UpdateCursor called - cursor should now be hidden");
     }
     */
@@ -340,25 +336,28 @@ public class CursorTests
         // Set cursor to position 0 (beginning)
         textField.CursorPosition = 0;
         Point? cursorPos = textField.PositionCursor ();
-        
+
         // Cursor at start should be visible
         Assert.NotNull (cursorPos);
         Assert.True (cursorPos.Value.X >= 0 && cursorPos.Value.X < textField.Viewport.Width);
 
         // Now move cursor forward - at some point it should scroll
         // and cursor should stay within viewport
-        for (int i = 0; i <= textField.Text.Length; i++)
+        for (var i = 0; i <= textField.Text.Length; i++)
         {
             textField.CursorPosition = i;
             cursorPos = textField.PositionCursor ();
-            
+
             if (cursorPos.HasValue)
             {
                 // Cursor position should always be within viewport bounds
-                Assert.True (cursorPos.Value.X >= 0, 
-                    $"Cursor X={cursorPos.Value.X} should be >= 0 at position {i}");
-                Assert.True (cursorPos.Value.X < textField.Viewport.Width,
-                    $"Cursor X={cursorPos.Value.X} should be < {textField.Viewport.Width} at position {i}");
+                Assert.True (
+                             cursorPos.Value.X >= 0,
+                             $"Cursor X={cursorPos.Value.X} should be >= 0 at position {i}");
+
+                Assert.True (
+                             cursorPos.Value.X < textField.Viewport.Width,
+                             $"Cursor X={cursorPos.Value.X} should be < {textField.Viewport.Width} at position {i}");
             }
         }
     }

@@ -1,10 +1,9 @@
-
 using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Helper class for <see cref="Application"/> navigation. Held by <see cref="Application.Navigation"/>
+///     Helper class for <see cref="Application"/> navigation and cursor handling. Held by <see cref="Application.Navigation"/>
 /// </summary>
 public class ApplicationNavigation
 {
@@ -23,11 +22,6 @@ public class ApplicationNavigation
 
     private View? _focused;
 
-    // Cursor caching fields
-    private bool _cursorNeedsUpdate;
-    private Point? _lastCursorPosition;
-    private CursorVisibility _lastCursorVisibility;
-
     /// <summary>
     ///     Raised when the most focused <see cref="View"/> in the application has changed.
     /// </summary>
@@ -36,102 +30,10 @@ public class ApplicationNavigation
     /// <summary>
     ///     Gets the most focused <see cref="View"/> in the application, if there is one.
     /// </summary>
-    public View? GetFocused ()
-    {
-        return _focused;
-    }
+    public View? GetFocused () => _focused;
 
-    /// <summary>
-    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
-    ///         changes but the view content does not need to be redrawn.
-    ///     </para>
-    /// </remarks>
-    public void SetCursorNeedsUpdate ()
-    {
-        _cursorNeedsUpdate = true;
-    }
-
-    /// <summary>
-    ///     Updates the terminal cursor based on the currently focused view.
-    /// </summary>
-    /// <param name="output">The output driver to use for cursor positioning.</param>
-    /// <remarks>
-    ///     <para>
-    ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
-    ///     </para>
-    ///     <para>
-    ///         Note: Cursor position caching was attempted but disabled due to test failures.
-    ///         The caching infrastructure (SetCursorNeedsUpdate, _cursorNeedsUpdate flag) remains
-    ///         in place for future optimization work.
-    ///     </para>
-    /// </remarks>
-    public void UpdateCursor (IOutput output)
-    {
-        // Get the most focused view from the view hierarchy
-        View? mostFocused = App?.TopRunnableView?.MostFocused;
-
-        if (mostFocused == null)
-        {
-            output.SetCursorVisibility (CursorVisibility.Invisible);
-            _cursorNeedsUpdate = false;
-            return;
-        }
-
-        // Always call PositionCursor() to get current viewport-relative position
-        Point? viewportPos = mostFocused.PositionCursor ();
-
-        if (viewportPos.HasValue)
-        {
-            // Translate to screen coordinates
-            Point screenPos = mostFocused.ViewportToScreen (viewportPos.Value);
-
-            // Check if cursor is within all ancestor viewports
-            // Walk up the view hierarchy and ensure cursor is visible in each ancestor's viewport
-            View? current = mostFocused;
-            bool isWithinAllAncestors = true;
-
-            while (current != null)
-            {
-                // Get this view's viewport in screen coordinates
-                Rectangle viewportBounds = current.ViewportToScreen (
-                    new Rectangle (Point.Empty, current.Viewport.Size));
-
-                // Check if cursor screen position is within this viewport
-                if (!viewportBounds.Contains (screenPos))
-                {
-                    isWithinAllAncestors = false;
-                    break;
-                }
-
-                // Move to parent
-                current = current.SuperView;
-            }
-
-            if (isWithinAllAncestors)
-            {
-                // Cursor is within all ancestor viewports - show it
-                output.SetCursorPosition (screenPos.X, screenPos.Y);
-                output.SetCursorVisibility (mostFocused.CursorVisibility);
-            }
-            else
-            {
-                // Cursor is outside at least one ancestor viewport - hide it
-                output.SetCursorVisibility (CursorVisibility.Invisible);
-            }
-        }
-        else
-        {
-            output.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
-        _cursorNeedsUpdate = false;
-    }
-
-    // BUGBUG: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
+    // QUESTION: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
+    // QUESTION: Related, see View.GetSubViews(), which does support Adornments.
     /// <summary>
     ///     Gets whether <paramref name="view"/> is in the SubView hierarchy of <paramref name="start"/>.
     /// </summary>
@@ -180,10 +82,11 @@ public class ApplicationNavigation
         {
             return;
         }
+
         Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
-        
+
         // Cursor needs update when focus changes
         _cursorNeedsUpdate = true;
 
@@ -211,6 +114,102 @@ public class ApplicationNavigation
         {
             return visiblePopover.AdvanceFocus (direction, behavior);
         }
+
         return App?.TopRunnableView is { } && App.TopRunnableView.AdvanceFocus (direction, behavior);
+    }
+
+
+    // Cursor caching fields
+    private bool _cursorNeedsUpdate;
+    private Point? _lastCursorPosition;
+    private CursorVisibility _lastCursorVisibility;
+
+    /// <summary>
+    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
+    ///         changes but the view content does not need to be redrawn.
+    ///     </para>
+    /// </remarks>
+    public void SetCursorNeedsUpdate () { _cursorNeedsUpdate = true; }
+
+    /// <summary>
+    ///     Updates the terminal cursor based on the currently focused view.
+    /// </summary>
+    /// <param name="output">The output driver to use for cursor positioning.</param>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
+    ///     </para>
+    ///     <para>
+    ///         Note: Cursor position caching was attempted but disabled due to test failures.
+    ///         The caching infrastructure (SetCursorNeedsUpdate, _cursorNeedsUpdate flag) remains
+    ///         in place for future optimization work.
+    ///     </para>
+    /// </remarks>
+    public void UpdateCursor (IOutput output)
+    {
+        // Get the most focused view from the view hierarchy
+        View? mostFocused = App?.TopRunnableView?.MostFocused;
+
+        if (mostFocused == null)
+        {
+            output.SetCursorVisibility (CursorVisibility.Invisible);
+            _cursorNeedsUpdate = false;
+
+            return;
+        }
+
+        // Always call PositionCursor() to get current viewport-relative position
+        Point? viewportPos = mostFocused.PositionCursor ();
+
+        if (viewportPos.HasValue)
+        {
+            // Translate to screen coordinates
+            Point screenPos = mostFocused.ViewportToScreen (viewportPos.Value);
+
+            // Check if cursor is within all ancestor viewports
+            // Walk up the view hierarchy and ensure cursor is visible in each ancestor's viewport
+            View? current = mostFocused;
+            var isWithinAllAncestors = true;
+
+            while (current != null)
+            {
+                // Get this view's viewport in screen coordinates
+                Rectangle viewportBounds = current.ViewportToScreen (
+                                                                     new Rectangle (Point.Empty, current.Viewport.Size));
+
+                // Check if cursor screen position is within this viewport
+                if (!viewportBounds.Contains (screenPos))
+                {
+                    isWithinAllAncestors = false;
+
+                    break;
+                }
+
+                // Move to SuperView
+                current = current.SuperView;
+            }
+
+            if (isWithinAllAncestors)
+            {
+                // Cursor is within all ancestor viewports - show it
+                output.SetCursorPosition (screenPos.X, screenPos.Y);
+                output.SetCursorVisibility (mostFocused.CursorVisibility);
+            }
+            else
+            {
+                // Cursor is outside at least one ancestor viewport - hide it
+                output.SetCursorVisibility (CursorVisibility.Invisible);
+            }
+        }
+        else
+        {
+            output.SetCursorVisibility (CursorVisibility.Invisible);
+        }
+
+        _cursorNeedsUpdate = false;
     }
 }

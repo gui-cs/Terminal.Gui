@@ -141,23 +141,17 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         SizeMonitor.Poll ();
 
         // Layout and draw any views that need it
-        App?.LayoutAndDraw (forceRedraw: false);
+        App?.LayoutAndDraw (false);
 
         // Update the cursor
-        SetCursor ();
+        App?.Navigation?.UpdateCursor (Output);
 
-        Stopwatch swCallbacks = Stopwatch.StartNew ();
+        var swCallbacks = Stopwatch.StartNew ();
 
         // Run any timeout callbacks that are due
         TimedEvents.RunTimers ();
 
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
-    }
-
-    private void SetCursor ()
-    {
-        // Delegate cursor management to ApplicationNavigation
-        App?.Navigation?.UpdateCursor (Output);
     }
 
     /// <inheritdoc/>

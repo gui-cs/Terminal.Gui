@@ -1,6 +1,4 @@
-
 namespace Terminal.Gui.ViewBase;
-
 public partial class View
 {
     /// <summary>
@@ -15,7 +13,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         Call this method when the cursor position changes but the view content does not need to be redrawn.
-    ///         This is more efficient than calling <see cref="View.SetNeedsDraw"/> when only the cursor needs to move.
+    ///         This is more efficient than calling <see cref="View.SetNeedsDraw()"/> when only the cursor needs to move.
     ///     </para>
     ///     <para>
     ///         Common use cases include:
@@ -62,7 +60,7 @@ public partial class View
     ///         in the focus chain with <see cref="HasFocus"/> == <see langword="true"/>).
     ///     </para>
     ///     <para>
-    ///         <b>IMPORTANT:</b> Do NOT call <see cref="View.Move"/>, <see cref="View.AddRune"/>, or any drawing
+    ///         <b>IMPORTANT:</b> Do NOT call <see cref="View.Move"/>, <see cref="View.AddRune(Rune)"/>, or any drawing
     ///         methods in this method. Those methods affect the "Draw Cursor" (where characters are rendered), not
     ///         the Terminal Cursor (the visible cursor indicator). This method should only calculate and return a position.
     ///     </para>
@@ -99,10 +97,9 @@ public partial class View
     ///     }
     ///     </code>
     /// </example>
-    public virtual Point? PositionCursor ()
-    {
+    public virtual Point? PositionCursor () =>
+
         // Base implementation: hide cursor
         // Returning null will hide the cursor.
-        return null;
-    }
+        null;
 }

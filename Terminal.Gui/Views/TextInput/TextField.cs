@@ -36,7 +36,7 @@ public class TextField : View, IDesignable
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
         Used = true;
-        MousePositionTracking  = true;
+        MousePositionTracking = true;
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -436,7 +436,7 @@ public class TextField : View, IDesignable
         set
         {
             int oldPosition = _cursorPosition;
-            
+
             if (value < 0)
             {
                 _cursorPosition = 0;
@@ -451,7 +451,7 @@ public class TextField : View, IDesignable
             }
 
             PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
-            
+
             // Signal cursor position changed without requiring full redraw
             if (_cursorPosition != oldPosition)
             {
@@ -472,7 +472,7 @@ public class TextField : View, IDesignable
     /// </summary>
     public bool IsDirty => _historyText.IsDirty ([Cell.StringToCells (Text)]);
 
-    /// <summary>If set to true its not allow any changes in the text.</summary>
+    /// <summary>If set to true it's not allow any changes in the text.</summary>
     public bool ReadOnly { get; set; }
 
     /// <summary>Gets the left offset position.</summary>
@@ -487,7 +487,8 @@ public class TextField : View, IDesignable
     /// <summary>Length of the selected text.</summary>
     public int SelectedLength { get; private set; }
 
-    /// <summary>Start position of the selected text.</summary>
+    // TODO: Make this be nullable to better indicate no selection
+    /// <summary>Start position of the selected text. -1 means no selection.</summary>
     public int SelectedStart
     {
         get => _selectedStart;
@@ -1008,7 +1009,7 @@ public class TextField : View, IDesignable
             AddRune ((Rune)' ');
         }
 
-        PositionCursor ();
+        //PositionCursor ();
 
         RenderCaption ();
 
@@ -1106,7 +1107,6 @@ public class TextField : View, IDesignable
 
         _cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
         ClearAllSelection ();
-        SetNeedsDraw ();
         Adjust ();
     }
 
@@ -1167,15 +1167,6 @@ public class TextField : View, IDesignable
         SetNeedsDraw ();
     }
 
-    ///// <summary>
-    /////     Changed event, raised when the text has changed.
-    /////     <remarks>
-    /////         This event is raised when the <see cref="Text"/> changes. The passed <see cref="EventArgs"/> is a
-    /////         <see cref="string"/> containing the old value.
-    /////     </remarks>
-    ///// </summary>
-    //public event EventHandler<StateEventArgs<string>> TextChanged;
-
     /// <summary>Undoes the latest changes.</summary>
     public void Undo ()
     {
@@ -1192,11 +1183,7 @@ public class TextField : View, IDesignable
     ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>
-    internal bool CursorIsAtEnd () { return CursorPosition == Text.Length; }
-
-    /// <summary>Returns <see langword="true"/> if the current cursor position is at the start of the <see cref="TextField"/>.</summary>
-    /// <returns></returns>
-    internal bool CursorIsAtStart () { return CursorPosition <= 0; }
+    internal bool CursorIsAtEnd () => CursorPosition == Text.Length;
 
     private void Adjust ()
     {
@@ -1205,7 +1192,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        // TODO: This is a lame prototype proving it should be easy for TextField to 
+        // TODO: This is a lame prototype proving it should be easy for TextField to
         // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
         //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
 
@@ -1239,7 +1226,7 @@ public class TextField : View, IDesignable
         }
         else
         {
-            PositionCursor ();
+            SetCursorNeedsUpdate ();
         }
     }
 
@@ -1264,7 +1251,7 @@ public class TextField : View, IDesignable
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
-        App?.Popover.Register (ContextMenu);
+        App?.Popover?.Register (ContextMenu);
     }
 
     private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
@@ -1296,9 +1283,7 @@ public class TextField : View, IDesignable
         Autocomplete.Context = new (
                                     currentLine,
                                     cursorPosition,
-                                    Autocomplete.Context != null
-                                        ? Autocomplete.Context.Canceled
-                                        : false
+                                    Autocomplete.Context?.Canceled ?? false
                                    );
 
         Autocomplete.GenerateSuggestions (
@@ -1308,7 +1293,7 @@ public class TextField : View, IDesignable
 
     private TextModel GetModel ()
     {
-        var model = new TextModel ();
+        TextModel model = new ();
         model.LoadString (Text);
 
         return model;
@@ -1329,7 +1314,7 @@ public class TextField : View, IDesignable
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
         _historyText.Add (
-                          new () { Cell.ToCells (_text) },
+                          [Cell.ToCells (_text)],
                           new (_cursorPosition, 0)
                          );
 
@@ -1483,7 +1468,7 @@ public class TextField : View, IDesignable
         return _cursorPosition != oldCursorPosition || hadSelection;
     }
 
-    private bool MoveLeft () { return Move (-1); }
+    private bool MoveLeft () => Move (-1);
 
     private void MoveLeftExtend ()
     {
@@ -1493,7 +1478,7 @@ public class TextField : View, IDesignable
         }
     }
 
-    private bool MoveRight () { return Move (1); }
+    private bool MoveRight () => Move (1);
 
     private void MoveRightExtend ()
     {
@@ -1601,7 +1586,7 @@ public class TextField : View, IDesignable
         return 0; //offB;
     }
 
-    private int PositionCursor (Mouse mouse) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false); }
+    private int PositionCursor (Mouse mouse) => PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false);
 
     private int PositionCursor (int x, bool getX = true)
     {
@@ -1741,7 +1726,7 @@ public class TextField : View, IDesignable
                                              GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // Use TitleTextFormatter to render the caption with hotkey support
-        TitleTextFormatter.Draw (driver: Driver, screen: ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), normalColor: captionAttribute, hotColor: hotKeyAttribute);
+        TitleTextFormatter.Draw (Driver, ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), captionAttribute, hotKeyAttribute);
     }
 
     private void SetClipboard (IEnumerable<string> text)
@@ -1790,10 +1775,11 @@ public class TextField : View, IDesignable
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSuperViewChanged (ValueChangedEventArgs<View> args)
     {
         base.OnSuperViewChanged (args);
+
         if (SuperView is { })
         {
             if (Autocomplete.HostControl is null)
@@ -1807,7 +1793,6 @@ public class TextField : View, IDesignable
             Autocomplete.HostControl = null;
         }
     }
-
 
     private void TextField_Initialized (object sender, EventArgs e)
     {
@@ -1826,7 +1811,6 @@ public class TextField : View, IDesignable
 
         CreateContextMenu ();
         KeyBindings.Add (ContextMenu?.Key, Command.Context);
-
     }
 
     private void DisposeContextMenu ()
