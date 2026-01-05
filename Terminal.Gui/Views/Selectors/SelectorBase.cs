@@ -265,7 +265,8 @@ public abstract class SelectorBase : View, IOrientation
 
         OnCreatedSubViews ();
 
-        AssignUniqueHotKeys ();
+        // Note: Hotkey assignment is now handled automatically by the base class
+        // when SubViews are added via Add(). No need to call AssignUniqueHotKeys() here.
         SetLayout ();
     }
 
@@ -294,23 +295,6 @@ public abstract class SelectorBase : View, IOrientation
         };
 
         return checkbox;
-    }
-
-    /// <summary>
-    ///     Assigns unique hotkeys to the labels of the subviews created by <see cref="CreateSubViews"/>.
-    /// </summary>
-    /// <remarks>
-    ///     This method uses the base class's <see cref="View.AssignHotKeysToSubViews"/> implementation.
-    /// </remarks>
-    private void AssignUniqueHotKeys ()
-    {
-        if (!AssignHotKeys || Labels is null)
-        {
-            return;
-        }
-
-        // Use the base class's hotkey assignment implementation
-        AssignHotKeysToSubViews ();
     }
 
     private int _horizontalSpace = 2;
