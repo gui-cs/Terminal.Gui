@@ -89,9 +89,39 @@ public class ApplicationNavigation
             // Translate to screen coordinates
             Point screenPos = mostFocused.ViewportToScreen (viewportPos.Value);
 
-            // Always update driver (caching disabled - see remarks)
-            output.SetCursorPosition (screenPos.X, screenPos.Y);
-            output.SetCursorVisibility (mostFocused.CursorVisibility);
+            // Check if cursor is within all ancestor viewports
+            // Walk up the view hierarchy and ensure cursor is visible in each ancestor's viewport
+            View? current = mostFocused;
+            bool isWithinAllAncestors = true;
+
+            while (current != null)
+            {
+                // Get this view's viewport in screen coordinates
+                Rectangle viewportBounds = current.ViewportToScreen (
+                    new Rectangle (Point.Empty, current.Viewport.Size));
+
+                // Check if cursor screen position is within this viewport
+                if (!viewportBounds.Contains (screenPos))
+                {
+                    isWithinAllAncestors = false;
+                    break;
+                }
+
+                // Move to parent
+                current = current.SuperView;
+            }
+
+            if (isWithinAllAncestors)
+            {
+                // Cursor is within all ancestor viewports - show it
+                output.SetCursorPosition (screenPos.X, screenPos.Y);
+                output.SetCursorVisibility (mostFocused.CursorVisibility);
+            }
+            else
+            {
+                // Cursor is outside at least one ancestor viewport - hide it
+                output.SetCursorVisibility (CursorVisibility.Invisible);
+            }
         }
         else
         {
