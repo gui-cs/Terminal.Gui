@@ -1,10 +1,10 @@
-#nullable enable
-namespace ViewBaseTests;
+namespace ViewBaseTests.Keyboard;
 
 /// <summary>
 ///     Tests for the automatic hotkey assignment feature in <see cref="View"/>.
 ///     This feature was added to address Issue #4145.
 /// </summary>
+
 // Claude - Opus 4.5
 public class AutoHotKeyAssignmentTests
 {

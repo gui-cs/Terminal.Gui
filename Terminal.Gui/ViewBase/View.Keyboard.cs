@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View // Keyboard APIs
 {
@@ -180,7 +179,7 @@ public partial class View // Keyboard APIs
             }
         }
 
-        // Add the new 
+        // Add the new
         if (newKey != Key.Empty)
         {
             KeyBinding keyBinding = new ()
@@ -228,10 +227,11 @@ public partial class View // Keyboard APIs
         if (HotKeySpecifier == new Rune ('\xFFFF'))
         {
             HotKey = Key.Empty;
+
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
 
-        if (Terminal.Gui.Text.TextFormatter.FindHotKey (_title, HotKeySpecifier, out _, out Key hk))
+        if (TextFormatter.FindHotKey (_title, HotKeySpecifier, out _, out Key hk))
         {
             if (_hotKey != hk)
             {
@@ -316,7 +316,7 @@ public partial class View // Keyboard APIs
     ///         Override this method to customize the hotkey assignment behavior.
     ///     </para>
     /// </remarks>
-    public virtual void AssignHotKeysToSubViews ()
+    public void AssignHotKeysToSubViews ()
     {
         if (!AssignHotKeys)
         {
@@ -340,7 +340,7 @@ public partial class View // Keyboard APIs
     ///         Otherwise, it assigns a new hotkey from the first available character in the title.
     ///     </para>
     /// </remarks>
-    protected virtual bool AssignHotKeyToView (View view)
+    protected bool AssignHotKeyToView (View view)
     {
         if (string.IsNullOrEmpty (view.Title))
         {
@@ -364,10 +364,9 @@ public partial class View // Keyboard APIs
             // Existing hotkey is already used, remove it and assign new one
             label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
         }
-        else if (view.HotKey != Key.Empty && !UsedHotKeys.Contains (view.HotKey))
+        else if (view.HotKey != Key.Empty && UsedHotKeys.Add (view.HotKey))
         {
             // View already has a hotkey set programmatically - preserve it
-            UsedHotKeys.Add (view.HotKey);
 
             return true;
         }
@@ -441,7 +440,7 @@ public partial class View // Keyboard APIs
             return false;
         }
 
-        // TODO: We really need an event before recursing into Focused. Without, there's no way for 
+        // TODO: We really need an event before recursing into Focused. Without, there's no way for
         // TODO: SuperViews to prevent SubViews from seeing certain keys. A use-case for this:
         // TODO:    - MenuBar needs to prevent MenuItems from seeing QuitKey if the MenuItem is not visible
 
@@ -460,7 +459,7 @@ public partial class View // Keyboard APIs
         // During (this is what can be cancelled)
 
         // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommands can be reflected up stack
-        if (InvokeCommands (key) is true || key.Handled)
+        if (InvokeCommandsBoundToKey (key) is true || key.Handled)
         {
             return true;
         }
@@ -573,9 +572,10 @@ public partial class View // Keyboard APIs
     public KeyBindings HotKeyBindings { get; internal set; } = null!;
 
     /// <summary>
-    ///     INTERNAL API: Invokes any commands bound to <paramref name="key"/> on this view, adornments, and subviews.
+    ///     INTERNAL: Invokes the Commands bound to <paramref name="key"/>.
+    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="key">The key event passed.</param>
     /// <returns>
     ///     <see langword="null"/> if no command was invoked or there was no matching key binding; input processing should
     ///     continue.
@@ -584,75 +584,23 @@ public partial class View // Keyboard APIs
     ///     <see langword="true"/> if at least one command was invoked and handled (or
     ///     cancelled); input processing should stop.
     /// </returns>
-    internal bool? InvokeCommands (Key key)
+    internal bool? InvokeCommandsBoundToKey (Key key)
     {
-        // * If no key binding was found, `InvokeKeyBindings` returns `null`.
-        //   Continue passing the event (return `false` from `OnInvokeKeyBindings`).
-        // * If key bindings were found, but none handled the key (all `Command`s returned `false`),
-        //   `InvokeKeyBindings` returns `false`. Continue passing the event (return `false` from `OnInvokeKeyBindings`)..
-        // * If key bindings were found, and any handled the key (at least one `Command` returned `true`),
-        //   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
-        bool? handled = DoInvokeCommands (key);
-
-        if (handled is true)
+        if (!KeyBindings.TryGet (key, out KeyBinding binding))
         {
-            // Stop processing if any key binding handled the key.
-            // DO NOT stop processing if there are no matching key bindings or none of the key bindings handled the key
-            return handled;
+            return null;
         }
 
-        //if (Margin is { } && InvokeCommandsBoundToKeyOnAdornment (Margin, key, ref handled))
-        //{
-        //    return true;
-        //}
-
-        //if (Padding is { } && InvokeCommandsBoundToKeyOnAdornment (Padding, key, ref handled))
-        //{
-        //    return true;
-        //}
-
-        //if (Border is { } && InvokeCommandsBoundToKeyOnAdornment (Border, key, ref handled))
-        //{
-        //    return true;
-        //}
-
-        return handled;
-    }
-
-    private static bool InvokeCommandsBoundToKeyOnAdornment (Adornment adornment, Key key, ref bool? handled)
-    {
-        if (!adornment.Enabled)
+        if (binding is { } && (binding.Key is null || !binding.Key.IsValid))
         {
-            return false;
+            binding.Key = key;
         }
 
-        bool? adornmentHandled = adornment.InvokeCommands (key);
-
-        if (adornmentHandled is true)
-        {
-            return true;
-        }
-
-        foreach (View subview in adornment.InternalSubViews)
-        {
-            bool? subViewHandled = subview.InvokeCommands (key);
-
-            if (subViewHandled is { })
-            {
-                handled = subViewHandled;
-
-                if ((bool)subViewHandled)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return InvokeCommands (binding.Commands, binding);
     }
 
     /// <summary>
-    ///     Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
+    ///     INTERNAL: Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
     /// </summary>
     /// <param name="hotKey"></param>
     /// <returns>
@@ -670,6 +618,7 @@ public partial class View // Keyboard APIs
         }
 
         bool? handled = null;
+
         // Process this View
         if (HotKeyBindings.TryGet (hotKey, out KeyBinding binding))
         {
@@ -701,34 +650,6 @@ public partial class View // Keyboard APIs
         }
 
         return false;
-    }
-
-    /// <summary>
-    ///     Invokes the Commands bound to <paramref name="key"/>.
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </summary>
-    /// <param name="key">The key event passed.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was invoked; input processing should continue.
-    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
-    ///     should continue.
-    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    protected bool? DoInvokeCommands (Key key)
-    {
-        if (!KeyBindings.TryGet (key, out KeyBinding binding))
-        {
-            return null;
-        }
-
-        // TODO: Should we set binding.Key = key if it's not set?
-        if (binding is { } && (binding.Key is null || !binding.Key.IsValid))
-        {
-            binding.Key = key;
-        }
-
-        return InvokeCommands (binding.Commands, binding);
     }
 
     #endregion Key Bindings

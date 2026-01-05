@@ -7,17 +7,11 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public abstract class SelectorBase : View, IOrientation
 {
-    private static MouseState _defaultHighlightStates = MouseState.In; // Resources/config.json overrides
-
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultMouseHighlightStates
-    {
-        get => _defaultHighlightStates;
-        set => _defaultHighlightStates = value;
-    }
+    public static MouseState DefaultMouseHighlightStates { get; set; } = MouseState.In;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SelectorBase"/> class.
@@ -34,9 +28,8 @@ public abstract class SelectorBase : View, IOrientation
         _orientationHelper.Orientation = Orientation.Vertical;
 
         AddCommand (Command.Accept, HandleAcceptCommand);
-        //AddCommand (Command.HotKey, HandleHotKeyCommand);
+
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
-        //CreateSubViews ();
     }
 
     private SelectorStyles _styles;
@@ -73,7 +66,7 @@ public abstract class SelectorBase : View, IOrientation
         return RaiseAccepting (ctx);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         // If the command did not come from a keyboard event, ignore it
@@ -87,6 +80,7 @@ public abstract class SelectorBase : View, IOrientation
             // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
             return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
         }
+
         return base.OnHandlingHotKey (args);
     }
 
@@ -117,7 +111,6 @@ public abstract class SelectorBase : View, IOrientation
             RaiseValueChanged (previousValue);
         }
     }
-
 
     /// <summary>
     ///     Raised the <see cref="ValueChanged"/> event.
@@ -291,7 +284,7 @@ public abstract class SelectorBase : View, IOrientation
             Title = label,
             Id = label,
             Data = value,
-            MouseHighlightStates = DefaultMouseHighlightStates,
+            MouseHighlightStates = DefaultMouseHighlightStates
         };
 
         return checkbox;
@@ -312,6 +305,7 @@ public abstract class SelectorBase : View, IOrientation
             {
                 _horizontalSpace = value;
                 SetLayout ();
+
                 // Pos.Align requires extra layout; good practice to call
                 // Layout to ensure Pos.Align gets updated
                 // BUGBUG: This Layout call is a hack to work around some bug in Layout.
@@ -323,18 +317,20 @@ public abstract class SelectorBase : View, IOrientation
 
     private void SetLayout ()
     {
-        int maxNaturalCheckBoxWidth = 0;
+        var maxNaturalCheckBoxWidth = 0;
+
         if (Values?.Count > 0 && Orientation == Orientation.Vertical)
         {
             // BUGBUG: This Layout call is a hack to work around some bug in Layout.
             // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-            maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ().Max (
-                                                                        v =>
-                                                                        {
-                                                                            v.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
-                                                                            v.Layout ();
-                                                                            return v.Frame.Width;
-                                                                        });
+            maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ()
+                                              .Max (v =>
+                                                    {
+                                                        v.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
+                                                        v.Layout ();
+
+                                                        return v.Frame.Width;
+                                                    });
         }
 
         for (var i = 0; i < SubViews.Count; i++)
@@ -361,7 +357,6 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     public abstract void UpdateChecked ();
-
 
     /// <summary>
     ///     Gets or sets whether double-clicking on an Item will cause the <see cref="View.Accepting"/> event to be
@@ -403,6 +398,7 @@ public abstract class SelectorBase : View, IOrientation
     public void OnOrientationChanged (Orientation newOrientation)
     {
         SetLayout ();
+
         // Pos.Align requires extra layout; good practice to call
         // Layout to ensure Pos.Align gets updated
         // BUGBUG: This Layout call is a hack to work around some bug in Layout.
