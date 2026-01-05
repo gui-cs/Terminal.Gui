@@ -42,12 +42,12 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         app.Navigation?.SetFocused (null);
 
         // UpdateCursor should return early when there's no focus
         // Just verify it doesn't crash
-        app.Navigation?.UpdateCursor (app.Driver!.GetOutput ());
+        app.Navigation?.UpdateCursor ();
 
         app.Dispose ();
     }
@@ -57,7 +57,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         TestView view = new ()
         {
             CanFocus = false,
@@ -72,7 +72,7 @@ public class CursorTests (ITestOutputHelper output)
 
         // UpdateCursor should return early when focused view can't have focus
         // Just verify it doesn't crash
-        app.Navigation?.UpdateCursor (app.Driver!.GetOutput ());
+        app.Navigation?.UpdateCursor ();
 
         if (token is { })
         {
@@ -87,7 +87,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         TestView view = new ()
         {
             CanFocus = true,
@@ -99,13 +99,13 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (view);
         SessionToken? token = app.Begin (runnable);
-        
+
         view.SetFocus ();
         Assert.True (view.HasFocus);
 
         // UpdateCursor should return early when PositionCursor returns null
         // Just verify it doesn't crash
-        app.Navigation?.UpdateCursor (app.Driver!.GetOutput ());
+        app.Navigation?.UpdateCursor ();
 
         if (token is { })
         {
@@ -120,7 +120,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         TestView view = new ()
         {
             CanFocus = true,
@@ -132,13 +132,13 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (view);
         SessionToken? token = app.Begin (runnable);
-        
+
         view.SetFocus ();
         Assert.True (view.HasFocus);
 
         // UpdateCursor should succeed when view has focus and valid position
         // Just verify it doesn't crash
-        app.Navigation?.UpdateCursor (app.Driver!.GetOutput ());
+        app.Navigation?.UpdateCursor ();
 
         if (token is { })
         {
@@ -153,7 +153,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         View view = new ()
         {
             CanFocus = true,
@@ -164,7 +164,7 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (view);
         SessionToken? token = app.Begin (runnable);
-        
+
         view.SetFocus ();
         Assert.True (view.HasFocus);
 
@@ -186,7 +186,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         // Test with a generic View that positions cursor outside viewport
         TestView view = new ()
         {
@@ -200,7 +200,7 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (view);
         SessionToken? token = app.Begin (runnable);
-        
+
         view.SetFocus ();
 
         // Position cursor outside viewport width
@@ -240,7 +240,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         // Create parent with small viewport
         View parent = new ()
         {
@@ -264,7 +264,7 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (parent);
         SessionToken? token = app.Begin (runnable);
-        
+
         child.SetFocus ();
 
         // Position cursor within child's viewport but outside parent's viewport
@@ -272,7 +272,7 @@ public class CursorTests (ITestOutputHelper output)
 
         // UpdateCursor should handle cursor outside ancestor viewport
         // Just verify it doesn't crash
-        app.Navigation?.UpdateCursor (app.Driver!.GetOutput ());
+        app.Navigation?.UpdateCursor ();
 
         if (token is { })
         {
@@ -287,7 +287,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         // Create parent viewport
         View parent = new ()
         {
@@ -311,7 +311,7 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (parent);
         SessionToken? token = app.Begin (runnable);
-        
+
         child.SetFocus ();
 
         // Position cursor within both child and parent viewports
@@ -319,7 +319,7 @@ public class CursorTests (ITestOutputHelper output)
 
         // UpdateCursor should succeed when cursor is within all ancestor viewports
         // Just verify it doesn't crash
-        app.Navigation?.UpdateCursor (app.Driver!.GetOutput ());
+        app.Navigation?.UpdateCursor ();
 
         if (token is { })
         {
@@ -334,7 +334,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         TestView view = new ()
         {
             CanFocus = true,
@@ -345,7 +345,7 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (view);
         SessionToken? token = app.Begin (runnable);
-        
+
         view.SetFocus ();
 
         // Call SetCursorNeedsUpdate - should set flag in ApplicationNavigation
@@ -367,7 +367,7 @@ public class CursorTests (ITestOutputHelper output)
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        
+
         TextField textField = new ()
         {
             X = 0,
@@ -379,7 +379,7 @@ public class CursorTests (ITestOutputHelper output)
         Runnable runnable = new ();
         runnable.Add (textField);
         SessionToken? token = app.Begin (runnable);
-        
+
         textField.SetFocus ();
 
         // Position cursor at end of text (beyond viewport)
@@ -387,7 +387,7 @@ public class CursorTests (ITestOutputHelper output)
 
         // PositionCursor should return a position within viewport
         Point? cursorPos = textField.PositionCursor ();
-        
+
         if (cursorPos.HasValue)
         {
             Assert.True (cursorPos.Value.X >= 0);

@@ -88,7 +88,7 @@ public class ApplicationNavigation
         _focused = value;
 
         // Cursor needs update when focus changes
-        _cursorNeedsUpdate = true;
+        App?.Driver?.SetCursorNeedsUpdate (true);
 
         FocusedChanged?.Invoke (this, EventArgs.Empty);
     }
@@ -119,45 +119,28 @@ public class ApplicationNavigation
     }
 
 
-    // Cursor caching fields
-    private bool _cursorNeedsUpdate;
-    private Point? _lastCursorPosition;
-    private CursorVisibility _lastCursorVisibility;
-
-    /// <summary>
-    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
-    ///         changes but the view content does not need to be redrawn.
-    ///     </para>
-    /// </remarks>
-    public void SetCursorNeedsUpdate () { _cursorNeedsUpdate = true; }
 
     /// <summary>
     ///     Updates the terminal cursor based on the currently focused view.
     /// </summary>
-    /// <param name="output">The output driver to use for cursor positioning.</param>
     /// <remarks>
     ///     <para>
     ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
     ///     </para>
-    ///     <para>
-    ///         Note: Cursor position caching was attempted but disabled due to test failures.
-    ///         The caching infrastructure (SetCursorNeedsUpdate, _cursorNeedsUpdate flag) remains
-    ///         in place for future optimization work.
-    ///     </para>
     /// </remarks>
-    public void UpdateCursor (IOutput output)
+    public void UpdateCursor ()
     {
+        if (App?.Driver?.GetCursorNeedsUpdate () == false)
+        {
+            return;
+        }
+
         // Get the most focused view from the view hierarchy
         View? mostFocused = App?.TopRunnableView?.MostFocused;
 
         if (mostFocused == null)
         {
-            output.SetCursorVisibility (CursorVisibility.Invisible);
-            _cursorNeedsUpdate = false;
+            App?.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
 
             return;
         }
@@ -196,20 +179,20 @@ public class ApplicationNavigation
             if (isWithinAllAncestors)
             {
                 // Cursor is within all ancestor viewports - show it
-                output.SetCursorPosition (screenPos.X, screenPos.Y);
-                output.SetCursorVisibility (mostFocused.CursorVisibility);
+                App?.Driver?.SetCursorPosition (screenPos);
+                App?.Driver?.SetCursorVisibility (mostFocused.CursorVisibility);
             }
             else
             {
                 // Cursor is outside at least one ancestor viewport - hide it
-                output.SetCursorVisibility (CursorVisibility.Invisible);
+                App?.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
             }
         }
         else
         {
-            output.SetCursorVisibility (CursorVisibility.Invisible);
+            App?.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
         }
 
-        _cursorNeedsUpdate = false;
+        App?.Driver?.SetCursorNeedsUpdate (false);
     }
 }

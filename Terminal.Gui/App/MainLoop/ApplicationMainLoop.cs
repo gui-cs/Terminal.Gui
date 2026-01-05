@@ -144,7 +144,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         App?.LayoutAndDraw (false);
 
         // Update the cursor
-        App?.Navigation?.UpdateCursor (Output);
+        App?.Navigation?.UpdateCursor ();
 
         var swCallbacks = Stopwatch.StartNew ();
 

@@ -47,8 +47,7 @@ public partial class View
     /// </example>
     public void SetCursorNeedsUpdate ()
     {
-        // Delegate to ApplicationNavigation which manages cursor state
-        App?.Navigation?.SetCursorNeedsUpdate ();
+        App?.Driver?.SetCursorNeedsUpdate (true);
     }
 
     /// <summary>
@@ -65,7 +64,7 @@ public partial class View
     ///         the Terminal Cursor (the visible cursor indicator). This method should only calculate and return a position.
     ///     </para>
     ///     <para>
-    ///         Return viewport-relative coordinates. The framework will convert to screen coordinates.
+    ///         Return content area-relative coordinates. The framework will convert to screen coordinates.
     ///         Return <see langword="null"/> to hide the cursor.
     ///     </para>
     ///     <para>
@@ -78,7 +77,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <returns>
-    ///     Viewport-relative cursor position (col, row), or <see langword="null"/> to hide the cursor.
+    ///     Content-relative cursor position (col, row), or <see langword="null"/> to hide the cursor.
     /// </returns>
     /// <example>
     ///     <code>
@@ -87,7 +86,9 @@ public partial class View
     ///         // Don't call base - it just returns null
     ///         
     ///         if (!CanFocus || !HasFocus)
+    ///         {
     ///             return null;  // Shouldn't happen, but be defensive
+    ///         }
     ///         
     ///         // Calculate cursor position based on your view's state
     ///         int visualColumn = CalculateVisualColumn();

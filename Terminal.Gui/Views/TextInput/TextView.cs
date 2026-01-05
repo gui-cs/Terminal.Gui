@@ -2025,10 +2025,6 @@ public class TextView : View, IDesignable
 
         if (App?.Mouse.MouseGrabView == this && IsSelecting)
         {
-            // BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
-            //var minRow = Math.Min (Math.Max (Math.Min (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
-            //var maxRow = Math.Min (Math.Max (Math.Max (selectionStartRow, currentRow) - topRow, 0), Viewport.Height);
-            //SetNeedsDraw (new (0, minRow, Viewport.Width, maxRow));
             SetNeedsDraw ();
         }
 
