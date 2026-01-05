@@ -263,11 +263,11 @@ public partial class View // Keyboard APIs
     ///         When enabled, hotkeys are assigned to subviews when they are added via <see cref="Add(View?)"/>.
     ///         The assignment algorithm:
     ///         <list type="number">
-    ///             <item>Checks if the subview's <see cref="Title"/> already contains a hotkey specifier (e.g., "_File")</item>
-    ///             <item>If found and not already used, preserves the existing hotkey</item>
-    ///             <item>If not found or already used, assigns a new hotkey from the first available character in the title</item>
-    ///             <item>Skips characters that are already in <see cref="UsedHotKeys"/>, spaces, and control characters</item>
-    ///         </list>
+    ///             <item>Checks if the subview already has a programmatically set <see cref="HotKey"/>; if so and the key is not already used, preserves that hotkey</item>
+    ///             <item>If no usable programmatic <see cref="HotKey"/> is found, checks if the subview's <see cref="Title"/> contains a hotkey specifier (e.g., "_File") and preserves it if the key is not already used</item>
+    ///             <item>If neither a usable programmatic hotkey nor a usable title specifier is found, assigns a new hotkey from the first available character in the title</item>
+    ///             <item>Skips characters that are already in <see cref="UsedHotKeys"/>, as well as spaces and control characters, when determining whether a hotkey is usable or when assigning a new one</item>
+        ///         </list>
     ///     </para>
     ///     <para>
     ///         Call <see cref="AssignHotKeysToSubViews"/> to manually trigger hotkey assignment for all subviews.
