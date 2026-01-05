@@ -246,6 +246,162 @@ public partial class View // Keyboard APIs
 
     #endregion HotKey Support
 
+    #region AutoHotKey Assignment
+
+    private bool _assignHotKeys;
+
+    /// <summary>
+    ///     If <see langword="true"/>, unique hotkeys will automatically be assigned to focusable subviews that have a
+    ///     <see cref="Title"/> but no <see cref="HotKey"/> defined.
+    ///     <para>
+    ///         <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
+    ///         before adding subviews with any hotkeys that may conflict with other Views.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When enabled, hotkeys are assigned to subviews when they are added via <see cref="Add(View?)"/>.
+    ///         The assignment algorithm:
+    ///         <list type="number">
+    ///             <item>Checks if the subview's <see cref="Title"/> already contains a hotkey specifier (e.g., "_File")</item>
+    ///             <item>If found and not already used, preserves the existing hotkey</item>
+    ///             <item>If not found or already used, assigns a new hotkey from the first available character in the title</item>
+    ///             <item>Skips characters that are already in <see cref="UsedHotKeys"/>, spaces, and control characters</item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Call <see cref="AssignHotKeysToSubViews"/> to manually trigger hotkey assignment for all subviews.
+    ///     </para>
+    /// </remarks>
+    public bool AssignHotKeys
+    {
+        get => _assignHotKeys;
+        set
+        {
+            if (_assignHotKeys == value)
+            {
+                return;
+            }
+
+            _assignHotKeys = value;
+
+            if (_assignHotKeys)
+            {
+                AssignHotKeysToSubViews ();
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the set of hotkeys that are already used or should not be used when
+    ///     <see cref="AssignHotKeys"/> is enabled.
+    ///     <para>
+    ///         This property is used to ensure that automatically assigned hotkeys do not conflict with
+    ///         hotkeys used elsewhere in the application. Set <see cref="UsedHotKeys"/> before adding
+    ///         subviews if there are hotkeys that may conflict with other views.
+    ///     </para>
+    /// </summary>
+    public HashSet<Key> UsedHotKeys { get; set; } = [];
+
+    /// <summary>
+    ///     Assigns unique hotkeys to all subviews that have a <see cref="Title"/> but no <see cref="HotKey"/> defined.
+    ///     Called automatically when <see cref="AssignHotKeys"/> is enabled and subviews are added.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method iterates through all subviews and assigns hotkeys based on their <see cref="Title"/>.
+    ///         It respects pre-existing hotkeys defined via the <see cref="HotKeySpecifier"/> in the title.
+    ///     </para>
+    ///     <para>
+    ///         Override this method to customize the hotkey assignment behavior.
+    ///     </para>
+    /// </remarks>
+    public virtual void AssignHotKeysToSubViews ()
+    {
+        if (!AssignHotKeys)
+        {
+            return;
+        }
+
+        foreach (View subView in SubViews)
+        {
+            AssignHotKeyToView (subView);
+        }
+    }
+
+    /// <summary>
+    ///     Assigns a unique hotkey to a single view based on its <see cref="Title"/>.
+    /// </summary>
+    /// <param name="view">The view to assign a hotkey to.</param>
+    /// <returns><see langword="true"/> if a hotkey was assigned; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method checks if the view's title already contains a hotkey specifier and preserves it if available.
+    ///         Otherwise, it assigns a new hotkey from the first available character in the title.
+    ///     </para>
+    /// </remarks>
+    protected virtual bool AssignHotKeyToView (View view)
+    {
+        if (string.IsNullOrEmpty (view.Title))
+        {
+            return false;
+        }
+
+        string label = view.Title;
+
+        // Check if there's already a hotkey defined in the title
+        if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key existingHotKey))
+        {
+            // Label already has a hotkey - preserve it if available
+            if (!UsedHotKeys.Contains (existingHotKey))
+            {
+                view.HotKey = existingHotKey;
+                UsedHotKeys.Add (existingHotKey);
+
+                return true;
+            }
+
+            // Existing hotkey is already used, remove it and assign new one
+            label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
+        }
+        else if (view.HotKey != Key.Empty && !UsedHotKeys.Contains (view.HotKey))
+        {
+            // View already has a hotkey set programmatically - preserve it
+            UsedHotKeys.Add (view.HotKey);
+
+            return true;
+        }
+
+        // Assign a new hotkey from available characters in the label
+        Rune [] runes = label.EnumerateRunes ().ToArray ();
+
+        for (var i = 0; i < runes.Length; i++)
+        {
+            Rune lower = Rune.ToLowerInvariant (runes [i]);
+            var newKey = new Key (lower.Value);
+
+            if (UsedHotKeys.Contains (newKey))
+            {
+                continue;
+            }
+
+            if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsControl (newKey.AsRune))
+            {
+                continue;
+            }
+
+            view.Title = label.Insert (i, HotKeySpecifier.ToString ());
+            view.HotKey = newKey;
+            UsedHotKeys.Add (newKey);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion AutoHotKey Assignment
+
     #region Low-level Key handling
 
     #region Key Down Event

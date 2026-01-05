@@ -284,6 +284,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     {
         OnSubViewAdded (view);
         SubViewAdded?.Invoke (this, new (this, view));
+
+        // If auto-hotkey assignment is enabled, assign a hotkey to the new subview
+        if (AssignHotKeys)
+        {
+            AssignHotKeyToView (view);
+        }
     }
 
     /// <summary>
@@ -418,6 +424,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     internal void RaiseSubViewRemoved (View view)
     {
+        // If auto-hotkey assignment is enabled, remove the subview's hotkey from UsedHotKeys
+        if (AssignHotKeys && view.HotKey != Key.Empty)
+        {
+            UsedHotKeys.Remove (view.HotKey);
+        }
+
         OnSubViewRemoved (view);
         SubViewRemoved?.Invoke (this, new (this, view));
     }

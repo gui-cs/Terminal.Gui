@@ -215,40 +215,8 @@ public abstract class SelectorBase : View, IOrientation
         Labels = Enum.GetNames<TEnum> ();
     }
 
-    private bool _assignHotKeys;
-
-    /// <summary>
-    ///     If <see langword="true"/> each label will automatically be assigned a unique hotkey.
-    ///     <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
-    ///     before setting <see cref="Labels"/> with any hotkeys that may conflict with other Views.
-    /// </summary>
-    public bool AssignHotKeys
-    {
-        get => _assignHotKeys;
-        set
-        {
-            if (_assignHotKeys == value)
-            {
-                return;
-            }
-
-            _assignHotKeys = value;
-
-            CreateSubViews ();
-            UpdateChecked ();
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets the set of hotkeys that are already used by labels or should not be used when
-    ///     <see cref="AssignHotKeys"/> is enabled.
-    ///     <para>
-    ///         This property is used to ensure that automatically assigned hotkeys do not conflict with
-    ///         hotkeys used elsewhere in the application. Set <see cref="UsedHotKeys"/> before setting
-    ///         <see cref="Labels"/> if there are hotkeys that may conflict with other views.
-    ///     </para>
-    /// </summary>
-    public HashSet<Key> UsedHotKeys { get; set; } = [];
+    // Note: AssignHotKeys and UsedHotKeys are inherited from the View base class.
+    // SelectorBase uses the base class's automatic hotkey assignment feature.
 
     private TextField? _valueField;
 
@@ -257,13 +225,9 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     public void CreateSubViews ()
     {
+        // Note: UsedHotKeys cleanup is handled by the base class's OnSubViewRemoved
         foreach (View sv in RemoveAll ())
         {
-            if (AssignHotKeys)
-            {
-                UsedHotKeys.Remove (sv.HotKey);
-            }
-
             sv.Dispose ();
         }
 
@@ -335,6 +299,9 @@ public abstract class SelectorBase : View, IOrientation
     /// <summary>
     ///     Assigns unique hotkeys to the labels of the subviews created by <see cref="CreateSubViews"/>.
     /// </summary>
+    /// <remarks>
+    ///     This method uses the base class's <see cref="View.AssignHotKeysToSubViews"/> implementation.
+    /// </remarks>
     private void AssignUniqueHotKeys ()
     {
         if (!AssignHotKeys || Labels is null)
@@ -342,52 +309,8 @@ public abstract class SelectorBase : View, IOrientation
             return;
         }
 
-        foreach (View subView in SubViews)
-        {
-            string label = subView.Title;
-
-            // Check if there's already a hotkey defined
-            if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key existingHotKey))
-            {
-                // Label already has a hotkey - preserve it if available
-                if (!UsedHotKeys.Contains (existingHotKey))
-                {
-                    subView.HotKey = existingHotKey;
-                    UsedHotKeys.Add (existingHotKey);
-                    continue; // Keep existing hotkey specifier in label
-                }
-                else
-                {
-                    // Existing hotkey is already used, remove it and assign new one
-                    label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
-                }
-            }
-
-            // Assign a new hotkey
-            Rune [] runes = label.EnumerateRunes ().ToArray ();
-
-            for (var i = 0; i < runes.Count (); i++)
-            {
-                Rune lower = Rune.ToLowerInvariant (runes [i]);
-                var newKey = new Key (lower.Value);
-
-                if (UsedHotKeys.Contains (newKey))
-                {
-                    continue;
-                }
-
-                if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsControl (newKey.AsRune))
-                {
-                    continue;
-                }
-
-                subView.Title = label.Insert (i, HotKeySpecifier.ToString ());
-                subView.HotKey = newKey;
-                UsedHotKeys.Add (subView.HotKey);
-
-                break;
-            }
-        }
+        // Use the base class's hotkey assignment implementation
+        AssignHotKeysToSubViews ();
     }
 
     private int _horizontalSpace = 2;
