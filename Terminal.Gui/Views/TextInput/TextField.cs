@@ -1133,7 +1133,7 @@ public class TextField : View, IDesignable
 
         // Check if cursor is within viewport bounds
         // If cursor is outside viewport, return null to hide it
-        if (pos < 0 || pos >= Viewport.Width)
+        if (!Viewport.Contains (new Point (pos, 0)))
         {
             return null;
         }
