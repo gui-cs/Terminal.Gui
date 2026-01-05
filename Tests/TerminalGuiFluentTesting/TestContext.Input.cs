@@ -173,7 +173,9 @@ public partial class TestContext
             }
         }
 
-        return this;
+        // Wait for one more iteration to ensure all side effects of the key event
+        // (like focus changes) are fully processed before returning
+        return WaitIteration ();
 
         void DriverOnKeyDown (object? sender, Key e)
         {

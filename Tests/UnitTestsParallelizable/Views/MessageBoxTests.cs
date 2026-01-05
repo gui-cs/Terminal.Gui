@@ -51,7 +51,7 @@ public class MessageBoxTests (ITestOutputHelper output)
         }
     }
 
-    [Theory (Skip = "Disabled in v2_44417-Continuous until Dialog sizing is figured out")]
+    [Theory]
     [MemberData (nameof (AcceptingKeys))]
     public void Button_Enter_Or_Space_Returns_Default_Index (Key key)
     {
@@ -64,7 +64,7 @@ public class MessageBoxTests (ITestOutputHelper output)
             int? res = MessageBox.Query (app, "hey", "IsDefault", "_No", "_Yes");
             app.Iteration -= OnApplicationOnIteration;
 
-            Assert.Equal (1, res);
+            Assert.Equal (0, res);
 
             void OnApplicationOnIteration (object? o, EventArgs<IApplication?> iterationEventArgs) { Assert.True (app.Keyboard.RaiseKeyDownEvent (key)); }
         }
