@@ -47,11 +47,55 @@ dotnet test Tests/IntegrationTests --no-build --verbosity normal
 Before modifying code, understand these concepts:
 
 - **Application Lifecycle** - `Application.Init`, `Application.Run`, `Application.Shutdown` - see `docfx/docs/application.md`
-- **Cancellable Workflow Pattern** - see `docfx/docs/cancellable-work-pattern.md`
-- **View Hierarchy** - `View`, `Runnable`, `Window`, containment - see `docfx/docs/View.md`
+- **Cancellable Workflow Pattern (CWP)** - see `docfx/docs/cancellable-work-pattern.md`
+- **View Hierarchy** - `View`, `Runnable`, `Window`, SuperView/SubViews - see `docfx/docs/View.md`
 - **Layout System** - Pos, Dim, automatic layout - see `docfx/docs/layout.md`
 - **Event System** - keyboard, mouse, application events - see `docfx/docs/events.md`
 - **Driver Architecture** - console drivers abstract platform differences - see `docfx/docs/drivers.md`
+- **Lexicon & Taxonomy** - standard terminology used in the codebase - see `docfx/docs/lexicon.md`
+
+## Terminology
+
+**ALWAYS use these terms consistently:**
+
+- **SubView** - A View contained within another View. NOT "child" or "children".
+- **SuperView** - The View that contains a SubView. NOT "parent" or "container".
+- **Add/Remove** - Methods to add/remove SubViews. NOT "append", "insert", "attach".
+
+```csharp
+// CORRECT
+View superView = new ();
+View subView = new () { Title = "SubView" };
+superView.Add (subView);  // subView.SuperView == superView
+
+// WRONG - Don't use "parent", "child", or "container"
+View parent = new ();      // Should be: superView
+View child = new ();       // Should be: subView
+View container = new ();   // Should be: superView
+```
+
+## Cancellable Workflow Pattern (CWP)
+
+When implementing CWP events:
+
+- **Virtual `OnXXX` methods** should be empty in base class - for subclasses to override
+- **Work happens BEFORE** the `OnXXX`/Event notification, not after
+- **Events** are raised after the virtual method call
+
+```csharp
+// CORRECT CWP pattern
+internal void RaiseSubViewAdded (View view)
+{
+    // Do work BEFORE notifications
+    if (AssignHotKeys)
+    {
+        AssignHotKeyToView (view);
+    }
+
+    OnSubViewAdded (view);  // Virtual method (empty in base)
+    SubViewAdded?.Invoke (this, new (this, view));  // Event
+}
+```
 
 ## Critical Coding Conventions
 
