@@ -225,7 +225,7 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     public void CreateSubViews ()
     {
-        // Note: UsedHotKeys cleanup is handled by the base class's OnSubViewRemoved
+        // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
         {
             sv.Dispose ();
