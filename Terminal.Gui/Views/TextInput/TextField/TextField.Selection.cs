@@ -81,11 +81,11 @@ public partial class TextField
     ///             <item>
     ///                 <description>
     ///                     <see cref="SelectedStart"/>: The anchor point where selection began (can be before or
-    ///                     after cursor)
+    ///                     after insertion point)
     ///                 </description>
     ///             </item>
     ///             <item>
-    ///                 <description><see cref="CursorPosition"/>: The current end of the selection</description>
+    ///                 <description><see cref="InsertionPoint"/>: The current end of the selection</description>
     ///             </item>
     ///             <item>
     ///                 <description><see cref="SelectedLength"/>: The absolute length of the selection</description>
@@ -97,14 +97,14 @@ public partial class TextField
     ///         <list type="bullet">
     ///             <item>
     ///                 <description>
-    ///                     If cursor was at position 6 and user shift-clicks at position 11: SelectedStart=6,
-    ///                     CursorPosition=11
+    ///                     If insertion point was at position 6 and user shift-clicks at position 11: SelectedStart=6,
+    ///                     InsertionPoint=11
     ///                 </description>
     ///             </item>
     ///             <item>
     ///                 <description>
-    ///                     If cursor was at position 11 and user shift-clicks at position 6: SelectedStart=11,
-    ///                     CursorPosition=6
+    ///                     If insertion point was at position 11 and user shift-clicks at position 6: SelectedStart=11,
+    ///                     InsertionPoint=6
     ///                 </description>
     ///             </item>
     ///             <item>
@@ -118,7 +118,7 @@ public partial class TextField
     /// </remarks>
     /// <seealso cref="SelectedLength"/>
     /// <seealso cref="SelectedText"/>
-    /// <seealso cref="CursorPosition"/>
+    /// <seealso cref="InsertionPoint"/>
     public int SelectedStart
     {
         get => _selectionAnchor;
