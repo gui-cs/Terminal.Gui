@@ -157,6 +157,8 @@ public class ListView : View, IDesignable
         // Use the form of Add that lets us pass context to the handler
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
+
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     private bool _allowsMarking;
@@ -826,10 +828,10 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+        if (!me.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+            && !me.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
             && me.Flags != MouseFlags.WheeledDown
             && me.Flags != MouseFlags.WheeledUp
             && me.Flags != MouseFlags.WheeledRight
@@ -882,14 +884,14 @@ public class ListView : View, IDesignable
             return true;
         }
 
-        if (me.Position.Y + Viewport.Y >= Source.Count
-            || me.Position.Y + Viewport.Y < 0
-            || me.Position.Y + Viewport.Y > Viewport.Y + Viewport.Height)
+        if (me.Position!.Value.Y + Viewport.Y >= Source.Count
+            || me.Position!.Value.Y + Viewport.Y < 0
+            || me.Position!.Value.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        SelectedItem = Viewport.Y + me.Position.Y;
+        SelectedItem = Viewport.Y + me.Position!.Value.Y;
 
         if (MarkUnmarkSelectedItem ())
         {
@@ -898,7 +900,7 @@ public class ListView : View, IDesignable
 
         SetNeedsDraw ();
 
-        if (me.Flags == MouseFlags.Button1DoubleClicked)
+        if (me.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             return InvokeCommand (Command.Accept) is true;
         }

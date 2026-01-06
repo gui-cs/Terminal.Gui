@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
@@ -25,7 +24,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class OptionSelector : SelectorBase, IDesignable
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public OptionSelector ()
     {
         // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
@@ -33,14 +32,14 @@ public class OptionSelector : SelectorBase, IDesignable
         base.Value = 0;
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         if (base.OnHandlingHotKey (args) is true)
         {
             return true;
         }
+
         if (!CanFocus)
         {
             if (RaiseActivating (args.Context) is true)
@@ -54,15 +53,17 @@ public class OptionSelector : SelectorBase, IDesignable
             {
                 return true;
             }
+
             SetFocus ();
             Value = Values? [0];
+
             return true;
         }
 
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         if (base.OnActivating (args) is true)
@@ -100,11 +101,11 @@ public class OptionSelector : SelectorBase, IDesignable
         return false;
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
+
         if (view is not CheckBox checkbox)
         {
             return;
@@ -115,7 +116,6 @@ public class OptionSelector : SelectorBase, IDesignable
         checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
-
 
     private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
     {
@@ -131,6 +131,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             // If user clicks with mouse and item is already checked, do nothing
             args.Handled = true;
+
             return;
         }
 
@@ -138,6 +139,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             // If user uses an item hotkey and the item is already checked, do nothing
             args.Handled = true;
+
             return;
         }
 
@@ -166,6 +168,7 @@ public class OptionSelector : SelectorBase, IDesignable
         {
             return;
         }
+
         Value = (int)checkbox.Data!;
         args.Handled = false; // Do not set to false; let Accepting propagate
     }
@@ -173,9 +176,10 @@ public class OptionSelector : SelectorBase, IDesignable
     private void Cycle ()
     {
         int valueIndex = Values.IndexOf (v => v == Value);
+
         Value = valueIndex == Values?.Count () - 1
-            ? Values! [0]
-            : Values! [valueIndex + 1];
+                    ? Values! [0]
+                    : Values! [valueIndex + 1];
 
         if (HasFocus)
         {
@@ -187,7 +191,6 @@ public class OptionSelector : SelectorBase, IDesignable
         Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.CheckedState == CheckState.Checked) <= 1);
     }
 
-
     /// <summary>
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
     ///     to the current <see cref="SelectorBase.Value"/> is checked. Throws <see cref="InvalidOperationException"/>
@@ -198,7 +201,7 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            int value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            var value = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
 
             cb.CheckedState = value == Value ? CheckState.Checked : CheckState.UnChecked;
         }

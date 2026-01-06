@@ -74,14 +74,14 @@ The majority of the Terminal.Gui Navigation system is dedicated to enabling the 
 
 Terminal.Gui defines these keys for keyboard navigation:
 
-- `Application.NextTabStopKey` (`Key.Tab`) - Navigates to the next subview that is a `TabStop` (see below). If there is no next, the first subview that is a `TabStop` will gain focus.
-- `Application.PrevTabStopKey` (`Key.Tab.WithShift`) - Opposite of `Application.NextTabStopKey`.
-- `Key.CursorRight` - Operates identically to `Application.NextTabStopKey`.
-- `Key.CursorDown` - Operates identically to `Application.NextTabStopKey`.
-- `Key.CursorLeft` - Operates identically to `Application.PrevTabStopKey`.
-- `Key.CursorUp` - Operates identically to `Application.PrevTabStopKey`.
-- `Application.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view that is a `TabGroup` will gain focus.
-- `Application.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `Application.NextTabGroupKey`.
+- `IKeyboard.NextTabStopKey` (`Key.Tab`) - Navigates to the next subview that is a `TabStop` (see below). If there is no next, the first subview that is a `TabStop` will gain focus.
+- `IKeyboard.PrevTabStopKey` (`Key.Tab.WithShift`) - Opposite of `IKeyboard.NextTabStopKey`.
+- `Key.CursorRight` - Operates identically to `IKeyboard.NextTabStopKey`.
+- `Key.CursorDown` - Operates identically to `IKeyboard.NextTabStopKey`.
+- `Key.CursorLeft` - Operates identically to `IKeyboard.PrevTabStopKey`.
+- `Key.CursorUp` - Operates identically to `IKeyboard.PrevTabStopKey`.
+- `IKeyboard.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a `TabGroup` (see below). If there is no next, the first view that is a `TabGroup` will gain focus.
+- `IKeyboard.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `IKeyboard.NextTabGroupKey`.
 
 `F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators) conventions.
 
@@ -146,7 +146,7 @@ For this to work properly, there must be logic that removes the focus-cache used
 // Mouse click behavior
 view.MouseEvent += (sender, e) => 
 {
-    if (e.Flags.HasFlag(MouseFlags.Button1Clicked) && view.CanFocus)
+    if (e.Flags.HasFlag(MouseFlags.LeftButtonClicked) && view.CanFocus)
     {
         view.SetFocus();
         e.Handled = true;
@@ -262,9 +262,9 @@ For keyboard navigation, the `TabStop` property is a filter for which views are 
 
 * `TabBehavior.NoStop` - Prevents the user from using keyboard navigation to cause view (and by definition its subviews) to gain focus. Note: The view can still be focused using code or the mouse.
 
-* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `Application.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.SubViews`).
+* `TabBehavior.TabStop` - Indicates a View is a focusable view with no focusable subviews. `IKeyboard.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.SubViews`).
 
-* `TabBehavior.TabGroup` - Indicates a View is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views in tiled scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, `Window` is a simple view designed to be a visible container of other views in overlapped scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `Application.Next/PrevGroupStopKey` will advance across all `TabGroup` views in the application (unless blocked by a `NoStop` SuperView).
+* `TabBehavior.TabGroup` - Indicates a View is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views in tiled scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, `Window` is a simple view designed to be a visible container of other views in overlapped scenarios. It has `TabStop` set to `TabBehavior.TabGroup` (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `IKeyboard.Next/PrevGroupStopKey` will advance across all `TabGroup` views in the application (unless blocked by a `NoStop` SuperView).
 
 ### Focus Requirements Summary
 
@@ -449,7 +449,7 @@ The following table summarizes how built-in views respond to various input metho
 | **Button** | 1 | No | Yes | 1 | OnSelect | Focus+OnAccept | Focus+OnAccept | HotKey | - | Select | No |
 | **CheckBox** | 3 | No | No | 1 | OnSelect+Advance | OnAccept | OnAccept | Select | - | Select | No |
 | **OptionSelector** | >1 | No | No | 2+ | Advance | SetValue+OnAccept | Focus+SetValue | SetFocus+SetCursor | - | SetFocus+SetCursor | No |
-| **Slider** | >1 | No | No | 1 | SetFocusedOption | SetFocusedOption+OnAccept | Focus | SetFocus+SetOption | - | SetFocus+SetOption | Yes |
+| **LinearRange** | >1 | No | No | 1 | SetFocusedOption | SetFocusedOption+OnAccept | Focus | SetFocus+SetOption | - | SetFocus+SetOption | Yes |
 | **ListView** | >1 | No | No | 1 | MarkUnMarkRow | OpenSelected+OnAccept | OnAccept | SetMark+OnSelectedChanged | OpenSelected+OnAccept | - | No |
 | **TextField** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | SelectAll | ContextMenu | No |
 | **TextView** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | - | ContextMenu | Yes |

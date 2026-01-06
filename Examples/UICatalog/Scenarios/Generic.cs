@@ -10,35 +10,31 @@ public sealed class Generic : Scenario
     {
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.BorderStyle = LineStyle.None;
 
-        var button = new Button ()
+        Button button = new ()
         {
+            //CanFocus = true,
             X = Pos.Center (),
             Y = 1,
-            Title = "_Button",
+            Text = "_Button",
         };
 
         button.Accepting += (s, e) =>
                             {
                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
                                 e.Handled = true;
-                                MessageBox.ErrorQuery (Application.Instance, "Error", "You pressed the button!", "_Ok");
+                                MessageBox.Query ((s as View)!.App!, "Nice Job", "You pressed the button!", "_Ok");
                             };
 
         appWindow.Add (button);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 }

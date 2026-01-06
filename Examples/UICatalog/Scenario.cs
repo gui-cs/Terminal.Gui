@@ -1,9 +1,6 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 
 namespace UICatalog;
 
@@ -83,10 +80,7 @@ namespace UICatalog;
 public class Scenario : IDisposable
 {
     private static int _maxScenarioNameLen = 30;
-    public BenchmarkResults BenchmarkResults
-    {
-        get { return _benchmarkResults; }
-    }
+    public BenchmarkResults BenchmarkResults { get; } = new ();
 
     private bool _disposedValue;
 
@@ -95,22 +89,22 @@ public class Scenario : IDisposable
     ///     <see cref="ScenarioCategory"/>)
     /// </summary>
     /// <returns>list of category names</returns>
-    public List<string> GetCategories () { return ScenarioCategory.GetCategories (GetType ()); }
+    public List<string> GetCategories () => ScenarioCategory.GetCategories (GetType ());
 
     /// <summary>Helper to get the <see cref="Scenario"/> Description (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetDescription () { return ScenarioMetadata.GetDescription (GetType ()); }
+    public string GetDescription () => ScenarioMetadata.GetDescription (GetType ());
 
     /// <summary>Helper to get the <see cref="Scenario"/> Name (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetName () { return ScenarioMetadata.GetName (GetType ()); }
+    public string GetName () => ScenarioMetadata.GetName (GetType ());
 
     /// <summary>
     ///     Helper to get the <see cref="Application.QuitKey"/> and the <see cref="Scenario"/> Name (defined in
     ///     <see cref="ScenarioMetadata"/>)
     /// </summary>
     /// <returns></returns>
-    public string GetQuitKeyAndName () { return $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"; }
+    public string GetQuitKeyAndName () => $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
 
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
@@ -122,8 +116,7 @@ public class Scenario : IDisposable
         List<Scenario> objects = [];
 
         foreach (Type type in typeof (Scenario).Assembly.ExportedTypes
-                                               .Where (
-                                                       myType => myType is { IsClass: true, IsAbstract: false }
+                                               .Where (myType => myType is { IsClass: true, IsAbstract: false }
                                                                  && myType.IsSubclassOf (typeof (Scenario))
                                                       ))
         {
@@ -153,7 +146,6 @@ public class Scenario : IDisposable
     private readonly object _timeoutLock = new ();
     private object? _timeout;
     private Stopwatch? _stopwatch;
-    private readonly BenchmarkResults _benchmarkResults = new ();
 
     public void StartBenchmark ()
     {
@@ -173,7 +165,7 @@ public class Scenario : IDisposable
             }
         }
 
-        return _benchmarkResults;
+        return BenchmarkResults;
     }
 
     private List<Key>? _demoKeys;
@@ -193,7 +185,6 @@ public class Scenario : IDisposable
             Application.Driver!.ClearedContents += OnClearedContents;
             Application.SessionBegun += OnApplicationSessionBegun;
 
-
             _stopwatch = Stopwatch.StartNew ();
         }
         else
@@ -207,13 +198,14 @@ public class Scenario : IDisposable
 
         return;
 
-        void OnClearedContents (object? sender, EventArgs args) => BenchmarkResults.ClearedContentCount++;
+        void OnClearedContents (object? sender, EventArgs args) { BenchmarkResults.ClearedContentCount++; }
     }
 
     private void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
     {
         BenchmarkResults.IterationCount++;
-        if (BenchmarkResults.IterationCount > BENCHMARK_MAX_NATURAL_ITERATIONS + (_demoKeys!.Count * BENCHMARK_KEY_PACING))
+
+        if (BenchmarkResults.IterationCount > BENCHMARK_MAX_NATURAL_ITERATIONS + _demoKeys!.Count * BENCHMARK_KEY_PACING)
         {
             a.Value?.RequestStop ();
         }
@@ -225,10 +217,10 @@ public class Scenario : IDisposable
     {
         SubscribeAllSubViews (Application.TopRunnableView!);
 
-        _demoKeys = GetDemoKeyStrokes ();
+        _demoKeys = GetDemoKeyStrokes (Application.Instance);
 
         Application.AddTimeout (
-                                new TimeSpan (0, 0, 0, 0, BENCHMARK_KEY_PACING),
+                                new (0, 0, 0, 0, BENCHMARK_KEY_PACING),
                                 () =>
                                 {
                                     if (_currentDemoKey >= _demoKeys.Count)
@@ -249,6 +241,7 @@ public class Scenario : IDisposable
         {
             view.DrawComplete += (s, a) => BenchmarkResults.DrawCompleteCount++;
             view.SubViewsLaidOut += (s, a) => BenchmarkResults.LaidOutCount++;
+
             foreach (View subview in view.SubViews)
             {
                 SubscribeAllSubViews (subview);
@@ -267,7 +260,8 @@ public class Scenario : IDisposable
             }
         }
 
-        Logging.Trace ($@"  Failed to Quit with {Application.QuitKey} after {BenchmarkTimeout}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
+        Logging.Trace (
+                       $@"  Failed to Quit with {Application.QuitKey} after {BenchmarkTimeout}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
 
         Application.RequestStop ();
 
@@ -276,7 +270,7 @@ public class Scenario : IDisposable
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
-    public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
+    public override string ToString () => $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}";
 
     #region IDispose
 
@@ -306,8 +300,7 @@ public class Scenario : IDisposable
         List<string> aCategories = [];
 
         aCategories = typeof (Scenario).Assembly.GetTypes ()
-                                       .Where (
-                                               myType => myType is { IsClass: true, IsAbstract: false }
+                                       .Where (myType => myType is { IsClass: true, IsAbstract: false }
                                                          && myType.IsSubclassOf (typeof (Scenario)))
                                        .Select (type => System.Attribute.GetCustomAttributes (type).ToList ())
                                        .Aggregate (
@@ -325,9 +318,7 @@ public class Scenario : IDisposable
         categories.Insert (0, "All Scenarios");
 
         return categories;
-
     }
 
-    public virtual List<Key> GetDemoKeyStrokes () => new List<Key> ();
-
+    public virtual List<Key> GetDemoKeyStrokes (IApplication? app) => [];
 }

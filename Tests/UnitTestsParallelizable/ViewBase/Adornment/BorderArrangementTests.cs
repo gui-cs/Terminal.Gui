@@ -12,7 +12,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
     public void Arrangement_Handles_Wide_Glyphs_Correctly ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (6, 5);
 
@@ -57,10 +57,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              🍎◊──┐
+                                              🍎◊↕─┐
+                                              🍎↔  ↔
                                               🍎│  │
-                                              🍎│  │
-                                              🍎└──↘
+                                              🍎└↕─↘
                                               🍎🍎🍎
                                               """,
                                               output,
@@ -72,10 +72,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �◊──┐
+                                              �◊↕─┐
+                                              �↔  ↔
                                               �│  │
-                                              �│  │
-                                              �└──↘
+                                              �└↕─↘
                                               🍎🍎🍎
                                               """,
                                               output,
@@ -87,10 +87,10 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              ◊──┐🍎
+                                              ◊↕─┐🍎
+                                              ↔  ↔🍎
                                               │  │🍎
-                                              │  │🍎
-                                              └──↘🍎
+                                              └↕─↘🍎
                                               🍎🍎🍎
                                               """,
                                               output,
@@ -101,7 +101,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
     public void Arrangement_With_SubView_In_Border_Handles_Wide_Glyphs_Correctly ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.Driver?.SetScreenSize (8, 7);
 
@@ -182,12 +182,12 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              🍎◊i
+                                              🍎◊i↕
+                                              🍎
+                                              🍎↔    ↔
                                               🍎
                                               🍎
-                                              🍎
-                                              🍎
-                                              🍎     ↘
+                                              🍎  ↕  ↘
                                               🍎🍎🍎🍎
                                               """,
                                               output,
@@ -213,12 +213,12 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              �◊i
+                                              �◊i↕
+                                              �
+                                              �↔    ↔
                                               �
                                               �
-                                              �
-                                              �
-                                              �     ↘
+                                              �  ↕  ↘
                                               🍎🍎🍎🍎
                                               """,
                                               output,
@@ -244,12 +244,12 @@ public class BorderArrangementTests (ITestOutputHelper output)
 
         DriverAssert.AssertDriverContentsAre (
                                               """
-                                              ◊i    🦮
+                                              ◊i↕   🦮
+                                                    🍎
+                                              ↔    ↔🍎
                                                     🍎
                                                     🍎
-                                                    🍎
-                                                    🍎
-                                                   ↘🍎
+                                                ↕  ↘🍎
                                               🍎🍎🍎🍎
                                               """,
                                               output,

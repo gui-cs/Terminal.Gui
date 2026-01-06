@@ -132,19 +132,19 @@ public class StatusBar : Bar, IDesignable
 
         Add (shortcut);
 
-        var button1 = new Button
+        var LeftButton = new Button
         {
             Text = "I'll Hide",
             // Visible = false
         };
-        button1.Accepting += OnButtonClicked;
-        Add (button1);
+        LeftButton.Accepting += OnButtonClicked;
+        Add (LeftButton);
 
 #pragma warning disable TGUI001
         shortcut.Accepting += (_, e) =>
                               {
-                                  button1.Visible = !button1.Visible;
-                                  button1.Enabled = button1.Visible;
+                                  LeftButton.Visible = !LeftButton.Visible;
+                                  LeftButton.Enabled = LeftButton.Visible;
                                   e.Handled = false;
                               };
 #pragma warning restore TGUI001
@@ -156,13 +156,13 @@ public class StatusBar : Bar, IDesignable
             CanFocus = true
         });
 
-        var button2 = new Button
+        var MiddleButton = new Button
         {
             Text = "Or me!",
         };
-        button2.Accepting += (s, e) => App?.RequestStop ();
+        MiddleButton.Accepting += (s, e) => App?.RequestStop ();
 
-        Add (button2);
+        Add (MiddleButton);
 
         return true;
 

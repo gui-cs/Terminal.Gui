@@ -59,13 +59,9 @@ internal partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        // Debug.Assert (Navigation is null);
-        // Navigation = new ();
-
-        //Debug.Assert (Popover is null);
-        //Popover = new ();
-
         // Preserve existing keyboard settings if they exist
+        // BUGBUG: These should not be needed; KeyboardImpl subscribes to Application static property changes
+        // BUGBUG: and should set these automatically.
         bool hasExistingKeyboard = _keyboard is { };
         Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
         Key existingArrangeKey = _keyboard?.ArrangeKey ?? Application.ArrangeKey;
@@ -282,20 +278,18 @@ internal partial class ApplicationImpl
 
         // === 6. Reset input systems ===
         // Dispose keyboard and mouse to unsubscribe from events
+        // Mouse and Keyboard will be lazy-initialized on next access
         if (_keyboard is IDisposable keyboardDisposable)
         {
             keyboardDisposable.Dispose ();
         }
+        _keyboard = null;
 
         if (_mouse is IDisposable mouseDisposable)
         {
             mouseDisposable.Dispose ();
         }
-
-        // Mouse and Keyboard will be lazy-initialized on next access
         _mouse = null;
-        _keyboard = null;
-        Mouse.ResetState ();
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;

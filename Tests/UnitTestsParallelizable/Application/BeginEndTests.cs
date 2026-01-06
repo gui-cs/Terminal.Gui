@@ -47,7 +47,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void Begin_Null_Runnable_Throws ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // Test null Runnable
         Assert.Throws<ArgumentNullException> (() => app.Begin (null!));
@@ -59,7 +59,7 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
     public void Begin_Sets_Application_Top_To_Console_Size ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Assert.Null (app.TopRunnableView);
         app.Driver!.SetScreenSize (80, 25);

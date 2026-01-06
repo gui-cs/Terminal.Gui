@@ -12,7 +12,6 @@ public class FileDialogExamples : Scenario
     private CheckBox _cbCaseSensitive;
     private CheckBox _cbDrivesOnlyInTree;
     private CheckBox _cbPreserveFilenameOnDirectoryChanges;
-    private CheckBox _cbFlipButtonOrder;
     private CheckBox _cbMustExist;
     private CheckBox _cbShowTreeBranchLines;
     private CheckBox _cbUseColors;
@@ -26,15 +25,18 @@ public class FileDialogExamples : Scenario
     public override void Main ()
     {
         Application.Init ();
+
+        using IApplication app = Application.Instance;
         var y = 0;
         var x = 1;
-        var win = new Window { Title = GetQuitKeyAndName () };
+        using Window win = new ();
+        win.Title = GetQuitKeyAndName ();
 
         _cbMustExist = new () { CheckedState = CheckState.Checked, Y = y++, X = x, Text = "Must E_xist" };
         win.Add (_cbMustExist);
 
         _cbUseColors = new ()
-            { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
+        { CheckedState = FileDialogStyle.DefaultUseColors ? CheckState.Checked : CheckState.UnChecked, Y = y++, X = x, Text = "_Use Colors" };
         win.Add (_cbUseColors);
 
         _cbCaseSensitive = new () { CheckedState = CheckState.UnChecked, Y = y++, X = x, Text = "_Case Sensitive Search" };
@@ -64,7 +66,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _osCaption = new () { X = x, Y = y };
-        _osCaption.Labels = ["_Ok", "O_pen", "_Save"];
+        _osCaption.Labels = ["_OK", "O_pen", "_Save"];
         win.Add (_osCaption);
 
         y = 0;
@@ -120,20 +122,17 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x, Y = y++, Text = "_Cancel Text:" });
         _tbCancelButton = new () { X = x, Y = y++, Width = 12 };
         win.Add (_tbCancelButton);
-        _cbFlipButtonOrder = new () { X = x, Y = y++, Text = "Flip Ord_er" };
-        win.Add (_cbFlipButtonOrder);
-
         var btn = new Button { X = 1, Y = 9, IsDefault = true, Text = "Run Dialog" };
 
         win.Accepting += (s, e) =>
                          {
                              try
                              {
-                                 CreateDialog ();
+                                 CreateDialog (app);
                              }
                              catch (Exception ex)
                              {
-                                 MessageBox.ErrorQuery (Application.Instance, "Error", ex.ToString (), "_Ok");
+                                 MessageBox.ErrorQuery (app, "Error", ex.ToString (), "_OK");
                              }
                              finally
                              {
@@ -142,9 +141,7 @@ public class FileDialogExamples : Scenario
                          };
         win.Add (btn);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 
     private void ConfirmOverwrite (object sender, FilesSelectedEventArgs e)
@@ -153,36 +150,33 @@ public class FileDialogExamples : Scenario
         {
             if (File.Exists (e.Dialog.Path))
             {
-                int? result = MessageBox.Query (Application.Instance, "Overwrite?", "File already exists", "_Yes", "_No");
-                e.Cancel = result == 1;
+                int? result = MessageBox.Query (Application.Instance, "Overwrite?", "File already exists", "_No", "_Yes");
+                e.Cancel = result is 0 or null;
             }
         }
     }
 
-    private void CreateDialog ()
+    private void CreateDialog (IApplication app)
     {
         if (_osOpenMode.Value is { })
         {
-            var fd = new FileDialog
-            {
-                OpenMode = Enum.Parse<OpenMode> (
-                                                 _osOpenMode.Labels
-                                                            .Select (l => TextFormatter.FindHotKey (l, _osOpenMode.HotKeySpecifier, out int hotPos, out Key _)
+            using FileDialog fd = new ();
 
-                                                                              // Remove the hotkey specifier at the found position
-                                                                              ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _osOpenMode.HotKeySpecifier)
+            fd.OpenMode = Enum.Parse<OpenMode> (
+                                                _osOpenMode.Labels
+                                                           .Select (l => TextFormatter.FindHotKey (l, _osOpenMode.HotKeySpecifier, out int hotPos, out Key _)
 
-                                                                              // No hotkey found, return the label as is
-                                                                              : l)
-                                                            .ToArray () [_osOpenMode.Value.Value]
-                                                ),
-                MustExist = _cbMustExist.CheckedState == CheckState.Checked,
-                AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked
-            };
+                                                                             // Remove the hotkey specifier at the found position
+                                                                             ? TextFormatter.RemoveHotKeySpecifier (l, hotPos, _osOpenMode.HotKeySpecifier)
 
-            fd.Style.OkButtonText =
-                _osCaption.Labels.Select (l => TextFormatter.RemoveHotKeySpecifier (l, 0, _osCaption.HotKeySpecifier)).ToArray ()
-                    [_osCaption.Value!.Value];
+                                                                             // No hotkey found, return the label as is
+                                                                             : l)
+                                                           .ToArray () [_osOpenMode.Value.Value]
+                                               );
+            fd.MustExist = _cbMustExist.CheckedState == CheckState.Checked;
+            fd.AllowsMultipleSelection = _cbAllowMultipleSelection.CheckedState == CheckState.Checked;
+
+            fd.Style.OkButtonText = _osCaption.Labels.ElementAt (_osCaption.Value!.Value);
 
             // If Save style dialog then give them an overwrite prompt
             if (_osCaption.Value == 2)
@@ -232,43 +226,27 @@ public class FileDialogExamples : Scenario
                 fd.Style.CancelButtonText = _tbCancelButton.Text;
             }
 
-            if (_cbFlipButtonOrder.CheckedState == CheckState.Checked)
-            {
-                fd.Style.FlipOkCancelButtonLayoutOrder = true;
-            }
+            var result = app.Run (fd) as int?;
 
-            Application.Run (fd);
-
-            bool canceled = fd.Canceled;
             IReadOnlyList<string> multiSelected = fd.MultiSelected;
             string path = fd.Path;
 
-            // This needs to be disposed before opening other runnable
-            fd.Dispose ();
-
-            if (canceled)
+            if (result is null or 1)
             {
-                MessageBox.Query (Application.Instance,
+                MessageBox.Query (
+                                  app,
                                   "Canceled",
                                   "You canceled navigation and did not pick anything",
-                                  "Ok"
+                                  "_OK"
                                  );
             }
             else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
             {
-                MessageBox.Query (Application.Instance,
-                                  "Chosen!",
-                                  "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)),
-                                  "Ok"
-                                 );
+                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)), "_OK");
             }
             else
             {
-                MessageBox.Query (Application.Instance,
-                                  "Chosen!",
-                                  "You chose:" + Environment.NewLine + path,
-                                  "Ok"
-                                 );
+                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + path, "_OK");
             }
         }
     }

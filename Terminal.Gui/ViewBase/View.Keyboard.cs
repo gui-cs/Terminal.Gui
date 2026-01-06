@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View // Keyboard APIs
 {
@@ -10,6 +9,8 @@ public partial class View // Keyboard APIs
     {
         KeyBindings = new (this);
         KeyBindings.Add (Key.Space, Command.Activate);
+
+        // QUESTION: Should subclasses be required to enable Accept?
         KeyBindings.Add (Key.Enter, Command.Accept);
 
         HotKeyBindings = new (this);
@@ -178,7 +179,7 @@ public partial class View // Keyboard APIs
             }
         }
 
-        // Add the new 
+        // Add the new
         if (newKey != Key.Empty)
         {
             KeyBinding keyBinding = new ()
@@ -226,10 +227,11 @@ public partial class View // Keyboard APIs
         if (HotKeySpecifier == new Rune ('\xFFFF'))
         {
             HotKey = Key.Empty;
+
             return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
         }
 
-        if (Terminal.Gui.Text.TextFormatter.FindHotKey (_title, HotKeySpecifier, out _, out Key hk))
+        if (TextFormatter.FindHotKey (_title, HotKeySpecifier, out _, out Key hk))
         {
             if (_hotKey != hk)
             {
@@ -243,6 +245,161 @@ public partial class View // Keyboard APIs
     }
 
     #endregion HotKey Support
+
+    #region AutoHotKey Assignment
+
+    private bool _assignHotKeys;
+
+    /// <summary>
+    ///     If <see langword="true"/>, unique hotkeys will automatically be assigned to focusable subviews that have a
+    ///     <see cref="Title"/> but no <see cref="HotKey"/> defined.
+    ///     <para>
+    ///         <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
+    ///         before adding subviews with any hotkeys that may conflict with other Views.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When enabled, hotkeys are assigned to subviews when they are added via <see cref="Add(View?)"/>.
+    ///         The assignment algorithm:
+    ///         <list type="number">
+    ///             <item>Checks if the subview already has a programmatically set <see cref="HotKey"/>; if so and the key is not already used, preserves that hotkey</item>
+    ///             <item>If no usable programmatic <see cref="HotKey"/> is found, checks if the subview's <see cref="Title"/> contains a hotkey specifier (e.g., "_File") and preserves it if the key is not already used</item>
+    ///             <item>If neither a usable programmatic hotkey nor a usable title specifier is found, assigns a new hotkey from the first available character in the title</item>
+    ///             <item>Skips characters that are already in <see cref="UsedHotKeys"/>, as well as spaces and control characters, when determining whether a hotkey is usable or when assigning a new one</item>
+        ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Call <see cref="AssignHotKeysToSubViews"/> to manually trigger hotkey assignment for all subviews.
+    ///     </para>
+    /// </remarks>
+    public bool AssignHotKeys
+    {
+        get => _assignHotKeys;
+        set
+        {
+            if (_assignHotKeys == value)
+            {
+                return;
+            }
+
+            _assignHotKeys = value;
+
+            if (_assignHotKeys)
+            {
+                AssignHotKeysToSubViews ();
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the set of hotkeys that are already used or should not be used when
+    ///     <see cref="AssignHotKeys"/> is enabled.
+    ///     <para>
+    ///         This property is used to ensure that automatically assigned hotkeys do not conflict with
+    ///         hotkeys used elsewhere in the application. Set <see cref="UsedHotKeys"/> before adding
+    ///         subviews if there are hotkeys that may conflict with other views.
+    ///     </para>
+    /// </summary>
+    public HashSet<Key> UsedHotKeys { get; set; } = [];
+
+    /// <summary>
+    ///     Assigns unique hotkeys to all subviews that have a <see cref="Title"/> but no <see cref="HotKey"/> defined.
+    ///     Called automatically when <see cref="AssignHotKeys"/> is enabled and subviews are added.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method iterates through all subviews and assigns hotkeys based on their <see cref="Title"/>.
+    ///         It respects pre-existing hotkeys defined via the <see cref="HotKeySpecifier"/> in the title.
+    ///     </para>
+    ///     <para>
+    ///         Override this method to customize the hotkey assignment behavior.
+    ///     </para>
+    /// </remarks>
+    public void AssignHotKeysToSubViews ()
+    {
+        if (!AssignHotKeys)
+        {
+            return;
+        }
+
+        foreach (View subView in SubViews)
+        {
+            AssignHotKeyToView (subView);
+        }
+    }
+
+    /// <summary>
+    ///     Assigns a unique hotkey to a single view based on its <see cref="Title"/>.
+    /// </summary>
+    /// <param name="view">The view to assign a hotkey to.</param>
+    /// <returns><see langword="true"/> if a hotkey was assigned; otherwise, <see langword="false"/>.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method checks if the view's title already contains a hotkey specifier and preserves it if available.
+    ///         Otherwise, it assigns a new hotkey from the first available character in the title.
+    ///     </para>
+    /// </remarks>
+    protected bool AssignHotKeyToView (View view)
+    {
+        if (string.IsNullOrEmpty (view.Title))
+        {
+            return false;
+        }
+
+        string label = view.Title;
+
+        // Check if there's already a hotkey defined in the title
+        if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key existingHotKey))
+        {
+            // Label already has a hotkey - preserve it if available
+            if (!UsedHotKeys.Contains (existingHotKey))
+            {
+                view.HotKey = existingHotKey;
+                UsedHotKeys.Add (existingHotKey);
+
+                return true;
+            }
+
+            // Existing hotkey is already used, remove it and assign new one
+            label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
+        }
+        else if (view.HotKey != Key.Empty && UsedHotKeys.Add (view.HotKey))
+        {
+            // View already has a hotkey set programmatically - preserve it
+
+            return true;
+        }
+
+        // Assign a new hotkey from available characters in the label
+        Rune [] runes = label.EnumerateRunes ().ToArray ();
+
+        for (var i = 0; i < runes.Length; i++)
+        {
+            Rune lower = Rune.ToLowerInvariant (runes [i]);
+            var newKey = new Key (lower.Value);
+
+            if (UsedHotKeys.Contains (newKey))
+            {
+                continue;
+            }
+
+            if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsControl (newKey.AsRune))
+            {
+                continue;
+            }
+
+            view.Title = label.Insert (i, HotKeySpecifier.ToString ());
+            view.HotKey = newKey;
+            UsedHotKeys.Add (newKey);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion AutoHotKey Assignment
 
     #region Low-level Key handling
 
@@ -270,7 +427,7 @@ public partial class View // Keyboard APIs
     ///     <para>
     ///         Calling this method for a key bound to the view via an Application-scoped keybinding will have no effect.
     ///         Instead,
-    ///         use <see cref="Application.RaiseKeyDownEvent"/>.
+    ///         use <see cref="IKeyboard.RaiseKeyDownEvent"/>.
     ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
@@ -283,7 +440,7 @@ public partial class View // Keyboard APIs
             return false;
         }
 
-        // TODO: We really need an event before recursing into Focused. Without, there's no way for 
+        // TODO: We really need an event before recursing into Focused. Without, there's no way for
         // TODO: SuperViews to prevent SubViews from seeing certain keys. A use-case for this:
         // TODO:    - MenuBar needs to prevent MenuItems from seeing QuitKey if the MenuItem is not visible
 
@@ -302,7 +459,7 @@ public partial class View // Keyboard APIs
         // During (this is what can be cancelled)
 
         // TODO: NewKeyDownEvent returns bool. It should be bool? so state of InvokeCommands can be reflected up stack
-        if (InvokeCommands (key) is true || key.Handled)
+        if (InvokeCommandsBoundToKey (key) is true || key.Handled)
         {
             return true;
         }
@@ -374,10 +531,6 @@ public partial class View // Keyboard APIs
     ///     stop the key from being processed further.
     /// </summary>
     /// <remarks>
-    ///     <para>
-    ///         Not all terminals support key distinct up notifications, Applications should avoid depending on distinct
-    ///         KeyUp events.
-    ///     </para>
     ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </remarks>
     public event EventHandler<Key>? KeyDown;
@@ -386,10 +539,6 @@ public partial class View // Keyboard APIs
     ///     Called when the user has pressed key it wasn't handled by <see cref="KeyDown"/> and was not bound to a key binding.
     /// </summary>
     /// <remarks>
-    ///     <para>
-    ///         Not all terminals support distinct key up notifications; applications should avoid depending on distinct
-    ///         KeyUp events.
-    ///     </para>
     /// </remarks>
     /// <param name="key">Contains the details about the key that produced the event.</param>
     /// <returns>
@@ -412,95 +561,6 @@ public partial class View // Keyboard APIs
 
     #endregion KeyDown Event
 
-    #region KeyUp Event
-
-    /// <summary>
-    ///     If the view is enabled, raises the related key up events on the view, and returns <see langword="true"/> if the
-    ///     event was
-    ///     handled.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on distinct
-    ///         KeyUp events.
-    ///     </para>
-    ///     <para>
-    ///         If the view has a sub view that is focused, <see cref="NewKeyUpEvent"/> will be called on the focused view
-    ///         first.
-    ///     </para>
-    ///     <para>
-    ///         If the focused sub view does not handle the key press, this method raises <see cref="OnKeyUp"/>/
-    ///         <see cref="KeyUp"/> to allow the
-    ///         view to pre-process the key press.
-    ///     </para>
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </remarks>
-    /// <param name="key"></param>
-    /// <returns><see langword="true"/> if the event was handled.</returns>
-    public bool NewKeyUpEvent (Key key)
-    {
-        if (!Enabled)
-        {
-            return false;
-        }
-
-        // Before
-        if (RaiseKeyUp (key) || key.Handled)
-        {
-            return true;
-        }
-
-        // During
-
-        // After
-
-        return false;
-
-        bool RaiseKeyUp (Key k)
-        {
-            // Before (fire the cancellable event)
-            if (OnKeyUp (k) || k.Handled)
-            {
-                return true;
-            }
-
-            // fire event
-            KeyUp?.Invoke (this, k);
-
-            return k.Handled;
-        }
-    }
-
-    /// <summary>Called when a key is released. This method is called from <see cref="NewKeyUpEvent"/>.</summary>
-    /// <param name="key">Contains the details about the key that produced the event.</param>
-    /// <returns>
-    ///     <see langword="false"/> if the keys up event was not handled. <see langword="true"/> if no other view should see
-    ///     it.
-    /// </returns>
-    /// <remarks>
-    ///     Not all terminals support key distinct down/up notifications, Applications should avoid depending on distinct KeyUp
-    ///     events.
-    ///     <para>
-    ///         Overrides must call into the base and return <see langword="true"/> if the base returns
-    ///         <see langword="true"/>.
-    ///     </para>
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </remarks>
-    public virtual bool OnKeyUp (Key key) { return false; }
-
-    /// <summary>
-    ///     Raised when a key is released. Set <see cref="Key.Handled"/> to true to stop the key up event from being processed
-    ///     by other views.
-    ///     <remarks>
-    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on
-    ///         distinct KeyDown and KeyUp events and instead should use <see cref="KeyDown"/>.
-    ///         <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    ///     </remarks>
-    /// </summary>
-    public event EventHandler<Key>? KeyUp;
-
-    #endregion KeyUp Event
-
     #endregion Low-level Key handling
 
     #region Key Bindings
@@ -512,9 +572,10 @@ public partial class View // Keyboard APIs
     public KeyBindings HotKeyBindings { get; internal set; } = null!;
 
     /// <summary>
-    ///     INTERNAL API: Invokes any commands bound to <paramref name="key"/> on this view, adornments, and subviews.
+    ///     INTERNAL: Invokes the Commands bound to <paramref name="key"/>.
+    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="key">The key event passed.</param>
     /// <returns>
     ///     <see langword="null"/> if no command was invoked or there was no matching key binding; input processing should
     ///     continue.
@@ -523,81 +584,23 @@ public partial class View // Keyboard APIs
     ///     <see langword="true"/> if at least one command was invoked and handled (or
     ///     cancelled); input processing should stop.
     /// </returns>
-    internal bool? InvokeCommands (Key key)
+    internal bool? InvokeCommandsBoundToKey (Key key)
     {
-        // * If no key binding was found, `InvokeKeyBindings` returns `null`.
-        //   Continue passing the event (return `false` from `OnInvokeKeyBindings`).
-        // * If key bindings were found, but none handled the key (all `Command`s returned `false`),
-        //   `InvokeKeyBindings` returns `false`. Continue passing the event (return `false` from `OnInvokeKeyBindings`)..
-        // * If key bindings were found, and any handled the key (at least one `Command` returned `true`),
-        //   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
-        bool? handled = DoInvokeCommands (key);
-
-        if (handled is true)
+        if (!KeyBindings.TryGet (key, out KeyBinding binding))
         {
-            // Stop processing if any key binding handled the key.
-            // DO NOT stop processing if there are no matching key bindings or none of the key bindings handled the key
-            return handled;
+            return null;
         }
 
-        if (Margin is { } && InvokeCommandsBoundToKeyOnAdornment (Margin, key, ref handled))
+        if (binding is { } && (binding.Key is null || !binding.Key.IsValid))
         {
-            return true;
+            binding.Key = key;
         }
 
-        if (Padding is { } && InvokeCommandsBoundToKeyOnAdornment (Padding, key, ref handled))
-        {
-            return true;
-        }
-
-        if (Border is { } && InvokeCommandsBoundToKeyOnAdornment (Border, key, ref handled))
-        {
-            return true;
-        }
-
-        return handled;
+        return InvokeCommands (binding.Commands, binding);
     }
 
-    private static bool InvokeCommandsBoundToKeyOnAdornment (Adornment adornment, Key key, ref bool? handled)
-    {
-        if (!adornment.Enabled)
-        {
-            return false;
-        }
-
-        bool? adornmentHandled = adornment.InvokeCommands (key);
-
-        if (adornmentHandled is true)
-        {
-            return true;
-        }
-
-        if (adornment?.InternalSubViews is null)
-        {
-            return false;
-        }
-
-        foreach (View subview in adornment.InternalSubViews)
-        {
-            bool? subViewHandled = subview.InvokeCommands (key);
-
-            if (subViewHandled is { })
-            {
-                handled = subViewHandled;
-
-                if ((bool)subViewHandled)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    // BUGBUG: This will miss any hotkeys in subviews of Adornments.
     /// <summary>
-    ///     Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
+    ///     INTERNAL: Invokes any commands bound to <paramref name="hotKey"/> on this view and subviews.
     /// </summary>
     /// <param name="hotKey"></param>
     /// <returns>
@@ -615,6 +618,7 @@ public partial class View // Keyboard APIs
         }
 
         bool? handled = null;
+
         // Process this View
         if (HotKeyBindings.TryGet (hotKey, out KeyBinding binding))
         {
@@ -630,7 +634,7 @@ public partial class View // Keyboard APIs
         }
 
         // Now, process any HotKey bindings in the subviews
-        foreach (View subview in InternalSubViews.ToList())
+        foreach (View subview in GetSubViews (includePadding: true, includeBorder: true))
         {
             if (subview == Focused)
             {
@@ -646,34 +650,6 @@ public partial class View // Keyboard APIs
         }
 
         return false;
-    }
-
-    /// <summary>
-    ///     Invokes the Commands bound to <paramref name="key"/>.
-    ///     <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
-    /// </summary>
-    /// <param name="key">The key event passed.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was invoked; input processing should continue.
-    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input processing
-    ///     should continue.
-    ///     <see langword="true"/> if at least one command was invoked and handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    protected bool? DoInvokeCommands (Key key)
-    {
-        if (!KeyBindings.TryGet (key, out KeyBinding binding))
-        {
-            return null;
-        }
-
-        // TODO: Should we set binding.Key = key if it's not set?
-        if (binding is {} && (binding.Key is null || !binding.Key.IsValid))
-        {
-            binding.Key = key;
-        }
-
-        return InvokeCommands (binding.Commands, binding);
     }
 
     #endregion Key Bindings

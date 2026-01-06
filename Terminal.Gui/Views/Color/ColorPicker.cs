@@ -21,6 +21,10 @@ public partial class ColorPicker : View, IDesignable
         Height = Dim.Auto ();
         Width = Dim.Auto (minimumContentDim: 32);
         ApplyStyleChanges ();
+
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+
     }
 
     private readonly Dictionary<IColorBar, TextField> _textFields = new ();

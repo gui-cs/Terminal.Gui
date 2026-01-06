@@ -73,4 +73,3 @@ log.*
 !/Tests/coverage/.gitkeep   # keep folder in repo
 /Tests/report/
 *.cobertura.xml
-/docfx/docs/migratingfromv1.md

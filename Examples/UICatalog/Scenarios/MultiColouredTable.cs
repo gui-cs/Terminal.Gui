@@ -99,7 +99,7 @@ public class MultiColouredTable : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (Application.Instance, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery (Application.Instance, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView.Update ();
@@ -110,25 +110,21 @@ public class MultiColouredTable : Scenario
     {
         var okPressed = false;
 
-        Button ok = new () { Text = "Ok", IsDefault = true };
-
-        ok.Accepting += (s, e) =>
-                        {
-                            okPressed = true;
-                            Application.RequestStop ();
-                        };
-        Button cancel = new () { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
-        Dialog d = new () { Title = title, Buttons = [ok, cancel] };
+        Dialog d = new ()
+        {
+            Title = title,
+            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
+        };
 
         Label lbl = new () { X = 0, Y = 1, Text = label };
 
-        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
+        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
 
         Application.Run (d);
+        okPressed = d.Result == 1;
         d.Dispose ();
 
         enteredText = okPressed ? tf.Text : string.Empty;

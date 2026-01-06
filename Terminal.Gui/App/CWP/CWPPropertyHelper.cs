@@ -87,7 +87,6 @@ public static class CWPPropertyHelper
             }
         }
 
-        // BUGBUG: This should pass this not null; need to test
         changingEvent?.Invoke (sender, args);
 
         if (args.Handled)

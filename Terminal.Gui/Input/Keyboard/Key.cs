@@ -1,7 +1,11 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Terminal.Gui.Input;
+
+// NOTE: It may be tempting to think this should be a record struct.
+// NOTE: If this were a struct, it would be boxed when used in events, and the ability to
+// NOTE: modify properties like Handled would be lost on the boxed copy.
+// NOTE: Mouse is a class for the same reason.
 
 /// <summary>
 ///     Provides an abstraction for common keyboard operations and state. Used for processing keyboard input and

@@ -163,20 +163,20 @@ public class TimeField : TextField
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent  (MouseEventArgs ev)
+    protected override bool OnMouseEvent  (Mouse mouse)
     {
-        if (base.OnMouseEvent (ev) || ev.Handled)
+        if (base.OnMouseEvent (mouse) || mouse.Handled)
         {
             return true;
         }
 
-        if (SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            int point = ev.Position.X;
+            int point = mouse.Position!.Value.X;
             AdjCursorPosition (point);
         }
 
-        return ev.Handled;
+        return mouse.Handled;
     }
 
     /// <inheritdoc/>

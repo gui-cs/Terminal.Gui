@@ -4,7 +4,7 @@ using UnitTests;
 namespace ViewBaseTests.Drawing;
 
 [Trait ("Category", "Output")]
-public class NeedsDrawTests : FakeDriverBase
+public class NeedsDrawTests : TestDriverBase
 {
     [Fact]
     public void NeedsDraw_False_If_Width_Height_Zero ()
@@ -20,7 +20,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void NeedsDraw_True_Initially_If_Width_Height_Not_Zero ()
     {
-        View superView = new () { Driver = CreateFakeDriver (), Width = 1, Height = 1 };
+        View superView = new () { Driver = CreateTestDriver (), Width = 1, Height = 1 };
         View view1 = new () { Width = 1, Height = 1 };
         View view2 = new () { Width = 1, Height = 1 };
 
@@ -102,7 +102,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void NeedsDraw_After_SetLayoutNeeded_And_Layout ()
     {
-        var view = new View { Driver = CreateFakeDriver (), Width = 2, Height = 2 };
+        var view = new View { Driver = CreateTestDriver (), Width = 2, Height = 2 };
         Assert.True (view.NeedsDraw);
         Assert.False (view.NeedsLayout);
 
@@ -122,7 +122,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void NeedsDraw_False_After_SetRelativeLayout_Absolute_Dims ()
     {
-        var view = new View { Driver = CreateFakeDriver (), Width = 2, Height = 2 };
+        var view = new View { Driver = CreateTestDriver (), Width = 2, Height = 2 };
         Assert.True (view.NeedsDraw);
 
         view.Draw ();
@@ -226,7 +226,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void NeedsDraw_False_After_Draw ()
     {
-        var view = new View { Driver = CreateFakeDriver (), Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+        var view = new View { Driver = CreateTestDriver (), Width = 2, Height = 2, BorderStyle = LineStyle.Single };
         Assert.True (view.NeedsDraw);
 
         view.BeginInit ();
@@ -316,7 +316,7 @@ public class NeedsDrawTests : FakeDriverBase
     public void ClearNeedsDraw_ClearsOwnFlags ()
     {
         // Verify that ClearNeedsDraw properly clears the view's own flags
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -345,7 +345,7 @@ public class NeedsDrawTests : FakeDriverBase
     public void ClearNeedsDraw_ClearsAdornments ()
     {
         // Verify that ClearNeedsDraw clears adornment flags
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -375,7 +375,7 @@ public class NeedsDrawTests : FakeDriverBase
     public void ClearNeedsDraw_PropagatesDownToAllSubViews ()
     {
         // Verify that ClearNeedsDraw clears flags on all descendants
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var topView = new View
@@ -437,7 +437,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void NeedsDraw_ClearedAfterDraw ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -463,7 +463,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void SetNeedsDraw_WithRectangle_UpdatesNeedsDrawRect ()
     {
-        var view = new View { Driver = CreateFakeDriver (), X = 0, Y = 0, Width = 20, Height = 20 };
+        var view = new View { Driver = CreateTestDriver (), X = 0, Y = 0, Width = 20, Height = 20 };
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();
@@ -484,7 +484,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void SetNeedsDraw_MultipleRectangles_Expands ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View { X = 0, Y = 0, Width = 30, Height = 30, Driver = driver };
@@ -564,7 +564,7 @@ public class NeedsDrawTests : FakeDriverBase
         // SubViewNeedsDraw flag when sibling subviews still need drawing.
         //
         // This is the core behavior that enables the fix in the static Draw method.
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new (driver.Screen);
 
         View superview = new ()
@@ -623,7 +623,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void SubViewNeedsDraw_InitiallyFalse ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View { Width = 10, Height = 10, Driver = driver };
@@ -657,7 +657,7 @@ public class NeedsDrawTests : FakeDriverBase
     [Fact]
     public void SubViewNeedsDraw_ClearedAfterDraw ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var parent = new View

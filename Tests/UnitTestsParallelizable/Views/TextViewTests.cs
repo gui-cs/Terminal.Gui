@@ -2401,7 +2401,7 @@ public class TextViewTests
         tv.Text = text;
         tv.SelectWordOnlyOnDoubleClick = selectWordOnly;
 
-        Assert.True (tv.NewMouseEvent (new () { Position = new (col, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.True (tv.NewMouseEvent (new () { Position = new (col, 0), Flags = MouseFlags.LeftButtonDoubleClicked }));
         Assert.Equal (expectedText, tv.SelectedText);
     }
 

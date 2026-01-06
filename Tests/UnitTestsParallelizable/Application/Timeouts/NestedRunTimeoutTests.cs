@@ -14,7 +14,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication? app = Application.Create ();
-        app.Init ("FakeDriver");
+        app.Init (DriverRegistry.Names.ANSI);
 
         List<string> executionOrder = new ();
 
@@ -148,7 +148,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
         // Arrange
         using IApplication? app = Application.Create ();
 
-        app.Init ("FakeDriver");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var timeoutFired = false;
         var nestedRunStarted = false;
@@ -235,7 +235,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
         // Arrange
         using IApplication? app = Application.Create ();
 
-        app.Init ("FakeDriver");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // Create a simple window for the main run loop
         var mainWindow = new Window { Title = "Main Window" };
@@ -271,7 +271,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
 
         // Arrange
         using IApplication? app = Application.Create ();
-        app.Init ("FakeDriver");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // Schedule a safety timeout that will ensure the app quits if test hangs
         var safetyRequestStopTimeoutFired = false;
@@ -372,7 +372,7 @@ public class NestedRunTimeoutTests (ITestOutputHelper output)
 
         // Arrange
         using IApplication? app = Application.Create ();
-        app.Init ("FakeDriver");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var enterFired = false;
         var escFired = false;

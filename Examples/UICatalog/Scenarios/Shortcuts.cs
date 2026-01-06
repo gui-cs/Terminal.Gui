@@ -13,12 +13,12 @@ public class Shortcuts : Scenario
     {
         Application.Init ();
         var quitKey = Application.QuitKey;
-        Window app = new ();
+        Window window = new ();
 
-        app.IsModalChanged += App_Loaded;
+        window.IsModalChanged += App_Loaded;
 
-        Application.Run (app);
-        app.Dispose ();
+        Application.Run (window);
+        window.Dispose ();
         Application.Shutdown ();
         Application.QuitKey = quitKey;
     }
@@ -66,7 +66,7 @@ public class Shortcuts : Scenario
             {
                 Text = "_Align Keys",
                 CanFocus = false,
-                HighlightStates = MouseState.None,
+                MouseHighlightStates = MouseState.None,
                 CheckedState = CheckState.Checked
             },
             Key = Key.F5.WithCtrl.WithAlt.WithShift
@@ -99,7 +99,7 @@ public class Shortcuts : Scenario
             {
                 Text = "Command _First",
                 CanFocus = false,
-                HighlightStates = MouseState.None
+                MouseHighlightStates = MouseState.None
             },
             Key = Key.F.WithCtrl
         };
@@ -186,7 +186,7 @@ public class Shortcuts : Scenario
             {
                 Title = "_Button",
                 ShadowStyle = ShadowStyle.None,
-                HighlightStates = MouseState.None
+                MouseHighlightStates = MouseState.None
             },
             Key = Key.K
         };
@@ -207,7 +207,7 @@ public class Shortcuts : Scenario
             {
                 Orientation = Orientation.Vertical,
                 Labels = ["O_ne", "T_wo", "Th_ree", "Fo_ur"],
-                HighlightStates = MouseState.None,
+                MouseHighlightStates = MouseState.None,
             },
         };
 

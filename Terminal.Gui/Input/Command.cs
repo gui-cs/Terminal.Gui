@@ -276,12 +276,6 @@ public enum Command
     /// <summary>Moves focus to the next<see cref="TabBehavior.TabGroup"/>.</summary>
     PreviousTabGroup,
 
-    /// <summary>Tabs to the next item.</summary>
-    Tab,
-
-    /// <summary>Tabs back to the previous item.</summary>
-    BackTab,
-
     /// <summary>Enables arrange mode.</summary>
     Arrange,
 

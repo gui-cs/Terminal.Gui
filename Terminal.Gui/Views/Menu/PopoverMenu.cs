@@ -193,9 +193,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
     /// <summary>
     ///     The mouse flags that will cause the popover menu to be visible. The default is
-    ///     <see cref="MouseFlags.Button3Clicked"/> which is typically the right mouse button.
+    ///     <see cref="MouseFlags.RightButtonClicked"/> which is typically the right mouse button.
     /// </summary>
-    public MouseFlags MouseFlags { get; set; } = MouseFlags.Button3Clicked;
+    public MouseFlags MouseFlags { get; set; } = MouseFlags.RightButtonClicked;
 
     /// <summary>
     ///     Makes the popover menu visible and locates it at <paramref name="idealScreenPosition"/>. The actual position of the
@@ -261,6 +261,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Root.App ??= App;
             Root.BeginInit ();
             Root.EndInit ();
+            // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+            // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
             Root.Layout ();
         }
 
@@ -478,7 +480,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         var menu = menuItem?.SuperView as Menu;
 
         // Logging.Debug ($"{Title} - menuItem: {menuItem?.Title}, menu: {menu?.Title}");
-
+        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
         menu?.Layout ();
 
         // If there's a visible peer, remove / hide it
@@ -551,6 +554,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             // to set focus to it.
             menu.Visible = true;
 
+            // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+            // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
             menu.Layout ();
         }
     }
