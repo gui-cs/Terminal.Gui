@@ -21,7 +21,7 @@ public partial class TextField
         }
 
         Text = Cell.ToString (obj.Lines [obj.CursorPosition.Y]);
-        CursorPosition = obj.CursorPosition.X;
+        InsertionPoint = obj.CursorPosition.X;
         Adjust ();
     }
 }

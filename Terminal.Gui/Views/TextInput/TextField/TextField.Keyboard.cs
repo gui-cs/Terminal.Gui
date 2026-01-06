@@ -30,7 +30,7 @@ public partial class TextField
     private void GenerateSuggestions ()
     {
         List<Cell> currentLine = Cell.ToCellList (Text);
-        int cursorPosition = Math.Min (CursorPosition, currentLine.Count);
+        int cursorPosition = Math.Min (InsertionPoint, currentLine.Count);
 
         Autocomplete.Context = new (
                                     currentLine,
@@ -59,7 +59,7 @@ public partial class TextField
         // Remember the cursor position because the new calculated cursor position is needed
         // to be set BEFORE the TextChanged event is triggered.
         // Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
-        _preTextChangedCursorPos = _cursorPosition;
+        _preChangeInsertionPoint = _insertionPoint;
 
         // Ignore other control characters.
         if (a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })

@@ -19,9 +19,9 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         <b>Cursor Position Model:</b>
 ///         <list type="bullet">
-///             <item><description><see cref="TextField.CursorPosition"/>: Inherited, but constrained by the override to [1, FieldLength]</description></item>
-///             <item><description><see cref="AdjCursorPosition"/>: Adjusts cursor to skip over time separator characters</description></item>
-///             <item><description><see cref="IncCursorPosition"/>/<see cref="DecCursorPosition"/>: Move cursor while respecting separator positions</description></item>
+///             <item><description><see cref="TextField.InsertionPoint"/>: Inherited, but constrained by the override to [1, FieldLength]</description></item>
+///             <item><description><see cref="AdjustInsertionPoint"/>: Adjusts cursor to skip over time separator characters</description></item>
+///             <item><description><see cref="IncrementInsertionPoint"/>/<see cref="DecrementInsertionPoint"/>: Move cursor while respecting separator positions</description></item>
 ///         </list>
 ///     </para>
 ///     <para>
@@ -84,7 +84,7 @@ public class TimeField : TextField
         _shortFormat = $" hh\\{_sepChar}mm";
         Width = FieldLength + 2;
         Time = TimeSpan.MinValue;
-        base.CursorPosition = 1;
+        base.InsertionPoint = 1;
         TextChanging += TextField_TextChanging;
 
         // Things this view knows how to do
@@ -139,7 +139,7 @@ public class TimeField : TextField
     ///     Gets or sets the cursor position within the time field, constrained to valid digit positions.
     /// </summary>
     /// <value>
-    ///     The cursor position, clamped to the range [1, FieldLength]. Unlike <see cref="TextField.CursorPosition"/>,
+    ///     The cursor position, clamped to the range [1, FieldLength]. Unlike <see cref="TextField.InsertionPoint"/>,
     ///     position 0 is not accessible because it contains a leading space.
     /// </value>
     /// <remarks>
@@ -152,15 +152,15 @@ public class TimeField : TextField
     ///     </para>
     ///     <para>
     ///         <b>Note:</b> This property only enforces bounds; it does not skip separator characters.
-    ///         Use <see cref="AdjCursorPosition"/> after setting to ensure the cursor is on a digit position.
+    ///         Use <see cref="AdjustInsertionPoint"/> after setting to ensure the cursor is on a digit position.
     ///     </para>
     /// </remarks>
-    /// <seealso cref="AdjCursorPosition"/>
+    /// <seealso cref="AdjustInsertionPoint"/>
     /// <seealso cref="FieldLength"/>
-    public override int CursorPosition
+    public override int InsertionPoint
     {
-        get => base.CursorPosition;
-        set => base.CursorPosition = Math.Max (Math.Min (value, FieldLength), 1);
+        get => base.InsertionPoint;
+        set => base.InsertionPoint = Math.Max (Math.Min (value, FieldLength), 1);
     }
 
     /// <summary>Get or sets whether <see cref="TimeField"/> uses the short or long time format.</summary>
@@ -237,7 +237,7 @@ public class TimeField : TextField
 
         ClearAllSelection ();
         SetText ((Rune)'0');
-        DecCursorPosition ();
+        DecrementInsertionPoint ();
         return true;
     }
 
@@ -265,7 +265,7 @@ public class TimeField : TextField
         if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             int point = mouse.Position!.Value.X;
-            AdjCursorPosition (point);
+            AdjustInsertionPoint (point);
         }
 
         return mouse.Handled;
@@ -281,7 +281,7 @@ public class TimeField : TextField
             {
                 if (SetText ((Rune)a))
                 {
-                    IncCursorPosition ();
+                    IncrementInsertionPoint ();
                 }
             }
 
@@ -318,12 +318,12 @@ public class TimeField : TextField
     ///     <para>
     ///         <b>Example:</b> For time " 14:30:45" with separator ':':
     ///         <list type="bullet">
-    ///             <item><description>AdjCursorPosition(3, true) → cursor moves to position 4 (first digit of minutes)</description></item>
-    ///             <item><description>AdjCursorPosition(3, false) → cursor moves to position 2 (last digit of hours)</description></item>
+    ///             <item><description>AdjustInsertionPoint(3, true) → cursor moves to position 4 (first digit of minutes)</description></item>
+    ///             <item><description>AdjustInsertionPoint(3, false) → cursor moves to position 2 (last digit of hours)</description></item>
     ///         </list>
     ///     </para>
     /// </remarks>
-    private void AdjCursorPosition (int point, bool increment = true)
+    private void AdjustInsertionPoint (int point, bool increment = true)
     {
         int newPoint = point;
 
@@ -340,19 +340,19 @@ public class TimeField : TextField
 
         if (newPoint != point)
         {
-            CursorPosition = newPoint;
+            InsertionPoint = newPoint;
         }
 
         // Skip over separator characters in the specified direction
-        while (CursorPosition < Text.GetColumns () - 1 && Text [CursorPosition] == _sepChar [0])
+        while (InsertionPoint < Text.GetColumns () - 1 && Text [InsertionPoint] == _sepChar [0])
         {
             if (increment)
             {
-                CursorPosition++;
+                InsertionPoint++;
             }
             else
             {
-                CursorPosition--;
+                InsertionPoint--;
             }
         }
     }
@@ -362,24 +362,24 @@ public class TimeField : TextField
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This method moves the cursor left by one position, then calls <see cref="AdjCursorPosition"/>
+    ///         This method moves the cursor left by one position, then calls <see cref="AdjustInsertionPoint"/>
     ///         with <c>increment=false</c> to skip over any separator that might be at the new position.
     ///     </para>
     ///     <para>
     ///         The cursor will not move below position 1 (the first digit position).
     ///     </para>
     /// </remarks>
-    private void DecCursorPosition ()
+    private void DecrementInsertionPoint ()
     {
-        if (CursorPosition <= 1)
+        if (InsertionPoint <= 1)
         {
-            CursorPosition = 1;
+            InsertionPoint = 1;
 
             return;
         }
 
-        CursorPosition--;
-        AdjCursorPosition (CursorPosition, false);
+        InsertionPoint--;
+        AdjustInsertionPoint (InsertionPoint, false);
     }
 
     /// <summary>
@@ -387,30 +387,30 @@ public class TimeField : TextField
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This method moves the cursor right by one position, then calls <see cref="AdjCursorPosition"/>
+    ///         This method moves the cursor right by one position, then calls <see cref="AdjustInsertionPoint"/>
     ///         with <c>increment=true</c> to skip over any separator that might be at the new position.
     ///     </para>
     ///     <para>
     ///         The cursor will not move beyond FieldLength (the last digit position).
     ///     </para>
     /// </remarks>
-    private void IncCursorPosition ()
+    private void IncrementInsertionPoint ()
     {
-        if (CursorPosition >= FieldLength)
+        if (InsertionPoint >= FieldLength)
         {
-            CursorPosition = FieldLength;
+            InsertionPoint = FieldLength;
 
             return;
         }
 
-        CursorPosition++;
-        AdjCursorPosition (CursorPosition);
+        InsertionPoint++;
+        AdjustInsertionPoint (InsertionPoint);
     }
 
     private new bool MoveEnd ()
     {
         ClearAllSelection ();
-        CursorPosition = FieldLength;
+        InsertionPoint = FieldLength;
 
         return true;
     }
@@ -419,7 +419,7 @@ public class TimeField : TextField
     {
         // Home, C-A
         ClearAllSelection ();
-        CursorPosition = 1;
+        InsertionPoint = 1;
 
         return true;
     }
@@ -427,7 +427,7 @@ public class TimeField : TextField
     private bool MoveLeft ()
     {
         ClearAllSelection ();
-        DecCursorPosition ();
+        DecrementInsertionPoint ();
 
         return true;
     }
@@ -435,7 +435,7 @@ public class TimeField : TextField
     private bool MoveRight ()
     {
         ClearAllSelection ();
-        IncCursorPosition ();
+        IncrementInsertionPoint ();
 
         return true;
     }
@@ -477,15 +477,15 @@ public class TimeField : TextField
     private bool SetText (Rune key)
     {
         List<Rune> text = Text.EnumerateRunes ().ToList ();
-        List<Rune> newText = text.GetRange (0, CursorPosition);
+        List<Rune> newText = text.GetRange (0, InsertionPoint);
         newText.Add (key);
 
-        if (CursorPosition < FieldLength)
+        if (InsertionPoint < FieldLength)
         {
             newText =
             [
                 .. newText,
-                .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+                .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))
             ];
         }
 
@@ -615,7 +615,7 @@ public class TimeField : TextField
                 e.Handled = true;
             }
 
-            AdjCursorPosition (CursorPosition);
+            AdjustInsertionPoint (InsertionPoint);
         }
         catch (Exception)
         {

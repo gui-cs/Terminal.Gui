@@ -127,7 +127,7 @@ public partial class TextField
     public bool KillWordBackwards ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordBackward (_insertionPoint, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -138,9 +138,9 @@ public partial class TextField
         {
             SetText (
                      _text.GetRange (0, newPos.Value.col)
-                          .Concat (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition))
+                          .Concat (_text.GetRange (_insertionPoint, _text.Count - _insertionPoint))
                     );
-            _cursorPosition = newPos.Value.col;
+            _insertionPoint = newPos.Value.col;
         }
 
         Adjust ();
@@ -152,7 +152,7 @@ public partial class TextField
     public bool KillWordForwards ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordForward (_insertionPoint, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -162,7 +162,7 @@ public partial class TextField
         if (newPos.Value.col != -1)
         {
             SetText (
-                     _text.GetRange (0, _cursorPosition)
+                     _text.GetRange (0, _insertionPoint)
                           .Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col))
                     );
         }
@@ -176,7 +176,7 @@ public partial class TextField
     public bool MoveEnd ()
     {
         ClearAllSelection ();
-        _cursorPosition = _text.Count;
+        _insertionPoint = _text.Count;
         Adjust ();
 
         return true;
@@ -198,7 +198,7 @@ public partial class TextField
         }
 
         SetSelectedStartSelectedLength ();
-        int selStart = _start == -1 ? CursorPosition : _start;
+        int selStart = _selectionStart == -1 ? InsertionPoint : _selectionStart;
 
         Text = StringExtensions.ToString (_text.GetRange (0, selStart))
                + cbTxt
@@ -209,7 +209,7 @@ public partial class TextField
                                                            )
                                            );
 
-        _cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
+        _insertionPoint = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
         ClearAllSelection ();
         SetNeedsDraw ();
         Adjust ();
@@ -238,7 +238,7 @@ public partial class TextField
             return false;
         }
 
-        _selectedStart = 0;
+        _selectionAnchor = 0;
         MoveEndExtend ();
         SetNeedsDraw ();
 
@@ -275,7 +275,7 @@ public partial class TextField
 
         if (keyboard)
         {
-            ContextMenu?.MakeVisible (ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1)));
+            ContextMenu?.MakeVisible (ViewportToScreen (new Point (_insertionPoint - ScrollOffset, 1)));
         }
         else
         {
@@ -293,7 +293,7 @@ public partial class TextField
             return false;
         }
 
-        _selectedStart = 0;
+        _selectionAnchor = 0;
         MoveEndExtend ();
         DeleteCharLeft (false);
         SetNeedsDraw ();
@@ -304,7 +304,7 @@ public partial class TextField
     /// <summary>Deletes the character to the left.</summary>
     /// <param name="usePreTextChangedCursorPos">
     ///     If set to <see langword="true">true</see> use the cursor position cached ;
-    ///     otherwise use <see cref="CursorPosition"/>. use .
+    ///     otherwise use <see cref="InsertionPoint"/>. use .
     /// </param>
     public virtual bool DeleteCharLeft (bool usePreTextChangedCursorPos)
     {
@@ -315,38 +315,38 @@ public partial class TextField
 
         _historyText.Add (
                           [Cell.ToCells (_text)],
-                          new (_cursorPosition, 0)
+                          new (_insertionPoint, 0)
                          );
 
         if (SelectedLength == 0)
         {
-            if (_cursorPosition == 0)
+            if (_insertionPoint == 0)
             {
                 return true;
             }
 
             if (!usePreTextChangedCursorPos)
             {
-                _preTextChangedCursorPos = _cursorPosition;
+                _preChangeInsertionPoint = _insertionPoint;
             }
 
-            _cursorPosition--;
+            _insertionPoint--;
 
-            if (_preTextChangedCursorPos < _text.Count)
+            if (_preChangeInsertionPoint < _text.Count)
             {
                 SetText (
-                         _text.GetRange (0, _preTextChangedCursorPos - 1)
+                         _text.GetRange (0, _preChangeInsertionPoint - 1)
                               .Concat (
                                        _text.GetRange (
-                                                       _preTextChangedCursorPos,
-                                                       _text.Count - _preTextChangedCursorPos
+                                                       _preChangeInsertionPoint,
+                                                       _text.Count - _preChangeInsertionPoint
                                                       )
                                       )
                         );
             }
             else
             {
-                SetText (_text.GetRange (0, _preTextChangedCursorPos - 1));
+                SetText (_text.GetRange (0, _preChangeInsertionPoint - 1));
             }
         }
         else
@@ -370,19 +370,19 @@ public partial class TextField
 
         _historyText.Add (
                           [Cell.ToCells (_text)],
-                          new (_cursorPosition, 0)
+                          new (_insertionPoint, 0)
                          );
 
         if (SelectedLength == 0)
         {
-            if (_text.Count == 0 || _text.Count == _cursorPosition)
+            if (_text.Count == 0 || _text.Count == _insertionPoint)
             {
                 return true;
             }
 
             SetText (
-                     _text.GetRange (0, _cursorPosition)
-                          .Concat (_text.GetRange (_cursorPosition + 1, _text.Count - (_cursorPosition + 1)))
+                     _text.GetRange (0, _insertionPoint)
+                          .Concat (_text.GetRange (_insertionPoint + 1, _text.Count - (_insertionPoint + 1)))
                     );
         }
         else
@@ -398,11 +398,11 @@ public partial class TextField
 
     private bool MoveEndExtend ()
     {
-        if (_cursorPosition <= _text.Count)
+        if (_insertionPoint <= _text.Count)
         {
-            int x = _cursorPosition;
-            _cursorPosition = _text.Count;
-            PrepareSelection (x, _cursorPosition - x);
+            int x = _insertionPoint;
+            _insertionPoint = _text.Count;
+            PrepareSelection (x, _insertionPoint - x);
         }
 
         return true;
@@ -411,7 +411,7 @@ public partial class TextField
     private bool MoveHome ()
     {
         ClearAllSelection ();
-        _cursorPosition = 0;
+        _insertionPoint = 0;
         Adjust ();
 
         return true;
@@ -419,11 +419,11 @@ public partial class TextField
 
     private bool MoveHomeExtend ()
     {
-        if (_cursorPosition > 0)
+        if (_insertionPoint > 0)
         {
-            int x = _cursorPosition;
-            _cursorPosition = 0;
-            PrepareSelection (x, _cursorPosition - x);
+            int x = _insertionPoint;
+            _insertionPoint = 0;
+            PrepareSelection (x, _insertionPoint - x);
         }
 
         return true;
@@ -440,23 +440,23 @@ public partial class TextField
     /// <returns></returns>
     private bool Move (int distance)
     {
-        int oldCursorPosition = _cursorPosition;
+        int oldCursorPosition = _insertionPoint;
         bool hadSelection = _selectedText != null && _selectedText.Length > 0;
 
-        _cursorPosition = Math.Min (_text.Count, Math.Max (0, _cursorPosition + distance));
+        _insertionPoint = Math.Min (_text.Count, Math.Max (0, _insertionPoint + distance));
         ClearAllSelection ();
         Adjust ();
 
-        return _cursorPosition != oldCursorPosition || hadSelection;
+        return _insertionPoint != oldCursorPosition || hadSelection;
     }
 
     private bool MoveLeft () { return Move (-1); }
 
     private bool MoveLeftExtend ()
     {
-        if (_cursorPosition > 0)
+        if (_insertionPoint > 0)
         {
-            PrepareSelection (_cursorPosition--, -1);
+            PrepareSelection (_insertionPoint--, -1);
         }
 
         return true;
@@ -466,9 +466,9 @@ public partial class TextField
 
     private bool MoveRightExtend ()
     {
-        if (_cursorPosition < _text.Count)
+        if (_insertionPoint < _text.Count)
         {
-            PrepareSelection (_cursorPosition++, 1);
+            PrepareSelection (_insertionPoint++, 1);
         }
 
         return true;
@@ -477,7 +477,7 @@ public partial class TextField
     private bool MoveWordLeft ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordBackward (_insertionPoint, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -486,7 +486,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            _cursorPosition = newPos.Value.col;
+            _insertionPoint = newPos.Value.col;
         }
 
         Adjust ();
@@ -496,13 +496,13 @@ public partial class TextField
 
     private bool MoveWordLeftExtend ()
     {
-        if (_cursorPosition <= 0)
+        if (_insertionPoint <= 0)
         {
             return false;
         }
 
         int x = Math.Min (
-                          _start > -1 && _start > _cursorPosition ? _start : _cursorPosition,
+                          _selectionStart > -1 && _selectionStart > _insertionPoint ? _selectionStart : _insertionPoint,
                           _text.Count
                          );
 
@@ -520,7 +520,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            _cursorPosition = newPos.Value.col;
+            _insertionPoint = newPos.Value.col;
         }
 
         PrepareSelection (x, newPos.Value.col - x);
@@ -531,7 +531,7 @@ public partial class TextField
     private bool MoveWordRight ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordForward (_insertionPoint, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -540,7 +540,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            _cursorPosition = newPos.Value.col;
+            _insertionPoint = newPos.Value.col;
         }
 
         Adjust ();
@@ -550,12 +550,12 @@ public partial class TextField
 
     private bool MoveWordRightExtend ()
     {
-        if (_cursorPosition >= _text.Count)
+        if (_insertionPoint >= _text.Count)
         {
             return false;
         }
 
-        int x = _start > -1 && _start > _cursorPosition ? _start : _cursorPosition;
+        int x = _selectionStart > -1 && _selectionStart > _insertionPoint ? _selectionStart : _insertionPoint;
         (int col, int row)? newPos = GetModel ().WordForward (x, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
@@ -565,7 +565,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            _cursorPosition = newPos.Value.col;
+            _insertionPoint = newPos.Value.col;
         }
 
         PrepareSelection (x, newPos.Value.col - x);
@@ -611,13 +611,13 @@ public partial class TextField
 
         ClearAllSelection ();
 
-        if (_cursorPosition >= _text.Count)
+        if (_insertionPoint >= _text.Count)
         {
             return true;
         }
 
-        SetClipboard (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition));
-        SetText (_text.GetRange (0, _cursorPosition));
+        SetClipboard (_text.GetRange (_insertionPoint, _text.Count - _insertionPoint));
+        SetText (_text.GetRange (0, _insertionPoint));
         Adjust ();
 
         return true;
@@ -632,14 +632,14 @@ public partial class TextField
 
         ClearAllSelection ();
 
-        if (_cursorPosition == 0)
+        if (_insertionPoint == 0)
         {
             return true;
         }
 
-        SetClipboard (_text.GetRange (0, _cursorPosition));
-        SetText (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition));
-        _cursorPosition = 0;
+        SetClipboard (_text.GetRange (0, _insertionPoint));
+        SetText (_text.GetRange (_insertionPoint, _text.Count - _insertionPoint));
+        _insertionPoint = 0;
         Adjust ();
 
         return true;
