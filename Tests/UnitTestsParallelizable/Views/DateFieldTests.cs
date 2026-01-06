@@ -167,7 +167,7 @@ public class DateFieldTests
         var df = new DateField (DateTime.Parse ("12/12/1971"))
         {
             // Start selection at before the first separator /
-            CursorPosition = 2
+            InsertionPoint = 2
         };
 
         // Now select the separator /
@@ -197,7 +197,7 @@ public class DateFieldTests
             var df = new DateField (DateTime.Parse ("12/12/1971"))
             {
                 // Move to the first 2
-                CursorPosition = 2
+                InsertionPoint = 2
             };
 
             // Type 3 over the separator
