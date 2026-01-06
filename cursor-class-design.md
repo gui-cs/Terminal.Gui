@@ -48,7 +48,7 @@ Replace `CursorVisibility` with ANSI-aligned enum:
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-/// Defines the shape and visibility of the terminal cursor, based on ANSI/VT terminal standards.
+/// Defines the shape of the terminal cursor, based on ANSI/VT terminal standards.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -67,13 +67,12 @@ namespace Terminal.Gui.Drivers;
 /// - Windows Console: Map to CONSOLE_CURSOR_INFO (bVisible and dwSize)
 /// - NCurses: Map to curs_set() and platform-specific extensions
 /// </para>
+/// <para>
+/// To hide the cursor, use null for the cursor position. This enum only defines visible cursor shapes.
+/// </para>
 /// </remarks>
 public enum CursorShape
 {
-    /// <summary>Cursor is hidden/invisible.</summary>
-    /// <remarks>Maps to ANSI DECTCEM (CSI ? 25 l) hide cursor.</remarks>
-    Hidden = 0,
-
     /// <summary>Blinking block cursor (default for most terminals).</summary>
     /// <remarks>ANSI DECSCUSR Ps=1 or Ps=0.</remarks>
     BlinkingBlock = 1,
@@ -102,13 +101,13 @@ public enum CursorShape
 
 **Rationale**:
 - Directly maps to ANSI DECSCUSR sequence values (Ps parameter)
-- Separates visibility (Hidden vs visible shapes) from blinking behavior
 - No platform-specific hex encoding - drivers handle mapping
-- `Hidden` = 0 makes default initialization safe
 - Clear naming: Shape + Blink state explicit
+- Visibility controlled by nullable position (null = hidden), not enum value
+- `BlinkingBlock` = 1 (ANSI default) is good default value
 
 **Migration from CursorVisibility**:
-- `Invisible` → `Hidden`
+- `Invisible` → null position (cursor hidden)
 - `Default`/`Box` → `BlinkingBlock` 
 - `BoxFix` → `SteadyBlock`
 - `Underline` → `BlinkingUnderline`
@@ -122,13 +121,14 @@ public enum CursorShape
 namespace Terminal.Gui;
 
 /// <summary>
-/// Represents a cursor with position, shape, and coordinate system information.
+/// Represents a cursor with position in screen coordinates and shape.
 /// </summary>
 /// <remarks>
 /// <para>
 /// This class consolidates cursor state that was previously split between position (Point?)
-/// and visibility (CursorVisibility). It tracks the coordinate system to prevent errors
-/// when converting between content-area, viewport, and screen coordinates.
+/// and visibility (CursorVisibility). The position is always in screen-absolute coordinates.
+/// Views are responsible for converting from their content-area or viewport coordinates to
+/// screen coordinates before setting the cursor.
 /// </para>
 /// <para>
 /// Immutable value type - use with 'with' expression to modify:
@@ -136,110 +136,36 @@ namespace Terminal.Gui;
 /// Cursor newCursor = currentCursor with { Position = new Point(5, 0) };
 /// </code>
 /// </para>
+/// <para>
+/// To hide the cursor, set Position to null. The Shape property defines the visual appearance
+/// when the cursor is visible.
+/// </para>
 /// </remarks>
 public record Cursor
 {
     /// <summary>
-    /// Gets a hidden cursor (no position, Hidden shape).
-    /// </summary>
-    public static readonly Cursor Hidden = new() { Shape = CursorShape.Hidden };
-
-    /// <summary>
-    /// Gets the cursor position in the coordinate system specified by <see cref="CoordinateSystem"/>.
+    /// Gets the cursor position in screen-absolute coordinates.
     /// </summary>
     /// <remarks>
-    /// Null position indicates the cursor has no defined location (effectively hidden).
-    /// Check <see cref="IsVisible"/> to determine if cursor should be shown.
+    /// Null position indicates the cursor is hidden.
+    /// When setting, ensure coordinates are in screen space (not content-area or viewport relative).
+    /// Use <c>View.ContentToScreen()</c> or <c>View.ViewportToScreen()</c> to convert if needed.
     /// </remarks>
     public Point? Position { get; init; }
 
     /// <summary>
-    /// Gets the cursor shape and visibility.
+    /// Gets the cursor shape.
     /// </summary>
-    public CursorShape Shape { get; init; } = CursorShape.Hidden;
+    /// <remarks>
+    /// Defines the visual appearance when <see cref="Position"/> is not null.
+    /// Default is <see cref="CursorShape.BlinkingBlock"/>.
+    /// </remarks>
+    public CursorShape Shape { get; init; } = CursorShape.BlinkingBlock;
 
     /// <summary>
-    /// Gets the coordinate system that <see cref="Position"/> is relative to.
+    /// Gets whether the cursor is visible (has valid position).
     /// </summary>
-    public CursorCoordinateSystem CoordinateSystem { get; init; } = CursorCoordinateSystem.Screen;
-
-    /// <summary>
-    /// Gets whether the cursor is visible (has valid position and non-Hidden shape).
-    /// </summary>
-    public bool IsVisible => Position.HasValue && Shape != CursorShape.Hidden;
-
-    /// <summary>
-    /// Creates a cursor with content-area relative coordinates.
-    /// </summary>
-    /// <param name="position">Content-area relative position.</param>
-    /// <param name="shape">Cursor shape.</param>
-    /// <returns>New Cursor instance.</returns>
-    public static Cursor ContentArea(Point position, CursorShape shape = CursorShape.BlinkingBar)
-        => new() { Position = position, Shape = shape, CoordinateSystem = CursorCoordinateSystem.ContentArea };
-
-    /// <summary>
-    /// Creates a cursor with viewport-relative coordinates.
-    /// </summary>
-    /// <param name="position">Viewport-relative position.</param>
-    /// <param name="shape">Cursor shape.</param>
-    /// <returns>New Cursor instance.</returns>
-    public static Cursor Viewport(Point position, CursorShape shape = CursorShape.BlinkingBar)
-        => new() { Position = position, Shape = shape, CoordinateSystem = CursorCoordinateSystem.Viewport };
-
-    /// <summary>
-    /// Creates a cursor with screen-absolute coordinates.
-    /// </summary>
-    /// <param name="position">Screen-absolute position.</param>
-    /// <param name="shape">Cursor shape.</param>
-    /// <returns>New Cursor instance.</returns>
-    public static Cursor Screen(Point position, CursorShape shape = CursorShape.BlinkingBar)
-        => new() { Position = position, Shape = shape, CoordinateSystem = CursorCoordinateSystem.Screen };
-
-    /// <summary>
-    /// Converts this cursor to screen coordinates using the provided view context.
-    /// </summary>
-    /// <param name="view">View that owns this cursor (for coordinate conversion).</param>
-    /// <returns>
-    /// Cursor with screen coordinates, or <see cref="Hidden"/> if position is outside
-    /// any ancestor viewport.
-    /// </returns>
-    public Cursor ToScreen(View view)
-    {
-        if (!Position.HasValue || Shape == CursorShape.Hidden)
-        {
-            return Hidden;
-        }
-
-        Point screenPos = CoordinateSystem switch
-        {
-            CursorCoordinateSystem.ContentArea => view.ContentToScreen(Position.Value),
-            CursorCoordinateSystem.Viewport => view.ViewportToScreen(Position.Value),
-            CursorCoordinateSystem.Screen => Position.Value,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-
-        // Check if position is within all ancestor viewports
-        View? current = view;
-        while (current is not null)
-        {
-            Rectangle viewportBounds = current.ViewportToScreen(
-                new Rectangle(Point.Empty, current.Viewport.Size));
-
-            if (!viewportBounds.Contains(screenPos))
-            {
-                return Hidden; // Outside ancestor viewport
-            }
-
-            current = current.SuperView;
-        }
-
-        return new Cursor
-        {
-            Position = screenPos,
-            Shape = Shape,
-            CoordinateSystem = CursorCoordinateSystem.Screen
-        };
-    }
+    public bool IsVisible => Position.HasValue;
 
     /// <summary>
     /// Returns string representation for debugging.
@@ -251,23 +177,8 @@ public record Cursor
             return "Cursor { Hidden }";
         }
 
-        return $"Cursor {{ Position = {Position}, Shape = {Shape}, CoordinateSystem = {CoordinateSystem} }}";
+        return $"Cursor {{ Position = {Position}, Shape = {Shape} }}";
     }
-}
-
-/// <summary>
-/// Defines the coordinate system used for cursor position.
-/// </summary>
-public enum CursorCoordinateSystem
-{
-    /// <summary>Position is relative to view's content area (scrollable area).</summary>
-    ContentArea,
-
-    /// <summary>Position is relative to view's viewport (visible area).</summary>
-    Viewport,
-
-    /// <summary>Position is absolute screen coordinates.</summary>
-    Screen
 }
 ```
 
@@ -278,7 +189,7 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
-    private Cursor _cursor = Cursor.Hidden;
+    private Cursor _cursor = new();
 
     /// <summary>
     /// Gets the current cursor for this view.
@@ -286,6 +197,7 @@ public partial class View
     /// <remarks>
     /// Use <see cref="SetCursor"/> to update the cursor position and shape.
     /// The cursor will only be visible when the view has focus and is the most focused view.
+    /// Position is always in screen-absolute coordinates.
     /// </remarks>
     public Cursor Cursor => _cursor;
 
@@ -293,21 +205,24 @@ public partial class View
     /// Sets the cursor for this view.
     /// </summary>
     /// <param name="cursor">
-    /// The cursor to set. Use <see cref="Cursor.ContentArea"/>, <see cref="Cursor.Viewport"/>,
-    /// or <see cref="Cursor.Screen"/> factory methods, or <see cref="Cursor.Hidden"/>.
+    /// The cursor to set. Position must be in screen-absolute coordinates.
+    /// Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    /// Set Position to null to hide the cursor.
     /// </param>
     /// <remarks>
     /// <para>
     /// Common patterns:
     /// <code>
-    /// // Text cursor at column 5 in content area
-    /// SetCursor(Cursor.ContentArea(new Point(5, 0), CursorShape.BlinkingBar));
+    /// // Text cursor at column 5 in content area - convert to screen coords
+    /// Point screenPos = ContentToScreen(new Point(5, 0));
+    /// SetCursor(new Cursor { Position = screenPos, Shape = CursorShape.BlinkingBar });
     ///
     /// // Hide cursor
-    /// SetCursor(Cursor.Hidden);
+    /// SetCursor(new Cursor { Position = null });
     ///
     /// // Update position keeping same shape
-    /// SetCursor(_cursor with { Position = new Point(6, 0) });
+    /// Point newScreenPos = ContentToScreen(new Point(6, 0));
+    /// SetCursor(_cursor with { Position = newScreenPos });
     /// </code>
     /// </para>
     /// <para>
@@ -335,7 +250,7 @@ public partial class View
     /// </summary>
     public void SetCursorNeedsUpdate()
     {
-        App?.Driver?.SetCursorNeedsUpdate(true);
+        App?.Navigation?.SetCursorNeedsUpdate();
     }
 }
 ```
@@ -347,42 +262,75 @@ namespace Terminal.Gui.App;
 
 public class ApplicationNavigation
 {
+    private bool _cursorNeedsUpdate = true;
+
+    /// <summary>
+    /// Signals that the cursor needs to be updated.
+    /// </summary>
+    public void SetCursorNeedsUpdate()
+    {
+        _cursorNeedsUpdate = true;
+    }
+
     /// <summary>
     /// Updates the terminal cursor based on the currently focused view.
     /// </summary>
-    public void UpdateCursor()
+    /// <param name="output">The output driver to update.</param>
+    public void UpdateCursor(IOutput output)
     {
-        if (App?.Driver?.GetCursorNeedsUpdate() == false)
+        if (!_cursorNeedsUpdate)
         {
             return;
         }
 
         View? mostFocused = App?.TopRunnableView?.MostFocused;
 
-        if (mostFocused is null)
+        if (mostFocused is null || !mostFocused.Cursor.IsVisible)
         {
-            App?.Driver?.SetCursorShape(CursorShape.Hidden);
+            output.SetCursorShape(null); // Hide cursor
+            _cursorNeedsUpdate = false;
             return;
         }
 
-        // Get cursor in view's coordinate system
-        Cursor viewCursor = mostFocused.Cursor;
+        // Get cursor in screen coordinates (view is responsible for conversion)
+        Cursor screenCursor = mostFocused.Cursor;
 
-        // Convert to screen coordinates (handles viewport clipping)
-        Cursor screenCursor = viewCursor.ToScreen(mostFocused);
-
-        // Apply to driver
-        if (screenCursor.IsVisible && screenCursor.Position.HasValue)
+        if (screenCursor.Position.HasValue)
         {
-            App.Driver.SetCursorPosition(screenCursor.Position.Value.X, screenCursor.Position.Value.Y);
-            App.Driver.SetCursorShape(screenCursor.Shape);
+            // Check if position is within all ancestor viewports
+            bool withinViewports = true;
+            View? current = mostFocused;
+
+            while (current is not null)
+            {
+                Rectangle viewportBounds = current.ViewportToScreen(
+                    new Rectangle(Point.Empty, current.Viewport.Size));
+
+                if (!viewportBounds.Contains(screenCursor.Position.Value))
+                {
+                    withinViewports = false;
+                    break;
+                }
+
+                current = current.SuperView;
+            }
+
+            if (withinViewports)
+            {
+                output.SetCursorPosition(screenCursor.Position.Value.X, screenCursor.Position.Value.Y);
+                output.SetCursorShape(screenCursor.Shape);
+            }
+            else
+            {
+                output.SetCursorShape(null); // Hide - outside viewport
+            }
         }
         else
         {
-            App.Driver.SetCursorShape(CursorShape.Hidden);
+            output.SetCursorShape(null); // Hide - no position
         }
 
-        App.Driver.SetCursorNeedsUpdate(false);
+        _cursorNeedsUpdate = false;
     }
 }
 ```
@@ -407,66 +355,69 @@ public interface IOutput : IDisposable
     void SetCursorPosition(int col, int row);
 
     /// <summary>
-    /// Gets the current cursor shape.
+    /// Gets the current cursor shape, or null if cursor is hidden.
     /// </summary>
-    CursorShape GetCursorShape();
+    CursorShape? GetCursorShape();
 
     /// <summary>
     /// Sets the cursor shape and visibility.
     /// </summary>
-    /// <param name="shape">The cursor shape. Use <see cref="CursorShape.Hidden"/> to hide.</param>
-    void SetCursorShape(CursorShape shape);
+    /// <param name="shape">The cursor shape, or null to hide the cursor.</param>
+    void SetCursorShape(CursorShape? shape);
 }
 ```
 
 ## Benefits of Proposed Design
 
 ### 1. Type Safety
-- Single `Cursor` object prevents position/visibility desync
-- Coordinate system tracked explicitly prevents coordinate confusion
+- Single `Cursor` object prevents position/shape desync
+- Position always in screen coordinates - no ambiguity
 - Immutable record prevents accidental mutation
+- Nullable position for visibility is idiomatic C#
 
 ### 2. Clearer API
 ```csharp
 // Old API - unclear coordinate system, split state
 view.SetCursor(new Point(5, 0), CursorVisibility.Vertical);
 
-// New API - explicit coordinate system, unified state
-view.SetCursor(Cursor.ContentArea(new Point(5, 0), CursorShape.BlinkingBar));
+// New API - explicit conversion, unified state
+Point screenPos = view.ContentToScreen(new Point(5, 0));
+view.SetCursor(new Cursor { Position = screenPos, Shape = CursorShape.BlinkingBar });
 ```
 
 ### 3. ANSI-First Design
 - `CursorShape` enum values match ANSI DECSCUSR sequence parameters
 - Drivers map to platform APIs (Windows, NCurses) internally
 - No hex encoding exposure in public API
+- Nullable shape at driver level (null = hide) aligns with ANSI DECTCEM
 
-### 4. Reduced Null Confusion
+### 4. Simplified Null Handling
 ```csharp
 // Old: null position vs Invisible visibility both mean "hidden"
 SetCursor(null, CursorVisibility.Invisible); // redundant
 SetCursor(new Point(5, 0), CursorVisibility.Invisible); // conflicting
 
 // New: single concept
-SetCursor(Cursor.Hidden); // clear
-SetCursor(Cursor.ContentArea(new Point(5, 0), CursorShape.Hidden)); // still hidden
+SetCursor(new Cursor { Position = null }); // hidden, clear
+SetCursor(new Cursor { Position = screenPos, Shape = CursorShape.BlinkingBar }); // visible
 ```
 
-### 5. Built-in Coordinate Conversion
+### 5. Explicit Coordinate Responsibility
 ```csharp
-// Cursor class handles viewport clipping
-Cursor screenCursor = viewCursor.ToScreen(view);
-// Returns Cursor.Hidden if outside any ancestor viewport
+// Views must explicitly convert coordinates
+Point contentPos = new Point(_cursorCol, 0);
+Point screenPos = ContentToScreen(contentPos);
+SetCursor(new Cursor { Position = screenPos, Shape = CursorShape.BlinkingBar });
+
+// Framework checks viewport clipping at screen level in ApplicationNavigation
 ```
 
 ### 6. Simpler Driver API
 ```csharp
-// Old: two separate methods
+// Driver level uses nullable shape
 driver.SetCursorPosition(x, y);
-driver.SetCursorVisibility(visibility);
-
-// New: still two methods but clearer semantics
-driver.SetCursorPosition(x, y);
-driver.SetCursorShape(shape); // Shape includes visibility (Hidden = invisible)
+driver.SetCursorShape(CursorShape.BlinkingBar); // visible
+driver.SetCursorShape(null); // hidden
 ```
 
 ## Migration Strategy
@@ -494,24 +445,24 @@ driver.SetCursorShape(shape); // Shape includes visibility (Hidden = invisible)
 ## Open Questions
 
 1. **Should Cursor be a class or record struct?**
-   - Record class (reference): Easier to cache/share, GC pressure
-   - Record struct (value): No allocations, copy overhead
-   - **Recommendation**: Record class - cursor state is small and not created frequently
+   - Record class (reference): Easier to cache/share, small GC pressure
+   - Record struct (value): No allocations, copy overhead for passing around
+   - **Recommendation**: Record class - cursor state changes infrequently, clarity over micro-optimization
 
-2. **Should Position allow null or use separate Hidden state?**
-   - Current: `Point? Position` + `CursorShape.Hidden` (two ways to hide)
-   - Alternative: `Point Position` required + `Shape.Hidden` only
-   - **Recommendation**: Keep nullable - allows "position unknown" vs "hidden at position"
+2. **Should Position allow null or require separate hidden state?**
+   - Current proposal: `Point? Position` (null = hidden) + `CursorShape` for when visible
+   - Alternative: Always require `Point Position` + add `bool IsVisible` property
+   - **Decision per @tig**: Use nullable - idiomatic C#, clear intent
 
-3. **Should ToScreen() be on Cursor or a separate converter?**
-   - Current: `cursor.ToScreen(view)` - convenient but couples Cursor to View
-   - Alternative: `ViewCursorConverter.ToScreen(cursor, view)` - decoupled
-   - **Recommendation**: Keep on Cursor - convenience outweighs coupling concern
+3. **Should coordinate conversion be automatic or manual?**
+   - Current proposal: Manual - views call `ContentToScreen()` before `SetCursor()`
+   - Original design: Automatic - `Cursor.ContentArea()` factory + `ToScreen()` method
+   - **Decision per @tig**: Manual - views responsible for conversion, explicit is better
 
-4. **Factory methods vs constructors?**
-   - Current: Static factory methods (Cursor.ContentArea, etc.)
-   - Alternative: Public init-only properties + examples
-   - **Recommendation**: Factories - clearer intent, harder to misuse
+4. **Should IOutput.SetCursorShape accept nullable?**
+   - Current proposal: `SetCursorShape(CursorShape? shape)` where null = hide
+   - Alternative: Keep `CursorShape` non-nullable, add separate `HideCursor()` method
+   - **Recommendation**: Nullable - simpler API, aligns with ANSI DECTCEM concept
 
 ## Example Usage Scenarios
 
@@ -526,10 +477,15 @@ protected override bool OnKeyPress(Key e)
         _text.Insert(_cursorPos, e.AsRune);
         _cursorPos++;
 
-        // Update cursor - content area coordinates
-        SetCursor(Cursor.ContentArea(
-            new Point(_cursorPos, 0),
-            CursorShape.BlinkingBar));
+        // Convert content-area cursor position to screen coordinates
+        Point screenPos = ContentToScreen(new Point(_cursorPos, 0));
+        
+        // Update cursor
+        SetCursor(new Cursor
+        {
+            Position = screenPos,
+            Shape = CursorShape.BlinkingBar
+        });
 
         return true;
     }
@@ -545,55 +501,66 @@ public class Label : View
     public Label()
     {
         CanFocus = false;
-        SetCursor(Cursor.Hidden);
+        SetCursor(new Cursor { Position = null });
     }
 }
 ```
 
 ### Cursor Style Customization
 ```csharp
-// Application sets cursor style preference
-Application.CursorShape = CursorShape.SteadyBlock; // Accessibility - no blinking
+// Application-level cursor shape preference
+public static CursorShape DefaultCursorShape { get; set; } = CursorShape.BlinkingBar;
 
 // TextField respects preference
-SetCursor(Cursor.ContentArea(_cursorPos, Application.CursorShape));
+Point screenPos = ContentToScreen(new Point(_cursorPos, 0));
+SetCursor(new Cursor
+{
+    Position = screenPos,
+    Shape = DefaultCursorShape // User can set to SteadyBlock for accessibility
+});
 ```
 
-### Multi-cursor (Future Enhancement)
+### Scrolling Text View
 ```csharp
-// Cursor record makes it easy to track multiple cursors
-public class MultiCursorTextView : TextView
+// TextView handles viewport clipping automatically
+protected override void UpdateCursor()
 {
-    private List<Cursor> _cursors = new();
-
-    // Primary cursor sent to framework
-    public override Cursor Cursor => _cursors.FirstOrDefault() ?? Cursor.Hidden;
-
-    // Render additional cursors in OnDrawContent
-    protected override void OnDrawContent(Rectangle contentArea)
+    if (!_cursorVisible)
     {
-        base.OnDrawContent(contentArea);
-
-        // Draw secondary cursors
-        foreach (Cursor cursor in _cursors.Skip(1))
-        {
-            if (cursor.IsVisible && cursor.Position.HasValue)
-            {
-                // Draw custom cursor indicator
-            }
-        }
+        SetCursor(new Cursor { Position = null });
+        return;
     }
+
+    // Cursor position in content area
+    Point contentPos = new Point(_cursorCol, _cursorRow);
+    
+    // Convert to screen - ContentToScreen handles viewport offset
+    Point screenPos = ContentToScreen(contentPos);
+    
+    // ApplicationNavigation.UpdateCursor() will check viewport clipping
+    SetCursor(new Cursor
+    {
+        Position = screenPos,
+        Shape = CursorShape.BlinkingBar
+    });
 }
 ```
 
 ## Conclusion
 
 The proposed `Cursor` class design:
-- ✅ Consolidates split position/visibility state
-- ✅ Makes coordinate systems explicit and type-safe
-- ✅ Aligns with ANSI terminal standards (baseline)
-- ✅ Simplifies driver implementation
-- ✅ Provides clear migration path
-- ✅ Enables future enhancements (multi-cursor, accessibility)
+- ✅ Consolidates split position/shape state into single immutable object
+- ✅ Uses nullable position for visibility (null = hidden) - clear and idiomatic
+- ✅ Stores position in screen coordinates - views responsible for conversion
+- ✅ Aligns with ANSI terminal standards (CursorShape enum based on DECSCUSR)
+- ✅ Simplifies driver implementation (nullable shape at IOutput level)
+- ✅ Provides clear migration path from current CursorVisibility model
+- ✅ Explicit coordinate conversion prevents bugs
 
 **Recommendation**: Proceed with implementation in phases, starting with non-breaking additions.
+
+**Design Decisions Summary** (per @tig feedback):
+1. ✅ Use nullable `Point? Position` instead of `CursorShape.Hidden` enum value
+2. ✅ Remove automatic coordinate mapping - users convert manually via `ContentToScreen()`/`ViewportToScreen()`
+3. ✅ Store coordinates in screen space only (no `CursorCoordinateSystem` enum needed)
+4. ✅ No multi-cursor support (simplified design, can be added later if needed)
