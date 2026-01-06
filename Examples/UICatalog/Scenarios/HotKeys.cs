@@ -1,3 +1,4 @@
+#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -10,118 +11,230 @@ public class HotKeys : Scenario
     {
         Application.Init ();
 
-        Window window = new ()
+        using IApplication app = Application.Instance;
+
+        using Window mainWindow = new ()
         {
             Title = GetQuitKeyAndName ()
         };
 
-        var textViewLabel = new Label { Text = "_TextView:", X = 0, Y = 0 };
-        window.Add (textViewLabel);
+        Label textViewLabel = new ()
+        {
+            Text = "_TextView:",
+            X = 0,
+            Y = 0
+        };
+        mainWindow.Add (textViewLabel);
 
-        var textField = new TextField { X = Pos.Right (textViewLabel) + 1, Y = 0, Width = 10 };
-        window.Add (textField);
+        TextField textField = new ()
+        {
+            X = Pos.Right (textViewLabel) + 1,
+            Y = 0,
+            Width = 10
+        };
+        mainWindow.Add (textField);
 
-        var viewLabel = new Label { Text = "_View:", X = 0, Y = Pos.Bottom (textField) + 1 };
-        window.Add (viewLabel);
+        Label viewLabel = new ()
+        {
+            Text = "_View:",
+            X = 0,
+            Y = Pos.Bottom (textField) + 1
+        };
+        mainWindow.Add (viewLabel);
 
-        var view = new View
+        View focusableView = new ()
         {
             Title = "View (_focusable)",
             Text = "Text renders _Underscore",
             CanFocus = true,
-            X = Pos.Right (viewLabel) + 1, Y = Pos.Top (viewLabel), Width = 30, Height = 3,
+            X = Pos.Right (viewLabel) + 1,
+            Y = Pos.Top (viewLabel),
+            Width = 30,
+            Height = 3,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (view);
+        mainWindow.Add (focusableView);
 
-        viewLabel = new () { Text = "Vi_ew:", X = 0, Y = Pos.Bottom (view) + 1 };
-        window.Add (viewLabel);
+        viewLabel = new ()
+        {
+            Text = "Vi_ew:",
+            X = 0,
+            Y = Pos.Bottom (focusableView) + 1
+        };
+        mainWindow.Add (viewLabel);
 
-        view = new ()
+        View nonFocusableView = new ()
         {
             Title = "View (n_ot focusable)",
             Text = "Text renders _Underscore",
-            X = Pos.Right (viewLabel) + 1, Y = Pos.Top (viewLabel), Width = 30, Height = 3,
+            X = Pos.Right (viewLabel) + 1,
+            Y = Pos.Top (viewLabel),
+            Width = 30,
+            Height = 3,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (view);
+        mainWindow.Add (nonFocusableView);
 
-        var labelWithFrameLabel = new Label { Text = "_Label with Frame:", X = 0, Y = Pos.Bottom (view) + 1 };
-        window.Add (labelWithFrameLabel);
+        Label labelWithFrameLabel = new ()
+        {
+            Text = "_Label with Frame:",
+            X = 0,
+            Y = Pos.Bottom (nonFocusableView) + 1
+        };
+        mainWindow.Add (labelWithFrameLabel);
 
-        var labelWithFrameFocusable = new Label
+        Label labelWithFrameFocusable = new ()
         {
             Title = "Label _with Frame (focusable)",
             CanFocus = true,
-            X = Pos.Right (labelWithFrameLabel) + 1, Y = Pos.Top (labelWithFrameLabel), Width = 40, Height = 3,
+            X = Pos.Right (labelWithFrameLabel) + 1,
+            Y = Pos.Top (labelWithFrameLabel),
+            Width = 40,
+            Height = 3,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (labelWithFrameFocusable);
+        mainWindow.Add (labelWithFrameFocusable);
 
-        labelWithFrameLabel = new () { Text = "L_abel with Frame:", X = 0, Y = Pos.Bottom (labelWithFrameFocusable) + 1 };
-        window.Add (labelWithFrameLabel);
+        labelWithFrameLabel = new ()
+        {
+            Text = "L_abel with Frame:",
+            X = 0,
+            Y = Pos.Bottom (labelWithFrameFocusable) + 1
+        };
+        mainWindow.Add (labelWithFrameLabel);
 
-        var labelWithFrame = new Label
+        Label labelWithFrame = new ()
         {
             Title = "Label with Frame (_not focusable)",
-            X = Pos.Right (labelWithFrameLabel) + 1, Y = Pos.Top (labelWithFrameLabel), Width = 40, Height = 3,
+            X = Pos.Right (labelWithFrameLabel) + 1,
+            Y = Pos.Top (labelWithFrameLabel),
+            Width = 40,
+            Height = 3,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (labelWithFrame);
+        mainWindow.Add (labelWithFrame);
 
-        var buttonWithFrameLabel = new Label { Text = "_Button with Frame:", X = 0, Y = Pos.Bottom (labelWithFrame) + 1 };
-        window.Add (buttonWithFrameLabel);
+        Label buttonWithFrameLabel = new ()
+        {
+            Text = "_Button with Frame:",
+            X = 0,
+            Y = Pos.Bottom (labelWithFrame) + 1
+        };
+        mainWindow.Add (buttonWithFrameLabel);
 
-        var buttonWithFrameFocusable = new Button
+        Button buttonWithFrameFocusable = new ()
         {
             Title = "B_utton with Frame (focusable)",
             CanFocus = true,
-            X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40,
+            X = Pos.Right (buttonWithFrameLabel) + 1,
+            Y = Pos.Top (buttonWithFrameLabel),
+            Width = 40,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (buttonWithFrameFocusable);
+        mainWindow.Add (buttonWithFrameFocusable);
 
-        buttonWithFrameLabel = new () { Text = "Butt_on with Frame:", X = 0, Y = Pos.Bottom (buttonWithFrameFocusable) + 1 };
-        window.Add (buttonWithFrameLabel);
+        buttonWithFrameLabel = new ()
+        {
+            Text = "Butt_on with Frame:",
+            X = 0,
+            Y = Pos.Bottom (buttonWithFrameFocusable) + 1
+        };
+        mainWindow.Add (buttonWithFrameLabel);
 
-        var buttonWithFrame = new Button
+        Button buttonWithFrame = new ()
         {
             Title = "Button with Frame (not focusab_le)",
-            X = Pos.Right (buttonWithFrameLabel) + 1, Y = Pos.Top (buttonWithFrameLabel), Width = 40,
+            X = Pos.Right (buttonWithFrameLabel) + 1,
+            Y = Pos.Top (buttonWithFrameLabel),
+            Width = 40,
             CanFocus = false,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (buttonWithFrame);
+        mainWindow.Add (buttonWithFrame);
 
-        var checkboxWithFrameLabel = new Label { Text = "_Checkbox with Frame:", X = 0, Y = Pos.Bottom (buttonWithFrame) + 1 };
-        window.Add (checkboxWithFrameLabel);
+        Label checkboxWithFrameLabel = new ()
+        {
+            Text = "_Checkbox with Frame:",
+            X = 0,
+            Y = Pos.Bottom (buttonWithFrame) + 1
+        };
+        mainWindow.Add (checkboxWithFrameLabel);
 
-        var checkboxWithFrameFocusable = new CheckBox
+        CheckBox checkboxWithFrameFocusable = new ()
         {
             Title = "C_heckbox with Frame (focusable)",
             CanFocus = true,
-            X = Pos.Right (checkboxWithFrameLabel) + 1, Y = Pos.Top (checkboxWithFrameLabel), Width = 40, Height = 3,
+            X = Pos.Right (checkboxWithFrameLabel) + 1,
+            Y = Pos.Top (checkboxWithFrameLabel),
+            Width = 40,
+            Height = 3,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (checkboxWithFrameFocusable);
+        mainWindow.Add (checkboxWithFrameFocusable);
 
-        checkboxWithFrameLabel = new () { Text = "Checkb_ox with Frame:", X = 0, Y = Pos.Bottom (checkboxWithFrameFocusable) + 1 };
-        window.Add (checkboxWithFrameLabel);
+        checkboxWithFrameLabel = new ()
+        {
+            Text = "Checkb_ox with Frame:",
+            X = 0,
+            Y = Pos.Bottom (checkboxWithFrameFocusable) + 1
+        };
+        mainWindow.Add (checkboxWithFrameLabel);
 
-        var checkboxWithFrame = new CheckBox
+        CheckBox checkboxWithFrame = new ()
         {
             Title = "Checkbox with Frame (not focusable)",
-            X = Pos.Right (checkboxWithFrameLabel) + 1, Y = Pos.Top (checkboxWithFrameLabel), Width = 40, Height = 3,
+            X = Pos.Right (checkboxWithFrameLabel) + 1,
+            Y = Pos.Top (checkboxWithFrameLabel),
+            Width = 40,
+            Height = 3,
             CanFocus = false,
             BorderStyle = LineStyle.Dashed
         };
-        window.Add (checkboxWithFrame);
+        mainWindow.Add (checkboxWithFrame);
 
-        var button = new Button { X = Pos.Center (), Y = Pos.AnchorEnd (), Text = "_Press me!" };
-        window.Add (button);
+        // Demonstrate automatic hotkey assignment (Issue #4145)
+        FrameView autoHotKeyFrame = new ()
+        {
+            Title = "Auto HotKey Assignment",
+            X = Pos.Right (checkboxWithFrame) + 2,
+            Y = 0,
+            Width = 35,
+            Height = 12,
+            AssignHotKeys = true
+        };
 
-        Application.Run (window);
-        window.Dispose ();
-        Application.Shutdown ();
+        // These buttons have no manual hotkey specifiers - they will be assigned automatically
+        Button saveButton = new () { Title = "Save", X = 1, Y = 0 };
+        Button sendButton = new () { Title = "Send", X = 1, Y = 1 };
+        Button submitButton = new () { Title = "Submit", X = 1, Y = 2 };
+        Button cancelButton = new () { Title = "Cancel", X = 1, Y = 3 };
+        Button closeButton = new () { Title = "Close", X = 1, Y = 4 };
+
+        autoHotKeyFrame.Add (saveButton, sendButton, submitButton, cancelButton, closeButton);
+
+        // This one has a manual hotkey that will be preserved
+        Button quitButton = new () { Title = "_Quit (manual)", X = 1, Y = 6 };
+        autoHotKeyFrame.Add (quitButton);
+
+        // Show the UsedHotKeys
+        Label usedKeysLabel = new ()
+        {
+            X = 1,
+            Y = 8,
+            Text = $"Used: {string.Join (", ", autoHotKeyFrame.UsedHotKeys.Select (k => k.ToString ()))}"
+        };
+        autoHotKeyFrame.Add (usedKeysLabel);
+
+        mainWindow.Add (autoHotKeyFrame);
+
+        Button pressButton = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.AnchorEnd (),
+            Text = "_Press me!"
+        };
+        mainWindow.Add (pressButton);
+
+        app.Run (mainWindow);
     }
 }

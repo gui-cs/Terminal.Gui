@@ -7,17 +7,11 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public abstract class SelectorBase : View, IOrientation
 {
-    private static MouseState _defaultHighlightStates = MouseState.In; // Resources/config.json overrides
-
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultMouseHighlightStates
-    {
-        get => _defaultHighlightStates;
-        set => _defaultHighlightStates = value;
-    }
+    public static MouseState DefaultMouseHighlightStates { get; set; } = MouseState.In;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SelectorBase"/> class.
@@ -34,9 +28,8 @@ public abstract class SelectorBase : View, IOrientation
         _orientationHelper.Orientation = Orientation.Vertical;
 
         AddCommand (Command.Accept, HandleAcceptCommand);
-        //AddCommand (Command.HotKey, HandleHotKeyCommand);
+
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
-        //CreateSubViews ();
     }
 
     private SelectorStyles _styles;
@@ -73,7 +66,7 @@ public abstract class SelectorBase : View, IOrientation
         return RaiseAccepting (ctx);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         // If the command did not come from a keyboard event, ignore it
@@ -87,6 +80,7 @@ public abstract class SelectorBase : View, IOrientation
             // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
             return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
         }
+
         return base.OnHandlingHotKey (args);
     }
 
@@ -117,7 +111,6 @@ public abstract class SelectorBase : View, IOrientation
             RaiseValueChanged (previousValue);
         }
     }
-
 
     /// <summary>
     ///     Raised the <see cref="ValueChanged"/> event.
@@ -215,40 +208,8 @@ public abstract class SelectorBase : View, IOrientation
         Labels = Enum.GetNames<TEnum> ();
     }
 
-    private bool _assignHotKeys;
-
-    /// <summary>
-    ///     If <see langword="true"/> each label will automatically be assigned a unique hotkey.
-    ///     <see cref="UsedHotKeys"/> will be used to ensure unique keys are assigned. Set <see cref="UsedHotKeys"/>
-    ///     before setting <see cref="Labels"/> with any hotkeys that may conflict with other Views.
-    /// </summary>
-    public bool AssignHotKeys
-    {
-        get => _assignHotKeys;
-        set
-        {
-            if (_assignHotKeys == value)
-            {
-                return;
-            }
-
-            _assignHotKeys = value;
-
-            CreateSubViews ();
-            UpdateChecked ();
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets the set of hotkeys that are already used by labels or should not be used when
-    ///     <see cref="AssignHotKeys"/> is enabled.
-    ///     <para>
-    ///         This property is used to ensure that automatically assigned hotkeys do not conflict with
-    ///         hotkeys used elsewhere in the application. Set <see cref="UsedHotKeys"/> before setting
-    ///         <see cref="Labels"/> if there are hotkeys that may conflict with other views.
-    ///     </para>
-    /// </summary>
-    public HashSet<Key> UsedHotKeys { get; set; } = [];
+    // Note: AssignHotKeys and UsedHotKeys are inherited from the View base class.
+    // SelectorBase uses the base class's automatic hotkey assignment feature.
 
     private TextField? _valueField;
 
@@ -257,13 +218,9 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     public void CreateSubViews ()
     {
+        // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
         {
-            if (AssignHotKeys)
-            {
-                UsedHotKeys.Remove (sv.HotKey);
-            }
-
             sv.Dispose ();
         }
 
@@ -301,7 +258,8 @@ public abstract class SelectorBase : View, IOrientation
 
         OnCreatedSubViews ();
 
-        AssignUniqueHotKeys ();
+        // Note: Hotkey assignment is now handled automatically by the base class
+        // when SubViews are added via Add(). No need to call AssignUniqueHotKeys() here.
         SetLayout ();
     }
 
@@ -326,68 +284,10 @@ public abstract class SelectorBase : View, IOrientation
             Title = label,
             Id = label,
             Data = value,
-            MouseHighlightStates = DefaultMouseHighlightStates,
+            MouseHighlightStates = DefaultMouseHighlightStates
         };
 
         return checkbox;
-    }
-
-    /// <summary>
-    ///     Assigns unique hotkeys to the labels of the subviews created by <see cref="CreateSubViews"/>.
-    /// </summary>
-    private void AssignUniqueHotKeys ()
-    {
-        if (!AssignHotKeys || Labels is null)
-        {
-            return;
-        }
-
-        foreach (View subView in SubViews)
-        {
-            string label = subView.Title;
-
-            // Check if there's already a hotkey defined
-            if (TextFormatter.FindHotKey (label, HotKeySpecifier, out int hotKeyPos, out Key existingHotKey))
-            {
-                // Label already has a hotkey - preserve it if available
-                if (!UsedHotKeys.Contains (existingHotKey))
-                {
-                    subView.HotKey = existingHotKey;
-                    UsedHotKeys.Add (existingHotKey);
-                    continue; // Keep existing hotkey specifier in label
-                }
-                else
-                {
-                    // Existing hotkey is already used, remove it and assign new one
-                    label = TextFormatter.RemoveHotKeySpecifier (label, hotKeyPos, HotKeySpecifier);
-                }
-            }
-
-            // Assign a new hotkey
-            Rune [] runes = label.EnumerateRunes ().ToArray ();
-
-            for (var i = 0; i < runes.Count (); i++)
-            {
-                Rune lower = Rune.ToLowerInvariant (runes [i]);
-                var newKey = new Key (lower.Value);
-
-                if (UsedHotKeys.Contains (newKey))
-                {
-                    continue;
-                }
-
-                if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsControl (newKey.AsRune))
-                {
-                    continue;
-                }
-
-                subView.Title = label.Insert (i, HotKeySpecifier.ToString ());
-                subView.HotKey = newKey;
-                UsedHotKeys.Add (subView.HotKey);
-
-                break;
-            }
-        }
     }
 
     private int _horizontalSpace = 2;
@@ -405,6 +305,7 @@ public abstract class SelectorBase : View, IOrientation
             {
                 _horizontalSpace = value;
                 SetLayout ();
+
                 // Pos.Align requires extra layout; good practice to call
                 // Layout to ensure Pos.Align gets updated
                 // BUGBUG: This Layout call is a hack to work around some bug in Layout.
@@ -416,18 +317,20 @@ public abstract class SelectorBase : View, IOrientation
 
     private void SetLayout ()
     {
-        int maxNaturalCheckBoxWidth = 0;
+        var maxNaturalCheckBoxWidth = 0;
+
         if (Values?.Count > 0 && Orientation == Orientation.Vertical)
         {
             // BUGBUG: This Layout call is a hack to work around some bug in Layout.
             // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-            maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ().Max (
-                                                                        v =>
-                                                                        {
-                                                                            v.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
-                                                                            v.Layout ();
-                                                                            return v.Frame.Width;
-                                                                        });
+            maxNaturalCheckBoxWidth = SubViews.OfType<CheckBox> ()
+                                              .Max (v =>
+                                                    {
+                                                        v.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
+                                                        v.Layout ();
+
+                                                        return v.Frame.Width;
+                                                    });
         }
 
         for (var i = 0; i < SubViews.Count; i++)
@@ -454,7 +357,6 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     public abstract void UpdateChecked ();
-
 
     /// <summary>
     ///     Gets or sets whether double-clicking on an Item will cause the <see cref="View.Accepting"/> event to be
@@ -496,6 +398,7 @@ public abstract class SelectorBase : View, IOrientation
     public void OnOrientationChanged (Orientation newOrientation)
     {
         SetLayout ();
+
         // Pos.Align requires extra layout; good practice to call
         // Layout to ensure Pos.Align gets updated
         // BUGBUG: This Layout call is a hack to work around some bug in Layout.
