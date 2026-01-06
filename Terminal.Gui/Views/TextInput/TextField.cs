@@ -1,4 +1,3 @@
-#nullable disable
 using System.Globalization;
 
 namespace Terminal.Gui.Views;
@@ -9,32 +8,6 @@ public class TextField : View, IDesignable
 {
     private readonly HistoryText _historyText;
     private CultureInfo _currentCulture;
-
-    /// <summary>
-    ///     The internal cursor position within the text, measured as a 0-based index into the text elements
-    ///     (graphemes/runes), not screen columns. This is the backing field for <see cref="CursorPosition"/>.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This value represents the logical cursor position in the text, where 0 is before the first character
-    ///         and <c>_text.Count</c> is after the last character. For example, in the text "Hello":
-    ///         <list type="bullet">
-    ///             <item><description>Position 0 = cursor is before 'H'</description></item>
-    ///             <item><description>Position 5 = cursor is after 'o' (at the end)</description></item>
-    ///         </list>
-    ///     </para>
-    ///     <para>
-    ///         This differs from screen position because:
-    ///         <list type="bullet">
-    ///             <item><description>Wide characters (e.g., CJK) occupy multiple screen columns but are a single text element</description></item>
-    ///             <item><description><see cref="ScrollOffset"/> shifts the visible portion of text</description></item>
-    ///         </list>
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="PositionCursor()"/> to convert this logical position to screen coordinates.
-    ///     </para>
-    /// </remarks>
-    private int _cursorPosition;
 
     private bool _isButtonPressed;
     private bool _isButtonReleased;
@@ -54,9 +27,15 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         When selecting text:
     ///         <list type="bullet">
-    ///             <item><description>This marks where the selection began (the anchor point)</description></item>
-    ///             <item><description><see cref="_cursorPosition"/> marks the current end of the selection</description></item>
-    ///             <item><description>Selection can extend in either direction from this point</description></item>
+    ///             <item>
+    ///                 <description>This marks where the selection began (the anchor point)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description><see cref="_cursorPosition"/> marks the current end of the selection</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Selection can extend in either direction from this point</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
@@ -66,7 +45,7 @@ public class TextField : View, IDesignable
     /// </remarks>
     private int _selectedStart;
 
-    private string _selectedText;
+    private string? _selectedText;
 
     /// <summary>
     ///     The normalized start position of the selection for drawing purposes. Unlike <see cref="_selectedStart"/>
@@ -76,8 +55,12 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         This value is computed by <see cref="SetSelectedStartSelectedLength"/> to ensure:
     ///         <list type="bullet">
-    ///             <item><description>When selecting left-to-right: <c>_start == _selectedStart</c></description></item>
-    ///             <item><description>When selecting right-to-left: <c>_start == _cursorPosition</c></description></item>
+    ///             <item>
+    ///                 <description>When selecting left-to-right: <c>_start == _selectedStart</c></description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>When selecting right-to-left: <c>_start == _cursorPosition</c></description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
@@ -110,7 +93,7 @@ public class TextField : View, IDesignable
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
         Used = true;
-        MousePositionTracking  = true;
+        MousePositionTracking = true;
 
         _historyText.ChangeText += HistoryText_ChangeText;
 
@@ -410,7 +393,7 @@ public class TextField : View, IDesignable
                         // This is what the default HotKey handler does:
                         SetFocus ();
 
-                        // Always return true on hotkey, even if SetFocus fails because 
+                        // Always return true on hotkey, even if SetFocus fails because
                         // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
                         return true;
                     });
@@ -500,8 +483,41 @@ public class TextField : View, IDesignable
     public IAutocomplete Autocomplete { get; set; }
 
     /// <summary>Get the Context Menu for this view.</summary>
-    [CanBeNull]
-    public PopoverMenu ContextMenu { get; private set; }
+    public PopoverMenu? ContextMenu { get; private set; }
+
+    /// <summary>
+    ///     The internal cursor position within the text, measured as a 0-based index into the text elements
+    ///     (graphemes/runes), not screen columns. This is the backing field for <see cref="CursorPosition"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This value represents the logical cursor position in the text, where 0 is before the first character
+    ///         and <c>_text.Count</c> is after the last character. For example, in the text "Hello":
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>Position 0 = cursor is before 'H'</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Position 5 = cursor is after 'o' (at the end)</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         This differs from screen position because:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>Wide characters (e.g., CJK) occupy multiple screen columns but are a single text element</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description><see cref="ScrollOffset"/> shifts the visible portion of text</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="PositionCursor()"/> to convert this logical position to screen coordinates.
+    ///     </para>
+    /// </remarks>
+    private int _cursorPosition;
 
     /// <summary>
     ///     Gets or sets the current cursor position within the text, measured as a 0-based index into text elements.
@@ -519,16 +535,29 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         <b>Relationship to <see cref="PositionCursor()"/>:</b>
     ///         <list type="bullet">
-    ///             <item><description><see cref="CursorPosition"/>: Logical position in text elements (0-based index)</description></item>
-    ///             <item><description><see cref="PositionCursor()"/>: Converts logical position to screen coordinates, accounting for <see cref="ScrollOffset"/> and wide characters</description></item>
+    ///             <item>
+    ///                 <description><see cref="CursorPosition"/>: Logical position in text elements (0-based index)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     <see cref="PositionCursor()"/>: Converts logical position to screen coordinates, accounting for
+    ///                     <see cref="ScrollOffset"/> and wide characters
+    ///                 </description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         <b>Example:</b> For text "Hello世界" (Hello + 2 CJK characters):
     ///         <list type="bullet">
-    ///             <item><description>CursorPosition = 0: Before 'H'</description></item>
-    ///             <item><description>CursorPosition = 5: Before '世'</description></item>
-    ///             <item><description>CursorPosition = 7: After '界' (end of text)</description></item>
+    ///             <item>
+    ///                 <description>CursorPosition = 0: Before 'H'</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>CursorPosition = 5: Before '世'</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>CursorPosition = 7: After '界' (end of text)</description>
+    ///             </item>
     ///         </list>
     ///         Note that screen columns would differ because '世' and '界' each occupy 2 columns.
     ///     </para>
@@ -589,16 +618,29 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         <b>Relationship to cursor positioning:</b>
     ///         <list type="bullet">
-    ///             <item><description><see cref="CursorPosition"/>: Absolute position in the text (0 to text length)</description></item>
-    ///             <item><description><see cref="ScrollOffset"/>: Index of first visible character</description></item>
-    ///             <item><description>Screen column = <see cref="CursorPosition"/> - <see cref="ScrollOffset"/> (approximately, adjusted for wide chars)</description></item>
+    ///             <item>
+    ///                 <description><see cref="CursorPosition"/>: Absolute position in the text (0 to text length)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description><see cref="ScrollOffset"/>: Index of first visible character</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     Screen column = <see cref="CursorPosition"/> - <see cref="ScrollOffset"/> (approximately,
+    ///                     adjusted for wide chars)
+    ///                 </description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         <b>Example:</b> For text "Hello World" with viewport width 5:
     ///         <list type="bullet">
-    ///             <item><description>ScrollOffset = 0: Shows "Hello"</description></item>
-    ///             <item><description>ScrollOffset = 6: Shows "World"</description></item>
+    ///             <item>
+    ///                 <description>ScrollOffset = 0: Shows "Hello"</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>ScrollOffset = 6: Shows "World"</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     /// </remarks>
@@ -639,17 +681,38 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         <b>Selection model:</b> TextField uses an anchor-based selection model:
     ///         <list type="bullet">
-    ///             <item><description><see cref="SelectedStart"/>: The anchor point where selection began (can be before or after cursor)</description></item>
-    ///             <item><description><see cref="CursorPosition"/>: The current end of the selection</description></item>
-    ///             <item><description><see cref="SelectedLength"/>: The absolute length of the selection</description></item>
+    ///             <item>
+    ///                 <description>
+    ///                     <see cref="SelectedStart"/>: The anchor point where selection began (can be before or
+    ///                     after cursor)
+    ///                 </description>
+    ///             </item>
+    ///             <item>
+    ///                 <description><see cref="CursorPosition"/>: The current end of the selection</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description><see cref="SelectedLength"/>: The absolute length of the selection</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         <b>Example:</b> In text "Hello World", selecting "World" by shift+clicking:
     ///         <list type="bullet">
-    ///             <item><description>If cursor was at position 6 and user shift-clicks at position 11: SelectedStart=6, CursorPosition=11</description></item>
-    ///             <item><description>If cursor was at position 11 and user shift-clicks at position 6: SelectedStart=11, CursorPosition=6</description></item>
-    ///             <item><description>In both cases, SelectedLength=5 and SelectedText="World"</description></item>
+    ///             <item>
+    ///                 <description>
+    ///                     If cursor was at position 6 and user shift-clicks at position 11: SelectedStart=6,
+    ///                     CursorPosition=11
+    ///                 </description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If cursor was at position 11 and user shift-clicks at position 6: SelectedStart=11,
+    ///                     CursorPosition=6
+    ///                 </description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>In both cases, SelectedLength=5 and SelectedText="World"</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
@@ -681,12 +744,8 @@ public class TextField : View, IDesignable
         }
     }
 
-    /// <summary>The selected text.</summary>
-    public string SelectedText
-    {
-        get => Secret ? null : _selectedText;
-        private set => _selectedText = value;
-    }
+    /// <summary>Gets The selected text.</summary>
+    public string? SelectedText => Secret ? null : _selectedText;
 
     /// <summary>Sets or gets the text held by the view.</summary>
     public new string Text
@@ -718,7 +777,7 @@ public class TextField : View, IDesignable
             ClearAllSelection ();
 
             // Note we use NewValue here; TextChanging subscribers may have changed it
-            _text = args.Result.ToStringList ();
+            _text = args.Result!.ToStringList ();
 
             if (!Secret && !_historyText.IsFromHistory)
             {
@@ -789,7 +848,7 @@ public class TextField : View, IDesignable
     /// <summary>Copy the selected text to the clipboard.</summary>
     public virtual void Copy ()
     {
-        if (Secret || SelectedLength == 0)
+        if (Secret || SelectedLength == 0 || SelectedText is null)
         {
             return;
         }
@@ -800,7 +859,7 @@ public class TextField : View, IDesignable
     /// <summary>Cut the selected text to the clipboard.</summary>
     public virtual void Cut ()
     {
-        if (ReadOnly || Secret || SelectedLength == 0)
+        if (ReadOnly || Secret || SelectedLength == 0 || SelectedText is null)
         {
             return;
         }
@@ -1099,7 +1158,7 @@ public class TextField : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingContent (DrawContext context)
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         _isDrawing = true;
 
@@ -1115,7 +1174,7 @@ public class TextField : View, IDesignable
 
         int p = ScrollOffset;
         var col = 0;
-        int width = Viewport.Width + OffSetBackground ();
+        int width = Viewport.Width;
         int tcount = _text.Count;
 
         for (int idx = p; idx < tcount; idx++)
@@ -1189,7 +1248,7 @@ public class TextField : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View previousFocusedView, View view)
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
         if (App?.Mouse.MouseGrabView is { } && App?.Mouse.MouseGrabView == this)
         {
@@ -1218,7 +1277,7 @@ public class TextField : View, IDesignable
         _preTextChangedCursorPos = _cursorPosition;
 
         // Ignore other control characters.
-        if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))
+        if (a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {
             return false;
         }
@@ -1246,7 +1305,7 @@ public class TextField : View, IDesignable
     }
 
     /// <summary>Raised before <see cref="Text"/> changes. The change can be canceled the text adjusted.</summary>
-    public event EventHandler<ResultEventArgs<string>> TextChanging;
+    public event EventHandler<ResultEventArgs<string>>? TextChanging;
 
     /// <summary>Paste the selected text from the clipboard.</summary>
     public virtual void Paste ()
@@ -1256,7 +1315,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        string cbTxt = App?.Clipboard?.GetClipboardData ()?.Split ("\n") [0];
+        string? cbTxt = App?.Clipboard?.GetClipboardData ().Split ("\n") [0];
 
         if (string.IsNullOrEmpty (cbTxt))
         {
@@ -1292,25 +1351,43 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         This method performs the critical translation between logical text position and physical screen position:
     ///         <list type="number">
-    ///             <item><description>Starts from <see cref="ScrollOffset"/> (first visible character)</description></item>
-    ///             <item><description>Iterates through visible text elements up to <see cref="CursorPosition"/></description></item>
-    ///             <item><description>Accumulates screen column widths (accounting for wide characters)</description></item>
-    ///             <item><description>Calls <see cref="View.Move"/> to position the terminal cursor</description></item>
+    ///             <item>
+    ///                 <description>Starts from <see cref="ScrollOffset"/> (first visible character)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Iterates through visible text elements up to <see cref="CursorPosition"/></description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Accumulates screen column widths (accounting for wide characters)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Calls <see cref="View.Move"/> to position the terminal cursor</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         <b>Coordinate spaces:</b>
     ///         <list type="bullet">
-    ///             <item><description><see cref="CursorPosition"/>: Logical position (0 to text length)</description></item>
-    ///             <item><description>Returned Point: Screen position within viewport (0 to viewport width)</description></item>
+    ///             <item>
+    ///                 <description><see cref="CursorPosition"/>: Logical position (0 to text length)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Returned Point: Screen position within viewport (0 to viewport width)</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         <b>Example:</b> For text "Hi世界" with ScrollOffset=0:
     ///         <list type="bullet">
-    ///             <item><description>CursorPosition=0 → Screen column 0 (before 'H')</description></item>
-    ///             <item><description>CursorPosition=2 → Screen column 2 (before '世')</description></item>
-    ///             <item><description>CursorPosition=3 → Screen column 4 (before '界', because '世' is 2 columns wide)</description></item>
+    ///             <item>
+    ///                 <description>CursorPosition=0 → Screen column 0 (before 'H')</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>CursorPosition=2 → Screen column 2 (before '世')</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>CursorPosition=3 → Screen column 4 (before '界', because '世' is 2 columns wide)</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
@@ -1406,13 +1483,17 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         This method maintains the invariant that the cursor is always visible by adjusting <see cref="ScrollOffset"/>:
     ///         <list type="bullet">
-    ///             <item><description>If <see cref="CursorPosition"/> is to the left of the visible area, scrolls left</description></item>
-    ///             <item><description>If <see cref="CursorPosition"/> is to the right of the visible area, scrolls right</description></item>
+    ///             <item>
+    ///                 <description>If <see cref="CursorPosition"/> is to the left of the visible area, scrolls left</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>If <see cref="CursorPosition"/> is to the right of the visible area, scrolls right</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         Called automatically after cursor movement or text changes to keep the cursor in view.
-    ///         If scrolling occurred or a redraw is needed, calls <see cref="View.SetNeedsDraw"/>;
+    ///         If scrolling occurred or a redraw is needed, calls <see cref="View.SetNeedsDraw()"/>;
     ///         otherwise, calls <see cref="PositionCursor()"/> to update the terminal cursor position.
     ///     </para>
     /// </remarks>
@@ -1423,11 +1504,6 @@ public class TextField : View, IDesignable
             return;
         }
 
-        // TODO: This is a lame prototype proving it should be easy for TextField to
-        // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
-        //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
-
-        int offB = OffSetBackground ();
         bool need = NeedsDraw || !Used;
 
         // If cursor is before the visible area, scroll left to show it
@@ -1436,17 +1512,18 @@ public class TextField : View, IDesignable
             ScrollOffset = _cursorPosition;
             need = true;
         }
+
         // If cursor is beyond the visible area, scroll right to show it
         else if (Viewport.Width > 0
-                 && (ScrollOffset + _cursorPosition - (Viewport.Width + offB) == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width + offB))
+                 && (ScrollOffset + _cursorPosition - Viewport.Width == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
                                                                     _text,
                                                                     ScrollOffset,
                                                                     _cursorPosition,
-                                                                    Viewport.Width + offB
+                                                                    Viewport.Width
                                                                    ),
                                      0
                                     );
@@ -1484,10 +1561,10 @@ public class TextField : View, IDesignable
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
-        App?.Popover.Register (ContextMenu);
+        App?.Popover?.Register (ContextMenu);
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
 
     private List<string> DeleteSelectedText ()
     {
@@ -1516,32 +1593,28 @@ public class TextField : View, IDesignable
         Autocomplete.Context = new (
                                     currentLine,
                                     cursorPosition,
-                                    Autocomplete.Context != null
-                                        ? Autocomplete.Context.Canceled
-                                        : false
+                                    Autocomplete.Context?.Canceled ?? false
                                    );
 
-        Autocomplete.GenerateSuggestions (
-                                          Autocomplete.Context
-                                         );
+        Autocomplete.GenerateSuggestions (Autocomplete.Context);
     }
 
     private TextModel GetModel ()
     {
-        var model = new TextModel ();
+        TextModel model = new ();
         model.LoadString (Text);
 
         return model;
     }
 
-    private void HistoryText_ChangeText (object sender, HistoryTextItemEventArgs obj)
+    private void HistoryText_ChangeText (object? sender, HistoryTextItemEventArgs? obj)
     {
         if (obj is null)
         {
             return;
         }
 
-        Text = Cell.ToString (obj?.Lines [obj.CursorPosition.Y]);
+        Text = Cell.ToString (obj.Lines [obj.CursorPosition.Y]);
         CursorPosition = obj.CursorPosition.X;
         Adjust ();
     }
@@ -1549,7 +1622,7 @@ public class TextField : View, IDesignable
     private void InsertText (Key a, bool usePreTextChangedCursorPos)
     {
         _historyText.Add (
-                          new () { Cell.ToCells (_text) },
+                          [Cell.ToCells (_text)],
                           new (_cursorPosition, 0)
                          );
 
@@ -1566,7 +1639,7 @@ public class TextField : View, IDesignable
             _preTextChangedCursorPos = _cursorPosition;
         }
 
-        StringRuneEnumerator kbstr = a.AsRune.ToString ().EnumerateRunes ();
+        StringRuneEnumerator enumeratedRunes = a.AsRune.ToString ().EnumerateRunes ();
 
         if (Used)
         {
@@ -1574,7 +1647,7 @@ public class TextField : View, IDesignable
 
             if (_cursorPosition == newText.Count + 1)
             {
-                SetText (newText.Concat (kbstr.Select (r => r.ToString ())).ToList ());
+                SetText (newText.Concat (enumeratedRunes.Select (r => r.ToString ())).ToList ());
             }
             else
             {
@@ -1585,7 +1658,7 @@ public class TextField : View, IDesignable
 
                 SetText (
                          newText.GetRange (0, _preTextChangedCursorPos)
-                                .Concat (kbstr.Select (r => r.ToString ()))
+                                .Concat (enumeratedRunes.Select (r => r.ToString ()))
                                 .Concat (
                                          newText.GetRange (
                                                            _preTextChangedCursorPos,
@@ -1602,7 +1675,7 @@ public class TextField : View, IDesignable
         {
             SetText (
                      newText.GetRange (0, _preTextChangedCursorPos)
-                            .Concat (kbstr.Select (r => r.ToString ()))
+                            .Concat (enumeratedRunes.Select (r => r.ToString ()))
                             .Concat (
                                      newText.GetRange (
                                                        Math.Min (_preTextChangedCursorPos + 1, newText.Count),
@@ -1808,19 +1881,6 @@ public class TextField : View, IDesignable
         }
     }
 
-    // BUGBUG: This assumes Frame == Viewport. It's also not clear what the intention is. For now, changed to always return 0.
-    private int OffSetBackground ()
-    {
-        var offB = 0;
-
-        if (SuperView?.Frame.Right - Frame.Right < 0)
-        {
-            offB = SuperView.Frame.Right - Frame.Right - 1;
-        }
-
-        return 0; //offB;
-    }
-
     /// <summary>
     ///     Positions the cursor based on a mouse event by converting the mouse's screen X coordinate
     ///     to a logical text position.
@@ -1845,9 +1905,18 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         This method handles the conversion from screen coordinates to logical text position:
     ///         <list type="number">
-    ///             <item><description>If <paramref name="getX"/> is true, converts screen column to text index using <see cref="TextModel.GetColFromX"/></description></item>
-    ///             <item><description>Adds <see cref="ScrollOffset"/> to get the absolute text position</description></item>
-    ///             <item><description>Clamps the result to valid bounds [0, text length]</description></item>
+    ///             <item>
+    ///                 <description>
+    ///                     If <paramref name="getX"/> is true, converts screen column to text index using
+    ///                     <see cref="TextModel.GetColFromX(List{string},int,int,int)"/>
+    ///                 </description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Adds <see cref="ScrollOffset"/> to get the absolute text position</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Clamps the result to valid bounds [0, text length]</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     /// </remarks>
@@ -1890,10 +1959,18 @@ public class TextField : View, IDesignable
     ///     <para>
     ///         This method manages the selection state:
     ///         <list type="bullet">
-    ///             <item><description>Sets <see cref="_selectedStart"/> if not already set and position is valid</description></item>
-    ///             <item><description>Calculates <see cref="SelectedLength"/> based on anchor and direction</description></item>
-    ///             <item><description>Extracts <see cref="SelectedText"/> from the text</description></item>
-    ///             <item><description>Adjusts <see cref="ScrollOffset"/> if selection extends beyond visible area</description></item>
+    ///             <item>
+    ///                 <description>Sets <see cref="_selectedStart"/> if not already set and position is valid</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Calculates <see cref="SelectedLength"/> based on anchor and direction</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Extracts <see cref="SelectedText"/> from the text</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Adjusts <see cref="ScrollOffset"/> if selection extends beyond visible area</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
@@ -1974,7 +2051,7 @@ public class TextField : View, IDesignable
             return;
         }
 
-        if (Autocomplete?.Context == null)
+        if (Autocomplete.Context == null)
         {
             return;
         }
@@ -1991,7 +2068,7 @@ public class TextField : View, IDesignable
     {
         if (HasFocus
             || string.IsNullOrEmpty (Title)
-            || Text?.Length > 0)
+            || Text.Length > 0)
         {
             return;
         }
@@ -2013,7 +2090,7 @@ public class TextField : View, IDesignable
                                              GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // Use TitleTextFormatter to render the caption with hotkey support
-        TitleTextFormatter.Draw (driver: Driver, screen: ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), normalColor: captionAttribute, hotColor: hotKeyAttribute);
+        TitleTextFormatter.Draw (Driver, ViewportToScreen (new Rectangle (0, 0, Viewport.Width, 1)), captionAttribute, hotKeyAttribute);
     }
 
     private void SetClipboard (IEnumerable<string> text)
@@ -2062,10 +2139,11 @@ public class TextField : View, IDesignable
         }
     }
 
-    /// <inheritdoc />
-    protected override void OnSuperViewChanged (ValueChangedEventArgs<View> args)
+    /// <inheritdoc/>
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> args)
     {
         base.OnSuperViewChanged (args);
+
         if (SuperView is { })
         {
             if (Autocomplete.HostControl is null)
@@ -2080,8 +2158,7 @@ public class TextField : View, IDesignable
         }
     }
 
-
-    private void TextField_Initialized (object sender, EventArgs e)
+    private void TextField_Initialized (object? sender, EventArgs e)
     {
         _cursorPosition = Text.GetRuneCount ();
 
@@ -2097,8 +2174,11 @@ public class TextField : View, IDesignable
         }
 
         CreateContextMenu ();
-        KeyBindings.Add (ContextMenu?.Key, Command.Context);
 
+        if (ContextMenu?.Key is { })
+        {
+            KeyBindings.Add (ContextMenu.Key, Command.Context);
+        }
     }
 
     private void DisposeContextMenu ()
