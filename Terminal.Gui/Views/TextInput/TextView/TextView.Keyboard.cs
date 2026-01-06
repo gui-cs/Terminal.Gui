@@ -2,9 +2,9 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-
     // BUGBUG: AllowsReturn is mis-named. It should be EnterKeyAccepts.
     private bool _allowsReturn = true;
+
     /// <summary>
     ///     Gets or sets whether pressing ENTER in a <see cref="TextView"/> creates a new line of text
     ///     in the view or invokes the <see cref="View.Accepting"/> event.
@@ -13,8 +13,7 @@ public partial class TextView
     ///     <para>
     ///         Setting this property alters <see cref="Multiline"/>.
     ///         If <see cref="AllowsReturn"/> is set to <see langword="true"/>, then <see cref="Multiline"/> is also set to
-    ///         `true` and
-    ///         vice-versa.
+    ///         `true` and vice versa.
     ///     </para>
     ///     <para>
     ///         If <see cref="AllowsReturn"/> is set to <see langword="false"/>, then <see cref="AllowsTab"/> gets set to
@@ -80,13 +79,11 @@ public partial class TextView
         }
     }
 
-
     /// <summary>
     ///     Provides autocomplete context menu based on suggestions at the current cursor position. Configure
     ///     <see cref="IAutocomplete.SuggestionGenerator"/> to enable this feature
     /// </summary>
     public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
-
 
     /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)
@@ -127,11 +124,11 @@ public partial class TextView
         return true;
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> args)
     {
         base.OnSuperViewChanged (args);
+
         if (SuperView is { })
         {
             if (Autocomplete.HostControl is null)
@@ -194,5 +191,4 @@ public partial class TextView
                                           Autocomplete.Context
                                          );
     }
-
 }

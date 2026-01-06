@@ -2,13 +2,13 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-
     /// <summary>
     ///     Gets or sets whether the word navigation should select only the word itself without spaces around it or with the
     ///     spaces at right.
     ///     Default is <c>false</c> meaning that the spaces at right are included in the selection.
     /// </summary>
     public bool SelectWordOnlyOnDoubleClick { get; set; }
+
     private bool _isButtonShift;
     private bool _isButtonReleased;
 
@@ -200,14 +200,19 @@ public partial class TextView
                 StopSelecting ();
             }
 
-            ProcessMouseClick (mouse, out List<Cell> line);
+            ProcessMouseClick (mouse, out List<Cell> _);
 
             if (!IsSelecting)
             {
                 StartSelecting ();
             }
 
-            (int startCol, int col, int row)? newPos = _model.ProcessDoubleClickSelection (SelectionStartColumn, CurrentColumn, CurrentRow, UseSameRuneTypeForWords, SelectWordOnlyOnDoubleClick);
+            (int startCol, int col, int row)? newPos = _model.ProcessDoubleClickSelection (
+                                                                                           SelectionStartColumn,
+                                                                                           CurrentColumn,
+                                                                                           CurrentRow,
+                                                                                           UseSameRuneTypeForWords,
+                                                                                           SelectWordOnlyOnDoubleClick);
 
             if (newPos.HasValue)
             {

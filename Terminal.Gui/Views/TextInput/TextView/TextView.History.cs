@@ -11,10 +11,9 @@ public partial class TextView
     public bool HasHistoryChanges => _historyText.HasHistoryChanges;
 
     /// <summary>Allows clearing the <see cref="HistoryTextItemEventArgs"/> items updating the original text.</summary>
-    public void ClearHistoryChanges () { _historyText?.Clear (_model.GetAllLines ()); }
+    public void ClearHistoryChanges () { _historyText.Clear (_model.GetAllLines ()); }
 
-
-    private void HistoryText_ChangeText (object sender, HistoryTextItemEventArgs obj)
+    private void HistoryText_ChangeText (object? sender, HistoryTextItemEventArgs? obj)
     {
         SetWrapModel ();
 
@@ -75,5 +74,4 @@ public partial class TextView
         Adjust ();
         OnContentsChanged ();
     }
-
 }

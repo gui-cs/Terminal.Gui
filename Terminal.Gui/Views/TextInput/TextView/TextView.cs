@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime.CompilerServices;
 
 namespace Terminal.Gui.Views;
 
@@ -74,7 +73,6 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public partial class TextView : View, IDesignable
 {
-
     // The column we are tracking, or -1 if we are not tracking any column
     private string? _currentCaller;
     private CultureInfo? _currentCulture;
@@ -107,11 +105,7 @@ public partial class TextView : View, IDesignable
 
     private void TextView_Initialized (object sender, EventArgs e)
     {
-        if (Autocomplete.HostControl is null)
-        {
-            Autocomplete.HostControl = this;
-        }
-
+        Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
         App?.Popover?.Register (ContextMenu);
@@ -207,6 +201,7 @@ public partial class TextView : View, IDesignable
 
         if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
+            // BUGBUG: Move should not be called outside the View.Draw loop.
             Move (col, CurrentRow - _topRow);
 
             return new (col, CurrentRow - _topRow);
@@ -243,23 +238,7 @@ public partial class TextView : View, IDesignable
     /// <summary>Get the Context Menu.</summary>
     public PopoverMenu? ContextMenu { get; private set; }
 
-
-    private void ShowContextMenu (Point? mousePosition)
-    {
-        if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
-        {
-            _currentCulture = Thread.CurrentThread.CurrentUICulture;
-        }
-
-        if (mousePosition is null)
-        {
-            mousePosition = ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y));
-        }
-
-        ContextMenu?.MakeVisible (mousePosition);
-    }
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Text = """
@@ -273,7 +252,6 @@ public partial class TextView : View, IDesignable
 
         return true;
     }
-
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

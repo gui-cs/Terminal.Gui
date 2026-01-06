@@ -3,19 +3,38 @@ namespace Terminal.Gui.Views;
 public partial class TextView
 {
     private TextModel _model = new ();
-
+    private int _currentColumn;
+    private int _currentRow;
 
     /// <summary>Gets the cursor column.</summary>
     /// <value>The cursor column.</value>
-    public int CurrentColumn { get; private set; }
+    public int CurrentColumn
+    {
+        get => _currentColumn;
+        private set
+        {
+            _currentColumn = value;
+            _cursorPosition = new (_currentColumn, _currentRow);
+        }
+    }
 
     /// <summary>Gets the current cursor row.</summary>
-    public int CurrentRow { get; private set; }
+    public int CurrentRow
+    {
+        get => _currentRow;
+        private set
+        {
+            _currentRow = value;
+            _cursorPosition = new (_currentColumn, _currentRow);
+        }
+    }
+
+    private Point _cursorPosition;
 
     /// <summary>Sets or gets the current cursor position.</summary>
     public Point CursorPosition
     {
-        get => new (CurrentColumn, CurrentRow);
+        get => _cursorPosition;
         set
         {
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
@@ -295,7 +314,7 @@ public partial class TextView
         var endCol = (int)(end & 0xffffffff);
         List<Cell> line = _model.GetLine (startRow);
 
-        _historyText.Add ([ [.. line]], new (startCol, startRow));
+        _historyText.Add ([[.. line]], new (startCol, startRow));
 
         List<List<Cell>> removedLines = [];
 
@@ -494,7 +513,7 @@ public partial class TextView
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add ([ [.. line]], CursorPosition);
+        _historyText.Add ([[.. line]], CursorPosition);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -503,7 +522,7 @@ public partial class TextView
             CurrentColumn += lines [0].Count;
 
             _historyText.Add (
-                              [ [.. line]],
+                              [[.. line]],
                               CursorPosition,
                               TextEditingLineStatus.Replaced
                              );
@@ -565,12 +584,12 @@ public partial class TextView
         OnContentsChanged ();
     }
 
-    private bool InsertText (Key a, Attribute? attribute = null)
+    private void InsertText (Key a, Attribute? attribute = null)
     {
         //So that special keys like tab can be processed
         if (_isReadOnly)
         {
-            return true;
+            return;
         }
 
         SetWrapModel ();
@@ -620,8 +639,6 @@ public partial class TextView
 
         UpdateWrapModel ();
         OnContentsChanged ();
-
-        return true;
     }
 
     private void Model_LinesLoaded (object sender, EventArgs e)
@@ -737,13 +754,6 @@ public partial class TextView
         _continuousFind = false;
 
         return foundPos.found;
-    }
-
-    private void SetOverwrite (bool overwrite)
-    {
-        Used = overwrite;
-        SetNeedsDraw ();
-        DoNeededAction ();
     }
 
     private string StringFromCells (List<Cell> cells)

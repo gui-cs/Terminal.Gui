@@ -2,10 +2,7 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-    private void DoSetNeedsDraw (Rectangle rect)
-    {
-        SetNeedsDraw ();
-    }
+    private void DoSetNeedsDraw (Rectangle rect) { SetNeedsDraw (); }
 
     /// <summary>
     ///     If <see langword="true"/> and the current <see cref="Cell.Attribute"/> is null will inherit from the
@@ -15,21 +12,6 @@ public partial class TextView
     public bool InheritsPreviousAttribute { get; set; }
 
     private bool _isDrawing;
-
-    /// <summary>Invoked when the normal color is drawn.</summary>
-    public event EventHandler<CellEventArgs>? DrawNormalColor;
-
-    /// <summary>Invoked when the ready only color is drawn.</summary>
-    public event EventHandler<CellEventArgs>? DrawReadOnlyColor;
-
-    /// <summary>Invoked when the selection color is drawn.</summary>
-    public event EventHandler<CellEventArgs>? DrawSelectionColor;
-
-    /// <summary>
-    ///     Invoked when the used color is drawn. The Used Color is used to indicate if the <see cref="Key.InsertChar"/>
-    ///     was pressed and enabled.
-    /// </summary>
-    public event EventHandler<CellEventArgs>? DrawUsedColor;
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
@@ -129,6 +111,11 @@ public partial class TextView
         return false;
     }
 
+    // TODO: These events should be refactored to use CWP
+
+    /// <summary>Invoked when the normal color is drawn.</summary>
+    public event EventHandler<CellEventArgs>? DrawNormalColor;
+
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
     ///     of the current <paramref name="line"/>. Override to provide custom coloring by calling
@@ -153,6 +140,9 @@ public partial class TextView
             SetAttribute (GetAttributeForRole (VisualRole.Normal));
         }
     }
+
+    /// <summary>Invoked when the ready only color is drawn.</summary>
+    public event EventHandler<CellEventArgs>? DrawReadOnlyColor;
 
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
@@ -180,6 +170,9 @@ public partial class TextView
             SetAttributeForRole (VisualRole.ReadOnly);
         }
     }
+
+    /// <summary>Invoked when the selection color is drawn.</summary>
+    public event EventHandler<CellEventArgs>? DrawSelectionColor;
 
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
@@ -209,6 +202,12 @@ public partial class TextView
     }
 
     /// <summary>
+    ///     Invoked when the used color is drawn. The Used Color is used to indicate if the <see cref="Key.InsertChar"/>
+    ///     was pressed and enabled.
+    /// </summary>
+    public event EventHandler<CellEventArgs>? DrawUsedColor;
+
+    /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
     ///     of the current <paramref name="line"/>. Override to provide custom coloring by calling
     ///     <see cref="View.SetAttribute(Attribute)"/> Defaults to <see cref="Scheme.HotFocus"/>.
@@ -234,7 +233,6 @@ public partial class TextView
         }
     }
 
-
     private void SetValidUsedColor (Attribute? attribute)
     {
         SetAttribute (new (attribute!.Value.Background, attribute!.Value.Foreground, attribute!.Value.Style));
@@ -252,7 +250,6 @@ public partial class TextView
 
         return base.OnGettingAttributeForRole (role, ref currentAttribute);
     }
-
 
     private void Adjust ()
     {
@@ -325,7 +322,6 @@ public partial class TextView
         OnUnwrappedCursorPosition ();
     }
 
-
     private (int width, int height) OffSetBackground ()
     {
         var w = 0;
@@ -385,7 +381,6 @@ public partial class TextView
         return cell.Attribute;
     }
 
-
     // If InheritsPreviousScheme is enabled this method will check if the rune cell on
     // the row and col location and around has a not null scheme. If it's null will set it with
     // the very most previous valid scheme.
@@ -417,82 +412,90 @@ public partial class TextView
 
         Cell lineTo = lineToSet [colWithoutColor];
 
-        if (cell.Attribute is { } && colWithColor == 0 && lineTo.Attribute is { })
+        switch (cell.Attribute)
         {
-            for (int r = row - 1; r > -1; r--)
+            case { } when colWithColor == 0 && lineTo.Attribute is { }:
             {
-                List<Cell> l = GetLine (r);
-
-                for (int c = l.Count - 1; c > -1; c--)
+                for (int r = row - 1; r > -1; r--)
                 {
-                    Cell cell1 = l [c];
+                    List<Cell> l = GetLine (r);
 
-                    if (cell1.Attribute is null)
+                    for (int c = l.Count - 1; c > -1; c--)
                     {
-                        cell1.Attribute = cell.Attribute;
-                        l [c] = cell1;
-                    }
-                    else
-                    {
-                        return;
+                        Cell cell1 = l [c];
+
+                        if (cell1.Attribute is null)
+                        {
+                            cell1.Attribute = cell.Attribute;
+                            l [c] = cell1;
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                 }
-            }
 
+                return;
+            }
+            case null:
+            {
+                for (int r = row; r > -1; r--)
+                {
+                    List<Cell> l = GetLine (r);
+
+                    colWithColor = l.FindLastIndex (
+                                                    colWithColor > -1 ? colWithColor : l.Count - 1,
+                                                    c => c.Attribute != null
+                                                   );
+
+                    if (colWithColor > -1 && l [colWithColor].Attribute is { })
+                    {
+                        cell = l [colWithColor];
+
+                        break;
+                    }
+                }
+
+                break;
+            }
+            default:
+            {
+                int cRow = row;
+
+                while (cell.Attribute is null)
+                {
+                    if ((colWithColor == 0 || cell.Attribute is null) && cRow > 0)
+                    {
+                        line = GetLine (--cRow);
+                        colWithColor = line.Count - 1;
+                        cell = line [colWithColor];
+                    }
+                    else if (cRow == 0 && colWithColor < line.Count)
+                    {
+                        cell = line [colWithColor + 1];
+                    }
+                }
+
+                break;
+            }
+        }
+
+        if (cell.Attribute is null || colWithColor <= -1 || colWithoutColor >= lineToSet.Count || lineTo.Attribute is { })
+        {
             return;
         }
 
-        if (cell.Attribute is null)
+        while (lineTo.Attribute is null)
         {
-            for (int r = row; r > -1; r--)
+            lineTo.Attribute = cell.Attribute;
+            lineToSet [colWithoutColor] = lineTo;
+            colWithoutColor--;
+
+            if (colWithoutColor == -1 && row > 0)
             {
-                List<Cell> l = GetLine (r);
-
-                colWithColor = l.FindLastIndex (
-                                                colWithColor > -1 ? colWithColor : l.Count - 1,
-                                                c => c.Attribute != null
-                                               );
-
-                if (colWithColor > -1 && l [colWithColor].Attribute is { })
-                {
-                    cell = l [colWithColor];
-
-                    break;
-                }
-            }
-        }
-        else
-        {
-            int cRow = row;
-
-            while (cell.Attribute is null)
-            {
-                if ((colWithColor == 0 || cell.Attribute is null) && cRow > 0)
-                {
-                    line = GetLine (--cRow);
-                    colWithColor = line.Count - 1;
-                    cell = line [colWithColor];
-                }
-                else if (cRow == 0 && colWithColor < line.Count)
-                {
-                    cell = line [colWithColor + 1];
-                }
-            }
-        }
-
-        if (cell.Attribute is { } && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineTo.Attribute is null)
-        {
-            while (lineTo.Attribute is null)
-            {
-                lineTo.Attribute = cell.Attribute;
-                lineToSet [colWithoutColor] = lineTo;
-                colWithoutColor--;
-
-                if (colWithoutColor == -1 && row > 0)
-                {
-                    lineToSet = GetLine (--row);
-                    colWithoutColor = lineToSet.Count - 1;
-                }
+                lineToSet = GetLine (--row);
+                colWithoutColor = lineToSet.Count - 1;
             }
         }
     }
@@ -531,12 +534,12 @@ public partial class TextView
 
             _historyText.Add (
                               [.. selectedCellsOriginal],
-                              new Point (startCol, startRow)
+                              new (startCol, startRow)
                              );
 
             _historyText.Add (
                               [.. selectedCellsChanged],
-                              new Point (startCol, startRow),
+                              new (startCol, startRow),
                               TextEditingLineStatus.Attribute
                              );
         }
@@ -567,5 +570,4 @@ public partial class TextView
 
         return GetAttributeForRole (VisualRole.Active);
     }
-
 }

@@ -147,11 +147,4 @@ public partial class TextView
         _isButtonShift = false;
     }
 
-    private void ToggleSelecting ()
-    {
-        ResetColumnTrack ();
-        IsSelecting = !IsSelecting;
-        _selectionStartColumn = CurrentColumn;
-        _selectionStartRow = CurrentRow;
-    }
 }
