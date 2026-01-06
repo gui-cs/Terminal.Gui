@@ -81,6 +81,9 @@ public class TextView : View, IDesignable
 
     // The column we are tracking, or -1 if we are not tracking any column
     private int _columnTrack = -1;
+    private int _currentColumn;
+    private int _currentRow;
+    private Point _cursorPosition;
     private bool _continuousFind;
     private bool _copyWithoutSelection;
     private string? _currentCaller;
@@ -711,15 +714,31 @@ public class TextView : View, IDesignable
 
     /// <summary>Gets the cursor column.</summary>
     /// <value>The cursor column.</value>
-    public int CurrentColumn { get; private set; }
+    public int CurrentColumn
+    {
+        get => _currentColumn;
+        private set
+        {
+            _currentColumn = value;
+            _cursorPosition = new (_currentColumn, _currentRow);
+        }
+    }
 
     /// <summary>Gets the current cursor row.</summary>
-    public int CurrentRow { get; private set; }
+    public int CurrentRow
+    {
+        get => _currentRow;
+        private set
+        {
+            _currentRow = value;
+            _cursorPosition = new (_currentColumn, _currentRow);
+        }
+    }
 
     /// <summary>Sets or gets the current cursor position.</summary>
     public Point CursorPosition
     {
-        get => new (CurrentColumn, CurrentRow);
+        get => _cursorPosition;
         set
         {
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
