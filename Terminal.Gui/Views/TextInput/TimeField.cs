@@ -1,11 +1,3 @@
-//
-// TimeField.cs: text entry for time
-//
-// Author: Jörg Preiß
-//
-// Licensed under the MIT license
-
-#nullable disable
 using System.Globalization;
 
 namespace Terminal.Gui.Views;
@@ -49,7 +41,7 @@ public class TimeField : TextField
     /// <summary>
     ///     The field length for long format (HH:mm:ss) = 8 characters.
     /// </summary>
-    private readonly int _longFieldLen = 8;
+    private const int LONG_FIELD_LEN = 8;
 
     /// <summary>
     ///     The format string for long time format with escaped separators (e.g., " hh\:mm\:ss").
@@ -66,7 +58,7 @@ public class TimeField : TextField
     /// <summary>
     ///     The field length for short format (HH:mm) = 5 characters.
     /// </summary>
-    private readonly int _shortFieldLen = 5;
+    private const int SHORT_FIELD_LEN = 5;
 
     /// <summary>
     ///     The format string for short time format with escaped separators (e.g., " hh\:mm").
@@ -92,7 +84,7 @@ public class TimeField : TextField
         _shortFormat = $" hh\\{_sepChar}mm";
         Width = FieldLength + 2;
         Time = TimeSpan.MinValue;
-        CursorPosition = 1;
+        base.CursorPosition = 1;
         TextChanging += TextField_TextChanging;
 
         // Things this view knows how to do
@@ -208,7 +200,7 @@ public class TimeField : TextField
             TimeSpan oldTime = _time;
             _time = value;
             Text = " " + value.ToString (Format.Trim ());
-            EventArgs<TimeSpan>  args = new (value);
+            EventArgs<TimeSpan> args = new (value);
 
             if (oldTime != value)
             {
@@ -228,7 +220,7 @@ public class TimeField : TextField
     ///         and FieldLength is the last digit.
     ///     </para>
     /// </remarks>
-    private int FieldLength => _isShort ? _shortFieldLen : _longFieldLen;
+    private int FieldLength => _isShort ? SHORT_FIELD_LEN : LONG_FIELD_LEN;
 
     /// <summary>
     ///     Gets the current time format string based on <see cref="IsShortFormat"/>.
@@ -236,32 +228,34 @@ public class TimeField : TextField
     private string Format => _isShort ? _shortFormat : _longFormat;
 
     /// <inheritdoc/>
-    public override void DeleteCharLeft (bool useOldCursorPos = true)
+    public override bool DeleteCharLeft (bool useOldCursorPos)
     {
         if (ReadOnly)
         {
-            return;
+            return false;
         }
 
         ClearAllSelection ();
         SetText ((Rune)'0');
         DecCursorPosition ();
+        return true;
     }
 
     /// <inheritdoc/>
-    public override void DeleteCharRight ()
+    public override bool DeleteCharRight ()
     {
         if (ReadOnly)
         {
-            return;
+            return false;
         }
 
         ClearAllSelection ();
         SetText ((Rune)'0');
+        return true;
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent  (Mouse mouse)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         if (base.OnMouseEvent (mouse) || mouse.Handled)
         {
@@ -303,7 +297,7 @@ public class TimeField : TextField
 
     /// <summary>TimeChanged event, raised when the Date has changed.</summary>
     /// <remarks>This event is raised when the <see cref="Time"/> changes.</remarks>
-    public event EventHandler<EventArgs<TimeSpan>> TimeChanged;
+    public event EventHandler<EventArgs<TimeSpan>>? TimeChanged;
 
     /// <summary>
     ///     Adjusts the cursor position to ensure it lands on a valid digit position, skipping separator characters.
@@ -350,7 +344,7 @@ public class TimeField : TextField
         }
 
         // Skip over separator characters in the specified direction
-        while (CursorPosition < Text.GetColumns() -1 && Text [CursorPosition] == _sepChar [0])
+        while (CursorPosition < Text.GetColumns () - 1 && Text [CursorPosition] == _sepChar [0])
         {
             if (increment)
             {
@@ -446,7 +440,7 @@ public class TimeField : TextField
         return true;
     }
 
-    private string NormalizeFormat (string text, string fmt = null, string sepChar = null)
+    private string NormalizeFormat (string text, string? fmt = null, string? sepChar = null)
     {
         if (string.IsNullOrEmpty (fmt))
         {
@@ -577,15 +571,20 @@ public class TimeField : TextField
         return true;
     }
 
-    private void TextField_TextChanging (object sender, ResultEventArgs<string> e)
+    private void TextField_TextChanging (object? sender, ResultEventArgs<string> e)
     {
+        if (e.Result is null)
+        {
+            return;
+        }
+
         try
         {
             var spaces = 0;
 
-            for (var i = 0; i < e.Result.Length; i++)
+            foreach (char t in e.Result)
             {
-                if (e.Result [i] == ' ')
+                if (t == ' ')
                 {
                     spaces++;
                 }
@@ -598,7 +597,7 @@ public class TimeField : TextField
             spaces += FieldLength;
             string trimmedText = e.Result [..spaces];
             spaces -= FieldLength;
-            trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
+            trimmedText = trimmedText.Replace (new (' ', spaces), " ");
 
             if (trimmedText != e.Result)
             {
@@ -610,7 +609,7 @@ public class TimeField : TextField
                                          Format.Trim (),
                                          CultureInfo.CurrentCulture,
                                          TimeSpanStyles.None,
-                                         out TimeSpan result
+                                         out TimeSpan _
                                         ))
             {
                 e.Handled = true;

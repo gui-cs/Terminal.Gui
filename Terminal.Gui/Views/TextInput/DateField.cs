@@ -1,13 +1,3 @@
-
-
-//
-// DateField.cs: text entry for date
-//
-// Author: Barry Nolte
-//
-// Licensed under the MIT license
-//
-
 using System.Globalization;
 
 namespace Terminal.Gui.Views;
@@ -19,29 +9,61 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         DateField extends <see cref="TextField"/> with date-specific cursor behavior:
 ///         <list type="bullet">
-///             <item><description>Cursor positions are constrained to valid digit positions (skipping separators)</description></item>
-///             <item><description>Position 0 is reserved for a leading space; valid cursor range is [1, FormatLength]</description></item>
-///             <item><description>Numeric input replaces characters in-place rather than inserting</description></item>
-///             <item><description>Delete operations replace digits with '0' rather than removing characters</description></item>
+///             <item>
+///                 <description>Cursor positions are constrained to valid digit positions (skipping separators)</description>
+///             </item>
+///             <item>
+///                 <description>Position 0 is reserved for a leading space; valid cursor range is [1, FormatLength]</description>
+///             </item>
+///             <item>
+///                 <description>Numeric input replaces characters in-place rather than inserting</description>
+///             </item>
+///             <item>
+///                 <description>Delete operations replace digits with '0' rather than removing characters</description>
+///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
 ///         <b>Cursor Position Model:</b>
 ///         <list type="bullet">
-///             <item><description><see cref="TextField.CursorPosition"/>: Inherited, but constrained by the override to [1, FormatLength]</description></item>
-///             <item><description><see cref="AdjCursorPosition"/>: Adjusts cursor to skip over date separator characters</description></item>
-///             <item><description><see cref="IncCursorPosition"/>/<see cref="DecCursorPosition"/>: Move cursor while respecting separator positions</description></item>
+///             <item>
+///                 <description>
+///                     <see cref="TextField.CursorPosition"/>: Inherited, but constrained by the override to [1,
+///                     FormatLength]
+///                 </description>
+///             </item>
+///             <item>
+///                 <description><see cref="AdjCursorPosition"/>: Adjusts cursor to skip over date separator characters</description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <see cref="IncCursorPosition"/>/<see cref="DecCursorPosition"/>: Move cursor while
+///                     respecting separator positions
+///                 </description>
+///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
 ///         <b>Example:</b> For format "MM/dd/yyyy" with text " 01/15/2024":
 ///         <list type="bullet">
-///             <item><description>Position 0: Leading space (not user-accessible)</description></item>
-///             <item><description>Positions 1-2: Month digits (01)</description></item>
-///             <item><description>Position 3: Separator '/' (cursor skips over)</description></item>
-///             <item><description>Positions 4-5: Day digits (15)</description></item>
-///             <item><description>Position 6: Separator '/' (cursor skips over)</description></item>
-///             <item><description>Positions 7-10: Year digits (2024)</description></item>
+///             <item>
+///                 <description>Position 0: Leading space (not user-accessible)</description>
+///             </item>
+///             <item>
+///                 <description>Positions 1-2: Month digits (01)</description>
+///             </item>
+///             <item>
+///                 <description>Position 3: Separator '/' (cursor skips over)</description>
+///             </item>
+///             <item>
+///                 <description>Positions 4-5: Day digits (15)</description>
+///             </item>
+///             <item>
+///                 <description>Position 6: Separator '/' (cursor skips over)</description>
+///             </item>
+///             <item>
+///                 <description>Positions 7-10: Year digits (2024)</description>
+///             </item>
 ///         </list>
 ///     </para>
 /// </remarks>
@@ -97,7 +119,7 @@ public class DateField : TextField
             _culture = value ?? CultureInfo.CurrentCulture;
             _separator = GetDataSeparator (_culture.DateTimeFormat.DateSeparator);
             _format = " " + StandardizeDateFormat (_culture.DateTimeFormat.ShortDatePattern);
-            Text = Date?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "");
+            Text = Date?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
         }
     }
 
@@ -112,8 +134,12 @@ public class DateField : TextField
     ///     <para>
     ///         This override constrains the cursor to valid editing positions within the date format:
     ///         <list type="bullet">
-    ///             <item><description>Minimum position is 1 (first digit of the date)</description></item>
-    ///             <item><description>Maximum position is FormatLength (last digit of the year)</description></item>
+    ///             <item>
+    ///                 <description>Minimum position is 1 (first digit of the date)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Maximum position is FormatLength (last digit of the year)</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
@@ -143,17 +169,18 @@ public class DateField : TextField
             DateTime? oldData = _date;
             _date = value;
 
-            if (_format is { })
+            if (_format is null)
             {
-                Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ()))
-                            .Replace (RIGHT_TO_LEFT_MARK, "");
-                EventArgs<DateTime> args = new (value!.Value);
+                return;
+            }
 
-                if (oldData != value)
-                {
-                    OnDateChanged (args);
-                    DateChanged?.Invoke (this, args);
-                }
+            Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ())).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
+            EventArgs<DateTime> args = new (value!.Value);
+
+            if (oldData != value)
+            {
+                OnDateChanged (args);
+                DateChanged?.Invoke (this, args);
             }
         }
     }
@@ -177,28 +204,31 @@ public class DateField : TextField
     public event EventHandler<EventArgs<DateTime>>? DateChanged;
 
     /// <inheritdoc/>
-    public override void DeleteCharLeft (bool useOldCursorPos = true)
+    public override bool DeleteCharLeft (bool useOldCursorPos)
     {
         if (ReadOnly)
         {
-            return;
+            return false;
         }
 
         ClearAllSelection ();
         SetText ((Rune)'0');
         DecCursorPosition ();
+        return true;
     }
 
     /// <inheritdoc/>
-    public override void DeleteCharRight ()
+    public override bool DeleteCharRight ()
     {
         if (ReadOnly)
         {
-            return;
+            return false;
         }
 
         ClearAllSelection ();
         SetText ((Rune)'0');
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -219,7 +249,7 @@ public class DateField : TextField
 
     /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>
     /// <param name="args">Event arguments</param>
-    protected virtual void OnDateChanged (EventArgs<DateTime> args) {  }
+    protected virtual void OnDateChanged (EventArgs<DateTime> args) { }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key a)
@@ -253,15 +283,26 @@ public class DateField : TextField
     ///     <para>
     ///         This method performs two adjustments:
     ///         <list type="number">
-    ///             <item><description>Clamps <paramref name="point"/> to valid bounds [1, FormatLength]</description></item>
-    ///             <item><description>If the cursor is on a separator character, moves it in the specified direction until it reaches a digit</description></item>
+    ///             <item>
+    ///                 <description>Clamps <paramref name="point"/> to valid bounds [1, FormatLength]</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the cursor is on a separator character, moves it in the specified direction until it
+    ///                     reaches a digit
+    ///                 </description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         <b>Example:</b> For date " 01/15/2024" with separator '/':
     ///         <list type="bullet">
-    ///             <item><description>AdjCursorPosition(3, true) → cursor moves to position 4 (first digit of day)</description></item>
-    ///             <item><description>AdjCursorPosition(3, false) → cursor moves to position 2 (last digit of month)</description></item>
+    ///             <item>
+    ///                 <description>AdjCursorPosition(3, true) → cursor moves to position 4 (first digit of day)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>AdjCursorPosition(3, false) → cursor moves to position 2 (last digit of month)</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     /// </remarks>

@@ -1,0 +1,500 @@
+﻿using System.Globalization;
+
+namespace Terminal.Gui.Views;
+
+public partial class TextField
+{
+    private CultureInfo _currentCulture;
+
+    /// <summary>Raised before <see cref="Text"/> changes. The change can be canceled the text adjusted.</summary>
+    public event EventHandler<ResultEventArgs<string>>? TextChanging;
+
+    /// <summary>
+    ///     Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so
+    ///     new input should be appended at the cursor position, rather than clearing the entry
+    /// </summary>
+    public bool Used { get; set; }
+
+    private TextModel GetModel ()
+    {
+        TextModel model = new ();
+        model.LoadString (Text);
+
+        return model;
+    }
+
+    /// <summary>
+    ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
+    ///     typed it
+    /// </summary>
+    /// <param name="toAdd">Text to add</param>
+    /// <param name="useOldCursorPos">Use the previous cursor position.</param>
+    public void InsertText (string toAdd, bool useOldCursorPos = true)
+    {
+        foreach (Rune rune in toAdd.EnumerateRunes ())
+        {
+            // All rune can be mapped to a Key and no exception will throw here because
+            // EnumerateRunes will replace a surrogate char with the Rune.ReplacementChar
+            Key key = rune.Value;
+            InsertText (key, useOldCursorPos);
+        }
+    }
+
+    /// <summary>Raises the <see cref="TextChanging"/> event, enabling canceling the change or adjusting the text.</summary>
+    /// <param name="args">The event arguments.</param>
+    /// <returns><see langword="true"/> if the event was cancelled or the text was adjusted by the event.</returns>
+    public bool RaiseTextChanging (ResultEventArgs<string> args)
+    {
+        // TODO: CWP: Add an OnTextChanging protected virtual method that can be overridden to handle text changing events.
+
+        TextChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    private List<string> DeleteSelectedText ()
+    {
+        SetSelectedStartSelectedLength ();
+        int selStart = SelectedStart > -1 ? _start : _cursorPosition;
+
+        string newText = StringExtensions.ToString (_text.GetRange (0, selStart))
+                         + StringExtensions.ToString (
+                                                      _text.GetRange (
+                                                                      selStart + SelectedLength,
+                                                                      _text.Count - (selStart + SelectedLength)
+                                                                     )
+                                                     );
+
+        ClearAllSelection ();
+        _cursorPosition = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
+
+        return newText.ToStringList ();
+    }
+
+    private void InsertText (Key a, bool usePreTextChangedCursorPos)
+    {
+        _historyText.Add (
+                          [Cell.ToCells (_text)],
+                          new (_cursorPosition, 0)
+                         );
+
+        List<string> newText = _text;
+
+        if (SelectedLength > 0)
+        {
+            newText = DeleteSelectedText ();
+            _preTextChangedCursorPos = _cursorPosition;
+        }
+
+        if (!usePreTextChangedCursorPos)
+        {
+            _preTextChangedCursorPos = _cursorPosition;
+        }
+
+        StringRuneEnumerator enumeratedRunes = a.AsRune.ToString ().EnumerateRunes ();
+
+        if (Used)
+        {
+            _cursorPosition++;
+
+            if (_cursorPosition == newText.Count + 1)
+            {
+                SetText (newText.Concat (enumeratedRunes.Select (r => r.ToString ())).ToList ());
+            }
+            else
+            {
+                if (_preTextChangedCursorPos > newText.Count)
+                {
+                    _preTextChangedCursorPos = newText.Count;
+                }
+
+                SetText (
+                         newText.GetRange (0, _preTextChangedCursorPos)
+                                .Concat (enumeratedRunes.Select (r => r.ToString ()))
+                                .Concat (
+                                         newText.GetRange (
+                                                           _preTextChangedCursorPos,
+                                                           Math.Min (
+                                                                     newText.Count - _preTextChangedCursorPos,
+                                                                     newText.Count
+                                                                    )
+                                                          )
+                                        )
+                        );
+            }
+        }
+        else
+        {
+            SetText (
+                     newText.GetRange (0, _preTextChangedCursorPos)
+                            .Concat (enumeratedRunes.Select (r => r.ToString ()))
+                            .Concat (
+                                     newText.GetRange (
+                                                       Math.Min (_preTextChangedCursorPos + 1, newText.Count),
+                                                       Math.Max (newText.Count - _preTextChangedCursorPos - 1, 0)
+                                                      )
+                                    )
+                    );
+            _cursorPosition++;
+        }
+
+        Adjust ();
+    }
+
+    /// <summary>
+    ///     Caches the cursor position before a text change operation. Used to properly handle text insertion
+    ///     and deletion operations, particularly for undo/redo and proper cursor placement after edits.
+    /// </summary>
+    private int _preTextChangedCursorPos;
+
+    /// <summary>
+    ///     The text content stored as a list of strings, where each string represents a single text element
+    ///     (grapheme cluster). This allows proper handling of Unicode combining characters and emoji.
+    /// </summary>
+    private List<string> _text;
+
+    private void SetText (List<string> newText) { Text = StringExtensions.ToString (newText); }
+    private void SetText (IEnumerable<string> newText) { SetText (newText.ToList ()); }
+
+    /// <summary>Sets or gets the text held by the view.</summary>
+    public new string Text
+    {
+        get => StringExtensions.ToString (_text);
+        set
+        {
+            var oldText = StringExtensions.ToString (_text);
+
+            if (oldText == value)
+            {
+                return;
+            }
+
+            string newText = value.Replace ("\t", "").Split ("\n") [0];
+            ResultEventArgs<string> args = new (newText);
+            RaiseTextChanging (args);
+
+            if (args.Handled)
+            {
+                if (_cursorPosition > _text.Count)
+                {
+                    _cursorPosition = _text.Count;
+                }
+
+                return;
+            }
+
+            ClearAllSelection ();
+
+            // Note we use NewValue here; TextChanging subscribers may have changed it
+            _text = args.Result!.ToStringList ();
+
+            if (!Secret && !_historyText.IsFromHistory)
+            {
+                _historyText.Add (
+                                  [Cell.ToCellList (oldText)],
+                                  new (_cursorPosition, 0)
+                                 );
+
+                _historyText.Add (
+                                  [Cell.ToCells (_text)],
+                                  new (_cursorPosition, 0),
+                                  TextEditingLineStatus.Replaced
+                                 );
+            }
+
+            OnTextChanged ();
+
+            ProcessAutocomplete ();
+
+            if (_cursorPosition > _text.Count)
+            {
+                _cursorPosition = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+            }
+
+            Adjust ();
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>
+    ///     Returns <see langword="true"/> if the current cursor position is at the end of the <see cref="Text"/>. This
+    ///     includes when it is empty.
+    /// </summary>
+    /// <returns></returns>
+    internal bool CursorIsAtEnd () { return CursorPosition == Text.Length; }
+
+    /// <summary>Returns <see langword="true"/> if the current cursor position is at the start of the <see cref="TextField"/>.</summary>
+    /// <returns></returns>
+    internal bool CursorIsAtStart () { return CursorPosition <= 0; }
+
+    /// <summary>
+    ///     Adjusts the <see cref="ScrollOffset"/> to ensure the cursor remains visible within the viewport,
+    ///     and triggers a redraw if necessary.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method maintains the invariant that the cursor is always visible by adjusting <see cref="ScrollOffset"/>:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>If <see cref="CursorPosition"/> is to the left of the visible area, scrolls left</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>If <see cref="CursorPosition"/> is to the right of the visible area, scrolls right</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Called automatically after cursor movement or text changes to keep the cursor in view.
+    ///         If scrolling occurred or a redraw is needed, calls <see cref="View.SetNeedsDraw()"/>;
+    ///         otherwise, calls <see cref="PositionCursor()"/> to update the terminal cursor position.
+    ///     </para>
+    /// </remarks>
+    private void Adjust ()
+    {
+        if (SuperView is null)
+        {
+            return;
+        }
+
+        bool need = NeedsDraw || !Used;
+
+        // If cursor is before the visible area, scroll left to show it
+        if (_cursorPosition < ScrollOffset)
+        {
+            ScrollOffset = _cursorPosition;
+            need = true;
+        }
+
+        // If cursor is beyond the visible area, scroll right to show it
+        else if (Viewport.Width > 0
+                 && (ScrollOffset + _cursorPosition - Viewport.Width == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width))
+        {
+            ScrollOffset = Math.Max (
+                                     TextModel.CalculateLeftColumn (
+                                                                    _text,
+                                                                    ScrollOffset,
+                                                                    _cursorPosition,
+                                                                    Viewport.Width
+                                                                   ),
+                                     0
+                                    );
+            need = true;
+        }
+
+        if (need)
+        {
+            SetNeedsDraw ();
+        }
+        else
+        {
+            PositionCursor ();
+        }
+    }
+
+    /// <summary>
+    ///     Positions the cursor based on a screen column or text index.
+    /// </summary>
+    /// <param name="x">
+    ///     Either a screen column (if <paramref name="getX"/> is true) or a text index
+    ///     (if <paramref name="getX"/> is false).
+    /// </param>
+    /// <param name="getX">
+    ///     If true, <paramref name="x"/> is treated as a screen column and converted to a text index.
+    ///     If false, <paramref name="x"/> is used directly as a text index offset from <see cref="ScrollOffset"/>.
+    /// </param>
+    /// <returns>The resulting <see cref="CursorPosition"/> after positioning.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method handles the conversion from screen coordinates to logical text position:
+    ///         <list type="number">
+    ///             <item>
+    ///                 <description>
+    ///                     If <paramref name="getX"/> is true, converts screen column to text index using
+    ///                     <see cref="TextModel.GetColFromX(List{string},int,int,int)"/>
+    ///                 </description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Adds <see cref="ScrollOffset"/> to get the absolute text position</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Clamps the result to valid bounds [0, text length]</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
+    private int PositionCursor (int x, bool getX = true)
+    {
+        int pX = x;
+
+        if (getX)
+        {
+            // Convert screen column to text index (relative to ScrollOffset)
+            pX = TextModel.GetColFromX (_text, ScrollOffset, x);
+        }
+
+        // Convert relative position to absolute and clamp to valid range
+        if (ScrollOffset + pX > _text.Count)
+        {
+            _cursorPosition = _text.Count;
+        }
+        else if (ScrollOffset + pX < ScrollOffset)
+        {
+            _cursorPosition = 0;
+        }
+        else
+        {
+            _cursorPosition = ScrollOffset + pX;
+        }
+
+        return _cursorPosition;
+    }
+
+    /// <summary>
+    ///     The internal cursor position within the text, measured as a 0-based index into the text elements
+    ///     (graphemes/runes), not screen columns. This is the backing field for <see cref="CursorPosition"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This value represents the logical cursor position in the text, where 0 is before the first character
+    ///         and <c>_text.Count</c> is after the last character. For example, in the text "Hello":
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>Position 0 = cursor is before 'H'</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Position 5 = cursor is after 'o' (at the end)</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         This differs from screen position because:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>Wide characters (e.g., CJK) occupy multiple screen columns but are a single text element</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description><see cref="ScrollOffset"/> shifts the visible portion of text</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="PositionCursor()"/> to convert this logical position to screen coordinates.
+    ///     </para>
+    /// </remarks>
+    private int _cursorPosition;
+
+    /// <summary>
+    ///     Gets or sets the current cursor position within the text, measured as a 0-based index into text elements.
+    /// </summary>
+    /// <value>
+    ///     The cursor position, clamped to the range [0, Text.Length]. Position 0 is before the first character;
+    ///     position equal to the text length is after the last character.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         This property provides access to the logical cursor position within the text. The value is automatically
+    ///         clamped to valid bounds: values less than 0 become 0, and values greater than the text length become
+    ///         the text length.
+    ///     </para>
+    ///     <para>
+    ///         <b>Relationship to <see cref="PositionCursor()"/>:</b>
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description><see cref="CursorPosition"/>: Logical position in text elements (0-based index)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     <see cref="PositionCursor()"/>: Converts logical position to screen coordinates, accounting for
+    ///                     <see cref="ScrollOffset"/> and wide characters
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Example:</b> For text "Hello世界" (Hello + 2 CJK characters):
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>CursorPosition = 0: Before 'H'</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>CursorPosition = 5: Before '世'</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>CursorPosition = 7: After '界' (end of text)</description>
+    ///             </item>
+    ///         </list>
+    ///         Note that screen columns would differ because '世' and '界' each occupy 2 columns.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property also updates the text selection via <see cref="PrepareSelection"/>.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="PositionCursor()"/>
+    /// <seealso cref="ScrollOffset"/>
+    public virtual int CursorPosition
+    {
+        get => _cursorPosition;
+        set
+        {
+            if (value < 0)
+            {
+                _cursorPosition = 0;
+            }
+            else if (value > _text.Count)
+            {
+                _cursorPosition = _text.Count;
+            }
+            else
+            {
+                _cursorPosition = value;
+            }
+
+            PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+        }
+    }
+
+    /// <summary>
+    ///     Gets the horizontal scroll offset, representing the index of the first visible text element.
+    /// </summary>
+    /// <value>
+    ///     A 0-based index into the text elements indicating which element appears at the left edge of the viewport.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         When the text is longer than the viewport width, this property tracks how far the view has scrolled.
+    ///         The <see cref="Adjust"/> method automatically updates this value to keep the cursor visible.
+    ///     </para>
+    ///     <para>
+    ///         <b>Relationship to cursor positioning:</b>
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description><see cref="CursorPosition"/>: Absolute position in the text (0 to text length)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description><see cref="ScrollOffset"/>: Index of first visible character</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     Screen column = <see cref="CursorPosition"/> - <see cref="ScrollOffset"/> (approximately,
+    ///                     adjusted for wide chars)
+    ///                 </description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Example:</b> For text "Hello World" with viewport width 5:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <description>ScrollOffset = 0: Shows "Hello"</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>ScrollOffset = 6: Shows "World"</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="CursorPosition"/>
+    /// <seealso cref="PositionCursor()"/>
+    public int ScrollOffset { get; private set; }
+}

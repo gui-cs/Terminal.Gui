@@ -502,9 +502,7 @@ internal class TextModel
                 for (int i = selText.Count - 1; i > -1; i--)
                 {
                     if (selText [i] == " ")
-                    {
-                        col--;
-                    }
+                    col--;
                 }
             }
         }
@@ -874,13 +872,13 @@ internal class TextModel
         return true;
     }
 
-    private void Append (List<byte> line)
+    internal void Append (List<byte> line)
     {
         var str = StringExtensions.ToString (line.ToArray ());
         _lines.Add (Cell.StringToCells (str));
     }
 
-    private bool ApplyToFind ((Point current, bool found) foundPos)
+    internal bool ApplyToFind ((Point current, bool found) foundPos)
     {
         var gaveFullTurn = false;
 
@@ -907,7 +905,7 @@ internal class TextModel
         return gaveFullTurn;
     }
 
-    private (Point current, bool found) GetFoundNextTextPoint (
+    internal (Point current, bool found) GetFoundNextTextPoint (
         string text,
         int linesCount,
         bool matchCase,
@@ -947,7 +945,7 @@ internal class TextModel
         return (Point.Empty, false);
     }
 
-    private (Point current, bool found) GetFoundPreviousTextPoint (
+    internal (Point current, bool found) GetFoundPreviousTextPoint (
         string text,
         int linesCount,
         bool matchCase,
@@ -985,7 +983,7 @@ internal class TextModel
         return (Point.Empty, false);
     }
 
-    private static RuneType GetRuneType (Rune rune)
+    internal static RuneType GetRuneType (Rune rune)
     {
         if (Rune.IsSymbol (rune))
         {
@@ -1010,7 +1008,7 @@ internal class TextModel
         return RuneType.IsUnknown;
     }
 
-    private static bool IsSameRuneType (Rune newRune, RuneType runeType, bool useSameRuneType)
+    internal static bool IsSameRuneType (Rune newRune, RuneType runeType, bool useSameRuneType)
     {
         RuneType rt = GetRuneType (newRune);
 
@@ -1027,7 +1025,7 @@ internal class TextModel
         };
     }
 
-    private static bool MatchWholeWord (string source, string matchText, int index = 0)
+    internal static bool MatchWholeWord (string source, string matchText, int index = 0)
     {
         if (string.IsNullOrEmpty (source) || string.IsNullOrEmpty (matchText))
         {
@@ -1041,7 +1039,7 @@ internal class TextModel
         return (start == 0 || Rune.IsWhiteSpace ((Rune)source [start])) && (end == source.Length || Rune.IsWhiteSpace ((Rune)source [end]));
     }
 
-    private bool MoveNext (ref int col, ref int row, out Rune rune, bool useSameRuneType)
+    internal bool MoveNext (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
@@ -1086,7 +1084,7 @@ internal class TextModel
         return false;
     }
 
-    private bool MovePrev (ref int col, ref int row, out Rune rune, bool useSameRuneType)
+    internal bool MovePrev (ref int col, ref int row, out Rune rune, bool useSameRuneType)
     {
         List<Cell> line = GetLine (row);
 
@@ -1107,9 +1105,9 @@ internal class TextModel
         return false;
     }
 
-    private void OnLinesLoaded () { LinesLoaded?.Invoke (this, EventArgs.Empty); }
+    internal void OnLinesLoaded () { LinesLoaded?.Invoke (this, EventArgs.Empty); }
 
-    private static string ReplaceText (List<Cell> source, string textToReplace, string matchText, int col)
+    internal static string ReplaceText (List<Cell> source, string textToReplace, string matchText, int col)
     {
         var origTxt = Cell.ToString (source);
         (_, int len) = DisplaySize (source, 0, col, false);
@@ -1119,7 +1117,7 @@ internal class TextModel
         return string.Concat (origTxt.AsSpan () [..len], textToReplace, origTxt.AsSpan (len + len2, len3));
     }
 
-    private Cell? RuneAt (int col, int row)
+    internal Cell? RuneAt (int col, int row)
     {
         List<Cell> line = GetLine (row);
 
@@ -1131,7 +1129,7 @@ internal class TextModel
         return null;
     }
 
-    private void SetAttributes (Attribute? attribute)
+    internal void SetAttributes (Attribute? attribute)
     {
         foreach (List<Cell> line in _lines)
         {
@@ -1144,7 +1142,7 @@ internal class TextModel
         }
     }
 
-    private enum RuneType
+    internal enum RuneType
     {
         IsSymbol,
         IsWhiteSpace,
