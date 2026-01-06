@@ -9,14 +9,88 @@ public class TextField : View, IDesignable
 {
     private readonly HistoryText _historyText;
     private CultureInfo _currentCulture;
+
+    /// <summary>
+    ///     The internal cursor position within the text, measured as a 0-based index into the text elements
+    ///     (graphemes/runes), not screen columns. This is the backing field for <see cref="CursorPosition"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This value represents the logical cursor position in the text, where 0 is before the first character
+    ///         and <c>_text.Count</c> is after the last character. For example, in the text "Hello":
+    ///         <list type="bullet">
+    ///             <item><description>Position 0 = cursor is before 'H'</description></item>
+    ///             <item><description>Position 5 = cursor is after 'o' (at the end)</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         This differs from screen position because:
+    ///         <list type="bullet">
+    ///             <item><description>Wide characters (e.g., CJK) occupy multiple screen columns but are a single text element</description></item>
+    ///             <item><description><see cref="ScrollOffset"/> shifts the visible portion of text</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="PositionCursor()"/> to convert this logical position to screen coordinates.
+    ///     </para>
+    /// </remarks>
     private int _cursorPosition;
+
     private bool _isButtonPressed;
     private bool _isButtonReleased;
     private bool _isDrawing;
+
+    /// <summary>
+    ///     Caches the cursor position before a text change operation. Used to properly handle text insertion
+    ///     and deletion operations, particularly for undo/redo and proper cursor placement after edits.
+    /// </summary>
     private int _preTextChangedCursorPos;
-    private int _selectedStart; // -1 represents there is no text selection.
+
+    /// <summary>
+    ///     The starting position of the text selection, measured as a 0-based index into text elements.
+    ///     A value of -1 indicates no active selection. This is the backing field for <see cref="SelectedStart"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When selecting text:
+    ///         <list type="bullet">
+    ///             <item><description>This marks where the selection began (the anchor point)</description></item>
+    ///             <item><description><see cref="_cursorPosition"/> marks the current end of the selection</description></item>
+    ///             <item><description>Selection can extend in either direction from this point</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         The <see cref="_start"/> field holds the normalized start position (always the lesser of
+    ///         <see cref="_selectedStart"/> and <see cref="_cursorPosition"/>), used for drawing and text operations.
+    ///     </para>
+    /// </remarks>
+    private int _selectedStart;
+
     private string _selectedText;
+
+    /// <summary>
+    ///     The normalized start position of the selection for drawing purposes. Unlike <see cref="_selectedStart"/>
+    ///     (the anchor), this is always the leftmost position of the selection range.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This value is computed by <see cref="SetSelectedStartSelectedLength"/> to ensure:
+    ///         <list type="bullet">
+    ///             <item><description>When selecting left-to-right: <c>_start == _selectedStart</c></description></item>
+    ///             <item><description>When selecting right-to-left: <c>_start == _cursorPosition</c></description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         This normalization simplifies rendering logic in <see cref="OnDrawingContent"/> and
+    ///         text operations in <see cref="DeleteSelectedText"/>.
+    ///     </para>
+    /// </remarks>
     private int _start;
+
+    /// <summary>
+    ///     The text content stored as a list of strings, where each string represents a single text element
+    ///     (grapheme cluster). This allows proper handling of Unicode combining characters and emoji.
+    /// </summary>
     private List<string> _text;
 
     /// <summary>
@@ -429,7 +503,41 @@ public class TextField : View, IDesignable
     [CanBeNull]
     public PopoverMenu ContextMenu { get; private set; }
 
-    /// <summary>Sets or gets the current cursor position.</summary>
+    /// <summary>
+    ///     Gets or sets the current cursor position within the text, measured as a 0-based index into text elements.
+    /// </summary>
+    /// <value>
+    ///     The cursor position, clamped to the range [0, Text.Length]. Position 0 is before the first character;
+    ///     position equal to the text length is after the last character.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         This property provides access to the logical cursor position within the text. The value is automatically
+    ///         clamped to valid bounds: values less than 0 become 0, and values greater than the text length become
+    ///         the text length.
+    ///     </para>
+    ///     <para>
+    ///         <b>Relationship to <see cref="PositionCursor()"/>:</b>
+    ///         <list type="bullet">
+    ///             <item><description><see cref="CursorPosition"/>: Logical position in text elements (0-based index)</description></item>
+    ///             <item><description><see cref="PositionCursor()"/>: Converts logical position to screen coordinates, accounting for <see cref="ScrollOffset"/> and wide characters</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Example:</b> For text "Hello世界" (Hello + 2 CJK characters):
+    ///         <list type="bullet">
+    ///             <item><description>CursorPosition = 0: Before 'H'</description></item>
+    ///             <item><description>CursorPosition = 5: Before '世'</description></item>
+    ///             <item><description>CursorPosition = 7: After '界' (end of text)</description></item>
+    ///         </list>
+    ///         Note that screen columns would differ because '世' and '界' each occupy 2 columns.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property also updates the text selection via <see cref="PrepareSelection"/>.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="PositionCursor()"/>
+    /// <seealso cref="ScrollOffset"/>
     public virtual int CursorPosition
     {
         get => _cursorPosition;
@@ -467,7 +575,35 @@ public class TextField : View, IDesignable
     /// <summary>If set to true its not allow any changes in the text.</summary>
     public bool ReadOnly { get; set; }
 
-    /// <summary>Gets the left offset position.</summary>
+    /// <summary>
+    ///     Gets the horizontal scroll offset, representing the index of the first visible text element.
+    /// </summary>
+    /// <value>
+    ///     A 0-based index into the text elements indicating which element appears at the left edge of the viewport.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         When the text is longer than the viewport width, this property tracks how far the view has scrolled.
+    ///         The <see cref="Adjust"/> method automatically updates this value to keep the cursor visible.
+    ///     </para>
+    ///     <para>
+    ///         <b>Relationship to cursor positioning:</b>
+    ///         <list type="bullet">
+    ///             <item><description><see cref="CursorPosition"/>: Absolute position in the text (0 to text length)</description></item>
+    ///             <item><description><see cref="ScrollOffset"/>: Index of first visible character</description></item>
+    ///             <item><description>Screen column = <see cref="CursorPosition"/> - <see cref="ScrollOffset"/> (approximately, adjusted for wide chars)</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Example:</b> For text "Hello World" with viewport width 5:
+    ///         <list type="bullet">
+    ///             <item><description>ScrollOffset = 0: Shows "Hello"</description></item>
+    ///             <item><description>ScrollOffset = 6: Shows "World"</description></item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="CursorPosition"/>
+    /// <seealso cref="PositionCursor()"/>
     public int ScrollOffset { get; private set; }
 
     /// <summary>
@@ -476,10 +612,53 @@ public class TextField : View, IDesignable
     /// </summary>
     public bool Secret { get; set; }
 
-    /// <summary>Length of the selected text.</summary>
+    /// <summary>
+    ///     Gets the length of the selected text in text elements.
+    /// </summary>
+    /// <value>
+    ///     The number of text elements (graphemes) currently selected. Returns 0 when no text is selected.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         This value represents the absolute length of the selection, regardless of selection direction.
+    ///         Use in combination with <see cref="SelectedStart"/> and <see cref="SelectedText"/> to work with selections.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="SelectedStart"/>
+    /// <seealso cref="SelectedText"/>
     public int SelectedLength { get; private set; }
 
-    /// <summary>Start position of the selected text.</summary>
+    /// <summary>
+    ///     Gets or sets the anchor position where text selection began, measured as a 0-based index into text elements.
+    /// </summary>
+    /// <value>
+    ///     The starting position of the selection, or -1 if no selection is active.
+    ///     The value is clamped to the range [-1, Text.Length].
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         <b>Selection model:</b> TextField uses an anchor-based selection model:
+    ///         <list type="bullet">
+    ///             <item><description><see cref="SelectedStart"/>: The anchor point where selection began (can be before or after cursor)</description></item>
+    ///             <item><description><see cref="CursorPosition"/>: The current end of the selection</description></item>
+    ///             <item><description><see cref="SelectedLength"/>: The absolute length of the selection</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Example:</b> In text "Hello World", selecting "World" by shift+clicking:
+    ///         <list type="bullet">
+    ///             <item><description>If cursor was at position 6 and user shift-clicks at position 11: SelectedStart=6, CursorPosition=11</description></item>
+    ///             <item><description>If cursor was at position 11 and user shift-clicks at position 6: SelectedStart=11, CursorPosition=6</description></item>
+    ///             <item><description>In both cases, SelectedLength=5 and SelectedText="World"</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Setting this property triggers <see cref="PrepareSelection"/> to update the selection state.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="SelectedLength"/>
+    /// <seealso cref="SelectedText"/>
+    /// <seealso cref="CursorPosition"/>
     public int SelectedStart
     {
         get => _selectedStart;
@@ -1102,7 +1281,44 @@ public class TextField : View, IDesignable
         Adjust ();
     }
 
-    /// <summary>Sets the cursor position.</summary>
+    /// <summary>
+    ///     Converts the logical <see cref="CursorPosition"/> to screen coordinates and positions the terminal cursor.
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="Point"/> representing the cursor's screen position within the viewport, where X is the column
+    ///     and Y is always 0 (since TextField is single-line).
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method performs the critical translation between logical text position and physical screen position:
+    ///         <list type="number">
+    ///             <item><description>Starts from <see cref="ScrollOffset"/> (first visible character)</description></item>
+    ///             <item><description>Iterates through visible text elements up to <see cref="CursorPosition"/></description></item>
+    ///             <item><description>Accumulates screen column widths (accounting for wide characters)</description></item>
+    ///             <item><description>Calls <see cref="View.Move"/> to position the terminal cursor</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Coordinate spaces:</b>
+    ///         <list type="bullet">
+    ///             <item><description><see cref="CursorPosition"/>: Logical position (0 to text length)</description></item>
+    ///             <item><description>Returned Point: Screen position within viewport (0 to viewport width)</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Example:</b> For text "Hi世界" with ScrollOffset=0:
+    ///         <list type="bullet">
+    ///             <item><description>CursorPosition=0 → Screen column 0 (before 'H')</description></item>
+    ///             <item><description>CursorPosition=2 → Screen column 2 (before '世')</description></item>
+    ///             <item><description>CursorPosition=3 → Screen column 4 (before '界', because '世' is 2 columns wide)</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         This method also triggers <see cref="ProcessAutocomplete"/> to update autocomplete suggestions.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="CursorPosition"/>
+    /// <seealso cref="ScrollOffset"/>
     public override Point? PositionCursor ()
     {
         ProcessAutocomplete ();
@@ -1182,6 +1398,24 @@ public class TextField : View, IDesignable
     /// <returns></returns>
     internal bool CursorIsAtStart () { return CursorPosition <= 0; }
 
+    /// <summary>
+    ///     Adjusts the <see cref="ScrollOffset"/> to ensure the cursor remains visible within the viewport,
+    ///     and triggers a redraw if necessary.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method maintains the invariant that the cursor is always visible by adjusting <see cref="ScrollOffset"/>:
+    ///         <list type="bullet">
+    ///             <item><description>If <see cref="CursorPosition"/> is to the left of the visible area, scrolls left</description></item>
+    ///             <item><description>If <see cref="CursorPosition"/> is to the right of the visible area, scrolls right</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Called automatically after cursor movement or text changes to keep the cursor in view.
+    ///         If scrolling occurred or a redraw is needed, calls <see cref="View.SetNeedsDraw"/>;
+    ///         otherwise, calls <see cref="PositionCursor()"/> to update the terminal cursor position.
+    ///     </para>
+    /// </remarks>
     private void Adjust ()
     {
         if (SuperView is null)
@@ -1189,18 +1423,20 @@ public class TextField : View, IDesignable
             return;
         }
 
-        // TODO: This is a lame prototype proving it should be easy for TextField to 
+        // TODO: This is a lame prototype proving it should be easy for TextField to
         // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
         //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
 
         int offB = OffSetBackground ();
         bool need = NeedsDraw || !Used;
 
+        // If cursor is before the visible area, scroll left to show it
         if (_cursorPosition < ScrollOffset)
         {
             ScrollOffset = _cursorPosition;
             need = true;
         }
+        // If cursor is beyond the visible area, scroll right to show it
         else if (Viewport.Width > 0
                  && (ScrollOffset + _cursorPosition - (Viewport.Width + offB) == 0
                      || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width + offB))
@@ -1585,17 +1821,47 @@ public class TextField : View, IDesignable
         return 0; //offB;
     }
 
+    /// <summary>
+    ///     Positions the cursor based on a mouse event by converting the mouse's screen X coordinate
+    ///     to a logical text position.
+    /// </summary>
+    /// <param name="mouse">The mouse event containing the screen position.</param>
+    /// <returns>The resulting <see cref="CursorPosition"/> after positioning.</returns>
     private int PositionCursor (Mouse mouse) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false); }
 
+    /// <summary>
+    ///     Positions the cursor based on a screen column or text index.
+    /// </summary>
+    /// <param name="x">
+    ///     Either a screen column (if <paramref name="getX"/> is true) or a text index
+    ///     (if <paramref name="getX"/> is false).
+    /// </param>
+    /// <param name="getX">
+    ///     If true, <paramref name="x"/> is treated as a screen column and converted to a text index.
+    ///     If false, <paramref name="x"/> is used directly as a text index offset from <see cref="ScrollOffset"/>.
+    /// </param>
+    /// <returns>The resulting <see cref="CursorPosition"/> after positioning.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method handles the conversion from screen coordinates to logical text position:
+    ///         <list type="number">
+    ///             <item><description>If <paramref name="getX"/> is true, converts screen column to text index using <see cref="TextModel.GetColFromX"/></description></item>
+    ///             <item><description>Adds <see cref="ScrollOffset"/> to get the absolute text position</description></item>
+    ///             <item><description>Clamps the result to valid bounds [0, text length]</description></item>
+    ///         </list>
+    ///     </para>
+    /// </remarks>
     private int PositionCursor (int x, bool getX = true)
     {
         int pX = x;
 
         if (getX)
         {
+            // Convert screen column to text index (relative to ScrollOffset)
             pX = TextModel.GetColFromX (_text, ScrollOffset, x);
         }
 
+        // Convert relative position to absolute and clamp to valid range
         if (ScrollOffset + pX > _text.Count)
         {
             _cursorPosition = _text.Count;
@@ -1612,6 +1878,28 @@ public class TextField : View, IDesignable
         return _cursorPosition;
     }
 
+    /// <summary>
+    ///     Updates the text selection state based on the anchor position and selection direction.
+    /// </summary>
+    /// <param name="x">The anchor position (where selection started) as a text element index.</param>
+    /// <param name="direction">
+    ///     The direction and distance of selection change. Positive values extend right,
+    ///     negative values extend left. A value of 0 indicates position-based selection (e.g., from mouse click).
+    /// </param>
+    /// <remarks>
+    ///     <para>
+    ///         This method manages the selection state:
+    ///         <list type="bullet">
+    ///             <item><description>Sets <see cref="_selectedStart"/> if not already set and position is valid</description></item>
+    ///             <item><description>Calculates <see cref="SelectedLength"/> based on anchor and direction</description></item>
+    ///             <item><description>Extracts <see cref="SelectedText"/> from the text</description></item>
+    ///             <item><description>Adjusts <see cref="ScrollOffset"/> if selection extends beyond visible area</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Called by cursor movement methods (with direction) and mouse handling (with direction=0).
+    ///     </para>
+    /// </remarks>
     private void PrepareSelection (int x, int direction = 0)
     {
         x = x + ScrollOffset < -1 ? 0 : x;
