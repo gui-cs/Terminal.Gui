@@ -45,10 +45,10 @@ public class LinearRange<T> : View, IOrientation
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
 
         _options = options;
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = _config._linearRangeOrientation = orientation;
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
@@ -522,8 +522,21 @@ public class LinearRange<T> : View, IOrientation
 
     #region Public Methods
 
+    private int _focusedOption;
+
     /// <summary>The focused option (has the cursor).</summary>
-    public int FocusedOption { get; set; }
+    public int FocusedOption
+    {
+        get => _focusedOption;
+        set
+        {
+            if (_focusedOption != value)
+            {
+                _focusedOption = value;
+                UpdateCursor ();
+            }
+        }
+    }
 
     /// <summary>Causes the specified option to be set and be focused.</summary>
     public bool SetOption (int optionIndex)
@@ -881,19 +894,22 @@ public class LinearRange<T> : View, IOrientation
         return false;
     }
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
+    /// <summary>Updates the cursor position based on the focused option.</summary>
+    /// <remarks>
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor(Point?, CursorVisibility)"/>.
+    ///     The framework automatically handles hiding the cursor when the view loses focus.
+    /// </remarks>
+    private void UpdateCursor ()
     {
         if (!TryGetPositionByOption (FocusedOption, out (int x, int y) position)
             || !IsInitialized
             || !Viewport.Contains (position.x, position.y))
         {
-            return base.PositionCursor ();
+            SetCursor (new Point (position.x, position.y), CursorVisibility.Invisible);
+            return;
         }
 
-        Move (position.x, position.y);
-
-        return new (position.x, position.y);
+        SetCursor (new Point (position.x, position.y), CursorVisibility.Default);
     }
 
     #endregion Cursor and Position

@@ -409,7 +409,7 @@ public class Editor : Scenario
                                              {
                                                  if (e.Result == CheckState.Checked)
                                                  {
-                                                     _textView.CursorVisibility = visibility;
+                                                     _textView.SetCursor (_textView.CursorPosition, visibility);
 
                                                      foreach (CheckBox cb in radioGroup)
                                                      {

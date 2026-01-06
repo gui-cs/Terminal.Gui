@@ -30,7 +30,7 @@ public class TimeField : TextField
         _shortFormat = $" hh\\{_sepChar}mm";
         Width = FieldLength + 2;
         Time = TimeSpan.MinValue;
-        CursorPosition = 1;
+        CursorPos = 1;
         TextChanging += TextField_TextChanging;
 
         // Things this view knows how to do
@@ -82,10 +82,10 @@ public class TimeField : TextField
     }
 
     /// <inheritdoc/>
-    public override int CursorPosition
+    public override int CursorPos
     {
-        get => base.CursorPosition;
-        set => base.CursorPosition = Math.Max (Math.Min (value, FieldLength), 1);
+        get => base.CursorPos;
+        set => base.CursorPos = Math.Max (Math.Min (value, FieldLength), 1);
     }
 
     /// <summary>Get or sets whether <see cref="TimeField"/> uses the short or long time format.</summary>
@@ -223,52 +223,52 @@ public class TimeField : TextField
 
         if (newPoint != point)
         {
-            CursorPosition = newPoint;
+            CursorPos = newPoint;
         }
 
-        while (CursorPosition < Text.GetColumns() -1 && Text [CursorPosition] == _sepChar [0])
+        while (CursorPos < Text.GetColumns() -1 && Text [CursorPos] == _sepChar [0])
         {
             if (increment)
             {
-                CursorPosition++;
+                CursorPos++;
             }
             else
             {
-                CursorPosition--;
+                CursorPos--;
             }
         }
     }
 
     private void DecCursorPosition ()
     {
-        if (CursorPosition <= 1)
+        if (CursorPos <= 1)
         {
-            CursorPosition = 1;
+            CursorPos = 1;
 
             return;
         }
 
-        CursorPosition--;
-        AdjCursorPosition (CursorPosition, false);
+        CursorPos--;
+        AdjCursorPosition (CursorPos, false);
     }
 
     private void IncCursorPosition ()
     {
-        if (CursorPosition >= FieldLength)
+        if (CursorPos >= FieldLength)
         {
-            CursorPosition = FieldLength;
+            CursorPos = FieldLength;
 
             return;
         }
 
-        CursorPosition++;
-        AdjCursorPosition (CursorPosition);
+        CursorPos++;
+        AdjCursorPosition (CursorPos);
     }
 
     private new bool MoveEnd ()
     {
         ClearAllSelection ();
-        CursorPosition = FieldLength;
+        CursorPos = FieldLength;
 
         return true;
     }
@@ -277,7 +277,7 @@ public class TimeField : TextField
     {
         // Home, C-A
         ClearAllSelection ();
-        CursorPosition = 1;
+        CursorPos = 1;
 
         return true;
     }
@@ -335,15 +335,15 @@ public class TimeField : TextField
     private bool SetText (Rune key)
     {
         List<Rune> text = Text.EnumerateRunes ().ToList ();
-        List<Rune> newText = text.GetRange (0, CursorPosition);
+        List<Rune> newText = text.GetRange (0, CursorPos);
         newText.Add (key);
 
-        if (CursorPosition < FieldLength)
+        if (CursorPos < FieldLength)
         {
             newText =
             [
                 .. newText,
-                .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+                .. text.GetRange (CursorPos + 1, text.Count - (CursorPos + 1))
             ];
         }
 
@@ -468,7 +468,7 @@ public class TimeField : TextField
                 e.Handled = true;
             }
 
-            AdjCursorPosition (CursorPosition);
+            AdjCursorPosition (CursorPos);
         }
         catch (Exception)
         {

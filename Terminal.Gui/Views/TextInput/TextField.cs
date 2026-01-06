@@ -9,7 +9,7 @@ public class TextField : View, IDesignable
 {
     private readonly HistoryText _historyText;
     private CultureInfo _currentCulture;
-    private int _cursorPosition;
+    private int _cursorPos;
     private bool _isButtonPressed;
     private bool _isButtonReleased;
     private bool _isDrawing;
@@ -34,7 +34,6 @@ public class TextField : View, IDesignable
         Height = Dim.Auto (DimAutoStyle.Text, 1);
 
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
         Used = true;
         MousePositionTracking = true;
 
@@ -430,32 +429,21 @@ public class TextField : View, IDesignable
     public PopoverMenu ContextMenu { get; private set; }
 
     /// <summary>Sets or gets the current cursor position.</summary>
-    public virtual int CursorPosition
+    public virtual int CursorPos
     {
-        get => _cursorPosition;
+        get => _cursorPos;
         set
         {
-            int oldPosition = _cursorPosition;
+            int oldPosition = _cursorPos;
 
-            if (value < 0)
-            {
-                _cursorPosition = 0;
-            }
-            else if (value > _text.Count)
-            {
-                _cursorPosition = _text.Count;
-            }
-            else
-            {
-                _cursorPosition = value;
-            }
+            _cursorPos = value < 0 ? 0 : value;
 
-            PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+            PrepareSelection (_selectedStart, _cursorPos - _selectedStart);
 
             // Signal cursor position changed without requiring full redraw
-            if (_cursorPosition != oldPosition)
+            if (_cursorPos != oldPosition)
             {
-                SetCursorNeedsUpdate ();
+                UpdateCursor ();
             }
         }
     }
@@ -507,7 +495,7 @@ public class TextField : View, IDesignable
                 _selectedStart = value;
             }
 
-            PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+            PrepareSelection (_selectedStart, CursorPos - _selectedStart);
         }
     }
 
@@ -537,9 +525,9 @@ public class TextField : View, IDesignable
 
             if (args.Handled)
             {
-                if (_cursorPosition > _text.Count)
+                if (CursorPos > _text.Count)
                 {
-                    _cursorPosition = _text.Count;
+                    CursorPos = _text.Count;
                 }
 
                 return;
@@ -554,12 +542,12 @@ public class TextField : View, IDesignable
             {
                 _historyText.Add (
                                   [Cell.ToCellList (oldText)],
-                                  new (_cursorPosition, 0)
+                                  new (CursorPos, 0)
                                  );
 
                 _historyText.Add (
                                   [Cell.ToCells (_text)],
-                                  new (_cursorPosition, 0),
+                                  new (CursorPos, 0),
                                   TextEditingLineStatus.Replaced
                                  );
             }
@@ -568,9 +556,9 @@ public class TextField : View, IDesignable
 
             ProcessAutocomplete ();
 
-            if (_cursorPosition > _text.Count)
+            if (CursorPos > _text.Count)
             {
-                _cursorPosition = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+                CursorPos = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
             }
 
             Adjust ();
@@ -658,7 +646,7 @@ public class TextField : View, IDesignable
     /// <summary>Deletes the character to the left.</summary>
     /// <param name="usePreTextChangedCursorPos">
     ///     If set to <see langword="true">true</see> use the cursor position cached ;
-    ///     otherwise use <see cref="CursorPosition"/>. use .
+    ///     otherwise use <see cref="CursorPos"/>. use .
     /// </param>
     public virtual void DeleteCharLeft (bool usePreTextChangedCursorPos)
     {
@@ -668,23 +656,23 @@ public class TextField : View, IDesignable
         }
 
         _historyText.Add (
-                          new () { Cell.ToCells (_text) },
-                          new (_cursorPosition, 0)
+                          [Cell.ToCells (_text)],
+                          new (CursorPos, 0)
                          );
 
         if (SelectedLength == 0)
         {
-            if (_cursorPosition == 0)
+            if (CursorPos == 0)
             {
                 return;
             }
 
             if (!usePreTextChangedCursorPos)
             {
-                _preTextChangedCursorPos = _cursorPosition;
+                _preTextChangedCursorPos = CursorPos;
             }
 
-            _cursorPosition--;
+            CursorPos--;
 
             if (_preTextChangedCursorPos < _text.Count)
             {
@@ -702,15 +690,14 @@ public class TextField : View, IDesignable
             {
                 SetText (_text.GetRange (0, _preTextChangedCursorPos - 1));
             }
-
-            Adjust ();
         }
         else
         {
             List<string> newText = DeleteSelectedText ();
             Text = StringExtensions.ToString (newText);
-            Adjust ();
         }
+
+        Adjust ();
     }
 
     /// <summary>Deletes the character to the right.</summary>
@@ -722,29 +709,29 @@ public class TextField : View, IDesignable
         }
 
         _historyText.Add (
-                          new () { Cell.ToCells (_text) },
-                          new (_cursorPosition, 0)
+                          [Cell.ToCells (_text)],
+                          new (CursorPos, 0)
                          );
 
         if (SelectedLength == 0)
         {
-            if (_text.Count == 0 || _text.Count == _cursorPosition)
+            if (_text.Count == 0 || _text.Count == CursorPos)
             {
                 return;
             }
 
             SetText (
-                     _text.GetRange (0, _cursorPosition)
-                          .Concat (_text.GetRange (_cursorPosition + 1, _text.Count - (_cursorPosition + 1)))
+                     _text.GetRange (0, CursorPos)
+                          .Concat (_text.GetRange (CursorPos + 1, _text.Count - (CursorPos + 1)))
                     );
-            Adjust ();
         }
         else
         {
             List<string> newText = DeleteSelectedText ();
             Text = StringExtensions.ToString (newText);
-            Adjust ();
         }
+
+        Adjust ();
     }
 
     /// <inheritdoc/>
@@ -781,7 +768,7 @@ public class TextField : View, IDesignable
     public virtual void KillWordBackwards ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordBackward (CursorPos, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -792,9 +779,9 @@ public class TextField : View, IDesignable
         {
             SetText (
                      _text.GetRange (0, newPos.Value.col)
-                          .Concat (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition))
+                          .Concat (_text.GetRange (CursorPos, _text.Count - CursorPos))
                     );
-            _cursorPosition = newPos.Value.col;
+            CursorPos = newPos.Value.col;
         }
 
         Adjust ();
@@ -804,7 +791,7 @@ public class TextField : View, IDesignable
     public virtual void KillWordForwards ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordForward (CursorPos, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -814,7 +801,7 @@ public class TextField : View, IDesignable
         if (newPos.Value.col != -1)
         {
             SetText (
-                     _text.GetRange (0, _cursorPosition)
+                     _text.GetRange (0, CursorPos)
                           .Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col))
                     );
         }
@@ -892,7 +879,7 @@ public class TextField : View, IDesignable
             }
 
             SelectedStart = newPos.Value.startCol;
-            CursorPosition = newPos.Value.col;
+            CursorPos = newPos.Value.col;
         }
         else if (ev.Flags == MouseFlags.LeftButtonTripleClicked)
         {
@@ -906,8 +893,6 @@ public class TextField : View, IDesignable
             PositionCursor (ev);
             ShowContextMenu (false);
         }
-
-        //SetNeedsDraw ();
 
         return true;
 
@@ -924,7 +909,7 @@ public class TextField : View, IDesignable
     public void MoveEnd ()
     {
         ClearAllSelection ();
-        _cursorPosition = _text.Count;
+        CursorPos = _text.Count;
         Adjust ();
     }
 
@@ -958,7 +943,7 @@ public class TextField : View, IDesignable
                 // Disabled
                 SetAttributeForRole (VisualRole.Disabled);
             }
-            else if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
+            else if (idx == CursorPos && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
             {
                 // Selected text
                 SetAttribute (selectedAttribute);
@@ -1025,6 +1010,17 @@ public class TextField : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+        if (newHasFocus)
+        {
+            UpdateCursor ();
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    {
+        UpdateCursor ();
+        base.OnSubViewsLaidOut (args);
     }
 
     /// <inheritdoc/>
@@ -1045,7 +1041,7 @@ public class TextField : View, IDesignable
         // Remember the cursor position because the new calculated cursor position is needed
         // to be set BEFORE the TextChanged event is triggered.
         // Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
-        _preTextChangedCursorPos = _cursorPosition;
+        _preTextChangedCursorPos = CursorPos;
 
         // Ignore other control characters.
         if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))
@@ -1094,7 +1090,7 @@ public class TextField : View, IDesignable
         }
 
         SetSelectedStartSelectedLength ();
-        int selStart = _start == -1 ? CursorPosition : _start;
+        int selStart = _start == -1 ? CursorPos : _start;
 
         Text = StringExtensions.ToString (_text.GetRange (0, selStart))
                + cbTxt
@@ -1105,13 +1101,16 @@ public class TextField : View, IDesignable
                                                            )
                                            );
 
-        _cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
+        CursorPos = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
         ClearAllSelection ();
         Adjust ();
     }
 
-    /// <summary>Sets the cursor position.</summary>
-    public override Point? PositionCursor ()
+    /// <summary>Updates the cursor position.</summary>
+    /// <remarks>
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor(Point?, CursorVisibility)"/>.
+    /// </remarks>
+    private void UpdateCursor ()
     {
         ProcessAutocomplete ();
 
@@ -1119,7 +1118,7 @@ public class TextField : View, IDesignable
 
         for (int idx = ScrollOffset < 0 ? 0 : ScrollOffset; idx < _text.Count; idx++)
         {
-            if (idx == _cursorPosition)
+            if (idx == CursorPos)
             {
                 break;
             }
@@ -1131,16 +1130,8 @@ public class TextField : View, IDesignable
 
         int pos = col + Math.Min (Viewport.X, 0);
 
-        // Check if cursor is within viewport bounds
-        // If cursor is outside viewport, return null to hide it
-        if (pos < 0 || pos >= Viewport.Width)
-        {
-            return null;
-        }
-
-        Move (pos, 0);
-
-        return new Point (pos, 0);
+        // Set the terminal cursor position
+        SetCursor (new Point (pos, 0), CursorVisibility.Default);
     }
 
     /// <summary>Redoes the latest changes.</summary>
@@ -1183,15 +1174,10 @@ public class TextField : View, IDesignable
     ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>
-    internal bool CursorIsAtEnd () => CursorPosition == Text.Length;
+    internal bool CursorIsAtEnd () => CursorPos == Text.Length;
 
     private void Adjust ()
     {
-        if (SuperView is null)
-        {
-            return;
-        }
-
         // TODO: This is a lame prototype proving it should be easy for TextField to
         // TODO: support Width = Dim.Auto (DimAutoStyle: Content).
         //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
@@ -1199,20 +1185,20 @@ public class TextField : View, IDesignable
         int offB = OffSetBackground ();
         bool need = NeedsDraw || !Used;
 
-        if (_cursorPosition < ScrollOffset)
+        if (CursorPos < ScrollOffset)
         {
-            ScrollOffset = _cursorPosition;
+            ScrollOffset = CursorPos;
             need = true;
         }
         else if (Viewport.Width > 0
-                 && (ScrollOffset + _cursorPosition - (Viewport.Width + offB) == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width + offB))
+                 && (ScrollOffset + CursorPos - (Viewport.Width + offB) == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, CursorPos).size >= Viewport.Width + offB))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
                                                                     _text,
                                                                     ScrollOffset,
-                                                                    _cursorPosition,
+                                                                    CursorPos,
                                                                     Viewport.Width + offB
                                                                    ),
                                      0
@@ -1224,10 +1210,7 @@ public class TextField : View, IDesignable
         {
             SetNeedsDraw ();
         }
-        else
-        {
-            SetCursorNeedsUpdate ();
-        }
+        UpdateCursor ();
     }
 
     private void CreateContextMenu ()
@@ -1259,7 +1242,7 @@ public class TextField : View, IDesignable
     private List<string> DeleteSelectedText ()
     {
         SetSelectedStartSelectedLength ();
-        int selStart = SelectedStart > -1 ? _start : _cursorPosition;
+        int selStart = SelectedStart > -1 ? _start : CursorPos;
 
         string newText = StringExtensions.ToString (_text.GetRange (0, selStart))
                          + StringExtensions.ToString (
@@ -1270,7 +1253,7 @@ public class TextField : View, IDesignable
                                                      );
 
         ClearAllSelection ();
-        _cursorPosition = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
+        CursorPos = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 
         return newText.ToStringList ();
     }
@@ -1278,7 +1261,7 @@ public class TextField : View, IDesignable
     private void GenerateSuggestions ()
     {
         List<Cell> currentLine = Cell.ToCellList (Text);
-        int cursorPosition = Math.Min (CursorPosition, currentLine.Count);
+        int cursorPosition = Math.Min (CursorPos, currentLine.Count);
 
         Autocomplete.Context = new (
                                     currentLine,
@@ -1307,7 +1290,7 @@ public class TextField : View, IDesignable
         }
 
         Text = Cell.ToString (obj?.Lines [obj.CursorPosition.Y]);
-        CursorPosition = obj.CursorPosition.X;
+        CursorPos = obj.CursorPosition.X;
         Adjust ();
     }
 
@@ -1315,7 +1298,7 @@ public class TextField : View, IDesignable
     {
         _historyText.Add (
                           [Cell.ToCells (_text)],
-                          new (_cursorPosition, 0)
+                          new (CursorPos, 0)
                          );
 
         List<string> newText = _text;
@@ -1323,21 +1306,21 @@ public class TextField : View, IDesignable
         if (SelectedLength > 0)
         {
             newText = DeleteSelectedText ();
-            _preTextChangedCursorPos = _cursorPosition;
+            _preTextChangedCursorPos = CursorPos;
         }
 
         if (!usePreTextChangedCursorPos)
         {
-            _preTextChangedCursorPos = _cursorPosition;
+            _preTextChangedCursorPos = CursorPos;
         }
 
         StringRuneEnumerator kbstr = a.AsRune.ToString ().EnumerateRunes ();
 
         if (Used)
         {
-            _cursorPosition++;
+            CursorPos++;
 
-            if (_cursorPosition == newText.Count + 1)
+            if (CursorPos == newText.Count + 1)
             {
                 SetText (newText.Concat (kbstr.Select (r => r.ToString ())).ToList ());
             }
@@ -1375,7 +1358,7 @@ public class TextField : View, IDesignable
                                                       )
                                     )
                     );
-            _cursorPosition++;
+            CursorPos++;
         }
 
         Adjust ();
@@ -1390,13 +1373,13 @@ public class TextField : View, IDesignable
 
         ClearAllSelection ();
 
-        if (_cursorPosition >= _text.Count)
+        if (CursorPos >= _text.Count)
         {
             return;
         }
 
-        SetClipboard (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition));
-        SetText (_text.GetRange (0, _cursorPosition));
+        SetClipboard (_text.GetRange (CursorPos, _text.Count - CursorPos));
+        SetText (_text.GetRange (0, CursorPos));
         Adjust ();
     }
 
@@ -1409,41 +1392,41 @@ public class TextField : View, IDesignable
 
         ClearAllSelection ();
 
-        if (_cursorPosition == 0)
+        if (CursorPos == 0)
         {
             return;
         }
 
-        SetClipboard (_text.GetRange (0, _cursorPosition));
-        SetText (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition));
-        _cursorPosition = 0;
+        SetClipboard (_text.GetRange (0, CursorPos));
+        SetText (_text.GetRange (CursorPos, _text.Count - CursorPos));
+        CursorPos = 0;
         Adjust ();
     }
 
     private void MoveEndExtend ()
     {
-        if (_cursorPosition <= _text.Count)
+        if (CursorPos <= _text.Count)
         {
-            int x = _cursorPosition;
-            _cursorPosition = _text.Count;
-            PrepareSelection (x, _cursorPosition - x);
+            int x = CursorPos;
+            CursorPos = _text.Count;
+            PrepareSelection (x, CursorPos - x);
         }
     }
 
     private void MoveHome ()
     {
         ClearAllSelection ();
-        _cursorPosition = 0;
+        CursorPos = 0;
         Adjust ();
     }
 
     private void MoveHomeExtend ()
     {
-        if (_cursorPosition > 0)
+        if (CursorPos > 0)
         {
-            int x = _cursorPosition;
-            _cursorPosition = 0;
-            PrepareSelection (x, _cursorPosition - x);
+            int x = CursorPos;
+            CursorPos = 0;
+            PrepareSelection (x, CursorPos - x);
         }
     }
 
@@ -1458,23 +1441,23 @@ public class TextField : View, IDesignable
     /// <returns></returns>
     private bool Move (int distance)
     {
-        int oldCursorPosition = _cursorPosition;
+        int oldCursorPosition = CursorPos;
         bool hadSelection = _selectedText != null && _selectedText.Length > 0;
 
-        _cursorPosition = Math.Min (_text.Count, Math.Max (0, _cursorPosition + distance));
+        CursorPos = Math.Min (_text.Count, Math.Max (0, CursorPos + distance));
         ClearAllSelection ();
         Adjust ();
 
-        return _cursorPosition != oldCursorPosition || hadSelection;
+        return CursorPos != oldCursorPosition || hadSelection;
     }
 
     private bool MoveLeft () => Move (-1);
 
     private void MoveLeftExtend ()
     {
-        if (_cursorPosition > 0)
+        if (CursorPos > 0)
         {
-            PrepareSelection (_cursorPosition--, -1);
+            PrepareSelection (CursorPos--, -1);
         }
     }
 
@@ -1482,16 +1465,16 @@ public class TextField : View, IDesignable
 
     private void MoveRightExtend ()
     {
-        if (_cursorPosition < _text.Count)
+        if (CursorPos < _text.Count)
         {
-            PrepareSelection (_cursorPosition++, 1);
+            PrepareSelection (CursorPos++, 1);
         }
     }
 
     private void MoveWordLeft ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordBackward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordBackward (CursorPos, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -1500,7 +1483,7 @@ public class TextField : View, IDesignable
 
         if (newPos.Value.col != -1)
         {
-            _cursorPosition = newPos.Value.col;
+            CursorPos = newPos.Value.col;
         }
 
         Adjust ();
@@ -1508,10 +1491,10 @@ public class TextField : View, IDesignable
 
     private void MoveWordLeftExtend ()
     {
-        if (_cursorPosition > 0)
+        if (CursorPos > 0)
         {
             int x = Math.Min (
-                              _start > -1 && _start > _cursorPosition ? _start : _cursorPosition,
+                              _start > -1 && _start > CursorPos ? _start : CursorPos,
                               _text.Count
                              );
 
@@ -1526,7 +1509,7 @@ public class TextField : View, IDesignable
 
                 if (newPos.Value.col != -1)
                 {
-                    _cursorPosition = newPos.Value.col;
+                    CursorPos = newPos.Value.col;
                 }
 
                 PrepareSelection (x, newPos.Value.col - x);
@@ -1537,7 +1520,7 @@ public class TextField : View, IDesignable
     private void MoveWordRight ()
     {
         ClearAllSelection ();
-        (int col, int row)? newPos = GetModel ().WordForward (_cursorPosition, 0, UseSameRuneTypeForWords);
+        (int col, int row)? newPos = GetModel ().WordForward (CursorPos, 0, UseSameRuneTypeForWords);
 
         if (newPos is null)
         {
@@ -1546,7 +1529,7 @@ public class TextField : View, IDesignable
 
         if (newPos.Value.col != -1)
         {
-            _cursorPosition = newPos.Value.col;
+            CursorPos = newPos.Value.col;
         }
 
         Adjust ();
@@ -1554,9 +1537,9 @@ public class TextField : View, IDesignable
 
     private void MoveWordRightExtend ()
     {
-        if (_cursorPosition < _text.Count)
+        if (CursorPos < _text.Count)
         {
-            int x = _start > -1 && _start > _cursorPosition ? _start : _cursorPosition;
+            int x = _start > -1 && _start > CursorPos ? _start : CursorPos;
             (int col, int row)? newPos = GetModel ().WordForward (x, 0, UseSameRuneTypeForWords);
 
             if (newPos is null)
@@ -1566,7 +1549,7 @@ public class TextField : View, IDesignable
 
             if (newPos.Value.col != -1)
             {
-                _cursorPosition = newPos.Value.col;
+                CursorPos = newPos.Value.col;
             }
 
             PrepareSelection (x, newPos.Value.col - x);
@@ -1599,18 +1582,18 @@ public class TextField : View, IDesignable
 
         if (ScrollOffset + pX > _text.Count)
         {
-            _cursorPosition = _text.Count;
+            CursorPos = _text.Count;
         }
         else if (ScrollOffset + pX < ScrollOffset)
         {
-            _cursorPosition = 0;
+            CursorPos = 0;
         }
         else
         {
-            _cursorPosition = ScrollOffset + pX;
+            CursorPos = ScrollOffset + pX;
         }
 
-        return _cursorPosition;
+        return CursorPos;
     }
 
     private void PrepareSelection (int x, int direction = 0)
@@ -1745,9 +1728,9 @@ public class TextField : View, IDesignable
 
     private void SetSelectedStartSelectedLength ()
     {
-        if (SelectedStart > -1 && _cursorPosition < SelectedStart)
+        if (SelectedStart > -1 && CursorPos < SelectedStart)
         {
-            _start = _cursorPosition;
+            _start = CursorPos;
         }
         else
         {
@@ -1767,7 +1750,7 @@ public class TextField : View, IDesignable
 
         if (keyboard)
         {
-            ContextMenu?.MakeVisible (ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1)));
+            ContextMenu?.MakeVisible (ViewportToScreen (new Point (CursorPos - ScrollOffset, 1)));
         }
         else
         {
@@ -1796,11 +1779,11 @@ public class TextField : View, IDesignable
 
     private void TextField_Initialized (object sender, EventArgs e)
     {
-        _cursorPosition = Text.GetRuneCount ();
+        CursorPos = Text.GetRuneCount ();
 
         if (Viewport.Width > 0)
         {
-            ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
+            ScrollOffset = CursorPos > Viewport.Width + 1 ? CursorPos - Viewport.Width + 1 : 0;
         }
 
         if (Autocomplete.HostControl is null)
@@ -1858,5 +1841,5 @@ public class TextFieldAutocomplete : PopupAutocomplete
     protected override void InsertText (string accepted) { ((TextField)HostControl).InsertText (accepted, false); }
 
     /// <inheritdoc/>
-    protected override void SetCursorPosition (int column) { ((TextField)HostControl).CursorPosition = column; }
+    protected override void SetCursorPosition (int column) { ((TextField)HostControl).CursorPos = column; }
 }

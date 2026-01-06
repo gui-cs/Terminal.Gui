@@ -297,8 +297,7 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        _treeViewFiles.CursorVisibility =
-            _miCursorCheckBox.CheckedState == CheckState.Checked ? CursorVisibility.Default : CursorVisibility.Invisible;
+        _treeViewFiles.SetCursor (_treeViewFiles.CursorPosition, _miCursorCheckBox.CheckedState == CheckState.Checked ? CursorVisibility.Default : CursorVisibility.Invisible);
     }
 
     private void SetCustomColors ()

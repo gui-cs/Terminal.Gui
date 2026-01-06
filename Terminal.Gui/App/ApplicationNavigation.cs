@@ -127,6 +127,10 @@ public class ApplicationNavigation
     ///     <para>
     ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
     ///     </para>
+    ///     <para>
+    ///         Reads the <see cref="View.CursorPosition"/> and <see cref="View.CursorVisibility"/> properties
+    ///         from the most focused view instead of calling a method.
+    ///     </para>
     /// </remarks>
     public void UpdateCursor ()
     {
@@ -145,8 +149,8 @@ public class ApplicationNavigation
             return;
         }
 
-        // Always call PositionCursor() to get current viewport-relative position
-        Point? viewportPos = mostFocused.PositionCursor ();
+        // Read cursor position from property instead of calling method
+        Point? viewportPos = mostFocused.CursorPosition;
 
         if (viewportPos.HasValue)
         {

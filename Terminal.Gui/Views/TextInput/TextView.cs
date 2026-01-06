@@ -109,7 +109,6 @@ public class TextView : View, IDesignable
     public TextView ()
     {
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
         Used = true;
 
         // By default, disable hotkeys (in case someone sets Title)
@@ -717,13 +716,13 @@ public class TextView : View, IDesignable
     public int CurrentRow { get; private set; }
 
     /// <summary>Sets or gets the current cursor position.</summary>
-    public Point CursorPosition
+    public Point CursorPos
     {
         get => new (CurrentColumn, CurrentRow);
         set
         {
             Point oldPosition = new (CurrentColumn, CurrentRow);
-            
+
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
 
             CurrentColumn = value.X < 0 ? 0 :
@@ -731,9 +730,9 @@ public class TextView : View, IDesignable
 
             CurrentRow = value.Y < 0 ? 0 :
                          value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
-            SetNeedsDraw ();
+
             Adjust ();
-            
+
             // Signal cursor position changed without requiring additional redraw
             Point newPosition = new (CurrentColumn, CurrentRow);
             if (newPosition != oldPosition)
@@ -1186,7 +1185,7 @@ public class TextView : View, IDesignable
 
             _historyText.Add (
                               [new (GetCurrentLine ())],
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
         }
@@ -1224,7 +1223,7 @@ public class TextView : View, IDesignable
 
         if (IsSelecting)
         {
-            _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
+            _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPos);
 
             ClearSelectedRegion ();
 
@@ -1232,7 +1231,7 @@ public class TextView : View, IDesignable
 
             _historyText.Add (
                               new () { new (currentLine) },
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -1268,7 +1267,7 @@ public class TextView : View, IDesignable
 
         if (IsSelecting)
         {
-            _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPosition);
+            _historyText.Add (new () { new (GetCurrentLine ()) }, CursorPos);
 
             ClearSelectedRegion ();
 
@@ -1276,7 +1275,7 @@ public class TextView : View, IDesignable
 
             _historyText.Add (
                               new () { new (currentLine) },
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -1933,7 +1932,7 @@ public class TextView : View, IDesignable
         return true;
     }
 
-    /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.</summary>
+    /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPos"/>.</summary>
     public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
     {
         int? row = cRow ?? CurrentRow;
@@ -1964,13 +1963,13 @@ public class TextView : View, IDesignable
             List<Cell> runeList = contents is null ? [] : Cell.ToCellList (contents);
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add ([new (currentLine)], CursorPosition);
+            _historyText.Add ([new (currentLine)], CursorPos);
 
             List<List<Cell>> addedLine = [new (currentLine), runeList];
 
             _historyText.Add (
                               [.. addedLine],
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Added
                              );
 
@@ -1979,7 +1978,7 @@ public class TextView : View, IDesignable
 
             _historyText.Add (
                               [new (GetCurrentLine ())],
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -2000,7 +1999,7 @@ public class TextView : View, IDesignable
             {
                 _historyText.ReplaceLast (
                                           [new (GetCurrentLine ())],
-                                          CursorPosition,
+                                          CursorPos,
                                           TextEditingLineStatus.Original
                                          );
             }
@@ -2014,13 +2013,13 @@ public class TextView : View, IDesignable
     }
 
     /// <summary>Positions the cursor on the current row and column</summary>
-    public override Point? PositionCursor ()
+    public void PositionCursor ()
     {
         ProcessAutocomplete ();
 
         if (!CanFocus || !Enabled || Driver is null)
         {
-            return null;
+            return;
         }
 
         if (App?.Mouse.MouseGrabView == this && IsSelecting)
@@ -2067,11 +2066,10 @@ public class TextView : View, IDesignable
         if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
             Move (col, CurrentRow - _topRow);
-
-            return new (col, CurrentRow - _topRow);
+            SetCursor (new Point (col, CurrentRow - _topRow), CursorVisibility.Default);
         }
 
-        return null; // Hide cursor
+        SetCursor (null, CursorVisibility.Invisible);
     }
 
     /// <summary>Redoes the latest changes.</summary>
@@ -2177,7 +2175,7 @@ public class TextView : View, IDesignable
         _historyText.Undo ();
     }
 
-    /// <summary>Invoked with the unwrapped <see cref="CursorPosition"/>.</summary>
+    /// <summary>Invoked with the unwrapped <see cref="CursorPos"/>.</summary>
     public event EventHandler<Point>? UnwrappedCursorPosition;
 
     /// <summary>
@@ -2431,7 +2429,7 @@ public class TextView : View, IDesignable
 
             _historyText.Add (
                               new (removedLines),
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Removed
                              );
 
@@ -2462,7 +2460,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           new (removedLines),
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Removed
                          );
 
@@ -2496,7 +2494,7 @@ public class TextView : View, IDesignable
             // Delete backwards 
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add (new () { new (currentLine) }, CursorPosition);
+            _historyText.Add (new () { new (currentLine) }, CursorPos);
 
             currentLine.RemoveAt (CurrentColumn - 1);
 
@@ -2509,7 +2507,7 @@ public class TextView : View, IDesignable
 
             _historyText.Add (
                               new () { new (currentLine) },
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -2536,7 +2534,7 @@ public class TextView : View, IDesignable
             int prowIdx = CurrentRow - 1;
             List<Cell> prevRow = _model.GetLine (prowIdx);
 
-            _historyText.Add (new () { new (prevRow) }, CursorPosition);
+            _historyText.Add (new () { new (prevRow) }, CursorPos);
 
             List<List<Cell>> removedLines = new () { new (prevRow) };
 
@@ -2589,7 +2587,7 @@ public class TextView : View, IDesignable
                 return true;
             }
 
-            _historyText.Add (new () { new (currentLine) }, CursorPosition);
+            _historyText.Add (new () { new (currentLine) }, CursorPos);
 
             List<List<Cell>> removedLines = new () { new (currentLine) };
 
@@ -2597,14 +2595,14 @@ public class TextView : View, IDesignable
 
             removedLines.Add (new (nextLine));
 
-            _historyText.Add (removedLines, CursorPosition, TextEditingLineStatus.Removed);
+            _historyText.Add (removedLines, CursorPos, TextEditingLineStatus.Removed);
 
             currentLine.AddRange (nextLine);
             _model.RemoveLine (CurrentRow + 1);
 
             _historyText.Add (
                               new () { new (currentLine) },
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -2617,13 +2615,13 @@ public class TextView : View, IDesignable
         }
         else
         {
-            _historyText.Add ([ [.. currentLine]], CursorPosition);
+            _historyText.Add ([ [.. currentLine]], CursorPos);
 
             currentLine.RemoveAt (CurrentColumn);
 
             _historyText.Add (
                               [ [.. currentLine]],
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -2916,7 +2914,7 @@ public class TextView : View, IDesignable
                 startLine++;
             }
 
-            CursorPosition = obj.FinalCursorPosition;
+            CursorPos = obj.FinalCursorPosition;
         }
 
         UpdateWrapModel ();
@@ -2982,7 +2980,7 @@ public class TextView : View, IDesignable
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add ([new (line)], CursorPosition);
+        _historyText.Add ([new (line)], CursorPos);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -2992,7 +2990,7 @@ public class TextView : View, IDesignable
 
             _historyText.Add (
                               [new (line)],
-                              CursorPosition,
+                              CursorPos,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -3053,7 +3051,7 @@ public class TextView : View, IDesignable
             addedLines.Last ().InsertRange (addedLines.Last ().Count, rest);
         }
 
-        _historyText.Add (addedLines, CursorPosition, TextEditingLineStatus.Added);
+        _historyText.Add (addedLines, CursorPos, TextEditingLineStatus.Added);
 
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
@@ -3062,7 +3060,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           [new (line)],
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Replaced
                          );
 
@@ -3080,7 +3078,7 @@ public class TextView : View, IDesignable
 
         SetWrapModel ();
 
-        _historyText.Add ([new (GetCurrentLine ())], CursorPosition);
+        _historyText.Add ([new (GetCurrentLine ())], CursorPos);
 
         if (IsSelecting)
         {
@@ -3119,7 +3117,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           [new (GetCurrentLine ())],
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Replaced
                          );
 
@@ -3156,7 +3154,7 @@ public class TextView : View, IDesignable
             return;
         }
 
-        _historyText.Add (new () { new (currentLine) }, CursorPosition);
+        _historyText.Add (new () { new (currentLine) }, CursorPos);
 
         if (currentLine.Count == 0)
         {
@@ -3170,7 +3168,7 @@ public class TextView : View, IDesignable
 
                 _historyText.Add (
                                   new (removedLines),
-                                  CursorPosition,
+                                  CursorPos,
                                   TextEditingLineStatus.Removed
                                  );
             }
@@ -3216,7 +3214,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           [ [.. GetCurrentLine ()]],
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Replaced
                          );
 
@@ -3255,7 +3253,7 @@ public class TextView : View, IDesignable
             return;
         }
 
-        _historyText.Add ([ [.. currentLine]], CursorPosition);
+        _historyText.Add ([ [.. currentLine]], CursorPos);
 
         if (currentLine.Count == 0)
         {
@@ -3294,7 +3292,7 @@ public class TextView : View, IDesignable
 
                 _historyText.Add (
                                   [.. removedLine],
-                                  CursorPosition,
+                                  CursorPos,
                                   TextEditingLineStatus.Removed
                                  );
 
@@ -3323,7 +3321,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           [ [.. GetCurrentLine ()]],
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Replaced
                          );
 
@@ -3346,7 +3344,7 @@ public class TextView : View, IDesignable
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPos);
 
         if (CurrentColumn == 0)
         {
@@ -3354,7 +3352,7 @@ public class TextView : View, IDesignable
 
             _historyText.ReplaceLast (
                                       [ [.. GetCurrentLine ()]],
-                                      CursorPosition,
+                                      CursorPos,
                                       TextEditingLineStatus.Replaced
                                      );
 
@@ -3409,7 +3407,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           [ [.. GetCurrentLine ()]],
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Replaced
                          );
 
@@ -3430,7 +3428,7 @@ public class TextView : View, IDesignable
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPos);
 
         if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
@@ -3438,7 +3436,7 @@ public class TextView : View, IDesignable
 
             _historyText.ReplaceLast (
                                       [ [.. GetCurrentLine ()]],
-                                      CursorPosition,
+                                      CursorPos,
                                       TextEditingLineStatus.Replaced
                                      );
 
@@ -3468,7 +3466,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           [ [.. GetCurrentLine ()]],
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Replaced
                          );
 
@@ -3813,7 +3811,7 @@ public class TextView : View, IDesignable
         var renderAt = new Point (
                                   Autocomplete.Context.CursorPosition,
                                   Autocomplete.PopupInsideContainer
-                                      ? CursorPosition.Y + 1 - TopRow
+                                      ? CursorPos.Y + 1 - TopRow
                                       : 0
                                  );
 
@@ -3837,14 +3835,14 @@ public class TextView : View, IDesignable
 
             if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Grapheme == "\t")
             {
-                _historyText.Add (new () { new (currentLine) }, CursorPosition);
+                _historyText.Add (new () { new (currentLine) }, CursorPos);
 
                 currentLine.RemoveAt (CurrentColumn - 1);
                 CurrentColumn--;
 
                 _historyText.Add (
                                   new () { new (GetCurrentLine ()) },
-                                  CursorPosition,
+                                  CursorPos,
                                   TextEditingLineStatus.Replaced
                                  );
             }
@@ -4328,7 +4326,7 @@ public class TextView : View, IDesignable
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add (new () { new (currentLine) }, CursorPosition);
+        _historyText.Add (new () { new (currentLine) }, CursorPos);
 
         if (IsSelecting)
         {
@@ -4346,7 +4344,7 @@ public class TextView : View, IDesignable
 
         addedLines.Add (new (_model.GetLine (CurrentRow + 1)));
 
-        _historyText.Add (addedLines, CursorPosition, TextEditingLineStatus.Added);
+        _historyText.Add (addedLines, CursorPos, TextEditingLineStatus.Added);
 
         CurrentRow++;
 
@@ -4362,7 +4360,7 @@ public class TextView : View, IDesignable
 
         _historyText.Add (
                           new () { new (GetCurrentLine ()) },
-                          CursorPosition,
+                          CursorPos,
                           TextEditingLineStatus.Replaced
                          );
 
@@ -4563,7 +4561,7 @@ public class TextView : View, IDesignable
 
         if (mousePosition is null)
         {
-            mousePosition = ViewportToScreen (new Point (CursorPosition.X, CursorPosition.Y));
+            mousePosition = ViewportToScreen (new Point (CursorPos.X, CursorPos.Y));
         }
 
         ContextMenu?.MakeVisible (mousePosition);
@@ -4797,7 +4795,7 @@ public class TextViewAutocomplete : PopupAutocomplete
     /// <inheritdoc/>
     protected override void SetCursorPosition (int column)
     {
-        ((TextView)HostControl!).CursorPosition =
+        ((TextView)HostControl!).CursorPos =
             new (column, ((TextView)HostControl).CurrentRow);
     }
 }

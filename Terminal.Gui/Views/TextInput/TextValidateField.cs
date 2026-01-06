@@ -8,6 +8,38 @@ public class TextValidateField : View, IDesignable
 {
     private const int DEFAULT_LENGTH = 10;
     private int _cursorPosition;
+
+    private int CursorPos
+    {
+        get => _cursorPosition;
+        set
+        {
+            if (_cursorPosition == value)
+            {
+                return;
+            }
+
+            _cursorPosition = value;
+            (int left, _) = GetMargins (Viewport.Width);
+
+            // Fixed = true, is for inputs that have fixed width, like masked ones.
+            // Fixed = false, is for normal input.
+            // When it's right-aligned and it's a normal input, the cursor behaves differently.
+            int curPos;
+
+            if (_provider?.Fixed == false && TextAlignment == Alignment.End)
+            {
+                curPos = _cursorPosition + left - 1;
+            }
+            else
+            {
+                curPos = _cursorPosition + left;
+            }
+
+            SetCursor (new Point (curPos, 0), CursorVisibility.Default);
+        }
+    }
+
     private ITextValidateProvider? _provider;
 
     /// <summary>
@@ -161,7 +193,7 @@ public class TextValidateField : View, IDesignable
                 c++;
             }
 
-            _cursorPosition = c;
+            CursorPos = c;
             SetFocus ();
             SetNeedsDraw ();
 
@@ -232,7 +264,7 @@ public class TextValidateField : View, IDesignable
 
         Rune rune = key.AsRune;
 
-        bool inserted = _provider.InsertAt ((char)rune.Value, _cursorPosition);
+        bool inserted = _provider.InsertAt ((char)rune.Value, CursorPos);
 
         if (inserted)
         {
@@ -244,41 +276,17 @@ public class TextValidateField : View, IDesignable
         return false;
     }
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        (int left, _) = GetMargins (Viewport.Width);
-
-        // Fixed = true, is for inputs that have fixed width, like masked ones.
-        // Fixed = false, is for normal input.
-        // When it's right-aligned and it's a normal input, the cursor behaves differently.
-        int curPos;
-
-        if (_provider?.Fixed == false && TextAlignment == Alignment.End)
-        {
-            curPos = _cursorPosition + left - 1;
-        }
-        else
-        {
-            curPos = _cursorPosition + left;
-        }
-
-        Move (curPos, 0);
-
-        return new (curPos, 0);
-    }
-
     /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>
     /// <returns></returns>
     private bool BackspaceKeyHandler ()
     {
-        if (_provider!.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
+        if (_provider!.Fixed == false && TextAlignment == Alignment.End && CursorPos <= 1)
         {
             return false;
         }
 
-        _cursorPosition = _provider.CursorLeft (_cursorPosition);
-        _provider.Delete (_cursorPosition);
+        CursorPos = _provider.CursorLeft (CursorPos);
+        _provider.Delete (CursorPos);
         SetNeedsDraw ();
 
         return true;
@@ -293,11 +301,11 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        int current = _cursorPosition;
-        _cursorPosition = _provider.CursorLeft (_cursorPosition);
+        int current = CursorPos;
+        CursorPos = _provider.CursorLeft (CursorPos);
         SetNeedsDraw ();
 
-        return current != _cursorPosition;
+        return current != CursorPos;
     }
 
     /// <summary>Try to move the cursor to the right.</summary>
@@ -309,11 +317,11 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        int current = _cursorPosition;
-        _cursorPosition = _provider.CursorRight (_cursorPosition);
+        int current = CursorPos;
+        CursorPos = _provider.CursorRight (CursorPos);
         SetNeedsDraw ();
 
-        return current != _cursorPosition;
+        return current != CursorPos;
     }
 
     /// <summary>Deletes char at current position.</summary>
@@ -322,10 +330,10 @@ public class TextValidateField : View, IDesignable
     {
         if (_provider!.Fixed == false && TextAlignment == Alignment.End)
         {
-            _cursorPosition = _provider.CursorLeft (_cursorPosition);
+            CursorPos = _provider.CursorLeft (CursorPos);
         }
 
-        _provider.Delete (_cursorPosition);
+        _provider.Delete (CursorPos);
         SetNeedsDraw ();
 
         return true;
@@ -335,7 +343,7 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool EndKeyHandler ()
     {
-        _cursorPosition = _provider!.CursorEnd ();
+        CursorPos = _provider!.CursorEnd ();
         SetNeedsDraw ();
 
         return true;
@@ -362,7 +370,7 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool HomeKeyHandler ()
     {
-        _cursorPosition = _provider!.CursorStart ();
+        CursorPos = _provider!.CursorStart ();
         SetNeedsDraw ();
 
         return true;

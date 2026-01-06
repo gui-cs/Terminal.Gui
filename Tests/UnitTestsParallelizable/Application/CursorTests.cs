@@ -14,26 +14,38 @@ public class CursorTests (ITestOutputHelper output)
 
     private class TestView : View
     {
-        public Point? TestLocation { get; set; }
+        private Point? _testLocation;
 
-        /// <inheritdoc/>
-        public override Point? PositionCursor ()
+        public Point? TestLocation
         {
-            if (TestLocation.HasValue && HasFocus)
+            get => _testLocation;
+            set
+            {
+                _testLocation = value;
+                UpdateTestCursor ();
+            }
+        }
+
+        private void UpdateTestCursor ()
+        {
+            if (_testLocation.HasValue)
             {
                 // Check if cursor is within viewport bounds
-                if (TestLocation.Value.X >= 0 && TestLocation.Value.X < Viewport.Width && TestLocation.Value.Y >= 0 && TestLocation.Value.Y < Viewport.Height)
+                if (_testLocation.Value.X >= 0 && _testLocation.Value.X < Viewport.Width
+                    && _testLocation.Value.Y >= 0 && _testLocation.Value.Y < Viewport.Height)
                 {
-                    Driver?.SetCursorVisibility (CursorVisibility.Default);
-
-                    return TestLocation;
+                    SetCursor (_testLocation, CursorVisibility.Default);
                 }
-
-                // Cursor outside viewport - hide it
-                return null;
+                else
+                {
+                    // Cursor outside viewport - hide it
+                    SetCursor (null, CursorVisibility.Invisible);
+                }
             }
-
-            return TestLocation;
+            else
+            {
+                SetCursor (null, CursorVisibility.Invisible);
+            }
         }
     }
 
@@ -148,41 +160,10 @@ public class CursorTests (ITestOutputHelper output)
         runnable.Dispose ();
     }
 
-    [Fact]
-    public void PositionCursor_Defaults_To_Null ()
-    {
-        IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        View view = new ()
-        {
-            CanFocus = true,
-            Width = 10,
-            Height = 5
-        };
-
-        Runnable runnable = new ();
-        runnable.Add (view);
-        SessionToken? token = app.Begin (runnable);
-
-        view.SetFocus ();
-        Assert.True (view.HasFocus);
-
-        // Default View.PositionCursor should return null
-        Point? cursorPos = view.PositionCursor ();
-        Assert.Null (cursorPos);
-
-        if (token is { })
-        {
-            app.End (token);
-        }
-        app.Dispose ();
-        runnable.Dispose ();
-    }
 
     // Tests for Issue #3444 - Cursor should be hidden when positioned outside viewport
     [Fact]
-    public void PositionCursor_OutsideViewport_Returns_Null ()
+    public void Cursor_OutsideViewport_Is_Invisible ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -205,25 +186,25 @@ public class CursorTests (ITestOutputHelper output)
 
         // Position cursor outside viewport width
         view.TestLocation = new Point (15, 0);
-        Point? cursorPos = view.PositionCursor ();
+        Point? cursorPos = view.CursorPosition;
 
         // Cursor should be hidden (return null) when outside viewport
         Assert.Null (cursorPos);
 
         // Position cursor outside viewport height
         view.TestLocation = new Point (0, 10);
-        cursorPos = view.PositionCursor ();
+        cursorPos = view.CursorPosition;
 
         Assert.Null (cursorPos);
 
         // Position cursor at negative position
         view.TestLocation = new Point (-1, 0);
-        cursorPos = view.PositionCursor ();
+        cursorPos = view.CursorPosition;
 
         Assert.Null (cursorPos);
 
         view.TestLocation = new Point (0, -1);
-        cursorPos = view.PositionCursor ();
+        cursorPos = view.CursorPosition;
 
         Assert.Null (cursorPos);
 
@@ -383,10 +364,10 @@ public class CursorTests (ITestOutputHelper output)
         textField.SetFocus ();
 
         // Position cursor at end of text (beyond viewport)
-        textField.CursorPosition = textField.Text.Length;
+        textField.CursorPos = textField.Text.Length;
 
         // PositionCursor should return a position within viewport
-        Point? cursorPos = textField.PositionCursor ();
+        Point? cursorPos = textField.CursorPosition;
 
         if (cursorPos.HasValue)
         {
