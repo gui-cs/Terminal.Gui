@@ -62,15 +62,6 @@ public class NetOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc />
-    public Point GetCursorPosition ()
-    {
-        return _lastCursorPosition ?? Point.Empty;
-    }
-
-    /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
-
-    /// <inheritdoc />
     public void SetSize (int width, int height)
     {
         // Do Nothing.
@@ -120,6 +111,23 @@ public class NetOutput : OutputBase, IOutput
         }
     }
 
+
+    /// <inheritdoc />
+    public Point GetCursorPosition ()
+    {
+        return _lastCursorPosition ?? Point.Empty;
+    }
+
+    /// <inheritdoc/>
+    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
+
+    /// <inheritdoc />
+    public CursorVisibility GetCursorVisibility ()
+    {
+        return LastCursorVisibility;
+    }
+
+
     /// <inheritdoc />
     protected override bool SetCursorPositionImpl (int col, int row)
     {
@@ -152,17 +160,13 @@ public class NetOutput : OutputBase, IOutput
         return true;
     }
 
-    /// <inheritdoc/>
-    public void Dispose ()
-    {
-    }
-
-
     private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
 
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
+        LastCursorVisibility = visibility;
+
         try
         {
             if (visibility != CursorVisibility.Invisible)
@@ -185,5 +189,11 @@ public class NetOutput : OutputBase, IOutput
         {
             // Ignore any exceptions
         }
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
     }
 }

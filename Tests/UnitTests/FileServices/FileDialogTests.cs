@@ -35,7 +35,7 @@ public class FileDialogTests ()
         FileDialog dlg = GetInitializedFileDialog ();
         TextField tf = dlg.SubViews.OfType<TextField> ().First (t => t.HasFocus);
         tf.ClearAllSelection ();
-        tf.CursorPosition = tf.Text.Length;
+        tf.CursorPos = tf.Text.Length;
         Assert.True (tf.HasFocus);
 
         SendSlash ();

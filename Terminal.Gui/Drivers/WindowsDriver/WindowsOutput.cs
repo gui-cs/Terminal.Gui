@@ -479,6 +479,8 @@ internal partial class WindowsOutput : OutputBase, IOutput
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
+        LastCursorVisibility = visibility;
+
         if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
             return;
@@ -501,6 +503,12 @@ internal partial class WindowsOutput : OutputBase, IOutput
                                                   : EscSeqUtils.CSI_HideCursor;
             Write (cursorVisibilitySequence);
         }
+    }
+
+    /// <inheritdoc />
+    public CursorVisibility GetCursorVisibility ()
+    {
+        return LastCursorVisibility;
     }
 
     /// <inheritdoc/>

@@ -109,8 +109,7 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.Equal (CursorVisibility.Invisible, tv.CursorVisibility);
 
         tv.SelectAll ();
-        tv.CursorVisibility = CursorVisibility.Default;
-        Application.PositionCursor ();
+        tv.SetCursor(tv.CursorPosition, CursorVisibility.Default);
         Application.Driver!.GetCursorVisibility (out CursorVisibility visibility);
         Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
         Assert.Equal (CursorVisibility.Default, visibility);

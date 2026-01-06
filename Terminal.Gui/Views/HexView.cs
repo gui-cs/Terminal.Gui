@@ -53,7 +53,6 @@ public class HexView : View, IDesignable
         Source = source;
 
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
         _leftSideHasFocus = true;
         _firstNibble = true;
 
@@ -189,26 +188,6 @@ public class HexView : View, IDesignable
             ScrollHorizontal (offsetToNewCursor.X);
         }
     }
-
-    ///<inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        Point position = GetCursor (Address);
-
-        if (HasFocus
-            && position.X >= 0
-            && position.X < Viewport.Width
-            && position.Y >= 0
-            && position.Y < Viewport.Height)
-        {
-            Move (position.X, position.Y);
-
-            return position;
-        }
-
-        return null;
-    }
-
     private SortedDictionary<long, byte> _edits = [];
 
     /// <summary>
@@ -595,6 +574,17 @@ public class HexView : View, IDesignable
     /// </summary>
     protected void RaisePositionChanged ()
     {
+        Point position = GetCursor (Address);
+
+        if (HasFocus
+            && position.X >= 0
+            && position.X < Viewport.Width
+            && position.Y >= 0
+            && position.Y < Viewport.Height)
+        {
+            SetCursor (position, CursorVisibility.Default);
+        }
+
         HexViewEventArgs args = new (Address, GetPosition (Address), BytesPerLine);
         OnPositionChanged (args);
         PositionChanged?.Invoke (this, args);

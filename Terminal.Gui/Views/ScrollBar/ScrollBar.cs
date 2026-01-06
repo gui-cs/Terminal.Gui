@@ -74,6 +74,7 @@ public class ScrollBar : View, IOrientation, IDesignable
 
         CanFocus = false;
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
 

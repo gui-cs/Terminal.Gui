@@ -1098,7 +1098,7 @@ public class FileDialog : Dialog, IDesignable
         }
 
         _tbPath.Autocomplete.GenerateSuggestions (
-                                                  new AutocompleteFilepathContext (_tbPath.Text, _tbPath.CursorPosition, State)
+                                                  new AutocompleteFilepathContext (_tbPath.Text, _tbPath.CursorPos, State)
                                                  );
     }
 
@@ -1139,7 +1139,7 @@ public class FileDialog : Dialog, IDesignable
             State = newState;
 
             _tbPath.Autocomplete.GenerateSuggestions (
-                                                      new AutocompleteFilepathContext (_tbPath.Text, _tbPath.CursorPosition, State)
+                                                      new AutocompleteFilepathContext (_tbPath.Text, _tbPath.CursorPos, State)
                                                      );
 
             WriteStateToTableView ();
@@ -1629,7 +1629,7 @@ public class FileDialog : Dialog, IDesignable
                                     Parent._tbPath.Autocomplete.GenerateSuggestions (
                                                                                      new AutocompleteFilepathContext (
                                                                                           Parent._tbPath.Text,
-                                                                                          Parent._tbPath.CursorPosition,
+                                                                                          Parent._tbPath.CursorPos,
                                                                                           this
                                                                                          )
                                                                                     );

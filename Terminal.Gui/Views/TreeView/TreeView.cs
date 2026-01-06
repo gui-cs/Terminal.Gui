@@ -583,6 +583,18 @@ public class TreeView<T> : View, ITreeView where T : class
             }
         }
 
+        if (CanFocus && HasFocus && Visible && SelectedObject is { })
+        {
+            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+            int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
+
+            // if currently selected line is visible
+            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
+            {
+                SetCursor (new Point (0, idx - ScrollOffsetVertical), CursorVisibility.Default);
+            }
+        }
+
         SetNeedsDraw ();
     }
 
@@ -1237,26 +1249,6 @@ public class TreeView<T> : View, ITreeView where T : class
         }
 
         return false;
-    }
-
-    /// <summary>Positions the cursor at the start of the selected objects line (if visible).</summary>
-    public override Point? PositionCursor ()
-    {
-        if (CanFocus && HasFocus && Visible && SelectedObject is { })
-        {
-            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-            int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
-
-            // if currently selected line is visible
-            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
-            {
-                Move (0, idx - ScrollOffsetVertical);
-
-                return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null;
-            }
-        }
-
-        return base.PositionCursor ();
     }
 
     /// <summary>

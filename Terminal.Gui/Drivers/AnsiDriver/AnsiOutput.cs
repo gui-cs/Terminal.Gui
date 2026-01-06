@@ -105,9 +105,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     public IOutputBuffer? GetLastBuffer () => _lastBuffer;
 
-    ///// <inheritdoc cref="IOutput.GetLastOutput"/>
-    //public override string GetLastOutput () => _outputStringBuilder.ToString ();
-
     /// <inheritdoc/>
     public void SetSize (int width, int height) { _consoleSize = new (width, height); }
 
@@ -171,6 +168,8 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
+        LastCursorVisibility = visibility;
+
         if (!_terminalInitialized)
         {
             return;
@@ -199,6 +198,14 @@ public class AnsiOutput : OutputBase, IOutput
             // ignore
         }
     }
+
+
+    /// <inheritdoc />
+    public CursorVisibility GetCursorVisibility ()
+    {
+        return LastCursorVisibility;
+    }
+
 
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)

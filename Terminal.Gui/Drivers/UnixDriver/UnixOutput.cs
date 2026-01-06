@@ -131,6 +131,7 @@ internal class UnixOutput : OutputBase, IOutput
     /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
     public override void SetCursorVisibility (CursorVisibility visibility)
     {
+        LastCursorVisibility = visibility;
         try
         {
             if (visibility != CursorVisibility.Invisible)
@@ -153,6 +154,12 @@ internal class UnixOutput : OutputBase, IOutput
         {
             // ignore
         }
+    }
+
+    /// <inheritdoc />
+    public CursorVisibility GetCursorVisibility ()
+    {
+        return LastCursorVisibility;
     }
 
     /// <inheritdoc/>

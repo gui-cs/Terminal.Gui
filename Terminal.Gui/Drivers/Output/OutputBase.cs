@@ -56,6 +56,11 @@ public abstract class OutputBase
     /// <param name="visibility"></param>
     public abstract void SetCursorVisibility (CursorVisibility visibility);
 
+    /// <summary>
+    ///     INTERNAL: Gets or sets the current cursor visibility state. Overrides use this to track state.
+    /// </summary>
+    protected CursorVisibility LastCursorVisibility { get; set; }
+
     StringBuilder _lastOutputStringBuilder = new ();
 
     /// <summary>
@@ -72,9 +77,6 @@ public abstract class OutputBase
         int cols = buffer.Cols;
         Attribute? redrawAttr = null;
         int lastCol = -1;
-
-        // Hide cursor during rendering to prevent flicker
-        SetCursorVisibility (CursorVisibility.Invisible);
 
         // Process each row
         for (int row = top; row < rows; row++)
@@ -171,8 +173,6 @@ public abstract class OutputBase
             SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
             Write ((StringBuilder)new (s.SixelData));
         }
-
-        // Cursor visibility restored by ApplicationMainLoop.SetCursor() to prevent flicker
     }
 
     /// <inheritdoc cref="IOutput.GetLastOutput" />
@@ -191,7 +191,7 @@ public abstract class OutputBase
     protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
 
     /// <summary>
-    ///     When overriden in derived class, positions the terminal output cursor to the specified point on the screen.
+    ///     When overriden in derived class, positions the terminal draw cursor to the specified point on the screen.
     /// </summary>
     /// <param name="screenPositionX">Column to move cursor to</param>
     /// <param name="screenPositionY">Row to move cursor to</param>

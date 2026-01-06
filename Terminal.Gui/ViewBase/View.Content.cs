@@ -51,7 +51,7 @@ public partial class View
                                           contentSize,
                                           OnContentSizeChanging,
                                           ContentSizeChanging,
-                                          newValue => SetNeedsLayout (),
+                                          _ => SetNeedsLayout (),
                                           OnContentSizeChanged,
                                           ContentSizeChanged,
                                           out Size? _);
@@ -363,7 +363,7 @@ public partial class View
 
     private void SetViewport (Rectangle viewport)
     {
-        Rectangle oldViewport = viewport;
+        Rectangle oldViewport = new (_viewportLocation, Viewport.Size);
         ApplySettings (ref viewport);
 
         Thickness thickness = GetAdornmentsThickness ();
@@ -380,11 +380,9 @@ public partial class View
             {
                 _viewportLocation = viewport.Location;
                 SetNeedsLayout ();
-
-                //SetNeedsDraw();
-                //SetSubViewNeedsDraw();
             }
 
+            // QUESTION: Shouldn't this be inside the if statement above?
             RaiseViewportChangedEvent (oldViewport);
 
             return;
@@ -458,7 +456,14 @@ public partial class View
 
     private void RaiseViewportChangedEvent (Rectangle oldViewport)
     {
-        var args = new DrawEventArgs (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
+        if (CursorPosition is { })
+        {
+            // Adjust the cursor if visible
+            int deltaX = oldViewport.X - Viewport.X;
+            int deltaY = oldViewport.Y - Viewport.Y;
+            SetCursor (new Point (CursorPosition.Value.X + deltaX, CursorPosition.Value.Y + deltaY), CursorVisibility);
+        }
+        DrawEventArgs args = new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
         OnViewportChanged (args);
         ViewportChanged?.Invoke (this, args);
     }

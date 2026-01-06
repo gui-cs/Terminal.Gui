@@ -49,10 +49,10 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    public override int CursorPosition
+    public override int CursorPos
     {
-        get => base.CursorPosition;
-        set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1);
+        get => base.CursorPos;
+        set => base.CursorPos = Math.Max (Math.Min (value, FormatLength), 1);
     }
 
     /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
@@ -173,18 +173,18 @@ public class DateField : TextField
 
         if (newPoint != point)
         {
-            CursorPosition = newPoint;
+            base.CursorPos = newPoint;
         }
 
-        while (CursorPosition < Text.GetColumns () - 1 && Text [CursorPosition].ToString () == _separator)
+        while (base.CursorPos < Text.GetColumns () - 1 && Text [base.CursorPos].ToString () == _separator)
         {
             if (increment)
             {
-                CursorPosition++;
+                base.CursorPos++;
             }
             else
             {
-                CursorPosition--;
+                base.CursorPos--;
             }
         }
     }
@@ -224,7 +224,7 @@ public class DateField : TextField
                 e.Result = $" {date}".Replace (RIGHT_TO_LEFT_MARK, "");
             }
 
-            AdjCursorPosition (CursorPosition);
+            AdjCursorPosition (base.CursorPos);
         }
         catch (Exception)
         {
@@ -234,15 +234,15 @@ public class DateField : TextField
 
     private void DecCursorPosition ()
     {
-        if (CursorPosition <= 1)
+        if (base.CursorPos <= 1)
         {
-            CursorPosition = 1;
+            base.CursorPos = 1;
 
             return;
         }
 
-        CursorPosition--;
-        AdjCursorPosition (CursorPosition, false);
+        base.CursorPos--;
+        AdjCursorPosition (base.CursorPos, false);
     }
 
     private string GetDataSeparator (string separator)
@@ -304,21 +304,21 @@ public class DateField : TextField
 
     private void IncCursorPosition ()
     {
-        if (CursorPosition >= FormatLength)
+        if (base.CursorPos >= FormatLength)
         {
-            CursorPosition = FormatLength;
+            base.CursorPos = FormatLength;
 
             return;
         }
 
-        CursorPosition++;
-        AdjCursorPosition (CursorPosition);
+        base.CursorPos++;
+        AdjCursorPosition (base.CursorPos);
     }
 
     private new bool MoveEnd ()
     {
         ClearAllSelection ();
-        CursorPosition = FormatLength;
+        base.CursorPos = FormatLength;
 
         return true;
     }
@@ -327,7 +327,7 @@ public class DateField : TextField
     {
         // Home, C-A
         ClearAllSelection ();
-        CursorPosition = 1;
+        base.CursorPos = 1;
 
         return true;
     }
@@ -385,7 +385,7 @@ public class DateField : TextField
         _format = $" {StandardizeDateFormat (Culture!.DateTimeFormat.ShortDatePattern)}";
         _separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
         Date = date;
-        CursorPosition = 1;
+        base.CursorPos = 1;
         TextChanging += OnTextChanging;
 
         // Things this view knows how to do
@@ -438,30 +438,30 @@ public class DateField : TextField
 
     private bool SetText (Rune key)
     {
-        if (CursorPosition > FormatLength)
+        if (base.CursorPos > FormatLength)
         {
-            CursorPosition = FormatLength;
+            base.CursorPos = FormatLength;
 
             return false;
         }
 
-        if (CursorPosition < 1)
+        if (base.CursorPos < 1)
         {
-            CursorPosition = 1;
+            base.CursorPos = 1;
 
             return false;
         }
 
         List<Rune> text = Text.EnumerateRunes ().ToList ();
-        List<Rune> newText = text.GetRange (0, CursorPosition);
+        List<Rune> newText = text.GetRange (0, base.CursorPos);
         newText.Add (key);
 
-        if (CursorPosition < FormatLength)
+        if (base.CursorPos < FormatLength)
         {
             newText =
             [
                 .. newText,
-                .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+                .. text.GetRange (base.CursorPos + 1, text.Count - (base.CursorPos + 1))
             ];
         }
 

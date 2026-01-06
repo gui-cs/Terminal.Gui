@@ -73,7 +73,18 @@ internal class DriverImpl : IDriver
     public void Init () { throw new NotSupportedException (); }
 
     /// <inheritdoc/>
-    public void Refresh () { _output.Write (_outputBuffer); }
+    public void Refresh ()
+    {
+        // Hide cursor during rendering to prevent flicker
+        if (_output.GetCursorVisibility () != CursorVisibility.Invisible)
+        {
+            _output.SetCursorVisibility (CursorVisibility.Invisible);
+            SetCursorNeedsUpdate (true);
+        }
+        _output.Write (_outputBuffer);
+
+        // Cursor visibility restored by ApplicationMainLoop to reduce flicker
+    }
 
     /// <inheritdoc/>
     public string? GetName () => _componentFactory.GetDriverName ();
@@ -383,16 +394,31 @@ internal class DriverImpl : IDriver
 
     #region Cursor
 
+    // Cursor caching fields
+    private bool _cursorNeedsUpdate;
+
+    /// <inheritdoc />
+    public bool GetCursorNeedsUpdate ()
+    {
+        return _cursorNeedsUpdate;
+    }
+
+    /// <param name="needsUpdate"></param>
+    /// <inheritdoc />
+    public void SetCursorNeedsUpdate (bool needsUpdate) { _cursorNeedsUpdate = needsUpdate; }
+
     private CursorVisibility _lastCursor = CursorVisibility.Default;
 
-    /// <inheritdoc/>
-    public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
+    /// <inheritdoc />
+    public void SetCursorPosition (Point screenPosition)
+    {
+        _output.SetCursorPosition (screenPosition.X, screenPosition.Y);
+    }
 
     /// <inheritdoc/>
     public bool GetCursorVisibility (out CursorVisibility current)
     {
         current = _lastCursor;
-
         return true;
     }
 
@@ -401,7 +427,6 @@ internal class DriverImpl : IDriver
     {
         _lastCursor = visibility;
         _output.SetCursorVisibility (visibility);
-
         return true;
     }
 

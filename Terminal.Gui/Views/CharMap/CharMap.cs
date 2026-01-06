@@ -27,7 +27,6 @@ public class CharMap : View, IDesignable
     public CharMap ()
     {
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
 
         AddCommand (Command.Up, commandContext => Move (commandContext, -16));
         AddCommand (Command.Down, commandContext => Move (commandContext, 16));
@@ -83,15 +82,19 @@ public class CharMap : View, IDesignable
         // We want the horizontal scrollbar to only show when needed.
         // We can't use ScrollBar.AutoShow because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
-        ViewportChanged += (sender, args) =>
+        ViewportChanged += (_, _) =>
                            {
-                               if (Viewport.Width < GetContentSize ().Width)
+                               HorizontalScrollBar.Visible = Viewport.Width < GetContentSize ().Width;
+
+                               // If the CursorPosition is in the headers, hide it
+                               // TODO: Add events for CursorPosition changing to handle this instead?
+                               if (CursorPosition is { Y: 0 } || (CursorPosition is {} && CursorPosition.Value.X < RowLabelWidth))
                                {
-                                   HorizontalScrollBar.Visible = true;
+                                   SetCursor (CursorPosition, CursorVisibility.Invisible);
                                }
                                else
                                {
-                                   HorizontalScrollBar.Visible = false;
+                                   SetCursor (CursorPosition, CursorVisibility.Default);
                                }
                            };
 
@@ -204,6 +207,7 @@ public class CharMap : View, IDesignable
             ScrollToMakeCursorVisible (offsetToNewCursor);
 
             SetNeedsDraw ();
+            UpdateCursor ();
             SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint));
         }
     }
@@ -540,25 +544,27 @@ public class CharMap : View, IDesignable
         return new (x, y);
     }
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
+    /// <summary>Updates the cursor position based on the selected code point.</summary>
+    /// <remarks>
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor(Point?, CursorVisibility)"/>.
+    ///     The framework automatically handles hiding the cursor when the view loses focus.
+    /// </remarks>
+    private void UpdateCursor ()
     {
         Point cursor = GetCursor (SelectedCodePoint);
 
-        if (HasFocus
-            && cursor.X >= RowLabelWidth
+        if (cursor.X >= RowLabelWidth
             && cursor.X < Viewport.Width
             && cursor.Y > 0
             && cursor.Y < Viewport.Height)
         {
-            Move (cursor.X, cursor.Y);
+            SetCursor (cursor, CursorVisibility.Default);
         }
         else
         {
-            return null;
+            // Cursor is scrolled out of view
+            SetCursor (null, CursorVisibility.Invisible);
         }
-
-        return cursor;
     }
 
     #endregion Cursor
