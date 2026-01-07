@@ -49,18 +49,6 @@ public abstract class OutputBase
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
-    /// <summary>
-    ///     Changes the visibility of the cursor in the terminal to the specified <paramref name="visibility"/> e.g.
-    ///     the flashing indicator, invisible, box indicator etc.
-    /// </summary>
-    /// <param name="visibility"></param>
-    public abstract void SetCursorVisibility (CursorVisibility visibility);
-
-    /// <summary>
-    ///     INTERNAL: Gets or sets the current cursor visibility state. Overrides use this to track state.
-    /// </summary>
-    protected CursorVisibility LastCursorVisibility { get; set; }
-
     StringBuilder _lastOutputStringBuilder = new ();
 
     /// <summary>

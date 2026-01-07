@@ -582,7 +582,7 @@ public class HexView : View, IDesignable
             && position.Y >= 0
             && position.Y < Viewport.Height)
         {
-            SetCursor (position, CursorVisibility.Default);
+            SetCursor (Cursor with { Position = position, Shape = CursorShape.BlinkingBlock });
         }
 
         HexViewEventArgs args = new (Address, GetPosition (Address), BytesPerLine);

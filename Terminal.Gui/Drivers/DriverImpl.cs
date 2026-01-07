@@ -76,9 +76,11 @@ internal class DriverImpl : IDriver
     public void Refresh ()
     {
         // Hide cursor during rendering to prevent flicker
-        if (_output.GetCursorVisibility () != CursorVisibility.Invisible)
+        Cursor cursor = _output.GetCursor ();
+        if (cursor.IsVisible)
         {
-            _output.SetCursorVisibility (CursorVisibility.Invisible);
+            Cursor hiddenCursor = cursor with { Position = null, Shape = cursor.Shape};
+            _output.SetCursor (hiddenCursor);
             SetCursorNeedsUpdate (true);
         }
         _output.Write (_outputBuffer);
@@ -394,6 +396,18 @@ internal class DriverImpl : IDriver
 
     #region Cursor
 
+    /// <inheritdoc />
+    public void SetCursor (Cursor cursor)
+    {
+        _output.SetCursor (cursor);
+    }
+
+    /// <inheritdoc />
+    public Cursor GetCursor ()
+    {
+        return _output.GetCursor ();
+    }
+
     // Cursor caching fields
     private bool _cursorNeedsUpdate;
 
@@ -406,29 +420,6 @@ internal class DriverImpl : IDriver
     /// <param name="needsUpdate"></param>
     /// <inheritdoc />
     public void SetCursorNeedsUpdate (bool needsUpdate) { _cursorNeedsUpdate = needsUpdate; }
-
-    private CursorVisibility _lastCursor = CursorVisibility.Default;
-
-    /// <inheritdoc />
-    public void SetCursorPosition (Point screenPosition)
-    {
-        _output.SetCursorPosition (screenPosition.X, screenPosition.Y);
-    }
-
-    /// <inheritdoc/>
-    public bool GetCursorVisibility (out CursorVisibility current)
-    {
-        current = _lastCursor;
-        return true;
-    }
-
-    /// <inheritdoc/>
-    public bool SetCursorVisibility (CursorVisibility visibility)
-    {
-        _lastCursor = visibility;
-        _output.SetCursorVisibility (visibility);
-        return true;
-    }
 
     #endregion Cursor
 

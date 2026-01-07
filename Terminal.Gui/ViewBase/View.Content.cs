@@ -456,12 +456,13 @@ public partial class View
 
     private void RaiseViewportChangedEvent (Rectangle oldViewport)
     {
-        if (CursorPosition is { })
+        if (Cursor.IsVisible)
         {
             // Adjust the cursor if visible
             int deltaX = oldViewport.X - Viewport.X;
             int deltaY = oldViewport.Y - Viewport.Y;
-            SetCursor (new Point (CursorPosition.Value.X + deltaX, CursorPosition.Value.Y + deltaY), CursorVisibility);
+
+            SetCursor (Cursor with { Position = new Point (Cursor.Position!.Value.X + deltaX, Cursor.Position.Value.Y + deltaY) });
         }
         DrawEventArgs args = new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
         OnViewportChanged (args);

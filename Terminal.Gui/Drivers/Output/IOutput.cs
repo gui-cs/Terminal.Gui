@@ -32,33 +32,20 @@ public interface IOutput : IDisposable
     void SetSize (int width, int height);
 
     /// <summary>
-    ///     Gets the current position of the console cursor.
+    ///     Sets the cursor for this output.
+    /// </summary>
+    /// <param name="cursor">
+    ///     The cursor to set. Position must be in screen-absolute coordinates.
+    ///     Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     Set Position to null to hide the cursor.
+    /// </param>
+    public void SetCursor (Cursor cursor);
+
+    /// <summary>
+    ///     Gets the current cursor for this output.
     /// </summary>
     /// <returns></returns>
-    Point GetCursorPosition ();
-
-    /// <summary>
-    ///     Moves the console cursor to the given location.
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="row"></param>
-    void SetCursorPosition (int col, int row);
-
-    /// <summary>
-    ///     Updates the console cursor to be hidden, visible etc.
-    /// </summary>
-    /// <param name="visibility"></param>
-    void SetCursorVisibility (CursorVisibility visibility);
-
-    /// <summary>
-    ///     Gets the visibility of the console cursor.
-    /// </summary>
-    /// <remarks>
-    ///     There is no standard ANSI sequence for querying cursor visibility state. As a result, most drivers
-    ///     track visibility state.
-    /// </remarks>
-    /// <returns>The current cursor visibility</returns>
-    CursorVisibility GetCursorVisibility ();
+    public Cursor GetCursor ();
 
     /// <summary>
     ///     Writes the given text directly to the console. Use to send

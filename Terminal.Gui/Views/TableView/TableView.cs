@@ -1271,10 +1271,11 @@ public class TableView : View, IDesignable
     {
         Point? screenPoint = CellToScreen (SelectedColumn, SelectedRow);
 
-        if (screenPoint is { })
-        {
-            SetCursor (screenPoint.Value, CursorVisibility.Default);
-        }
+        // If we wanted a visible console cursor, we'd uncomment this:
+        //if (screenPoint is { })
+        //{
+        //    SetCursor (screenPoint.Value, CursorVisibility.Default);
+        //}
 
         SelectedCellChanged?.Invoke (this, args);
     }

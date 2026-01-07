@@ -905,11 +905,10 @@ public class LinearRange<T> : View, IOrientation
             || !IsInitialized
             || !Viewport.Contains (position.x, position.y))
         {
-            SetCursor (new Point (position.x, position.y), CursorVisibility.Invisible);
+            SetCursor (new () { Position = null, Shape = Cursor.Shape }); // Hide cursor
             return;
         }
-
-        SetCursor (new Point (position.x, position.y), CursorVisibility.Default);
+        SetCursor (Cursor with { Position = new Point (position.x, position.y), Shape = CursorShape.BlinkingBlock });
     }
 
     #endregion Cursor and Position

@@ -299,37 +299,38 @@ public interface IDriver : IDisposable
     #region Cursor
 
     /// <summary>
-    ///     Gets whether the terminal cursor position or visibility needs to be updated.
+    ///     Sets the cursor for this driver.
+    /// </summary>
+    /// <param name="cursor">
+    ///     The cursor to set. Position must be in screen-absolute coordinates.
+    ///     Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     Set Position to null to hide the cursor.
+    /// </param>
+    public void SetCursor (Cursor cursor);
+
+    /// <summary>
+    ///     Gets the current cursor for this driver.
+    /// </summary>
+    /// <returns></returns>
+    public Cursor GetCursor ();
+
+    /// <summary>
+    ///     Gets whether the terminal cursor needs to be updated.
     /// </summary>
     /// <returns></returns>
     bool GetCursorNeedsUpdate ();
 
     /// <summary>
-    ///     Signals that the cursor position or visibility needs to be updated without requiring a full redraw.
+    ///     Signals that the cursor needs to be updated without requiring a full redraw.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
-    ///         or visibility changes but the view content does not need to be redrawn.
+    ///         or shape changes but the view content does not need to be redrawn.
     ///     </para>
     /// </remarks>
     /// <param name="needsUpdate">Indicates whether the cursor needs to be updated.</param>
     public void SetCursorNeedsUpdate (bool needsUpdate);
-
-    /// <summary>
-    ///     Sets the position of the terminal cursor.
-    /// </summary>
-    void SetCursorPosition (Point screenPosition);
-
-    /// <summary>Gets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool GetCursorVisibility (out CursorVisibility visibility);
-
-    /// <summary>Sets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool SetCursorVisibility (CursorVisibility visibility);
 
     #endregion Cursor
 

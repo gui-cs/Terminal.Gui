@@ -3,7 +3,8 @@ using System.Diagnostics;
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     Helper class for <see cref="Application"/> navigation and cursor handling. Held by <see cref="Application.Navigation"/>
+///     Helper class for <see cref="Application"/> navigation and cursor handling. Held by
+///     <see cref="Application.Navigation"/>
 /// </summary>
 public class ApplicationNavigation
 {
@@ -30,7 +31,7 @@ public class ApplicationNavigation
     /// <summary>
     ///     Gets the most focused <see cref="View"/> in the application, if there is one.
     /// </summary>
-    public View? GetFocused () => _focused;
+    public View? GetFocused () { return _focused; }
 
     // QUESTION: This only gets Subviews and ignores Adornments. Should it use View.IsInHierarchy?
     // QUESTION: Related, see View.GetSubViews(), which does support Adornments.
@@ -118,18 +119,12 @@ public class ApplicationNavigation
         return App?.TopRunnableView is { } && App.TopRunnableView.AdvanceFocus (direction, behavior);
     }
 
-
-
     /// <summary>
     ///     Updates the terminal cursor based on the currently focused view.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         This method is called once per main loop iteration by <see cref="IApplicationMainLoop{T}"/>.
-    ///     </para>
-    ///     <para>
-    ///         Reads the <see cref="View.CursorPosition"/> and <see cref="View.CursorVisibility"/> properties
-    ///         from the most focused view instead of calling a method.
     ///     </para>
     /// </remarks>
     public void UpdateCursor ()
@@ -139,64 +134,51 @@ public class ApplicationNavigation
             return;
         }
 
-        // Get the most focused view from the view hierarchy
         View? mostFocused = App?.TopRunnableView?.MostFocused;
 
-        if (mostFocused == null)
+        if (mostFocused is null || !mostFocused.Cursor.IsVisible)
         {
-            App?.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+            App?.Driver?.SetCursor (new () { Position = null, Shape = mostFocused?.Cursor.Shape ?? CursorShape.BlinkingBlock }); // Hide cursor
 
             return;
         }
 
-        // Read cursor position from property instead of calling method
-        Point? viewportPos = mostFocused.CursorPosition;
+        // Get cursor in content area coordinates
+        Cursor mostFocusedCursor = mostFocused.Cursor;
 
-        if (viewportPos.HasValue)
+        if (mostFocusedCursor.Position.HasValue)
         {
-            // Translate to screen coordinates
-            Point screenPos = mostFocused.ViewportToScreen (viewportPos.Value);
-
-            // Check if cursor is within all ancestor viewports
-            // Walk up the view hierarchy and ensure cursor is visible in each ancestor's viewport
+            // Check if position is within all ancestor viewports
+            var withinViewports = true;
             View? current = mostFocused;
-            var isWithinAllAncestors = true;
 
-            while (current != null)
+            while (current is { })
             {
-                // Get this view's viewport in screen coordinates
                 Rectangle viewportBounds = current.ViewportToScreen (
                                                                      new Rectangle (Point.Empty, current.Viewport.Size));
 
-                // Check if cursor screen position is within this viewport
-                if (!viewportBounds.Contains (screenPos))
+                if (!viewportBounds.Contains (mostFocusedCursor.Position.Value))
                 {
-                    isWithinAllAncestors = false;
+                    withinViewports = false;
 
                     break;
                 }
 
-                // Move to SuperView
                 current = current.SuperView;
             }
 
-            if (isWithinAllAncestors)
+            if (withinViewports)
             {
-                // Cursor is within all ancestor viewports - show it
-                App?.Driver?.SetCursorPosition (screenPos);
-                App?.Driver?.SetCursorVisibility (mostFocused.CursorVisibility);
+                App?.Driver?.SetCursor (mostFocusedCursor);
             }
             else
             {
-                // Cursor is outside at least one ancestor viewport - hide it
-                App?.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+                App?.Driver?.SetCursor (new () { Position = null, Shape = mostFocusedCursor.Shape }); // Hide cursor
             }
         }
         else
         {
-            App?.Driver?.SetCursorVisibility (CursorVisibility.Invisible);
+            App?.Driver?.SetCursor (new () { Position = null, Shape = mostFocusedCursor.Shape }); // Hide cursor
         }
-
-        App?.Driver?.SetCursorNeedsUpdate (false);
     }
 }

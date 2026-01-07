@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Drivers;
 
-/// <summary>Terminal Cursor Visibility settings.</summary>
+/// <summary>Windows Specific Terminal Cursor Visibility settings.</summary>
 /// <remarks>
 ///     Hex value are set as 0xAABBCCDD where : AA stand for the TERMINFO DECSUSR parameter value to be used under
 ///     Linux and MacOS BB stand for the NCurses curs_set parameter value to be used under Linux and MacOS CC stand for the
