@@ -146,8 +146,10 @@ public class TreeViewFileSystem : Scenario
 
         _miHighlightModelTextOnlyCheckBox = new ()
         {
-            Title = "_Highlight Model Text Only"
+            Title = "_Highlight Model Text Only",
+            CheckedState = CheckState.Checked
         };
+        SetCheckHighlightModelTextOnly ();
         _miHighlightModelTextOnlyCheckBox.CheckedStateChanged += (s, e) => SetCheckHighlightModelTextOnly ();
 
         _miCustomColorsCheckBox = new ()
@@ -158,8 +160,10 @@ public class TreeViewFileSystem : Scenario
 
         _miCursorCheckBox = new ()
         {
-            Title = "Curs_or (MultiSelect only)"
+            Title = "Curs_or (MultiSelect only)",
+            CheckedState = CheckState.Checked
         };
+        SetCursor ();
         _miCursorCheckBox.CheckedStateChanged += (s, e) => SetCursor ();
 
         menu.Add (

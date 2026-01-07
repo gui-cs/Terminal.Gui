@@ -583,23 +583,32 @@ public class TreeView<T> : View, ITreeView where T : class
             }
         }
 
-        if (CanFocus && HasFocus && Visible && SelectedObject is { })
-        {
-            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-            int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
-
-            // if currently selected line is visible
-            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
-            {
-                SetCursor (Cursor with
-                {
-                    Position = ViewportToScreen (new Point (0, idx - ScrollOffsetVertical)),
-                    Shape = CursorShape.Default
-                });
-            }
-        }
+        UpdateCursor ();
 
         SetNeedsDraw ();
+    }
+
+    private void UpdateCursor ()
+    {
+        if (!CanFocus || !HasFocus || !Visible || SelectedObject is null)
+        {
+            return;
+        }
+
+        IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+        int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
+
+        // if currently selected line is visible
+        if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
+        {
+            Branch<T> branch = map.ElementAt (idx);
+            int indent = branch.Depth + 2 + branch.Parent?.Depth ?? 1;
+            SetCursor (Cursor with
+            {
+                Position = ViewportToScreen (new Point (indent - ScrollOffsetHorizontal, idx - ScrollOffsetVertical)),
+                Shape = CursorShape.BlinkingBlock
+            });
+        }
     }
 
     /// <summary>Moves the selection to the last child in the currently selected level.</summary>
@@ -1351,6 +1360,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
         multiSelectedRegions.Push (new (map.ElementAt (0), map.Count, map));
         SetNeedsDraw ();
+        UpdateCursor ();
 
         OnSelectionChanged (new (this, SelectedObject, SelectedObject));
     }
