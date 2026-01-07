@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The position is always in screen-absolute coordinates.
+///         The position is always in screen coordinates.
 ///         Views are responsible for converting from their content-area or viewport coordinates to
 ///         screen coordinates before setting the cursor.
 ///     </para>
@@ -23,7 +23,7 @@ namespace Terminal.Gui;
 public record Cursor
 {
     /// <summary>
-    ///     Gets the cursor position in screen-absolute coordinates.
+    ///     Gets the cursor position in screen coordinates.
     /// </summary>
     /// <remarks>
     ///     Null position indicates the cursor is hidden.

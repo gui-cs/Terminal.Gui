@@ -53,5 +53,5 @@ public enum CursorShape
 
     /// <summary>Steady (non-blinking) vertical bar cursor (I-beam).</summary>
     /// <remarks>ANSI DECSCUSR Ps=6.</remarks>
-    SteadyBar = 6
+    SteadyBar = 6,
 }

@@ -138,7 +138,7 @@ public class TextField : View
         int visualColumn = GetVisualColumnForCursor(_textCursorPosition);
         
         // Update cursor position
-        SetCursor (new Point(visualColumn, 0), CursorVisibility.Default);
+        Cursor = new Point(visualColumn, 0), CursorVisibility.Default;
     }
     
     public override bool OnKeyDown(Key key)

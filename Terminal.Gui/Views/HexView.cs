@@ -582,11 +582,11 @@ public class HexView : View, IDesignable
             && position.Y >= 0
             && position.Y < Viewport.Height)
         {
-            SetCursor (Cursor with
+            Cursor = Cursor with
             {
-                Position = ViewportToScreen (position), 
+                Position = ViewportToScreen (position),
                 Shape = CursorShape.Default
-            });
+            };
         }
 
         HexViewEventArgs args = new (Address, GetPosition (Address), BytesPerLine);

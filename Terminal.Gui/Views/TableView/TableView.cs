@@ -1274,7 +1274,7 @@ public class TableView : View, IDesignable
         // If we wanted a visible console cursor, we'd uncomment this:
         //if (screenPoint is { })
         //{
-        //    SetCursor (screenPoint.Value, CursorVisibility.Default);
+        //    Cursor = screenPoint.Value, CursorVisibility.Default;
         //}
 
         SelectedCellChanged?.Invoke (this, args);

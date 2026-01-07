@@ -603,10 +603,10 @@ public class TreeView<T> : View, ITreeView where T : class
         {
             Branch<T> branch = map.ElementAt (idx);
             int indent = branch.Depth + 2 + branch.Parent?.Depth ?? 1;
-            SetCursor (Cursor with
+            Cursor = Cursor with
             {
                 Position = ViewportToScreen (new Point (indent - ScrollOffsetHorizontal, idx - ScrollOffsetVertical)),
-            });
+            };
         }
     }
 

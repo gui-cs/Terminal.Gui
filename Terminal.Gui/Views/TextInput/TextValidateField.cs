@@ -111,11 +111,11 @@ public class TextValidateField : View, IDesignable
                 curPos = _insertionPoint + left;
             }
 
-            SetCursor (Cursor with
+            Cursor = Cursor with
             {
                 Position = ViewportToScreen (new Point (curPos, 0)),
                 Shape = CursorShape.Default
-            });
+            };
         }
     }
     /// <inheritdoc/>

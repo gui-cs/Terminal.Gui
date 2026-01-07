@@ -93,13 +93,16 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
         // Simulates typing abcd into a TextField with width 3 (wide enough to render 2 characters only)
         using TestContext c = With.A<Window> (100, 20, d, _out)
                                   .Add (
-                                        new()
+                                        new ()
                                         {
                                             Height = 1,
                                             Width = 1,
                                             CanFocus = true
                                         })
-                                  .Then (app => { app?.TopRunnableView!.SubViews.ElementAt (0).SetCursor (new () { Position = new Point (1, 1) }); })
+                                  .Then (app =>
+                                         {
+                                             app!.TopRunnableView!.SubViews.ElementAt (0).Cursor = new () { Position = new Point (1, 1) };
+                                         })
                                   .AssertCursorPosition (new (1, 1)) // Initial cursor position (because Window has border)
             ;
     }

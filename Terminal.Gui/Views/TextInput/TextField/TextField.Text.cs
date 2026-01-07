@@ -429,7 +429,7 @@ public partial class TextField
 
         if (!HasFocus)
         {
-            SetCursor (new () { Position = null });
+            Cursor = new () { Position = null };
 
             return;
         }
@@ -450,11 +450,11 @@ public partial class TextField
 
         int pos = col + Math.Min (Viewport.X, 0);
 
-        SetCursor (new ()
+        Cursor = new ()
         {
             Position = ViewportToScreen (new Point (pos, 0)),
             Shape = CursorShape.Default
-        });
+        };
     }
 
     /// <summary>

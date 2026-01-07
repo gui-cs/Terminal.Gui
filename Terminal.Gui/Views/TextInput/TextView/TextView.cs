@@ -198,15 +198,15 @@ public partial class TextView : View, IDesignable
 
         if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
-            SetCursor (Cursor with
+            Cursor = Cursor with
             {
                 Position = ViewportToScreen (new Point (col, CurrentRow - _topRow)),
                 Shape = CursorShape.Default
-            });
+            };
         }
         else
         {
-            SetCursor (Cursor with { Position = null, Shape = Cursor.Shape });
+            Cursor = Cursor with { Position = null, Shape = Cursor.Shape };
         }
     }
 
