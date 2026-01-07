@@ -180,6 +180,7 @@ public abstract class OutputBase
 
     /// <summary>
     ///     When overriden in derived class, positions the terminal draw cursor to the specified point on the screen.
+    ///     Note, this does NOT update any internal cursor position state - that is the responsibility of the caller.
     /// </summary>
     /// <param name="screenPositionX">Column to move cursor to</param>
     /// <param name="screenPositionY">Row to move cursor to</param>

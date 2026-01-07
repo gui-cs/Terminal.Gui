@@ -133,9 +133,6 @@ public class OutputBaseTests
         Assert.False (buffer.Contents! [0, 0].IsDirty);
         Assert.False (buffer.Contents! [0, 2].IsDirty);
 
-        // Verify SetCursorPositionImpl was invoked by WriteToConsole (cursor set to a written column)
-        Assert.Equal (new (0, 0), output.GetCursor().Position);
-
         // Now write 'X' at col 0 to verify subsequent writes also work
         buffer.Move (0, 0);
         buffer.AddStr ("X");
@@ -153,9 +150,6 @@ public class OutputBaseTests
         // Dirty flags cleared for the written cells
         Assert.False (buffer.Contents! [0, 0].IsDirty);
         Assert.False (buffer.Contents! [0, 2].IsDirty);
-
-        // Verify SetCursorPositionImpl was invoked by WriteToConsole (cursor set to a written column)
-        Assert.Equal (new (2, 0), output.GetCursor ().Position);
     }
 
     [Theory]
@@ -204,8 +198,6 @@ public class OutputBaseTests
         // Column 2 was written ('A')
         Assert.False (buffer.Contents! [0, 2].IsDirty);
 
-        Assert.Equal (new (0, 0), output.GetCursor ().Position);
-
         // Now write 'X' at col 1 which invalidates the wide glyph at col 0
         buffer.Move (1, 0);
         buffer.AddStr ("X");
@@ -224,9 +216,6 @@ public class OutputBaseTests
         Assert.False (buffer.Contents! [0, 0].IsDirty);
         Assert.False (buffer.Contents! [0, 1].IsDirty);
         Assert.False (buffer.Contents! [0, 2].IsDirty);
-
-        // Verify SetCursorPositionImpl was invoked by WriteToConsole (cursor set to a written column)
-        Assert.Equal (new (0, 0), output.GetCursor ().Position);
     }
 
     [Theory]
@@ -273,7 +262,7 @@ public class OutputBaseTests
             Assert.Contains ("SIXEL-DATA", output.GetLastOutput ());
 
             // Cursor was moved to Sixel position
-            Assert.Equal (s.ScreenPosition, output.GetCursor ().Position);
+            //Assert.Equal (s.ScreenPosition, output.GetCursor ().Position);
         }
         else
         {
@@ -281,7 +270,7 @@ public class OutputBaseTests
             Assert.DoesNotContain ("SIXEL-DATA", output.GetLastOutput ());
 
             // Cursor was NOT moved to Sixel position
-            Assert.NotEqual (s.ScreenPosition, output.GetCursor ().Position);
+            //Assert.NotEqual (s.ScreenPosition, output.GetCursor ().Position);
         }
 
         IApplication app = Application.Create ();

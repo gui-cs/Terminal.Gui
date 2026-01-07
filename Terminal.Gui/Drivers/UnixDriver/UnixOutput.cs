@@ -38,6 +38,13 @@ internal class UnixOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
+    public void Write (ReadOnlySpan<char> text)
+    {
+        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+        UnixIOHelper.TryWriteStdout (utf8);
+    }
+
+    /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
         base.Write (output);
@@ -111,7 +118,6 @@ internal class UnixOutput : OutputBase, IOutput
         return true;
     }
 
-
     private TextWriter? CreateUnixStdoutWriter ()
     {
         // duplicate stdout so we don't mess with Console.Out's FD
@@ -145,13 +151,6 @@ internal class UnixOutput : OutputBase, IOutput
 
             return null;
         }
-    }
-
-    /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text)
-    {
-        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
-        UnixIOHelper.TryWriteStdout (utf8);
     }
 
     /// <inheritdoc/>

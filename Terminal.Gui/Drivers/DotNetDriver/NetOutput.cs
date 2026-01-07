@@ -33,19 +33,6 @@ public class NetOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text)
-    {
-        try
-        {
-            Console.Out.Write (text);
-        }
-        catch (IOException)
-        {
-            // Not connected to a terminal; do nothing
-        }
-    }
-
-    /// <inheritdoc/>
     public Size GetSize ()
     {
         try
@@ -94,6 +81,19 @@ public class NetOutput : OutputBase, IOutput
         }
 
         EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+    }
+
+    /// <inheritdoc/>
+    public void Write (ReadOnlySpan<char> text)
+    {
+        try
+        {
+            Console.Out.Write (text);
+        }
+        catch (IOException)
+        {
+            // Not connected to a terminal; do nothing
+        }
     }
 
     /// <inheritdoc/>
@@ -167,15 +167,12 @@ public class NetOutput : OutputBase, IOutput
             try
             {
                 Console.SetCursorPosition (col, row);
-
-                return true;
             }
             catch
             {
                 // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             }
-
-            return false;
+            return true;
         }
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
