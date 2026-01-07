@@ -55,6 +55,7 @@ public partial class TextView
             _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
         }
 
+        PositionCursor ();
         SetNeedsDraw ();
     }
 
@@ -104,7 +105,7 @@ public partial class TextView
         }
         else
         {
-            return false;
+            return true;
         }
 
         DoNeededAction ();
@@ -144,7 +145,7 @@ public partial class TextView
             }
             else
             {
-                return false;
+                return true;
             }
         }
 
@@ -250,7 +251,7 @@ public partial class TextView
             }
             else
             {
-                return false;
+                return true;
             }
         }
 
@@ -268,18 +269,14 @@ public partial class TextView
             StopSelecting ();
         }
 
-        MoveHome ();
-
-        return true;
+        return MoveHome ();
     }
 
     private bool MoveTopHomeExtend ()
     {
         ResetColumnTrack ();
         StartSelecting ();
-        MoveHome ();
-
-        return true;
+        return MoveHome ();
     }
 
     private bool MoveUp ()
@@ -304,7 +301,7 @@ public partial class TextView
         }
         else
         {
-            return false;
+            return true;
         }
 
         DoNeededAction ();

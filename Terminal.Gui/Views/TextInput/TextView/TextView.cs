@@ -150,16 +150,9 @@ public partial class TextView : View, IDesignable
     /// <summary>Positions the cursor on the current row and column</summary>
     public void PositionCursor ()
     {
-        ProcessAutocomplete ();
-
         if (!CanFocus || !Enabled || Driver is null)
         {
             return;
-        }
-
-        if (App?.Mouse.MouseGrabView == this && IsSelecting)
-        {
-            SetNeedsDraw ();
         }
 
         List<Cell> line = _model.GetLine (CurrentRow);

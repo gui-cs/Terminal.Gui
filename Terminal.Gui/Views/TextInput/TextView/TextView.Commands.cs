@@ -537,7 +537,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        return false;
+        return true;
     }
 
     private bool DeleteTextForwards ()
@@ -602,7 +602,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        return false;
+        return true;
     }
 
     private bool KillToEndOfLine ()

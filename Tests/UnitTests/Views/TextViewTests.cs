@@ -966,24 +966,29 @@ This is the second line.
 
         for (var i = 0; i < 12; i++)
         {
+            // Scroll right, hiding the insertion point
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledRight });
             Application.Navigation.UpdateCursor ();
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
+            Assert.False (tv.Cursor.IsVisible);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
 
         for (var i = 11; i > 0; i--)
         {
+            // Scroll left, eventually showing insertion point
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledLeft });
             Application.Navigation.UpdateCursor ();
             Assert.Equal (i - 1, tv.LeftColumn);
 
             if (i - 1 == 0)
             {
+                Assert.True (tv.Cursor.IsVisible);
                 Assert.True (Application.Driver!.GetCursor ().IsVisible);
             }
             else
             {
+                Assert.False (tv.Cursor.IsVisible);
                 Assert.False (Application.Driver!.GetCursor ().IsVisible);
             }
         }
@@ -994,7 +999,7 @@ This is the second line.
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void DesiredCursorVisibility_Vertical_Navigation ()
+    public void Cursor_Vertical_Navigation ()
     {
         var text = "";
 
@@ -1014,6 +1019,7 @@ This is the second line.
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledDown });
+            Application.Navigation.UpdateCursor ();
             Assert.Equal (i + 1, tv.TopRow);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
@@ -1021,6 +1027,7 @@ This is the second line.
         for (var i = 12; i > 0; i--)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledUp });
+            Application.Navigation.UpdateCursor ();
             Assert.Equal (i - 1, tv.TopRow);
 
 
