@@ -1,6 +1,3 @@
-
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
@@ -19,72 +16,17 @@ public class TextValidateField : View, IDesignable
         CanFocus = true;
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.LeftStart,
-                    () =>
-                    {
-                        HomeKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.RightEnd,
-                    () =>
-                    {
-                        EndKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.DeleteCharRight,
-                    () =>
-                    {
-                        DeleteKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.DeleteCharLeft,
-                    () =>
-                    {
-                        BackspaceKeyHandler ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        CursorLeft ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Right,
-                    () =>
-                    {
-                        CursorRight ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.LeftStart, () => HomeKeyHandler ());
+        AddCommand (Command.RightEnd, () => EndKeyHandler ());
+        AddCommand (Command.DeleteCharRight, () => DeleteKeyHandler ());
+        AddCommand (Command.DeleteCharLeft, () => BackspaceKeyHandler ());
+        AddCommand (Command.Left, () => CursorLeft ());
+        AddCommand (Command.Right, () => CursorRight ());
 
         // Default keybindings for this view
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
-
         KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -127,15 +69,7 @@ public class TextValidateField : View, IDesignable
     /// <summary>Text</summary>
     public new string Text
     {
-        get
-        {
-            if (_provider is null)
-            {
-                return string.Empty;
-            }
-
-            return _provider.Text;
-        }
+        get => _provider is null ? string.Empty : _provider.Text;
         set
         {
             if (_provider is null)
@@ -152,23 +86,23 @@ public class TextValidateField : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            int c = _provider!.Cursor (mouse.Position!.Value.X - GetMargins (Viewport.Width).left);
-
-            if (_provider.Fixed == false && TextAlignment == Alignment.End && Text.Length > 0)
-            {
-                c++;
-            }
-
-            _cursorPosition = c;
-            SetFocus ();
-            SetNeedsDraw ();
-
-            return true;
+            return false;
         }
 
-        return false;
+        int c = _provider!.Cursor (mouse.Position!.Value.X - GetMargins (Viewport.Width).left);
+
+        if (!_provider.Fixed && TextAlignment == Alignment.End && Text.Length > 0)
+        {
+            c++;
+        }
+
+        _cursorPosition = c;
+        SetFocus ();
+        SetNeedsDraw ();
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -201,9 +135,9 @@ public class TextValidateField : View, IDesignable
         SetAttribute (textColor);
 
         // Content
-        for (var i = 0; i < _provider.DisplayText.Length; i++)
+        foreach (char t in _provider.DisplayText)
         {
-            AddRune ((Rune)_provider.DisplayText [i]);
+            AddRune ((Rune)t);
         }
 
         // Right Margin
@@ -251,7 +185,7 @@ public class TextValidateField : View, IDesignable
 
         // Fixed = true, is for inputs that have fixed width, like masked ones.
         // Fixed = false, is for normal input.
-        // When it's right-aligned and it's a normal input, the cursor behaves differently.
+        // When it's right-aligned, and it's a normal input, the cursor behaves differently.
         int curPos;
 
         if (_provider?.Fixed == false && TextAlignment == Alignment.End)
@@ -272,7 +206,7 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool BackspaceKeyHandler ()
     {
-        if (_provider!.Fixed == false && TextAlignment == Alignment.End && _cursorPosition <= 1)
+        if (!_provider!.Fixed && TextAlignment == Alignment.End && _cursorPosition <= 1)
         {
             return false;
         }
@@ -320,7 +254,7 @@ public class TextValidateField : View, IDesignable
     /// <returns></returns>
     private bool DeleteKeyHandler ()
     {
-        if (_provider!.Fixed == false && TextAlignment == Alignment.End)
+        if (!_provider!.Fixed && TextAlignment == Alignment.End)
         {
             _cursorPosition = _provider.CursorLeft (_cursorPosition);
         }
@@ -368,7 +302,7 @@ public class TextValidateField : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         TextRegexProvider provider = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
