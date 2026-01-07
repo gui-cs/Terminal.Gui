@@ -590,7 +590,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
     private void UpdateCursor ()
     {
-        if (!CanFocus || !HasFocus || !Visible || SelectedObject is null)
+        if (!CanFocus || !HasFocus || !Visible || SelectedObject is null || !Cursor.IsVisible)
         {
             return;
         }
@@ -606,7 +606,6 @@ public class TreeView<T> : View, ITreeView where T : class
             SetCursor (Cursor with
             {
                 Position = ViewportToScreen (new Point (indent - ScrollOffsetHorizontal, idx - ScrollOffsetVertical)),
-                Shape = CursorShape.BlinkingBlock
             });
         }
     }

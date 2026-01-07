@@ -77,7 +77,7 @@ public class TreeViewFileSystem : Scenario
         _miMultiSelectCheckBox = new ()
         {
             Title = "_Multi Select",
-            CheckedState = CheckState.Checked
+            //CheckedState = CheckState.Checked
         };
         _miMultiSelectCheckBox.CheckedStateChanged += (s, e) => SetMultiSelect ();
 
@@ -160,8 +160,8 @@ public class TreeViewFileSystem : Scenario
 
         _miCursorCheckBox = new ()
         {
-            Title = "Curs_or (MultiSelect only)",
-            CheckedState = CheckState.Checked
+            Title = "Curs_or",
+            //CheckedState = CheckState.Checked
         };
         SetCursor ();
         _miCursorCheckBox.CheckedStateChanged += (s, e) => SetCursor ();
@@ -304,7 +304,8 @@ public class TreeViewFileSystem : Scenario
 
         if (_miCursorCheckBox.CheckedState == CheckState.Checked)
         {
-            _treeViewFiles.SetCursor (_treeViewFiles.Cursor with { Shape = CursorShape.BlinkingBlock });
+            // Provide a non-null position to enable the cursor
+            _treeViewFiles.SetCursor (_treeViewFiles.Cursor with { Position = Point.Empty, Shape = CursorShape.BlinkingBlock });
         }
         else
         {
