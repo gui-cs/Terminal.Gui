@@ -28,16 +28,16 @@ namespace Terminal.Gui.Views;
 ///         <list type="bullet">
 ///             <item>
 ///                 <description>
-///                     <see cref="TextField.CursorPosition"/>: Inherited, but constrained by the override to [1,
+///                     <see cref="TextField.InsertionPoint"/>: Inherited, but constrained by the override to [1,
 ///                     FormatLength]
 ///                 </description>
 ///             </item>
 ///             <item>
-///                 <description><see cref="AdjCursorPosition"/>: Adjusts cursor to skip over date separator characters</description>
+///                 <description><see cref="AdjustInsertionPoint"/>: Adjusts cursor to skip over date separator characters</description>
 ///             </item>
 ///             <item>
 ///                 <description>
-///                     <see cref="IncCursorPosition"/>/<see cref="DecCursorPosition"/>: Move cursor while
+///                     <see cref="IncrementInsertionPoint"/>/<see cref="DecrementInsertionPoint"/>: Move cursor while
 ///                     respecting separator positions
 ///                 </description>
 ///             </item>
@@ -127,7 +127,7 @@ public class DateField : TextField
     ///     Gets or sets the cursor position within the date field, constrained to valid digit positions.
     /// </summary>
     /// <value>
-    ///     The cursor position, clamped to the range [1, FormatLength]. Unlike <see cref="TextField.CursorPosition"/>,
+    ///     The cursor position, clamped to the range [1, FormatLength]. Unlike <see cref="TextField.InsertionPoint"/>,
     ///     position 0 is not accessible because it contains a leading space.
     /// </value>
     /// <remarks>
@@ -144,14 +144,14 @@ public class DateField : TextField
     ///     </para>
     ///     <para>
     ///         <b>Note:</b> This property only enforces bounds; it does not skip separator characters.
-    ///         Use <see cref="AdjCursorPosition"/> after setting to ensure the cursor is on a digit position.
+    ///         Use <see cref="AdjustInsertionPoint"/> after setting to ensure the cursor is on a digit position.
     ///     </para>
     /// </remarks>
-    /// <seealso cref="AdjCursorPosition"/>
-    public override int CursorPosition
+    /// <seealso cref="AdjustInsertionPoint"/>
+    public override int InsertionPoint
     {
-        get => base.CursorPosition;
-        set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1);
+        get => base.InsertionPoint;
+        set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1);
     }
 
     /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
@@ -213,7 +213,7 @@ public class DateField : TextField
 
         ClearAllSelection ();
         SetText ((Rune)'0');
-        DecCursorPosition ();
+        DecrementInsertionPoint ();
         return true;
     }
 
@@ -241,7 +241,7 @@ public class DateField : TextField
 
         if (SelectedLength == 0 && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
-            AdjCursorPosition (mouse.Position!.Value.X);
+            AdjustInsertionPoint (mouse.Position!.Value.X);
         }
 
         return mouse.Handled;
@@ -261,7 +261,7 @@ public class DateField : TextField
             {
                 if (SetText ((Rune)a))
                 {
-                    IncCursorPosition ();
+                    IncrementInsertionPoint ();
                 }
             }
 
@@ -298,15 +298,15 @@ public class DateField : TextField
     ///         <b>Example:</b> For date " 01/15/2024" with separator '/':
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>AdjCursorPosition(3, true) → cursor moves to position 4 (first digit of day)</description>
+    ///                 <description>AdjustInsertionPoint(3, true) → cursor moves to position 4 (first digit of day)</description>
     ///             </item>
     ///             <item>
-    ///                 <description>AdjCursorPosition(3, false) → cursor moves to position 2 (last digit of month)</description>
+    ///                 <description>AdjustInsertionPoint(3, false) → cursor moves to position 2 (last digit of month)</description>
     ///             </item>
     ///         </list>
     ///     </para>
     /// </remarks>
-    private void AdjCursorPosition (int point, bool increment = true)
+    private void AdjustInsertionPoint (int point, bool increment = true)
     {
         int newPoint = point;
 
@@ -323,19 +323,19 @@ public class DateField : TextField
 
         if (newPoint != point)
         {
-            CursorPosition = newPoint;
+            InsertionPoint = newPoint;
         }
 
         // Skip over separator characters in the specified direction
-        while (CursorPosition < Text.GetColumns () - 1 && Text [CursorPosition].ToString () == _separator)
+        while (InsertionPoint < Text.GetColumns () - 1 && Text [InsertionPoint].ToString () == _separator)
         {
             if (increment)
             {
-                CursorPosition++;
+                InsertionPoint++;
             }
             else
             {
-                CursorPosition--;
+                InsertionPoint--;
             }
         }
     }
@@ -375,7 +375,7 @@ public class DateField : TextField
                 e.Result = $" {date}".Replace (RIGHT_TO_LEFT_MARK, "");
             }
 
-            AdjCursorPosition (CursorPosition);
+            AdjustInsertionPoint (InsertionPoint);
         }
         catch (Exception)
         {
@@ -388,24 +388,24 @@ public class DateField : TextField
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This method moves the cursor left by one position, then calls <see cref="AdjCursorPosition"/>
+    ///         This method moves the cursor left by one position, then calls <see cref="AdjustInsertionPoint"/>
     ///         with <c>increment=false</c> to skip over any separator that might be at the new position.
     ///     </para>
     ///     <para>
     ///         The cursor will not move below position 1 (the first digit position).
     ///     </para>
     /// </remarks>
-    private void DecCursorPosition ()
+    private void DecrementInsertionPoint ()
     {
-        if (CursorPosition <= 1)
+        if (InsertionPoint <= 1)
         {
-            CursorPosition = 1;
+            InsertionPoint = 1;
 
             return;
         }
 
-        CursorPosition--;
-        AdjCursorPosition (CursorPosition, false);
+        InsertionPoint--;
+        AdjustInsertionPoint (InsertionPoint, false);
     }
 
     private string GetDataSeparator (string separator)
@@ -470,30 +470,30 @@ public class DateField : TextField
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This method moves the cursor right by one position, then calls <see cref="AdjCursorPosition"/>
+    ///         This method moves the cursor right by one position, then calls <see cref="AdjustInsertionPoint"/>
     ///         with <c>increment=true</c> to skip over any separator that might be at the new position.
     ///     </para>
     ///     <para>
     ///         The cursor will not move beyond FormatLength (the last digit position).
     ///     </para>
     /// </remarks>
-    private void IncCursorPosition ()
+    private void IncrementInsertionPoint ()
     {
-        if (CursorPosition >= FormatLength)
+        if (InsertionPoint >= FormatLength)
         {
-            CursorPosition = FormatLength;
+            InsertionPoint = FormatLength;
 
             return;
         }
 
-        CursorPosition++;
-        AdjCursorPosition (CursorPosition);
+        InsertionPoint++;
+        AdjustInsertionPoint (InsertionPoint);
     }
 
     private new bool MoveEnd ()
     {
         ClearAllSelection ();
-        CursorPosition = FormatLength;
+        InsertionPoint = FormatLength;
 
         return true;
     }
@@ -502,7 +502,7 @@ public class DateField : TextField
     {
         // Home, C-A
         ClearAllSelection ();
-        CursorPosition = 1;
+        InsertionPoint = 1;
 
         return true;
     }
@@ -510,7 +510,7 @@ public class DateField : TextField
     private bool MoveLeft ()
     {
         ClearAllSelection ();
-        DecCursorPosition ();
+        DecrementInsertionPoint ();
 
         return true;
     }
@@ -518,7 +518,7 @@ public class DateField : TextField
     private bool MoveRight ()
     {
         ClearAllSelection ();
-        IncCursorPosition ();
+        IncrementInsertionPoint ();
 
         return true;
     }
@@ -560,7 +560,7 @@ public class DateField : TextField
         _format = $" {StandardizeDateFormat (Culture!.DateTimeFormat.ShortDatePattern)}";
         _separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
         Date = date;
-        CursorPosition = 1;
+        InsertionPoint = 1;
         TextChanging += OnTextChanging;
 
         // Things this view knows how to do
@@ -613,30 +613,30 @@ public class DateField : TextField
 
     private bool SetText (Rune key)
     {
-        if (CursorPosition > FormatLength)
+        if (InsertionPoint > FormatLength)
         {
-            CursorPosition = FormatLength;
+            InsertionPoint = FormatLength;
 
             return false;
         }
 
-        if (CursorPosition < 1)
+        if (InsertionPoint < 1)
         {
-            CursorPosition = 1;
+            InsertionPoint = 1;
 
             return false;
         }
 
         List<Rune> text = Text.EnumerateRunes ().ToList ();
-        List<Rune> newText = text.GetRange (0, CursorPosition);
+        List<Rune> newText = text.GetRange (0, InsertionPoint);
         newText.Add (key);
 
-        if (CursorPosition < FormatLength)
+        if (InsertionPoint < FormatLength)
         {
             newText =
             [
                 .. newText,
-                .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+                .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))
             ];
         }
 

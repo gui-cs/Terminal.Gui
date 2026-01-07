@@ -55,7 +55,7 @@ public partial class TextField
     private List<string> DeleteSelectedText ()
     {
         SetSelectedStartSelectedLength ();
-        int selStart = SelectedStart > -1 ? _start : _cursorPosition;
+        int selStart = SelectedStart > -1 ? _selectionStart : _insertionPoint;
 
         string newText = StringExtensions.ToString (_text.GetRange (0, selStart))
                          + StringExtensions.ToString (
@@ -66,7 +66,7 @@ public partial class TextField
                                                      );
 
         ClearAllSelection ();
-        _cursorPosition = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
+        _insertionPoint = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 
         return newText.ToStringList ();
     }
@@ -75,7 +75,7 @@ public partial class TextField
     {
         _historyText.Add (
                           [Cell.ToCells (_text)],
-                          new (_cursorPosition, 0)
+                          new (_insertionPoint, 0)
                          );
 
         List<string> newText = _text;
@@ -83,39 +83,39 @@ public partial class TextField
         if (SelectedLength > 0)
         {
             newText = DeleteSelectedText ();
-            _preTextChangedCursorPos = _cursorPosition;
+            _preChangeInsertionPoint = _insertionPoint;
         }
 
         if (!usePreTextChangedCursorPos)
         {
-            _preTextChangedCursorPos = _cursorPosition;
+            _preChangeInsertionPoint = _insertionPoint;
         }
 
         StringRuneEnumerator enumeratedRunes = a.AsRune.ToString ().EnumerateRunes ();
 
         if (Used)
         {
-            _cursorPosition++;
+            _insertionPoint++;
 
-            if (_cursorPosition == newText.Count + 1)
+            if (_insertionPoint == newText.Count + 1)
             {
                 SetText (newText.Concat (enumeratedRunes.Select (r => r.ToString ())).ToList ());
             }
             else
             {
-                if (_preTextChangedCursorPos > newText.Count)
+                if (_preChangeInsertionPoint > newText.Count)
                 {
-                    _preTextChangedCursorPos = newText.Count;
+                    _preChangeInsertionPoint = newText.Count;
                 }
 
                 SetText (
-                         newText.GetRange (0, _preTextChangedCursorPos)
+                         newText.GetRange (0, _preChangeInsertionPoint)
                                 .Concat (enumeratedRunes.Select (r => r.ToString ()))
                                 .Concat (
                                          newText.GetRange (
-                                                           _preTextChangedCursorPos,
+                                                           _preChangeInsertionPoint,
                                                            Math.Min (
-                                                                     newText.Count - _preTextChangedCursorPos,
+                                                                     newText.Count - _preChangeInsertionPoint,
                                                                      newText.Count
                                                                     )
                                                           )
@@ -126,16 +126,16 @@ public partial class TextField
         else
         {
             SetText (
-                     newText.GetRange (0, _preTextChangedCursorPos)
+                     newText.GetRange (0, _preChangeInsertionPoint)
                             .Concat (enumeratedRunes.Select (r => r.ToString ()))
                             .Concat (
                                      newText.GetRange (
-                                                       Math.Min (_preTextChangedCursorPos + 1, newText.Count),
-                                                       Math.Max (newText.Count - _preTextChangedCursorPos - 1, 0)
+                                                       Math.Min (_preChangeInsertionPoint + 1, newText.Count),
+                                                       Math.Max (newText.Count - _preChangeInsertionPoint - 1, 0)
                                                       )
                                     )
                     );
-            _cursorPosition++;
+            _insertionPoint++;
         }
 
         Adjust ();
@@ -145,7 +145,7 @@ public partial class TextField
     ///     Caches the cursor position before a text change operation. Used to properly handle text insertion
     ///     and deletion operations, particularly for undo/redo and proper cursor placement after edits.
     /// </summary>
-    private int _preTextChangedCursorPos;
+    private int _preChangeInsertionPoint;
 
     /// <summary>
     ///     The text content stored as a list of strings, where each string represents a single text element
@@ -175,9 +175,9 @@ public partial class TextField
 
             if (args.Handled)
             {
-                if (_cursorPosition > _text.Count)
+                if (_insertionPoint > _text.Count)
                 {
-                    _cursorPosition = _text.Count;
+                    _insertionPoint = _text.Count;
                 }
 
                 return;
@@ -192,12 +192,12 @@ public partial class TextField
             {
                 _historyText.Add (
                                   [Cell.ToCellList (oldText)],
-                                  new (_cursorPosition, 0)
+                                  new (_insertionPoint, 0)
                                  );
 
                 _historyText.Add (
                                   [Cell.ToCells (_text)],
-                                  new (_cursorPosition, 0),
+                                  new (_insertionPoint, 0),
                                   TextEditingLineStatus.Replaced
                                  );
             }
@@ -206,9 +206,9 @@ public partial class TextField
 
             ProcessAutocomplete ();
 
-            if (_cursorPosition > _text.Count)
+            if (_insertionPoint > _text.Count)
             {
-                _cursorPosition = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+                _insertionPoint = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
             }
 
             Adjust ();
@@ -221,11 +221,11 @@ public partial class TextField
     ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>
-    internal bool CursorIsAtEnd () { return CursorPosition == Text.Length; }
+    internal bool InsertionPointIsAtEnd () { return InsertionPoint == Text.Length; }
 
     /// <summary>Returns <see langword="true"/> if the current cursor position is at the start of the <see cref="TextField"/>.</summary>
     /// <returns></returns>
-    internal bool CursorIsAtStart () { return CursorPosition <= 0; }
+    internal bool InsertionPointIsAtStart () { return InsertionPoint <= 0; }
 
     /// <summary>
     ///     Adjusts the <see cref="ScrollOffset"/> to ensure the cursor remains visible within the viewport,
@@ -259,22 +259,22 @@ public partial class TextField
         bool need = NeedsDraw || !Used;
 
         // If cursor is before the visible area, scroll left to show it
-        if (_cursorPosition < ScrollOffset)
+        if (_insertionPoint < ScrollOffset)
         {
-            ScrollOffset = _cursorPosition;
+            ScrollOffset = _insertionPoint;
             need = true;
         }
 
         // If cursor is beyond the visible area, scroll right to show it
         else if (Viewport.Width > 0
-                 && (ScrollOffset + _cursorPosition - Viewport.Width == 0
-                     || TextModel.DisplaySize (_text, ScrollOffset, _cursorPosition).size >= Viewport.Width))
+                 && (ScrollOffset + _insertionPoint - Viewport.Width == 0
+                     || TextModel.DisplaySize (_text, ScrollOffset, _insertionPoint).size >= Viewport.Width))
         {
             ScrollOffset = Math.Max (
                                      TextModel.CalculateLeftColumn (
                                                                     _text,
                                                                     ScrollOffset,
-                                                                    _cursorPosition,
+                                                                    _insertionPoint,
                                                                     Viewport.Width
                                                                    ),
                                      0
@@ -323,7 +323,7 @@ public partial class TextField
     ///         </list>
     ///     </para>
     /// </remarks>
-    private int PositionCursor (int x, bool getX = true)
+    private int SetInsertionPointFromScreen (int x, bool getX = true)
     {
         int pX = x;
 
@@ -336,34 +336,34 @@ public partial class TextField
         // Convert relative position to absolute and clamp to valid range
         if (ScrollOffset + pX > _text.Count)
         {
-            _cursorPosition = _text.Count;
+            _insertionPoint = _text.Count;
         }
         else if (ScrollOffset + pX < ScrollOffset)
         {
-            _cursorPosition = 0;
+            _insertionPoint = 0;
         }
         else
         {
-            _cursorPosition = ScrollOffset + pX;
+            _insertionPoint = ScrollOffset + pX;
         }
 
-        return _cursorPosition;
+        return _insertionPoint;
     }
 
     /// <summary>
-    ///     The internal cursor position within the text, measured as a 0-based index into the text elements
-    ///     (graphemes/runes), not screen columns. This is the backing field for <see cref="CursorPosition"/>.
+    ///     The internal insertion point within the text, measured as a 0-based index into the text elements
+    ///     (graphemes/runes), not screen columns. This is the backing field for <see cref="InsertionPoint"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This value represents the logical cursor position in the text, where 0 is before the first character
+    ///         This value represents the logical insertion point in the text, where 0 is before the first character
     ///         and <c>_text.Count</c> is after the last character. For example, in the text "Hello":
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>Position 0 = cursor is before 'H'</description>
+    ///                 <description>Position 0 = insertion point is before 'H'</description>
     ///             </item>
     ///             <item>
-    ///                 <description>Position 5 = cursor is after 'o' (at the end)</description>
+    ///                 <description>Position 5 = insertion point is after 'o' (at the end)</description>
     ///             </item>
     ///         </list>
     ///     </para>
@@ -382,18 +382,18 @@ public partial class TextField
     ///         Use <see cref="PositionCursor()"/> to convert this logical position to screen coordinates.
     ///     </para>
     /// </remarks>
-    private int _cursorPosition;
+    private int _insertionPoint;
 
     /// <summary>
-    ///     Gets or sets the current cursor position within the text, measured as a 0-based index into text elements.
+    ///     Gets or sets the insertion point within the text, measured as a 0-based index into text elements.
     /// </summary>
     /// <value>
-    ///     The cursor position, clamped to the range [0, Text.Length]. Position 0 is before the first character;
+    ///     The insertion point position, clamped to the range [0, Text.Length]. Position 0 is before the first character;
     ///     position equal to the text length is after the last character.
     /// </value>
     /// <remarks>
     ///     <para>
-    ///         This property provides access to the logical cursor position within the text. The value is automatically
+    ///         This property provides access to the logical insertion point within the text. The value is automatically
     ///         clamped to valid bounds: values less than 0 become 0, and values greater than the text length become
     ///         the text length.
     ///     </para>
@@ -401,7 +401,7 @@ public partial class TextField
     ///         <b>Relationship to <see cref="PositionCursor()"/>:</b>
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description><see cref="CursorPosition"/>: Logical position in text elements (0-based index)</description>
+    ///                 <description><see cref="InsertionPoint"/>: Logical position in text elements (0-based index)</description>
     ///             </item>
     ///             <item>
     ///                 <description>
@@ -415,13 +415,13 @@ public partial class TextField
     ///         <b>Example:</b> For text "Hello世界" (Hello + 2 CJK characters):
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>CursorPosition = 0: Before 'H'</description>
+    ///                 <description>InsertionPoint = 0: Before 'H'</description>
     ///             </item>
     ///             <item>
-    ///                 <description>CursorPosition = 5: Before '世'</description>
+    ///                 <description>InsertionPoint = 5: Before '世'</description>
     ///             </item>
     ///             <item>
-    ///                 <description>CursorPosition = 7: After '界' (end of text)</description>
+    ///                 <description>InsertionPoint = 7: After '界' (end of text)</description>
     ///             </item>
     ///         </list>
     ///         Note that screen columns would differ because '世' and '界' each occupy 2 columns.
@@ -432,25 +432,25 @@ public partial class TextField
     /// </remarks>
     /// <seealso cref="PositionCursor()"/>
     /// <seealso cref="ScrollOffset"/>
-    public virtual int CursorPosition
+    public virtual int InsertionPoint
     {
-        get => _cursorPosition;
+        get => _insertionPoint;
         set
         {
             if (value < 0)
             {
-                _cursorPosition = 0;
+                _insertionPoint = 0;
             }
             else if (value > _text.Count)
             {
-                _cursorPosition = _text.Count;
+                _insertionPoint = _text.Count;
             }
             else
             {
-                _cursorPosition = value;
+                _insertionPoint = value;
             }
 
-            PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+            PrepareSelection (_selectionAnchor, _insertionPoint - _selectionAnchor);
         }
     }
 

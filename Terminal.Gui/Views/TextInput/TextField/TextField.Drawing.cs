@@ -48,7 +48,7 @@ public partial class TextField
                 // Disabled
                 SetAttributeForRole (VisualRole.Disabled);
             }
-            else if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
+            else if (idx == _insertionPoint && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
             {
                 // Selected text
                 SetAttribute (selectedAttribute);
@@ -56,7 +56,7 @@ public partial class TextField
             else if (ReadOnly)
             {
                 SetAttribute (
-                              idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
+                              idx >= _selectionStart && SelectedLength > 0 && idx < _selectionStart + SelectedLength
                                   ? selectedAttribute
                                   : readonlyAttribute
                              );
@@ -69,7 +69,7 @@ public partial class TextField
             else
             {
                 SetAttribute (
-                              idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
+                              idx >= _selectionStart && SelectedLength > 0 && idx < _selectionStart + SelectedLength
                                   ? selectedAttribute
                                   : normalAttribute
                              );

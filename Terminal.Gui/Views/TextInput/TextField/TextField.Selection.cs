@@ -15,7 +15,7 @@ public partial class TextField
     public bool SelectWordOnlyOnDoubleClick { get; set; }
 
     /// <summary>
-    ///     The normalized start position of the selection for drawing purposes. Unlike <see cref="_selectedStart"/>
+    ///     The normalized start position of the selection for drawing purposes. Unlike <see cref="_selectionAnchor"/>
     ///     (the anchor), this is always the leftmost position of the selection range.
     /// </summary>
     /// <remarks>
@@ -23,10 +23,10 @@ public partial class TextField
     ///         This value is computed by <see cref="SetSelectedStartSelectedLength"/> to ensure:
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>When selecting left-to-right: <c>_start == _selectedStart</c></description>
+    ///                 <description>When selecting left-to-right: <c>_selectionStart == _selectionAnchor</c></description>
     ///             </item>
     ///             <item>
-    ///                 <description>When selecting right-to-left: <c>_start == _cursorPosition</c></description>
+    ///                 <description>When selecting right-to-left: <c>_selectionStart == _insertionPoint</c></description>
     ///             </item>
     ///         </list>
     ///     </para>
@@ -35,17 +35,17 @@ public partial class TextField
     ///         text operations in <see cref="DeleteSelectedText"/>.
     ///     </para>
     /// </remarks>
-    private int _start;
+    private int _selectionStart;
 
     private void SetSelectedStartSelectedLength ()
     {
-        if (SelectedStart > -1 && _cursorPosition < SelectedStart)
+        if (SelectedStart > -1 && _insertionPoint < SelectedStart)
         {
-            _start = _cursorPosition;
+            _selectionStart = _insertionPoint;
         }
         else
         {
-            _start = SelectedStart;
+            _selectionStart = SelectedStart;
         }
     }
 
@@ -65,7 +65,7 @@ public partial class TextField
     /// <seealso cref="SelectedText"/>
     public int SelectedLength { get; private set; }
 
-    private int _selectedStart;
+    private int _selectionAnchor;
 
     /// <summary>
     ///     Gets or sets the anchor position where text selection began, measured as a 0-based index into text elements.
@@ -81,11 +81,11 @@ public partial class TextField
     ///             <item>
     ///                 <description>
     ///                     <see cref="SelectedStart"/>: The anchor point where selection began (can be before or
-    ///                     after cursor)
+    ///                     after insertion point)
     ///                 </description>
     ///             </item>
     ///             <item>
-    ///                 <description><see cref="CursorPosition"/>: The current end of the selection</description>
+    ///                 <description><see cref="InsertionPoint"/>: The current end of the selection</description>
     ///             </item>
     ///             <item>
     ///                 <description><see cref="SelectedLength"/>: The absolute length of the selection</description>
@@ -97,14 +97,14 @@ public partial class TextField
     ///         <list type="bullet">
     ///             <item>
     ///                 <description>
-    ///                     If cursor was at position 6 and user shift-clicks at position 11: SelectedStart=6,
-    ///                     CursorPosition=11
+    ///                     If insertion point was at position 6 and user shift-clicks at position 11: SelectedStart=6,
+    ///                     InsertionPoint=11
     ///                 </description>
     ///             </item>
     ///             <item>
     ///                 <description>
-    ///                     If cursor was at position 11 and user shift-clicks at position 6: SelectedStart=11,
-    ///                     CursorPosition=6
+    ///                     If insertion point was at position 11 and user shift-clicks at position 6: SelectedStart=11,
+    ///                     InsertionPoint=6
     ///                 </description>
     ///             </item>
     ///             <item>
@@ -118,26 +118,26 @@ public partial class TextField
     /// </remarks>
     /// <seealso cref="SelectedLength"/>
     /// <seealso cref="SelectedText"/>
-    /// <seealso cref="CursorPosition"/>
+    /// <seealso cref="InsertionPoint"/>
     public int SelectedStart
     {
-        get => _selectedStart;
+        get => _selectionAnchor;
         set
         {
             if (value < -1)
             {
-                _selectedStart = -1;
+                _selectionAnchor = -1;
             }
             else if (value > _text.Count)
             {
-                _selectedStart = _text.Count;
+                _selectionAnchor = _text.Count;
             }
             else
             {
-                _selectedStart = value;
+                _selectionAnchor = value;
             }
 
-            PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+            PrepareSelection (_selectionAnchor, _insertionPoint - _selectionAnchor);
         }
     }
 
@@ -154,7 +154,7 @@ public partial class TextField
     ///         This method manages the selection state:
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>Sets <see cref="_selectedStart"/> if not already set and position is valid</description>
+    ///                 <description>Sets <see cref="_selectionAnchor"/> if not already set and position is valid</description>
     ///             </item>
     ///             <item>
     ///                 <description>Calculates <see cref="SelectedLength"/> based on anchor and direction</description>
@@ -175,25 +175,25 @@ public partial class TextField
     {
         x = x + ScrollOffset < -1 ? 0 : x;
 
-        _selectedStart = _selectedStart == -1 && _text.Count > 0 && x >= 0 && x <= _text.Count
+        _selectionAnchor = _selectionAnchor == -1 && _text.Count > 0 && x >= 0 && x <= _text.Count
                              ? x
-                             : _selectedStart;
+                             : _selectionAnchor;
 
-        if (_selectedStart > -1)
+        if (_selectionAnchor > -1)
         {
             SelectedLength = Math.Abs (
                                        x + direction <= _text.Count
-                                           ? x + direction - _selectedStart
-                                           : _text.Count - _selectedStart
+                                           ? x + direction - _selectionAnchor
+                                           : _text.Count - _selectionAnchor
                                       );
             SetSelectedStartSelectedLength ();
 
-            if (_start > -1 && SelectedLength > 0)
+            if (_selectionStart > -1 && SelectedLength > 0)
             {
                 _selectedText = SelectedLength > 0
                                     ? StringExtensions.ToString (
                                                                  _text.GetRange (
-                                                                                 _start < 0 ? 0 : _start,
+                                                                                 _selectionStart < 0 ? 0 : _selectionStart,
                                                                                  SelectedLength > _text.Count
                                                                                      ? _text.Count
                                                                                      : SelectedLength
@@ -201,12 +201,12 @@ public partial class TextField
                                                                 )
                                     : "";
 
-                if (ScrollOffset > _start)
+                if (ScrollOffset > _selectionStart)
                 {
-                    ScrollOffset = _start;
+                    ScrollOffset = _selectionStart;
                 }
             }
-            else if (_start > -1 && SelectedLength == 0)
+            else if (_selectionStart > -1 && SelectedLength == 0)
             {
                 _selectedText = null;
             }
@@ -224,15 +224,15 @@ public partial class TextField
     /// <summary>Clear the selected text.</summary>
     public void ClearAllSelection ()
     {
-        if (_selectedStart == -1 && SelectedLength == 0 && string.IsNullOrEmpty (_selectedText))
+        if (_selectionAnchor == -1 && SelectedLength == 0 && string.IsNullOrEmpty (_selectedText))
         {
             return;
         }
 
-        _selectedStart = -1;
+        _selectionAnchor = -1;
         SelectedLength = 0;
         _selectedText = null;
-        _start = 0;
+        _selectionStart = 0;
         SelectedLength = 0;
         SetNeedsDraw ();
     }

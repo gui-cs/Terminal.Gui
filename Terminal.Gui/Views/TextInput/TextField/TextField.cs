@@ -11,7 +11,7 @@ public partial class TextField : View, IDesignable
     {
         _historyText = new ();
         _isButtonReleased = true;
-        _selectedStart = -1;
+        _selectionAnchor = -1;
         _text = [];
 
         ReadOnly = false;
@@ -34,11 +34,11 @@ public partial class TextField : View, IDesignable
 
     private void TextField_Initialized (object? sender, EventArgs e)
     {
-        _cursorPosition = Text.GetRuneCount ();
+        _insertionPoint = Text.GetRuneCount ();
 
         if (Viewport.Width > 0)
         {
-            ScrollOffset = _cursorPosition > Viewport.Width + 1 ? _cursorPosition - Viewport.Width + 1 : 0;
+            ScrollOffset = _insertionPoint > Viewport.Width + 1 ? _insertionPoint - Viewport.Width + 1 : 0;
         }
 
         if (Autocomplete.HostControl is null)
@@ -65,7 +65,7 @@ public partial class TextField : View, IDesignable
     public bool Secret { get; set; }
 
     /// <summary>
-    ///     Converts the logical <see cref="CursorPosition"/> to screen coordinates and positions the terminal cursor.
+    ///     Converts the logical <see cref="InsertionPoint"/> to screen coordinates and positions the terminal cursor.
     /// </summary>
     /// <returns>
     ///     A <see cref="Point"/> representing the cursor's screen position within the viewport, where X is the column
@@ -79,7 +79,7 @@ public partial class TextField : View, IDesignable
     ///                 <description>Starts from <see cref="ScrollOffset"/> (first visible character)</description>
     ///             </item>
     ///             <item>
-    ///                 <description>Iterates through visible text elements up to <see cref="CursorPosition"/></description>
+    ///                 <description>Iterates through visible text elements up to <see cref="InsertionPoint"/></description>
     ///             </item>
     ///             <item>
     ///                 <description>Accumulates screen column widths (accounting for wide characters)</description>
@@ -93,7 +93,7 @@ public partial class TextField : View, IDesignable
     ///         <b>Coordinate spaces:</b>
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description><see cref="CursorPosition"/>: Logical position (0 to text length)</description>
+    ///                 <description><see cref="InsertionPoint"/>: Logical position (0 to text length)</description>
     ///             </item>
     ///             <item>
     ///                 <description>Returned Point: Screen position within viewport (0 to viewport width)</description>
@@ -104,13 +104,13 @@ public partial class TextField : View, IDesignable
     ///         <b>Example:</b> For text "Hi世界" with ScrollOffset=0:
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>CursorPosition=0 → Screen column 0 (before 'H')</description>
+    ///                 <description>InsertionPoint=0 → Screen column 0 (before 'H')</description>
     ///             </item>
     ///             <item>
-    ///                 <description>CursorPosition=2 → Screen column 2 (before '世')</description>
+    ///                 <description>InsertionPoint=2 → Screen column 2 (before '世')</description>
     ///             </item>
     ///             <item>
-    ///                 <description>CursorPosition=3 → Screen column 4 (before '界', because '世' is 2 columns wide)</description>
+    ///                 <description>InsertionPoint=3 → Screen column 4 (before '界', because '世' is 2 columns wide)</description>
     ///             </item>
     ///         </list>
     ///     </para>
@@ -118,7 +118,7 @@ public partial class TextField : View, IDesignable
     ///         This method also triggers <see cref="ProcessAutocomplete"/> to update autocomplete suggestions.
     ///     </para>
     /// </remarks>
-    /// <seealso cref="CursorPosition"/>
+    /// <seealso cref="InsertionPoint"/>
     /// <seealso cref="ScrollOffset"/>
     public override Point? PositionCursor ()
     {
@@ -128,7 +128,7 @@ public partial class TextField : View, IDesignable
 
         for (int idx = ScrollOffset < 0 ? 0 : ScrollOffset; idx < _text.Count; idx++)
         {
-            if (idx == _cursorPosition)
+            if (idx == _insertionPoint)
             {
                 break;
             }

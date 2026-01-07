@@ -3,12 +3,12 @@ namespace Terminal.Gui.Views;
 public partial class TextField
 {
     /// <summary>
-    ///     Positions the cursor based on a mouse event by converting the mouse's screen X coordinate
+    ///     Sets the insertion point based on a mouse event by converting the mouse's screen X coordinate
     ///     to a logical text position.
     /// </summary>
     /// <param name="mouse">The mouse event containing the screen position.</param>
-    /// <returns>The resulting <see cref="CursorPosition"/> after positioning.</returns>
-    private int PositionCursor (Mouse mouse) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false); }
+    ///     <returns>The resulting <see cref="InsertionPoint"/> after positioning.</returns>
+    private int SetInsertionPointFromMouse (Mouse mouse) { return SetInsertionPointFromScreen (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false); }
 
     private bool _isButtonPressed;
     private bool _isButtonReleased;
@@ -44,7 +44,7 @@ public partial class TextField
         if (ev.Flags == MouseFlags.LeftButtonPressed)
         {
             EnsureHasFocus ();
-            PositionCursor (ev);
+            SetInsertionPointFromMouse (ev);
 
             if (_isButtonReleased)
             {
@@ -56,7 +56,7 @@ public partial class TextField
         }
         else if (ev.Flags == (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport) && _isButtonPressed)
         {
-            int x = PositionCursor (ev);
+            int x = SetInsertionPointFromMouse (ev);
             _isButtonReleased = false;
             PrepareSelection (x);
 
@@ -74,7 +74,7 @@ public partial class TextField
         else if (ev.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             EnsureHasFocus ();
-            int x = PositionCursor (ev);
+            int x = SetInsertionPointFromMouse (ev);
             (int startCol, int col, int row)? newPos = GetModel ().ProcessDoubleClickSelection (x, x, 0, UseSameRuneTypeForWords, SelectWordOnlyOnDoubleClick);
 
             if (newPos is null)
@@ -83,18 +83,18 @@ public partial class TextField
             }
 
             SelectedStart = newPos.Value.startCol;
-            CursorPosition = newPos.Value.col;
+            InsertionPoint = newPos.Value.col;
         }
         else if (ev.Flags == MouseFlags.LeftButtonTripleClicked)
         {
             EnsureHasFocus ();
-            PositionCursor (0);
+            SetInsertionPointFromScreen (0);
             ClearAllSelection ();
             PrepareSelection (0, _text.Count);
         }
         else if (ev.Flags == ContextMenu!.MouseFlags)
         {
-            PositionCursor (ev);
+            SetInsertionPointFromMouse (ev);
             ShowContextMenu (false);
         }
 

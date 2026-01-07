@@ -13,5 +13,5 @@ public class TextFieldAutocomplete : PopupAutocomplete
     protected override void InsertText (string accepted) { ((TextField)HostControl).InsertText (accepted, false); }
 
     /// <inheritdoc/>
-    protected override void SetCursorPosition (int column) { ((TextField)HostControl).CursorPosition = column; }
+    protected override void SetCursorPosition (int column) { ((TextField)HostControl).InsertionPoint = column; }
 }
