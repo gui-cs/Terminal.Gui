@@ -256,10 +256,7 @@ public partial class TextView
             {
                 Adjust ();
             }
-            else
-            {
-                PositionCursor ();
-            }
+            PositionCursor ();
         }
     }
 
