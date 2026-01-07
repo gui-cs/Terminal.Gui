@@ -913,7 +913,7 @@ public class LinearRange<T> : View, IOrientation
         Cursor = Cursor with
         {
             Position = ViewportToScreen (new Point (position.x, position.y)),
-            Shape = CursorShape.Default
+            Shape = CursorStyle.Default
         };
     }
 

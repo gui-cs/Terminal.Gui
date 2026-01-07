@@ -114,7 +114,7 @@ public class TextValidateField : View, IDesignable
             Cursor = Cursor with
             {
                 Position = ViewportToScreen (new Point (curPos, 0)),
-                Shape = CursorShape.Default
+                Shape = CursorStyle.Default
             };
         }
     }

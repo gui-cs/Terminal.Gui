@@ -176,12 +176,12 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
                     cursorInfo.dwSize = cursor.Shape switch
                     {
-                        CursorShape.BlinkingBlock => 100,
-                        CursorShape.SteadyBlock => 100,
-                        CursorShape.BlinkingUnderline => 15,
-                        CursorShape.SteadyUnderline => 15,
-                        CursorShape.BlinkingBar => 15,
-                        CursorShape.SteadyBar => 15,
+                        CursorStyle.BlinkingBlock => 100,
+                        CursorStyle.SteadyBlock => 100,
+                        CursorStyle.BlinkingUnderline => 15,
+                        CursorStyle.SteadyUnderline => 15,
+                        CursorStyle.BlinkingBar => 15,
+                        CursorStyle.SteadyBar => 15,
                         _ => 100
                     };
                 }

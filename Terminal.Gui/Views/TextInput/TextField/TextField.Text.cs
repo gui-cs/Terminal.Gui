@@ -453,7 +453,7 @@ public partial class TextField
         Cursor = new ()
         {
             Position = ViewportToScreen (new Point (pos, 0)),
-            Shape = CursorShape.Default
+            Shape = CursorStyle.Default
         };
     }
 
