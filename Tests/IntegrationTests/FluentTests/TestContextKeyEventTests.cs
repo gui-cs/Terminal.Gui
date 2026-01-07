@@ -63,7 +63,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         using TestContext context = With.A<Window> (40, 10, d,  _out)
                                            .Add (textField)
                                            .Focus (textField)
-                                           .Then ((_) => textField.CursorPosition = textField.Text.Length)
+                                           .Then ((_) => textField.InsertionPoint = textField.Text.Length)
                                            .KeyDown (Key.Backspace)
                                            .KeyDown (Key.Backspace);
 

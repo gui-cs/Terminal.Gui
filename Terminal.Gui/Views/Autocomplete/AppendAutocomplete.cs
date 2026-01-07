@@ -196,5 +196,5 @@ public class AppendAutocomplete : AutocompleteBase
     ///     to see auto-complete (i.e. focused and cursor in right place).
     /// </summary>
     /// <returns></returns>
-    private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && _textField.HasFocus && _textField.CursorIsAtEnd (); }
+    private bool MakingSuggestion () { return Suggestions.Any () && SelectedIdx != -1 && _textField.HasFocus && _textField.InsertionPointIsAtEnd (); }
 }
