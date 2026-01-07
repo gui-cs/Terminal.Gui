@@ -10,13 +10,12 @@ public sealed class Selectors : Scenario
     {
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.BorderStyle = LineStyle.None;
 
         FrameView? optionSelectorsFrame = null;
         FrameView? flagSelectorsFrame = null;
@@ -35,7 +34,7 @@ public sealed class Selectors : Scenario
             X = Pos.Right (orientationSelector) + 1,
             Orientation = Orientation.Horizontal,
             BorderStyle = LineStyle.Dotted,
-            Title = "Selector St_yles",
+            Title = "Selector St_yles"
         };
         stylesSelector.ValueChanged += StylesSelectorOnValueChanged;
 
@@ -46,7 +45,7 @@ public sealed class Selectors : Scenario
             Width = 11,
             Title = "H_. Space",
             Value = stylesSelector.HorizontalSpace,
-            BorderStyle = LineStyle.Dotted,
+            BorderStyle = LineStyle.Dotted
         };
         horizontalSpace.ValueChanging += HorizontalSpaceOnValueChanging;
 
@@ -56,7 +55,7 @@ public sealed class Selectors : Scenario
             Y = Pos.Top (horizontalSpace),
             Title = "Border _& Title",
             CheckedState = CheckState.Checked,
-            BorderStyle = LineStyle.Dotted,
+            BorderStyle = LineStyle.Dotted
         };
         showBorderAndTitle.CheckedStateChanged += ShowBorderAndTitleOnCheckedStateChanged;
 
@@ -66,7 +65,7 @@ public sealed class Selectors : Scenario
             Y = Pos.Top (horizontalSpace),
             Title = "_CanFocus",
             CheckedState = CheckState.Checked,
-            BorderStyle = LineStyle.Dotted,
+            BorderStyle = LineStyle.Dotted
         };
         canFocus.CheckedStateChanged += CanFocusOnCheckedStateChanged;
 
@@ -76,14 +75,8 @@ public sealed class Selectors : Scenario
             Width = Dim.Percent (50),
             Height = Dim.Fill (),
             Title = "O_ptionSelectors",
-            TabStop = TabBehavior.TabStop,
-            //InvertFocusAttribute = true
+            TabStop = TabBehavior.TabStop
         };
-        optionSelectorsFrame.ClearingViewport += (sender, args) =>
-                                                 {
-                                                     //               optionSelectorsFrame.SetAttributeForRole (optionSelectorsFrame.HasFocus ? VisualRole.Focus : VisualRole.Normal);
-                                                 };
-
 
         Label label = new ()
         {
@@ -99,7 +92,7 @@ public sealed class Selectors : Scenario
             AssignHotKeys = true,
             Labels = ["Option _1 (0)", "Option _2 (1)", "Option _3 (5) 你", "Option _Quattro (4) 你"],
             Values = [0, 1, 5, 4],
-            Arrangement = ViewArrangement.Resizable,
+            Arrangement = ViewArrangement.Resizable
         };
         optionSelectorsFrame.Add (label, optionSelector);
 
@@ -116,7 +109,7 @@ public sealed class Selectors : Scenario
             Title = "<Vi_sualRole>",
             BorderStyle = LineStyle.Dotted,
             UsedHotKeys = optionSelector.UsedHotKeys,
-            AssignHotKeys = true,
+            AssignHotKeys = true
         };
 
         optionSelectorsFrame.Add (label, optionSelectorT);
@@ -139,7 +132,6 @@ public sealed class Selectors : Scenario
         FlagSelector flagSelector = new ()
         {
             X = Pos.Right (label) + 1,
-            UsedHotKeys = optionSelectorT.UsedHotKeys,
             BorderStyle = LineStyle.Dotted,
             Title = "FlagSe_lector (uint)",
             AssignHotKeys = true,
@@ -179,19 +171,12 @@ public sealed class Selectors : Scenario
             Value = View.Diagnostics
         };
         flagSelectorsFrame.Add (label, flagSelectorT);
-        flagSelectorT.ValueChanged += (s, a) =>
-                                      {
-                                          View.Diagnostics = (ViewDiagnosticFlags)a.Value!;
-                                      };
+        flagSelectorT.ValueChanged += (_, a) => { View.Diagnostics = (ViewDiagnosticFlags)a.Value!; };
 
         appWindow.Add (orientationSelector, stylesSelector, horizontalSpace, showBorderAndTitle, canFocus, optionSelectorsFrame, flagSelectorsFrame);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
 
         return;
 
@@ -203,6 +188,7 @@ public sealed class Selectors : Scenario
             }
 
             List<SelectorBase> selectors = GetAllSelectors ();
+
             foreach (SelectorBase selector in selectors)
             {
                 selector.Orientation = s.Value!.Value;
@@ -226,9 +212,10 @@ public sealed class Selectors : Scenario
 
         void HorizontalSpaceOnValueChanging (object? sender, CancelEventArgs<int> e)
         {
-            if (sender is not NumericUpDown<int> upDown || e.NewValue < 0)
+            if (sender is not NumericUpDown<int> || e.NewValue < 0)
             {
                 e.Cancel = true;
+
                 return;
             }
 
@@ -239,7 +226,6 @@ public sealed class Selectors : Scenario
                 selector.HorizontalSpace = e.NewValue;
             }
         }
-
 
         void ShowBorderAndTitleOnCheckedStateChanged (object? sender, EventArgs<CheckState> e)
         {
@@ -274,14 +260,14 @@ public sealed class Selectors : Scenario
         List<SelectorBase> GetAllSelectors ()
         {
             List<SelectorBase> optionSelectors = [];
+
             // ReSharper disable once AccessToModifiedClosure
             optionSelectors.AddRange (optionSelectorsFrame!.SubViews.OfType<SelectorBase> ());
+
             // ReSharper disable once AccessToModifiedClosure
             optionSelectors.AddRange (flagSelectorsFrame!.SubViews.OfType<FlagSelector> ());
 
             return optionSelectors;
         }
     }
-
-
 }
