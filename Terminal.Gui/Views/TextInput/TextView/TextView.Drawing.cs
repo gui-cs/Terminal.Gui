@@ -186,14 +186,14 @@ public partial class TextView
     protected virtual void OnDrawSelectionColor (List<Cell> line, int idxCol, int idxRow)
     {
         (int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
-        var ev = new CellEventArgs (line, idxCol, unwrappedPos);
+        CellEventArgs ev = new (line, idxCol, unwrappedPos);
         DrawSelectionColor?.Invoke (this, ev);
 
         if (line [idxCol].Attribute is { })
         {
             Attribute? attribute = line [idxCol].Attribute;
             Attribute? active = GetAttributeForRole (VisualRole.Active);
-            SetAttribute (new (active!.Value.Foreground, active.Value.Background, attribute!.Value.Style));
+            SetAttribute (new (active.Value.Foreground, active.Value.Background, attribute!.Value.Style));
         }
         else
         {
@@ -219,7 +219,7 @@ public partial class TextView
     protected virtual void OnDrawUsedColor (List<Cell> line, int idxCol, int idxRow)
     {
         (int Row, int Col) unwrappedPos = GetUnwrappedPosition (idxRow, idxCol);
-        var ev = new CellEventArgs (line, idxCol, unwrappedPos);
+        CellEventArgs ev = new (line, idxCol, unwrappedPos);
         DrawUsedColor?.Invoke (this, ev);
 
         if (line [idxCol].Attribute is { })
@@ -235,7 +235,7 @@ public partial class TextView
 
     private void SetValidUsedColor (Attribute? attribute)
     {
-        SetAttribute (new (attribute!.Value.Background, attribute!.Value.Foreground, attribute!.Value.Style));
+        SetAttribute (new (attribute!.Value.Background, attribute.Value.Foreground, attribute.Value.Style));
     }
 
     /// <inheritdoc/>
@@ -415,70 +415,70 @@ public partial class TextView
         switch (cell.Attribute)
         {
             case { } when colWithColor == 0 && lineTo.Attribute is { }:
-            {
-                for (int r = row - 1; r > -1; r--)
                 {
-                    List<Cell> l = GetLine (r);
-
-                    for (int c = l.Count - 1; c > -1; c--)
+                    for (int r = row - 1; r > -1; r--)
                     {
-                        Cell cell1 = l [c];
+                        List<Cell> l = GetLine (r);
 
-                        if (cell1.Attribute is null)
+                        for (int c = l.Count - 1; c > -1; c--)
                         {
-                            cell1.Attribute = cell.Attribute;
-                            l [c] = cell1;
-                        }
-                        else
-                        {
-                            return;
+                            Cell cell1 = l [c];
+
+                            if (cell1.Attribute is null)
+                            {
+                                cell1.Attribute = cell.Attribute;
+                                l [c] = cell1;
+                            }
+                            else
+                            {
+                                return;
+                            }
                         }
                     }
-                }
 
-                return;
-            }
+                    return;
+                }
             case null:
-            {
-                for (int r = row; r > -1; r--)
                 {
-                    List<Cell> l = GetLine (r);
-
-                    colWithColor = l.FindLastIndex (
-                                                    colWithColor > -1 ? colWithColor : l.Count - 1,
-                                                    c => c.Attribute != null
-                                                   );
-
-                    if (colWithColor > -1 && l [colWithColor].Attribute is { })
+                    for (int r = row; r > -1; r--)
                     {
-                        cell = l [colWithColor];
+                        List<Cell> l = GetLine (r);
 
-                        break;
+                        colWithColor = l.FindLastIndex (
+                                                        colWithColor > -1 ? colWithColor : l.Count - 1,
+                                                        c => c.Attribute != null
+                                                       );
+
+                        if (colWithColor > -1 && l [colWithColor].Attribute is { })
+                        {
+                            cell = l [colWithColor];
+
+                            break;
+                        }
                     }
-                }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                int cRow = row;
-
-                while (cell.Attribute is null)
                 {
-                    if ((colWithColor == 0 || cell.Attribute is null) && cRow > 0)
-                    {
-                        line = GetLine (--cRow);
-                        colWithColor = line.Count - 1;
-                        cell = line [colWithColor];
-                    }
-                    else if (cRow == 0 && colWithColor < line.Count)
-                    {
-                        cell = line [colWithColor + 1];
-                    }
-                }
+                    int cRow = row;
 
-                break;
-            }
+                    while (cell.Attribute is null)
+                    {
+                        if ((colWithColor == 0 || cell.Attribute is null) && cRow > 0)
+                        {
+                            line = GetLine (--cRow);
+                            colWithColor = line.Count - 1;
+                            cell = line [colWithColor];
+                        }
+                        else if (cRow == 0 && colWithColor < line.Count)
+                        {
+                            cell = line [colWithColor + 1];
+                        }
+                    }
+
+                    break;
+                }
         }
 
         if (cell.Attribute is null || colWithColor <= -1 || colWithoutColor >= lineToSet.Count || lineTo.Attribute is { })

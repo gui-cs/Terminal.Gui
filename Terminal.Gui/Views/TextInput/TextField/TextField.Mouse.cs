@@ -8,7 +8,7 @@ public partial class TextField
     /// </summary>
     /// <param name="mouse">The mouse event containing the screen position.</param>
     ///     <returns>The resulting <see cref="InsertionPoint"/> after positioning.</returns>
-    private int SetInsertionPointFromMouse (Mouse mouse) { return SetInsertionPointFromScreen (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false); }
+    private int SetInsertionPointFromMouse (Mouse mouse) => SetInsertionPointFromScreen (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false);
 
     private bool _isButtonPressed;
     private bool _isButtonReleased;

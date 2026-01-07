@@ -92,7 +92,7 @@ public partial class TextView : View, IDesignable
         base.HotKeySpecifier = new ('\xffff');
 
         _model.LinesLoaded += Model_LinesLoaded!;
-        _historyText.ChangeText += HistoryText_ChangeText!;
+        _historyText.ChangeText += HistoryText_ChangeText;
 
         Initialized += TextView_Initialized!;
 

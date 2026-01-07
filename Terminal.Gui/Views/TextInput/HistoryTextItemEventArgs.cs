@@ -12,16 +12,15 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class HistoryTextItemEventArgs : EventArgs
 {
-    // TODO: these should all be properties
     /// <summary>
-    ///     Gets or sets the cursor position at the time of the change.
+    ///      Gets or sets the insertion point within the text, measured as a 0-based index into text elements.
     /// </summary>
-    public Point CursorPosition { get; set; }
+    public Point InsertionPoint { get; set; }
 
     /// <summary>
-    ///     Gets or sets the final cursor position after the change is applied.
+    ///     Gets or sets the final insertion point after the change is applied.
     /// </summary>
-    public Point FinalCursorPosition { get; set; }
+    public Point FinalInsertionPoint { get; set; }
 
     /// <summary>
     ///     Gets or sets a value indicating whether the change is part of an undo operation.
@@ -56,16 +55,16 @@ public class HistoryTextItemEventArgs : EventArgs
     ///     position, line status, and associated removed line.
     /// </summary>
     /// <param name="lines">The lines of text affected by the change.</param>
-    /// <param name="curPos">The cursor position at the time of the change.</param>
+    /// <param name="insertionPoints">The insertion point at the time of the change.</param>
     /// <param name="linesStatus">The status of the line(s) affected by the change.</param>
     /// <param name="removedOnAdded">
     ///     The associated <see cref="HistoryTextItemEventArgs"/> for a removed line when an added
     ///     line replaces it.
     /// </param>
-    public HistoryTextItemEventArgs (List<List<Cell>> lines, Point curPos, TextEditingLineStatus linesStatus, HistoryTextItemEventArgs removedOnAdded)
+    public HistoryTextItemEventArgs (List<List<Cell>> lines, Point insertionPoints, TextEditingLineStatus linesStatus, HistoryTextItemEventArgs removedOnAdded)
     {
         Lines = lines;
-        CursorPosition = curPos;
+        InsertionPoint = insertionPoints;
         LineStatus = linesStatus;
         RemovedOnAdded = removedOnAdded;
     }
@@ -83,7 +82,7 @@ public class HistoryTextItemEventArgs : EventArgs
     {
         RemovedOnAdded = removedOnAdded;
         Lines = [.. historyTextItem.Lines];
-        CursorPosition = new (historyTextItem.CursorPosition.X, historyTextItem.CursorPosition.Y);
+        InsertionPoint = new (historyTextItem.InsertionPoint.X, historyTextItem.InsertionPoint.Y);
         LineStatus = historyTextItem.LineStatus;
     }
 
@@ -97,7 +96,7 @@ public class HistoryTextItemEventArgs : EventArgs
     public HistoryTextItemEventArgs (List<List<Cell>> lines, Point curPos, TextEditingLineStatus linesStatus)
     {
         Lines = lines;
-        CursorPosition = curPos;
+        InsertionPoint = curPos;
         LineStatus = linesStatus;
     }
 
@@ -108,13 +107,13 @@ public class HistoryTextItemEventArgs : EventArgs
     public HistoryTextItemEventArgs (HistoryTextItemEventArgs historyTextItem)
     {
         Lines = [.. historyTextItem.Lines];
-        CursorPosition = new (historyTextItem.CursorPosition.X, historyTextItem.CursorPosition.Y);
+        InsertionPoint = new (historyTextItem.InsertionPoint.X, historyTextItem.InsertionPoint.Y);
         LineStatus = historyTextItem.LineStatus;
     }
 
     /// <summary>
     ///     Returns a string representation of the <see cref="HistoryTextItemEventArgs"/> instance.
     /// </summary>
-    /// <returns>A string containing the count of lines, cursor position, and line status.</returns>
-    public override string ToString () { return $"(Count: {Lines.Count}, Cursor: {CursorPosition}, Status: {LineStatus})"; }
+    /// <returns>A string containing the count of lines, insertion point, and line status.</returns>
+    public override string ToString () => $"(Count: {Lines.Count}, InsertionPoint: {InsertionPoint}, Status: {LineStatus})";
 }

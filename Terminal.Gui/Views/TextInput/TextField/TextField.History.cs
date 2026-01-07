@@ -20,8 +20,8 @@ public partial class TextField
             return;
         }
 
-        Text = Cell.ToString (obj.Lines [obj.CursorPosition.Y]);
-        InsertionPoint = obj.CursorPosition.X;
+        Text = Cell.ToString (obj.Lines [obj.InsertionPoint.Y]);
+        InsertionPoint = obj.InsertionPoint.X;
         Adjust ();
     }
 }

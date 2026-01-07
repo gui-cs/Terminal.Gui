@@ -325,7 +325,6 @@ internal class WordWrapManager (TextModel model)
                                                                               tabWidth
                                                                              )
                                                        );
-            var sumColWidth = 0;
 
             for (var j = 0; j < wrappedLines.Count; j++)
             {
@@ -393,7 +392,6 @@ internal class WordWrapManager (TextModel model)
                 }
 
                 wrappedModel.AddLine (lines, wrapLine);
-                sumColWidth += wrapLine.Count;
 
                 var wrappedLine = new WrappedLine
                 {

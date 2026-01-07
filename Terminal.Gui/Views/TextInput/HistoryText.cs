@@ -115,7 +115,7 @@ internal class HistoryText
         if (found is { })
         {
             found.Lines = lines;
-            found.CursorPosition = curPos;
+            found.InsertionPoint = curPos;
         }
     }
 
@@ -161,7 +161,7 @@ internal class HistoryText
 
                 historyTextItem = new (_historyTextItems [_idxHistoryText]);
                 historyTextItem.IsUndoing = true;
-                historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
+                historyTextItem.FinalInsertionPoint = historyTextItem.InsertionPoint;
             }
 
             if (historyTextItem.LineStatus == TextEditingLineStatus.Removed
@@ -180,7 +180,7 @@ internal class HistoryText
             {
                 if (!historyTextItem.Lines [0]
                                     .SequenceEqual (_historyTextItems [_idxHistoryText - 1].Lines [0])
-                    && historyTextItem.CursorPosition == _historyTextItems [_idxHistoryText - 1].CursorPosition)
+                    && historyTextItem.InsertionPoint == _historyTextItems [_idxHistoryText - 1].InsertionPoint)
                 {
                     historyTextItem.Lines [0] =
                         new (_historyTextItems [_idxHistoryText - 1].Lines [0]);
@@ -189,18 +189,18 @@ internal class HistoryText
                 if (historyTextItem.LineStatus == TextEditingLineStatus.Added
                     && _historyTextItems [_idxHistoryText - 1].LineStatus == TextEditingLineStatus.Removed)
                 {
-                    historyTextItem.FinalCursorPosition =
-                        _historyTextItems [_idxHistoryText - 2].CursorPosition;
+                    historyTextItem.FinalInsertionPoint =
+                        _historyTextItems [_idxHistoryText - 2].InsertionPoint;
                 }
                 else
                 {
-                    historyTextItem.FinalCursorPosition =
-                        _historyTextItems [_idxHistoryText - 1].CursorPosition;
+                    historyTextItem.FinalInsertionPoint =
+                        _historyTextItems [_idxHistoryText - 1].InsertionPoint;
                 }
             }
             else
             {
-                historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
+                historyTextItem.FinalInsertionPoint = historyTextItem.InsertionPoint;
             }
 
             OnChangeText (historyTextItem);
@@ -221,7 +221,7 @@ internal class HistoryText
                 _idxHistoryText++;
                 historyTextItem = new (_historyTextItems [_idxHistoryText]);
                 historyTextItem.IsUndoing = false;
-                historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
+                historyTextItem.FinalInsertionPoint = historyTextItem.InsertionPoint;
             }
 
             if (historyTextItem.LineStatus == TextEditingLineStatus.Added
@@ -246,12 +246,12 @@ internal class HistoryText
                         new (_historyTextItems [_idxHistoryText + 1].Lines [0]);
                 }
 
-                historyTextItem.FinalCursorPosition =
-                    _historyTextItems [_idxHistoryText + 1].CursorPosition;
+                historyTextItem.FinalInsertionPoint =
+                    _historyTextItems [_idxHistoryText + 1].InsertionPoint;
             }
             else
             {
-                historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
+                historyTextItem.FinalInsertionPoint = historyTextItem.InsertionPoint;
             }
 
             OnChangeText (historyTextItem);

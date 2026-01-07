@@ -221,11 +221,11 @@ public partial class TextField
     ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>
-    internal bool InsertionPointIsAtEnd () { return InsertionPoint == Text.Length; }
+    internal bool InsertionPointIsAtEnd () => InsertionPoint == Text.Length;
 
     /// <summary>Returns <see langword="true"/> if the current cursor position is at the start of the <see cref="TextField"/>.</summary>
     /// <returns></returns>
-    internal bool InsertionPointIsAtStart () { return InsertionPoint <= 0; }
+    internal bool InsertionPointIsAtStart () => InsertionPoint <= 0;
 
     /// <summary>
     ///     Adjusts the <see cref="ScrollOffset"/> to ensure the cursor remains visible within the viewport,
@@ -236,10 +236,10 @@ public partial class TextField
     ///         This method maintains the invariant that the cursor is always visible by adjusting <see cref="ScrollOffset"/>:
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description>If <see cref="CursorPosition"/> is to the left of the visible area, scrolls left</description>
+    ///                 <description>If <see cref="InsertionPoint"/> is to the left of the visible area, scrolls left</description>
     ///             </item>
     ///             <item>
-    ///                 <description>If <see cref="CursorPosition"/> is to the right of the visible area, scrolls right</description>
+    ///                 <description>If <see cref="InsertionPoint"/> is to the right of the visible area, scrolls right</description>
     ///             </item>
     ///         </list>
     ///     </para>
@@ -303,7 +303,7 @@ public partial class TextField
     ///     If true, <paramref name="x"/> is treated as a screen column and converted to a text index.
     ///     If false, <paramref name="x"/> is used directly as a text index offset from <see cref="ScrollOffset"/>.
     /// </param>
-    /// <returns>The resulting <see cref="CursorPosition"/> after positioning.</returns>
+    /// <returns>The resulting <see cref="InsertionPoint"/> after positioning.</returns>
     /// <remarks>
     ///     <para>
     ///         This method handles the conversion from screen coordinates to logical text position:
@@ -469,14 +469,14 @@ public partial class TextField
     ///         <b>Relationship to cursor positioning:</b>
     ///         <list type="bullet">
     ///             <item>
-    ///                 <description><see cref="CursorPosition"/>: Absolute position in the text (0 to text length)</description>
+    ///                 <description><see cref="InsertionPoint"/>: Absolute position in the text (0 to text length)</description>
     ///             </item>
     ///             <item>
     ///                 <description><see cref="ScrollOffset"/>: Index of first visible character</description>
     ///             </item>
     ///             <item>
     ///                 <description>
-    ///                     Screen column = <see cref="CursorPosition"/> - <see cref="ScrollOffset"/> (approximately,
+    ///                     Screen column = <see cref="InsertionPoint"/> - <see cref="ScrollOffset"/> (approximately,
     ///                     adjusted for wide chars)
     ///                 </description>
     ///             </item>
@@ -494,7 +494,7 @@ public partial class TextField
     ///         </list>
     ///     </para>
     /// </remarks>
-    /// <seealso cref="CursorPosition"/>
+    /// <seealso cref="InsertionPoint"/>
     /// <seealso cref="PositionCursor()"/>
     public int ScrollOffset { get; private set; }
 }

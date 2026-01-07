@@ -19,7 +19,7 @@ public partial class TextView
 
         if (obj is { })
         {
-            int startLine = obj.CursorPosition.Y;
+            int startLine = obj.InsertionPoint.Y;
 
             if (obj.RemovedOnAdded is { })
             {
@@ -36,9 +36,9 @@ public partial class TextView
 
                 for (var i = 0; i < offset; i++)
                 {
-                    if (Lines > obj.RemovedOnAdded.CursorPosition.Y)
+                    if (Lines > obj.RemovedOnAdded.InsertionPoint.Y)
                     {
-                        _model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
+                        _model.RemoveLine (obj.RemovedOnAdded.InsertionPoint.Y);
                     }
                     else
                     {
@@ -58,15 +58,15 @@ public partial class TextView
                 {
                     _model.AddLine (startLine, obj.Lines [i]);
                 }
-                else if (Lines > obj.CursorPosition.Y + 1)
+                else if (Lines > obj.InsertionPoint.Y + 1)
                 {
-                    _model.RemoveLine (obj.CursorPosition.Y + 1);
+                    _model.RemoveLine (obj.InsertionPoint.Y + 1);
                 }
 
                 startLine++;
             }
 
-            CursorPosition = obj.FinalCursorPosition;
+            CursorPosition = obj.FinalInsertionPoint;
         }
 
         UpdateWrapModel ();
