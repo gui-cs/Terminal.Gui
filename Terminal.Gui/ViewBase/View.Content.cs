@@ -462,10 +462,12 @@ public partial class View
             int deltaX = oldViewport.X - Viewport.X;
             int deltaY = oldViewport.Y - Viewport.Y;
 
+            Point currentCursorPos = ScreenToViewport (Cursor.Position!.Value);
+
             SetCursor (
                        Cursor with
                        {
-                           Position = ViewportToScreen (new Point (Cursor.Position!.Value.X + deltaX, Cursor.Position.Value.Y + deltaY))
+                           Position = ViewportToScreen (new Point (currentCursorPos.X + deltaX, currentCursorPos.Y + deltaY))
                        });
         }
 
