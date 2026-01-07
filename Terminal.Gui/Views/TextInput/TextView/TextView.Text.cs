@@ -3,21 +3,43 @@ namespace Terminal.Gui.Views;
 public partial class TextView
 {
     private TextModel _model = new ();
+    private int _currentColumn;
+    private int _currentRow;
 
     /// <summary>Gets the cursor column.</summary>
     /// <value>The cursor column.</value>
-    public int CurrentColumn { get; private set; }
+    public int CurrentColumn
+    {
+        get => _currentColumn;
+        private set
+        {
+            _currentColumn = value;
+            _insertionPoint = new (_currentColumn, _currentRow);
+            PositionCursor ();
+        }
+    }
 
     /// <summary>Gets the current cursor row.</summary>
-    public int CurrentRow { get; private set; }
+    public int CurrentRow
+    {
+        get => _currentRow;
+        private set
+        {
+            _currentRow = value;
+            _insertionPoint = new (_currentColumn, _currentRow);
+            PositionCursor ();
+        }
+    }
+
+    private Point _insertionPoint;
 
     /// <summary>Sets or gets the current cursor position.</summary>
     public Point InsertionPoint
     {
-        get => new (CurrentColumn, CurrentRow);
+        get => _insertionPoint;
         set
         {
-            Point oldPosition = new (CurrentColumn, CurrentRow);
+            Point oldPosition = _insertionPoint;
 
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
 
@@ -33,7 +55,7 @@ public partial class TextView
             Point newPosition = new (CurrentColumn, CurrentRow);
             if (newPosition != oldPosition)
             {
-                SetCursorNeedsUpdate ();
+                PositionCursor ();
             }
         }
     }

@@ -109,7 +109,7 @@ public partial class TextView : View, IDesignable
         ContextMenu = CreateContextMenu ();
         App?.Popover?.Register (ContextMenu);
         KeyBindings.Add (ContextMenu.Key, Command.Context);
-
+        PositionCursor ();
         OnContentsChanged ();
     }
 

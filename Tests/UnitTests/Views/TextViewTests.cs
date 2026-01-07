@@ -941,7 +941,7 @@ This is the second line.
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void DesiredCursorVisibility_Horizontal_Navigation ()
+    public void Cursor_Horizontal_Navigation ()
     {
         var text = "";
 
@@ -955,7 +955,11 @@ This is the second line.
         var top = new Runnable ();
         top.Add (tv);
         Application.Begin (top);
+        Assert.False (Application.Driver!.GetCursor ().IsVisible);
+        Application.Navigation.UpdateCursor();
+        Assert.True (Application.Driver!.GetCursor ().IsVisible);
 
+        Assert.True (tv.HasFocus);
         Assert.Equal (0, tv.LeftColumn);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.True (tv.Cursor.IsVisible);
@@ -963,6 +967,7 @@ This is the second line.
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledRight });
+            Application.Navigation.UpdateCursor ();
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
             Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
@@ -970,6 +975,7 @@ This is the second line.
         for (var i = 11; i > 0; i--)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledLeft });
+            Application.Navigation.UpdateCursor ();
             Assert.Equal (i - 1, tv.LeftColumn);
 
             if (i - 1 == 0)
