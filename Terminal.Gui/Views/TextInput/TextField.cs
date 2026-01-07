@@ -1010,13 +1010,14 @@ public class TextField : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+
         if (newHasFocus)
         {
             UpdateCursor ();
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         UpdateCursor ();
@@ -1108,11 +1109,18 @@ public class TextField : View, IDesignable
 
     /// <summary>Updates the cursor position.</summary>
     /// <remarks>
-    ///     This method calculates the cursor position and calls <see cref="View.SetCursor(Point?, CursorVisibility)"/>.
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor"/>.
     /// </remarks>
     private void UpdateCursor ()
     {
         ProcessAutocomplete ();
+
+        if (!HasFocus)
+        {
+            SetCursor (new() { Position = null });
+
+            return;
+        }
 
         var col = 0;
 
@@ -1130,8 +1138,8 @@ public class TextField : View, IDesignable
 
         int pos = col + Math.Min (Viewport.X, 0);
 
-        // Set the terminal cursor position
-        SetCursor (new Point (pos, 0), CursorVisibility.Default);
+        Point screenPos = ContentToScreen (new (pos, 0));
+        SetCursor (new() { Position = screenPos, Shape = CursorShape.BlinkingBar });
     }
 
     /// <summary>Redoes the latest changes.</summary>
@@ -1174,7 +1182,7 @@ public class TextField : View, IDesignable
     ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>
-    internal bool CursorIsAtEnd () => CursorPos == Text.Length;
+    internal bool CursorIsAtEnd () { return CursorPos == Text.Length; }
 
     private void Adjust ()
     {
@@ -1210,6 +1218,7 @@ public class TextField : View, IDesignable
         {
             SetNeedsDraw ();
         }
+
         UpdateCursor ();
     }
 
@@ -1451,7 +1460,7 @@ public class TextField : View, IDesignable
         return CursorPos != oldCursorPosition || hadSelection;
     }
 
-    private bool MoveLeft () => Move (-1);
+    private bool MoveLeft () { return Move (-1); }
 
     private void MoveLeftExtend ()
     {
@@ -1461,7 +1470,7 @@ public class TextField : View, IDesignable
         }
     }
 
-    private bool MoveRight () => Move (1);
+    private bool MoveRight () { return Move (1); }
 
     private void MoveRightExtend ()
     {
@@ -1569,7 +1578,7 @@ public class TextField : View, IDesignable
         return 0; //offB;
     }
 
-    private int PositionCursor (Mouse mouse) => PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false);
+    private int PositionCursor (Mouse mouse) { return PositionCursor (TextModel.GetColFromX (_text, ScrollOffset, mouse.Position!.Value.X), false); }
 
     private int PositionCursor (int x, bool getX = true)
     {

@@ -36,7 +36,7 @@ public class TextValidateField : View, IDesignable
                 curPos = _cursorPosition + left;
             }
 
-            SetCursor (new Point (curPos, 0), CursorVisibility.Default);
+            SetCursor (Cursor with { Position = new Point (curPos, 0), Shape = CursorShape.BlinkingBlock });
         }
     }
 

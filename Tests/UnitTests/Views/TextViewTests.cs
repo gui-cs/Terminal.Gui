@@ -958,16 +958,13 @@ This is the second line.
 
         Assert.Equal (0, tv.LeftColumn);
         Assert.Equal (Point.Empty, tv.CursorPos);
-        //Application.PositionCursor ();
-        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
+        Assert.True (tv.Cursor.IsVisible); 
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledRight });
             Assert.Equal (Math.Min (i + 1, 11), tv.LeftColumn);
-            //Application.PositionCursor ();
-            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
-            Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
+            Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
 
         for (var i = 11; i > 0; i--)
@@ -975,16 +972,13 @@ This is the second line.
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledLeft });
             Assert.Equal (i - 1, tv.LeftColumn);
 
-            //Application.PositionCursor ();
-            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
-
             if (i - 1 == 0)
             {
-                Assert.Equal (CursorVisibility.Default, cursorVisibility);
+                Assert.True (Application.Driver!.GetCursor ().IsVisible);
             }
             else
             {
-                Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
+                Assert.False (Application.Driver!.GetCursor ().IsVisible);
             }
         }
 
@@ -1010,34 +1004,27 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (0, tv.TopRow);
-       // Application.PositionCursor ();
-        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
 
         for (var i = 0; i < 12; i++)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledDown });
-           // Application.PositionCursor ();
             Assert.Equal (i + 1, tv.TopRow);
-            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
-            Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
+            Assert.False (Application.Driver!.GetCursor ().IsVisible);
         }
 
         for (var i = 12; i > 0; i--)
         {
             tv.NewMouseEvent (new () { Flags = MouseFlags.WheeledUp });
-           // Application.PositionCursor ();
             Assert.Equal (i - 1, tv.TopRow);
 
-          //  Application.PositionCursor ();
-            Application.Driver!.GetCursorVisibility (out CursorVisibility cursorVisibility);
 
             if (i - 1 == 0)
             {
-                Assert.Equal (CursorVisibility.Default, cursorVisibility);
+                Assert.True (Application.Driver!.GetCursor ().IsVisible);
             }
             else
             {
-                Assert.Equal (CursorVisibility.Invisible, cursorVisibility);
+                Assert.False (Application.Driver!.GetCursor ().IsVisible);
             }
         }
 

@@ -2065,11 +2065,12 @@ public class TextView : View, IDesignable
 
         if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
-            Move (col, CurrentRow - _topRow);
-            SetCursor (new Point (col, CurrentRow - _topRow), CursorVisibility.Default);
+            SetCursor (Cursor with { Position = new Point (col, CurrentRow - _topRow), Shape = CursorShape.BlinkingBlock });
         }
-
-        SetCursor (null, CursorVisibility.Invisible);
+        else
+        {
+            SetCursor (Cursor with { Position = null, Shape = Cursor.Shape });
+        }
     }
 
     /// <summary>Redoes the latest changes.</summary>

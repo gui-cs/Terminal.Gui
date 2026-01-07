@@ -95,7 +95,6 @@ public class Editor : Scenario
                  );
 
         menu.Add (new MenuBarItem ("_ScrollBars", CreateScrollBarsMenu ()));
-        menu.Add (new MenuBarItem ("_Cursor", CreateCursorRadio ()));
 
         menu.Add (
                   new MenuBarItem (
@@ -381,70 +380,6 @@ public class Editor : Scenario
         };
 
         menuItems.Add (horizontalItem);
-
-        return [.. menuItems];
-    }
-
-    private MenuItem [] CreateCursorRadio ()
-    {
-        if (_textView is null)
-        {
-            return [];
-        }
-
-        List<MenuItem> menuItems = [];
-        List<CheckBox> radioGroup = [];
-
-        void AddRadioItem (string title, CursorVisibility visibility)
-        {
-            CheckBox checkBox = new ()
-            {
-                Title = title,
-                CheckedState = _textView.CursorVisibility == visibility ? CheckState.Checked : CheckState.UnChecked
-            };
-
-            radioGroup.Add (checkBox);
-
-            checkBox.CheckedStateChanging += (s, e) =>
-                                             {
-                                                 if (e.Result == CheckState.Checked)
-                                                 {
-                                                     _textView.SetCursor (_textView.CursorPosition, visibility);
-
-                                                     foreach (CheckBox cb in radioGroup)
-                                                     {
-                                                         if (cb != checkBox)
-                                                         {
-                                                             cb.CheckedState = CheckState.UnChecked;
-                                                         }
-                                                     }
-                                                 }
-                                             };
-
-            MenuItem item = new () { CommandView = checkBox };
-
-            item.Accepting += (s, e) =>
-                             {
-                                 checkBox.AdvanceCheckState ();
-                                 e.Handled = true;
-                             };
-
-            menuItems.Add (item);
-        }
-
-        AddRadioItem ("_Invisible", CursorVisibility.Invisible);
-        AddRadioItem ("_Box", CursorVisibility.Box);
-        AddRadioItem ("_Underline", CursorVisibility.Underline);
-
-        menuItems.Add (new () { Title = "" });
-        menuItems.Add (new () { Title = "xTerm :" });
-        menuItems.Add (new () { Title = "" });
-
-        AddRadioItem ("  _Default", CursorVisibility.Default);
-        AddRadioItem ("  _Vertical", CursorVisibility.Vertical);
-        AddRadioItem ("  V_ertical Fix", CursorVisibility.VerticalFix);
-        AddRadioItem ("  B_ox Fix", CursorVisibility.BoxFix);
-        AddRadioItem ("  U_nderline Fix", CursorVisibility.UnderlineFix);
 
         return [.. menuItems];
     }

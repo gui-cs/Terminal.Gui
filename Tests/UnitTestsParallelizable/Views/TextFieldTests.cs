@@ -570,12 +570,12 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 
         tf.NewKeyDownEvent (new ("📄"));
         Assert.Equal (1, tf.CursorPos);
-        Assert.Equal (new (2, 0), tf.CursorPosition);
+        Assert.Equal (new (2, 0), tf.Cursor.Position);
         Assert.Equal ("📄", tf.Text);
 
         tf.NewKeyDownEvent (new (KeyCode.A));
         Assert.Equal (2, tf.CursorPos);
-        Assert.Equal (new (3, 0), tf.CursorPosition);
+        Assert.Equal (new (3, 0), tf.Cursor.Position);
         Assert.Equal ("📄a", tf.Text);
     }
 
@@ -667,10 +667,10 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (0, tf.CursorPos);
 
         tf.CursorPos = 1;
-        Assert.Equal (new Point (1, 0), tf.CursorPosition);
+        Assert.Equal (new Point (1, 0), tf.Cursor.Position);
 
         tf.CursorPos = 2;
-        Assert.Equal (new Point (2, 0), tf.CursorPosition);
+        Assert.Equal (new Point (2, 0), tf.Cursor.Position);
     }
 
     [Fact]

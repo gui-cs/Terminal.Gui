@@ -2,6 +2,7 @@
 
 using System.IO.Abstractions;
 using System.Text;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -297,7 +298,14 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        _treeViewFiles.SetCursor (_treeViewFiles.CursorPosition, _miCursorCheckBox.CheckedState == CheckState.Checked ? CursorVisibility.Default : CursorVisibility.Invisible);
+        if (_miCursorCheckBox.CheckedState == CheckState.Checked)
+        {
+            _treeViewFiles.SetCursor (_treeViewFiles.Cursor with { Shape = CursorShape.BlinkingBlock });
+        }
+        else
+        {
+            _treeViewFiles.SetCursor (_treeViewFiles.Cursor with { Position = null });
+        }
     }
 
     private void SetCustomColors ()

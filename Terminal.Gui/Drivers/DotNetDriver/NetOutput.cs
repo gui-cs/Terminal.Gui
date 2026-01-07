@@ -45,13 +45,13 @@ public class NetOutput : OutputBase, IOutput
         }
     }
 
-
     /// <inheritdoc/>
     public Size GetSize ()
     {
         try
         {
             Size size = new (Console.WindowWidth, Console.WindowHeight);
+
             return size.IsEmpty ? new (80, 25) : size;
         }
         catch (IOException)
@@ -61,13 +61,12 @@ public class NetOutput : OutputBase, IOutput
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void SetSize (int width, int height)
     {
         // Do Nothing.
     }
 
-    private Point? _lastCursorPosition;
 
     /// <inheritdoc/>
     protected override void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
@@ -97,10 +96,11 @@ public class NetOutput : OutputBase, IOutput
         EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
         base.Write (output);
+
         try
         {
             Console.Out.Write (output);
@@ -111,46 +111,71 @@ public class NetOutput : OutputBase, IOutput
         }
     }
 
+    private Cursor? _currentCursor = new ();
 
     /// <inheritdoc />
-    public Point GetCursorPosition ()
+    public Cursor GetCursor ()
     {
-        return _lastCursorPosition ?? Point.Empty;
+        return _currentCursor!;
+    }
+
+
+    /// <inheritdoc />
+    public void SetCursor (Cursor cursor)
+    {
+        try
+        {
+            if (!cursor.IsVisible)
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
+            else
+            {
+                if (_currentCursor!.Shape != cursor.Shape)
+                {
+                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)cursor.Shape));
+                }
+
+                Write (EscSeqUtils.CSI_ShowCursor);
+            }
+        }
+        catch
+        {
+            // Ignore any exceptions
+        }
+        finally
+        {
+            SetCursorPositionImpl (
+                                   cursor.Position?.X ?? 0,
+                                   cursor.Position?.Y ?? 0
+                                  );
+
+            _currentCursor = cursor;
+        }
     }
 
     /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
-
-    /// <inheritdoc />
-    public CursorVisibility GetCursorVisibility ()
-    {
-        return LastCursorVisibility;
-    }
-
-
-    /// <inheritdoc />
     protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == col && _lastCursorPosition.Value.Y == row)
+        if (_currentCursor!.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
-            return true;
+            return false;
         }
-
-        _lastCursorPosition = new (col, row);
 
         if (_isWinPlatform)
         {
-            // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             try
             {
                 Console.SetCursorPosition (col, row);
 
                 return true;
             }
-            catch (Exception)
+            catch
             {
-                return true;
+                // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             }
+
+            return false;
         }
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
@@ -160,40 +185,6 @@ public class NetOutput : OutputBase, IOutput
         return true;
     }
 
-    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
-
-    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
-    public override void SetCursorVisibility (CursorVisibility visibility)
-    {
-        LastCursorVisibility = visibility;
-
-        try
-        {
-            if (visibility != CursorVisibility.Invisible)
-            {
-                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
-                {
-                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
-
-                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
-                }
-
-                Write (EscSeqUtils.CSI_ShowCursor);
-            }
-            else
-            {
-                Write (EscSeqUtils.CSI_HideCursor);
-            }
-        }
-        catch
-        {
-            // Ignore any exceptions
-        }
-    }
-
-
     /// <inheritdoc/>
-    public void Dispose ()
-    {
-    }
+    public void Dispose () { }
 }

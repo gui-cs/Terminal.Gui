@@ -182,7 +182,7 @@ public class NetInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void NetOutput_SetCursorPosition_DoesNotThrow_WhenNoTerminalAvailable ()
+    public void NetOutput_SetCursor_Position_DoesNotThrow_WhenNoTerminalAvailable ()
     {
         // Arrange
         using var output = new NetOutput ();
@@ -190,7 +190,7 @@ public class NetInputOutputTests (ITestOutputHelper output)
         // Act
         Exception? exception = Record.Exception (() =>
                                                  {
-                                                     output.SetCursorPosition (0, 0);
+                                                     output.SetCursor (new () { Position = new (0, 0) });
                                                      _output.WriteLine ("NetOutput.SetCursorPosition() succeeded");
                                                  });
 

@@ -34,17 +34,17 @@ public class CursorTests (ITestOutputHelper output)
                 if (_testLocation.Value.X >= 0 && _testLocation.Value.X < Viewport.Width
                     && _testLocation.Value.Y >= 0 && _testLocation.Value.Y < Viewport.Height)
                 {
-                    SetCursor (_testLocation, CursorVisibility.Default);
+                    SetCursor (Cursor with { Position = _testLocation, Shape = CursorShape.BlinkingBlock });
                 }
                 else
                 {
                     // Cursor outside viewport - hide it
-                    SetCursor (null, CursorVisibility.Invisible);
+                    SetCursor (Cursor with { Position = null, Shape = Cursor.Shape });
                 }
             }
             else
             {
-                SetCursor (null, CursorVisibility.Invisible);
+                SetCursor (Cursor with { Position = null, Shape = Cursor.Shape });
             }
         }
     }
@@ -186,25 +186,25 @@ public class CursorTests (ITestOutputHelper output)
 
         // Position cursor outside viewport width
         view.TestLocation = new Point (15, 0);
-        Point? cursorPos = view.CursorPosition;
+        Point? cursorPos = view.Cursor.Position;
 
         // Cursor should be hidden (return null) when outside viewport
         Assert.Null (cursorPos);
 
         // Position cursor outside viewport height
         view.TestLocation = new Point (0, 10);
-        cursorPos = view.CursorPosition;
+        cursorPos = view.Cursor.Position;
 
         Assert.Null (cursorPos);
 
         // Position cursor at negative position
         view.TestLocation = new Point (-1, 0);
-        cursorPos = view.CursorPosition;
+        cursorPos = view.Cursor.Position;
 
         Assert.Null (cursorPos);
 
         view.TestLocation = new Point (0, -1);
-        cursorPos = view.CursorPosition;
+        cursorPos = view.Cursor.Position;
 
         Assert.Null (cursorPos);
 
@@ -367,7 +367,7 @@ public class CursorTests (ITestOutputHelper output)
         textField.CursorPos = textField.Text.Length;
 
         // PositionCursor should return a position within viewport
-        Point? cursorPos = textField.CursorPosition;
+        Point? cursorPos = textField.Cursor.Position;
 
         if (cursorPos.HasValue)
         {
