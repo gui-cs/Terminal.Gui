@@ -111,12 +111,12 @@ public class NetOutput : OutputBase, IOutput
         }
     }
 
-    private Cursor? _currentCursor = new ();
+    private Cursor _currentCursor = new ();
 
     /// <inheritdoc />
     public Cursor GetCursor ()
     {
-        return _currentCursor!;
+        return _currentCursor;
     }
 
 

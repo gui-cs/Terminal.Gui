@@ -49,6 +49,7 @@ public class AnsiOutput : OutputBase, IOutput
 
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);
+        _currentCursor = new ();
 
         try
         {
@@ -156,12 +157,12 @@ public class AnsiOutput : OutputBase, IOutput
         base.Write (buffer);
     }
 
-    private Cursor? _currentCursor = new ();
+    private Cursor _currentCursor;
 
     /// <inheritdoc />
     public Cursor GetCursor ()
     {
-        return _currentCursor!;
+        return _currentCursor;
     }
 
     /// <inheritdoc />
