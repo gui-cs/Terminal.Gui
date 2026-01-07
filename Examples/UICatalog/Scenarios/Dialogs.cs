@@ -277,7 +277,7 @@ public class Dialogs : Scenario
         {
             Y = Pos.Bottom (label),
             Width = Dim.Fill (0, minimumContentDim: 60),
-            Text = new string ("0123456789").Repeat (6)
+            Text = new string ("0123456789").Repeat (6)!
         };
         dialog.Add (textField);
 

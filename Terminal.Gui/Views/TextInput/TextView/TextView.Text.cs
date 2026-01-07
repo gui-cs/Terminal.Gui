@@ -3,40 +3,22 @@ namespace Terminal.Gui.Views;
 public partial class TextView
 {
     private TextModel _model = new ();
-    private int _currentColumn;
-    private int _currentRow;
 
     /// <summary>Gets the cursor column.</summary>
     /// <value>The cursor column.</value>
-    public int CurrentColumn
-    {
-        get => _currentColumn;
-        private set
-        {
-            _currentColumn = value;
-            _cursorPosition = new (_currentColumn, _currentRow);
-        }
-    }
+    public int CurrentColumn { get; private set; }
 
     /// <summary>Gets the current cursor row.</summary>
-    public int CurrentRow
-    {
-        get => _currentRow;
-        private set
-        {
-            _currentRow = value;
-            _cursorPosition = new (_currentColumn, _currentRow);
-        }
-    }
-
-    private Point _cursorPosition;
+    public int CurrentRow { get; private set; }
 
     /// <summary>Sets or gets the current cursor position.</summary>
-    public Point CursorPosition
+    public Point InsertionPoint
     {
-        get => _cursorPosition;
+        get => new (CurrentColumn, CurrentRow);
         set
         {
+            Point oldPosition = new (CurrentColumn, CurrentRow);
+
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
 
             CurrentColumn = value.X < 0 ? 0 :
@@ -44,8 +26,15 @@ public partial class TextView
 
             CurrentRow = value.Y < 0 ? 0 :
                          value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
-            SetNeedsDraw ();
+
             Adjust ();
+
+            // Signal cursor position changed without requiring additional redraw
+            Point newPosition = new (CurrentColumn, CurrentRow);
+            if (newPosition != oldPosition)
+            {
+                SetCursorNeedsUpdate ();
+            }
         }
     }
 
@@ -314,7 +303,7 @@ public partial class TextView
         var endCol = (int)(end & 0xffffffff);
         List<Cell> line = _model.GetLine (startRow);
 
-        _historyText.Add ([[.. line]], new (startCol, startRow));
+        _historyText.Add ([ [.. line]], new (startCol, startRow));
 
         List<List<Cell>> removedLines = [];
 
@@ -329,7 +318,7 @@ public partial class TextView
 
             _historyText.Add (
                               [.. removedLines],
-                              CursorPosition,
+                              InsertionPoint,
                               TextEditingLineStatus.Removed
                              );
 
@@ -360,7 +349,7 @@ public partial class TextView
 
         _historyText.Add (
                           [.. removedLines],
-                          CursorPosition,
+                          InsertionPoint,
                           TextEditingLineStatus.Removed
                          );
 
@@ -513,7 +502,7 @@ public partial class TextView
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add ([[.. line]], CursorPosition);
+        _historyText.Add ([ [.. line]], InsertionPoint);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -522,8 +511,8 @@ public partial class TextView
             CurrentColumn += lines [0].Count;
 
             _historyText.Add (
-                              [[.. line]],
-                              CursorPosition,
+                              [ [.. line]],
+                              InsertionPoint,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -553,7 +542,7 @@ public partial class TextView
         // First line is inserted at the current location, the rest is appended
         line.InsertRange (CurrentColumn, lines [0]);
 
-        List<List<Cell>> addedLines = [[..line]];
+        List<List<Cell>> addedLines = [ [.. line]];
 
         for (var i = 1; i < lines.Count; i++)
         {
@@ -571,14 +560,14 @@ public partial class TextView
             addedLines.Last ().InsertRange (addedLines.Last ().Count, rest);
         }
 
-        _historyText.Add (addedLines, CursorPosition, TextEditingLineStatus.Added);
+        _historyText.Add (addedLines, InsertionPoint, TextEditingLineStatus.Added);
 
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
         CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
         Adjust ();
 
-        _historyText.Add ([[..line]], CursorPosition, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
         OnContentsChanged ();
@@ -594,7 +583,7 @@ public partial class TextView
 
         SetWrapModel ();
 
-        _historyText.Add ([[..GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
         if (IsSelecting)
         {
@@ -632,8 +621,8 @@ public partial class TextView
         }
 
         _historyText.Add (
-                          [[..GetCurrentLine ()]],
-                          CursorPosition,
+                          [ [.. GetCurrentLine ()]],
+                          InsertionPoint,
                           TextEditingLineStatus.Replaced
                          );
 

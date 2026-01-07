@@ -344,7 +344,7 @@ public class CursorTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void TextField_CursorPosition_Stays_Within_Viewport ()
+    public void TextField_InsertionPointition_Stays_Within_Viewport ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -364,7 +364,7 @@ public class CursorTests (ITestOutputHelper output)
         textField.SetFocus ();
 
         // Position cursor at end of text (beyond viewport)
-        textField.CursorPos = textField.Text.Length;
+        textField.InsertionPoint = textField.Text.Length;
 
         // PositionCursor should return a position within viewport
         Point? cursorPos = textField.Cursor.Position;

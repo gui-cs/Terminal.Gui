@@ -85,7 +85,6 @@ public partial class TextView : View, IDesignable
     public TextView ()
     {
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
         Used = true;
 
         // By default, disable hotkeys (in case someone sets Title)
@@ -149,13 +148,13 @@ public partial class TextView : View, IDesignable
     }
 
     /// <summary>Positions the cursor on the current row and column</summary>
-    public override Point? PositionCursor ()
+    public void PositionCursor ()
     {
         ProcessAutocomplete ();
 
         if (!CanFocus || !Enabled || Driver is null)
         {
-            return null;
+            return;
         }
 
         if (App?.Mouse.MouseGrabView == this && IsSelecting)
@@ -201,13 +200,16 @@ public partial class TextView : View, IDesignable
 
         if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
-            // BUGBUG: Move should not be called outside the View.Draw loop.
-            Move (col, CurrentRow - _topRow);
-
-            return new (col, CurrentRow - _topRow);
+            SetCursor (Cursor with
+            {
+                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow)),
+                Shape = CursorShape.Default
+            });
         }
-
-        return null; // Hide cursor
+        else
+        {
+            SetCursor (Cursor with { Position = null, Shape = Cursor.Shape });
+        }
     }
 
     private PopoverMenu CreateContextMenu ()

@@ -173,7 +173,7 @@ public partial class View
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new content size.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnContentSizeChanging (ValueChangingEventArgs<Size?> args) { return false; }
+    protected virtual bool OnContentSizeChanging (ValueChangingEventArgs<Size?> args) => false;
 
     /// <summary>
     ///     Called after the content size has changed.
@@ -462,8 +462,13 @@ public partial class View
             int deltaX = oldViewport.X - Viewport.X;
             int deltaY = oldViewport.Y - Viewport.Y;
 
-            SetCursor (Cursor with { Position = new Point (Cursor.Position!.Value.X + deltaX, Cursor.Position.Value.Y + deltaY) });
+            SetCursor (
+                       Cursor with
+                       {
+                           Position = ViewportToScreen (new Point (Cursor.Position!.Value.X + deltaX, Cursor.Position.Value.Y + deltaY))
+                       });
         }
+
         DrawEventArgs args = new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
         OnViewportChanged (args);
         ViewportChanged?.Invoke (this, args);

@@ -9,7 +9,7 @@ public class ColorPicker16Tests
     {
         var colorPicker = new ColorPicker16 ();
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
-        Assert.Equal (Point.Empty, colorPicker.Cursor);
+        Assert.Equal (Point.Empty, colorPicker.Caret);
         Assert.True (colorPicker.CanFocus);
 
         colorPicker.BeginInit ();
@@ -63,17 +63,17 @@ public class ColorPicker16Tests
     {
         var colorPicker = new ColorPicker16 ();
         colorPicker.SelectedColor = ColorName16.White;
-        Assert.Equal (7, colorPicker.Cursor.X);
-        Assert.Equal (1, colorPicker.Cursor.Y);
+        Assert.Equal (7, colorPicker.Caret.X);
+        Assert.Equal (1, colorPicker.Caret.Y);
 
         colorPicker.SelectedColor = Color.Black;
-        Assert.Equal (0, colorPicker.Cursor.X);
-        Assert.Equal (0, colorPicker.Cursor.Y);
+        Assert.Equal (0, colorPicker.Caret.X);
+        Assert.Equal (0, colorPicker.Caret.Y);
 
-        colorPicker.Cursor = new (7, 1);
+        colorPicker.Caret = new (7, 1);
         Assert.Equal (ColorName16.White, colorPicker.SelectedColor);
 
-        colorPicker.Cursor = Point.Empty;
+        colorPicker.Caret = Point.Empty;
         Assert.Equal (ColorName16.Black, colorPicker.SelectedColor);
     }
 }

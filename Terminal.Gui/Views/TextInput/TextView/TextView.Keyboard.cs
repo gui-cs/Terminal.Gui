@@ -167,7 +167,7 @@ public partial class TextView
         var renderAt = new Point (
                                   Autocomplete.Context.CursorPosition,
                                   Autocomplete.PopupInsideContainer
-                                      ? CursorPosition.Y + 1 - TopRow
+                                      ? InsertionPoint.Y + 1 - TopRow
                                       : 0
                                  );
 

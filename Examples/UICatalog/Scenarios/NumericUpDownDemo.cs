@@ -150,11 +150,11 @@ internal sealed class NumericUpDownEditor<T> : View where T : notnull
 
         _value.Text = _numericUpDown.Text;
         _format.Text = _numericUpDown.Format;
-        _increment.Text = _numericUpDown!.Increment?.ToString ();
+        _increment.Text = _numericUpDown!.Increment?.ToString ()!;
 
         return;
 
-        void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs) { _increment.Text = _numericUpDown!.Increment?.ToString (); }
+        void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs) { _increment.Text = _numericUpDown!.Increment?.ToString ()!; }
 
         void NumericUpDownOnValueChanged (object? o, EventArgs<T> eventArgs) { _value.Text = _numericUpDown.Text; }
 

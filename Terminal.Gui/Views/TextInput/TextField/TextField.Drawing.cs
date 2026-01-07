@@ -99,8 +99,6 @@ public partial class TextField
             AddRune ((Rune)' ');
         }
 
-        PositionCursor ();
-
         RenderCaption ();
 
         _isDrawing = false;

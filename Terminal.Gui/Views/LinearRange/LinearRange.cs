@@ -896,7 +896,7 @@ public class LinearRange<T> : View, IOrientation
 
     /// <summary>Updates the cursor position based on the focused option.</summary>
     /// <remarks>
-    ///     This method calculates the cursor position and calls <see cref="View.SetCursor(Point?, CursorVisibility)"/>.
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor"/>.
     ///     The framework automatically handles hiding the cursor when the view loses focus.
     /// </remarks>
     private void UpdateCursor ()
@@ -906,9 +906,16 @@ public class LinearRange<T> : View, IOrientation
             || !Viewport.Contains (position.x, position.y))
         {
             SetCursor (new () { Position = null, Shape = Cursor.Shape }); // Hide cursor
+
             return;
         }
-        SetCursor (Cursor with { Position = new Point (position.x, position.y), Shape = CursorShape.BlinkingBlock });
+
+        SetCursor (
+                   Cursor with
+                   {
+                       Position = ViewportToScreen (new Point (position.x, position.y)),
+                       Shape = CursorShape.Default
+                   });
     }
 
     #endregion Cursor and Position
