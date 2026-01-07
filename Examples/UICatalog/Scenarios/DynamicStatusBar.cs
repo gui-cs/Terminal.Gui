@@ -206,7 +206,7 @@ public class DynamicStatusBar : Scenario
             Height = Dim.Fill (0, minimumContentDim: 10) - 2;
             dialog.Add (this);
             TextTitle.SetFocus ();
-            TextTitle.CursorPos = TextTitle.Text.Length;
+            TextTitle.InsertionPoint = TextTitle.Text.Length;
             Application.Run (dialog);
             dialog.Dispose ();
 

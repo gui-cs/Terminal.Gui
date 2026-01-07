@@ -503,18 +503,18 @@ public class HexView : View, IDesignable
 
                         //    break;
                         case > 127:
-                        {
-                            byte [] utf8 = GetData (data, offset, 4, out bool _);
-
-                            OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-
-                            while (status == OperationStatus.NeedMoreData)
                             {
-                                status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-                            }
+                                byte [] utf8 = GetData (data, offset, 4, out bool _);
 
-                            break;
-                        }
+                                OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+
+                                while (status == OperationStatus.NeedMoreData)
+                                {
+                                    status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+                                }
+
+                                break;
+                            }
                         default:
                             Rune.DecodeFromUtf8 (new (ref b), out c, out _);
 
@@ -582,7 +582,11 @@ public class HexView : View, IDesignable
             && position.Y >= 0
             && position.Y < Viewport.Height)
         {
-            SetCursor (Cursor with { Position = position, Shape = CursorShape.BlinkingBlock });
+            SetCursor (Cursor with
+            {
+                Position = ViewportToScreen (position), 
+                Shape = CursorShape.Default
+            });
         }
 
         HexViewEventArgs args = new (Address, GetPosition (Address), BytesPerLine);

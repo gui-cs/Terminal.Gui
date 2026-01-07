@@ -130,7 +130,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
                                               tfRequest.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Request : "";
                                               tfValue.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Value ?? "" : "";
-                                              tfTerminator.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Terminator : "";
+                                              tfTerminator.Text = (selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Terminator : "")!;
                                           };
 
         // Forces raise cbRequests.SelectedItemChanged to update TextFields

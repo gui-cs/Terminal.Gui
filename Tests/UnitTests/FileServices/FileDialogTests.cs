@@ -35,7 +35,7 @@ public class FileDialogTests ()
         FileDialog dlg = GetInitializedFileDialog ();
         TextField tf = dlg.SubViews.OfType<TextField> ().First (t => t.HasFocus);
         tf.ClearAllSelection ();
-        tf.CursorPos = tf.Text.Length;
+        tf.InsertionPoint = tf.Text.Length;
         Assert.True (tf.HasFocus);
 
         SendSlash ();
@@ -738,7 +738,7 @@ public class FileDialogTests ()
                 ForceFocus (tb);
 
                 tb.Text = "/bob/fish";
-                tb.CursorPosition = tb.Text.Length;
+                tb.InsertionPoint = tb.Text.Length;
                 tb.GenerateSuggestions (null, "fish", "fishes");
 
                 // should not report success for autocompletion because we already have that exact
@@ -753,7 +753,7 @@ public class FileDialogTests ()
                 ForceFocus (tb);
 
                 tb.Text = @"/bob/fi";
-                tb.CursorPosition = tb.Text.Length;
+                tb.InsertionPoint = tb.Text.Length;
                 tb.GenerateSuggestions (null, "fish", "fishes");
 
                 Assert.True (tb.AcceptSelectionIfAny ());

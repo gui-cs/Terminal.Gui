@@ -591,7 +591,11 @@ public class TreeView<T> : View, ITreeView where T : class
             // if currently selected line is visible
             if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
             {
-                SetCursor (Cursor with { Position = new Point (0, idx - ScrollOffsetVertical), Shape = CursorShape.BlinkingBlock });
+                SetCursor (Cursor with
+                {
+                    Position = ViewportToScreen (new Point (0, idx - ScrollOffsetVertical)),
+                    Shape = CursorShape.Default
+                });
             }
         }
 

@@ -54,7 +54,7 @@ public class ColorPicker16 : View
     public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <summary>Cursor for the selected color.</summary>
-    public Point Cursor
+    public Point Caret
     {
         get => new (_selectColorIndex % COLS, _selectColorIndex / COLS);
         set
@@ -73,7 +73,7 @@ public class ColorPicker16 : View
             return true;
         }
 
-        if (Cursor.Y < ROWS - 1)
+        if (Caret.Y < ROWS - 1)
         {
             SelectedColor += COLS;
             return true;
@@ -90,7 +90,7 @@ public class ColorPicker16 : View
             return true;
         }
 
-        if (Cursor.X > 0)
+        if (Caret.X > 0)
         {
             SelectedColor--;
             return true;
@@ -107,7 +107,7 @@ public class ColorPicker16 : View
             return true;
         }
 
-        if (Cursor.X < COLS - 1)
+        if (Caret.X < COLS - 1)
         {
             SelectedColor++;
             return true;
@@ -124,7 +124,7 @@ public class ColorPicker16 : View
             return true;
         }
 
-        if (Cursor.Y > 0)
+        if (Caret.Y > 0)
         {
             SelectedColor -= COLS;
             return true;
@@ -158,7 +158,7 @@ public class ColorPicker16 : View
                     SetAttribute (new ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimColor (), TextStyle.Faint));
                 }
 
-                bool selected = x == Cursor.X && y == Cursor.Y;
+                bool selected = x == Caret.X && y == Caret.Y;
                 DrawColorBox (x, y, selected);
                 colorIndex++;
             }
@@ -205,7 +205,7 @@ public class ColorPicker16 : View
                                                 return true;
                                             }
 
-                                            Cursor = new (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position!.Value.Y / _boxHeight);
+                                            Caret = new (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position!.Value.Y / _boxHeight);
                                             return SetFocus ();
                                         }
 
