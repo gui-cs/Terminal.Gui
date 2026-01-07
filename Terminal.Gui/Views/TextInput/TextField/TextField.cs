@@ -70,6 +70,7 @@ public partial class TextField : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+        UpdateCursor ();
     }
 
 

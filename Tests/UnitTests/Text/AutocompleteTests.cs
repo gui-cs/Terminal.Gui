@@ -28,6 +28,8 @@ public class AutocompleteTests (ITestOutputHelper output)
             Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
             top.SetNeedsDraw ();
             AutoInitShutdownAttribute.RunIteration ();
+            Assert.Equal (i + 1, tv.InsertionPoint.X);
+            Assert.Equal (i + 1, tv.Cursor.Position!.Value.X);
 
             if (i < 4 || i > 5)
             {
@@ -238,14 +240,14 @@ This an long line and against TextView.",
         Assert.Empty (tv.Autocomplete.Suggestions);
         Assert.Equal (3, g.AllSuggestions.Count);
         Assert.False (tv.Autocomplete.Visible);
-        tv.PositionCursor ();
+
         Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.Reopen)));
         Assert.Equal ("F Fortunately super feature.", tv.Text);
         Assert.Equal (new (1, 0), tv.InsertionPoint);
         Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
         Assert.Equal (3, g.AllSuggestions.Count);
+
         Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.SelectionKey)));
-        tv.PositionCursor ();
         Assert.Equal ("Fortunately Fortunately super feature.", tv.Text);
         Assert.Equal (new (11, 0), tv.InsertionPoint);
         Assert.Empty (tv.Autocomplete.Suggestions);

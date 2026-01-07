@@ -456,9 +456,7 @@ public partial class TextView
             StopSelecting ();
         }
 
-        MoveRight ();
-
-        return true;
+        return MoveRight ();
     }
 
     private bool ProcessMoveRightEndExtend ()

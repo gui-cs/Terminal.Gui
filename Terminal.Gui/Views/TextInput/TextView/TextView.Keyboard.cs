@@ -1,3 +1,5 @@
+using Terminal.Gui.Input;
+
 namespace Terminal.Gui.Views;
 
 public partial class TextView
@@ -111,6 +113,12 @@ public partial class TextView
         }
 
         ResetColumnTrack ();
+
+        if (a == Autocomplete.Reopen)
+        {
+            GenerateSuggestions ();
+            return Autocomplete.ProcessKey (a);
+        }
 
         // Ignore control characters and other special keys
         if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask))

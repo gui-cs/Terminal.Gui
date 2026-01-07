@@ -166,6 +166,7 @@ public partial class TextView
             PositionCursor ();
             OnUnwrappedCursorPosition ();
         }
+        ProcessAutocomplete ();
     }
 
     /// <summary>

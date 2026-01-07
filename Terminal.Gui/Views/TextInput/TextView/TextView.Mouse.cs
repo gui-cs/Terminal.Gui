@@ -288,5 +288,6 @@ public partial class TextView
         }
 
         line = r!;
+        ProcessAutocomplete ();
     }
 }
