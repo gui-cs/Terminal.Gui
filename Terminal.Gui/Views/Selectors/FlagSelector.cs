@@ -59,7 +59,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         if (checkbox.CheckedState == CheckState.Checked)
         {
-            if ((int)checkbox.Data! == default!)
+            if ((int)checkbox.Data! == 0)
             {
                 newValue = 0;
             }
@@ -157,14 +157,14 @@ public class FlagSelector : SelectorBase, IDesignable
     {
         // Uncheck all NON-None checkboxes (Data != 0)
         _updatingChecked = true;
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? default!) != default!))
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? null!) != 0))
         {
             cb.CheckedState = CheckState.UnChecked;
         }
         _updatingChecked = false;
     }
 
-    private bool _updatingChecked = false;
+    private bool _updatingChecked;
 
     /// <inheritdoc />
     public override void UpdateChecked ()
@@ -181,7 +181,7 @@ public class FlagSelector : SelectorBase, IDesignable
             // If this flag is set in Value, check the checkbox. Otherwise, uncheck it.
             if (flag == 0)
             {
-                cb.CheckedState = (Value != 0) ? CheckState.UnChecked : CheckState.Checked;
+                cb.CheckedState = Value != 0 ? CheckState.UnChecked : CheckState.Checked;
             }
             else
             {

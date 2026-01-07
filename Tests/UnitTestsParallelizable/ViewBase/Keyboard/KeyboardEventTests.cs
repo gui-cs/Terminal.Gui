@@ -200,7 +200,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         var view = new KeyBindingsTestView ();
         view.CommandReturns = toReturn;
 
-        bool? result = view.InvokeCommands (Key.A);
+        bool? result = view.InvokeCommandsBoundToKey (Key.A);
         Assert.Equal (expected, result);
     }
 
