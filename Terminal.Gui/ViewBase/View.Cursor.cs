@@ -5,22 +5,26 @@ public partial class View
     private Cursor _cursor = new () { Position = null };
 
     /// <summary>
-    ///     Gets or sets the cursor for this view. Position must be in screen coordinates.
+    ///     Gets or sets the cursor for this view. <see cref="Cursor.Position"/> must be in screen coordinates.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         Use <c>ViewportToScreen()</c> to convert from view-relative coordinates.
-    ///         Set Position to null to hide the cursor.
+    ///     </para>
+    ///     <para>
+    ///         To hide the cursor, set <see cref="Cursor.Position"/> to null or set the Style property to
+    ///         <see cref="CursorStyle.Hidden"/>.
     ///     </para>
     ///     <para>
     ///         Common patterns:
     ///         <code>
     /// // Text cursor at column 5 in viewport - convert to screen coords
     /// Point screenPos = ViewportToScreen(new Point(5, 0));
-    /// SetCursor(new Cursor { Position = screenPos, Shape = CursorShape.BlinkingBar });
+    /// SetCursor(new Cursor { Position = screenPos, Shape = CursorStyle.BlinkingBar });
     /// 
     /// // Hide cursor
     /// SetCursor(new Cursor { Position = null });
+    /// SetCursor(new Cursor { Style = CursorStyle.Hidden });
     /// 
     /// // Update position keeping same shape
     /// Point newScreenPos = ViewportToScreen(new Point(6, 0));

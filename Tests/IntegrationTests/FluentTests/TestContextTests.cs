@@ -101,7 +101,7 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
                                         })
                                   .Then (app =>
                                          {
-                                             app!.TopRunnableView!.SubViews.ElementAt (0).Cursor = new () { Position = new Point (1, 1) };
+                                             app!.TopRunnableView!.SubViews.ElementAt (0).Cursor = new () { Style = CursorStyle.BlinkingBar, Position = new Point (1, 1) };
                                          })
                                   .AssertCursorPosition (new (1, 1)) // Initial cursor position (because Window has border)
             ;

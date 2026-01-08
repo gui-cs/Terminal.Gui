@@ -197,7 +197,7 @@ public partial class TextView : View, IDesignable
             Cursor = Cursor with
             {
                 Position = ViewportToScreen (new Point (col, CurrentRow - _topRow)),
-                Shape = CursorStyle.Default
+                Style = CursorStyle.Default
             };
         }
         else

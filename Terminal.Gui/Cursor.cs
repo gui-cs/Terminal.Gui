@@ -16,8 +16,7 @@ namespace Terminal.Gui;
 /// </code>
 ///     </para>
 ///     <para>
-///         To hide the cursor, set Position to null. The Shape property defines the visual appearance
-///         when the cursor is visible.
+///         To hide the cursor, set Position to null or set the Style property to <see cref="CursorStyle.Hidden"/>.
 ///     </para>
 /// </remarks>
 public record Cursor
@@ -33,18 +32,18 @@ public record Cursor
     public Point? Position { get; init; }
 
     /// <summary>
-    ///     Gets the cursor shape.
+    ///     Gets the cursor style.
     /// </summary>
     /// <remarks>
     ///     Defines the visual appearance when <see cref="Position"/> is not null.
     ///     Default is <see cref="CursorStyle.Hidden"/>.
     /// </remarks>
-    public CursorStyle Shape { get; init; } = CursorStyle.Hidden;
+    public CursorStyle Style { get; init; } = CursorStyle.Hidden;
 
     /// <summary>
     ///     Gets whether the cursor is visible (has valid position).
     /// </summary>
-    public bool IsVisible => Position.HasValue && Shape != CursorStyle.Hidden;
+    public bool IsVisible => Position.HasValue && Style != CursorStyle.Hidden;
 
     /// <summary>
     ///     Returns string representation for debugging.
@@ -56,6 +55,6 @@ public record Cursor
             return "Cursor { Hidden }";
         }
 
-        return $"Cursor {{ Position = {Position}, Shape = {Shape} }}";
+        return $"Cursor {{ Position = {Position}, Shape = {Style} }}";
     }
 }

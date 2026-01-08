@@ -585,7 +585,7 @@ public class HexView : View, IDesignable
             Cursor = Cursor with
             {
                 Position = ViewportToScreen (position),
-                Shape = CursorStyle.Default
+                Style = CursorStyle.Default
             };
         }
 

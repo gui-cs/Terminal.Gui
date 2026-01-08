@@ -305,7 +305,7 @@ public class TreeViewFileSystem : Scenario
         if (_miCursorCheckBox.CheckedState == CheckState.Checked)
         {
             // Provide a non-null position to enable the cursor
-            _treeViewFiles.Cursor = _treeViewFiles.Cursor with { Position = Point.Empty, Shape = CursorStyle.BlinkingBlock };
+            _treeViewFiles.Cursor = _treeViewFiles.Cursor with { Position = Point.Empty, Style = CursorStyle.BlinkingBlock };
         }
         else
         {

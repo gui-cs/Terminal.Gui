@@ -34,17 +34,17 @@ public class CursorTests (ITestOutputHelper output)
                 if (_testLocation.Value.X >= 0 && _testLocation.Value.X < Viewport.Width
                     && _testLocation.Value.Y >= 0 && _testLocation.Value.Y < Viewport.Height)
                 {
-                    Cursor = Cursor with { Position = _testLocation, Shape = CursorStyle.BlinkingBlock };
+                    Cursor = Cursor with { Position = _testLocation, Style = CursorStyle.BlinkingBlock };
                 }
                 else
                 {
                     // Cursor outside viewport - hide it
-                    Cursor = Cursor with { Position = null, Shape = Cursor.Shape };
+                    Cursor = Cursor with { Position = null, Style = Cursor.Style };
                 }
             }
             else
             {
-                Cursor = Cursor with { Position = null, Shape = Cursor.Shape };
+                Cursor = Cursor with { Position = null, Style = Cursor.Style };
             }
         }
     }

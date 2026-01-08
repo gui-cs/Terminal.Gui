@@ -174,7 +174,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 {
                     cursorInfo.bVisible = true;
 
-                    cursorInfo.dwSize = cursor.Shape switch
+                    cursorInfo.dwSize = cursor.Style switch
                     {
                         CursorStyle.BlinkingBlock => 100,
                         CursorStyle.SteadyBlock => 100,
@@ -196,9 +196,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 }
                 else
                 {
-                    if (_currentCursor!.Shape != cursor.Shape)
+                    if (_currentCursor!.Style != cursor.Style)
                     {
-                        Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Shape));
+                        Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                     }
 
                     Write (EscSeqUtils.CSI_ShowCursor);

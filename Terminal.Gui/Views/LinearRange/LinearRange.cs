@@ -905,7 +905,7 @@ public class LinearRange<T> : View, IOrientation
             || !IsInitialized
             || !Viewport.Contains (position.x, position.y))
         {
-            Cursor = new () { Position = null, Shape = Cursor.Shape }; // Hide cursor
+            Cursor = new () { Position = null, Style = Cursor.Style }; // Hide cursor
 
             return;
         }
@@ -913,7 +913,7 @@ public class LinearRange<T> : View, IOrientation
         Cursor = Cursor with
         {
             Position = ViewportToScreen (new Point (position.x, position.y)),
-            Shape = CursorStyle.Default
+            Style = CursorStyle.Default
         };
     }
 
