@@ -404,6 +404,7 @@ public class HexView : View, IDesignable
             }
 
             SetNeedsDraw ();
+            UpdateCursor ();
         }
 
         return false;
@@ -467,7 +468,7 @@ public class HexView : View, IDesignable
                     if (offset + addressOfFirstLine == Address)
                     {
                         // Selected
-                        SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : GetAttributeForRole (VisualRole.Focus));
+                        SetAttribute (_leftSideHasFocus ? editingAttribute : selectedAttribute);
                     }
                     else
                     {
@@ -522,10 +523,10 @@ public class HexView : View, IDesignable
                     }
                 }
 
-                if (offset + Source.Position == Address)
+                if (offset == Address)
                 {
                     // Selected
-                    SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : selectedAttribute);
+                    SetAttribute (selectedAttribute);
                 }
                 else
                 {
@@ -574,24 +575,20 @@ public class HexView : View, IDesignable
     /// </summary>
     protected void RaisePositionChanged ()
     {
-        Point position = GetCursor (Address);
-
-        if (HasFocus
-            && position.X >= 0
-            && position.X < Viewport.Width
-            && position.Y >= 0
-            && position.Y < Viewport.Height)
-        {
-            Cursor = Cursor with
-            {
-                Position = ViewportToScreen (position),
-                Style = CursorStyle.Default
-            };
-        }
+        UpdateCursor ();
 
         HexViewEventArgs args = new (Address, GetPosition (Address), BytesPerLine);
         OnPositionChanged (args);
         PositionChanged?.Invoke (this, args);
+    }
+
+    private void UpdateCursor ()
+    {
+        Cursor = Cursor with
+        {
+            Position = ViewportToScreen (GetCursor (Address)),
+            Style = CursorStyle.Default
+        };
     }
 
     /// <summary>
@@ -886,6 +883,8 @@ public class HexView : View, IDesignable
             _leftSideHasFocus = !_leftSideHasFocus;
             _firstNibble = true;
             SetNeedsDraw ();
+
+            UpdateCursor ();
 
             return true;
         }
