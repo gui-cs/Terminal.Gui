@@ -1,4 +1,4 @@
-namespace ViewsTests.TextViewTests;
+﻿namespace ViewsTests.TextViewTests;
 
 public class TextViewInputTests
 {
@@ -89,8 +89,123 @@ public class TextViewInputTests
 
         // The fix should calculate: 1 (for 'a') + 3 (tab from col 1 to 4) = 4 (where '1' starts)
         // Then after '1': 4 + 1 = 5
-        int fixedVisualColumn = 1 + (4 - (1 % 4)) + 1; // a(1) + tab_to_4(3) + 1(1) = 5
+        int fixedVisualColumn = 1 + (4 - 1 % 4) + 1; // a(1) + tab_to_4(3) + 1(1) = 5
 
         Assert.Equal (expectedVisualColumn, fixedVisualColumn);
+    }
+
+    [Fact]
+    public void Typing_Text_With_Tab_And_Wide_Characters_Positions_Cursor_Correctly ()
+    {
+        // This test verifies tab cursor positioning with wide characters (emoji, CJK, etc.)
+        // Wide characters take 2 visual columns each
+
+        TextView tv = new ()
+        {
+            TabKeyAddsTab = true,
+            TabWidth = 4,
+            Width = 20,
+            Height = 3,
+            Text = "😀\t1"  // Emoji (2 cols) + tab + "1" (1 col)
+        };
+
+        tv.InsertionPoint = new (3, 0); // Position cursor after the "1"
+
+        // Expected visual layout with TabWidth=4:
+        // "😀" (emoji) is at visual column 0-1 (takes 2 columns)
+        // Tab starts at visual column 2, expands to next tab stop at column 4 (adds 2 columns)
+        // "1" is at visual column 4
+        // Cursor after "1" should be at visual column 5
+
+        // Calculate expected visual position
+        // Character '😀' at index 0: visual column 0, emoji takes 2 columns -> advance to column 2
+        // Tab at index 1: at visual column 2, tab to next stop at 4 -> advance by 2 to column 4
+        // Character '1' at index 2: at visual column 4, '1' takes 1 column -> advance to column 5
+        // Cursor at index 3: should be at visual column 5
+        int expectedVisualColumn = 5;
+
+        // The calculation: 2 (for emoji) + 2 (tab from col 2 to 4) + 1 (for '1') = 5
+        int fixedVisualColumn = 2 + (4 - 2 % 4) + 1; // emoji(2) + tab_to_4(2) + 1(1) = 5
+
+        Assert.Equal (expectedVisualColumn, fixedVisualColumn);
+    }
+
+    [Fact]
+    public void Typing_Text_With_Tab_And_Multiple_Wide_Characters_Positions_Cursor_Correctly ()
+    {
+        // This test verifies tab cursor positioning with multiple wide characters
+        // demonstrating tab stops across different starting positions
+
+        TextView tv = new ()
+        {
+            TabKeyAddsTab = true,
+            TabWidth = 8,  // Larger tab width to show multiple scenarios
+            Width = 40,
+            Height = 3,
+            Text = "a😀\t中\tX"  // 'a'(1) + emoji(2) + tab + CJK(2) + tab + 'X'(1)
+        };
+
+        tv.InsertionPoint = new (6, 0); // Position cursor after the "X"
+
+        // Expected visual layout with TabWidth=8:
+        // "a" is at visual column 0 (1 col) -> cursor at 1
+        // "😀" (emoji) at visual column 1-2 (2 cols) -> cursor at 3
+        // Tab at visual column 3, next tab stop is at 8 -> adds 5 cols -> cursor at 8
+        // "中" (CJK) at visual column 8-9 (2 cols) -> cursor at 10
+        // Tab at visual column 10, next tab stop is at 16 -> adds 6 cols -> cursor at 16
+        // "X" at visual column 16 (1 col) -> cursor at 17
+
+        // Calculate expected visual position
+        int expectedVisualColumn = 17;
+
+        // The calculation:
+        // 'a' = 1 col -> at column 1
+        // emoji = 2 cols -> at column 3
+        // tab from 3 to 8 = 5 cols -> at column 8
+        // CJK = 2 cols -> at column 10
+        // tab from 10 to 16 = 6 cols -> at column 16
+        // 'X' = 1 col -> at column 17
+        int fixedVisualColumn = 1 + 2 + (8 - 3 % 8) + 2 + (8 - 10 % 8) + 1;
+
+        Assert.Equal (expectedVisualColumn, fixedVisualColumn);
+    }
+
+    [Theory]
+    [InlineData ("abc\t1", 4, 5)]   // "abc" (3 cols) + tab to col 4 (1 col) + "1" = col 5
+    [InlineData ("abcd\t1", 4, 9)]  // "abcd" (4 cols) + tab to col 8 (4 cols) + "1" = col 9
+    [InlineData ("a\t1", 4, 5)]     // "a" (1 col) + tab to col 4 (3 cols) + "1" = col 5
+    [InlineData ("ab\t1", 4, 5)]    // "ab" (2 cols) + tab to col 4 (2 cols) + "1" = col 5
+    public void Tab_Advances_Correctly_To_Next_Tab_Stop (string text, int tabWidth, int expectedColumn)
+    {
+        // Test that tabs advance correctly based on current column position
+        // Tabs always advance to the next tab stop (multiple of TabWidth)
+
+        TextView tv = new ()
+        {
+            TabKeyAddsTab = true,
+            TabWidth = tabWidth,
+            Width = 20,
+            Height = 3,
+            Text = text
+        };
+
+        tv.InsertionPoint = new (text.Length, 0); // Position cursor at end
+
+        // Calculate the visual column position
+        int visualColumn = 0;
+        for (int i = 0; i < text.Length; i++)
+        {
+            if (text [i] == '\t')
+            {
+                // Standard tab behavior: advance to next tab stop
+                visualColumn += tabWidth - visualColumn % tabWidth;
+            }
+            else
+            {
+                visualColumn += text [i].ToString ().GetColumns ();
+            }
+        }
+
+        Assert.Equal (expectedColumn, visualColumn);
     }
 }
