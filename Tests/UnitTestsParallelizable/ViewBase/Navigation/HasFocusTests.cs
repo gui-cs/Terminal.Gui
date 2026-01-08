@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Navigation;
 
-[Collection ("Global Test Setup")]
+
 public class HasFocusTests () : TestsAllViews
 {
 

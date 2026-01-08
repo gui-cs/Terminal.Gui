@@ -1,6 +1,6 @@
 namespace ViewsTests;
 
-[Collection ("Global Test Setup")]
+
 public class WizardTests
 {
     #region Constructor Tests

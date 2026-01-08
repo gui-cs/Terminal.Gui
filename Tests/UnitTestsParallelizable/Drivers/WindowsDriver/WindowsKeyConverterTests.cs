@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace DriverTests.Windows;
 
-[Collection ("Global Test Setup")]
+
 [Trait ("Platform", "Windows")]
 public class WindowsKeyConverterTests
 {

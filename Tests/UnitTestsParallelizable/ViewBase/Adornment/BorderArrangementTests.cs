@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Adornments;
 
-[Collection ("Global Test Setup")]
+
 public class BorderArrangementTests (ITestOutputHelper output)
 {
     [Fact]

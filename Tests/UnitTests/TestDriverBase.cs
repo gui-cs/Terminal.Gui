@@ -7,7 +7,7 @@ namespace UnitTests;
 ///     Enables tests to create an instance of the ANSI driver configured for testing purposes.
 ///     The driver will use the <see cref="FakeClipboard"/>.
 /// </summary>
-[Collection ("Global Test Setup")]
+
 public abstract class TestDriverBase
 {
     /// <summary>

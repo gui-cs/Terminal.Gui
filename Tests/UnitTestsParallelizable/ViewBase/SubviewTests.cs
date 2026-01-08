@@ -1,6 +1,6 @@
 ﻿namespace ViewBaseTests.Hierarchy;
 
-[Collection ("Global Test Setup")]
+
 public class SubViewTests
 {
     [Fact]
