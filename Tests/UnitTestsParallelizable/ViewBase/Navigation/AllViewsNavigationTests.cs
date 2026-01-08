@@ -176,7 +176,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         {
             if (++tries > 10)
             {
-                Assert.Fail ($"{view} is not leaving.");
+                Assert.Fail ($"{view} is not leaving after {tries} attempts.");
             }
 
             switch (view.TabStop)

@@ -74,7 +74,7 @@ internal class UnixOutput : OutputBase, IOutput
             {
                 if (_currentCursor!.Shape != cursor.Shape)
                 {
-                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)cursor.Shape));
+                    Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Shape));
                 }
 
                 Write (EscSeqUtils.CSI_ShowCursor);

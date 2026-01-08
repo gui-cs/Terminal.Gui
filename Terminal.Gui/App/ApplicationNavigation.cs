@@ -138,7 +138,7 @@ public class ApplicationNavigation
 
         if (mostFocused is null || !mostFocused.Cursor.IsVisible)
         {
-            App?.Driver?.SetCursor (new () { Position = null, Shape = mostFocused?.Cursor.Shape ?? CursorStyle.BlinkingBlock }); // Hide cursor
+            App?.Driver?.SetCursor (new ()); // Hide cursor
 
             return;
         }
@@ -173,12 +173,12 @@ public class ApplicationNavigation
             }
             else
             {
-                App?.Driver?.SetCursor (new () { Position = null, Shape = mostFocusedCursor.Shape }); // Hide cursor
+                App?.Driver?.SetCursor (new ()); // Hide cursor
             }
         }
         else
         {
-            App?.Driver?.SetCursor (new () { Position = null, Shape = mostFocusedCursor.Shape }); // Hide cursor
+            App?.Driver?.SetCursor (new ()); // Hide cursor
         }
     }
 }

@@ -53,4 +53,9 @@ public enum CursorStyle
     /// <summary>Steady (non-blinking) vertical bar cursor (I-beam).</summary>
     /// <remarks>ANSI DECSCUSR Ps=6.</remarks>
     SteadyBar = 6,
+
+    /// <summary>
+    ///     Represents a hidden cursor (no visible cursor).
+    /// </summary>
+    Hidden = -1
 }

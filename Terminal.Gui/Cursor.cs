@@ -37,14 +37,14 @@ public record Cursor
     /// </summary>
     /// <remarks>
     ///     Defines the visual appearance when <see cref="Position"/> is not null.
-    ///     Default is <see cref="CursorStyle.BlinkingBlock"/>.
+    ///     Default is <see cref="CursorStyle.Hidden"/>.
     /// </remarks>
-    public CursorStyle Shape { get; init; } = CursorStyle.BlinkingBlock;
+    public CursorStyle Shape { get; init; } = CursorStyle.Hidden;
 
     /// <summary>
     ///     Gets whether the cursor is visible (has valid position).
     /// </summary>
-    public bool IsVisible => Position.HasValue;
+    public bool IsVisible => Position.HasValue && Shape != CursorStyle.Hidden;
 
     /// <summary>
     ///     Returns string representation for debugging.

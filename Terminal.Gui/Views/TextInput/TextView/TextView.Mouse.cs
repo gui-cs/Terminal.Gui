@@ -24,12 +24,7 @@ public partial class TextView
             return false;
         }
 
-        if (!CanFocus)
-        {
-            return true;
-        }
-
-        if (!HasFocus)
+        if (CanFocus && !HasFocus)
         {
             SetFocus ();
         }
@@ -224,7 +219,6 @@ public partial class TextView
             PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            SetNeedsDraw ();
         }
         else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
         {
@@ -245,7 +239,6 @@ public partial class TextView
             PositionCursor ();
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            SetNeedsDraw ();
         }
         else if (mouse.Flags == ContextMenu!.MouseFlags)
         {
@@ -253,6 +246,7 @@ public partial class TextView
         }
 
         OnUnwrappedCursorPosition ();
+        SetNeedsDraw ();
 
         return true;
     }

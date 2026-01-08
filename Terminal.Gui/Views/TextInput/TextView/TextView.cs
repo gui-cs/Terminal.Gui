@@ -145,18 +145,14 @@ public partial class TextView : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
-
-        if (newHasFocus)
-        {
-            //PositionCursor ();
-        }
     }
 
     /// <summary>Positions the cursor on the current row and column</summary>
     public void PositionCursor ()
     {
-        if (!CanFocus || !Enabled || Driver is null)
+        if (!CanFocus || !Enabled || ReadOnly || Driver is null)
         {
+            Cursor = new ();
             return;
         }
 
@@ -206,7 +202,7 @@ public partial class TextView : View, IDesignable
         }
         else
         {
-            Cursor = Cursor with { Position = null, Shape = Cursor.Shape };
+            Cursor = new ();
         }
     }
 

@@ -137,7 +137,7 @@ public class TextViewTests
 
         tv.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
-        Assert.Empty (tv.SelectedText);
+        Assert.NotEmpty (tv.SelectedText);
         Assert.False (tv.CanFocus);
         Assert.False (tv.HasFocus);
         Assert.False (fv.CanFocus);
