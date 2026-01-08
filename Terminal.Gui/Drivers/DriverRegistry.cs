@@ -89,7 +89,7 @@ public static class DriverRegistry
     public static void Register (DriverDescriptor descriptor)
     {
         _registry [descriptor.Name] = descriptor;
-        Logging.Trace ($"Registered driver: {descriptor.Name} ({descriptor.DisplayName})");
+        //Logging.Trace ($"Registered driver: {descriptor.Name} ({descriptor.DisplayName})");
     }
 
     /// <summary>
