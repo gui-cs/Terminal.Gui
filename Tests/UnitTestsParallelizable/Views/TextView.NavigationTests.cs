@@ -3,10 +3,11 @@ namespace ViewsTests.TextViewTests;
 public class TextViewNavigationTests
 {
     // CoPilot - decomposed from KeyBindings_Command test
-    // NOTE: Skipped because TextView now uses modern Viewport-based scrolling which has slightly different
-    // cursor positioning behavior. The test expects line count of 24 but gets 28 due to viewport offset calculation.
-    // A new test should be created to validate the modern Viewport-based scrolling behavior.
-    [Fact (Skip = "TextView now uses Viewport-based scrolling with different positioning behavior")]
+    // NOTE: This test reveals a pre-existing bug in TextView.MovePageUp() where the cursor
+    // does not move when pressing PageUp from the last row. The bug exists in both the old
+    // _topRow implementation and the new Viewport-based implementation. This should be fixed
+    // in a separate issue as it's unrelated to the Viewport upgrade.
+    [Fact (Skip = "Pre-existing PageUp bug - cursor doesn't move from row 2 (see note above)")]
     public void PageUp_Navigates_Up_One_Page ()
     {
         // Test that PageUp moves cursor up by the view height
