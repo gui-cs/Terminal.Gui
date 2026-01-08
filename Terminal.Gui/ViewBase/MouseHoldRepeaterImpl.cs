@@ -83,7 +83,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
             ScreenPosition = mouse.ScreenPosition,
             View = mouse.View
         };
-        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
+        //Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 
         _isDown = true;
         _mouseGrabber?.GrabMouse (_mouseGrabView);
@@ -111,11 +111,11 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
     {
         if (_mouseEvent is null)
         {
-            Logging.Trace ($"host: {_mouseGrabView.Id}");
+            //Logging.Trace ($"host: {_mouseGrabView.Id}");
 
             return;
         }
-        Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
+        //Logging.Trace ($"host: {_mouseGrabView.Id} {_mouseEvent.View?.Id}: {_mouseEvent.Flags}");
 
         _mouseEvent = null;
 
@@ -143,7 +143,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
     {
         if (_mouseGrabber?.MouseGrabView == _mouseGrabView)
         {
-            Logging.Trace ($"host: {_mouseGrabView.Id} Disposing and ungrabbing mouse");
+            //Logging.Trace ($"host: {_mouseGrabView.Id} Disposing and ungrabbing mouse");
             Stop ();
         }
     }
@@ -162,7 +162,7 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
         // stop the currently running operation.
         if (args.Cancel)
         {
-            Logging.Trace ($"host: {_mouseGrabView.Id} MouseIsHeldDownTick cancelled, stopping");
+            //Logging.Trace ($"host: {_mouseGrabView.Id} MouseIsHeldDownTick cancelled, stopping");
             Stop ();
         }
 

@@ -159,7 +159,7 @@ public partial class TestContext : IDisposable
                                          {
                                              runnableView.Dispose ();
                                          }
-                                         Logging.Trace ("Application.Run completed");
+                                         //Logging.Trace ("Application.Run completed");
                                          App?.Dispose ();
                                          _runCancellationTokenSource.Cancel ();
                                      }
@@ -272,7 +272,7 @@ public partial class TestContext : IDisposable
         }
 
         _applicationImpl = new (cf!, _timeProvider, testMode: true);
-        Logging.Trace ($"Driver: {_driverName}. Timeout: {_timeout}");
+        //Logging.Trace ($"Driver: {_driverName}. Timeout: {_timeout}");
     }
 
     /// <summary>
@@ -295,7 +295,7 @@ public partial class TestContext : IDisposable
     {
         try
         {
-            Logging.Trace ($"Invoking action via WaitIteration");
+            //Logging.Trace ($"Invoking action via WaitIteration");
             WaitIteration (doAction);
         }
         catch (Exception ex)
@@ -372,7 +372,7 @@ public partial class TestContext : IDisposable
         TestContext? c = null;
         var sw = Stopwatch.StartNew ();
 
-        Logging.Trace ($"WaitUntil started with timeout {_timeout}");
+        //Logging.Trace ($"WaitUntil started with timeout {_timeout}");
 
         int count = 0;
         while (!condition ())
@@ -568,7 +568,7 @@ public partial class TestContext : IDisposable
     /// </summary>
     public void Dispose ()
     {
-        Logging.Trace ($"Disposing TestContext");
+        //Logging.Trace ($"Disposing TestContext");
         Stop ();
 
         bool shouldThrow = false;

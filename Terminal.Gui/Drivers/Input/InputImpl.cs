@@ -67,7 +67,7 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
         { }
         finally
         {
-            Logging.Trace ("Stopping input processing");
+            //Logging.Trace ("Stopping input processing");
             linkedCts?.Dispose ();
         }
     }
