@@ -37,6 +37,8 @@ public partial class TextView
                 _model = _wrapManager.Model;
             }
 
+            UpdateHorizontalScrollBarVisibility ();
+            UpdateContentSize ();
             SetNeedsDraw ();
         }
     }

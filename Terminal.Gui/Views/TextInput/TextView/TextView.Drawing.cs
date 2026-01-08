@@ -25,7 +25,7 @@ public partial class TextView
         int bottom = Viewport.Height + offB.height;
         var row = 0;
 
-        for (int idxRow = _topRow; idxRow < _model.Count; idxRow++)
+        for (int idxRow = Viewport.Y; idxRow < _model.Count; idxRow++)
         {
             List<Cell> line = _model.GetLine (idxRow);
             int lineRuneCount = line.Count;
@@ -33,7 +33,7 @@ public partial class TextView
 
             Move (0, row);
 
-            for (int idxCol = _leftColumn; idxCol < lineRuneCount; idxCol++)
+            for (int idxCol = Viewport.X; idxCol < lineRuneCount; idxCol++)
             {
                 string text = idxCol >= lineRuneCount ? " " : line [idxCol].Grapheme;
                 int cols = text.GetColumns (false);
@@ -267,47 +267,50 @@ public partial class TextView
         List<Cell> line = GetCurrentLine ();
         bool need = NeedsDraw || _wrapNeeded || !Used;
         (int size, int length) tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
-        (int size, int length) dSize = TextModel.DisplaySize (line, _leftColumn, CurrentColumn, true, TabWidth);
+        (int size, int length) dSize = TextModel.DisplaySize (line, Viewport.X, CurrentColumn, true, TabWidth);
 
-        if (!_wordWrap && CurrentColumn < _leftColumn)
+        // Handle horizontal scrolling (only when WordWrap is off)
+        if (!_wordWrap && CurrentColumn < Viewport.X)
         {
-            _leftColumn = CurrentColumn;
+            Viewport = Viewport with { X = CurrentColumn };
             need = true;
         }
         else if (!_wordWrap
-                 && (CurrentColumn - _leftColumn + 1 > Viewport.Width + offB.width || dSize.size + 1 >= Viewport.Width + offB.width))
+                 && (CurrentColumn - Viewport.X + 1 > Viewport.Width + offB.width || dSize.size + 1 >= Viewport.Width + offB.width))
         {
-            _leftColumn = TextModel.CalculateLeftColumn (
+            int newLeftCol = TextModel.CalculateLeftColumn (
                                                          line,
-                                                         _leftColumn,
+                                                         Viewport.X,
                                                          CurrentColumn,
                                                          Viewport.Width + offB.width,
                                                          TabWidth
                                                         );
+            Viewport = Viewport with { X = newLeftCol };
             need = true;
         }
-        else if ((_wordWrap && _leftColumn > 0) || (dSize.size < Viewport.Width + offB.width && tSize.size < Viewport.Width + offB.width))
+        else if ((_wordWrap && Viewport.X > 0) || (dSize.size < Viewport.Width + offB.width && tSize.size < Viewport.Width + offB.width))
         {
-            if (_leftColumn > 0)
+            if (Viewport.X > 0)
             {
-                _leftColumn = 0;
+                Viewport = Viewport with { X = 0 };
                 need = true;
             }
         }
 
-        if (CurrentRow < _topRow)
+        // Handle vertical scrolling
+        if (CurrentRow < Viewport.Y)
         {
-            _topRow = CurrentRow;
+            Viewport = Viewport with { Y = CurrentRow };
             need = true;
         }
-        else if (CurrentRow - _topRow >= Viewport.Height + offB.height)
+        else if (CurrentRow - Viewport.Y >= Viewport.Height + offB.height)
         {
-            _topRow = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow);
+            Viewport = Viewport with { Y = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow) };
             need = true;
         }
-        else if (_topRow > 0 && CurrentRow < _topRow)
+        else if (Viewport.Y > 0 && CurrentRow < Viewport.Y)
         {
-            _topRow = Math.Max (_topRow - 1, 0);
+            Viewport = Viewport with { Y = Math.Max (Viewport.Y - 1, 0) };
             need = true;
         }
 

@@ -491,9 +491,9 @@ public partial class TextView
 
             _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
-            if (CurrentColumn < _leftColumn)
+            if (CurrentColumn < Viewport.X)
             {
-                _leftColumn--;
+                Viewport = Viewport with { X = Viewport.X - 1 };
             }
             SetNeedsDraw ();
         }
@@ -575,7 +575,7 @@ public partial class TextView
                 _wrapNeeded = true;
             }
 
-            DoSetNeedsDraw (new (0, CurrentRow - _topRow, Viewport.Width, CurrentRow - _topRow + 1));
+            DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, CurrentRow - Viewport.Y + 1));
         }
         else
         {
@@ -592,10 +592,10 @@ public partial class TextView
 
             DoSetNeedsDraw (
                             new (
-                                 CurrentColumn - _leftColumn,
-                                 CurrentRow - _topRow,
+                                 CurrentColumn - Viewport.X,
+                                 CurrentRow - Viewport.Y,
                                  Viewport.Width,
-                                 Math.Max (CurrentRow - _topRow + 1, 0)
+                                 Math.Max (CurrentRow - Viewport.Y + 1, 0)
                                 )
                            );
         }
@@ -690,7 +690,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        DoSetNeedsDraw (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
+        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -791,7 +791,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        DoSetNeedsDraw (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
+        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -871,7 +871,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        DoSetNeedsDraw (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
+        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
         DoNeededAction ();
 
         return true;
@@ -924,7 +924,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        DoSetNeedsDraw (new (0, CurrentRow - _topRow, Viewport.Width, Viewport.Height));
+        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
         DoNeededAction ();
 
         return true;
@@ -1004,18 +1004,18 @@ public partial class TextView
         addedLines.Add ([.. _model.GetLine (CurrentRow + 1)]);
         _historyText.Add (addedLines, InsertionPoint, TextEditingLineStatus.Added);
         CurrentRow++;
-        if (CurrentRow >= _topRow + Viewport.Height)
+        if (CurrentRow >= Viewport.Y + Viewport.Height)
         {
-            _topRow++;
+            Viewport = Viewport with { Y = Viewport.Y + 1 };
         }
 
         CurrentColumn = 0;
 
         _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
-        if (!_wordWrap && CurrentColumn < _leftColumn)
+        if (!_wordWrap && CurrentColumn < Viewport.X)
         {
-            _leftColumn = 0;
+            Viewport = Viewport with { X = 0 };
         }
 
         SetNeedsDraw ();

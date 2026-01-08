@@ -18,9 +18,9 @@ public partial class TextView
     public bool MoveHome ()
     {
         CurrentRow = 0;
-        _topRow = 0;
+        Viewport = Viewport with { Y = 0 };
         CurrentColumn = 0;
-        _leftColumn = 0;
+        Viewport = Viewport with { X = 0 };
         TrackColumn ();
         DoNeededAction ();
 
@@ -46,13 +46,13 @@ public partial class TextView
 
         if (isRow)
         {
-            _topRow = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0);
+            Viewport = Viewport with { Y = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0) };
         }
         else if (!_wordWrap)
         {
             int maxlength =
-                _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
-            _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
+                _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
+            Viewport = Viewport with { X = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0) };
         }
 
         PositionCursor ();
@@ -90,9 +90,9 @@ public partial class TextView
 
             CurrentRow++;
 
-            if (CurrentRow >= _topRow + Viewport.Height)
+            if (CurrentRow >= Viewport.Y + Viewport.Height)
             {
-                _topRow++;
+                Viewport = Viewport with { Y = Viewport.Y + 1 };
                 SetNeedsDraw ();
             }
 
@@ -134,9 +134,9 @@ public partial class TextView
             {
                 CurrentRow--;
 
-                if (CurrentRow < _topRow)
+                if (CurrentRow < Viewport.Y)
                 {
-                    _topRow--;
+                    Viewport = Viewport with { Y = Viewport.Y - 1 };
                     SetNeedsDraw ();
                 }
 
@@ -156,13 +156,13 @@ public partial class TextView
 
     private bool MoveLeftStart ()
     {
-        if (_leftColumn > 0)
+        if (Viewport.X > 0)
         {
             SetNeedsDraw ();
         }
 
         CurrentColumn = 0;
-        _leftColumn = 0;
+        Viewport = Viewport with { X = 0 };
         DoNeededAction ();
 
         return true;
@@ -183,11 +183,11 @@ public partial class TextView
                              ? _model.Count > 0 ? _model.Count - 1 : 0
                              : CurrentRow + nPageDnShift;
 
-            if (_topRow < CurrentRow - nPageDnShift)
+            if (Viewport.Y < CurrentRow - nPageDnShift)
             {
-                _topRow = CurrentRow >= _model.Count
+                Viewport = Viewport with { Y = CurrentRow >= _model.Count
                               ? CurrentRow - nPageDnShift
-                              : _topRow + nPageDnShift;
+                              : Viewport.Y + nPageDnShift };
                 SetNeedsDraw ();
             }
 
@@ -213,9 +213,9 @@ public partial class TextView
 
             CurrentRow = CurrentRow - nPageUpShift < 0 ? 0 : CurrentRow - nPageUpShift;
 
-            if (CurrentRow < _topRow)
+            if (CurrentRow < Viewport.Y)
             {
-                _topRow = _topRow - nPageUpShift < 0 ? 0 : _topRow - nPageUpShift;
+                Viewport = Viewport with { Y = Viewport.Y - nPageUpShift < 0 ? 0 : Viewport.Y - nPageUpShift };
                 SetNeedsDraw ();
             }
 
@@ -243,9 +243,9 @@ public partial class TextView
                 CurrentRow++;
                 CurrentColumn = 0;
 
-                if (CurrentRow >= _topRow + Viewport.Height)
+                if (CurrentRow >= Viewport.Y + Viewport.Height)
                 {
-                    _topRow++;
+                    Viewport = Viewport with { Y = Viewport.Y + 1 };
                     SetNeedsDraw ();
                 }
             }
@@ -290,9 +290,9 @@ public partial class TextView
 
             CurrentRow--;
 
-            if (CurrentRow < _topRow)
+            if (CurrentRow < Viewport.Y)
             {
-                _topRow--;
+                Viewport = Viewport with { Y = Viewport.Y - 1 };
                 SetNeedsDraw ();
             }
 

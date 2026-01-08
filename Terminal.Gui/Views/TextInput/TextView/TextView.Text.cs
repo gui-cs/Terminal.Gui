@@ -71,12 +71,10 @@ public partial class TextView
         set => _historyText.Clear (_model.GetAllLines ());
     }
 
-    private int _leftColumn;
-
     /// <summary>Gets or sets the left column.</summary>
     public int LeftColumn
     {
-        get => _leftColumn;
+        get => Viewport.X;
         set
         {
             if (value > 0 && _wordWrap)
@@ -84,7 +82,7 @@ public partial class TextView
                 return;
             }
 
-            _leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+            Viewport = Viewport with { X = Math.Max (Math.Min (value, Maxlength - 1), 0) };
         }
     }
 
@@ -92,7 +90,7 @@ public partial class TextView
     public int Lines => _model.Count;
 
     /// <summary>Gets the maximum visible length line.</summary>
-    public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
+    public int Maxlength => _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
 
     private bool _multiline = true;
 
@@ -224,8 +222,8 @@ public partial class TextView
     /// <summary>Gets or sets the top row.</summary>
     public int TopRow
     {
-        get => _topRow;
-        set => _topRow = Math.Max (Math.Min (value, Lines - 1), 0);
+        get => Viewport.Y;
+        set => Viewport = Viewport with { Y = Math.Max (Math.Min (value, Lines - 1), 0) };
     }
 
     /// <summary>
@@ -542,9 +540,9 @@ public partial class TextView
                               TextEditingLineStatus.Replaced
                              );
 
-            if (!_wordWrap && CurrentColumn - _leftColumn > Viewport.Width)
+            if (!_wordWrap && CurrentColumn - Viewport.X > Viewport.Width)
             {
-                _leftColumn = Math.Max (CurrentColumn - Viewport.Width + 1, 0);
+                Viewport = Viewport with { X = Math.Max (CurrentColumn - Viewport.Width + 1, 0) };
             }
 
             SetNeedsDraw ();
@@ -633,9 +631,9 @@ public partial class TextView
                 Insert (new () { Grapheme = a.AsRune.ToString (), Attribute = attribute });
                 CurrentColumn++;
 
-                if (CurrentColumn >= _leftColumn + Viewport.Width)
+                if (CurrentColumn >= Viewport.X + Viewport.Width)
                 {
-                    _leftColumn++;
+                    Viewport = Viewport with { X = Viewport.X + 1 };
                     SetNeedsDraw ();
                 }
             }
@@ -668,8 +666,10 @@ public partial class TextView
         if (!_multiline && !IsInitialized)
         {
             CurrentColumn = Text.GetRuneCount ();
-            _leftColumn = CurrentColumn > Viewport.Width + 1 ? CurrentColumn - Viewport.Width + 1 : 0;
+            Viewport = Viewport with { X = CurrentColumn > Viewport.Width + 1 ? CurrentColumn - Viewport.Width + 1 : 0 };
         }
+
+        UpdateContentSize ();
     }
 
     private int _columnTrack = -1;
@@ -712,11 +712,10 @@ public partial class TextView
         _continuousFind = false;
     }
 
-    private int _topRow;
-
     private void ResetPosition ()
     {
-        _topRow = _leftColumn = CurrentRow = CurrentColumn = 0;
+        Viewport = Viewport with { Y = 0, X = 0 };
+        CurrentRow = CurrentColumn = 0;
         StopSelecting ();
     }
 

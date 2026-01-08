@@ -117,12 +117,19 @@ public partial class TextView : View, IDesignable
         ContextMenu = CreateContextMenu ();
         App?.Popover?.Register (ContextMenu);
         KeyBindings.Add (ContextMenu.Key, Command.Context);
+        
+        // Configure scrollbars to use modern Viewport system
+        VerticalScrollBar.AutoShow = true;
+        UpdateHorizontalScrollBarVisibility ();
+        UpdateContentSize ();
+        
         PositionCursor ();
     }
 
     private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
     {
         WrapTextModel ();
+        UpdateContentSize ();
         Adjust ();
     }
 
@@ -168,7 +175,7 @@ public partial class TextView : View, IDesignable
 
         if (line.Count > 0)
         {
-            for (int idx = _leftColumn; idx < line.Count; idx++)
+            for (int idx = Viewport.X; idx < line.Count; idx++)
             {
                 if (idx >= CurrentColumn)
                 {
@@ -207,14 +214,14 @@ public partial class TextView : View, IDesignable
             }
         }
 
-        int posX = CurrentColumn - _leftColumn;
-        int posY = CurrentRow - _topRow;
+        int posX = CurrentColumn - Viewport.X;
+        int posY = CurrentRow - Viewport.Y;
 
-        if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
+        if (posX > -1 && col >= posX && posX < Viewport.Width && Viewport.Y <= CurrentRow && posY < Viewport.Height)
         {
             Cursor = Cursor with
             {
-                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow))
+                Position = ViewportToScreen (new Point (col, CurrentRow - Viewport.Y))
             };
         }
         else
@@ -277,5 +284,35 @@ public partial class TextView : View, IDesignable
         }
 
         base.Dispose (disposing);
+    }
+
+    /// <summary>
+    /// Updates the content size based on the current text model dimensions.
+    /// </summary>
+    private void UpdateContentSize ()
+    {
+        if (!IsInitialized)
+        {
+            return;
+        }
+
+        int contentHeight = _model.Count;
+        int contentWidth = _wordWrap ? Viewport.Width : _model.GetMaxVisibleLine (0, _model.Count, TabWidth);
+
+        SetContentSize (new Size (contentWidth, contentHeight));
+    }
+
+    /// <summary>
+    /// Updates the horizontal scrollbar visibility based on WordWrap state.
+    /// </summary>
+    private void UpdateHorizontalScrollBarVisibility ()
+    {
+        // When WordWrap is on, horizontal scrolling is disabled
+        HorizontalScrollBar.AutoShow = !_wordWrap;
+        
+        if (_wordWrap)
+        {
+            HorizontalScrollBar.Visible = false;
+        }
     }
 }
