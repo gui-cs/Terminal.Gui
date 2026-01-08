@@ -502,7 +502,9 @@ internal class TextModel
                 for (int i = selText.Count - 1; i > -1; i--)
                 {
                     if (selText [i] == " ")
-                    col--;
+                    {
+                        col--;
+                    }
                 }
             }
         }

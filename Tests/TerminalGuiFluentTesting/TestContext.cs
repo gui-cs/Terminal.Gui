@@ -395,7 +395,11 @@ public partial class TestContext : IDisposable
     ///     Returns the last set position of the cursor.
     /// </summary>
     /// <returns></returns>
-    public Point? GetCursorPosition () => _output!.GetCursor().Position;
+    public Point? GetCursorPosition ()
+    {
+        App?.Navigation?.UpdateCursor ();
+        return _output!.GetCursor ().Position;
+    }
 
     /// <summary>
     ///     Simulates changing the console size e.g. by resizing window in your operating system

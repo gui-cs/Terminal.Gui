@@ -545,6 +545,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         var tf = new TextField { Width = 5 };
         tf.BeginInit ();
         tf.EndInit ();
+        tf.SetFocus ();
 
         tf.NewKeyDownEvent (new ("📄"));
         Assert.Equal (1, tf.InsertionPoint);
@@ -641,6 +642,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         TextField tf = new () { Width = 10, Text = "\u001B[" };
         tf.Driver = driver;
         tf.SetRelativeLayout (new (10, 1));
+        tf.SetFocus ();
 
         Assert.Equal (0, tf.InsertionPoint);
 
@@ -654,7 +656,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void ScrollOffset_Treat_Negative_Width_As_One_Column ()
     {
-        View view = new () { Width = 10, Height = 1};
+        View view = new () { Width = 10, Height = 1 };
         TextField tf = new () { Width = 2, Text = "\u001B[" };
         view.Add (tf);
         tf.SetRelativeLayout (new (10, 1));

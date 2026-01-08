@@ -95,7 +95,7 @@ public partial class TextField
 
         if (Used)
         {
-            InsertionPoint++;
+            _insertionPoint++;
 
             if (InsertionPoint == newText.Count + 1)
             {
@@ -251,11 +251,6 @@ public partial class TextField
     /// </remarks>
     private void Adjust ()
     {
-        if (SuperView is null)
-        {
-            return;
-        }
-
         bool need = NeedsDraw || !Used;
 
         // If cursor is before the visible area, scroll left to show it
@@ -434,7 +429,7 @@ public partial class TextField
 
         if (!HasFocus)
         {
-            SetCursor (new () { Position = null });
+            Cursor = new () { Position = null };
 
             return;
         }
@@ -455,11 +450,11 @@ public partial class TextField
 
         int pos = col + Math.Min (Viewport.X, 0);
 
-        SetCursor (new ()
+        Cursor = new ()
         {
             Position = ViewportToScreen (new Point (pos, 0)),
-            Shape = CursorShape.Default
-        });
+            Style = CursorStyle.Default
+        };
     }
 
     /// <summary>

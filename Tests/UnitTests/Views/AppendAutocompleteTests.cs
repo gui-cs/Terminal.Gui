@@ -168,7 +168,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new() { "FISH" };
+        generator.AllSuggestions = new () { "FISH" };
 
         tf.SetClipToScreen ();
         tf.Draw ();
@@ -206,7 +206,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new() { "fish" };
+        generator.AllSuggestions = new () { "fish" };
 
         tf.SetClipToScreen ();
         tf.Draw ();

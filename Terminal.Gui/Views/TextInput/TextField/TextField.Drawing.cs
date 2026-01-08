@@ -100,6 +100,7 @@ public partial class TextField
         }
 
         RenderCaption ();
+        DrawAutocomplete ();
 
         _isDrawing = false;
 

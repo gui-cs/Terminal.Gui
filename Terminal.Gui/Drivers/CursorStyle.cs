@@ -1,7 +1,7 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Defines the shape of the terminal cursor, based on ANSI/VT terminal standards.
+///     Defines the style of the terminal cursor, based on ANSI/VT terminal standards.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -18,13 +18,12 @@ namespace Terminal.Gui.Drivers;
 ///         Drivers map these values to platform-specific APIs:
 ///         - ANSI terminals: Use DECSCUSR escape sequences directly
 ///         - Windows Console: Map to CONSOLE_CURSOR_INFO (bVisible and dwSize)
-///         - NCurses: Map to curs_set() and platform-specific extensions
 ///     </para>
 ///     <para>
-///         To hide the cursor, use null for the cursor position. This enum only defines visible cursor shapes.
+///         To hide the cursor, use null for the cursor position.
 ///     </para>
 /// </remarks>
-public enum CursorShape
+public enum CursorStyle
 {
     /// <summary>
     ///     The default cursor shape, typically a blinking block.
@@ -53,5 +52,10 @@ public enum CursorShape
 
     /// <summary>Steady (non-blinking) vertical bar cursor (I-beam).</summary>
     /// <remarks>ANSI DECSCUSR Ps=6.</remarks>
-    SteadyBar = 6
+    SteadyBar = 6,
+
+    /// <summary>
+    ///     Represents a hidden cursor (no visible cursor).
+    /// </summary>
+    Hidden = -1
 }

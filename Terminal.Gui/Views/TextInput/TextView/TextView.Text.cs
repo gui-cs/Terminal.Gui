@@ -154,6 +154,7 @@ public partial class TextView
             if (value != _isReadOnly)
             {
                 _isReadOnly = value;
+                CanFocus = !_isReadOnly;
 
                 SetNeedsDraw ();
                 WrapTextModel ();

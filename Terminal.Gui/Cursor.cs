@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The position is always in screen-absolute coordinates.
+///         The position is always in screen coordinates.
 ///         Views are responsible for converting from their content-area or viewport coordinates to
 ///         screen coordinates before setting the cursor.
 ///     </para>
@@ -16,14 +16,13 @@ namespace Terminal.Gui;
 /// </code>
 ///     </para>
 ///     <para>
-///         To hide the cursor, set Position to null. The Shape property defines the visual appearance
-///         when the cursor is visible.
+///         To hide the cursor, set Position to null or set the Style property to <see cref="CursorStyle.Hidden"/>.
 ///     </para>
 /// </remarks>
 public record Cursor
 {
     /// <summary>
-    ///     Gets the cursor position in screen-absolute coordinates.
+    ///     Gets the cursor position in screen coordinates.
     /// </summary>
     /// <remarks>
     ///     Null position indicates the cursor is hidden.
@@ -33,18 +32,18 @@ public record Cursor
     public Point? Position { get; init; }
 
     /// <summary>
-    ///     Gets the cursor shape.
+    ///     Gets the cursor style.
     /// </summary>
     /// <remarks>
     ///     Defines the visual appearance when <see cref="Position"/> is not null.
-    ///     Default is <see cref="CursorShape.BlinkingBlock"/>.
+    ///     Default is <see cref="CursorStyle.Hidden"/>.
     /// </remarks>
-    public CursorShape Shape { get; init; } = CursorShape.BlinkingBlock;
+    public CursorStyle Style { get; init; } = CursorStyle.Hidden;
 
     /// <summary>
     ///     Gets whether the cursor is visible (has valid position).
     /// </summary>
-    public bool IsVisible => Position.HasValue;
+    public bool IsVisible => Position.HasValue && Style != CursorStyle.Hidden;
 
     /// <summary>
     ///     Returns string representation for debugging.
@@ -56,6 +55,6 @@ public record Cursor
             return "Cursor { Hidden }";
         }
 
-        return $"Cursor {{ Position = {Position}, Shape = {Shape} }}";
+        return $"Cursor {{ Position = {Position}, Shape = {Style} }}";
     }
 }

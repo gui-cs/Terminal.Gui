@@ -166,6 +166,7 @@ public partial class TextView
             PositionCursor ();
             OnUnwrappedCursorPosition ();
         }
+        ProcessAutocomplete ();
     }
 
     /// <summary>
@@ -537,7 +538,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        return false;
+        return true;
     }
 
     private bool DeleteTextForwards ()
@@ -602,7 +603,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        return false;
+        return true;
     }
 
     private bool KillToEndOfLine ()

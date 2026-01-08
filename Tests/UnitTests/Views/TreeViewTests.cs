@@ -109,8 +109,9 @@ public class TreeViewTests (ITestOutputHelper output)
         Assert.False (tv.Cursor.IsVisible);
 
         tv.SelectAll ();
-        tv.SetCursor(tv.Cursor with {Shape = CursorShape.BlinkingBlock});
+        tv.Cursor = tv.Cursor with { Position = new Point (0, 0), Style = CursorStyle.BlinkingBlock };
         Assert.True (tv.Cursor.IsVisible);
+        Application.Navigation.UpdateCursor ();
         Assert.True (Application.Driver!.GetCursor ().IsVisible);
         top.Dispose ();
     }

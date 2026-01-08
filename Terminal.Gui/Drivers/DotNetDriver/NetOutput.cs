@@ -33,19 +33,6 @@ public class NetOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text)
-    {
-        try
-        {
-            Console.Out.Write (text);
-        }
-        catch (IOException)
-        {
-            // Not connected to a terminal; do nothing
-        }
-    }
-
-    /// <inheritdoc/>
     public Size GetSize ()
     {
         try
@@ -97,6 +84,19 @@ public class NetOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
+    public void Write (ReadOnlySpan<char> text)
+    {
+        try
+        {
+            Console.Out.Write (text);
+        }
+        catch (IOException)
+        {
+            // Not connected to a terminal; do nothing
+        }
+    }
+
+    /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
         base.Write (output);
@@ -111,12 +111,12 @@ public class NetOutput : OutputBase, IOutput
         }
     }
 
-    private Cursor? _currentCursor = new ();
+    private Cursor _currentCursor = new ();
 
     /// <inheritdoc />
     public Cursor GetCursor ()
     {
-        return _currentCursor!;
+        return _currentCursor;
     }
 
 
@@ -131,9 +131,9 @@ public class NetOutput : OutputBase, IOutput
             }
             else
             {
-                if (_currentCursor!.Shape != cursor.Shape)
+                if (_currentCursor!.Style != cursor.Style)
                 {
-                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)cursor.Shape));
+                    Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                 }
 
                 Write (EscSeqUtils.CSI_ShowCursor);
@@ -167,15 +167,12 @@ public class NetOutput : OutputBase, IOutput
             try
             {
                 Console.SetCursorPosition (col, row);
-
-                return true;
             }
             catch
             {
                 // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             }
-
-            return false;
+            return true;
         }
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and

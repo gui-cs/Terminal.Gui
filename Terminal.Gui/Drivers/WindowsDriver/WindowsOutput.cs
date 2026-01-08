@@ -148,12 +148,12 @@ internal partial class WindowsOutput : OutputBase, IOutput
         GetSize ();
     }
 
-    private Cursor? _currentCursor = new ();
+    private Cursor _currentCursor = new ();
 
     /// <inheritdoc />
     public Cursor GetCursor ()
     {
-        return _currentCursor!;
+        return _currentCursor;
     }
 
     // <inheritdoc />
@@ -174,14 +174,14 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 {
                     cursorInfo.bVisible = true;
 
-                    cursorInfo.dwSize = cursor.Shape switch
+                    cursorInfo.dwSize = cursor.Style switch
                     {
-                        CursorShape.BlinkingBlock => 100,
-                        CursorShape.SteadyBlock => 100,
-                        CursorShape.BlinkingUnderline => 15,
-                        CursorShape.SteadyUnderline => 15,
-                        CursorShape.BlinkingBar => 15,
-                        CursorShape.SteadyBar => 15,
+                        CursorStyle.BlinkingBlock => 100,
+                        CursorStyle.SteadyBlock => 100,
+                        CursorStyle.BlinkingUnderline => 15,
+                        CursorStyle.SteadyUnderline => 15,
+                        CursorStyle.BlinkingBar => 15,
+                        CursorStyle.SteadyBar => 15,
                         _ => 100
                     };
                 }
@@ -196,9 +196,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
                 }
                 else
                 {
-                    if (_currentCursor!.Shape != cursor.Shape)
+                    if (_currentCursor!.Style != cursor.Style)
                     {
-                        Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)cursor.Shape));
+                        Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                     }
 
                     Write (EscSeqUtils.CSI_ShowCursor);

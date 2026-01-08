@@ -79,7 +79,7 @@ internal class DriverImpl : IDriver
         Cursor cursor = _output.GetCursor ();
         if (cursor.IsVisible)
         {
-            Cursor hiddenCursor = cursor with { Position = null, Shape = cursor.Shape};
+            Cursor hiddenCursor = cursor with { Position = null, Style = cursor.Style};
             _output.SetCursor (hiddenCursor);
             SetCursorNeedsUpdate (true);
         }

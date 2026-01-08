@@ -77,7 +77,7 @@ public class TreeViewFileSystem : Scenario
         _miMultiSelectCheckBox = new ()
         {
             Title = "_Multi Select",
-            CheckedState = CheckState.Checked
+            //CheckedState = CheckState.Checked
         };
         _miMultiSelectCheckBox.CheckedStateChanged += (s, e) => SetMultiSelect ();
 
@@ -146,8 +146,10 @@ public class TreeViewFileSystem : Scenario
 
         _miHighlightModelTextOnlyCheckBox = new ()
         {
-            Title = "_Highlight Model Text Only"
+            Title = "_Highlight Model Text Only",
+            CheckedState = CheckState.Checked
         };
+        SetCheckHighlightModelTextOnly ();
         _miHighlightModelTextOnlyCheckBox.CheckedStateChanged += (s, e) => SetCheckHighlightModelTextOnly ();
 
         _miCustomColorsCheckBox = new ()
@@ -158,8 +160,10 @@ public class TreeViewFileSystem : Scenario
 
         _miCursorCheckBox = new ()
         {
-            Title = "Curs_or (MultiSelect only)"
+            Title = "Curs_or",
+            //CheckedState = CheckState.Checked
         };
+        SetCursor ();
         _miCursorCheckBox.CheckedStateChanged += (s, e) => SetCursor ();
 
         menu.Add (
@@ -300,11 +304,12 @@ public class TreeViewFileSystem : Scenario
 
         if (_miCursorCheckBox.CheckedState == CheckState.Checked)
         {
-            _treeViewFiles.SetCursor (_treeViewFiles.Cursor with { Shape = CursorShape.BlinkingBlock });
+            // Provide a non-null position to enable the cursor
+            _treeViewFiles.Cursor = _treeViewFiles.Cursor with { Position = Point.Empty, Style = CursorStyle.BlinkingBlock };
         }
         else
         {
-            _treeViewFiles.SetCursor (_treeViewFiles.Cursor with { Position = null });
+            _treeViewFiles.Cursor = _treeViewFiles.Cursor with { Position = null };
         }
     }
 

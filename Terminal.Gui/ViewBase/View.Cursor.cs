@@ -5,45 +5,43 @@ public partial class View
     private Cursor _cursor = new () { Position = null };
 
     /// <summary>
-    /// Gets the current cursor for this view.
+    ///     Gets or sets the cursor for this view. <see cref="Cursor.Position"/> must be in screen coordinates.
     /// </summary>
     /// <remarks>
-    /// Use <see cref="SetCursor"/> to update the cursor position and shape.
-    /// The cursor will only be visible when the view has focus and is the most focused view.
-    /// Position is always in screen-absolute coordinates.
-    /// </remarks>
-    public Cursor Cursor => _cursor;
-
-    /// <summary>
-    ///     Sets the cursor for this view.
-    /// </summary>
-    /// <param name="cursor">
-    ///     The cursor to set. Position must be in screen-absolute coordinates.
-    ///     Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
-    ///     Set Position to null to hide the cursor.
-    /// </param>
-    /// <remarks>
+    ///     <para>
+    ///         Use <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     </para>
+    ///     <para>
+    ///         To hide the cursor, set <see cref="Cursor.Position"/> to null or set the Style property to
+    ///         <see cref="CursorStyle.Hidden"/>.
+    ///     </para>
     ///     <para>
     ///         Common patterns:
     ///         <code>
-    /// // Text cursor at column 5 in content area - convert to screen coords
-    /// Point screenPos = ContentToScreen(new Point(5, 0));
-    /// SetCursor(new Cursor { Position = screenPos, Shape = CursorShape.BlinkingBar });
+    /// // Text cursor at column 5 in viewport - convert to screen coords
+    /// Point screenPos = ViewportToScreen(new Point(5, 0));
+    /// SetCursor(new Cursor { Position = screenPos, Shape = CursorStyle.BlinkingBar });
     /// 
     /// // Hide cursor
     /// SetCursor(new Cursor { Position = null });
+    /// SetCursor(new Cursor { Style = CursorStyle.Hidden });
     /// 
     /// // Update position keeping same shape
-    /// Point newScreenPos = ContentToScreen(new Point(6, 0));
+    /// Point newScreenPos = ViewportToScreen(new Point(6, 0));
     /// SetCursor(_cursor with { Position = newScreenPos });
     /// </code>
     ///     </para>
-    ///     <para>
-    ///         This is more efficient than calling <see cref="SetNeedsDraw()"/> when only
-    ///         the cursor needs to move.
-    ///     </para>
     /// </remarks>
-    public void SetCursor (Cursor cursor)
+    public Cursor Cursor
+    {
+        get => _cursor;
+        set => SetCursor (value);
+    }
+
+    /// <summary>
+    ///     INTERNAL: Sets the cursor for this view.
+    /// </summary>
+    private void SetCursor (Cursor cursor)
     {
         if (_cursor == cursor)
         {
@@ -61,8 +59,5 @@ public partial class View
     /// <summary>
     ///     Signals that the cursor position needs to be updated without requiring a full redraw.
     /// </summary>
-    public void SetCursorNeedsUpdate ()
-    {
-        App?.Driver?.SetCursorNeedsUpdate (true);
-    }
+    public void SetCursorNeedsUpdate () { App?.Driver?.SetCursorNeedsUpdate (true); }
 }

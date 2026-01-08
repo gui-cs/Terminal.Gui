@@ -550,12 +550,12 @@ public class CharMap : View, IDesignable
             && cursor.Y < Viewport.Height)
         {
             // Convert to Screen coordinates
-            SetCursor (Cursor with { Position = ViewportToScreen (cursor), Shape = CursorShape.Default });
+            Cursor = Cursor with { Position = ViewportToScreen (cursor), Style = CursorStyle.BlinkingBlock };
         }
         else
         {
             // Cursor is scrolled out of view
-            SetCursor (Cursor with { Position = null });
+            Cursor = Cursor with { Position = null };
         }
     }
 

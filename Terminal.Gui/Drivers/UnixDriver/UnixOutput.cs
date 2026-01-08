@@ -38,6 +38,13 @@ internal class UnixOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
+    public void Write (ReadOnlySpan<char> text)
+    {
+        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+        UnixIOHelper.TryWriteStdout (utf8);
+    }
+
+    /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
         base.Write (output);
@@ -46,12 +53,12 @@ internal class UnixOutput : OutputBase, IOutput
         UnixIOHelper.TryWriteStdout (utf8);
     }
 
-    private Cursor? _currentCursor = new ();
+    private Cursor _currentCursor = new ();
 
     /// <inheritdoc />
     public Cursor GetCursor ()
     {
-        return _currentCursor!;
+        return _currentCursor;
     }
 
     /// <inheritdoc />
@@ -65,9 +72,9 @@ internal class UnixOutput : OutputBase, IOutput
             }
             else
             {
-                if (_currentCursor!.Shape != cursor.Shape)
+                if (_currentCursor!.Style != cursor.Style)
                 {
-                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)cursor.Shape));
+                    Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                 }
 
                 Write (EscSeqUtils.CSI_ShowCursor);
@@ -111,7 +118,6 @@ internal class UnixOutput : OutputBase, IOutput
         return true;
     }
 
-
     private TextWriter? CreateUnixStdoutWriter ()
     {
         // duplicate stdout so we don't mess with Console.Out's FD
@@ -145,13 +151,6 @@ internal class UnixOutput : OutputBase, IOutput
 
             return null;
         }
-    }
-
-    /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text)
-    {
-        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
-        UnixIOHelper.TryWriteStdout (utf8);
     }
 
     /// <inheritdoc/>
