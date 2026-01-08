@@ -19,6 +19,7 @@ For detailed breaking change documentation, check out this Discussion: https://g
 - [Scrolling Changes](#scrolling-changes)
 - [Adornments](#adornments)
 - [Event Pattern Changes](#event-pattern-changes)
+- [Cursor Management](#cursor-management)
 - [View-Specific Changes](#view-specific-changes)
 - [Disposal and Resource Management](#disposal-and-resource-management)
 - [API Terminology Changes](#api-terminology-changes)
@@ -816,6 +817,164 @@ event Action<T1, T2> ThirdEvent;
 event EventHandler<EventArgs>? SomeEvent;
 event EventHandler<T>? OtherEvent;
 ```
+
+---
+
+## Cursor Management
+
+Terminal.Gui v2 introduces a completely redesigned cursor system that separates the **Terminal Cursor** (visible indicator) from the **Draw Cursor** (internal rendering position).
+
+### Key Changes
+
+**v1 Pattern (PositionCursor Override):**
+```csharp
+// v1 - Override PositionCursor method
+public override void PositionCursor ()
+{
+    if (!HasFocus) return;
+    
+    var col = _cursorPosition - _scrollOffset;
+    if (col < 0 || col >= Frame.Width) return;
+    
+    Move (col, 0);  // This was confusing - affected both cursors
+}
+```
+
+**v2 Pattern (Cursor Property):**
+```csharp
+// v2 - Set Cursor property in OnDrawContent
+protected override void OnDrawContent (Rectangle viewport)
+{
+    // ... drawing code ...
+    
+    if (HasFocus)
+    {
+        int col = _cursorPosition - _scrollOffset;
+        
+        if (col >= 0 && col < viewport.Width)
+        {
+            // Convert to screen coordinates and set cursor
+            Point screenPos = ViewportToScreen (new Point (col, 0));
+            Cursor = new Cursor 
+            { 
+                Position = screenPos,
+                Style = CursorStyle.BlinkingBar 
+            };
+        }
+        else
+        {
+            // Hide cursor when outside viewport
+            Cursor = new Cursor { Position = null };
+        }
+    }
+}
+```
+
+### Cursor Class
+
+v2 uses an immutable `Cursor` record class:
+
+```csharp
+// Immutable cursor with screen coordinates
+Cursor = new Cursor
+{
+    Position = screenPos,        // Point? - null = hidden
+    Style = CursorStyle.BlinkingBar  // ANSI-based styles
+};
+
+// Update position keeping same style
+Cursor = Cursor with { Position = newScreenPos };
+
+// Hide cursor
+Cursor = new Cursor { Position = null };
+```
+
+### CursorStyle Enum
+
+v2 uses ANSI/VT terminal standards instead of Windows-based styles:
+
+```csharp
+// v2 - ANSI DECSCUSR-based styles
+public enum CursorStyle
+{
+    Default = 0,           // Usually BlinkingBlock
+    BlinkingBlock = 1,     // █ (blinking)
+    SteadyBlock = 2,       // █ (steady)
+    BlinkingUnderline = 3, // _ (blinking)
+    SteadyUnderline = 4,   // _ (steady)
+    BlinkingBar = 5,       // | (blinking) - common for text editors
+    SteadyBar = 6,         // | (steady)
+    Hidden = -1            // No visible cursor
+}
+```
+
+### Coordinate Systems
+
+**CRITICAL**: `Cursor.Position` must ALWAYS be in screen-absolute coordinates.
+
+```csharp
+// v2 - Always convert to screen coordinates
+Point contentPos = new Point (col, row);        // Your internal coordinates
+Point screenPos = ContentToScreen (contentPos); // Convert to screen
+Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
+
+// Or from viewport coordinates
+Point viewportPos = new Point (col, row);
+Point screenPos = ViewportToScreen (viewportPos);
+Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
+```
+
+### Efficient Cursor Updates
+
+When cursor moves without content changes, use `SetCursorNeedsUpdate()`:
+
+```csharp
+// v2 - Signal cursor update without full redraw
+private void MoveCursorRight ()
+{
+    _cursorPosition++;
+    
+    int viewportCol = _cursorPosition - _scrollOffset;
+    if (viewportCol >= 0 && viewportCol < Viewport.Width)
+    {
+        Point screenPos = ViewportToScreen (new Point (viewportCol, 0));
+        Cursor = Cursor with { Position = screenPos };
+        SetCursorNeedsUpdate (); // Efficient - no redraw
+    }
+}
+```
+
+### Critical: Move() vs Cursor
+
+**v1 Confusion:**
+- `Move()` affected both Draw Cursor and positioning for Terminal Cursor
+
+**v2 Clarity:**
+- `Move()` ONLY affects **Draw Cursor** (where next character renders)
+- `Cursor` property ONLY affects **Terminal Cursor** (visible indicator)
+
+```csharp
+// ❌ WRONG in v2 - Don't use Move() for cursor positioning
+Move (cursorCol, cursorRow);  // This is for drawing, not Terminal Cursor
+
+// ✅ CORRECT in v2 - Use Cursor property
+Point screenPos = ViewportToScreen (new Point (cursorCol, cursorRow));
+Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
+```
+
+### Migration Checklist
+
+When migrating cursor code from v1 to v2:
+
+1. ✅ Remove `PositionCursor()` override
+2. ✅ Move cursor logic to `OnDrawContent()` or event handlers
+3. ✅ Convert coordinates to screen space using `ViewportToScreen()` or `ContentToScreen()`
+4. ✅ Set `Cursor` property instead of calling `Move()`
+5. ✅ Use `CursorStyle` enum for cursor appearance
+6. ✅ Use `SetCursorNeedsUpdate()` for position-only changes
+7. ✅ Set `Cursor.Position = null` to hide cursor
+
+See [Cursor Management](cursor.md) for comprehensive documentation and examples.
 
 ---
 
