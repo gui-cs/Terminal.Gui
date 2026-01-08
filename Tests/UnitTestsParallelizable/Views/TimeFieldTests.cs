@@ -45,6 +45,7 @@ public class TimeFieldTests
     {
         IApplication app = Application.Create();
         app.Init(DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
 
         try
         {

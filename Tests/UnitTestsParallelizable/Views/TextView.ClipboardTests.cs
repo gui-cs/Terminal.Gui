@@ -3,11 +3,13 @@ namespace ViewsTests.TextViewTests;
 public class TextViewClipboardTests
 {
     // CoPilot - decomposed from KeyBindings_Command test
-    [Fact (Skip = "Clipboard operations not supported in Ansi driver used by parallelizable tests")]
+    [Fact]
     public void CtrlK_Kill_Line_To_Clipboard ()
     {
         // Test that Ctrl+K cuts from cursor to end of line and copies to clipboard
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -26,16 +28,18 @@ public class TextViewClipboardTests
         Assert.True (tv.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal ("is is the first lin", Clipboard.Contents);
+        Assert.Equal ("is is the first lin", app.Clipboard!.GetClipboardData ());
         Assert.False (tv.IsSelecting);
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
-    [Fact (Skip = "Clipboard operations not supported in Ansi driver used by parallelizable tests")]
+    [Fact]
     public void CtrlY_Yank_From_Clipboard ()
     {
         // Test that Ctrl+Y pastes (yanks) from clipboard
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -48,7 +52,7 @@ public class TextViewClipboardTests
         runnable.Add (tv);
         app.Begin (runnable);
 
-        Clipboard.Contents = "is is the first lin";
+        app.Clipboard!.SetClipboardData ("is is the first lin");
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Ctrl+Y should paste from clipboard
@@ -64,6 +68,8 @@ public class TextViewClipboardTests
     {
         // Test that Ctrl+Y does not paste when ReadOnly is true
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -77,7 +83,7 @@ public class TextViewClipboardTests
         runnable.Add (tv);
         app.Begin (runnable);
 
-        Clipboard.Contents = "is is the first lin";
+        app.Clipboard!.SetClipboardData ("is is the first lin");
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Ctrl+Y should not paste when ReadOnly
@@ -88,11 +94,13 @@ public class TextViewClipboardTests
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
-    [Fact (Skip = "Clipboard operations not supported in Ansi driver used by parallelizable tests")]
+    [Fact]
     public void CtrlC_Copy_Selection_To_Clipboard ()
     {
         // Test that Ctrl+C copies selected text to clipboard
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -107,7 +115,7 @@ public class TextViewClipboardTests
 
         // Select text using Shift+End from start
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithShift);
-        
+
         Assert.Equal (new (19, 0), tv.InsertionPoint);
         Assert.Equal (19, tv.SelectedLength);
         Assert.Equal ("is is the first lin", tv.SelectedText);
@@ -122,15 +130,17 @@ public class TextViewClipboardTests
         Assert.Equal (19, tv.SelectedLength);
         Assert.Equal ("is is the first lin", tv.SelectedText);
         Assert.True (tv.IsSelecting);
-        Assert.Equal ("is is the first lin", Clipboard.Contents);
+        Assert.Equal ("is is the first lin", app.Clipboard.GetClipboardData ());
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
-    [Fact (Skip = "Clipboard operations not supported in Ansi driver used by parallelizable tests")]
+    [Fact]
     public void CtrlX_Cut_Selection_To_Clipboard ()
     {
         // Test that Ctrl+X cuts selected text to clipboard
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -145,7 +155,7 @@ public class TextViewClipboardTests
 
         // Select text using Shift+End from start
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithShift);
-        
+
         Assert.Equal (new (19, 0), tv.InsertionPoint);
         Assert.Equal (19, tv.SelectedLength);
         Assert.Equal ("is is the first lin", tv.SelectedText);
@@ -160,7 +170,7 @@ public class TextViewClipboardTests
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
-        Assert.Equal ("is is the first lin", Clipboard.Contents);
+        Assert.Equal ("is is the first lin", app.Clipboard!.GetClipboardData ());
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
@@ -169,6 +179,8 @@ public class TextViewClipboardTests
     {
         // Test that Ctrl+W clears the clipboard
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -181,7 +193,7 @@ public class TextViewClipboardTests
         runnable.Add (tv);
         app.Begin (runnable);
 
-        Clipboard.Contents = "is is the first lin";
+        app.Clipboard!.SetClipboardData ("is is the first lin");
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Ctrl+W should clear clipboard
@@ -189,7 +201,7 @@ public class TextViewClipboardTests
 
         Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal ("", Clipboard.Contents);
+        Assert.Equal ("", app.Clipboard!.GetClipboardData ());
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
@@ -198,6 +210,8 @@ public class TextViewClipboardTests
     {
         // Test that Ctrl+X without selection does nothing
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -210,7 +224,7 @@ public class TextViewClipboardTests
         runnable.Add (tv);
         app.Begin (runnable);
 
-        Clipboard.Contents = "";
+        app.Clipboard!.SetClipboardData ("");
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Ctrl+X with no selection should do nothing
@@ -218,15 +232,17 @@ public class TextViewClipboardTests
 
         Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal ("", Clipboard.Contents);
+        Assert.Equal ("", app.Clipboard!.GetClipboardData ());
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
-    [Fact (Skip = "Clipboard operations not supported in Ansi driver used by parallelizable tests")]
+    [Fact]
     public void CtrlShiftDelete_Kill_Line_To_Clipboard ()
     {
         // Test that Ctrl+Shift+Delete kills line to clipboard (same as Ctrl+K)
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -245,15 +261,17 @@ public class TextViewClipboardTests
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift));
         Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal ("is is the first lin", Clipboard.Contents);
+        Assert.Equal ("is is the first lin", app.Clipboard!.GetClipboardData ());
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
-    [Fact (Skip = "Clipboard operations not supported in Ansi driver used by parallelizable tests")]
+    [Fact]
     public void CtrlShiftBackspace_Kill_Line_Backward_To_Clipboard ()
     {
         // Test that Ctrl+Shift+Backspace kills from start of line to cursor
         using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Clipboard = new FakeClipboard ();
         using Runnable<bool> runnable = new ();
 
         TextView tv = new ()
@@ -274,6 +292,6 @@ public class TextViewClipboardTests
         Assert.True (tv.NewKeyDownEvent (Key.Backspace.WithCtrl.WithShift));
         Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal ("is is the first lin", Clipboard.Contents);
+        Assert.Equal ("is is the first lin", app.Clipboard!.GetClipboardData ());
     }
 }

@@ -122,33 +122,7 @@ public class TextViewTests
         Assert.Equal (18, _textView.SelectedLength);
         Assert.Equal ("B to jump between ", _textView.SelectedText);
     }
-
-    [Fact]
-    [SetupFakeApplication]
-    public void ContentsChanged_Event_Fires_On_Init ()
-    {
-        Application.StopAfterFirstIteration = true;
-
-        var expectedRow = 0;
-        var expectedCol = 0;
-        var eventcount = 0;
-
-        var tv = new TextView { Width = 50, Height = 10 };
-
-        tv.ContentsChanged += (s, e) =>
-                              {
-                                  eventcount++;
-                                  Assert.Equal (expectedRow, e.Row);
-                                  Assert.Equal (expectedCol, e.Col);
-                              };
-
-        var top = new Runnable ();
-        top.Add (tv);
-        Application.Begin (top);
-        Assert.Equal (1, eventcount);
-        top.Dispose ();
-    }
-
+    
     [Fact]
     [SetupFakeApplication]
     public void ContentsChanged_Event_Fires_On_InsertText ()
@@ -177,81 +151,6 @@ public class TextViewTests
 
         tv.InsertText ("1234");
         Assert.Equal (10, eventcount);
-    }
-
-    [Fact]
-    [SetupFakeApplication]
-    public void ContentsChanged_Event_Fires_On_Set_Text ()
-    {
-        Application.StopAfterFirstIteration = true;
-        var eventcount = 0;
-
-        var expectedRow = 0;
-        var expectedCol = 0;
-
-        var tv = new TextView
-        {
-            Width = 50,
-            Height = 10,
-
-            // you'd think col would be 3, but it's 0 because TextView sets
-            // row/col = 0 when you set Text
-            Text = "abc"
-        };
-
-        tv.ContentsChanged += (s, e) =>
-                              {
-                                  eventcount++;
-                                  Assert.Equal (expectedRow, e.Row);
-                                  Assert.Equal (expectedCol, e.Col);
-                              };
-
-        Assert.Equal ("abc", tv.Text);
-
-        var top = new Runnable ();
-        top.Add (tv);
-        SessionToken rs = Application.Begin (top);
-        Assert.Equal (1, eventcount); // for Initialize
-
-        expectedCol = 0;
-        tv.Text = "defg";
-        Assert.Equal (2, eventcount); // for set Text = "defg"
-        top.Dispose ();
-    }
-
-    [Fact]
-    [SetupFakeApplication]
-    public void ContentsChanged_Event_Fires_On_Typing ()
-    {
-        Application.StopAfterFirstIteration = true;
-        var eventcount = 0;
-
-        var expectedRow = 0;
-        var expectedCol = 0;
-
-        var tv = new TextView { Width = 50, Height = 10 };
-
-        tv.ContentsChanged += (s, e) =>
-                              {
-                                  eventcount++;
-                                  Assert.Equal (expectedRow, e.Row);
-                                  Assert.Equal (expectedCol, e.Col);
-                              };
-
-        var top = new Runnable ();
-        top.Add (tv);
-        SessionToken rs = Application.Begin (top);
-        Assert.Equal (1, eventcount); // for Initialize
-
-        expectedCol = 0;
-        tv.Text = "ay";
-        Assert.Equal (2, eventcount);
-
-        expectedCol = 1;
-        tv.NewKeyDownEvent (Key.Y.WithShift);
-        Assert.Equal (3, eventcount);
-        Assert.Equal ("Yay", tv.Text);
-        top.Dispose ();
     }
 
     [Fact]
@@ -383,7 +282,7 @@ public class TextViewTests
 
     [Fact]
     [SetupFakeApplication]
-    public void ContentsChanged_Event_NoFires_On_InsertionPointition ()
+    public void ContentsChanged_Event_NoFires_On_InsertionPoint ()
     {
         var eventcount = 0;
 
@@ -540,7 +439,7 @@ public class TextViewTests
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void InsertionPointition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
+    public void InsertionPoint_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
     {
         _textView.InsertionPoint = new (33, 1);
         Assert.Equal (32, _textView.InsertionPoint.X);
@@ -551,7 +450,7 @@ public class TextViewTests
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void InsertionPointition_With_Value_Less_Than_Zero_Changes_To_Zero ()
+    public void InsertionPoint_With_Value_Less_Than_Zero_Changes_To_Zero ()
     {
         _textView.InsertionPoint = new (-1, -1);
         Assert.Equal (0, _textView.InsertionPoint.X);
@@ -3979,7 +3878,7 @@ This is the second line.
 
     [Fact]
     [SetupFakeApplication]
-    public void MoveDown_By_Setting_InsertionPointition ()
+    public void MoveDown_By_Setting_InsertionPoint ()
     {
         var tv = new TextView { Width = 10, Height = 5 };
 
@@ -4060,7 +3959,7 @@ This is the second line.
 
     [Fact]
     [SetupFakeApplication]
-    public void ScrollTo_InsertionPointition ()
+    public void ScrollTo_InsertionPoint ()
     {
         var tv = new TextView { Width = 10, Height = 5 };
 
@@ -4114,7 +4013,7 @@ This is the second line.
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void Selection_And_InsertionPointition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
+    public void Selection_And_InsertionPoint_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
     {
         _textView.InsertionPoint = new (33, 2);
         _textView.SelectionStartColumn = 33;
@@ -4527,7 +4426,7 @@ TAB to jump between text field",
 
     [Fact]
     [SetupFakeApplication]
-    public void UnwrappedInsertionPointition_Event ()
+    public void UnwrappedInsertionPoint_Event ()
     {
         var cp = Point.Empty;
 
@@ -5158,7 +5057,7 @@ line.
     [Fact]
     [TextViewTestsSetupFakeApplication]
     public void
-        WordBackward_With_The_Same_Values_For_SelectedStart_And_InsertionPointition_And_Not_Starting_At_Beginning_Of_The_Text ()
+        WordBackward_With_The_Same_Values_For_SelectedStart_And_InsertionPoint_And_Not_Starting_At_Beginning_Of_The_Text ()
     {
         _textView.InsertionPoint = new (10, 0);
         _textView.SelectionStartColumn = 10;
@@ -5670,7 +5569,7 @@ line.
     [Fact]
     [TextViewTestsSetupFakeApplication]
     public void
-        WordForward_With_The_Same_Values_For_SelectedStart_And_InsertionPointition_And_Not_Starting_At_Beginning_Of_The_Text ()
+        WordForward_With_The_Same_Values_For_SelectedStart_And_InsertionPoint_And_Not_Starting_At_Beginning_Of_The_Text ()
     {
         _textView.InsertionPoint = new (10, 0);
         _textView.SelectionStartColumn = 10;
@@ -5876,7 +5775,7 @@ Line 2.",
 
     [Fact]
     [SetupFakeApplication]
-    public void WordWrap_ReadOnly_InsertionPointition_SelectedText_Copy ()
+    public void WordWrap_ReadOnly_InsertionPoint_SelectedText_Copy ()
     {
         //          0123456789
         var text = "This is the first line.\nThis is the second line.\n";

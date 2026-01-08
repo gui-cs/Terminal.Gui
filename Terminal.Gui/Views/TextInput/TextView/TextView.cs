@@ -118,7 +118,6 @@ public partial class TextView : View, IDesignable
         App?.Popover?.Register (ContextMenu);
         KeyBindings.Add (ContextMenu.Key, Command.Context);
         PositionCursor ();
-        OnContentsChanged ();
     }
 
     private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)

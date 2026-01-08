@@ -344,7 +344,7 @@ public class CursorTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void TextField_InsertionPointition_Stays_Within_Viewport ()
+    public void TextField_InsertionPoint_Stays_Within_Viewport ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
