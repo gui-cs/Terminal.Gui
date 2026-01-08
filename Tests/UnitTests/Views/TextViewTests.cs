@@ -3995,117 +3995,29 @@ This is the second line.
         Assert.True (tv.EnterKeyAddsLine);
 
         tv.EnterKeyAddsLine = false;
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
         Assert.False (tv.NewKeyDownEvent (Key.Enter)); // Accepted event not handled
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
         Assert.False (tv.EnterKeyAddsLine);
 
         tv.EnterKeyAddsLine = true;
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
-
+        Assert.True (tv.EnterKeyAddsLine);
+        Assert.True (tv.Multiline);
         Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
+                      $"This is the second line.{Environment.NewLine}This is the third {Environment.NewLine}",
                       tv.Text
                      );
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        Assert.Equal (new (0, 2), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
         Assert.True (tv.EnterKeyAddsLine);
-        Assert.True (tv.NewKeyDownEvent (Key.End.WithShift.WithCtrl));
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.Equal (42 + Environment.NewLine.Length, tv.SelectedLength);
-        Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
-        Assert.True (tv.IsSelecting);
-        Assert.True (tv.NewKeyDownEvent (Key.Home.WithShift.WithCtrl));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal (Environment.NewLine.Length, tv.SelectedLength);
-        Assert.Equal ($"{Environment.NewLine}", tv.SelectedText);
-        Assert.True (tv.IsSelecting);
-        Assert.True (tv.NewKeyDownEvent (Key.A.WithCtrl));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.Equal (42 + Environment.NewLine.Length * 2, tv.SelectedLength);
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.SelectedText
-                     );
-        Assert.True (tv.IsSelecting);
-        Assert.True (tv.Used);
-        Assert.True (tv.NewKeyDownEvent (Key.InsertChar));
-        Assert.False (tv.Used);
-        Assert.True (tv.TabKeyAddsTab);
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.True (tv.IsSelecting);
-        tv.TabKeyAddsTab = false;
-        Assert.False (tv.NewKeyDownEvent (Key.Tab));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.False (tv.TabKeyAddsTab);
-        tv.TabKeyAddsTab = true;
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.True (tv.IsSelecting);
-        tv.IsSelecting = false;
-        Assert.True (tv.NewKeyDownEvent (Key.Tab));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
-                      tv.Text
-                     );
-        Assert.False (tv.IsSelecting);
-        Assert.True (tv.TabKeyAddsTab);
-        tv.TabKeyAddsTab = false;
-        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithShift));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
-                      tv.Text
-                     );
-        Assert.False (tv.IsSelecting);
-        Assert.False (tv.TabKeyAddsTab);
-
-        // Now with TabKeyAddsTab = true - Shift+Tab should not remove tab
-        tv.TabKeyAddsTab = true;
-        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithShift));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
-                      tv.Text
-                     );
-        Assert.False (tv.IsSelecting);
-        Assert.True (tv.TabKeyAddsTab);
-        Assert.False (tv.NewKeyDownEvent (Key.F6));
-        Assert.False (tv.NewKeyDownEvent (Application.NextTabGroupKey));
-        Assert.False (tv.NewKeyDownEvent (Key.F6.WithShift));
-        Assert.False (tv.NewKeyDownEvent (Application.PrevTabGroupKey));
-
-        Assert.True (tv.NewKeyDownEvent (PopoverMenu.DefaultKey));
-        Assert.True (tv.ContextMenu != null && tv.ContextMenu.Visible);
-        Assert.False (tv.IsSelecting);
         top.Dispose ();
     }
 

@@ -208,4 +208,93 @@ public class TextViewInputTests
 
         Assert.Equal (expectedColumn, visualColumn);
     }
+
+    [Fact]
+    public void EnterKeyAddsLine_Setter_Should_Not_Scroll_View ()
+    {
+        // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/3988
+        // Setting EnterKeyAddsLine (formerly AllowsReturn) should not scroll the text out of view
+
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            X = 1,
+            Height = Dim.Fill (2),
+            Width = Dim.Fill (2),
+            Text = "Heya",
+            TabKeyAddsTab = false
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        tv.SelectAll ();
+        int leftColumnBefore = tv.LeftColumn;
+
+        // Setting EnterKeyAddsLine should not change LeftColumn
+        tv.EnterKeyAddsLine = false;
+
+        Assert.Equal (leftColumnBefore, tv.LeftColumn);
+    }
+
+    [Fact]
+    public void EnterKeyAddsLine_Toggling_Does_Not_Reset_Cursor_Position ()
+    {
+        // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/3988
+        // Setting EnterKeyAddsLine should not reset the cursor position (InsertionPoint)
+
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 30,
+            Height = 5,
+            Text = $"This is the second line.{Environment.NewLine}This is the third "
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        // Move cursor to a specific position using Ctrl+Backspace twice
+        app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
+        Assert.Equal (new (18, 1), tv.InsertionPoint);
+        Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
+
+        // Setting EnterKeyAddsLine to false should NOT reset cursor position
+        tv.EnterKeyAddsLine = false;
+        Assert.Equal (new (18, 1), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+        Assert.Equal (0, tv.SelectedLength);
+        Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.EnterKeyAddsLine);
+
+        // Pressing Enter should trigger Accepted event (not add newline)
+        Assert.False (app.Keyboard.RaiseKeyDownEvent (Key.Enter)); // Accepted event not handled
+        Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
+        Assert.Equal (new (18, 1), tv.InsertionPoint); // Cursor should remain at (18, 1)
+        Assert.Equal (0, tv.SelectedLength);
+        Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
+
+        // Setting EnterKeyAddsLine to true should NOT reset cursor position
+        tv.EnterKeyAddsLine = true;
+        Assert.Equal (new (18, 1), tv.InsertionPoint); // Cursor should still be at (18, 1)
+        Assert.True (tv.EnterKeyAddsLine);
+        Assert.True (tv.Multiline);
+
+        // Pressing Enter should now add a newline
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Enter));
+        Assert.Equal (
+                      $"This is the second line.{Environment.NewLine}This is the third {Environment.NewLine}",
+                      tv.Text
+                     );
+        Assert.Equal (new (0, 2), tv.InsertionPoint); // Cursor moved after inserting newline
+        Assert.Equal (0, tv.SelectedLength);
+        Assert.Equal ("", tv.SelectedText);
+        Assert.False (tv.IsSelecting);
+        Assert.True (tv.EnterKeyAddsLine);
+    }
 }

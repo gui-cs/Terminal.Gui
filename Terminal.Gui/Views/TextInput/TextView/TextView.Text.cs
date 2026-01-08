@@ -119,8 +119,9 @@ public partial class TextView
                 EnterKeyAddsLine = false;
                 TabKeyAddsTab = false;
                 WordWrap = false;
-                CurrentColumn = 0;
-                CurrentRow = 0;
+                // Don't reset cursor position - this causes unwanted scrolling (issue #3988)
+                // CurrentColumn = 0;
+                // CurrentRow = 0;
                 _savedHeight = Height;
 
                 Height = Dim.Auto (DimAutoStyle.Text, 1);
