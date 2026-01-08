@@ -6,7 +6,7 @@
 		<ParallelizeAssembly>true</ParallelizeAssembly>
 		<ParallelizeTestCollections>true</ParallelizeTestCollections>
 		<!-- Enable collection parallelism -->
-		<MaxParallelThreads>unlimited</MaxParallelThreads>
+		<MaxParallelThreads>4x</MaxParallelThreads>
 		<!-- Or 'unlimited' / '2x' for CPU multiplier -->
 		<StopOnFail>true</StopOnFail>
 		<!-- Still stop on first failure -->
