@@ -162,8 +162,8 @@ jobs:
         echo "Starting parallel unit tests"
         echo "============================================"
         
-        # Use default parallelization (2x CPU cores)
-        echo "Using default parallelization (2x)"
+        # Use default parallelization (4x CPU cores)
+        echo "Using default parallelization (4x)"
         
         # Run tests with or without coverage based on OS
         if [ "${{ runner.os }}" == "Linux" ]; then
@@ -179,7 +179,7 @@ jobs:
             --blame-hang \
             --blame-hang-timeout 60s \
             --blame-crash-collect-always \
-            -- xUnit.MaxParallelThreads=2x
+            -- xUnit.MaxParallelThreads=4x
         else
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
@@ -191,7 +191,7 @@ jobs:
             --blame-hang \
             --blame-hang-timeout 60s \
             --blame-crash-collect-always \
-            -- xUnit.MaxParallelThreads=2x
+            -- xUnit.MaxParallelThreads=4x
         fi
         
         echo "============================================"
