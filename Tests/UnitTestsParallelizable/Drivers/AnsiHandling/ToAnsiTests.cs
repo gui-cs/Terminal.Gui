@@ -68,7 +68,7 @@ public class ToAnsiTests : TestDriverBase
         Assert.Contains ("Blue", ansi);
     }
 
-    [Theory (Skip = "Uses Application.")]
+    [Theory]
     [InlineData (false, "\u001b[48;2;")]
     [InlineData (true, "\u001b[41m")]
     public void ToAnsi_With_Background_Colors (bool force16Colors, string expected)
