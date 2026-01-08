@@ -373,7 +373,7 @@ public class Notepad : Scenario
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
                 Text = initialText,
-                AllowsTab = false
+                TabKeyAddsTab = false
             };
         }
 

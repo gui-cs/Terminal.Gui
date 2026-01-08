@@ -73,6 +73,12 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public partial class TextView : View, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
+
     // The column we are tracking, or -1 if we are not tracking any column
     private string? _currentCaller;
     private CultureInfo? _currentCulture;
@@ -100,6 +106,8 @@ public partial class TextView : View, IDesignable
         CreateCommandsAndBindings ();
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     private void TextView_Initialized (object sender, EventArgs e)
@@ -152,7 +160,7 @@ public partial class TextView : View, IDesignable
     {
         if (!CanFocus || !Enabled || ReadOnly || Driver is null)
         {
-            Cursor = new ();
+            Cursor = Cursor with { Position = null };
             return;
         }
 
@@ -172,7 +180,18 @@ public partial class TextView : View, IDesignable
 
                 if (line [idx].Grapheme == "\t")
                 {
-                    cols += TabWidth + 1;
+                    if (TabWidth > 0)
+                    {
+                        // Calculate columns to next tab stop
+                        // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
+                        // If we're at visual column col, advance to next tab stop
+                        cols = TabWidth - col % TabWidth;
+                    }
+                    else
+                    {
+                        // When TabWidth is 0, tabs are invisible (0 columns)
+                        cols = 0;
+                    }
                 }
                 else
                 {
@@ -196,13 +215,12 @@ public partial class TextView : View, IDesignable
         {
             Cursor = Cursor with
             {
-                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow)),
-                Style = CursorStyle.Default
+                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow))
             };
         }
         else
         {
-            Cursor = new ();
+            Cursor = Cursor with { Position = null };
         }
     }
 
@@ -244,7 +262,7 @@ public partial class TextView : View, IDesignable
 
         // This enables AllViews_HasFocus_Changed_Event to pass since it requires
         // tab navigation to work
-        AllowsTab = false;
+        TabKeyAddsTab = false;
 
         return true;
     }

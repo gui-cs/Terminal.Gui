@@ -57,7 +57,17 @@ public partial class TextView
 
                 if (text == "\t")
                 {
-                    cols += TabWidth + 1;
+                    if (TabWidth > 0)
+                    {
+                        // Calculate columns to next tab stop
+                        // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
+                        cols = TabWidth - col % TabWidth;
+                    }
+                    else
+                    {
+                        // When TabWidth is 0, tabs are invisible (0 columns)
+                        cols = 0;
+                    }
 
                     if (col + cols > right)
                     {

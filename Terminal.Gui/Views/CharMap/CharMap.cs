@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
@@ -13,6 +12,12 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class CharMap : View, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
     private const int COLUMN_WIDTH = 3; // Width of each column of glyphs
     private const int HEADER_HEIGHT = 1; // Height of the header
 
@@ -100,6 +105,8 @@ public class CharMap : View, IDesignable
 
         // Build initial visible rows (all rows with at least one valid codepoint)
         RebuildVisibleRows ();
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     // Visible rows management: each entry is the starting code point of a 16-wide row
@@ -550,7 +557,7 @@ public class CharMap : View, IDesignable
             && cursor.Y < Viewport.Height)
         {
             // Convert to Screen coordinates
-            Cursor = Cursor with { Position = ViewportToScreen (cursor), Style = CursorStyle.BlinkingBlock };
+            Cursor = Cursor with { Position = ViewportToScreen (cursor) };
         }
         else
         {

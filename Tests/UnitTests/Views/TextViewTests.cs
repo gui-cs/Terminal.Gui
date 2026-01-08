@@ -16,10 +16,10 @@ public class TextViewTests
     [TextViewTestsSetupFakeApplication]
     public void AllowsReturn_Setting_To_True_Changes_Multiline_To_True_If_It_Is_False ()
     {
-        Assert.True (_textView.AllowsReturn);
+        Assert.True (_textView.EnterKeyAddsLine);
         Assert.True (_textView.Multiline);
         Assert.Equal (4, _textView.TabWidth);
-        Assert.True (_textView.AllowsTab);
+        Assert.True (_textView.TabKeyAddsTab);
         _textView.NewKeyDownEvent (Key.Enter);
 
         Assert.Equal (
@@ -27,11 +27,11 @@ public class TextViewTests
                       _textView.Text
                      );
 
-        _textView.AllowsReturn = false;
-        Assert.False (_textView.AllowsReturn);
+        _textView.EnterKeyAddsLine = false;
+        Assert.False (_textView.EnterKeyAddsLine);
         Assert.False (_textView.Multiline);
         Assert.Equal (0, _textView.TabWidth);
-        Assert.False (_textView.AllowsTab);
+        Assert.False (_textView.TabKeyAddsTab);
         _textView.NewKeyDownEvent (Key.Enter);
 
         Assert.Equal (
@@ -46,72 +46,14 @@ public class TextViewTests
     {
         _textView.TabWidth = 0;
         Assert.Equal (0, _textView.TabWidth);
-        Assert.True (_textView.AllowsTab);
-        Assert.True (_textView.AllowsReturn);
+        Assert.True (_textView.TabKeyAddsTab);
+        Assert.True (_textView.EnterKeyAddsLine);
         Assert.True (_textView.Multiline);
-        _textView.AllowsTab = true;
-        Assert.True (_textView.AllowsTab);
+        _textView.TabKeyAddsTab = true;
+        Assert.True (_textView.TabKeyAddsTab);
         Assert.Equal (4, _textView.TabWidth);
-        Assert.True (_textView.AllowsReturn);
+        Assert.True (_textView.EnterKeyAddsLine);
         Assert.True (_textView.Multiline);
-    }
-
-    [Fact]
-    [TextViewTestsSetupFakeApplication]
-    public void BackTab_Test_Follow_By_Tab ()
-    {
-        var top = new Runnable ();
-        top.Add (_textView);
-
-        Application.Iteration += OnApplicationOnIteration;
-
-        Application.Run (top);
-        Application.Iteration -= OnApplicationOnIteration;
-        top.Dispose ();
-
-        return;
-
-        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
-        {
-            int width = _textView.Viewport.Width - 1;
-            Assert.Equal (30, width + 1);
-            Assert.Equal (10, _textView.Height);
-            _textView.Text = "";
-
-            for (var i = 0; i < 100; i++)
-            {
-                _textView.Text += "\t";
-            }
-
-            var col = 100;
-            int tabWidth = _textView.TabWidth;
-            int leftCol = _textView.LeftColumn;
-            _textView.MoveEnd ();
-            Assert.Equal (new (col, 0), _textView.InsertionPoint);
-            leftCol = GetLeftCol (leftCol);
-            Assert.Equal (leftCol, _textView.LeftColumn);
-
-            while (col > 0)
-            {
-                col--;
-                _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            while (col < 100)
-            {
-                col++;
-                _textView.NewKeyDownEvent (Key.Tab);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            Application.TopRunnableView.Remove (_textView);
-            Application.RequestStop ();
-        }
     }
 
     [Fact]
@@ -4050,118 +3992,32 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
-        Assert.True (tv.AllowsReturn);
+        Assert.True (tv.EnterKeyAddsLine);
 
-        tv.AllowsReturn = false;
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
+        tv.EnterKeyAddsLine = false;
         Assert.False (tv.IsSelecting);
         Assert.False (tv.NewKeyDownEvent (Key.Enter)); // Accepted event not handled
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
-        Assert.False (tv.AllowsReturn);
+        Assert.False (tv.EnterKeyAddsLine);
 
-        tv.AllowsReturn = true;
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
+        tv.EnterKeyAddsLine = true;
         Assert.True (tv.NewKeyDownEvent (Key.Enter));
-
+        Assert.True (tv.EnterKeyAddsLine);
+        Assert.True (tv.Multiline);
         Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
+                      $"This is the second line.{Environment.NewLine}This is the third {Environment.NewLine}",
                       tv.Text
                      );
-        Assert.Equal (new (0, 1), tv.InsertionPoint);
+        Assert.Equal (new (0, 2), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
-        Assert.True (tv.AllowsReturn);
-        Assert.True (tv.NewKeyDownEvent (Key.End.WithShift.WithCtrl));
+        Assert.True (tv.EnterKeyAddsLine);
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
 
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.Equal (42 + Environment.NewLine.Length, tv.SelectedLength);
-        Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
-        Assert.True (tv.IsSelecting);
-        Assert.True (tv.NewKeyDownEvent (Key.Home.WithShift.WithCtrl));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal (Environment.NewLine.Length, tv.SelectedLength);
-        Assert.Equal ($"{Environment.NewLine}", tv.SelectedText);
-        Assert.True (tv.IsSelecting);
-        Assert.True (tv.NewKeyDownEvent (Key.A.WithCtrl));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.Equal (42 + Environment.NewLine.Length * 2, tv.SelectedLength);
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.SelectedText
-                     );
-        Assert.True (tv.IsSelecting);
-        Assert.True (tv.Used);
-        Assert.True (tv.NewKeyDownEvent (Key.InsertChar));
-        Assert.False (tv.Used);
-        Assert.True (tv.AllowsTab);
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.True (tv.IsSelecting);
-        tv.AllowsTab = false;
-        Assert.False (tv.NewKeyDownEvent (Key.Tab));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.False (tv.AllowsTab);
-        tv.AllowsTab = true;
-        Assert.Equal (new (18, 2), tv.InsertionPoint);
-        Assert.True (tv.IsSelecting);
-        tv.IsSelecting = false;
-        Assert.True (tv.NewKeyDownEvent (Key.Tab));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
-                      tv.Text
-                     );
-        Assert.False (tv.IsSelecting);
-        Assert.True (tv.AllowsTab);
-        tv.AllowsTab = false;
-        Assert.False (tv.NewKeyDownEvent (Key.Tab.WithShift));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t",
-                      tv.Text
-                     );
-        Assert.False (tv.IsSelecting);
-        Assert.False (tv.AllowsTab);
-        tv.AllowsTab = true;
-        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
-
-        Assert.Equal (
-                      $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
-                      tv.Text
-                     );
-        Assert.False (tv.IsSelecting);
-        Assert.True (tv.AllowsTab);
-        Assert.False (tv.NewKeyDownEvent (Key.F6));
-        Assert.False (tv.NewKeyDownEvent (Application.NextTabGroupKey));
-        Assert.False (tv.NewKeyDownEvent (Key.F6.WithShift));
-        Assert.False (tv.NewKeyDownEvent (Application.PrevTabGroupKey));
-
-        Assert.True (tv.NewKeyDownEvent (PopoverMenu.DefaultKey));
-        Assert.True (tv.ContextMenu != null && tv.ContextMenu.Visible);
-        Assert.False (tv.IsSelecting);
         top.Dispose ();
     }
 
@@ -4777,27 +4633,27 @@ This is the second line.
     public void Multiline_Setting_Changes_AllowsReturn_AllowsTab_Height_WordWrap ()
     {
         Assert.True (_textView.Multiline);
-        Assert.True (_textView.AllowsReturn);
+        Assert.True (_textView.EnterKeyAddsLine);
         Assert.Equal (4, _textView.TabWidth);
-        Assert.True (_textView.AllowsTab);
+        Assert.True (_textView.TabKeyAddsTab);
         Assert.False (_textView.WordWrap);
 
         _textView.WordWrap = true;
         Assert.True (_textView.WordWrap);
         _textView.Multiline = false;
         Assert.False (_textView.Multiline);
-        Assert.False (_textView.AllowsReturn);
+        Assert.False (_textView.EnterKeyAddsLine);
         Assert.Equal (0, _textView.TabWidth);
-        Assert.False (_textView.AllowsTab);
+        Assert.False (_textView.TabKeyAddsTab);
         Assert.False (_textView.WordWrap);
 
         _textView.WordWrap = true;
         Assert.False (_textView.WordWrap);
         _textView.Multiline = true;
         Assert.True (_textView.Multiline);
-        Assert.True (_textView.AllowsReturn);
+        Assert.True (_textView.EnterKeyAddsLine);
         Assert.Equal (4, _textView.TabWidth);
-        Assert.True (_textView.AllowsTab);
+        Assert.True (_textView.TabKeyAddsTab);
         Assert.False (_textView.WordWrap);
     }
 
@@ -4943,102 +4799,6 @@ This is the second line.
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void Tab_Test_Follow_By_BackTab ()
-    {
-        var top = new Runnable ();
-        top.Add (_textView);
-
-        Application.Iteration += OnApplicationOnIteration;
-
-        Application.Run (top);
-        Application.Iteration -= OnApplicationOnIteration;
-        top.Dispose ();
-
-        return;
-
-        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
-        {
-            int width = _textView.Viewport.Width - 1;
-            Assert.Equal (30, width + 1);
-            Assert.Equal (10, _textView.Height);
-            _textView.Text = "";
-            var col = 0;
-            var leftCol = 0;
-            int tabWidth = _textView.TabWidth;
-
-            while (col < 100)
-            {
-                col++;
-                _textView.NewKeyDownEvent (Key.Tab);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            while (col > 0)
-            {
-                col--;
-                _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            top.Remove (_textView);
-            Application.RequestStop ();
-        }
-    }
-
-    [Fact]
-    [TextViewTestsSetupFakeApplication]
-    public void Tab_Test_Follow_By_BackTab_With_Text ()
-    {
-        var top = new Runnable ();
-        top.Add (_textView);
-
-        Application.Iteration += OnApplicationOnIteration;
-
-        Application.Run (top);
-        Application.Iteration -= OnApplicationOnIteration;
-        top.Dispose ();
-
-        return;
-
-        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
-        {
-            int width = _textView.Viewport.Width - 1;
-            Assert.Equal (30, width + 1);
-            Assert.Equal (10, _textView.Height);
-            var col = 0;
-            var leftCol = 0;
-            Assert.Equal (new (col, 0), _textView.InsertionPoint);
-            Assert.Equal (leftCol, _textView.LeftColumn);
-
-            while (col < 100)
-            {
-                col++;
-                _textView.NewKeyDownEvent (Key.Tab);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            while (col > 0)
-            {
-                col--;
-                _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            top.Remove (_textView);
-            Application.RequestStop ();
-        }
-    }
-
-    [Fact]
-    [TextViewTestsSetupFakeApplication]
     public void Tab_Test_Follow_By_CursorLeft_And_Then_Follow_By_CursorRight ()
     {
         var top = new Runnable ();
@@ -5153,80 +4913,6 @@ This is the second line.
         }
     }
 
-    [Fact]
-    [TextViewTestsSetupFakeApplication]
-    public void Tab_Test_Follow_By_Home_And_Then_Follow_By_End_And_Then_Follow_By_BackTab_With_Text ()
-    {
-        var top = new Runnable ();
-        top.Add (_textView);
-
-        Application.Iteration += OnApplicationOnIteration;
-
-        Application.Run (top);
-        Application.Iteration -= OnApplicationOnIteration;
-        top.Dispose ();
-
-        return;
-
-        void OnApplicationOnIteration (object s, EventArgs<IApplication> a)
-        {
-            int width = _textView.Viewport.Width - 1;
-            Assert.Equal (30, width + 1);
-            Assert.Equal (10, _textView.Height);
-            var col = 0;
-            var leftCol = 0;
-            Assert.Equal (new (col, 0), _textView.InsertionPoint);
-            Assert.Equal (leftCol, _textView.LeftColumn);
-            Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-            Assert.Equal (32, _textView.Text.Length);
-
-            while (col < 100)
-            {
-                col++;
-                _textView.NewKeyDownEvent (Key.Tab);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            _textView.NewKeyDownEvent (Key.Home);
-            col = 0;
-            Assert.Equal (new (col, 0), _textView.InsertionPoint);
-            leftCol = 0;
-            Assert.Equal (leftCol, _textView.LeftColumn);
-
-            _textView.NewKeyDownEvent (Key.End);
-            col = _textView.Text.Length;
-            Assert.Equal (132, _textView.Text.Length);
-            Assert.Equal (new (col, 0), _textView.InsertionPoint);
-            leftCol = GetLeftCol (leftCol);
-            Assert.Equal (leftCol, _textView.LeftColumn);
-            string txt = _textView.Text;
-
-            while (col - 1 > 0 && txt [col - 1] != '\t')
-            {
-                col--;
-            }
-
-            _textView.InsertionPoint = new (col, 0);
-            leftCol = GetLeftCol (leftCol);
-
-            while (col > 0)
-            {
-                col--;
-                _textView.NewKeyDownEvent (Key.Tab.WithShift);
-                Assert.Equal (new (col, 0), _textView.InsertionPoint);
-                leftCol = GetLeftCol (leftCol);
-                Assert.Equal (leftCol, _textView.LeftColumn);
-            }
-
-            Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-            Assert.Equal (32, _textView.Text.Length);
-
-            top.Remove (_textView);
-            Application.RequestStop ();
-        }
-    }
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
@@ -5237,13 +4923,13 @@ This is the second line.
         Application.Begin (top);
 
         Assert.Equal (4, _textView.TabWidth);
-        Assert.True (_textView.AllowsTab);
-        Assert.True (_textView.AllowsReturn);
+        Assert.True (_textView.TabKeyAddsTab);
+        Assert.True (_textView.EnterKeyAddsLine);
         Assert.True (_textView.Multiline);
         _textView.TabWidth = -1;
         Assert.Equal (0, _textView.TabWidth);
-        Assert.True (_textView.AllowsTab);
-        Assert.True (_textView.AllowsReturn);
+        Assert.True (_textView.TabKeyAddsTab);
+        Assert.True (_textView.EnterKeyAddsLine);
         Assert.True (_textView.Multiline);
         _textView.NewKeyDownEvent (Key.Tab);
         Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
@@ -5261,17 +4947,6 @@ TAB to jump between text field",
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                        @"
     TAB to jump between text f",
-                                                       _output
-                                                      );
-
-        _textView.NewKeyDownEvent (Key.Tab.WithShift);
-        Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-        Assert.True (_textView.NeedsDraw);
-        SetupFakeApplicationAttribute.RunIteration ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
-TAB to jump between text field",
                                                        _output
                                                       );
         top.Dispose ();

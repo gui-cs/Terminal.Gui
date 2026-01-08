@@ -33,6 +33,12 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class HexView : View, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth
     private const int NUM_BYTES_PER_HEX_COLUMN = 4;
     private const int HEX_COLUMN_WIDTH = NUM_BYTES_PER_HEX_COLUMN * 3 + 2; // 3 cols per byte + 1 for vert separator + right space
@@ -106,6 +112,8 @@ public class HexView : View, IDesignable
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 
         SubViewsLaidOut += HexViewSubViewsLaidOut;
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     private void HexViewSubViewsLaidOut (object? sender, LayoutEventArgs e)
@@ -586,8 +594,7 @@ public class HexView : View, IDesignable
     {
         Cursor = Cursor with
         {
-            Position = ViewportToScreen (GetCursor (Address)),
-            Style = CursorStyle.Default
+            Position = ViewportToScreen (GetCursor (Address))
         };
     }
 
