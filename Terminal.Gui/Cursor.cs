@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Represents a cursor with position in screen coordinates and shape.
@@ -55,6 +55,6 @@ public record Cursor
             return "Cursor { Hidden }";
         }
 
-        return $"Cursor {{ Position = {Position}, Shape = {Style} }}";
+        return $"Cursor {{ Position = {Position}, Style = {Style} }}";
     }
 }
