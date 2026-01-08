@@ -638,53 +638,12 @@ public static class EscSeqUtils
     //ESC [ ? 25 l - DECTCEM Text Cursor Enable Mode Hide    Hide the cursor
 
     /// <summary>
-    ///     Styles for ANSI ESC "[x q" - Set Cursor Style
-    /// </summary>
-    public enum DECSCUSR_Style
-    {
-        /// <summary>
-        ///     DECSCUSR - User Shape - Default cursor shape configured by the user
-        /// </summary>
-        UserShape = 0,
-
-        /// <summary>
-        ///     DECSCUSR - Blinking Block - Blinking block cursor shape
-        /// </summary>
-        BlinkingBlock = 1,
-
-        /// <summary>
-        ///     DECSCUSR - Steady Block - Steady block cursor shape
-        /// </summary>
-        SteadyBlock = 2,
-
-        /// <summary>
-        ///     DECSCUSR - Blinking Underline - Blinking underline cursor shape
-        /// </summary>
-        BlinkingUnderline = 3,
-
-        /// <summary>
-        ///     DECSCUSR - Steady Underline - Steady underline cursor shape
-        /// </summary>
-        SteadyUnderline = 4,
-
-        /// <summary>
-        ///     DECSCUSR - Blinking Bar - Blinking bar cursor shape
-        /// </summary>
-        BlinkingBar = 5,
-
-        /// <summary>
-        ///     DECSCUSR - Steady Bar - Steady bar cursor shape
-        /// </summary>
-        SteadyBar = 6
-    }
-
-    /// <summary>
     ///     ESC [ n SP q - Select Cursor Style (DECSCUSR)
     ///     https://terminalguide.namepad.de/seq/csi_sq_t_space/
     /// </summary>
     /// <param name="style"></param>
     /// <returns></returns>
-    public static string CSI_SetCursorStyle (DECSCUSR_Style style) { return $"{CSI}{(int)style} q"; }
+    public static string CSI_SetCursorStyle (CursorStyle style) { return $"{CSI}{(int)style} q"; }
 
     #endregion Cursor
 

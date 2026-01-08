@@ -9,6 +9,7 @@ namespace DriverTests.UnixDriver;
 ///     without a real terminal (like GitHub Actions).
 /// </summary>
 [Trait ("Platform", "Unix")]
+[Collection ("Driver Tests")]
 public class UnixInputOutputTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

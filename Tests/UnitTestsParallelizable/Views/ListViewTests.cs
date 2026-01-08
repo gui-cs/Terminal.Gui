@@ -207,7 +207,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Null (lv.SelectedItem);
         Assert.True (lv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (Key.CursorUp));
+        Assert.False (lv.NewKeyDownEvent (Key.CursorUp));  // at top already
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (2, lv.SelectedItem);

@@ -108,7 +108,7 @@ public class TabViewExample : Scenario
                                 "This demos the tabs control\nSwitch between tabs using cursor keys.\nThis TextView has AllowsTab = false, so tab should nav too.",
                             Width = Dim.Fill (),
                             Height = Dim.Fill (),
-                            AllowsTab = false
+                            TabKeyAddsTab = false
                         }
                        );
 

@@ -2,6 +2,7 @@
 
 namespace DriverTests;
 
+[Collection ("Driver Tests")]
 public class SizeMonitorTests
 {
     [Fact]

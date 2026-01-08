@@ -13,11 +13,8 @@ public class WizardStep : View, IDesignable
 {
     private readonly TextView _helpTextView = new ()
     {
-        CanFocus = true,
-        TabStop = TabBehavior.TabStop,
         ReadOnly = true,
         WordWrap = true,
-        AllowsTab = false,
         X = Pos.AnchorEnd () + 1,
         Height = Dim.Fill (),
 #if DEBUG
@@ -66,7 +63,6 @@ public class WizardStep : View, IDesignable
         if (Padding is { } && _helpTextView.Text.Length > 0)
         {
             Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
-            App?.Invoke (() => Layout ());
         }
     }
 
@@ -100,11 +96,6 @@ public class WizardStep : View, IDesignable
 
         if (_helpTextView.Text.Length > 0)
         {
-            // Configure Padding
-
-            Padding.CanFocus = true;
-            Padding.TabStop = TabBehavior.TabStop;
-
             // Help text goes in right Padding - set thickness based on current frame width
             Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
 
@@ -113,10 +104,6 @@ public class WizardStep : View, IDesignable
         }
         else
         {
-            // Configure Padding
-
-            Padding.CanFocus = false;
-
             // No help text - no right padding needed
             Padding.Thickness = Padding.Thickness with { Right = 0 };
 

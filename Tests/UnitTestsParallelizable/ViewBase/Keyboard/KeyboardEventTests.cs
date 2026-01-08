@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Keyboard;
 
-[Collection ("Global Test Setup")]
+
 public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 {
     /// <summary>

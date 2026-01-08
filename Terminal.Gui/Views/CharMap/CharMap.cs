@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
@@ -13,6 +12,12 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class CharMap : View, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
     private const int COLUMN_WIDTH = 3; // Width of each column of glyphs
     private const int HEADER_HEIGHT = 1; // Height of the header
 
@@ -27,7 +32,6 @@ public class CharMap : View, IDesignable
     public CharMap ()
     {
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
 
         AddCommand (Command.Up, commandContext => Move (commandContext, -16));
         AddCommand (Command.Down, commandContext => Move (commandContext, 16));
@@ -83,16 +87,10 @@ public class CharMap : View, IDesignable
         // We want the horizontal scrollbar to only show when needed.
         // We can't use ScrollBar.AutoShow because we are using custom ContentSize
         // So, we do it manually on ViewportChanged events.
-        ViewportChanged += (sender, args) =>
+        ViewportChanged += (_, _) =>
                            {
-                               if (Viewport.Width < GetContentSize ().Width)
-                               {
-                                   HorizontalScrollBar.Visible = true;
-                               }
-                               else
-                               {
-                                   HorizontalScrollBar.Visible = false;
-                               }
+                               HorizontalScrollBar.Visible = Viewport.Width < GetContentSize ().Width;
+                               UpdateCursor ();
                            };
 
         // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
@@ -107,6 +105,8 @@ public class CharMap : View, IDesignable
 
         // Build initial visible rows (all rows with at least one valid codepoint)
         RebuildVisibleRows ();
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     // Visible rows management: each entry is the starting code point of a 16-wide row
@@ -172,7 +172,7 @@ public class CharMap : View, IDesignable
 
     private int VisibleRowIndexForCodePoint (int codePoint)
     {
-        int start = (codePoint / 16) * 16;
+        int start = codePoint / 16 * 16;
         return _rowStartToVisibleIndex.GetValueOrDefault (start, -1);
     }
 
@@ -204,6 +204,7 @@ public class CharMap : View, IDesignable
             ScrollToMakeCursorVisible (offsetToNewCursor);
 
             SetNeedsDraw ();
+            UpdateCursor ();
             SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint));
         }
     }
@@ -263,7 +264,7 @@ public class CharMap : View, IDesignable
             RebuildVisibleRows ();
 
             // Ensure selection is on a visible row
-            int desiredRowStart = (SelectedCodePoint / 16) * 16;
+            int desiredRowStart = SelectedCodePoint / 16 * 16;
             if (!_rowStartToVisibleIndex.ContainsKey (desiredRowStart))
             {
                 // Find nearest visible row (prefer next; fallback to last)
@@ -342,7 +343,7 @@ public class CharMap : View, IDesignable
             return;
         }
 
-        UcdApiClient? client = new ();
+        UcdApiClient client = new ();
         var decResponse = string.Empty;
         var getCodePointError = string.Empty;
 
@@ -423,7 +424,8 @@ public class CharMap : View, IDesignable
         Button copyCodepoint = new () { Text = Strings.charMapCopyCP };
         Button cancel = new () { Text = Strings.btnCancel };
 
-        using Dialog dlg = new () { Buttons = [copyGlyph, copyCodepoint, cancel] };
+        using Dialog dlg = new ();
+        dlg.Buttons = [copyGlyph, copyCodepoint, cancel];
         dlg.Title = title;
 
         var rune = (Rune)SelectedCodePoint;
@@ -540,25 +542,28 @@ public class CharMap : View, IDesignable
         return new (x, y);
     }
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
+    /// <summary>Updates the cursor position based on the selected code point.</summary>
+    /// <remarks>
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor"/>.
+    ///     The framework automatically handles hiding the cursor when the view loses focus.
+    /// </remarks>
+    private void UpdateCursor ()
     {
         Point cursor = GetCursor (SelectedCodePoint);
 
-        if (HasFocus
-            && cursor.X >= RowLabelWidth
+        if (cursor.X >= RowLabelWidth
             && cursor.X < Viewport.Width
             && cursor.Y > 0
             && cursor.Y < Viewport.Height)
         {
-            Move (cursor.X, cursor.Y);
+            // Convert to Screen coordinates
+            Cursor = Cursor with { Position = ViewportToScreen (cursor) };
         }
         else
         {
-            return null;
+            // Cursor is scrolled out of view
+            Cursor = Cursor with { Position = null };
         }
-
-        return cursor;
     }
 
     #endregion Cursor

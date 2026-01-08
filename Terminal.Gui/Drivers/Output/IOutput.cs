@@ -18,12 +18,6 @@ public interface IOutput : IDisposable
     ConcurrentQueue<SixelToRender> GetSixels ();
 
     /// <summary>
-    ///     Gets the current position of the console cursor.
-    /// </summary>
-    /// <returns></returns>
-    Point GetCursorPosition ();
-
-    /// <summary>
     ///     Returns the current size of the console in rows/columns (i.e.
     ///     of characters not pixels).
     /// </summary>
@@ -31,25 +25,27 @@ public interface IOutput : IDisposable
     Size GetSize ();
 
     /// <summary>
-    ///     Moves the console cursor to the given location.
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="row"></param>
-    void SetCursorPosition (int col, int row);
-
-    /// <summary>
-    ///     Updates the console cursor (the blinking underscore) to be hidden,
-    ///     visible etc.
-    /// </summary>
-    /// <param name="visibility"></param>
-    void SetCursorVisibility (CursorVisibility visibility);
-
-    /// <summary>
     ///     Sets the size of the console.
     /// </summary>
     /// <param name="width"></param>
     /// <param name="height"></param>
     void SetSize (int width, int height);
+
+    /// <summary>
+    ///     Sets the cursor for this output.
+    /// </summary>
+    /// <param name="cursor">
+    ///     The cursor to set. Position must be in screen-absolute coordinates.
+    ///     Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     Set Position to null to hide the cursor.
+    /// </param>
+    public void SetCursor (Cursor cursor);
+
+    /// <summary>
+    ///     Gets the current cursor for this output.
+    /// </summary>
+    /// <returns></returns>
+    public Cursor GetCursor ();
 
     /// <summary>
     ///     Writes the given text directly to the console. Use to send

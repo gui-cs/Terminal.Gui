@@ -6,6 +6,7 @@ namespace ApplicationTests.Keyboard;
 /// <summary>
 ///     Tests to verify that KeyboardImpl is thread-safe for concurrent access scenarios.
 /// </summary>
+[Collection("Application Tests")]
 public class KeyboardImplThreadSafetyTests
 {
     [Fact]

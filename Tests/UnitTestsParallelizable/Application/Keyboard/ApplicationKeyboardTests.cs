@@ -5,6 +5,7 @@
 ///     input injection and <see cref="IKeyboard.RaiseKeyDownEvent"/>.
 /// </summary>
 [Trait ("Category", "Keyboard")]
+[Collection("Application Tests")]
 public class ApplicationKeyboardTests
 {
     #region InjectKeyEvent → RaiseKeyDownEvent Integration Tests

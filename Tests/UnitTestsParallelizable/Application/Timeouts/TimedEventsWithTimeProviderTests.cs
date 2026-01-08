@@ -6,6 +6,7 @@ namespace ApplicationTests.TimedEventTests;
 ///     These tests validate that TimedEvents correctly uses virtual time for deterministic, instant testing.
 /// </summary>
 [Trait ("Category", "Timeout")]
+[Collection ("Application Timer Tests")]
 public class TimedEventsWithTimeProviderTests
 {
     [Fact]

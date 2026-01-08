@@ -3,6 +3,8 @@
 #nullable disable
 namespace DriverTests.MouseTests;
 
+[Collection ("Driver Tests")]
+
 public class MouseInterpreterTests
 {
     [Theory]

@@ -16,6 +16,7 @@ namespace ApplicationTests.MouseTests;
 ///     - Multiple quick clicks → DoubleClicked, TripleClicked events
 ///     - This means injecting one event may generate multiple output events
 /// </remarks>
+[Collection("Application Tests")]
 [Trait ("Category", "Mouse")]
 public class ApplicationMouseTests : TestDriverBase
 {

@@ -694,14 +694,6 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (window.Arrangement.HasFlag (ViewArrangement.Overlapped));
     }
 
-    [Fact (Skip = "need to test with IsRunnable true")]
-    public void Dialog_DefaultsToMovableAndOverlapped ()
-    {
-        var dialog = new Dialog ();
-        Assert.True (dialog.Arrangement.HasFlag (ViewArrangement.Movable));
-        Assert.True (dialog.Arrangement.HasFlag (ViewArrangement.Overlapped));
-    }
-
     [Fact]
     public void View_Navigation_RespectsOverlappedFlag ()
     {

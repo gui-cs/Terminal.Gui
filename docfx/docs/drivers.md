@@ -347,8 +347,13 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 - `Refresh()`, `ToString()`, `ToAnsi()` - Output rendering
 
 #### Cursor
-- `UpdateCursor()` - Position cursor
-- `GetCursorVisibility()`, `SetCursorVisibility()` - Visibility management
+- `SetCursorPosition(int col, int row)` - Set cursor position in screen coordinates
+- `SetCursorVisibility(CursorStyle style)` - Set cursor style/visibility (ANSI DECSCUSR-based)
+- `SetCursorNeedsUpdate(bool needsUpdate)` - Signal cursor position needs update without redraw
+
+> [!NOTE]
+> The cursor system is managed by `ApplicationNavigation`. Drivers should not directly manage cursor state.
+> See [Cursor Management](cursor.md) for details.
 
 #### Input Events
 - `KeyDown`, `MouseEvent` - Input events

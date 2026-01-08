@@ -4,6 +4,7 @@ using Xunit.Abstractions;
 
 namespace DriverTests.AnsiHandling;
 
+[Collection ("Driver Tests")]
 public class Osc8UrlLinkerTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

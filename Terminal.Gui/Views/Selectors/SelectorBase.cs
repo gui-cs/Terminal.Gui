@@ -120,7 +120,7 @@ public abstract class SelectorBase : View, IOrientation
     {
         if (_valueField is { })
         {
-            _valueField.Text = Value.ToString ();
+            _valueField.Text = Value.ToString ()!;
         }
 
         OnValueChanged (Value, previousValue);
@@ -246,7 +246,7 @@ public abstract class SelectorBase : View, IOrientation
             _valueField = new ()
             {
                 Id = "valueField",
-                Text = Value.ToString (),
+                Text = Value.ToString ()!,
 
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,

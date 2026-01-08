@@ -38,6 +38,13 @@ internal class UnixOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
+    public void Write (ReadOnlySpan<char> text)
+    {
+        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+        UnixIOHelper.TryWriteStdout (utf8);
+    }
+
+    /// <inheritdoc/>
     protected override void Write (StringBuilder output)
     {
         base.Write (output);
@@ -46,17 +53,55 @@ internal class UnixOutput : OutputBase, IOutput
         UnixIOHelper.TryWriteStdout (utf8);
     }
 
-    private Point? _lastCursorPosition;
+    private Cursor _currentCursor = new ();
+
+    /// <inheritdoc />
+    public Cursor GetCursor ()
+    {
+        return _currentCursor;
+    }
+
+    /// <inheritdoc />
+    public void SetCursor (Cursor cursor)
+    {
+        try
+        {
+            if (!cursor.IsVisible)
+            {
+                Write (EscSeqUtils.CSI_HideCursor);
+            }
+            else
+            {
+                if (_currentCursor!.Style != cursor.Style)
+                {
+                    Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
+                }
+
+                Write (EscSeqUtils.CSI_ShowCursor);
+            }
+        }
+        catch
+        {
+            // Ignore any exceptions
+        }
+        finally
+        {
+            SetCursorPositionImpl (
+                                   cursor.Position?.X ?? 0,
+                                   cursor.Position?.Y ?? 0
+                                  );
+
+            _currentCursor = cursor;
+        }
+    }
 
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
     {
-        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == screenPositionX && _lastCursorPosition.Value.Y == screenPositionY)
+        if (_currentCursor!.Position is { } && _currentCursor.Position.Value.X == screenPositionX && _currentCursor.Position.Value.Y == screenPositionY)
         {
-            return true;
+            return false;
         }
-
-        _lastCursorPosition = new (screenPositionX, screenPositionY);
 
         try
         {
@@ -109,13 +154,6 @@ internal class UnixOutput : OutputBase, IOutput
     }
 
     /// <inheritdoc/>
-    public void Write (ReadOnlySpan<char> text)
-    {
-        byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
-        UnixIOHelper.TryWriteStdout (utf8);
-    }
-
-    /// <inheritdoc/>
     public Size GetSize ()
     {
         if (UnixIOHelper.TryGetTerminalSize (out Size size))
@@ -125,41 +163,6 @@ internal class UnixOutput : OutputBase, IOutput
 
         return new (80, 25); // fallback
     }
-
-    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
-
-    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
-    public override void SetCursorVisibility (CursorVisibility visibility)
-    {
-        try
-        {
-            if (visibility != CursorVisibility.Invisible)
-            {
-                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
-                {
-                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
-
-                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
-                }
-
-                Write (EscSeqUtils.CSI_ShowCursor);
-            }
-            else
-            {
-                Write (EscSeqUtils.CSI_HideCursor);
-            }
-        }
-        catch
-        {
-            // ignore
-        }
-    }
-
-    /// <inheritdoc/>
-    public Point GetCursorPosition () => _lastCursorPosition ?? Point.Empty;
-
-    /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
 
     /// <inheritdoc/>
     public void SetSize (int width, int height)

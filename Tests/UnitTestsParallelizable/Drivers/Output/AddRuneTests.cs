@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 
+[Collection ("Driver Tests")]
 public class AddRuneTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]

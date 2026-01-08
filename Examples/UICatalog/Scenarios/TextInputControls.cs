@@ -63,14 +63,25 @@ public class TextInputControls : Scenario
         };
         win.Add (label);
 
-        textField = new TextField
+        textField = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Bottom (textField),
             Width = Dim.Percent (50) - 1,
-            Title = "TextField with caption"
+            Title = "TextField with caption and AppendAutoComplete",
         };
+        textField.Autocomplete = new AppendAutocomplete (textField);
+        var appendSingleWordGenerator = new SingleWordSuggestionGenerator ();
+        textField.Autocomplete.SuggestionGenerator = appendSingleWordGenerator;
+        textField.TextChanging += AppendTextFieldTextChanging;
 
+        void AppendTextFieldTextChanging (object sender, ResultEventArgs<string> e)
+        {
+            appendSingleWordGenerator.AllSuggestions = Regex.Matches (e.Result, "\\w+")
+                                                            .Select (s => s.Value)
+                                                            .Distinct ()
+                                                            .ToList ();
+        }
         win.Add (textField);
 
         // TextView is a rich (as in functionality, not formatting) text editing control
@@ -84,16 +95,18 @@ public class TextInputControls : Scenario
             Width = Dim.Percent (50) - 1,
             Height = Dim.Percent (10)
         };
-        textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
+        var textViewAppendSingleWordGenerator = new SingleWordSuggestionGenerator ();
+        textView.Autocomplete.SuggestionGenerator = textViewAppendSingleWordGenerator;
         textView.DrawingContent += TextView_DrawContent;
+        textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
 
         // This shows how to enable autocomplete in TextView.
         void TextView_DrawContent (object sender, DrawEventArgs e)
         {
-            singleWordGenerator.AllSuggestions = Regex.Matches (textView.Text, "\\w+")
-                                                      .Select (s => s.Value)
-                                                      .Distinct ()
-                                                      .ToList ();
+            textViewAppendSingleWordGenerator.AllSuggestions = Regex.Matches (textView.Text, "\\w+")
+                                                                    .Select (s => s.Value)
+                                                                    .Distinct ()
+                                                                    .ToList ();
         }
 
         win.Add (textView);
@@ -149,7 +162,7 @@ public class TextInputControls : Scenario
         {
             X = Pos.Right (chxWordWrap) + 2,
             Y = Pos.Top (chxWordWrap),
-            CheckedState = textView.AllowsTab ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Capture Tabs"
         };
 
@@ -184,7 +197,7 @@ public class TextInputControls : Scenario
                                           textView.KeyBindings.Remove (keyBackTab);
                                       }
 
-                                      textView.AllowsTab = e.Result == CheckState.Checked;
+                                      textView.TabKeyAddsTab = e.Result == CheckState.Checked;
                                   };
         win.Add (chxCaptureTabs);
 

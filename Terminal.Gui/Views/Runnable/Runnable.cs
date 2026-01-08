@@ -173,16 +173,17 @@ public class Runnable : View, IRunnable
         if (newIsModal)
         {
             // Set focus to self if becoming modal
-            if (HasFocus is false)
+            if (!HasFocus)
             {
                 SetFocus ();
             }
 
-            // Position cursor and update driver
-            if (App?.PositionCursor () == true)
-            {
-                App?.Driver?.UpdateCursor ();
-            }
+            //// BUGBUG: we should not have to do this here
+            //// Position cursor and update driver
+            //if (App?.PositionCursor () == true)
+            //{
+            //    App?.Navigation?.UpdateCursor ();
+            //}
         }
 
         // CWP Phase 3: Post-notification (work already done by Application)

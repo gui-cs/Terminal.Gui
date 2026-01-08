@@ -217,25 +217,6 @@ public class Button : View, IDesignable
     public bool NoPadding { get; set; }
 
     /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        if (HotKey.IsValid && Text != "")
-        {
-            for (var i = 0; i < TextFormatter.Text.GetRuneCount (); i++)
-            {
-                if (TextFormatter.Text [i] == Text [0])
-                {
-                    Move (i, 0);
-
-                    return null; // Don't show the cursor
-                }
-            }
-        }
-
-        return base.PositionCursor ();
-    }
-
-    /// <inheritdoc/>
     protected override void UpdateTextFormatterText ()
     {
         base.UpdateTextFormatterText ();

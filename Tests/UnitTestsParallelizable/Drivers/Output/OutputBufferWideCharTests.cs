@@ -8,6 +8,7 @@ namespace DriverTests.Output;
 ///     Specifically, they ensure that wide characters are properly invalidated and replaced when a MessageBox border or
 ///     similar UI element is drawn over them, preventing visual corruption.
 /// </summary>
+[Collection ("Driver Tests")]
 public class OutputBufferWideCharTests
 {
     /// <summary>

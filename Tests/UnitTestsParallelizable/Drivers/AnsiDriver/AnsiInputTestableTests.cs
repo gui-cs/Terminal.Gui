@@ -6,6 +6,7 @@ namespace DriverTests.AnsiHandling;
 /// <summary>
 ///     Tests for ITestableInput implementation in AnsiInput.
 /// </summary>
+[Collection ("Driver Tests")]
 public class AnsiInputTestableTests
 {
     #region Helper Methods

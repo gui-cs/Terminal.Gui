@@ -198,8 +198,12 @@ See the [Scheme Deep Dive](scheme.md) for details on color theming.
 - [View.Draw](~/api/Terminal.Gui.ViewBase.View.yml) - Main drawing method
 - [View.AddRune](~/api/Terminal.Gui.ViewBase.View.yml) - Draws a single Rune
 - [View.AddStr](~/api/Terminal.Gui.ViewBase.View.yml) - Draws a string
-- [View.Move](~/api/Terminal.Gui.ViewBase.View.yml) - Positions the cursor
+- [View.Move](~/api/Terminal.Gui.ViewBase.View.yml) - Positions the **Draw Cursor** (internal rendering position, NOT the visible Terminal Cursor)
 - [View.Clear](~/api/Terminal.Gui.ViewBase.View.yml) - Clears the View's content
+
+> [!WARNING]
+> `Move()` sets the **Draw Cursor** (where next character renders), NOT the **Terminal Cursor** (visible cursor indicator).
+> To position the Terminal Cursor, use the `View.Cursor` property. See [Cursor Management](cursor.md) for details.
 
 #### Drawing Events
 

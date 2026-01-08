@@ -2,8 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace DriverTests.Windows;
 
-[Collection ("Global Test Setup")]
+
 [Trait ("Platform", "Windows")]
+[Collection ("Driver Tests")]
 public class WindowsKeyConverterTests
 {
     private readonly WindowsKeyConverter _converter = new ();

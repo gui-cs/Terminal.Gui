@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
 
 namespace Terminal.Gui.Drivers;
 
@@ -149,6 +148,94 @@ internal partial class WindowsOutput : OutputBase, IOutput
         GetSize ();
     }
 
+    private Cursor _currentCursor = new ();
+
+    /// <inheritdoc />
+    public Cursor GetCursor ()
+    {
+        return _currentCursor;
+    }
+
+    // <inheritdoc />
+    public void SetCursor (Cursor cursor)
+    {
+        try
+        {
+            if (IsLegacyConsole)
+            {
+                WindowsConsole.ConsoleCursorInfo cursorInfo = new ();
+
+                if (!cursor.IsVisible)
+                {
+                    cursorInfo.bVisible = false;
+                    cursorInfo.dwSize = 0;
+                }
+                else
+                {
+                    cursorInfo.bVisible = true;
+
+                    cursorInfo.dwSize = cursor.Style switch
+                    {
+                        CursorStyle.BlinkingBlock => 100,
+                        CursorStyle.SteadyBlock => 100,
+                        CursorStyle.BlinkingUnderline => 15,
+                        CursorStyle.SteadyUnderline => 15,
+                        CursorStyle.BlinkingBar => 15,
+                        CursorStyle.SteadyBar => 15,
+                        _ => 100
+                    };
+                }
+
+                SetConsoleCursorInfo (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref cursorInfo);
+            }
+            else
+            {
+                if (!cursor.IsVisible)
+                {
+                    Write (EscSeqUtils.CSI_HideCursor);
+                }
+                else
+                {
+                    if (_currentCursor!.Style != cursor.Style)
+                    {
+                        Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
+                    }
+
+                    Write (EscSeqUtils.CSI_ShowCursor);
+                }
+            }
+        }
+        catch
+        {
+            // Ignore any exceptions
+        }
+        finally
+        {
+            SetCursorPositionImpl (
+                                   cursor.Position?.X ?? 0,
+                                   cursor.Position?.Y ?? 0
+                                  );
+            _currentCursor = cursor;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
+    {
+        if (Force16Colors && IsLegacyConsole)
+        {
+            SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
+        }
+        else
+        {
+            var sb = new StringBuilder ();
+            EscSeqUtils.CSI_AppendCursorPosition (sb, screenPositionY + 1, screenPositionX + 1);
+            Write (sb.ToString ());
+        }
+
+        return true;
+    }
+
     private void CreateScreenBuffer ()
     {
         _screenBuffer = CreateConsoleScreenBuffer (
@@ -201,6 +288,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
         {
             // Do nothing; unit tests
         }
+
         return newSize;
     }
 
@@ -319,6 +407,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
         {
             return;
         }
+
         base.Write (output);
 
         var str = output.ToString ();
@@ -457,78 +546,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
         return new (maxWinSize.X, maxWinSize.Y);
     }
 
-    /// <inheritdoc/>
-    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
-    {
-        if (Force16Colors && IsLegacyConsole)
-        {
-            SetConsoleCursorPosition (_screenBuffer, new ((short)screenPositionX, (short)screenPositionY));
-        }
-        else
-        {
-            // CSI codes are 1 indexed
-            _everythingStringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            EscSeqUtils.CSI_AppendCursorPosition (_everythingStringBuilder, screenPositionY + 1, screenPositionX + 1);
-        }
-
-        _lastCursorPosition = new (screenPositionX, screenPositionY);
-
-        return true;
-    }
-
-    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
-    public override void SetCursorVisibility (CursorVisibility visibility)
-    {
-        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            return;
-        }
-
-        if (IsLegacyConsole)
-        {
-            var info = new WindowsConsole.ConsoleCursorInfo
-            {
-                dwSize = (uint)visibility & 0x00FF,
-                bVisible = ((uint)visibility & 0xFF00) != 0
-            };
-
-            SetConsoleCursorInfo (_screenBuffer, ref info);
-        }
-        else
-        {
-            string cursorVisibilitySequence = visibility != CursorVisibility.Invisible
-                                                  ? EscSeqUtils.CSI_ShowCursor
-                                                  : EscSeqUtils.CSI_HideCursor;
-            Write (cursorVisibilitySequence);
-        }
-    }
-
-    /// <inheritdoc/>
-    public Point GetCursorPosition () { return _lastCursorPosition ?? Point.Empty; }
-
-    private Point? _lastCursorPosition;
-
-    /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row)
-    {
-        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == col && _lastCursorPosition.Value.Y == row)
-        {
-            return;
-        }
-
-        _lastCursorPosition = new (col, row);
-
-        if (IsLegacyConsole)
-        {
-            SetConsoleCursorPosition (_screenBuffer, new ((short)col, (short)row));
-        }
-        else
-        {
-            var sb = new StringBuilder ();
-            EscSeqUtils.CSI_AppendCursorPosition (sb, row + 1, col + 1);
-            Write (sb.ToString ());
-        }
-    }
 
     /// <inheritdoc/>
     public void SetSize (int width, int height)

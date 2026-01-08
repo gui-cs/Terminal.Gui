@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using TerminalGuiFluentTesting;
-
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Provides methods to create and manage a fake application for testing purposes.
@@ -28,6 +25,7 @@ public class FakeApplicationFactory
 
         // Initialize with a ANSI driver
         impl.Init (DriverRegistry.Names.ANSI);
+        impl.Driver!.Clipboard = new FakeClipboard ();
 
         return new FakeApplicationLifecycle (impl, hardStopTokenSource);
     }
