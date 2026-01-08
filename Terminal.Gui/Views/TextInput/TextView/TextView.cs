@@ -251,7 +251,7 @@ public partial class TextView : View, IDesignable
 
         // This enables AllViews_HasFocus_Changed_Event to pass since it requires
         // tab navigation to work
-        AllowsTab = false;
+        TabKeyAddsTab = false;
 
         return true;
     }

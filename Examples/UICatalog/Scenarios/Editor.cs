@@ -522,10 +522,10 @@ public class Editor : Scenario
         CheckBox checkBox = new ()
         {
             Title = "Allows Tab",
-            CheckedState = _textView.AllowsTab ? CheckState.Checked : CheckState.UnChecked
+            CheckedState = _textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked
         };
 
-        checkBox.CheckedStateChanged += (s, e) => { _textView.AllowsTab = checkBox.CheckedState == CheckState.Checked; };
+        checkBox.CheckedStateChanged += (s, e) => { _textView.TabKeyAddsTab = checkBox.CheckedState == CheckState.Checked; };
 
         MenuItem item = new () { CommandView = checkBox };
 

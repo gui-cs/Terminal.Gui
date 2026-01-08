@@ -162,7 +162,7 @@ public class TextInputControls : Scenario
         {
             X = Pos.Right (chxWordWrap) + 2,
             Y = Pos.Top (chxWordWrap),
-            CheckedState = textView.AllowsTab ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Capture Tabs"
         };
 
@@ -197,7 +197,7 @@ public class TextInputControls : Scenario
                                           textView.KeyBindings.Remove (keyBackTab);
                                       }
 
-                                      textView.AllowsTab = e.Result == CheckState.Checked;
+                                      textView.TabKeyAddsTab = e.Result == CheckState.Checked;
                                   };
         win.Add (chxCaptureTabs);
 

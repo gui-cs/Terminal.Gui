@@ -52,7 +52,6 @@ public partial class TextView
         AddCommand (Command.Redo, () => Redo ());
 
         AddCommand (Command.NextTabStop, () => ProcessTab ());
-        AddCommand (Command.PreviousTabStop, () => ProcessBackTab ());
         AddCommand (Command.ToggleOverwrite, () => ProcessSetOverwrite ());
         AddCommand (Command.EnableOverwrite, () => SetOverwrite (true));
         AddCommand (Command.DisableOverwrite, () => SetOverwrite (false));
@@ -931,41 +930,6 @@ public partial class TextView
         return true;
     }
 
-    private bool ProcessBackTab ()
-    {
-        ResetColumnTrack ();
-
-        if (!AllowsTab || _isReadOnly)
-        {
-            return false;
-        }
-
-        if (CurrentColumn > 0)
-        {
-            SetWrapModel ();
-
-            List<Cell> currentLine = GetCurrentLine ();
-
-            if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Grapheme == "\t")
-            {
-                _historyText.Add ([ [.. currentLine]], InsertionPoint);
-
-                currentLine.RemoveAt (CurrentColumn - 1);
-                CurrentColumn--;
-
-                _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
-            }
-
-            SetNeedsDraw ();
-
-            UpdateWrapModel ();
-        }
-
-        DoNeededAction ();
-
-        return true;
-    }
-
     private bool ProcessDeleteCharLeft ()
     {
         ResetColumnTrack ();
@@ -1016,7 +980,7 @@ public partial class TextView
             return false;
         }
 
-        if (!AllowsReturn)
+        if (!EnterKeyAddsLine)
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
@@ -1090,7 +1054,7 @@ public partial class TextView
     {
         ResetColumnTrack ();
 
-        if (!AllowsTab || _isReadOnly)
+        if (!TabKeyAddsTab || _isReadOnly)
         {
             return false;
         }

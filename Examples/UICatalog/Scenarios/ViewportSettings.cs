@@ -67,7 +67,7 @@ public class ViewportSettings : Scenario
             Y = 10,
             Title = "TextVie_w",
             Text = "I have a 3 row top border.\nMy border inherits from the SuperView.\nI have 3 lines of text with room for 2.",
-            AllowsTab = false,
+            TabKeyAddsTab = false,
             Width = 30,
             Height = 6 // TODO: Use Dim.Auto
         };

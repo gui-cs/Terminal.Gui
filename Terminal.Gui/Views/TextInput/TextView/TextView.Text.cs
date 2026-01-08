@@ -103,20 +103,20 @@ public partial class TextView
         {
             _multiline = value;
 
-            if (_multiline && !_allowsTab)
+            if (_multiline && !_tabKeyAddsTab)
             {
-                AllowsTab = true;
+                TabKeyAddsTab = true;
             }
 
-            if (_multiline && !_allowsReturn)
+            if (_multiline && !_enterKeyAddsLine)
             {
-                AllowsReturn = true;
+                EnterKeyAddsLine = true;
             }
 
             if (!_multiline)
             {
-                AllowsReturn = false;
-                AllowsTab = false;
+                EnterKeyAddsLine = false;
+                TabKeyAddsTab = false;
                 WordWrap = false;
                 CurrentColumn = 0;
                 CurrentRow = 0;
@@ -173,9 +173,9 @@ public partial class TextView
         {
             _tabWidth = Math.Max (value, 0);
 
-            if (_tabWidth > 0 && !AllowsTab)
+            if (_tabWidth > 0 && !TabKeyAddsTab)
             {
-                AllowsTab = true;
+                TabKeyAddsTab = true;
             }
 
             SetNeedsDraw ();

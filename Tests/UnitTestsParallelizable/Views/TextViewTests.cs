@@ -915,9 +915,9 @@ public class TextViewTests
     }
 
     [Fact]
-    public void HistoryText_Undo_Redo_Multiline_Selected_Tab_BackTab ()
+    public void HistoryText_Undo_Redo_Multiline_Selected_Tab ()
     {
-        var text = "First line.\nSecond line.\nThird line.";
+        var text = $"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.";
         var tv = new TextView { Width = 80, Height = 5, Text = text };
 
         tv.SelectionStartColumn = 6;
@@ -928,20 +928,9 @@ public class TextViewTests
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new (7, 0), tv.InsertionPoint);
 
-        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
-        Assert.Equal ("First line.", tv.Text);
-        Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (6, 0), tv.InsertionPoint);
-
         // Undo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-        Assert.Equal ("First \tline.", tv.Text);
-        Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (7, 0), tv.InsertionPoint);
-        Assert.True (tv.IsDirty);
-
-        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
+        Assert.Equal (text, tv.Text);
         Assert.Equal (3, tv.Lines);
         Assert.Equal (new (6, 2), tv.InsertionPoint);
         Assert.False (tv.IsDirty);
@@ -951,64 +940,6 @@ public class TextViewTests
         Assert.Equal ("First \tline.", tv.Text);
         Assert.Equal (1, tv.Lines);
         Assert.Equal (new (7, 0), tv.InsertionPoint);
-
-        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
-        Assert.Equal ("First line.", tv.Text);
-        Assert.Equal (1, tv.Lines);
-        Assert.Equal (new (6, 0), tv.InsertionPoint);
-    }
-
-    [Fact]
-    public void HistoryText_Undo_Redo_Multiline_Simples_Tab_BackTab ()
-    {
-        var text = "First line.\nSecond line.\nThird line.";
-        var tv = new TextView { Width = 80, Height = 5, Text = text };
-
-        Assert.True (tv.NewKeyDownEvent (Key.Tab));
-
-        Assert.Equal (
-                      $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
-                      tv.Text
-                     );
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
-
-        Assert.True (tv.NewKeyDownEvent (Key.Tab.WithShift));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
-
-        // Undo
-        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-
-        Assert.Equal (
-                      $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
-                      tv.Text
-                     );
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
-        Assert.True (tv.IsDirty);
-
-        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.False (tv.IsDirty);
-
-        // Redo
-        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
-
-        Assert.Equal (
-                      $"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.",
-                      tv.Text
-                     );
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (new (1, 0), tv.InsertionPoint);
-
-        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
-        Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
-        Assert.Equal (3, tv.Lines);
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
     }
 
     [Fact]
@@ -1699,8 +1630,8 @@ public class TextViewTests
         // the default for TextView
         Assert.True (view.Multiline);
 
-        view.AllowsTab = false;
-        Assert.False (view.AllowsTab);
+        view.TabKeyAddsTab = false;
+        Assert.False (view.TabKeyAddsTab);
 
         Assert.True (view.Multiline);
     }
@@ -1777,7 +1708,7 @@ public class TextViewTests
     {
         var view = new TextView
         {
-            AllowsReturn = allowsReturn
+            EnterKeyAddsLine = allowsReturn
         };
 
         var acceptedEvents = 0;
