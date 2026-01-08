@@ -121,7 +121,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Clipboard_GetClipboarData_Works ()
+    public void Clipboard_GetClipboardData_Works ()
     {
         IDriver driver = CreateTestDriver ();
 

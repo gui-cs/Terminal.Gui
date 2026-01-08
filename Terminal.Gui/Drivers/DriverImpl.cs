@@ -173,21 +173,10 @@ internal class DriverImpl : IDriver
     private readonly ISizeMonitor _sizeMonitor;
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
+    public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
 
     private void CreateClipboard ()
     {
-        string? driverName = GetName ();
-
-        // TODO: When "ansi" is used for real, it can have a real clipboard.
-        // TODO: Need to figure out how to configure that.
-        if (driverName is null || driverName.Contains (DriverRegistry.Names.ANSI, StringComparison.OrdinalIgnoreCase))
-        {
-            Clipboard ??= new FakeClipboard ();
-
-            return;
-        }
-
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
@@ -202,8 +191,6 @@ internal class DriverImpl : IDriver
         {
             Clipboard = new WSLClipboard ();
         }
-
-        // Clipboard is set to FakeClipboard at initialization
     }
 
     #endregion Driver Components

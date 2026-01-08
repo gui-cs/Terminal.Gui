@@ -1,7 +1,11 @@
+#nullable enable
+using Xunit.Abstractions;
+
 namespace UnitTests;
 
 /// <summary>
 ///     Enables tests to create an instance of the ANSI driver configured for testing purposes.
+///     The driver will use the <see cref="FakeClipboard"/>.
 /// </summary>
 [Collection ("Global Test Setup")]
 public abstract class TestDriverBase
@@ -24,16 +28,16 @@ public abstract class TestDriverBase
     /// <returns>A configured IDriver instance</returns>
     protected static IDriver CreateTestDriver (int width = 80, int height = 25)
     {
-        var timeProvider = new SystemTimeProvider ();
-        var output = new AnsiOutput ();
-        var factory = new AnsiComponentFactory (null, output, null);
-        var parser = new AnsiResponseParser (timeProvider);
-        var scheduler = new AnsiRequestScheduler (parser);
-        var sizeMonitor = factory.CreateSizeMonitor (output, new OutputBufferImpl ());
+        SystemTimeProvider timeProvider = new ();
+        AnsiOutput output = new ();
+        AnsiComponentFactory factory = new (null, output, null);
+        AnsiResponseParser parser = new (timeProvider);
+        AnsiRequestScheduler scheduler = new (parser);
+        ISizeMonitor sizeMonitor = factory.CreateSizeMonitor (output, new OutputBufferImpl ());
 
         DriverImpl driver = new (
                                  factory,
-                                 new AnsiInputProcessor (null, timeProvider),
+                                 new AnsiInputProcessor (null!, timeProvider),
                                  new OutputBufferImpl (),
                                  output,
                                  scheduler,
@@ -43,7 +47,40 @@ public abstract class TestDriverBase
         sizeMonitor.Initialize (driver);
 
         driver.SetScreenSize (width, height);
+        driver.Clipboard = new FakeClipboard ();
 
         return driver;
+    }
+
+    protected static IApplication RunTestApplication (int width = 80, int height = 25, EventHandler<EventArgs<IApplication?>>? iterationHandler = null, bool stopAfterFirstIteration = true, ITestOutputHelper? output = null)
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (width, height);
+        // Use fake clipboard for testing to avoid contamination of the system clipboard
+        app.Driver!.Clipboard = new FakeClipboard ();
+        using Runnable runnable = new Runnable ();
+        // Give the runnable a border to help visually separate it
+        runnable.BorderStyle = LineStyle.Dotted;
+
+        app.StopAfterFirstIteration = stopAfterFirstIteration;
+
+        try
+        {
+            app.Iteration += iterationHandler;
+            app.Run (runnable);
+        }
+        catch (Exception ex)
+        {
+            output?.WriteLine ($"Exception: {ex}");
+
+            throw;
+        }
+        finally
+        {
+            app.Iteration -= iterationHandler;
+
+        }
+        return app;
     }
 }

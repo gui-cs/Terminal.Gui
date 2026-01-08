@@ -71,8 +71,8 @@ public interface IDriver : IDisposable
     /// </summary>
     IOutput GetOutput ();
 
-    /// <summary>Get the operating system clipboard.</summary>
-    IClipboard? Clipboard { get; }
+    /// <summary>Gets or sets the clipboard.</summary>
+    IClipboard? Clipboard { get; set; }
 
     #endregion Driver Components
 

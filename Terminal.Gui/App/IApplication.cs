@@ -447,7 +447,7 @@ public interface IApplication : IDisposable
     ///         <see cref="Driver"/> is not initialized.
     ///     </para>
     /// </remarks>
-    IClipboard? Clipboard { get; }
+    IClipboard? Clipboard { get; internal set; }
 
     /// <summary>
     ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not

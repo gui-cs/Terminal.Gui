@@ -179,7 +179,17 @@ internal partial class ApplicationImpl : IApplication
     #region Screen and Driver
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard => Driver?.Clipboard;
+    public IClipboard? Clipboard
+    {
+        get => Driver?.Clipboard;
+        set
+        {
+            if (Driver != null)
+            {
+                Driver.Clipboard = value;
+            }
+        }
+    }
 
     #endregion Screen and Driver
 
