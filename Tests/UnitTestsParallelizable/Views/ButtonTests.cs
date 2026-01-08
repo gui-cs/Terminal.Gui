@@ -502,45 +502,7 @@ public class ButtonTests
         }
     }
 
-    [Fact (Skip = "Broken")]
-    public void LeftButtonPressed_Activates ()
-    {
-        Button button = new () { Text = "_Button" };
-        Assert.True (button.CanFocus);
-
-        var activatingCount = 0;
-        button.Activating += (_, _) => activatingCount++;
-
-        var acceptingCount = 0;
-        button.Accepting += (_, _) => acceptingCount++;
-
-        button.HasFocus = true;
-        Assert.True (button.HasFocus);
-        Assert.Equal (0, activatingCount);
-        Assert.Equal (0, acceptingCount);
-
-        // When ShouldAutoGrab is true (Button default: MouseHighlightStates = In | Pressed | PressedOutside),
-        // Pressed events do NOT invoke commands - only Clicked events do.
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal (0, activatingCount); // No command invocation on Pressed when ShouldAutoGrab
-        Assert.Equal (0, acceptingCount);
-
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal (0, activatingCount);
-        Assert.Equal (0, acceptingCount);
-
-        // When MouseHighlightStates = None, ShouldAutoGrab = false, so Pressed DOES invoke commands
-        button.MouseHighlightStates = MouseState.None;
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal (1, activatingCount); // Now Pressed invokes Command.Activate
-        Assert.Equal (0, acceptingCount);
-
-        button.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        Assert.Equal (2, activatingCount);
-        Assert.Equal (0, acceptingCount);
-    }
-
-    [Fact (Skip = "Broke in #4417")]
+    [Fact]
     public void LeftButtonClicked_Accepts ()
     {
         Button button = new () { Text = "_Button" };
@@ -718,7 +680,7 @@ public class ButtonTests
     ///     Per spec: Quick click (press + immediate release within 100ms) should fire Accept once.
     ///     Uses Direct mode to bypass ANSI encoding and control timing precisely.
     /// </summary>
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void MouseHoldRepeat_QuickSingleClick_FiresAcceptOnce ()
     {
         using IApplication app = Application.Create ();
@@ -763,7 +725,7 @@ public class ButtonTests
     ///     Per spec: When MouseHoldRepeat=true, Press/Release events are used (Click events ignored).
     ///     Each Press/Release cycle fires exactly one Accept.
     /// </summary>
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void MouseHoldRepeat_QuickDoubleClick_FiresAcceptTwice ()
     {
         // Arrange
@@ -847,7 +809,7 @@ public class ButtonTests
     ///     Per spec: When MouseHoldRepeat=true, Press/Release events are used (Click events ignored).
     ///     Each Press/Release cycle fires exactly one Accept.
     /// </summary>
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void MouseHoldRepeat_QuickTripleClick_FiresAcceptThreeTimes ()
     {
         // Arrange
@@ -950,7 +912,7 @@ public class ButtonTests
     ///     Per spec: Clicks spaced >500ms apart should each fire Accept once independently.
     ///     Uses Direct mode to bypass ANSI encoding and control timing precisely.
     /// </summary>
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void MouseHoldRepeat_SpacedClicks_FiresAcceptForEach ()
     {
         using IApplication app = Application.Create ();
@@ -1002,99 +964,5 @@ public class ButtonTests
                               options);
 
         Assert.Equal (3, acceptingCount);
-    }
-
-
-    [Theory (Skip = "Broken in #4474")]
-    [InlineData (MouseFlags.LeftButtonPressed, MouseFlags.LeftButtonReleased, MouseFlags.LeftButtonClicked)]
-    [InlineData (MouseFlags.MiddleButtonPressed, MouseFlags.MiddleButtonReleased, MouseFlags.MiddleButtonClicked)]
-    [InlineData (MouseFlags.RightButtonPressed, MouseFlags.RightButtonReleased, MouseFlags.RightButtonClicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void MouseHoldRepeat_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
-    {
-        var me = new Mouse ();
-
-        var button = new Button
-        {
-            Width = 1,
-            Height = 1,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
-        };
-
-        var activatingCount = 0;
-
-        button.Activating += (s, e) => activatingCount++;
-        var acceptedCount = 0;
-
-        button.Accepting += (s, e) =>
-        {
-            acceptedCount++;
-            e.Handled = true;
-        };
-
-        me = new ();
-        me.Flags = pressed;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, activatingCount);
-        Assert.Equal (0, acceptedCount);
-
-        me = new ();
-        me.Flags = released;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, activatingCount);
-        Assert.Equal (0, acceptedCount);
-
-        me = new ();
-        me.Flags = clicked;
-        button.NewMouseEvent (me);
-        Assert.Equal (1, activatingCount);
-        Assert.Equal (1, acceptedCount);
-
-        button.Dispose ();
-    }
-
-    [Theory (Skip = "Broken in #4474")]
-    [InlineData (MouseFlags.LeftButtonPressed, MouseFlags.LeftButtonReleased)]
-    [InlineData (MouseFlags.MiddleButtonPressed, MouseFlags.MiddleButtonReleased)]
-    [InlineData (MouseFlags.RightButtonPressed, MouseFlags.RightButtonReleased)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
-    public void MouseHoldRepeat_True_ButtonPressRelease_Does_Not_Raise_Selected_Or_Accepted (MouseFlags pressed, MouseFlags released)
-    {
-        var me = new Mouse ();
-
-        var button = new Button
-        {
-            Width = 1,
-            Height = 1,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
-        };
-
-        var acceptedCount = 0;
-
-        button.Accepting += (s, e) =>
-        {
-            acceptedCount++;
-            e.Handled = true;
-        };
-
-        var activatingCount = 0;
-
-        button.Activating += (s, e) =>
-        {
-            activatingCount++;
-            e.Handled = true;
-        };
-
-        me.Flags = pressed;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, activatingCount);
-
-        me.Flags = released;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, activatingCount);
-
-        button.Dispose ();
     }
 }

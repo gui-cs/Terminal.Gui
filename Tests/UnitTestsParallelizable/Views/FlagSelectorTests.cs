@@ -611,7 +611,7 @@ public class FlagSelectorTests
         Assert.Equal (1, selector.SubViews.OfType<CheckBox> ().Count (cb => (int)cb.Data! == 0));
     }
 
-    [Fact (Skip = "Broken in #4474")]
+    [Fact]
     public void Mouse_DoubleClick_TogglesAndAccepts ()
     {
         var selector = new FlagSelector { DoubleClickAccepts = true };

@@ -64,7 +64,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.ProcessQueue ();
 
         // Wait less than timeout (20ms)
-        Thread.Sleep (20);
+        Thread.Sleep (5);
 
         // Process again - should still be held
         processor.ProcessQueue ();
