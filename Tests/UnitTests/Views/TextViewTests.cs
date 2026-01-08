@@ -166,7 +166,7 @@ public class TextViewTests
 
     [Fact]
     [TextViewTestsSetupFakeApplication]
-    public void Changing_Selection_Or_InsertionPointition_Update_SelectedLength_And_SelectedText ()
+    public void Changing_Selection_Or_InsertionPoint_Update_SelectedLength_And_SelectedText ()
     {
         _textView.SelectionStartColumn = 2;
         _textView.SelectionStartRow = 0;
