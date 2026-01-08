@@ -5,6 +5,12 @@ namespace Terminal.Gui.Views;
 public partial class TextField : View, IDesignable
 {
     /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="TextField"/> class.
     /// </summary>
     public TextField ()
@@ -19,7 +25,6 @@ public partial class TextField : View, IDesignable
         Height = Dim.Auto (DimAutoStyle.Text, 1);
 
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
         Used = true;
         MousePositionTracking = true;
 
@@ -30,6 +35,8 @@ public partial class TextField : View, IDesignable
         CreateCommandsAndBindings ();
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     private void TextField_Initialized (object? sender, EventArgs e)
@@ -64,87 +71,6 @@ public partial class TextField : View, IDesignable
     /// </summary>
     public bool Secret { get; set; }
 
-    /// <summary>
-    ///     Converts the logical <see cref="InsertionPoint"/> to screen coordinates and positions the terminal cursor.
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="Point"/> representing the cursor's screen position within the viewport, where X is the column
-    ///     and Y is always 0 (since TextField is single-line).
-    /// </returns>
-    /// <remarks>
-    ///     <para>
-    ///         This method performs the critical translation between logical text position and physical screen position:
-    ///         <list type="number">
-    ///             <item>
-    ///                 <description>Starts from <see cref="ScrollOffset"/> (first visible character)</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>Iterates through visible text elements up to <see cref="InsertionPoint"/></description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>Accumulates screen column widths (accounting for wide characters)</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>Calls <see cref="View.Move"/> to position the terminal cursor</description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    ///     <para>
-    ///         <b>Coordinate spaces:</b>
-    ///         <list type="bullet">
-    ///             <item>
-    ///                 <description><see cref="InsertionPoint"/>: Logical position (0 to text length)</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>Returned Point: Screen position within viewport (0 to viewport width)</description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    ///     <para>
-    ///         <b>Example:</b> For text "Hi世界" with ScrollOffset=0:
-    ///         <list type="bullet">
-    ///             <item>
-    ///                 <description>InsertionPoint=0 → Screen column 0 (before 'H')</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>InsertionPoint=2 → Screen column 2 (before '世')</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>InsertionPoint=3 → Screen column 4 (before '界', because '世' is 2 columns wide)</description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    ///     <para>
-    ///         This method also triggers <see cref="ProcessAutocomplete"/> to update autocomplete suggestions.
-    ///     </para>
-    /// </remarks>
-    /// <seealso cref="InsertionPoint"/>
-    /// <seealso cref="ScrollOffset"/>
-    public override Point? PositionCursor ()
-    {
-        ProcessAutocomplete ();
-
-        var col = 0;
-
-        for (int idx = ScrollOffset < 0 ? 0 : ScrollOffset; idx < _text.Count; idx++)
-        {
-            if (idx == _insertionPoint)
-            {
-                break;
-            }
-
-            int cols = Math.Max (_text [idx].GetColumns (), 1);
-
-            TextModel.SetCol (ref col, Viewport.Width - 1, cols);
-        }
-
-        int pos = col + Math.Min (Viewport.X, 0);
-        Move (pos, 0);
-
-        return new Point (pos, 0);
-    }
-
-
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
     {
@@ -152,6 +78,7 @@ public partial class TextField : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+        UpdateCursor ();
     }
 
 

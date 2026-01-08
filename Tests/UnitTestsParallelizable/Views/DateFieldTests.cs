@@ -40,6 +40,7 @@ public class DateFieldTests
     {
         IApplication app = Application.Create();
         app.Init(DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
 
         try
         {
@@ -68,7 +69,7 @@ public class DateFieldTests
 
     [Fact]
     [TestDate]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
+    public void CursorPos_Min_Is_Always_One_Max_Is_Always_Max_Format ()
     {
         var df = new DateField ();
         Assert.Equal (1, df.InsertionPoint);
@@ -80,7 +81,7 @@ public class DateFieldTests
 
     [Fact]
     [TestDate]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
+    public void CursorPos_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
     {
         var df = new DateField ();
 

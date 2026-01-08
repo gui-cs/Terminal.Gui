@@ -5,6 +5,7 @@ namespace DriverTests.AnsiHandling;
 /// <summary>
 ///     Debug tests to understand ANSI mouse button code mapping.
 /// </summary>
+[Collection ("Driver Tests")]
 public class AnsiMouseParserDebugTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

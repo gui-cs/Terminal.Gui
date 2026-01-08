@@ -2,6 +2,7 @@
 
 namespace DriverTests.Keyboard;
 
+[Collection ("Driver Tests")]
 public class KeyCodeTests
 {
     private readonly ITestOutputHelper _output;

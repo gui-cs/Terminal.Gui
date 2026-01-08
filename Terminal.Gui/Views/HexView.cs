@@ -33,6 +33,12 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class HexView : View, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth
     private const int NUM_BYTES_PER_HEX_COLUMN = 4;
     private const int HEX_COLUMN_WIDTH = NUM_BYTES_PER_HEX_COLUMN * 3 + 2; // 3 cols per byte + 1 for vert separator + right space
@@ -53,7 +59,6 @@ public class HexView : View, IDesignable
         Source = source;
 
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
         _leftSideHasFocus = true;
         _firstNibble = true;
 
@@ -107,6 +112,8 @@ public class HexView : View, IDesignable
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 
         SubViewsLaidOut += HexViewSubViewsLaidOut;
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     private void HexViewSubViewsLaidOut (object? sender, LayoutEventArgs e)
@@ -189,26 +196,6 @@ public class HexView : View, IDesignable
             ScrollHorizontal (offsetToNewCursor.X);
         }
     }
-
-    ///<inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        Point position = GetCursor (Address);
-
-        if (HasFocus
-            && position.X >= 0
-            && position.X < Viewport.Width
-            && position.Y >= 0
-            && position.Y < Viewport.Height)
-        {
-            Move (position.X, position.Y);
-
-            return position;
-        }
-
-        return null;
-    }
-
     private SortedDictionary<long, byte> _edits = [];
 
     /// <summary>
@@ -425,6 +412,7 @@ public class HexView : View, IDesignable
             }
 
             SetNeedsDraw ();
+            UpdateCursor ();
         }
 
         return false;
@@ -488,7 +476,7 @@ public class HexView : View, IDesignable
                     if (offset + addressOfFirstLine == Address)
                     {
                         // Selected
-                        SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : GetAttributeForRole (VisualRole.Focus));
+                        SetAttribute (_leftSideHasFocus ? editingAttribute : selectedAttribute);
                     }
                     else
                     {
@@ -524,18 +512,18 @@ public class HexView : View, IDesignable
 
                         //    break;
                         case > 127:
-                        {
-                            byte [] utf8 = GetData (data, offset, 4, out bool _);
-
-                            OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-
-                            while (status == OperationStatus.NeedMoreData)
                             {
-                                status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-                            }
+                                byte [] utf8 = GetData (data, offset, 4, out bool _);
 
-                            break;
-                        }
+                                OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+
+                                while (status == OperationStatus.NeedMoreData)
+                                {
+                                    status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+                                }
+
+                                break;
+                            }
                         default:
                             Rune.DecodeFromUtf8 (new (ref b), out c, out _);
 
@@ -543,10 +531,10 @@ public class HexView : View, IDesignable
                     }
                 }
 
-                if (offset + Source.Position == Address)
+                if (offset == Address)
                 {
                     // Selected
-                    SetAttribute (_leftSideHasFocus ? editingAttribute : edited ? editedAttribute : selectedAttribute);
+                    SetAttribute (selectedAttribute);
                 }
                 else
                 {
@@ -595,9 +583,19 @@ public class HexView : View, IDesignable
     /// </summary>
     protected void RaisePositionChanged ()
     {
+        UpdateCursor ();
+
         HexViewEventArgs args = new (Address, GetPosition (Address), BytesPerLine);
         OnPositionChanged (args);
         PositionChanged?.Invoke (this, args);
+    }
+
+    private void UpdateCursor ()
+    {
+        Cursor = Cursor with
+        {
+            Position = ViewportToScreen (GetCursor (Address))
+        };
     }
 
     /// <summary>
@@ -892,6 +890,8 @@ public class HexView : View, IDesignable
             _leftSideHasFocus = !_leftSideHasFocus;
             _firstNibble = true;
             SetNeedsDraw ();
+
+            UpdateCursor ();
 
             return true;
         }

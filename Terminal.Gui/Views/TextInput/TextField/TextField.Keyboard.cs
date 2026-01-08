@@ -24,7 +24,7 @@ public partial class TextField
 
         GenerateSuggestions ();
 
-        DrawAutocomplete ();
+        //DrawAutocomplete ();
     }
 
     private void GenerateSuggestions ()

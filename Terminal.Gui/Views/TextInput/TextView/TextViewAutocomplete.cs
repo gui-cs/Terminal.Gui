@@ -15,7 +15,6 @@ public class TextViewAutocomplete : PopupAutocomplete
     /// <inheritdoc/>
     protected override void SetCursorPosition (int column)
     {
-        ((TextView)HostControl!).CursorPosition =
-            new (column, ((TextView)HostControl).CurrentRow);
+        ((TextView)HostControl!).InsertionPoint = new (column, ((TextView)HostControl).CurrentRow);
     }
 }

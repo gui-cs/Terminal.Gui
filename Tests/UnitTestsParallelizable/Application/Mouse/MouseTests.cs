@@ -4,6 +4,7 @@ namespace ApplicationTests.MouseTests;
 ///     Tests for the <see cref="IMouse"/> interface and <see cref="MouseImpl"/> implementation.
 ///     These tests demonstrate the decoupled mouse handling that enables parallel test execution.
 /// </summary>
+[Collection("Application Tests")]
 public class MouseTests
 {
     [Fact]

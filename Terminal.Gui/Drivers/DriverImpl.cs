@@ -73,7 +73,20 @@ internal class DriverImpl : IDriver
     public void Init () { throw new NotSupportedException (); }
 
     /// <inheritdoc/>
-    public void Refresh () { _output.Write (_outputBuffer); }
+    public void Refresh ()
+    {
+        // Hide cursor during rendering to prevent flicker
+        Cursor cursor = _output.GetCursor ();
+        if (cursor.IsVisible)
+        {
+            Cursor hiddenCursor = cursor with { Position = null, Style = cursor.Style};
+            _output.SetCursor (hiddenCursor);
+            SetCursorNeedsUpdate (true);
+        }
+        _output.Write (_outputBuffer);
+
+        // Cursor visibility restored by ApplicationMainLoop to reduce flicker
+    }
 
     /// <inheritdoc/>
     public string? GetName () => _componentFactory.GetDriverName ();
@@ -160,21 +173,10 @@ internal class DriverImpl : IDriver
     private readonly ISizeMonitor _sizeMonitor;
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
+    public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
 
     private void CreateClipboard ()
     {
-        string? driverName = GetName ();
-
-        // TODO: When "ansi" is used for real, it can have a real clipboard.
-        // TODO: Need to figure out how to configure that.
-        if (driverName is null || driverName.Contains (DriverRegistry.Names.ANSI, StringComparison.OrdinalIgnoreCase))
-        {
-            Clipboard ??= new FakeClipboard ();
-
-            return;
-        }
-
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
@@ -189,8 +191,6 @@ internal class DriverImpl : IDriver
         {
             Clipboard = new WSLClipboard ();
         }
-
-        // Clipboard is set to FakeClipboard at initialization
     }
 
     #endregion Driver Components
@@ -383,27 +383,30 @@ internal class DriverImpl : IDriver
 
     #region Cursor
 
-    private CursorVisibility _lastCursor = CursorVisibility.Default;
-
-    /// <inheritdoc/>
-    public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
-
-    /// <inheritdoc/>
-    public bool GetCursorVisibility (out CursorVisibility current)
+    /// <inheritdoc />
+    public void SetCursor (Cursor cursor)
     {
-        current = _lastCursor;
-
-        return true;
+        _output.SetCursor (cursor);
     }
 
-    /// <inheritdoc/>
-    public bool SetCursorVisibility (CursorVisibility visibility)
+    /// <inheritdoc />
+    public Cursor GetCursor ()
     {
-        _lastCursor = visibility;
-        _output.SetCursorVisibility (visibility);
-
-        return true;
+        return _output.GetCursor ();
     }
+
+    // Cursor caching fields
+    private bool _cursorNeedsUpdate;
+
+    /// <inheritdoc />
+    public bool GetCursorNeedsUpdate ()
+    {
+        return _cursorNeedsUpdate;
+    }
+
+    /// <param name="needsUpdate"></param>
+    /// <inheritdoc />
+    public void SetCursorNeedsUpdate (bool needsUpdate) { _cursorNeedsUpdate = needsUpdate; }
 
     #endregion Cursor
 

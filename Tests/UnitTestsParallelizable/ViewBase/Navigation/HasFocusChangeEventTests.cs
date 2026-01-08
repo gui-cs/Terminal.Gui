@@ -2,7 +2,7 @@
 
 namespace ViewBaseTests.Navigation;
 
-[Collection ("Global Test Setup")]
+
 public class HasFocusChangeEventTests () : TestsAllViews
 {
     #region HasFocusChanging_NewValue_True

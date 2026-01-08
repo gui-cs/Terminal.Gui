@@ -7,6 +7,7 @@ namespace ApplicationTests.Init;
 ///     These tests ensure the fragile state management logic is robust and catches regressions.
 ///     Tests work directly with ApplicationImpl instances to avoid global Application state issues.
 /// </summary>
+[Collection("Application Tests")]
 public class InitTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

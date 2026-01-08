@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 
 namespace DriverTests.Output;
 
+[Collection ("Driver Tests")]
 public class ClipRegionTests (ITestOutputHelper output) : TestDriverBase
 {
     private readonly ITestOutputHelper _output = output;

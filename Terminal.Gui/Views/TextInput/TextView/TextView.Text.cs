@@ -14,7 +14,8 @@ public partial class TextView
         private set
         {
             _currentColumn = value;
-            _cursorPosition = new (_currentColumn, _currentRow);
+            _insertionPoint = new (_currentColumn, _currentRow);
+            PositionCursor ();
         }
     }
 
@@ -25,18 +26,21 @@ public partial class TextView
         private set
         {
             _currentRow = value;
-            _cursorPosition = new (_currentColumn, _currentRow);
+            _insertionPoint = new (_currentColumn, _currentRow);
+            PositionCursor ();
         }
     }
 
-    private Point _cursorPosition;
+    private Point _insertionPoint;
 
     /// <summary>Sets or gets the current cursor position.</summary>
-    public Point CursorPosition
+    public Point InsertionPoint
     {
-        get => _cursorPosition;
+        get => _insertionPoint;
         set
         {
+            Point oldPosition = _insertionPoint;
+
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
 
             CurrentColumn = value.X < 0 ? 0 :
@@ -44,8 +48,16 @@ public partial class TextView
 
             CurrentRow = value.Y < 0 ? 0 :
                          value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
-            SetNeedsDraw ();
+
             Adjust ();
+
+            // Signal cursor position changed without requiring additional redraw
+            Point newPosition = new (CurrentColumn, CurrentRow);
+
+            if (newPosition != oldPosition)
+            {
+                PositionCursor ();
+            }
         }
     }
 
@@ -92,23 +104,24 @@ public partial class TextView
         {
             _multiline = value;
 
-            if (_multiline && !_allowsTab)
+            if (_multiline && !_tabKeyAddsTab)
             {
-                AllowsTab = true;
+                TabKeyAddsTab = true;
             }
 
-            if (_multiline && !_allowsReturn)
+            if (_multiline && !_enterKeyAddsLine)
             {
-                AllowsReturn = true;
+                EnterKeyAddsLine = true;
             }
 
             if (!_multiline)
             {
-                AllowsReturn = false;
-                AllowsTab = false;
+                EnterKeyAddsLine = false;
+                TabKeyAddsTab = false;
                 WordWrap = false;
-                CurrentColumn = 0;
-                CurrentRow = 0;
+                // Don't reset cursor position - this causes unwanted scrolling (issue #3988)
+                // CurrentColumn = 0;
+                // CurrentRow = 0;
                 _savedHeight = Height;
 
                 Height = Dim.Auto (DimAutoStyle.Text, 1);
@@ -143,6 +156,7 @@ public partial class TextView
             if (value != _isReadOnly)
             {
                 _isReadOnly = value;
+                CanFocus = !_isReadOnly;
 
                 SetNeedsDraw ();
                 WrapTextModel ();
@@ -153,7 +167,10 @@ public partial class TextView
 
     private int _tabWidth = 4;
 
-    /// <summary>Gets or sets a value indicating the number of whitespace when pressing the TAB key.</summary>
+    /// <summary>
+    ///     Gets or sets the number of columns that will be used for tab characters in the text.
+    ///     The default is 4.
+    /// </summary>
     public int TabWidth
     {
         get => _tabWidth;
@@ -161,9 +178,9 @@ public partial class TextView
         {
             _tabWidth = Math.Max (value, 0);
 
-            if (_tabWidth > 0 && !AllowsTab)
+            if (_tabWidth > 0 && !TabKeyAddsTab)
             {
-                AllowsTab = true;
+                TabKeyAddsTab = true;
             }
 
             SetNeedsDraw ();
@@ -225,19 +242,19 @@ public partial class TextView
 
     /// <summary>Gets all lines of characters.</summary>
     /// <returns></returns>
-    public List<List<Cell>> GetAllLines () { return _model.GetAllLines (); }
+    public List<List<Cell>> GetAllLines () => _model.GetAllLines ();
 
     /// <summary>
     ///     Returns the characters on the current line (where the cursor is positioned). Use <see cref="CurrentColumn"/>
     ///     to determine the position of the cursor within that line
     /// </summary>
     /// <returns></returns>
-    public List<Cell> GetCurrentLine () { return _model.GetLine (CurrentRow); }
+    public List<Cell> GetCurrentLine () => _model.GetLine (CurrentRow);
 
     /// <summary>Returns the characters on the <paramref name="line"/>.</summary>
     /// <param name="line">The intended line.</param>
     /// <returns></returns>
-    public List<Cell> GetLine (int line) { return _model.GetLine (line); }
+    public List<Cell> GetLine (int line) => _model.GetLine (line);
 
     /// <summary>
     ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
@@ -267,10 +284,8 @@ public partial class TextView
             {
                 Adjust ();
             }
-            else
-            {
-                PositionCursor ();
-            }
+
+            PositionCursor ();
         }
     }
 
@@ -329,7 +344,7 @@ public partial class TextView
 
             _historyText.Add (
                               [.. removedLines],
-                              CursorPosition,
+                              InsertionPoint,
                               TextEditingLineStatus.Removed
                              );
 
@@ -360,7 +375,7 @@ public partial class TextView
 
         _historyText.Add (
                           [.. removedLines],
-                          CursorPosition,
+                          InsertionPoint,
                           TextEditingLineStatus.Removed
                          );
 
@@ -513,7 +528,7 @@ public partial class TextView
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add ([[.. line]], CursorPosition);
+        _historyText.Add ([[.. line]], InsertionPoint);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -523,7 +538,7 @@ public partial class TextView
 
             _historyText.Add (
                               [[.. line]],
-                              CursorPosition,
+                              InsertionPoint,
                               TextEditingLineStatus.Replaced
                              );
 
@@ -553,7 +568,7 @@ public partial class TextView
         // First line is inserted at the current location, the rest is appended
         line.InsertRange (CurrentColumn, lines [0]);
 
-        List<List<Cell>> addedLines = [[..line]];
+        List<List<Cell>> addedLines = [[.. line]];
 
         for (var i = 1; i < lines.Count; i++)
         {
@@ -571,14 +586,14 @@ public partial class TextView
             addedLines.Last ().InsertRange (addedLines.Last ().Count, rest);
         }
 
-        _historyText.Add (addedLines, CursorPosition, TextEditingLineStatus.Added);
+        _historyText.Add (addedLines, InsertionPoint, TextEditingLineStatus.Added);
 
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
         CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
         Adjust ();
 
-        _historyText.Add ([[..line]], CursorPosition, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
         OnContentsChanged ();
@@ -594,7 +609,7 @@ public partial class TextView
 
         SetWrapModel ();
 
-        _historyText.Add ([[..GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
 
         if (IsSelecting)
         {
@@ -632,8 +647,8 @@ public partial class TextView
         }
 
         _historyText.Add (
-                          [[..GetCurrentLine ()]],
-                          CursorPosition,
+                          [[.. GetCurrentLine ()]],
+                          InsertionPoint,
                           TextEditingLineStatus.Replaced
                          );
 

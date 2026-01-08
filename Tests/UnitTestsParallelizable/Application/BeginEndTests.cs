@@ -7,6 +7,7 @@ namespace ApplicationTests.BeginEnd;
 ///     These tests ensure the fragile state management logic is robust and catches regressions.
 ///     Tests work directly with ApplicationImpl instances to avoid global Application state issues.
 /// </summary>
+[Collection ("Application Tests")]
 public class ApplicationImplBeginEndTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
@@ -191,39 +192,6 @@ public class ApplicationImplBeginEndTests (ITestOutputHelper output)
         {
             runnable1?.Dispose ();
             runnable2?.Dispose ();
-            app.Dispose ();
-        }
-    }
-
-    [Fact (Skip = "This test may be bogus. What's wrong with ending a non-top session?")]
-    public void End_ThrowsArgumentException_WhenNotBalanced ()
-    {
-        IApplication app = Application.Create ();
-        Runnable? runnable1 = null;
-        Runnable? runnable2 = null;
-
-        try
-        {
-            runnable1 = new () { Id = "1" };
-            runnable2 = new () { Id = "2" };
-
-            SessionToken? token1 = app.Begin (runnable1);
-            SessionToken? token2 = app.Begin (runnable2);
-
-            // Trying to end token1 when token2 is on top should throw
-            // NOTE: This throws but has the side effect of popping token2 from the stack
-            Assert.Throws<ArgumentException> (() => app.End (token1!));
-
-            // Don't try to clean up with more End calls - the state is now inconsistent
-            // Let Shutdown/ResetState handle cleanup
-        }
-        finally
-        {
-            // Dispose runnables BEFORE Shutdown to satisfy DEBUG_IDISPOSABLE assertions
-            runnable1?.Dispose ();
-            runnable2?.Dispose ();
-
-            // Shutdown will call ResetState which clears any remaining state
             app.Dispose ();
         }
     }

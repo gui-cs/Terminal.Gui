@@ -2,6 +2,7 @@
 
 namespace DriverTests.AnsiHandling;
 
+[Collection ("Driver Tests")]
 public class EscSeqRequestsTests : TestDriverBase
 {
     [Fact]

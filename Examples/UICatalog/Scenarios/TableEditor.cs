@@ -1006,7 +1006,7 @@ public class TableEditor : Scenario
         var cancel = new Button { Text = "_Cancel" };
         var d = new Dialog { Title = title, Buttons = [cancel, ok] };
         var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table.ColumnNames [e.Col] };
-        var tf = new TextField { Text = oldValue, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
+        var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();

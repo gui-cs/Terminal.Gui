@@ -73,6 +73,12 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public partial class TextView : View, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
+
     // The column we are tracking, or -1 if we are not tracking any column
     private string? _currentCaller;
     private CultureInfo? _currentCulture;
@@ -85,7 +91,6 @@ public partial class TextView : View, IDesignable
     public TextView ()
     {
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
         Used = true;
 
         // By default, disable hotkeys (in case someone sets Title)
@@ -101,6 +106,8 @@ public partial class TextView : View, IDesignable
         CreateCommandsAndBindings ();
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     private void TextView_Initialized (object sender, EventArgs e)
@@ -110,8 +117,7 @@ public partial class TextView : View, IDesignable
         ContextMenu = CreateContextMenu ();
         App?.Popover?.Register (ContextMenu);
         KeyBindings.Add (ContextMenu.Key, Command.Context);
-
-        OnContentsChanged ();
+        PositionCursor ();
     }
 
     private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
@@ -149,18 +155,12 @@ public partial class TextView : View, IDesignable
     }
 
     /// <summary>Positions the cursor on the current row and column</summary>
-    public override Point? PositionCursor ()
+    public void PositionCursor ()
     {
-        ProcessAutocomplete ();
-
-        if (!CanFocus || !Enabled || Driver is null)
+        if (!CanFocus || !Enabled || ReadOnly || Driver is null)
         {
-            return null;
-        }
-
-        if (App?.Mouse.MouseGrabView == this && IsSelecting)
-        {
-            SetNeedsDraw ();
+            Cursor = Cursor with { Position = null };
+            return;
         }
 
         List<Cell> line = _model.GetLine (CurrentRow);
@@ -179,7 +179,18 @@ public partial class TextView : View, IDesignable
 
                 if (line [idx].Grapheme == "\t")
                 {
-                    cols += TabWidth + 1;
+                    if (TabWidth > 0)
+                    {
+                        // Calculate columns to next tab stop
+                        // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
+                        // If we're at visual column col, advance to next tab stop
+                        cols = TabWidth - col % TabWidth;
+                    }
+                    else
+                    {
+                        // When TabWidth is 0, tabs are invisible (0 columns)
+                        cols = 0;
+                    }
                 }
                 else
                 {
@@ -201,13 +212,15 @@ public partial class TextView : View, IDesignable
 
         if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
         {
-            // BUGBUG: Move should not be called outside the View.Draw loop.
-            Move (col, CurrentRow - _topRow);
-
-            return new (col, CurrentRow - _topRow);
+            Cursor = Cursor with
+            {
+                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow))
+            };
         }
-
-        return null; // Hide cursor
+        else
+        {
+            Cursor = Cursor with { Position = null };
+        }
     }
 
     private PopoverMenu CreateContextMenu ()
@@ -248,7 +261,7 @@ public partial class TextView : View, IDesignable
 
         // This enables AllViews_HasFocus_Changed_Event to pass since it requires
         // tab navigation to work
-        AllowsTab = false;
+        TabKeyAddsTab = false;
 
         return true;
     }

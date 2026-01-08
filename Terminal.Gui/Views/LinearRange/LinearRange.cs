@@ -6,8 +6,18 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class LinearRange : LinearRange<object>
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
+
     /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
-    public LinearRange () { }
+    public LinearRange ()
+    {
+        Cursor = new () { Style = DefaultCursorStyle };
+    }
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
     /// <param name="options">Initial options.</param>
@@ -45,10 +55,10 @@ public class LinearRange<T> : View, IOrientation
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
         CanFocus = true;
-        CursorVisibility = CursorVisibility.Default;
 
         _options = options;
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = _config._linearRangeOrientation = orientation;
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
@@ -94,13 +104,15 @@ public class LinearRange<T> : View, IOrientation
     #region Constructors
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
-    public LinearRange () : this (new ()) { }
+    public LinearRange () : this (new ())  { }
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
     /// <param name="options">Initial options.</param>
     /// <param name="orientation">Initial orientation.</param>
     public LinearRange (List<T>? options, Orientation orientation = Orientation.Horizontal)
     {
+        Cursor = new () { Style = LinearRange.DefaultCursorStyle };
+
         if (options is null)
         {
             return;
@@ -205,7 +217,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<int>>? MinimumInnerSpacingChanged;
 
     /// <summary>Called before <see cref="MinimumInnerSpacing"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnMinimumInnerSpacingChanging (ValueChangingEventArgs<int> args) => false;
+    protected virtual bool OnMinimumInnerSpacingChanging (ValueChangingEventArgs<int> args) { return false; }
 
     /// <summary>Called after <see cref="MinimumInnerSpacing"/> has changed.</summary>
     protected virtual void OnMinimumInnerSpacingChanged (ValueChangedEventArgs<int> args) { }
@@ -246,7 +258,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<LinearRangeType>>? TypeChanged;
 
     /// <summary>Called before <see cref="Type"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnTypeChanging (ValueChangingEventArgs<LinearRangeType> args) => false;
+    protected virtual bool OnTypeChanging (ValueChangingEventArgs<LinearRangeType> args) { return false; }
 
     /// <summary>Called after <see cref="Type"/> has changed.</summary>
     protected virtual void OnTypeChanged (ValueChangedEventArgs<LinearRangeType> args) { }
@@ -324,7 +336,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<Orientation>>? LegendsOrientationChanged;
 
     /// <summary>Called before <see cref="LegendsOrientation"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnLegendsOrientationChanging (ValueChangingEventArgs<Orientation> args) => false;
+    protected virtual bool OnLegendsOrientationChanging (ValueChangingEventArgs<Orientation> args) { return false; }
 
     /// <summary>Called after <see cref="LegendsOrientation"/> has changed.</summary>
     protected virtual void OnLegendsOrientationChanged (ValueChangedEventArgs<Orientation> args) { }
@@ -390,7 +402,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<bool>>? ShowEndSpacingChanged;
 
     /// <summary>Called before <see cref="ShowEndSpacing"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnShowEndSpacingChanging (ValueChangingEventArgs<bool> args) => false;
+    protected virtual bool OnShowEndSpacingChanging (ValueChangingEventArgs<bool> args) { return false; }
 
     /// <summary>Called after <see cref="ShowEndSpacing"/> has changed.</summary>
     protected virtual void OnShowEndSpacingChanged (ValueChangedEventArgs<bool> args) { }
@@ -428,7 +440,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<bool>>? ShowLegendsChanged;
 
     /// <summary>Called before <see cref="ShowLegends"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnShowLegendsChanging (ValueChangingEventArgs<bool> args) => false;
+    protected virtual bool OnShowLegendsChanging (ValueChangingEventArgs<bool> args) { return false; }
 
     /// <summary>Called after <see cref="ShowLegends"/> has changed.</summary>
     protected virtual void OnShowLegendsChanged (ValueChangedEventArgs<bool> args) { }
@@ -468,7 +480,7 @@ public class LinearRange<T> : View, IOrientation
     public event EventHandler<ValueChangedEventArgs<bool>>? UseMinimumSizeChanged;
 
     /// <summary>Called before <see cref="UseMinimumSize"/> changes. Return true to cancel the change.</summary>
-    protected virtual bool OnUseMinimumSizeChanging (ValueChangingEventArgs<bool> args) => false;
+    protected virtual bool OnUseMinimumSizeChanging (ValueChangingEventArgs<bool> args) { return false; }
 
     /// <summary>Called after <see cref="UseMinimumSize"/> has changed.</summary>
     protected virtual void OnUseMinimumSizeChanged (ValueChangedEventArgs<bool> args) { }
@@ -522,8 +534,21 @@ public class LinearRange<T> : View, IOrientation
 
     #region Public Methods
 
+    private int _focusedOption;
+
     /// <summary>The focused option (has the cursor).</summary>
-    public int FocusedOption { get; set; }
+    public int FocusedOption
+    {
+        get => _focusedOption;
+        set
+        {
+            if (_focusedOption != value)
+            {
+                _focusedOption = value;
+                UpdateCursor ();
+            }
+        }
+    }
 
     /// <summary>Causes the specified option to be set and be focused.</summary>
     public bool SetOption (int optionIndex)
@@ -881,19 +906,26 @@ public class LinearRange<T> : View, IOrientation
         return false;
     }
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
+    /// <summary>Updates the cursor position based on the focused option.</summary>
+    /// <remarks>
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor"/>.
+    ///     The framework automatically handles hiding the cursor when the view loses focus.
+    /// </remarks>
+    private void UpdateCursor ()
     {
         if (!TryGetPositionByOption (FocusedOption, out (int x, int y) position)
             || !IsInitialized
             || !Viewport.Contains (position.x, position.y))
         {
-            return base.PositionCursor ();
+            Cursor = Cursor with { Position = null }; // Hide cursor
+
+            return;
         }
 
-        Move (position.x, position.y);
-
-        return new (position.x, position.y);
+        Cursor = Cursor with
+        {
+            Position = ViewportToScreen (new Point (position.x, position.y))
+        };
     }
 
     #endregion Cursor and Position
@@ -1855,7 +1887,7 @@ public class LinearRange<T> : View, IOrientation
         return true;
     }
 
-    internal bool Select () => SetFocusedOption ();
+    internal bool Select () { return SetFocusedOption (); }
 
     internal bool Accept (ICommandContext? commandContext)
     {

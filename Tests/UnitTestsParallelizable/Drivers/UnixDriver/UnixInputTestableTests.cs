@@ -8,6 +8,7 @@ namespace DriverTests.Unix;
 /// </summary>
 [Trait ("Category", "Unix")]
 [Trait ("Platform", "Unix")]
+[Collection ("Driver Tests")]
 public class UnixInputTestableTests
 {
     #region Helper Methods

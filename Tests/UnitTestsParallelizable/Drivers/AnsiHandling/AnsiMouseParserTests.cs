@@ -1,5 +1,6 @@
 ﻿namespace DriverTests.AnsiHandling;
 
+[Collection ("Driver Tests")]
 public class AnsiMouseParserTests
 {
     private readonly AnsiMouseParser _parser = new ();

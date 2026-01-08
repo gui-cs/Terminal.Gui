@@ -176,7 +176,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         {
             if (++tries > 10)
             {
-                Assert.Fail ($"{view} is not leaving.");
+                Assert.Fail ($"{view} is not leaving after {tries} attempts.");
             }
 
             switch (view.TabStop)
@@ -352,7 +352,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void GetMostFocused_NoSubViews_Returns_Null ()
+    public void GetMostFocused_NoSubViews_Returns_This ()
     {
         var view = new View ();
         Assert.Null (view.Focused);
@@ -361,7 +361,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.False (view.HasFocus);
         view.SetFocus ();
         Assert.True (view.HasFocus);
-        Assert.Null (view.MostFocused);
+        Assert.Equal (view, view.MostFocused);
     }
 
     [Fact]

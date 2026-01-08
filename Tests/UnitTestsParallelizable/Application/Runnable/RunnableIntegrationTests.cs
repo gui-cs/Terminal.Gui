@@ -7,6 +7,7 @@ namespace ApplicationTests.RunnableTests;
 ///     Integration tests for IApplication's IRunnable support.
 ///     Tests the full lifecycle of IRunnable instances through Application methods.
 /// </summary>
+[Collection ("Application Tests")]
 public class ApplicationRunnableIntegrationTests
 {
     [Fact]
@@ -428,39 +429,6 @@ public class ApplicationRunnableIntegrationTests
 
         // Cleanup
         app.End (token!);
-    }
-
-    [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
-    public void RunGeneric_CreatesAndReturnsRunnable ()
-    {
-        // Arrange
-        IApplication app = CreateAndInitApp ();
-        app.StopAfterFirstIteration = true;
-
-        // Act - With fluent API, Run<T>() returns IApplication for chaining
-        IApplication result = app.Run<TestRunnable> ();
-
-        // Assert
-        Assert.NotNull (result);
-        Assert.Same (app, result); // Fluent API returns this
-
-        // Note: Run blocks until stopped, but StopAfterFirstIteration makes it return immediately
-        // The runnable is automatically disposed by Dispose()
-    }
-
-    [Fact (Skip = "Run methods with main loop are not suitable for parallel tests - use non-parallel UnitTests instead")]
-    public void RunGeneric_ThrowsIfNotInitialized ()
-    {
-        // Arrange
-        IApplication app = Application.Create ();
-
-        // Don't call Init
-
-        // Act & Assert
-        Assert.Throws<NotInitializedException> (() => app.Run<TestRunnable> ());
-
-        // Cleanup
-        app.Dispose ();
     }
 
     private IApplication CreateAndInitApp ()

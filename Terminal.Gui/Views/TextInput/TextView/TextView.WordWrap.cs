@@ -43,7 +43,7 @@ public partial class TextView
 
 
 
-    /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.</summary>
+    /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="InsertionPoint"/>.</summary>
     public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
     {
         int? row = cRow ?? CurrentRow;
@@ -58,7 +58,7 @@ public partial class TextView
         UnwrappedCursorPosition?.Invoke (this, new (col.Value, row.Value));
     }
 
-    /// <summary>Invoked with the unwrapped <see cref="CursorPosition"/>.</summary>
+    /// <summary>Invoked with the unwrapped <see cref="InsertionPoint"/>.</summary>
     public event EventHandler<Point>? UnwrappedCursorPosition;
 
     private (int Row, int Col) GetUnwrappedPosition (int line, int col)

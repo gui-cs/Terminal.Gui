@@ -1,6 +1,7 @@
 ﻿#nullable enable
 namespace DriverTests.AnsiHandling;
 
+[Collection ("Driver Tests")]
 public class AnsiKeyboardParserTests
 {
     private readonly AnsiKeyboardParser _parser = new ();

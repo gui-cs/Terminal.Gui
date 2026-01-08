@@ -3,6 +3,7 @@ using System.Text;
 
 namespace DriverTests.Dotnet;
 
+[Collection ("Driver Tests")]
 public class NetInputProcessorTests
 {
     public static IEnumerable<object []> GetConsoleKeyInfoToKeyTestCases_Rune ()

@@ -4,6 +4,7 @@ namespace ApplicationTests.TimedEventTests;
 /// <summary>
 ///     Tests for TimedEvents class, focusing on high-resolution timing with Stopwatch.
 /// </summary>
+[Collection("Application Timer Tests")]
 public class TimedEventsTests
 {
     [Fact]

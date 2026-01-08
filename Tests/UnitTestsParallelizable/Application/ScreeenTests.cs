@@ -6,6 +6,7 @@ namespace ApplicationTests.Screen;
 ///     Parallelizable tests for IApplication.ScreenChanged event and Screen property.
 ///     Tests using the modern instance-based IApplication API.
 /// </summary>
+[Collection("Application Tests")]
 public class ScreenTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

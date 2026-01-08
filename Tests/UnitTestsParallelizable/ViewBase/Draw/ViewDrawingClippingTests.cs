@@ -23,20 +23,6 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
     }
 
     [Fact]
-    public void SetClip_NullRegion_DoesNothing ()
-    {
-        IDriver driver = CreateTestDriver ();
-        var original = new Region (new (5, 5, 10, 10));
-        driver.Clip = original;
-
-        View view = new () { Driver = driver };
-
-        view.SetClip (null);
-
-        Assert.Equal (original, driver.Clip);
-    }
-
-    [Fact]
     public void SetClip_ValidRegion_SetsDriverClip ()
     {
         IDriver driver = CreateTestDriver ();
@@ -861,7 +847,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
         Assert.Equal (newClip, driver.Clip);
     }
 
-    [Fact (Skip = "See BUGBUG in SetClip")]
+    [Fact]// (Skip = "See BUGBUG in SetClip")]
     public void SetClip_WithNullClip_ClearsClip ()
     {
         IDriver driver = CreateTestDriver ();

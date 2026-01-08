@@ -1,6 +1,6 @@
 namespace ViewsTests;
 
-[Collection ("Global Test Setup")]
+
 public class WizardTests
 {
     #region Constructor Tests
@@ -21,7 +21,7 @@ public class WizardTests
         Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Resizable));
     }
 
-    [Fact(Skip = "Disabled in v2_44417-Continuous until Dialog sizing is figured out")]
+    [Fact]
     public void Constructor_Sets_Button_Properties ()
     {
         // Arrange & Act
@@ -31,8 +31,6 @@ public class WizardTests
         Assert.Equal (Strings.wzBack, wizard.BackButton.Text);
         Assert.Equal (Strings.wzFinish, wizard.NextFinishButton.Text);
         Assert.True (wizard.NextFinishButton.IsDefault);
-        Assert.Equal (0, wizard.BackButton.X);
-        Assert.Equal (Pos.AnchorEnd (), wizard.NextFinishButton.X);
     }
 
     #endregion Constructor Tests

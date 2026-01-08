@@ -66,7 +66,7 @@ public partial class TextView
                 startLine++;
             }
 
-            CursorPosition = obj.FinalInsertionPoint;
+            InsertionPoint = obj.FinalInsertionPoint;
         }
 
         UpdateWrapModel ();
