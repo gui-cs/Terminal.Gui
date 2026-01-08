@@ -163,7 +163,7 @@ jobs:
         echo "============================================"
         
         # Use default parallelization (4x CPU cores)
-        echo "Using default parallelization (4x)"
+        echo "Using (4x) parallelization"
         
         # Run tests with or without coverage based on OS
         if [ "${{ runner.os }}" == "Linux" ]; then
