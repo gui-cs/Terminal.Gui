@@ -180,7 +180,18 @@ public partial class TextView : View, IDesignable
 
                 if (line [idx].Grapheme == "\t")
                 {
-                    cols += TabWidth + 1;
+                    if (TabWidth > 0)
+                    {
+                        // Calculate columns to next tab stop
+                        // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
+                        // If we're at visual column col, advance to next tab stop
+                        cols = TabWidth - col % TabWidth;
+                    }
+                    else
+                    {
+                        // When TabWidth is 0, tabs are invisible (0 columns)
+                        cols = 0;
+                    }
                 }
                 else
                 {
@@ -209,7 +220,7 @@ public partial class TextView : View, IDesignable
         }
         else
         {
-            Cursor = Cursor with {Position = null };
+            Cursor = Cursor with { Position = null };
         }
     }
 

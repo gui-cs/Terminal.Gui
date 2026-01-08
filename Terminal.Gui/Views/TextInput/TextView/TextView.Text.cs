@@ -53,6 +53,7 @@ public partial class TextView
 
             // Signal cursor position changed without requiring additional redraw
             Point newPosition = new (CurrentColumn, CurrentRow);
+
             if (newPosition != oldPosition)
             {
                 PositionCursor ();
@@ -165,7 +166,10 @@ public partial class TextView
 
     private int _tabWidth = 4;
 
-    /// <summary>Gets or sets a value indicating the number of whitespace when pressing the TAB key.</summary>
+    /// <summary>
+    ///     Gets or sets the number of columns that will be used for tab characters in the text.
+    ///     The default is 4.
+    /// </summary>
     public int TabWidth
     {
         get => _tabWidth;
@@ -237,19 +241,19 @@ public partial class TextView
 
     /// <summary>Gets all lines of characters.</summary>
     /// <returns></returns>
-    public List<List<Cell>> GetAllLines () { return _model.GetAllLines (); }
+    public List<List<Cell>> GetAllLines () => _model.GetAllLines ();
 
     /// <summary>
     ///     Returns the characters on the current line (where the cursor is positioned). Use <see cref="CurrentColumn"/>
     ///     to determine the position of the cursor within that line
     /// </summary>
     /// <returns></returns>
-    public List<Cell> GetCurrentLine () { return _model.GetLine (CurrentRow); }
+    public List<Cell> GetCurrentLine () => _model.GetLine (CurrentRow);
 
     /// <summary>Returns the characters on the <paramref name="line"/>.</summary>
     /// <param name="line">The intended line.</param>
     /// <returns></returns>
-    public List<Cell> GetLine (int line) { return _model.GetLine (line); }
+    public List<Cell> GetLine (int line) => _model.GetLine (line);
 
     /// <summary>
     ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
@@ -279,6 +283,7 @@ public partial class TextView
             {
                 Adjust ();
             }
+
             PositionCursor ();
         }
     }
@@ -323,7 +328,7 @@ public partial class TextView
         var endCol = (int)(end & 0xffffffff);
         List<Cell> line = _model.GetLine (startRow);
 
-        _historyText.Add ([ [.. line]], new (startCol, startRow));
+        _historyText.Add ([[.. line]], new (startCol, startRow));
 
         List<List<Cell>> removedLines = [];
 
@@ -522,7 +527,7 @@ public partial class TextView
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add ([ [.. line]], InsertionPoint);
+        _historyText.Add ([[.. line]], InsertionPoint);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -531,7 +536,7 @@ public partial class TextView
             CurrentColumn += lines [0].Count;
 
             _historyText.Add (
-                              [ [.. line]],
+                              [[.. line]],
                               InsertionPoint,
                               TextEditingLineStatus.Replaced
                              );
@@ -562,7 +567,7 @@ public partial class TextView
         // First line is inserted at the current location, the rest is appended
         line.InsertRange (CurrentColumn, lines [0]);
 
-        List<List<Cell>> addedLines = [ [.. line]];
+        List<List<Cell>> addedLines = [[.. line]];
 
         for (var i = 1; i < lines.Count; i++)
         {
@@ -587,7 +592,7 @@ public partial class TextView
         CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
         Adjust ();
 
-        _historyText.Add ([ [.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
         OnContentsChanged ();
@@ -603,7 +608,7 @@ public partial class TextView
 
         SetWrapModel ();
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
 
         if (IsSelecting)
         {
@@ -641,7 +646,7 @@ public partial class TextView
         }
 
         _historyText.Add (
-                          [ [.. GetCurrentLine ()]],
+                          [[.. GetCurrentLine ()]],
                           InsertionPoint,
                           TextEditingLineStatus.Replaced
                          );
