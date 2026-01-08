@@ -6,8 +6,18 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class LinearRange : LinearRange<object>
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
+
     /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
-    public LinearRange () { }
+    public LinearRange ()
+    {
+        Cursor = new () { Style = DefaultCursorStyle };
+    }
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange"/> class.</summary>
     /// <param name="options">Initial options.</param>
@@ -94,13 +104,15 @@ public class LinearRange<T> : View, IOrientation
     #region Constructors
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
-    public LinearRange () : this (new ()) { }
+    public LinearRange () : this (new ())  { }
 
     /// <summary>Initializes a new instance of the <see cref="LinearRange{T}"/> class.</summary>
     /// <param name="options">Initial options.</param>
     /// <param name="orientation">Initial orientation.</param>
     public LinearRange (List<T>? options, Orientation orientation = Orientation.Horizontal)
     {
+        Cursor = new () { Style = LinearRange.DefaultCursorStyle };
+
         if (options is null)
         {
             return;
@@ -905,15 +917,14 @@ public class LinearRange<T> : View, IOrientation
             || !IsInitialized
             || !Viewport.Contains (position.x, position.y))
         {
-            Cursor = new () { Position = null, Style = Cursor.Style }; // Hide cursor
+            Cursor = Cursor with { Position = null }; // Hide cursor
 
             return;
         }
 
         Cursor = Cursor with
         {
-            Position = ViewportToScreen (new Point (position.x, position.y)),
-            Style = CursorStyle.Default
+            Position = ViewportToScreen (new Point (position.x, position.y))
         };
     }
 

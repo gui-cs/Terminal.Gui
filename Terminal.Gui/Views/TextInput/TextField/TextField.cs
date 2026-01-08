@@ -5,6 +5,12 @@ namespace Terminal.Gui.Views;
 public partial class TextField : View, IDesignable
 {
     /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="TextField"/> class.
     /// </summary>
     public TextField ()
@@ -29,6 +35,8 @@ public partial class TextField : View, IDesignable
         CreateCommandsAndBindings ();
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     private void TextField_Initialized (object? sender, EventArgs e)

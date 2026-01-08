@@ -73,6 +73,12 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public partial class TextView : View, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default cursor style.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
+
     // The column we are tracking, or -1 if we are not tracking any column
     private string? _currentCaller;
     private CultureInfo? _currentCulture;
@@ -100,6 +106,8 @@ public partial class TextView : View, IDesignable
         CreateCommandsAndBindings ();
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+        Cursor = new () { Style = DefaultCursorStyle };
     }
 
     private void TextView_Initialized (object sender, EventArgs e)
@@ -152,7 +160,7 @@ public partial class TextView : View, IDesignable
     {
         if (!CanFocus || !Enabled || ReadOnly || Driver is null)
         {
-            Cursor = new ();
+            Cursor = Cursor with { Position = null };
             return;
         }
 
@@ -196,13 +204,12 @@ public partial class TextView : View, IDesignable
         {
             Cursor = Cursor with
             {
-                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow)),
-                Style = CursorStyle.Default
+                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow))
             };
         }
         else
         {
-            Cursor = new ();
+            Cursor = Cursor with {Position = null };
         }
     }
 
