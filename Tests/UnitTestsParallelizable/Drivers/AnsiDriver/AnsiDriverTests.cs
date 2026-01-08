@@ -7,6 +7,7 @@ namespace DriverTests.Ansi;
 /// <summary>
 ///     Tests for the AnsiDriver to ensure it works properly with the modern component factory architecture.
 /// </summary>
+[Collection ("Driver Tests")]
 public class AnsiDriverTests (ITestOutputHelper output) : TestDriverBase
 {
     private readonly ITestOutputHelper _output = output;

@@ -7,6 +7,7 @@ namespace ApplicationTests.MouseTests;
 ///     Tests the decoupled mouse handling without Application.Init or global state.
 /// </summary>
 [Trait ("Category", "Input")]
+[Collection("Application Tests")]
 public class MouseInterfaceTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

@@ -5,6 +5,17 @@ using Xunit.Abstractions;
 
 namespace DriverTests;
 
+/// <summary>
+///     Collection definition for Application Timer Related tests.
+///     Tests in this collection run sequentially to avoid conflicts with Application lifecycle and state.
+/// </summary>
+[CollectionDefinition ("Driver Tests")]
+public class DriverTestCollection
+{
+    // This class is never instantiated - it's just a marker for xUnit
+}
+
+[Collection ("Driver Tests")]
 public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
 {
 

@@ -9,6 +9,7 @@ namespace DriverTests.AnsiHandling;
 ///     CoPilot - GitHub Copilot (GPT-4)
 /// </remarks>
 [Trait ("Category", "AnsiHandling")]
+[Collection ("Driver Tests")]
 public class AnsiKeyboardEncoderTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

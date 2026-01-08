@@ -3,6 +3,7 @@ using Moq;
 
 namespace ApplicationTests;
 
+[Collection ("Application Tests")]
 public class ApplicationImplTests
 {
 

@@ -2,6 +2,7 @@
 
 namespace DriverTests.Output;
 
+[Collection ("Driver Tests")]
 public class OutputBaseTests
 {
     [Fact]

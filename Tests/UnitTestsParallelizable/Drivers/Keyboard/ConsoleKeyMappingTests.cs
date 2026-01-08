@@ -1,5 +1,6 @@
 namespace DriverTests.Keyboard;
 
+[Collection ("Driver Tests")]
 public class ConsoleKeyMappingTests
 {
     [Theory]

@@ -4,6 +4,7 @@ namespace DriverTests.Windows;
 
 
 [Trait ("Platform", "Windows")]
+[Collection ("Driver Tests")]
 public class WindowsKeyConverterTests
 {
     private readonly WindowsKeyConverter _converter = new ();

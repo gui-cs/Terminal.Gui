@@ -11,6 +11,7 @@ namespace ApplicationTests;
 ///     These tests ensure that the input thread starts, runs, and stops correctly when applications
 ///     are created, initialized, and disposed.
 /// </summary>
+[Collection("Application Tests")]
 public class MainLoopCoordinatorTests : IDisposable
 {
     private readonly List<IApplication> _createdApps = new ();

@@ -9,6 +9,7 @@ namespace DriverTests.DotnetDriver;
 ///     These tests are designed to fail with good error messages when run in environments
 ///     without a real terminal (like GitHub Actions).
 /// </summary>
+[Collection ("Driver Tests")]
 public class NetInputOutputTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

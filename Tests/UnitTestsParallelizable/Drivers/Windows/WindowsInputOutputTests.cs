@@ -9,6 +9,7 @@ namespace DriverTests.WindowsDriver;
 ///     without a real terminal (like GitHub Actions).
 /// </summary>
 [Trait ("Platform", "Windows")]
+[Collection ("Driver Tests")]
 public class WindowsInputOutputTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

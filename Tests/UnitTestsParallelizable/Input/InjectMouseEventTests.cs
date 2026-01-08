@@ -8,6 +8,7 @@ namespace DriverTests.MouseTests;
 ///     Tests validate the entire pipeline: MouseEventArgs → TInputRecord → Queue → ProcessQueue → Events.
 ///     fully implemented in InputProcessorImpl (base class). Only WindowsInputProcessor has a working implementation.
 /// </summary>
+[Collection ("Driver Tests")]
 [Trait ("Category", "Input")]
 public class InjectMouseEventTests (ITestOutputHelper output)
 {

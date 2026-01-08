@@ -9,6 +9,7 @@ namespace DriverTests.MouseTests;
 ///     Unit tests for <see cref="MouseButtonClickTracker"/> state machine and click detection logic.
 /// </summary>
 [Trait ("Category", "Input")]
+[Collection ("Driver Tests")]
 public class MouseButtonClickTrackerTests (ITestOutputHelper output)
 {
     #region Setup

@@ -8,6 +8,7 @@ namespace ApplicationTests;
 /// <remarks>
 /// CoPilot - GitHub Copilot Agent
 /// </remarks>
+[Collection("Application Tests")]
 public class CursorTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

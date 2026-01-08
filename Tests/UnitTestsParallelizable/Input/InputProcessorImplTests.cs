@@ -11,6 +11,7 @@ namespace DriverTests.Input;
 ///     processing.
 ///     Tests HIGH priority scenarios for input processing.
 /// </summary>
+[Collection ("Driver Tests")]
 [Trait ("Category", "Input")]
 public class InputProcessorImplTests (ITestOutputHelper output)
 {

@@ -3,6 +3,7 @@ using Xunit.Abstractions;
 
 namespace ApplicationTests;
 
+[Collection("Application Tests")]
 public class RunTests
 {
     [Fact]

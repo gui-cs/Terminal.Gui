@@ -7,6 +7,7 @@ namespace ApplicationTests.RunnableTests;
 ///     Integration tests for IApplication's IRunnable support.
 ///     Tests the full lifecycle of IRunnable instances through Application methods.
 /// </summary>
+[Collection("Application Tests")]
 public class ApplicationRunnableIntegrationTests
 {
     [Fact]

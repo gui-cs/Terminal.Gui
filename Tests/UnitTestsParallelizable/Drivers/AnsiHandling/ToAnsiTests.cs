@@ -5,6 +5,7 @@ namespace DriverTests.AnsiHandling;
 /// <summary>
 ///     Tests for the ToAnsi functionality that generates ANSI escape sequences from buffer contents.
 /// </summary>
+[Collection ("Driver Tests")]
 public class ToAnsiTests : TestDriverBase
 {
     [Fact]

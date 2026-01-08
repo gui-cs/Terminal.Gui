@@ -3,6 +3,7 @@ using UnitTests;
 
 namespace DriverTests;
 
+[Collection ("Driver Tests")]
 public class LegacyConsoleTests : TestDriverBase
 {
     [Fact]

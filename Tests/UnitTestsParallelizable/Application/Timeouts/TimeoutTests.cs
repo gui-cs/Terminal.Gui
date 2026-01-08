@@ -9,6 +9,7 @@ namespace ApplicationTests.Timeout;
 ///     These tests verify that timeouts fire correctly, can be added/removed,
 ///     handle exceptions properly, and work with Application.Run() calls.
 /// </summary>
+[Collection ("Application Timer Tests")]
 public class TimeoutTests
 {
     [Fact]
