@@ -18,19 +18,23 @@ public partial class TestContext
     /// <returns></returns>
     public TestContext RightClick (int screenX, int screenY)
     {
-        InjectMouseEvent (new ()
-        {
-            Flags = MouseFlags.RightButtonPressed,
-            ScreenPosition = new (screenX, screenY),
-            Position = new (screenX, screenY)
-        }, advanceTimeAfter: false); // Don't advance time between Press and Release
+        InjectMouseEvent (
+                          new ()
+                          {
+                              Flags = MouseFlags.RightButtonPressed,
+                              ScreenPosition = new (screenX, screenY),
+                              Position = new (screenX, screenY)
+                          },
+                          false); // Don't advance time between Press and Release
 
-        return InjectMouseEvent (new ()
-        {
-            Flags = MouseFlags.RightButtonReleased,
-            ScreenPosition = new (screenX, screenY),
-            Position = new (screenX, screenY)
-        }, advanceTimeAfter: true); // Advance time after the complete click
+        return InjectMouseEvent (
+                                 new ()
+                                 {
+                                     Flags = MouseFlags.RightButtonReleased,
+                                     ScreenPosition = new (screenX, screenY),
+                                     Position = new (screenX, screenY)
+                                 },
+                                 true); // Advance time after the complete click
     }
 
     /// <summary>
@@ -43,19 +47,23 @@ public partial class TestContext
     /// <returns></returns>
     public TestContext LeftClick (int screenX, int screenY)
     {
-        InjectMouseEvent (new ()
-        {
-            Flags = MouseFlags.LeftButtonPressed,
-            ScreenPosition = new (screenX, screenY),
-            Position = new (screenX, screenY)
-        }, advanceTimeAfter: false); // Don't advance time between Press and Release
+        InjectMouseEvent (
+                          new ()
+                          {
+                              Flags = MouseFlags.LeftButtonPressed,
+                              ScreenPosition = new (screenX, screenY),
+                              Position = new (screenX, screenY)
+                          },
+                          false); // Don't advance time between Press and Release
 
-        return InjectMouseEvent (new ()
-        {
-            Flags = MouseFlags.LeftButtonReleased,
-            ScreenPosition = new (screenX, screenY),
-            Position = new (screenX, screenY)
-        }, advanceTimeAfter: true); // Advance time after the complete click
+        return InjectMouseEvent (
+                                 new ()
+                                 {
+                                     Flags = MouseFlags.LeftButtonReleased,
+                                     ScreenPosition = new (screenX, screenY),
+                                     Position = new (screenX, screenY)
+                                 },
+                                 true); // Advance time after the complete click
     }
 
     /// <summary>
@@ -67,56 +75,61 @@ public partial class TestContext
     /// <returns></returns>
     public TestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
     {
-        return InjectMouseEvent (new ()
-        {
-            Flags = MouseFlags.LeftButtonClicked
-        }, evaluator);
+        return InjectMouseEvent (
+                                 new ()
+                                 {
+                                     Flags = MouseFlags.LeftButtonClicked
+                                 },
+                                 evaluator);
     }
 
     /// <summary>
-    /// Injects a mouse event to the current driver's input processor.
-    /// Uses the new input injection infrastructure with virtual time support.
+    ///     Injects a mouse event to the current driver's input processor.
+    ///     Uses the new input injection infrastructure with virtual time support.
     /// </summary>
     /// <param name="mouse">The mouse event to inject.</param>
-    /// <param name="advanceTimeAfter">Whether to advance time after this event to space clicks apart (prevents multi-click detection).</param>
+    /// <param name="advanceTimeAfter">
+    ///     Whether to advance time after this event to space clicks apart (prevents multi-click
+    ///     detection).
+    /// </param>
     /// <returns>This TestContext for fluent chaining.</returns>
     private TestContext InjectMouseEvent (Mouse mouse, bool advanceTimeAfter = false)
     {
         // Use the new injection infrastructure
-        WaitIteration ((app) =>
-        {
-            if (app.Driver is { })
-            {
-                // Set timestamp from virtual time provider
-                mouse.Timestamp = _timeProvider.Now;
-                mouse.Position = mouse.ScreenPosition;
+        WaitIteration (app =>
+                       {
+                           if (app.Driver is { })
+                           {
+                               // Set timestamp from virtual time provider
+                               mouse.Timestamp = _timeProvider.Now;
+                               mouse.Position = mouse.ScreenPosition;
 
-                // Use the new simplified injection API
-                app.InjectMouse (mouse);
+                               // Use the new simplified injection API
+                               app.InjectMouse (mouse);
 
-                // Advance virtual time after complete clicks to space them apart
-                // This prevents rapid clicks from being detected as multi-clicks
-                // while keeping Press+Release pairs together (no delay within a single click)
-                if (advanceTimeAfter && _timeProvider is VirtualTimeProvider vtp)
-                {
-                    // Advance virtual time beyond the double-click threshold (500ms)
-                    // This is instant - no real delay!
-                    vtp.Advance (TimeSpan.FromMilliseconds (550));
-                }
-            }
-            else
-            {
-                Fail ("Expected Application.Driver to be non-null.");
-            }
-        });
+                               // Advance virtual time after complete clicks to space them apart
+                               // This prevents rapid clicks from being detected as multi-clicks
+                               // while keeping Press+Release pairs together (no delay within a single click)
+                               if (advanceTimeAfter && _timeProvider is VirtualTimeProvider vtp)
+                               {
+                                   // Advance virtual time beyond the double-click threshold (500ms)
+                                   // This is instant - no real delay!
+                                   vtp.Advance (TimeSpan.FromMilliseconds (550));
+                               }
+                           }
+                           else
+                           {
+                               Fail ("Expected Application.Driver to be non-null.");
+                           }
+                       });
 
         // Wait for the event to be processed
         return WaitIteration ();
     }
 
     /// <summary>
-    /// Injects a mouse event to the current driver's input processor.
-    /// Uses the new input injection infrastructure with virtual time support.
+    ///     Injects a mouse event to the current driver's input processor.
+    ///     Uses the new input injection infrastructure with virtual time support.
     /// </summary>
     /// <param name="mouse">The mouse event to inject.</param>
     /// <param name="evaluator">Function to find the target view.</param>
@@ -125,11 +138,11 @@ public partial class TestContext
     {
         var screen = Point.Empty;
 
-        TestContext ctx = WaitIteration ((_) =>
-                                            {
-                                                TView v = Find (evaluator);
-                                                screen = v.ViewportToScreen (new Point (0, 0));
-                                            });
+        TestContext ctx = WaitIteration (_ =>
+                                         {
+                                             TView v = Find (evaluator);
+                                             screen = v.ViewportToScreen (new Point (0, 0));
+                                         });
         mouse.ScreenPosition = screen;
         mouse.Position = screen;
 
@@ -149,19 +162,19 @@ public partial class TestContext
         //Logging.Trace ($"Injecting key: {key}");
 
         // Use the new injection infrastructure - same pattern as mouse injection
-        WaitIteration ((app) =>
-        {
-            if (app.Driver is { })
-            {
-                // Use the simplified injection API with default Direct mode
-                // This is faster and more reliable than Pipeline mode
-                app.InjectKey (key);
-            }
-            else
-            {
-                Fail ("Expected Application.Driver to be non-null.");
-            }
-        });
+        WaitIteration (app =>
+                       {
+                           if (app.Driver is { })
+                           {
+                               // Use the simplified injection API with default Direct mode
+                               // This is faster and more reliable than Pipeline mode
+                               app.InjectKey (key);
+                           }
+                           else
+                           {
+                               Fail ("Expected Application.Driver to be non-null.");
+                           }
+                       });
 
         // Wait for the event to be processed
         return WaitIteration ();

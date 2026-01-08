@@ -118,7 +118,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     {
         foreach (Mouse expiredClick in _mouseInterpreter.CheckForExpiredClicks ())
         {
-            Logging.Trace ($"Emitting expired click: {expiredClick}");
+            //Logging.Trace ($"Emitting expired click: {expiredClick}");
             SyntheticMouseEvent?.Invoke (this, expiredClick);
         }
     }
