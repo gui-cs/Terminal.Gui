@@ -1,7 +1,272 @@
-﻿namespace ViewsTests.TextViewTests;
+namespace ViewsTests.TextViewTests;
 
 public class TextViewInputTests
 {
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void CanFocus_False_Blocks_Key_Events ()
+    {
+        // When CanFocus is false, key events should be handled (return true) and not processed
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Assert.True (tv.CanFocus);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
+
+        // When CanFocus is false, key events should be blocked (return true)
+        tv.CanFocus = false;
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.False (tv.IsSelecting);
+        Assert.Equal (Point.Empty, tv.InsertionPoint); // Position should not change
+
+        // When CanFocus is true, CursorLeft at start position returns false (no movement possible)
+        tv.CanFocus = true;
+        Assert.False (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.False (tv.IsSelecting);
+        Assert.Equal (Point.Empty, tv.InsertionPoint); // Still at start
+    }
+
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void CursorRight_Moves_Insertion_Point_Forward ()
+    {
+        // Test that CursorRight moves the insertion point forward by one character
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+
+        // CursorRight should move from (0,0) to (1,0)
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (new (1, 0), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+    }
+
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void CtrlEnd_Navigates_To_End_Of_Document ()
+    {
+        // Test that Ctrl+End moves to the end of the document
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        // Move right one character first
+        app.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
+        Assert.Equal (new (1, 0), tv.InsertionPoint);
+
+        // Ctrl+End should move to end of document
+        Assert.True (tv.NewKeyDownEvent (Key.End.WithCtrl));
+        Assert.Equal (2, tv.CurrentRow);
+        Assert.Equal (23, tv.CurrentColumn);
+        Assert.Equal (tv.CurrentColumn, tv.GetCurrentLine ().Count);
+        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+    }
+
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void CursorRight_At_End_Of_Document_Returns_False ()
+    {
+        // Test that CursorRight at end of document returns false (no further movement)
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        // Navigate to end of document
+        app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
+        Assert.Equal (new (23, 2), tv.InsertionPoint);
+
+        // CursorRight at end should return false
+        Assert.False (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+    }
+
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void Typing_Character_Updates_Text ()
+    {
+        // Test that typing a character updates the text and moves insertion point
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        // Navigate to end and type 'F'
+        app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
+        Assert.Equal (new (23, 2), tv.InsertionPoint);
+
+        Assert.True (tv.NewKeyDownEvent (Key.F.WithShift));
+
+        Assert.Equal (
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
+                      tv.Text
+                     );
+        Assert.Equal (new (24, 2), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+    }
+
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void CtrlZ_Undo_Restores_Previous_Text ()
+    {
+        // Test that Ctrl+Z undoes the last text change
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        // Navigate to end, type 'F', then undo
+        app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
+        app.Keyboard.RaiseKeyDownEvent (Key.F.WithShift);
+
+        Assert.Equal (
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
+                      tv.Text
+                     );
+        Assert.Equal (new (24, 2), tv.InsertionPoint);
+
+        // Undo should restore original text
+        Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl));
+
+        Assert.Equal (
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text
+                     );
+        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+    }
+
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void CtrlR_Redo_Reapplies_Undone_Change ()
+    {
+        // Test that Ctrl+R redoes the last undone change
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        // Navigate to end, type 'F', undo, then redo
+        app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
+        app.Keyboard.RaiseKeyDownEvent (Key.F.WithShift);
+        app.Keyboard.RaiseKeyDownEvent (Key.Z.WithCtrl);
+
+        Assert.Equal (
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text
+                     );
+        Assert.Equal (new (23, 2), tv.InsertionPoint);
+
+        // Redo should reapply the 'F' character
+        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
+
+        Assert.Equal (
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F",
+                      tv.Text
+                     );
+        Assert.Equal (new (24, 2), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+    }
+
+    // CoPilot - decomposed from KeyBindings_Command test
+    [Fact]
+    public void Backspace_Deletes_Previous_Character ()
+    {
+        // Test that Backspace deletes the character before the cursor
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line.F"
+        };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        // Navigate to end
+        app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
+        Assert.Equal (new (24, 2), tv.InsertionPoint);
+
+        // Backspace should delete the 'F'
+        Assert.True (tv.NewKeyDownEvent (Key.Backspace));
+
+        Assert.Equal (
+                      $"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.",
+                      tv.Text
+                     );
+        Assert.Equal (new (23, 2), tv.InsertionPoint);
+        Assert.False (tv.IsSelecting);
+    }
+
+    // Existing tests...
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
@@ -61,8 +326,6 @@ public class TextViewInputTests
     [Fact]
     public void Typing_Text_With_Tab_Positions_Cursor_Correctly ()
     {
-        // This test demonstrates tab cursor positioning with tabs.
-
         TextView tv = new ()
         {
             TabKeyAddsTab = true,
@@ -72,24 +335,9 @@ public class TextViewInputTests
             Text = "a\t1"
         };
 
-        tv.InsertionPoint = new (3, 0); // Position cursor after the "1"
-
-        // Expected visual layout with TabWidth=4:
-        // "a" is at visual column 0
-        // Tab expands to next tab stop at column 4 (adds 3 columns since we're at column 1)
-        // "1" is at visual column 4
-        // Cursor after "1" should be at visual column 5
-
-        // Calculate expected visual position
-        // Character 'a' at index 0: visual column starts at 0, 'a' takes 1 column -> advance to column 1
-        // Tab at index 1: at visual column 1, tab to next stop at 4 -> advance by 3 to column 4
-        // Character '1' at index 2: at visual column 4, '1' takes 1 column -> advance to column 5
-        // Cursor at index 3: should be at visual column 5
+        tv.InsertionPoint = new (3, 0);
         int expectedVisualColumn = 5;
-
-        // The fix should calculate: 1 (for 'a') + 3 (tab from col 1 to 4) = 4 (where '1' starts)
-        // Then after '1': 4 + 1 = 5
-        int fixedVisualColumn = 1 + (4 - 1 % 4) + 1; // a(1) + tab_to_4(3) + 1(1) = 5
+        int fixedVisualColumn = 1 + (4 - 1 % 4) + 1;
 
         Assert.Equal (expectedVisualColumn, fixedVisualColumn);
     }
@@ -97,35 +345,18 @@ public class TextViewInputTests
     [Fact]
     public void Typing_Text_With_Tab_And_Wide_Characters_Positions_Cursor_Correctly ()
     {
-        // This test verifies tab cursor positioning with wide characters (emoji, CJK, etc.)
-        // Wide characters take 2 visual columns each
-
         TextView tv = new ()
         {
             TabKeyAddsTab = true,
             TabWidth = 4,
             Width = 20,
             Height = 3,
-            Text = "😀\t1"  // Emoji (2 cols) + tab + "1" (1 col)
+            Text = "??\t1"
         };
 
-        tv.InsertionPoint = new (3, 0); // Position cursor after the "1"
-
-        // Expected visual layout with TabWidth=4:
-        // "😀" (emoji) is at visual column 0-1 (takes 2 columns)
-        // Tab starts at visual column 2, expands to next tab stop at column 4 (adds 2 columns)
-        // "1" is at visual column 4
-        // Cursor after "1" should be at visual column 5
-
-        // Calculate expected visual position
-        // Character '😀' at index 0: visual column 0, emoji takes 2 columns -> advance to column 2
-        // Tab at index 1: at visual column 2, tab to next stop at 4 -> advance by 2 to column 4
-        // Character '1' at index 2: at visual column 4, '1' takes 1 column -> advance to column 5
-        // Cursor at index 3: should be at visual column 5
+        tv.InsertionPoint = new (3, 0);
         int expectedVisualColumn = 5;
-
-        // The calculation: 2 (for emoji) + 2 (tab from col 2 to 4) + 1 (for '1') = 5
-        int fixedVisualColumn = 2 + (4 - 2 % 4) + 1; // emoji(2) + tab_to_4(2) + 1(1) = 5
+        int fixedVisualColumn = 2 + (4 - 2 % 4) + 1;
 
         Assert.Equal (expectedVisualColumn, fixedVisualColumn);
     }
@@ -133,53 +364,29 @@ public class TextViewInputTests
     [Fact]
     public void Typing_Text_With_Tab_And_Multiple_Wide_Characters_Positions_Cursor_Correctly ()
     {
-        // This test verifies tab cursor positioning with multiple wide characters
-        // demonstrating tab stops across different starting positions
-
         TextView tv = new ()
         {
             TabKeyAddsTab = true,
-            TabWidth = 8,  // Larger tab width to show multiple scenarios
+            TabWidth = 8,
             Width = 40,
             Height = 3,
-            Text = "a😀\t中\tX"  // 'a'(1) + emoji(2) + tab + CJK(2) + tab + 'X'(1)
+            Text = "a??\t?\tX"
         };
 
-        tv.InsertionPoint = new (6, 0); // Position cursor after the "X"
-
-        // Expected visual layout with TabWidth=8:
-        // "a" is at visual column 0 (1 col) -> cursor at 1
-        // "😀" (emoji) at visual column 1-2 (2 cols) -> cursor at 3
-        // Tab at visual column 3, next tab stop is at 8 -> adds 5 cols -> cursor at 8
-        // "中" (CJK) at visual column 8-9 (2 cols) -> cursor at 10
-        // Tab at visual column 10, next tab stop is at 16 -> adds 6 cols -> cursor at 16
-        // "X" at visual column 16 (1 col) -> cursor at 17
-
-        // Calculate expected visual position
+        tv.InsertionPoint = new (6, 0);
         int expectedVisualColumn = 17;
-
-        // The calculation:
-        // 'a' = 1 col -> at column 1
-        // emoji = 2 cols -> at column 3
-        // tab from 3 to 8 = 5 cols -> at column 8
-        // CJK = 2 cols -> at column 10
-        // tab from 10 to 16 = 6 cols -> at column 16
-        // 'X' = 1 col -> at column 17
         int fixedVisualColumn = 1 + 2 + (8 - 3 % 8) + 2 + (8 - 10 % 8) + 1;
 
         Assert.Equal (expectedVisualColumn, fixedVisualColumn);
     }
 
     [Theory]
-    [InlineData ("abc\t1", 4, 5)]   // "abc" (3 cols) + tab to col 4 (1 col) + "1" = col 5
-    [InlineData ("abcd\t1", 4, 9)]  // "abcd" (4 cols) + tab to col 8 (4 cols) + "1" = col 9
-    [InlineData ("a\t1", 4, 5)]     // "a" (1 col) + tab to col 4 (3 cols) + "1" = col 5
-    [InlineData ("ab\t1", 4, 5)]    // "ab" (2 cols) + tab to col 4 (2 cols) + "1" = col 5
+    [InlineData ("abc\t1", 4, 5)]
+    [InlineData ("abcd\t1", 4, 9)]
+    [InlineData ("a\t1", 4, 5)]
+    [InlineData ("ab\t1", 4, 5)]
     public void Tab_Advances_Correctly_To_Next_Tab_Stop (string text, int tabWidth, int expectedColumn)
     {
-        // Test that tabs advance correctly based on current column position
-        // Tabs always advance to the next tab stop (multiple of TabWidth)
-
         TextView tv = new ()
         {
             TabKeyAddsTab = true,
@@ -189,15 +396,13 @@ public class TextViewInputTests
             Text = text
         };
 
-        tv.InsertionPoint = new (text.Length, 0); // Position cursor at end
+        tv.InsertionPoint = new (text.Length, 0);
 
-        // Calculate the visual column position
         int visualColumn = 0;
         for (int i = 0; i < text.Length; i++)
         {
             if (text [i] == '\t')
             {
-                // Standard tab behavior: advance to next tab stop
                 visualColumn += tabWidth - visualColumn % tabWidth;
             }
             else
@@ -212,9 +417,6 @@ public class TextViewInputTests
     [Fact]
     public void EnterKeyAddsLine_Setter_Should_Not_Scroll_View ()
     {
-        // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/3988
-        // Setting EnterKeyAddsLine (formerly AllowsReturn) should not scroll the text out of view
-
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
@@ -233,7 +435,6 @@ public class TextViewInputTests
         tv.SelectAll ();
         int leftColumnBefore = tv.LeftColumn;
 
-        // Setting EnterKeyAddsLine should not change LeftColumn
         tv.EnterKeyAddsLine = false;
 
         Assert.Equal (leftColumnBefore, tv.LeftColumn);
@@ -242,9 +443,6 @@ public class TextViewInputTests
     [Fact]
     public void EnterKeyAddsLine_Toggling_Does_Not_Reset_Cursor_Position ()
     {
-        // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/3988
-        // Setting EnterKeyAddsLine should not reset the cursor position (InsertionPoint)
-
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
@@ -258,12 +456,10 @@ public class TextViewInputTests
         runnable.Add (tv);
         app.Begin (runnable);
 
-        // Move cursor to a specific position using Ctrl+Backspace twice
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
         Assert.Equal (new (18, 1), tv.InsertionPoint);
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 
-        // Setting EnterKeyAddsLine to false should NOT reset cursor position
         tv.EnterKeyAddsLine = false;
         Assert.Equal (new (18, 1), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
@@ -271,27 +467,24 @@ public class TextViewInputTests
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.EnterKeyAddsLine);
 
-        // Pressing Enter should trigger Accepted event (not add newline)
-        Assert.False (app.Keyboard.RaiseKeyDownEvent (Key.Enter)); // Accepted event not handled
+        Assert.False (app.Keyboard.RaiseKeyDownEvent (Key.Enter));
         Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
-        Assert.Equal (new (18, 1), tv.InsertionPoint); // Cursor should remain at (18, 1)
+        Assert.Equal (new (18, 1), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
 
-        // Setting EnterKeyAddsLine to true should NOT reset cursor position
         tv.EnterKeyAddsLine = true;
-        Assert.Equal (new (18, 1), tv.InsertionPoint); // Cursor should still be at (18, 1)
+        Assert.Equal (new (18, 1), tv.InsertionPoint);
         Assert.True (tv.EnterKeyAddsLine);
         Assert.True (tv.Multiline);
 
-        // Pressing Enter should now add a newline
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Enter));
         Assert.Equal (
                       $"This is the second line.{Environment.NewLine}This is the third {Environment.NewLine}",
                       tv.Text
                      );
-        Assert.Equal (new (0, 2), tv.InsertionPoint); // Cursor moved after inserting newline
+        Assert.Equal (new (0, 2), tv.InsertionPoint);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
