@@ -148,39 +148,22 @@ public partial class TestContext
     {
         //Logging.Trace ($"Injecting key: {key}");
 
-        // Use the new simplified injection API
-        // We do this by subscribing to the Driver.KeyDown event and waiting until it is raised.
-        // This prevents the application from missing the key event if we inject it and immediately return.
-        bool keyReceived = false;
-        IDriver? driver = App?.Driver;
-
-        if (driver is { })
+        // Use the new injection infrastructure - same pattern as mouse injection
+        WaitIteration ((app) =>
         {
-            driver.KeyDown += DriverOnKeyDown;
-
-            try
+            if (app.Driver is { })
             {
-                // Use Pipeline mode to match the old behavior (InjectKeyDownEvent)
-                App?.GetInputInjector ().InjectKey (key, new () { Mode = InputInjectionMode.Pipeline });
-
-                WaitUntil (() => keyReceived);
+                // Use the simplified injection API with default Direct mode
+                // This is faster and more reliable than Pipeline mode
+                app.InjectKey (key);
             }
-            finally
+            else
             {
-                // Always unsubscribe, even if wait times out or exception occurs
-                // Use the captured driver reference to avoid NullReferenceException
-                driver.KeyDown -= DriverOnKeyDown;
+                Fail ("Expected Application.Driver to be non-null.");
             }
-        }
+        });
 
-        // Wait for one more iteration to ensure all side effects of the key event
-        // (like focus changes) are fully processed before returning
+        // Wait for the event to be processed
         return WaitIteration ();
-
-        void DriverOnKeyDown (object? sender, Key e)
-        {
-            keyReceived = true;
-        }
-
     }
 }
