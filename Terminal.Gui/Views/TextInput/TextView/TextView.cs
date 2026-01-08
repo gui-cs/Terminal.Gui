@@ -129,8 +129,8 @@ public partial class TextView : View, IDesignable
     private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
     {
         WrapTextModel ();
-        UpdateContentSize ();
         Adjust ();
+        UpdateContentSize ();
     }
 
     /// <summary>Raised when the contents of the <see cref="TextView"/> are changed.</summary>

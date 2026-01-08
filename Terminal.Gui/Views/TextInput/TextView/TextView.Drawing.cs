@@ -278,14 +278,13 @@ public partial class TextView
         else if (!_wordWrap
                  && (CurrentColumn - Viewport.X + 1 > Viewport.Width + offB.width || dSize.size + 1 >= Viewport.Width + offB.width))
         {
-            int newLeftCol = TextModel.CalculateLeftColumn (
+            Viewport = Viewport with { X = TextModel.CalculateLeftColumn (
                                                          line,
                                                          Viewport.X,
                                                          CurrentColumn,
                                                          Viewport.Width + offB.width,
                                                          TabWidth
-                                                        );
-            Viewport = Viewport with { X = newLeftCol };
+                                                        ) };
             need = true;
         }
         else if ((_wordWrap && Viewport.X > 0) || (dSize.size < Viewport.Width + offB.width && tSize.size < Viewport.Width + offB.width))
