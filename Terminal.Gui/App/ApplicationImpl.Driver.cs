@@ -91,7 +91,7 @@ internal partial class ApplicationImpl
             }
         }
 
-        Logging.Trace ($"Created Subcomponents: {Coordinator}");
+        //Logging.Trace ($"Created Subcomponents: {Coordinator}");
 
         Coordinator.StartInputTaskAsync (this).Wait ();
 

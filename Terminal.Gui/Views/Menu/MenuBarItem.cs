@@ -179,7 +179,7 @@ public class MenuBarItem : MenuItem
     /// <inheritdoc />
     protected override bool OnKeyDownNotHandled (Key key)
     {
-        Logging.Trace ($"{key}");
+        //Logging.Trace ($"{key}");
 
         if (PopoverMenu is { Visible: true } && HotKeyBindings.TryGet (key, out _))
         {
