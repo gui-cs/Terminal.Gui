@@ -28,6 +28,90 @@ namespace Terminal.Gui.Views;
 ///         original unwrapped model to maintain consistency. The <c>CallerMemberName</c> tracking ensures
 ///         SetWrapModel and UpdateWrapModel are paired correctly within the same method.
 ///     </para>
+///     <para>
+///         <b>?? ARCHITECTURAL ISSUES WITH CURRENT IMPLEMENTATION:</b>
+///         <list type="bullet">
+///             <item>
+///                 <b>Fragile Pairing:</b> Relies on developers remembering to call both SetWrapModel and UpdateWrapModel.
+///                 Easy to forget UpdateWrapModel or call in wrong order (currently 28 call sites across 8 files).
+///             </item>
+///             <item>
+///                 <b>Hidden State:</b> <c>_currentCaller</c> is module-level state for what should be a scoped operation.
+///                 Makes debugging difficult and reasoning about state complex.
+///             </item>
+///             <item>
+///                 <b>Redundant Position Updates:</b> Setting CurrentRow/CurrentColumn in both SetWrapModel (to unwrapped)
+///                 and UpdateWrapModel (to wrapped) triggers property setters twice, calling PositionCursor() and
+///                 potentially causing intermediate rendering states or flicker.
+///             </item>
+///             <item>
+///                 <b>Error Detection After-the-Fact:</b> InvalidOperationException thrown in UpdateWrapModel happens
+///                 after the transaction, not when the error occurs, making debugging harder.
+///             </item>
+///             <item>
+///                 <b>No Exception Safety:</b> If an exception occurs during text modification, the model can be left
+///                 in an inconsistent state (unwrapped with no way to re-wrap).
+///             </item>
+///         </list>
+///     </para>
+///     <para>
+///         <b>?? RECOMMENDED REFACTORING - Action-Based Transaction Pattern:</b>
+///         Replace SetWrapModel/UpdateWrapModel with a single method that takes an Action:
+///         <code>
+///         private void ExecuteWithUnwrappedModel(Action modifyAction)
+///         {
+///             if (!_wordWrap) { modifyAction(); return; }
+///             
+///             // Save wrapped positions without triggering setters
+///             int wrappedRow = _currentRow, wrappedCol = _currentColumn;
+///             int wrappedSelRow = _selectionStartRow, wrappedSelCol = _selectionStartColumn;
+///             
+///             // Convert to unwrapped (without triggering setters)
+///             _currentRow = _wrapManager!.GetModelLineFromWrappedLines(wrappedRow);
+///             _currentColumn = _wrapManager.GetModelColFromWrappedLines(wrappedRow, wrappedCol);
+///             // ... same for selection ...
+///             
+///             TextModel originalModel = _model;
+///             _model = _wrapManager.Model;
+///             
+///             try {
+///                 modifyAction(); // Execute modification
+///                 
+///                 // Rewrap
+///                 _model = _wrapManager.WrapModel(..., out int nRow, out int nCol, ...);
+///                 
+///                 // Update positions ONCE with final wrapped coordinates
+///                 CurrentRow = nRow; CurrentColumn = nCol;
+///                 _wrapNeeded = true; SetNeedsDraw();
+///             }
+///             catch {
+///                 _model = originalModel; // Restore on error
+///                 _currentRow = wrappedRow; _currentColumn = wrappedCol;
+///                 throw;
+///             }
+///         }
+///         
+///         // Usage becomes:
+///         ExecuteWithUnwrappedModel(() => {
+///             GetCurrentLine().InsertRange(CurrentColumn, cells);
+///             CurrentColumn += cells.Count;
+///         });
+///         </code>
+///         
+///         <b>Benefits:</b>
+///         <list type="bullet">
+///             <item>? Impossible to forget the second half of the transaction</item>
+///             <item>? No hidden module-level state</item>
+///             <item>? Position setters triggered only ONCE with final wrapped coordinates</item>
+///             <item>? Exception-safe with automatic rollback</item>
+///             <item>? Clear transaction boundary - self-documenting</item>
+///             <item>? Easier to debug - all logic in one place</item>
+///         </list>
+///         
+///         <b>Scope:</b> Would require updating 28 call sites across 8 files:
+///         TextView.Commands.cs (12), TextView.Files.cs (7), TextView.Find.cs (2),
+///         TextView.History.cs (1), TextView.Selection.cs (1), TextView.Text.cs (4), TextView.WordWrap.cs (2)
+///     </para>
 /// </remarks>
 public partial class TextView
 {
@@ -39,6 +123,10 @@ public partial class TextView
     ///     Tracks the calling method name to ensure <see cref="SetWrapModel"/> and <see cref="UpdateWrapModel"/>
     ///     are properly paired. This prevents incorrect nesting of wrap/unwrap operations.
     /// </summary>
+    /// <remarks>
+    ///     <b>ARCHITECTURAL ISSUE:</b> This field represents hidden module-level state for what should be
+    ///     a scoped operation. Consider refactoring to an action-based transaction pattern.
+    /// </remarks>
     private string? _currentCaller;
 
     /// <summary>
@@ -340,6 +428,119 @@ public partial class TextView
             _selectionStartRow = nStartRow;
             _selectionStartColumn = nStartCol;
             SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Executes a text modification operation with proper wrap/unwrap handling.
+    /// </summary>
+    /// <param name="modifyAction">The action that modifies the unwrapped text model.</param>
+    /// <remarks>
+    ///     <para>
+    ///         This method provides a transactional approach to modifying text when word wrap is enabled.
+    ///         It handles the complete wrap/unwrap cycle automatically and safely:
+    ///         <list type="number">
+    ///             <item>Saves current wrapped positions</item>
+    ///             <item>Converts positions from wrapped to unwrapped coordinates (without triggering property setters)</item>
+    ///             <item>Switches to the unwrapped model</item>
+    ///             <item>Executes the modification action</item>
+    ///             <item>Regenerates the wrapped model</item>
+    ///             <item>Converts positions back to wrapped coordinates (triggering setters only ONCE)</item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         <b>Exception Safety:</b> If an exception occurs during the modification action, the method
+    ///         automatically restores the original model state and position, ensuring the TextView remains
+    ///         in a consistent state.
+    ///     </para>
+    ///     <para>
+    ///         <b>Performance:</b> Position property setters (which call PositionCursor()) are triggered
+    ///         only once with the final wrapped coordinates, avoiding intermediate rendering states.
+    ///     </para>
+    ///     <para>
+    ///         If word wrap is disabled or the wrap manager is not initialized, the action is executed directly
+    ///         without any coordinate conversion.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    ///     <code>
+    ///     ExecuteWithUnwrappedModel(() =>
+    ///     {
+    ///         List&lt;Cell&gt; line = GetCurrentLine();
+    ///         line.InsertRange(CurrentColumn, cells);
+    ///         CurrentColumn += cells.Count;
+    ///     });
+    ///     </code>
+    /// </example>
+    private void ExecuteWithUnwrappedModel (Action modifyAction)
+    {
+        if (!_wordWrap || _wrapManager is null)
+        {
+            modifyAction ();
+
+            return;
+        }
+
+        // Save current wrapped positions without triggering property setters
+        int wrappedRow = _currentRow;
+        int wrappedCol = _currentColumn;
+        int wrappedSelRow = _selectionStartRow;
+        int wrappedSelCol = _selectionStartColumn;
+
+        // Convert to unwrapped coordinates (direct field access, no property setters triggered)
+        int unwrappedRow = _wrapManager.GetModelLineFromWrappedLines (wrappedRow);
+        int unwrappedCol = _wrapManager.GetModelColFromWrappedLines (wrappedRow, wrappedCol);
+        int unwrappedSelRow = _wrapManager.GetModelLineFromWrappedLines (wrappedSelRow);
+        int unwrappedSelCol = _wrapManager.GetModelColFromWrappedLines (wrappedSelRow, wrappedSelCol);
+
+        // Assign to fields directly (bypassing property setters to avoid triggering PositionCursor)
+        _currentRow = unwrappedRow;
+        _currentColumn = unwrappedCol;
+        _selectionStartRow = unwrappedSelRow;
+        _selectionStartColumn = unwrappedSelCol;
+
+        // Switch to unwrapped model
+        TextModel wrappedModel = _model;
+        _model = _wrapManager.Model;
+
+        try
+        {
+            // Execute the modification action on the unwrapped model
+            modifyAction ();
+
+            // Regenerate wrapped model with updated positions
+            _model = _wrapManager.WrapModel (
+                                             Math.Max (Viewport.Width - (ReadOnly ? 0 : 1), 0),
+                                             out int nRow,
+                                             out int nCol,
+                                             out int nStartRow,
+                                             out int nStartCol,
+                                             _currentRow,
+                                             _currentColumn,
+                                             _selectionStartRow,
+                                             _selectionStartColumn,
+                                             _tabWidth
+                                            );
+
+            // Update positions ONCE with final wrapped coordinates (now triggers property setters)
+            CurrentRow = nRow;
+            CurrentColumn = nCol;
+            _selectionStartRow = nStartRow;
+            _selectionStartColumn = nStartCol;
+
+            _wrapNeeded = true;
+            SetNeedsDraw ();
+        }
+        catch
+        {
+            // Restore original state on exception
+            _model = wrappedModel;
+            _currentRow = wrappedRow;
+            _currentColumn = wrappedCol;
+            _selectionStartRow = wrappedSelRow;
+            _selectionStartColumn = wrappedSelCol;
+
+            throw;
         }
     }
 }
