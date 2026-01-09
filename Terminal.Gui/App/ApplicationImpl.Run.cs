@@ -237,7 +237,7 @@ internal partial class ApplicationImpl
 
         if (token is null)
         {
-            Logging.Trace (@"Run - Begin session failed or was cancelled.");
+            Logging.Warning (@"Run - Begin session failed or was cancelled.");
 
             return null;
         }

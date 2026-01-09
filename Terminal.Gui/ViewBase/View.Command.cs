@@ -161,7 +161,7 @@ public partial class View // Command APIs
                 // TODO: It's a bit of a hack that this uses KeyBinding. There should be an InvokeCommmand that 
                 // TODO: is generic?
 
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
+                //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - InvokeCommand on Default View ({isDefaultView.Title})");
                 bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
 
                 if (handled == true)
@@ -172,7 +172,7 @@ public partial class View // Command APIs
 
             if (SuperView is { })
             {
-                Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
+                //Logging.Debug ($"{Title} ({ctx?.Source?.Title}) - Invoking Accept on SuperView ({SuperView.Title}/{SuperView.Id})...");
 
                 return SuperView?.InvokeCommand (Command.Accept, ctx);
             }
