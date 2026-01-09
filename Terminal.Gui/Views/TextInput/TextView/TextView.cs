@@ -79,10 +79,8 @@ public partial class TextView : View, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
 
-    // The column we are tracking, or -1 if we are not tracking any column
-    private string? _currentCaller;
     private CultureInfo? _currentCulture;
-    private Dim? _savedHeight;
+    //private Dim? _savedHeight;
 
     /// <summary>
     ///     Initializes a <see cref="TextView"/> on the specified area, with dimensions controlled with the X, Y, Width
@@ -99,10 +97,6 @@ public partial class TextView : View, IDesignable
         _model.LinesLoaded += Model_LinesLoaded!;
         _historyText.ChangeText += HistoryText_ChangeText;
 
-        Initialized += TextView_Initialized!;
-
-        SubViewsLaidOut += TextView_LayoutComplete;
-
         CreateCommandsAndBindings ();
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
@@ -110,24 +104,25 @@ public partial class TextView : View, IDesignable
         Cursor = new () { Style = DefaultCursorStyle };
     }
 
-    private void TextView_Initialized (object sender, EventArgs e)
+    /// <inheritdoc />
+    public override void EndInit ()
     {
         Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
         App?.Popover?.Register (ContextMenu);
         KeyBindings.Add (ContextMenu.Key, Command.Context);
-        
-        // Configure scrollbars to use modern Viewport system
-        VerticalScrollBar.AutoShow = true;
-        UpdateHorizontalScrollBarVisibility ();
+
+        UpdateScrollBars ();
         UpdateContentSize ();
-        
         PositionCursor ();
+        base.EndInit ();
     }
 
-    private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
+        base.OnSubViewsLaidOut (args);
         WrapTextModel ();
         Adjust ();
         UpdateContentSize ();
@@ -286,33 +281,4 @@ public partial class TextView : View, IDesignable
         base.Dispose (disposing);
     }
 
-    /// <summary>
-    /// Updates the content size based on the current text model dimensions.
-    /// </summary>
-    private void UpdateContentSize ()
-    {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
-        int contentHeight = _model.Count;
-        int contentWidth = _wordWrap ? Viewport.Width : _model.GetMaxVisibleLine (0, _model.Count, TabWidth);
-
-        SetContentSize (new Size (contentWidth, contentHeight));
-    }
-
-    /// <summary>
-    /// Updates the horizontal scrollbar visibility based on WordWrap state.
-    /// </summary>
-    private void UpdateHorizontalScrollBarVisibility ()
-    {
-        // When WordWrap is on, horizontal scrolling is disabled
-        HorizontalScrollBar.AutoShow = !_wordWrap;
-        
-        if (_wordWrap)
-        {
-            HorizontalScrollBar.Visible = false;
-        }
-    }
 }

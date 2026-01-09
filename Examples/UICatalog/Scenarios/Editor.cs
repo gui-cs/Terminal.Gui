@@ -49,7 +49,8 @@ public class Editor : Scenario
             X = 0,
             Y = 1,
             Width = Dim.Fill (),
-            Height = Dim.Fill (1)
+            Height = Dim.Fill (1),
+            ScrollBars = true
         };
 
         CreateDemoFile (_fileName!);
@@ -163,8 +164,6 @@ public class Editor : Scenario
             AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast
         };
 
-        _textView.VerticalScrollBar.AutoShow = false;
-
         _textView.UnwrappedCursorPosition += (s, e) => { siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}"; };
 
         _appWindow.Add (statusBar);
@@ -203,17 +202,16 @@ public class Editor : Scenario
                                        Application.Instance,
                                        "Save File",
                                        $"Do you want save changes in {_appWindow.Title}?",
-                                       "Yes",
-                                       "No",
-                                       "Cancel"
+                                       "_No",
+                                       "_Yes"
                                       );
 
-        if (r == 0)
+        if (r == 1)
         {
             return Save ();
         }
 
-        if (r == 1)
+        if (r == 0)
         {
             return true;
         }
@@ -235,7 +233,7 @@ public class Editor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Error", ex.Message, "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "Error", ex.Message, "_Ok");
         }
     }
 
@@ -314,14 +312,14 @@ public class Editor : Scenario
 
         if (!found)
         {
-            MessageBox.Query (Application.Instance, "Find", $"The following specified text was not found: '{_textToFind}'", "Ok");
+            MessageBox.Query (Application.Instance, "Find", $"The following specified text was not found: '{_textToFind}'", "_Ok");
         }
         else if (gaveFullTurn)
         {
             MessageBox.Query (Application.Instance,
                               "Find",
                               $"No more occurrences were found for the following specified text: '{_textToFind}'",
-                              "Ok"
+                              "_Ok"
                              );
         }
     }
@@ -337,49 +335,26 @@ public class Editor : Scenario
 
         List<MenuItem> menuItems = [];
 
-        // Vertical ScrollBar AutoShow
-        CheckBox verticalAutoShowCheckBox = new ()
+        CheckBox scrollBarCheckBox = new ()
         {
-            Title = "_Vertical ScrollBar AutoShow",
-            CheckedState = _textView.VerticalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
+            Title = "_Scroll Bars",
+            CheckedState = _textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
 
-        verticalAutoShowCheckBox.CheckedStateChanged += (s, e) =>
+        scrollBarCheckBox.CheckedStateChanged += (s, e) =>
         {
-            _textView.VerticalScrollBar.AutoShow = verticalAutoShowCheckBox.CheckedState == CheckState.Checked;
+            _textView.ScrollBars = scrollBarCheckBox.CheckedState == CheckState.Checked;
         };
 
-        MenuItem verticalItem = new () { CommandView = verticalAutoShowCheckBox };
+        MenuItem verticalItem = new () { CommandView = scrollBarCheckBox };
 
         verticalItem.Accepting += (s, e) =>
         {
-            verticalAutoShowCheckBox.AdvanceCheckState ();
+            scrollBarCheckBox.AdvanceCheckState ();
             e.Handled = true;
         };
 
         menuItems.Add (verticalItem);
-
-        // Horizontal ScrollBar AutoShow
-        CheckBox horizontalAutoShowCheckBox = new ()
-        {
-            Title = "_Horizontal ScrollBar AutoShow",
-            CheckedState = _textView.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
-        };
-
-        horizontalAutoShowCheckBox.CheckedStateChanged += (s, e) =>
-        {
-            _textView.HorizontalScrollBar.AutoShow = horizontalAutoShowCheckBox.CheckedState == CheckState.Checked;
-        };
-
-        MenuItem horizontalItem = new () { CommandView = horizontalAutoShowCheckBox };
-
-        horizontalItem.Accepting += (s, e) =>
-        {
-            horizontalAutoShowCheckBox.AdvanceCheckState ();
-            e.Handled = true;
-        };
-
-        menuItems.Add (horizontalItem);
 
         return [.. menuItems];
     }
@@ -452,7 +427,7 @@ public class Editor : Scenario
 
         CheckBox checkBox = new ()
         {
-            Title = "Word Wrap",
+            Title = "_Word Wrap",
             CheckedState = _textView.WordWrap ? CheckState.Checked : CheckState.UnChecked
         };
 
@@ -516,12 +491,12 @@ public class Editor : Scenario
     {
         if (_textView is null)
         {
-            return new () { Title = "Allows Tab" };
+            return new () { Title = "Tab Enters Tab" };
         }
 
         CheckBox checkBox = new ()
         {
-            Title = "Allows Tab",
+            Title = "Tab Enters Tab",
             CheckedState = _textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked
         };
 
@@ -833,7 +808,7 @@ public class Editor : Scenario
             MessageBox.Query (Application.Instance,
                               "Replace All",
                               $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
-                              "Ok"
+                              "_Ok"
                              );
         }
         else
@@ -841,7 +816,7 @@ public class Editor : Scenario
             MessageBox.Query (Application.Instance,
                               "Replace All",
                               $"None of the following specified text was found: '{_textToFind}'",
-                              "Ok"
+                              "_Ok"
                              );
         }
     }
@@ -1093,8 +1068,8 @@ public class Editor : Scenario
                 if (MessageBox.Query (Application.Instance,
                                       "Save File",
                                       "File already exists. Overwrite any way?",
-                                      "No",
-                                      "Ok"
+                                      "_No",
+                                      "_Yes"
                                      )
                     == 1)
                 {
@@ -1129,11 +1104,11 @@ public class Editor : Scenario
             _originalText = Encoding.Unicode.GetBytes (_textView.Text);
             _saved = true;
             _textView.ClearHistoryChanges ();
-            MessageBox.Query (Application.Instance, "Save File", "File was successfully saved.", "Ok");
+            MessageBox.Query (Application.Instance, "Save File", "File was successfully saved.", "_Ok");
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Error", ex.Message, "Ok");
+            MessageBox.ErrorQuery (Application.Instance, "Error", ex.Message, "_Ok");
 
             return false;
         }

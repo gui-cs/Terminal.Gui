@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui.Views;
 
 public partial class TextView
@@ -20,9 +22,8 @@ public partial class TextView
 
         SetAttributeForRole (Enabled ? VisualRole.Editable : VisualRole.Disabled);
 
-        (int width, int height) offB = OffSetBackground ();
-        int right = Viewport.Width + offB.width;
-        int bottom = Viewport.Height + offB.height;
+        int right = Viewport.Width;
+        int bottom = Viewport.Height;
         var row = 0;
 
         for (int idxRow = Viewport.Y; idxRow < _model.Count; idxRow++)
@@ -263,7 +264,6 @@ public partial class TextView
 
     private void Adjust ()
     {
-        (int width, int height) offB = OffSetBackground ();
         List<Cell> line = GetCurrentLine ();
         bool need = NeedsDraw || _wrapNeeded || !Used;
         (int size, int length) tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
@@ -276,18 +276,21 @@ public partial class TextView
             need = true;
         }
         else if (!_wordWrap
-                 && (CurrentColumn - Viewport.X + 1 > Viewport.Width + offB.width || dSize.size + 1 >= Viewport.Width + offB.width))
+                 && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size + 1 >= Viewport.Width))
         {
-            Viewport = Viewport with { X = TextModel.CalculateLeftColumn (
+            Viewport = Viewport with
+            {
+                X = TextModel.CalculateLeftColumn (
                                                          line,
                                                          Viewport.X,
                                                          CurrentColumn,
-                                                         Viewport.Width + offB.width,
+                                                         Viewport.Width,
                                                          TabWidth
-                                                        ) };
+                                                        )
+            };
             need = true;
         }
-        else if ((_wordWrap && Viewport.X > 0) || (dSize.size < Viewport.Width + offB.width && tSize.size < Viewport.Width + offB.width))
+        else if ((_wordWrap && Viewport.X > 0) || (dSize.size < Viewport.Width && tSize.size < Viewport.Width))
         {
             if (Viewport.X > 0)
             {
@@ -302,7 +305,7 @@ public partial class TextView
             Viewport = Viewport with { Y = CurrentRow };
             need = true;
         }
-        else if (CurrentRow - Viewport.Y >= Viewport.Height + offB.height)
+        else if (CurrentRow - Viewport.Y >= Viewport.Height)
         {
             Viewport = Viewport with { Y = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow) };
             need = true;
@@ -332,24 +335,6 @@ public partial class TextView
         }
 
         OnUnwrappedCursorPosition ();
-    }
-
-    private (int width, int height) OffSetBackground ()
-    {
-        var w = 0;
-        var h = 0;
-
-        if (SuperView?.Viewport.Right - Viewport.Right < 0)
-        {
-            w = SuperView!.Viewport.Right - Viewport.Right - 1;
-        }
-
-        if (SuperView?.Viewport.Bottom - Viewport.Bottom < 0)
-        {
-            h = SuperView!.Viewport.Bottom - Viewport.Bottom - 1;
-        }
-
-        return (w, h);
     }
 
     private void ClearRegion (int left, int top, int right, int bottom)

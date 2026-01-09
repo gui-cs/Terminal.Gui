@@ -7,6 +7,8 @@ public partial class TextView
     private bool _wordWrap;
     private WordWrapManager? _wrapManager;
     private bool _wrapNeeded;
+    // The column we are tracking, or -1 if we are not tracking any column
+    private string? _currentCaller;
 
     /// <summary>Allows word wrap the to fit the available container width.</summary>
     public bool WordWrap
@@ -37,13 +39,11 @@ public partial class TextView
                 _model = _wrapManager.Model;
             }
 
-            UpdateHorizontalScrollBarVisibility ();
             UpdateContentSize ();
+            UpdateHorizontalScrollBarVisibility ();
             SetNeedsDraw ();
         }
     }
-
-
 
     /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="InsertionPoint"/>.</summary>
     public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
