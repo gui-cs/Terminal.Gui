@@ -20,7 +20,6 @@ public partial class TextView
     /// <param name="path">Path to the file to load.</param>
     public bool Load (string path)
     {
-        SetWrapModel ();
         bool res;
 
         try
@@ -36,8 +35,6 @@ public partial class TextView
             SetNeedsDraw ();
             Adjust ();
         }
-
-        UpdateWrapModel ();
 
         return res;
     }
