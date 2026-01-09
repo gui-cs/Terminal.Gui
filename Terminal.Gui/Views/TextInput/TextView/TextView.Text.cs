@@ -157,6 +157,8 @@ public partial class TextView
                 CanFocus = !_isReadOnly;
 
                 SetNeedsDraw ();
+                // TODO: This call is probably not needed as Adjust also
+                // TODO: calls WrapTextModel
                 WrapTextModel ();
                 Adjust ();
             }
@@ -712,6 +714,9 @@ public partial class TextView
         _continuousFind = false;
     }
 
+    /// <summary>
+    ///     Resets the Viewport and InsertionPoint to the top-left of the text content.
+    /// </summary>
     private void ResetPosition ()
     {
         Viewport = Viewport with { Y = 0, X = 0 };
