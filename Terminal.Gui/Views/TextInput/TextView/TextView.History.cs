@@ -71,7 +71,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        Adjust ();
+        AdjustViewport ();
         OnContentsChanged ();
     }
 }

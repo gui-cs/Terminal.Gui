@@ -56,7 +56,7 @@ public partial class TextView
                                     value > line.Count ? line.Count : value;
             IsSelecting = true;
             SetNeedsDraw ();
-            Adjust ();
+            AdjustViewport ();
         }
     }
 
@@ -70,7 +70,7 @@ public partial class TextView
                                  value > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value;
             IsSelecting = true;
             SetNeedsDraw ();
-            Adjust ();
+            AdjustViewport ();
         }
     }
 
@@ -133,6 +133,7 @@ public partial class TextView
         IsSelecting = true;
         _selectionStartColumn = CurrentColumn;
         _selectionStartRow = CurrentRow;
+        SetNeedsDraw ();
     }
 
     private void StopSelecting ()

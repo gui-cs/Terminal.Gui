@@ -26,10 +26,10 @@ public partial class TextView
         AddCommand (Command.LeftStartExtend, () => ProcessMoveLeftStartExtend ());
         AddCommand (Command.RightEnd, () => ProcessMoveEndOfLine ());
         AddCommand (Command.RightEndExtend, () => ProcessMoveRightEndExtend ());
-        AddCommand (Command.WordLeft, () => ProcessMoveWordBackward ());
-        AddCommand (Command.WordLeftExtend, () => ProcessMoveWordBackwardExtend ());
-        AddCommand (Command.WordRight, () => ProcessMoveWordForward ());
-        AddCommand (Command.WordRightExtend, () => ProcessMoveWordForwardExtend ());
+        AddCommand (Command.WordLeft, () => ProcessMoveWordLeft ());
+        AddCommand (Command.WordLeftExtend, () => ProcessMoveWordLeftExtend ());
+        AddCommand (Command.WordRight, () => ProcessMoveWordRight ());
+        AddCommand (Command.WordRightExtend, () => ProcessMoveWordRightExtend ());
         AddCommand (Command.End, () => MoveBottomEnd ());
         AddCommand (Command.EndExtend, () => MoveBottomEndExtend ());
         AddCommand (Command.Start, () => MoveTopHome ());
@@ -38,16 +38,16 @@ public partial class TextView
 
         // Editing
         AddCommand (Command.SelectAll, () => ProcessSelectAll ());
-        AddCommand (Command.CutToEndLine, () => KillToEndOfLine ());
-        AddCommand (Command.CutToStartLine, () => KillToLeftStart ());
+        AddCommand (Command.CutToEndOfLine, () => CutToEndOfLine ());
+        AddCommand (Command.CutToStartOfLine, () => CutToStartOfLine ());
         AddCommand (Command.Paste, () => ProcessPaste ());
         AddCommand (Command.Copy, () => ProcessCopy ());
         AddCommand (Command.Cut, () => ProcessCut ());
         AddCommand (Command.DeleteCharLeft, () => ProcessDeleteCharLeft ());
         AddCommand (Command.DeleteCharRight, () => ProcessDeleteCharRight ());
         AddCommand (Command.DeleteAll, () => DeleteAll ());
-        AddCommand (Command.KillWordForwards, () => ProcessKillWordForward ());
-        AddCommand (Command.KillWordBackwards, () => ProcessKillWordBackward ());
+        AddCommand (Command.KillWordRight, () => ProcessKillWordRight ());
+        AddCommand (Command.KillWordLeft, () => ProcessKillWordLeft ());
         AddCommand (Command.Undo, () => Undo ());
         AddCommand (Command.Redo, () => Redo ());
 
@@ -107,11 +107,11 @@ public partial class TextView
 
         KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
 
-        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine); // kill-to-end
+        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine); // kill-to-end
 
-        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndLine); // kill-to-end
+        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndOfLine); // kill-to-end
 
-        KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartLine); // kill-to-start
+        KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartOfLine); // kill-to-start
 
         KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
         KeyBindings.Add (Key.Space.WithCtrl, Command.ToggleExtend);
@@ -128,8 +128,8 @@ public partial class TextView
         KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
 
         KeyBindings.Add (Key.CursorRight.WithCtrl.WithShift, Command.WordRightExtend);
-        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards); // kill-word-forwards
-        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards); // kill-word-backwards
+        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordRight); // kill-word-forwards
+        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordLeft); // kill-word-backwards
 
         KeyBindings.Add (Key.End.WithCtrl, Command.End);
         KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
@@ -158,7 +158,7 @@ public partial class TextView
 
         if (NeedsDraw)
         {
-            Adjust ();
+            AdjustViewport ();
         }
         else
         {
@@ -199,6 +199,10 @@ public partial class TextView
         App?.Clipboard?.SetClipboardData (text);
     }
 
+
+    private string? _copiedText;
+    private List<List<Cell>> _copiedCellsList = [];
+
     /// <summary>Copy the selected text to the clipboard contents.</summary>
     public bool Copy ()
     {
@@ -237,7 +241,7 @@ public partial class TextView
             ClearRegion ();
 
             _historyText.Add (
-                              [new (GetCurrentLine ())],
+                              [ [.. GetCurrentLine ()]],
                               InsertionPoint,
                               TextEditingLineStatus.Replaced
                              );
@@ -270,10 +274,10 @@ public partial class TextView
             List<List<Cell>> addedLine = [ [.. currentLine], runeList];
             _historyText.Add ([.. addedLine], InsertionPoint, TextEditingLineStatus.Added);
             _model.AddLine (CurrentRow, runeList);
+            SetNeedsDraw ();
             CurrentRow++;
             _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
-            SetNeedsDraw ();
             OnContentsChanged ();
         }
         else
@@ -290,8 +294,6 @@ public partial class TextView
             {
                 _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
             }
-
-            SetNeedsDraw ();
         }
 
         UpdateWrapModel ();
@@ -355,7 +357,6 @@ public partial class TextView
         _selectionStartRow = 0;
         CurrentColumn = _model.GetLine (_model.Count - 1).Count;
         CurrentRow = _model.Count - 1;
-        SetNeedsDraw ();
 
         return true;
     }
@@ -392,10 +393,9 @@ public partial class TextView
             return true;
         }
 
-        SetWrapModel ();
-
         if (IsSelecting)
         {
+            SetWrapModel ();
             _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
             ClearSelectedRegion ();
@@ -410,20 +410,12 @@ public partial class TextView
             return true;
         }
 
-        if (DeleteTextBackwards ())
-        {
-            UpdateWrapModel ();
-            OnContentsChanged ();
-
-            return true;
-        }
-
-        UpdateWrapModel ();
+        bool retValue = DeleteTextLeft ();
 
         DoNeededAction ();
         OnContentsChanged ();
 
-        return true;
+        return retValue;
     }
 
     /// <summary>Deletes all the selected or a single character at right from the position of the cursor.</summary>
@@ -434,10 +426,9 @@ public partial class TextView
             return true;
         }
 
-        SetWrapModel ();
-
         if (IsSelecting)
         {
+            SetWrapModel ();
             _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
             ClearSelectedRegion ();
@@ -452,35 +443,27 @@ public partial class TextView
             return true;
         }
 
-        if (DeleteTextForwards ())
-        {
-            UpdateWrapModel ();
-            OnContentsChanged ();
-
-            return true;
-        }
-
-        UpdateWrapModel ();
+        bool retValue = DeleteTextRight ();
 
         DoNeededAction ();
         OnContentsChanged ();
 
-        return true;
+        return retValue;
     }
 
 
-    private bool DeleteTextBackwards ()
+    private bool DeleteTextLeft ()
     {
-        SetWrapModel ();
-
         if (CurrentColumn > 0)
         {
+            SetWrapModel ();
             // Delete backwards
             List<Cell> currentLine = GetCurrentLine ();
 
             _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
             currentLine.RemoveAt (CurrentColumn - 1);
+            SetNeedsDraw ();
 
             if (_wordWrap)
             {
@@ -495,7 +478,7 @@ public partial class TextView
             {
                 Viewport = Viewport with { X = Viewport.X - 1 };
             }
-            SetNeedsDraw ();
+            UpdateWrapModel ();
         }
         else
         {
@@ -505,6 +488,7 @@ public partial class TextView
                 return true;
             }
 
+            SetWrapModel ();
             int prowIdx = CurrentRow - 1;
             List<Cell> prevRow = _model.GetLine (prowIdx);
 
@@ -521,6 +505,7 @@ public partial class TextView
             int prevCount = prevRow.Count;
             _model.GetLine (prowIdx).AddRange (GetCurrentLine ());
             _model.RemoveLine (CurrentRow);
+            SetNeedsDraw ();
 
             if (_wordWrap)
             {
@@ -532,41 +517,38 @@ public partial class TextView
             _historyText.Add ([GetCurrentLine ()], new (CurrentColumn, prowIdx), TextEditingLineStatus.Replaced);
 
             CurrentColumn = prevCount;
-            SetNeedsDraw ();
+            UpdateWrapModel ();
         }
-
-        UpdateWrapModel ();
 
         return true;
     }
 
-    private bool DeleteTextForwards ()
+    private bool DeleteTextRight ()
     {
         SetWrapModel ();
 
         List<Cell> currentLine = GetCurrentLine ();
 
+        if (CurrentColumn == currentLine.Count && CurrentRow + 1 == _model.Count)
+        {
+            // Nothing to delete
+            UpdateWrapModel ();
+
+            return true;
+        }
+
         if (CurrentColumn == currentLine.Count)
         {
-            if (CurrentRow + 1 == _model.Count)
-            {
-                UpdateWrapModel ();
-
-                return true;
-            }
-
+            // We're at the end of the line; need to merge with the next line
             _historyText.Add ([ [.. currentLine]], InsertionPoint);
 
             List<List<Cell>> removedLines = [ [.. currentLine]];
-
             List<Cell> nextLine = _model.GetLine (CurrentRow + 1);
-
             removedLines.Add ([.. nextLine]);
-
             _historyText.Add (removedLines, InsertionPoint, TextEditingLineStatus.Removed);
-
             currentLine.AddRange (nextLine);
             _model.RemoveLine (CurrentRow + 1);
+            SetNeedsDraw ();
 
             _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
@@ -575,37 +557,29 @@ public partial class TextView
                 _wrapNeeded = true;
             }
 
-            DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, CurrentRow - Viewport.Y + 1));
+            UpdateWrapModel ();
+
+            return true;
         }
-        else
+
+        // We're not at the end of the line; delete to end of line
+        _historyText.Add ([ [.. currentLine]], InsertionPoint);
+
+        currentLine.RemoveAt (CurrentColumn);
+        SetNeedsDraw ();
+
+        _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+
+        if (_wordWrap)
         {
-            _historyText.Add ([ [.. currentLine]], InsertionPoint);
-
-            currentLine.RemoveAt (CurrentColumn);
-
-            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
-
-            if (_wordWrap)
-            {
-                _wrapNeeded = true;
-            }
-
-            DoSetNeedsDraw (
-                            new (
-                                 CurrentColumn - Viewport.X,
-                                 CurrentRow - Viewport.Y,
-                                 Viewport.Width,
-                                 Math.Max (CurrentRow - Viewport.Y + 1, 0)
-                                )
-                           );
+            _wrapNeeded = true;
         }
-
         UpdateWrapModel ();
 
         return true;
     }
 
-    private bool KillToEndOfLine ()
+    private bool CutToEndOfLine ()
     {
         if (_isReadOnly)
         {
@@ -627,7 +601,7 @@ public partial class TextView
         {
             UpdateWrapModel ();
 
-            DeleteTextForwards ();
+            DeleteTextRight ();
 
             return true;
         }
@@ -641,6 +615,7 @@ public partial class TextView
                 List<List<Cell>> removedLines = [ [.. currentLine]];
 
                 _model.RemoveLine (CurrentRow);
+                SetNeedsDraw ();
 
                 removedLines.Add ([.. GetCurrentLine ()]);
 
@@ -684,13 +659,12 @@ public partial class TextView
             }
 
             currentLine.RemoveRange (CurrentColumn, restCount);
+            SetNeedsDraw ();
         }
 
         _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
-
-        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -698,7 +672,7 @@ public partial class TextView
         return true;
     }
 
-    private bool KillToLeftStart ()
+    private bool CutToStartOfLine ()
     {
         if (_isReadOnly)
         {
@@ -720,7 +694,7 @@ public partial class TextView
         {
             UpdateWrapModel ();
 
-            DeleteTextBackwards ();
+            DeleteTextLeft ();
 
             return true;
         }
@@ -791,7 +765,7 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
+        SetNeedsDraw ();
 
         _lastWasKill = setLastWasKill;
         DoNeededAction ();
@@ -799,7 +773,7 @@ public partial class TextView
         return true;
     }
 
-    private bool KillWordBackward ()
+    private bool KillWordLeft ()
     {
         if (_isReadOnly)
         {
@@ -814,7 +788,7 @@ public partial class TextView
 
         if (CurrentColumn == 0)
         {
-            DeleteTextBackwards ();
+            DeleteTextLeft ();
 
             _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
@@ -829,6 +803,7 @@ public partial class TextView
         {
             int restCount = CurrentColumn - newPos.Value.col;
             currentLine.RemoveRange (newPos.Value.col, restCount);
+            SetNeedsDraw ();
 
             if (_wordWrap)
             {
@@ -845,6 +820,7 @@ public partial class TextView
             {
                 restCount = currentLine.Count - CurrentColumn;
                 currentLine.RemoveRange (CurrentColumn, restCount);
+                SetNeedsDraw ();
             }
             else
             {
@@ -852,6 +828,7 @@ public partial class TextView
                 {
                     restCount = currentLine.Count;
                     currentLine.RemoveRange (0, restCount);
+                    SetNeedsDraw ();
 
                     CurrentRow--;
                     currentLine = GetCurrentLine ();
@@ -871,13 +848,12 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
         DoNeededAction ();
 
         return true;
     }
 
-    private bool KillWordForward ()
+    private bool KillWordRight ()
     {
         if (_isReadOnly)
         {
@@ -892,7 +868,7 @@ public partial class TextView
 
         if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
-            DeleteTextForwards ();
+            DeleteTextRight ();
 
             _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
@@ -908,11 +884,13 @@ public partial class TextView
         {
             restCount = newPos.Value.col - CurrentColumn;
             currentLine.RemoveRange (CurrentColumn, restCount);
+            SetNeedsDraw ();
         }
         else if (newPos.HasValue)
         {
             restCount = currentLine.Count - CurrentColumn;
             currentLine.RemoveRange (CurrentColumn, restCount);
+            SetNeedsDraw ();
         }
 
         if (_wordWrap)
@@ -924,7 +902,6 @@ public partial class TextView
 
         UpdateWrapModel ();
 
-        DoSetNeedsDraw (new (0, CurrentRow - Viewport.Y, Viewport.Width, Viewport.Height));
         DoNeededAction ();
 
         return true;
@@ -944,19 +921,19 @@ public partial class TextView
         return DeleteCharRight ();
     }
 
-    private bool ProcessKillWordBackward ()
+    private bool ProcessKillWordLeft ()
     {
         ResetColumnTrack ();
 
-        return KillWordBackward ();
+        return KillWordLeft ();
     }
 
-    private bool ProcessKillWordForward ()
+    private bool ProcessKillWordRight ()
     {
         ResetColumnTrack ();
         StopSelecting ();
 
-        return KillWordForward ();
+        return KillWordRight ();
     }
 
     private bool ProcessPaste ()

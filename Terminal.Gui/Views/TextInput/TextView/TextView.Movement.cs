@@ -101,7 +101,7 @@ public partial class TextView
         }
         else if (CurrentRow > Viewport.Height)
         {
-            Adjust ();
+            AdjustViewport ();
         }
         else
         {
@@ -309,7 +309,7 @@ public partial class TextView
         return true;
     }
 
-    private bool MoveWordBackward ()
+    private bool MoveWordLeft ()
     {
         (int col, int row)? newPos = _model.WordBackward (CurrentColumn, CurrentRow, UseSameRuneTypeForWords);
 
@@ -324,7 +324,7 @@ public partial class TextView
         return true;
     }
 
-    private bool MoveWordForward ()
+    private bool MoveWordRight ()
     {
         (int col, int row)? newPos = _model.WordForward (CurrentColumn, CurrentRow, UseSameRuneTypeForWords);
 
@@ -495,7 +495,7 @@ public partial class TextView
         return MoveUp ();
     }
 
-    private bool ProcessMoveWordBackward ()
+    private bool ProcessMoveWordLeft ()
     {
         ResetAllTrack ();
 
@@ -504,18 +504,18 @@ public partial class TextView
             StopSelecting ();
         }
 
-        return MoveWordBackward ();
+        return MoveWordLeft ();
     }
 
-    private bool ProcessMoveWordBackwardExtend ()
+    private bool ProcessMoveWordLeftExtend ()
     {
         ResetAllTrack ();
         StartSelecting ();
 
-        return MoveWordBackward ();
+        return MoveWordLeft ();
     }
 
-    private bool ProcessMoveWordForward ()
+    private bool ProcessMoveWordRight ()
     {
         ResetAllTrack ();
 
@@ -524,15 +524,15 @@ public partial class TextView
             StopSelecting ();
         }
 
-        return MoveWordForward ();
+        return MoveWordRight ();
     }
 
-    private bool ProcessMoveWordForwardExtend ()
+    private bool ProcessMoveWordRightExtend ()
     {
         ResetAllTrack ();
         StartSelecting ();
 
-        return MoveWordForward ();
+        return MoveWordRight ();
     }
 
     private bool ProcessPageDown ()

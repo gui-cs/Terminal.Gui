@@ -49,7 +49,7 @@ public partial class TextView
             CurrentRow = value.Y < 0 ? 0 :
                          value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
 
-            Adjust ();
+            AdjustViewport ();
 
             // Signal cursor position changed without requiring additional redraw
             Point newPosition = new (CurrentColumn, CurrentRow);
@@ -160,7 +160,7 @@ public partial class TextView
                 // TODO: This call is probably not needed as Adjust also
                 // TODO: calls WrapTextModel
                 WrapTextModel ();
-                Adjust ();
+                AdjustViewport ();
             }
         }
     }
@@ -282,7 +282,7 @@ public partial class TextView
 
             if (NeedsDraw)
             {
-                Adjust ();
+                AdjustViewport ();
             }
 
             PositionCursor ();
@@ -313,6 +313,7 @@ public partial class TextView
         (Point current, bool found) foundPos =
             _model.ReplaceAllText (textToFind, matchCase, matchWholeWord, textToReplace);
 
+        // Calls UpdateWrapModel internally
         return SetFoundText (textToFind, foundPos, textToReplace, false, true);
     }
 
@@ -320,27 +321,25 @@ public partial class TextView
     {
         SetWrapModel ();
 
-        long start, end;
         long currentEncoded = ((long)(uint)CurrentRow << 32) | (uint)CurrentColumn;
-        GetEncodedRegionBounds (out start, out end);
+        GetEncodedRegionBounds (out long start, out long end);
         var startRow = (int)(start >> 32);
-        var maxrow = (int)(end >> 32);
+        var maxRow = (int)(end >> 32);
         var startCol = (int)(start & 0xffffffff);
         var endCol = (int)(end & 0xffffffff);
         List<Cell> line = _model.GetLine (startRow);
 
-        _historyText.Add ([[.. line]], new (startCol, startRow));
+        _historyText.Add ([ [.. line]], new (startCol, startRow));
 
         List<List<Cell>> removedLines = [];
 
-        if (startRow == maxrow)
+        if (startRow == maxRow)
         {
             removedLines.Add ([.. line]);
 
             line.RemoveRange (startCol, endCol - startCol);
-            CurrentColumn = startCol;
-
             SetNeedsDraw ();
+            CurrentColumn = startCol;
 
             _historyText.Add (
                               [.. removedLines],
@@ -356,19 +355,20 @@ public partial class TextView
         removedLines.Add ([.. line]);
 
         line.RemoveRange (startCol, line.Count - startCol);
-        List<Cell> line2 = _model.GetLine (maxrow);
+        List<Cell> line2 = _model.GetLine (maxRow);
         line.AddRange (line2.Skip (endCol));
 
-        for (int row = startRow + 1; row <= maxrow; row++)
+        for (int row = startRow + 1; row <= maxRow; row++)
         {
             removedLines.Add ([.. _model.GetLine (startRow + 1)]);
 
             _model.RemoveLine (startRow + 1);
+            SetNeedsDraw ();
         }
 
         if (currentEncoded == end)
         {
-            CurrentRow -= maxrow - startRow;
+            CurrentRow -= maxRow - startRow;
         }
 
         CurrentColumn = startCol;
@@ -380,8 +380,6 @@ public partial class TextView
                          );
 
         UpdateWrapModel ();
-
-        SetNeedsDraw ();
     }
 
     private void GetEncodedRegionBounds (
@@ -496,8 +494,6 @@ public partial class TextView
         }
     }
 
-    private string? _copiedText;
-    private List<List<Cell>> _copiedCellsList = [];
 
     private void InsertAllText (string text, bool fromClipboard = false)
     {
@@ -528,7 +524,7 @@ public partial class TextView
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add ([[.. line]], InsertionPoint);
+        _historyText.Add ([ [.. line]], InsertionPoint);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -537,7 +533,7 @@ public partial class TextView
             CurrentColumn += lines [0].Count;
 
             _historyText.Add (
-                              [[.. line]],
+                              [ [.. line]],
                               InsertionPoint,
                               TextEditingLineStatus.Replaced
                              );
@@ -547,7 +543,6 @@ public partial class TextView
                 Viewport = Viewport with { X = Math.Max (CurrentColumn - Viewport.Width + 1, 0) };
             }
 
-            SetNeedsDraw ();
             UpdateWrapModel ();
             OnContentsChanged ();
 
@@ -568,7 +563,7 @@ public partial class TextView
         // First line is inserted at the current location, the rest is appended
         line.InsertRange (CurrentColumn, lines [0]);
 
-        List<List<Cell>> addedLines = [[.. line]];
+        List<List<Cell>> addedLines = [ [.. line]];
 
         for (var i = 1; i < lines.Count; i++)
         {
@@ -591,9 +586,9 @@ public partial class TextView
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
         CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
-        Adjust ();
+        AdjustViewport ();
 
-        _historyText.Add ([[.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
         OnContentsChanged ();
@@ -609,7 +604,7 @@ public partial class TextView
 
         SetWrapModel ();
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
         if (IsSelecting)
         {
@@ -636,7 +631,6 @@ public partial class TextView
                 if (CurrentColumn >= Viewport.X + Viewport.Width)
                 {
                     Viewport = Viewport with { X = Viewport.X + 1 };
-                    SetNeedsDraw ();
                 }
             }
             else
@@ -647,7 +641,7 @@ public partial class TextView
         }
 
         _historyText.Add (
-                          [[.. GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           InsertionPoint,
                           TextEditingLineStatus.Replaced
                          );
@@ -751,7 +745,7 @@ public partial class TextView
 
             if (!_isReadOnly && replace)
             {
-                Adjust ();
+                AdjustViewport ();
                 ClearSelectedRegion ();
                 InsertAllText (textToReplace!);
                 StartSelecting ();
@@ -760,8 +754,7 @@ public partial class TextView
             else
             {
                 UpdateWrapModel ();
-                SetNeedsDraw ();
-                Adjust ();
+                AdjustViewport ();
             }
 
             _continuousFind = true;
@@ -819,6 +812,6 @@ public partial class TextView
             CurrentColumn = line.Count;
         }
 
-        Adjust ();
+        AdjustViewport ();
     }
 }

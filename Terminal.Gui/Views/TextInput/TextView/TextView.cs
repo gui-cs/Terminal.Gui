@@ -124,10 +124,11 @@ public partial class TextView : View, IDesignable
     {
         base.OnSubViewsLaidOut (args);
         WrapTextModel ();
-        Adjust ();
+        AdjustViewport ();
         UpdateContentSize ();
     }
 
+    // TODO: Upgrade TextView events to use CWP
     /// <summary>Raised when the contents of the <see cref="TextView"/> are changed.</summary>
     /// <remarks>
     ///     Unlike the <see cref="View.TextChanged"/> event, this event is raised whenever the user types or otherwise changes
