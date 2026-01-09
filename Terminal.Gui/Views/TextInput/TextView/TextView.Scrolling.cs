@@ -90,13 +90,7 @@ public partial class TextView
         {
             Viewport = Viewport with
             {
-                X = TextModel.CalculateLeftColumn (
-                                                         line,
-                                                         Viewport.X,
-                                                         CurrentColumn,
-                                                         Viewport.Width,
-                                                         TabWidth
-                                                        )
+                X = TextModel.CalculateLeftColumn (line, Viewport.X, CurrentColumn, Viewport.Width, TabWidth)
             };
             need = true;
         }
@@ -138,10 +132,7 @@ public partial class TextView
         }
         else
         {
-            if (IsInitialized)
-            {
-                PositionCursor ();
-            }
+            PositionCursor ();
         }
 
         OnUnwrappedCursorPosition ();

@@ -78,9 +78,18 @@ public partial class TextField : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
-        UpdateCursor ();
+        if (newHasFocus)
+        {
+           UpdateCursor ();
+        }
     }
 
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    {
+        base.OnSubViewsLaidOut (args);
+        UpdateCursor ();
+    }
 
     /// <summary>Get the Context Menu for this view.</summary>
     public PopoverMenu? ContextMenu { get; private set; }

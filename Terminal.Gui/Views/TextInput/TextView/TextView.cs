@@ -155,6 +155,10 @@ public partial class TextView : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+        if (newHasFocus)
+        {
+            PositionCursor ();
+        }
     }
 
     /// <summary>Positions the cursor on the current row and column</summary>
