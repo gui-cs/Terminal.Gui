@@ -201,16 +201,16 @@ public class TextViewSelectionTests
         // Navigate using same pattern as original test to preserve column position
         app.Keyboard.RaiseKeyDownEvent (Key.End.WithCtrl);
         Assert.Equal (new (28, 2), tv.InsertionPoint);
-        
+
         app.Keyboard.RaiseKeyDownEvent (Key.PageUp);
         Assert.Equal (new (24, 1), tv.InsertionPoint);
-        
+
         app.Keyboard.RaiseKeyDownEvent (Key.PageUp);
         Assert.Equal (new (23, 0), tv.InsertionPoint);
-        
+
         app.Keyboard.RaiseKeyDownEvent (Key.PageDown);
         Assert.Equal (new (23, 1), tv.InsertionPoint);
-        
+
         app.Keyboard.RaiseKeyDownEvent (Key.PageDown);
         Assert.Equal (new (23, 2), tv.InsertionPoint);
 
