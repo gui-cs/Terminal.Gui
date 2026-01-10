@@ -129,6 +129,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunnableWrapperExample", "E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputView", "docfx\scripts\OutputView\OutputView.csproj", "{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{3DD033C0-E023-47BF-A808-9CCE30873C3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScenarioRunner", "Examples\ScenarioRunner\ScenarioRunner.csproj", "{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -215,6 +219,10 @@ Global
 		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,6 +232,7 @@ Global
 		{13BB2C46-B324-4B9C-92EB-CE6184D4736E} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
 		{C7A51224-5E0F-4986-AB37-A6BF89966C12} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
 		{1A3CBA89-EDAB-4F75-811E-FE81B13A4836} = {E143FB1F-0B88-48CB-9086-72CDCECFCD22}
+		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F8F8A4D-7B8D-4C2A-AC5E-CD7117F74C03}

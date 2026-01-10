@@ -13,7 +13,6 @@ global using Terminal.Gui.FileServices;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
-using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -360,6 +359,9 @@ public class UICatalog
         // regardless of what's in a config file.
         Application.ForceDriver = _forceDriver = options.Driver;
 
+        // Create the runner for executing scenarios
+        Runner runner = new (_forceDriver);
+
         // If a Scenario name has been provided on the commandline
         // run it and exit when done.
         if (options.Scenario != "none")
@@ -376,7 +378,7 @@ public class UICatalog
                                                                        )!);
             UICatalogRunnable.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogRunnable.CachedScenarios [item].GetType ())!;
 
-            BenchmarkResults? results = RunScenario (UICatalogRunnable.CachedSelectedScenario, options.Benchmark);
+            BenchmarkResults? results = runner.RunScenario (UICatalogRunnable.CachedSelectedScenario, options.Benchmark);
 
             if (results is { })
             {
@@ -397,7 +399,19 @@ public class UICatalog
         // Benchmark all Scenarios
         if (options.Benchmark)
         {
-            BenchmarkAllScenarios ();
+            List<BenchmarkResults> results = runner.BenchmarkAllScenarios (UICatalogRunnable.CachedScenarios!);
+
+            if (results.Count > 0)
+            {
+                if (!string.IsNullOrEmpty (Options.ResultsFile))
+                {
+                    Runner.SaveResultsToFile (results, Options.ResultsFile);
+                }
+                else
+                {
+                    Runner.DisplayResultsUI (results);
+                }
+            }
 
             return;
         }
@@ -423,17 +437,7 @@ public class UICatalog
             Application.InitializedChanged += ApplicationOnInitializedChanged;
 #endif
 
-            Application.ForceDriver = _forceDriver;
-
-            scenario.Main ();
-            scenario.Dispose ();
-
-            // This call to Application.Shutdown brackets the Application.Init call
-            // made by Scenario.Init() above
-            if (Application.Driver is { })
-            {
-                Application.Shutdown ();
-            }
+            runner.RunScenario (scenario, false);
 
             VerifyObjectsWereDisposed ();
 
@@ -459,193 +463,6 @@ public class UICatalog
 
         StopConfigWatcher ();
         VerifyObjectsWereDisposed ();
-    }
-
-    private static BenchmarkResults? RunScenario (Scenario scenario, bool benchmark)
-    {
-        if (benchmark)
-        {
-            scenario.StartBenchmark ();
-        }
-
-        Application.ForceDriver = _forceDriver!;
-
-        scenario.Main ();
-
-        BenchmarkResults? results = null;
-
-        if (benchmark)
-        {
-            results = scenario.EndBenchmark ();
-        }
-
-        scenario.Dispose ();
-
-        if (Application.Driver is { })
-        {
-            Application.Shutdown ();
-        }
-
-        return results;
-    }
-
-    private static void BenchmarkAllScenarios ()
-    {
-        List<BenchmarkResults> resultsList = [];
-
-        var maxScenarios = 5;
-
-        foreach (Scenario s in UICatalogRunnable.CachedScenarios!)
-        {
-            resultsList.Add (RunScenario (s, true)!);
-            maxScenarios--;
-
-            if (maxScenarios == 0)
-            {
-                // break;
-            }
-        }
-
-        if (resultsList.Count <= 0)
-        {
-            return;
-        }
-
-        if (!string.IsNullOrEmpty (Options.ResultsFile))
-        {
-            string output = JsonSerializer.Serialize (
-                                                      resultsList,
-                                                      new JsonSerializerOptions
-                                                      {
-                                                          WriteIndented = true
-                                                      });
-
-            using StreamWriter file = File.CreateText (Options.ResultsFile);
-            file.Write (output);
-            file.Close ();
-
-            return;
-        }
-
-        Application.Init ();
-
-        var benchmarkWindow = new Window
-        {
-            Title = "Benchmark Results"
-        };
-
-        if (benchmarkWindow.Border is { })
-        {
-            benchmarkWindow.Border!.Thickness = new (0, 0, 0, 0);
-        }
-
-        TableView resultsTableView = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
-
-        // TableView provides many options for table headers. For simplicity we turn all 
-        // of these off. By enabling FullRowSelect and turning off headers, TableView looks just
-        // like a ListView
-        resultsTableView.FullRowSelect = true;
-        resultsTableView.Style.ShowHeaders = true;
-        resultsTableView.Style.ShowHorizontalHeaderOverline = false;
-        resultsTableView.Style.ShowHorizontalHeaderUnderline = true;
-        resultsTableView.Style.ShowHorizontalBottomline = false;
-        resultsTableView.Style.ShowVerticalCellLines = true;
-        resultsTableView.Style.ShowVerticalHeaderLines = true;
-
-        /* By default, TableView lays out columns at render time and only
-         * measures y rows of data at a time.  Where y is the height of the
-         * console. This is for the following reasons:
-         *
-         * - Performance, when tables have a large amount of data
-         * - Defensive, prevents a single wide cell value pushing other
-         *   columns off-screen (requiring horizontal scrolling
-         *
-         * In the case of UICatalog here, such an approach is overkill so
-         * we just measure all the data ourselves and set the appropriate
-         * max widths as ColumnStyles
-         */
-        //int longestName = _scenarios!.Max (s => s.GetName ().Length);
-
-        //resultsTableView.Style.ColumnStyles.Add (
-        //                                     0,
-        //                                     new () { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
-        //                                    );
-        //resultsTableView.Style.ColumnStyles.Add (1, new () { MaxWidth = 1 });
-        //resultsTableView.CellActivated += ScenarioView_OpenSelectedItem;
-
-        // TableView typically is a grid where nav keys are biased for moving left/right.
-        resultsTableView.KeyBindings.Remove (Key.Home);
-        resultsTableView.KeyBindings.Add (Key.Home, Command.Start);
-        resultsTableView.KeyBindings.Remove (Key.End);
-        resultsTableView.KeyBindings.Add (Key.End, Command.End);
-
-        // Ideally, TableView.MultiSelect = false would turn off any keybindings for
-        // multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
-        // a shortcut to About.
-        resultsTableView.MultiSelect = false;
-
-        var dt = new DataTable ();
-
-        dt.Columns.Add (new DataColumn ("Scenario", typeof (string)));
-        dt.Columns.Add (new DataColumn ("Duration", typeof (TimeSpan)));
-        dt.Columns.Add (new DataColumn ("Refreshed", typeof (int)));
-        dt.Columns.Add (new DataColumn ("LaidOut", typeof (int)));
-        dt.Columns.Add (new DataColumn ("ClearedContent", typeof (int)));
-        dt.Columns.Add (new DataColumn ("DrawComplete", typeof (int)));
-        dt.Columns.Add (new DataColumn ("Updated", typeof (int)));
-        dt.Columns.Add (new DataColumn ("Iterations", typeof (int)));
-
-        foreach (BenchmarkResults r in resultsList)
-        {
-            dt.Rows.Add (
-                         r.Scenario,
-                         r.Duration,
-                         r.RefreshedCount,
-                         r.LaidOutCount,
-                         r.ClearedContentCount,
-                         r.DrawCompleteCount,
-                         r.UpdatedCount,
-                         r.IterationCount
-                        );
-        }
-
-        BenchmarkResults totalRow = new ()
-        {
-            Scenario = "TOTAL",
-            Duration = new (resultsList.Sum (r => r.Duration.Ticks)),
-            RefreshedCount = resultsList.Sum (r => r.RefreshedCount),
-            LaidOutCount = resultsList.Sum (r => r.LaidOutCount),
-            ClearedContentCount = resultsList.Sum (r => r.ClearedContentCount),
-            DrawCompleteCount = resultsList.Sum (r => r.DrawCompleteCount),
-            UpdatedCount = resultsList.Sum (r => r.UpdatedCount),
-            IterationCount = resultsList.Sum (r => r.IterationCount)
-        };
-
-        dt.Rows.Add (
-                     totalRow.Scenario,
-                     totalRow.Duration,
-                     totalRow.RefreshedCount,
-                     totalRow.LaidOutCount,
-                     totalRow.ClearedContentCount,
-                     totalRow.DrawCompleteCount,
-                     totalRow.UpdatedCount,
-                     totalRow.IterationCount
-                    );
-
-        dt.DefaultView.Sort = "Duration";
-        DataTable sortedCopy = dt.DefaultView.ToTable ();
-
-        resultsTableView.Table = new DataTableSource (sortedCopy);
-
-        benchmarkWindow.Add (resultsTableView);
-
-        Application.Run (benchmarkWindow);
-        benchmarkWindow.Dispose ();
-        Application.Shutdown ();
     }
 
     private static void VerifyObjectsWereDisposed ()

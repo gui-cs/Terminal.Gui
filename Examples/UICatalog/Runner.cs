@@ -1,0 +1,212 @@
+#nullable enable
+using System.Data;
+using System.Text.Json;
+using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
+
+namespace UICatalog;
+
+/// <summary>
+///     Provides functionality for running and benchmarking Terminal.Gui scenarios.
+/// </summary>
+public class Runner
+{
+    private readonly string? _forceDriver;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Runner"/> class.
+    /// </summary>
+    /// <param name="forceDriver">The driver to use, or null to use the default.</param>
+    public Runner (string? forceDriver = null)
+    {
+        _forceDriver = forceDriver;
+    }
+
+    /// <summary>
+    ///     Runs a single scenario with optional benchmarking.
+    /// </summary>
+    /// <param name="scenario">The scenario to run.</param>
+    /// <param name="benchmark">Whether to collect benchmark metrics.</param>
+    /// <returns>Benchmark results if benchmarking was enabled, otherwise null.</returns>
+    public BenchmarkResults? RunScenario (Scenario scenario, bool benchmark)
+    {
+        if (benchmark)
+        {
+            scenario.StartBenchmark ();
+        }
+
+        Application.ForceDriver = _forceDriver!;
+
+        scenario.Main ();
+
+        BenchmarkResults? results = null;
+
+        if (benchmark)
+        {
+            results = scenario.EndBenchmark ();
+        }
+
+        scenario.Dispose ();
+
+        if (Application.Driver is { })
+        {
+            Application.Shutdown ();
+        }
+
+        return results;
+    }
+
+    /// <summary>
+    ///     Runs benchmarks for all provided scenarios.
+    /// </summary>
+    /// <param name="scenarios">The scenarios to benchmark.</param>
+    /// <returns>List of benchmark results for all scenarios.</returns>
+    public List<BenchmarkResults> BenchmarkAllScenarios (IEnumerable<Scenario> scenarios)
+    {
+        List<BenchmarkResults> resultsList = [];
+
+        foreach (Scenario s in scenarios)
+        {
+            BenchmarkResults? result = RunScenario (s, true);
+
+            if (result is { })
+            {
+                resultsList.Add (result);
+            }
+        }
+
+        return resultsList;
+    }
+
+    /// <summary>
+    ///     Saves benchmark results to a JSON file.
+    /// </summary>
+    /// <param name="results">The results to save.</param>
+    /// <param name="filePath">The file path to write to.</param>
+    public static void SaveResultsToFile (List<BenchmarkResults> results, string filePath)
+    {
+        string output = JsonSerializer.Serialize (
+                                                  results,
+                                                  new JsonSerializerOptions
+                                                  {
+                                                      WriteIndented = true
+                                                  });
+
+        using StreamWriter file = File.CreateText (filePath);
+        file.Write (output);
+        file.Close ();
+    }
+
+    /// <summary>
+    ///     Displays benchmark results in a TableView UI.
+    /// </summary>
+    /// <param name="results">The results to display.</param>
+    public static void DisplayResultsUI (List<BenchmarkResults> results)
+    {
+        if (results.Count <= 0)
+        {
+            return;
+        }
+
+        Application.Init ();
+
+        Window benchmarkWindow = new ()
+        {
+            Title = "Benchmark Results"
+        };
+
+        if (benchmarkWindow.Border is { })
+        {
+            benchmarkWindow.Border!.Thickness = new Thickness (0, 0, 0, 0);
+        }
+
+        TableView resultsTableView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        // TableView provides many options for table headers. For simplicity we turn all
+        // of these off. By enabling FullRowSelect and turning off headers, TableView looks just
+        // like a ListView
+        resultsTableView.FullRowSelect = true;
+        resultsTableView.Style.ShowHeaders = true;
+        resultsTableView.Style.ShowHorizontalHeaderOverline = false;
+        resultsTableView.Style.ShowHorizontalHeaderUnderline = true;
+        resultsTableView.Style.ShowHorizontalBottomline = false;
+        resultsTableView.Style.ShowVerticalCellLines = true;
+        resultsTableView.Style.ShowVerticalHeaderLines = true;
+
+        // TableView typically is a grid where nav keys are biased for moving left/right.
+        resultsTableView.KeyBindings.Remove (Key.Home);
+        resultsTableView.KeyBindings.Add (Key.Home, Command.Start);
+        resultsTableView.KeyBindings.Remove (Key.End);
+        resultsTableView.KeyBindings.Add (Key.End, Command.End);
+
+        // Ideally, TableView.MultiSelect = false would turn off any keybindings for
+        // multi-select options. But it currently does not.
+        resultsTableView.MultiSelect = false;
+
+        DataTable dt = new ();
+
+        dt.Columns.Add (new DataColumn ("Scenario", typeof (string)));
+        dt.Columns.Add (new DataColumn ("Duration", typeof (TimeSpan)));
+        dt.Columns.Add (new DataColumn ("Refreshed", typeof (int)));
+        dt.Columns.Add (new DataColumn ("LaidOut", typeof (int)));
+        dt.Columns.Add (new DataColumn ("ClearedContent", typeof (int)));
+        dt.Columns.Add (new DataColumn ("DrawComplete", typeof (int)));
+        dt.Columns.Add (new DataColumn ("Updated", typeof (int)));
+        dt.Columns.Add (new DataColumn ("Iterations", typeof (int)));
+
+        foreach (BenchmarkResults r in results)
+        {
+            dt.Rows.Add (
+                         r.Scenario,
+                         r.Duration,
+                         r.RefreshedCount,
+                         r.LaidOutCount,
+                         r.ClearedContentCount,
+                         r.DrawCompleteCount,
+                         r.UpdatedCount,
+                         r.IterationCount
+                        );
+        }
+
+        BenchmarkResults totalRow = new ()
+        {
+            Scenario = "TOTAL",
+            Duration = new TimeSpan (results.Sum (r => r.Duration.Ticks)),
+            RefreshedCount = results.Sum (r => r.RefreshedCount),
+            LaidOutCount = results.Sum (r => r.LaidOutCount),
+            ClearedContentCount = results.Sum (r => r.ClearedContentCount),
+            DrawCompleteCount = results.Sum (r => r.DrawCompleteCount),
+            UpdatedCount = results.Sum (r => r.UpdatedCount),
+            IterationCount = results.Sum (r => r.IterationCount)
+        };
+
+        dt.Rows.Add (
+                     totalRow.Scenario,
+                     totalRow.Duration,
+                     totalRow.RefreshedCount,
+                     totalRow.LaidOutCount,
+                     totalRow.ClearedContentCount,
+                     totalRow.DrawCompleteCount,
+                     totalRow.UpdatedCount,
+                     totalRow.IterationCount
+                    );
+
+        dt.DefaultView.Sort = "Duration";
+        DataTable sortedCopy = dt.DefaultView.ToTable ();
+
+        resultsTableView.Table = new DataTableSource (sortedCopy);
+
+        benchmarkWindow.Add (resultsTableView);
+
+        Application.Run (benchmarkWindow);
+        benchmarkWindow.Dispose ();
+        Application.Shutdown ();
+    }
+}
