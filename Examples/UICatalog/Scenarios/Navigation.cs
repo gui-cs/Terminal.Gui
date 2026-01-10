@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Timers;
+// ReSharper disable AccessToModifiedClosure
 
 namespace UICatalog.Scenarios;
 
@@ -14,6 +15,7 @@ public class Navigation : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window window = new ()
         {
@@ -21,7 +23,7 @@ public class Navigation : Scenario
             TabStop = TabBehavior.TabGroup
         };
 
-        var adornmentsEditor = new AdornmentsEditor
+        AdornmentsEditor adornmentsEditor = new ()
         {
             X = 0,
             Y = 0,
@@ -31,7 +33,7 @@ public class Navigation : Scenario
         };
         window.Add (adornmentsEditor);
 
-        var arrangementEditor = new ArrangementEditor ()
+        ArrangementEditor arrangementEditor = new ()
         {
             X = Pos.Right (adornmentsEditor),
             Y = 0,
@@ -59,7 +61,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
-        button.Accepting += (sender, args) => MessageBox.Query (Application.Instance, "hi", button.Title, "_Ok");
+        button.Accepting += (_, _) => MessageBox.Query (app, "hi", button.Title, "_Ok");
 
         testFrame.Add (button);
 
@@ -107,7 +109,7 @@ public class Navigation : Scenario
         //                 };
         //timer.Start ();
 
-        Application.Iteration += OnApplicationIteration;
+        app.Iteration += OnApplicationIteration;
 
         View overlappedView2 = CreateOverlappedView (3, 8, 10);
 
@@ -168,7 +170,7 @@ public class Navigation : Scenario
         colorPicker.ApplyStyleChanges ();
 
         colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
-        colorPicker.ColorChanged += ColorPicker_ColorChanged;
+        colorPicker.ColorChanged += ColorPickerColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
 
@@ -202,11 +204,10 @@ public class Navigation : Scenario
         arrangementEditor.AutoSelectSuperView = testFrame;
 
         testFrame.SetFocus ();
-        Application.Run (window);
-        Application.Iteration -= OnApplicationIteration;
+        app.Run (window);
+        app.Iteration -= OnApplicationIteration;
         // timer.Close ();
         window.Dispose ();
-        Application.Shutdown ();
 
         return;
 
@@ -219,10 +220,10 @@ public class Navigation : Scenario
 
             progressBar.Fraction += 0.01f;
 
-            Application.Invoke ((_) => { });
+            app.Invoke (_ => { });
         }
 
-        void ColorPicker_ColorChanged (object sender, ResultEventArgs<Color> e)
+        void ColorPickerColorChanged (object sender, ResultEventArgs<Color> e)
         {
             testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
         }
@@ -230,7 +231,7 @@ public class Navigation : Scenario
 
     private View CreateOverlappedView (int id, Pos x, Pos y)
     {
-        var overlapped = new View
+        View overlapped = new ()
         {
             X = x,
             Y = y,
@@ -264,7 +265,7 @@ public class Navigation : Scenario
 
     private View CreateTiledView (int id, Pos x, Pos y)
     {
-        var overlapped = new View
+        View overlapped = new ()
         {
             X = x,
             Y = y,

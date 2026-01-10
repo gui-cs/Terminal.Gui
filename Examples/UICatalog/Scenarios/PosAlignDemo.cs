@@ -13,6 +13,7 @@ public sealed class PosAlignDemo : Scenario
     {
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
@@ -27,11 +28,8 @@ public sealed class PosAlignDemo : Scenario
         Setup3By3Grid (appWindow);
 
         // Run - Start the application.
-        Application.Run (appWindow);
+        app.Run (appWindow);
         appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
     }
 
     private void SetupControls (Window appWindow, Dimension dimension, Schemes scheme)
@@ -52,7 +50,7 @@ public sealed class PosAlignDemo : Scenario
             alignOptionSelector.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        alignOptionSelector.ValueChanged += (s, e) =>
+        alignOptionSelector.ValueChanged += (_, _) =>
                                             {
                                                 if (alignOptionSelector.Value is null)
                                                 {
@@ -92,7 +90,7 @@ public sealed class PosAlignDemo : Scenario
             endToStartCheckBox.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        endToStartCheckBox.CheckedStateChanging += (s, e) =>
+        endToStartCheckBox.CheckedStateChanging += (_, e) =>
                                                    {
                                                        if (dimension == Dimension.Width)
                                                        {
@@ -131,7 +129,7 @@ public sealed class PosAlignDemo : Scenario
             ignoreFirstOrLast.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        ignoreFirstOrLast.CheckedStateChanging += (s, e) =>
+        ignoreFirstOrLast.CheckedStateChanging += (_, e) =>
                                                   {
                                                       if (dimension == Dimension.Width)
                                                       {
@@ -171,7 +169,7 @@ public sealed class PosAlignDemo : Scenario
             addSpacesBetweenItems.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        addSpacesBetweenItems.CheckedStateChanging += (s, e) =>
+        addSpacesBetweenItems.CheckedStateChanging += (_, e) =>
                                                       {
                                                           if (dimension == Dimension.Width)
                                                           {
@@ -212,7 +210,7 @@ public sealed class PosAlignDemo : Scenario
             margin.Y = Pos.Align (_vertAligner.Alignment);
         }
 
-        margin.CheckedStateChanging += (s, e) =>
+        margin.CheckedStateChanging += (_, e) =>
                                        {
                                            if (dimension == Dimension.Width)
                                            {
@@ -259,7 +257,7 @@ public sealed class PosAlignDemo : Scenario
             addedViewsUpDown.Border!.Thickness = new (1, 0, 0, 0);
         }
 
-        addedViewsUpDown.ValueChanging += (s, e) =>
+        addedViewsUpDown.ValueChanging += (_, e) =>
                                           {
                                               if (e.NewValue < 0)
                                               {
@@ -308,34 +306,27 @@ public sealed class PosAlignDemo : Scenario
     {
         foreach (View view in superView.SubViews.Where (v => dimension == Dimension.Width ? v.X is PosAlign : v.Y is PosAlign))
         {
-            if (dimension == Dimension.Width ? view.X is PosAlign : view.Y is PosAlign)
+            if (dimension == Dimension.Width ? view.X is not PosAlign : view.Y is not PosAlign)
             {
-                //posAlign.Aligner.Alignment = _horizAligner.Alignment;
-                //posAlign.Aligner.AlignmentMode = _horizAligner.AlignmentMode;
+                continue;
+            }
 
-                // BUGBUG: Create and assign a new Pos object because we currently have no way for X to be notified
-                // BUGBUG: of changes in the Pos object. See https://github.com/gui-cs/Terminal.Gui/issues/3485
-                if (dimension == Dimension.Width)
-                {
-                    var posAlign = view.X as PosAlign;
+            // BUGBUG: Create and assign a new Pos object because we currently have no way for X to be notified
+            // BUGBUG: of changes in the Pos object. See https://github.com/gui-cs/Terminal.Gui/issues/3485
+            if (dimension == Dimension.Width)
+            {
+                var posAlign = view.X as PosAlign;
 
-                    view.X = Pos.Align (
-                                        aligner.Alignment,
-                                        aligner.AlignmentModes,
-                                        posAlign!.GroupId);
-                    view.Margin!.Thickness = new (_leftMargin, view.Margin!.Thickness.Top, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
-                }
-                else
-                {
-                    var posAlign = view.Y as PosAlign;
+                view.X = Pos.Align (aligner.Alignment, aligner.AlignmentModes, posAlign!.GroupId);
+                view.Margin!.Thickness = new (_leftMargin, view.Margin!.Thickness.Top, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
+            }
+            else
+            {
+                var posAlign = view.Y as PosAlign;
 
-                    view.Y = Pos.Align (
-                                        aligner.Alignment,
-                                        aligner.AlignmentModes,
-                                        posAlign!.GroupId);
+                view.Y = Pos.Align (aligner.Alignment, aligner.AlignmentModes, posAlign!.GroupId);
 
-                    view.Margin!.Thickness = new (view.Margin!.Thickness.Left, _topMargin, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
-                }
+                view.Margin!.Thickness = new (view.Margin!.Thickness.Left, _topMargin, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
             }
         }
     }
@@ -388,7 +379,7 @@ public sealed class PosAlignDemo : Scenario
         };
         container.Padding.Add (heightAlignOptionSelector);
 
-        heightAlignOptionSelector.ValueChanged += (sender, e) =>
+        heightAlignOptionSelector.ValueChanged += (_, _) =>
                                                          {
                                                              heightAligner.Alignment =
                                                                  (Alignment)Enum.Parse (

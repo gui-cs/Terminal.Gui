@@ -197,24 +197,24 @@ public class TextInputControls : Scenario
                                                {
                                                    if (e.Result == CheckState.Checked)
                                                    {
-                                                       if (keyTab is { })
+                                                       if (keyTab is not null)
                                                        {
                                                            textView.KeyBindings.Add (keyTab, Command.NextTabStop);
                                                        }
 
-                                                       if (keyBackTab is { })
+                                                       if (keyBackTab is not null)
                                                        {
                                                            textView.KeyBindings.Add (keyBackTab, Command.PreviousTabStop);
                                                        }
                                                    }
                                                    else
                                                    {
-                                                       if (keyTab is { })
+                                                       if (keyTab is not null)
                                                        {
                                                            textView.KeyBindings.Remove (keyTab);
                                                        }
 
-                                                       if (keyBackTab is { })
+                                                       if (keyBackTab is not null)
                                                        {
                                                            textView.KeyBindings.Remove (keyBackTab);
                                                        }
@@ -530,7 +530,7 @@ public class TextInputControls : Scenario
 
     private void TimeChanged (object? sender, EventArgs<TimeSpan> e)
     {
-        if (_labelMirroringTimeField is { } && _timeField is { })
+        if (_labelMirroringTimeField is not null && _timeField is not null)
         {
             _labelMirroringTimeField.Text = _timeField.Text;
         }

@@ -17,6 +17,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Menus")]
 public class Editor : Scenario
 {
+    private IApplication? _app;
     private Window? _appWindow;
     private List<CultureInfo>? _cultureInfos;
     private string _fileName = "demo.txt";
@@ -39,6 +40,7 @@ public class Editor : Scenario
 
         // Prepping for modern app model
         using IApplication app = Application.Instance;
+        _app = app;
 
         _appWindow = new ()
         {
@@ -133,7 +135,7 @@ public class Editor : Scenario
                                                                      _forceMinimumPosToZero = e.Result == CheckState.Checked;
 
                                                                      // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
-                                                                     // if (_textView?.ContextMenu is { })
+                                                                     // if (_textView?.ContextMenu is not null)
                                                                      // {
                                                                      //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
                                                                      // }
@@ -204,7 +206,7 @@ public class Editor : Scenario
         Debug.Assert (_textView.IsDirty);
 
         int? r = MessageBox.ErrorQuery (
-                                        Application.Instance,
+                                        _appWindow!.App!,
                                         "Save File",
                                         $"Do you want save changes in {_appWindow.Title}?",
                                         "Yes",
@@ -239,7 +241,7 @@ public class Editor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Error", ex.Message, "Ok");
+            MessageBox.ErrorQuery (_appWindow!.App!, "Error", ex.Message, "Ok");
         }
     }
 
@@ -318,12 +320,12 @@ public class Editor : Scenario
 
         if (!found)
         {
-            MessageBox.Query (Application.Instance, "Find", $"The following specified text was not found: '{_textToFind}'", "Ok");
+            MessageBox.Query (_appWindow!.App!, "Find", $"The following specified text was not found: '{_textToFind}'", "Ok");
         }
         else if (gaveFullTurn)
         {
             MessageBox.Query (
-                              Application.Instance,
+                              _appWindow!.App!,
                               "Find",
                               $"No more occurrences were found for the following specified text: '{_textToFind}'",
                               "Ok"
@@ -795,7 +797,7 @@ public class Editor : Scenario
         ];
 
         OpenDialog d = new () { Title = "Open", AllowedTypes = aTypes, AllowsMultipleSelection = false };
-        Application.Run (d);
+        _app?.Run (d);
 
         if (!d.Canceled && d.FilePaths.Count > 0)
         {
@@ -837,7 +839,7 @@ public class Editor : Scenario
         if (_textView.ReplaceAllText (_textToFind, _matchCase, _matchWholeWord, _textToReplace))
         {
             MessageBox.Query (
-                              Application.Instance,
+                              _appWindow!.App!,
                               "Replace All",
                               $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
                               "Ok"
@@ -846,7 +848,7 @@ public class Editor : Scenario
         else
         {
             MessageBox.Query (
-                              Application.Instance,
+                              _appWindow!.App!,
                               "Replace All",
                               $"None of the following specified text was found: '{_textToFind}'",
                               "Ok"
@@ -1064,7 +1066,7 @@ public class Editor : Scenario
 
     private bool Save ()
     {
-        if (_fileName is { } && _appWindow is { })
+        if (_fileName is not null && _appWindow is not null)
         {
             return SaveFile (_appWindow.Title, _fileName);
         }
@@ -1088,7 +1090,7 @@ public class Editor : Scenario
         SaveDialog sd = new () { Title = "Save file", AllowedTypes = aTypes };
 
         sd.Path = _appWindow.Title;
-        Application.Run (sd);
+        _app?.Run (sd);
         bool canceled = sd.Canceled;
         string path = sd.Path;
         string fileName = sd.FileName;
@@ -1099,7 +1101,7 @@ public class Editor : Scenario
             if (File.Exists (path))
             {
                 if (MessageBox.Query (
-                                      Application.Instance,
+                                      _app!,
                                       "Save File",
                                       "File already exists. Overwrite any way?",
                                       "No",
@@ -1138,11 +1140,11 @@ public class Editor : Scenario
             _originalText = Encoding.Unicode.GetBytes (_textView.Text);
             _saved = true;
             _textView.ClearHistoryChanges ();
-            MessageBox.Query (Application.Instance, "Save File", "File was successfully saved.", "Ok");
+            MessageBox.Query (_appWindow.App!, "Save File", "File was successfully saved.", "Ok");
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Error", ex.Message, "Ok");
+            MessageBox.ErrorQuery (_appWindow.App!, "Error", ex.Message, "Ok");
 
             return false;
         }
@@ -1244,7 +1246,7 @@ public class Editor : Scenario
 
         private void FindReplaceWindow_Initialized (object? sender, EventArgs e)
         {
-            if (Border is { })
+            if (Border is not null)
             {
                 Border.LineStyle = LineStyle.Dashed;
                 Border.Thickness = new (0, 1, 0, 0);

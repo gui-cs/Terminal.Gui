@@ -9,8 +9,9 @@ public class LineExample : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        var window = new Window
+        Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -212,8 +213,7 @@ public class LineExample : Scenario
         };
         window.Add (helpLabel);
 
-        Application.Run (window);
+        app.Run (window);
         window.Dispose ();
-        Application.Shutdown ();
     }
 }

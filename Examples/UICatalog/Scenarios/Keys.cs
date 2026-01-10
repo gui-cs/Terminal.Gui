@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
 
@@ -9,13 +9,14 @@ public class Keys : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
         ObservableCollection<string> keyDownList = [];
-        ObservableCollection<string> keyDownNotHandledList = new ();
-        ObservableCollection<string> swallowedList = new ();
+        ObservableCollection<string> keyDownNotHandledList = [];
+        ObservableCollection<string> swallowedList = [];
 
-        var win = new Window { Title = GetQuitKeyAndName () };
+        Window win = new () { Title = GetQuitKeyAndName () };
 
-        var label = new Label
+        Label label = new ()
         {
             X = 0,
             Y = 0,
@@ -23,7 +24,7 @@ public class Keys : Scenario
         };
         win.Add (label);
 
-        var edit = new TextField
+        TextField edit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -32,21 +33,21 @@ public class Keys : Scenario
         };
         win.Add (edit);
 
-        label = new Label
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
-            Text = "Last _Application.KeyDown:"
+            Text = "Last _app.Keyboard.KeyDown:"
         };
         win.Add (label);
-        var labelAppKeypress = new Label
+        Label labelAppKeypress = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label)
         };
         win.Add (labelAppKeypress);
 
-        Application.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
+        app.Keyboard.KeyDown += (_, e) => labelAppKeypress.Text = e.ToString ();
 
         label = new ()
         {
@@ -56,7 +57,7 @@ public class Keys : Scenario
         };
         win.Add (label);
 
-        var lastTextFieldKeyDownLabel = new Label
+        Label lastTextFieldKeyDownLabel = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -64,10 +65,10 @@ public class Keys : Scenario
         };
         win.Add (lastTextFieldKeyDownLabel);
 
-        edit.KeyDown += (s, e) => lastTextFieldKeyDownLabel.Text = e.ToString ();
+        edit.KeyDown += (_, e) => lastTextFieldKeyDownLabel.Text = e.ToString ();
 
         // Application key event log:
-        label = new Label
+        label = new ()
         {
             X = 0,
             Y = Pos.Bottom (label) + 1,
@@ -76,9 +77,9 @@ public class Keys : Scenario
         win.Add (label);
         int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
 
-        ObservableCollection<string> keyList = new ();
+        ObservableCollection<string> keyList = [];
 
-        var appKeyListView = new ListView
+        ListView appKeyListView = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -90,15 +91,15 @@ public class Keys : Scenario
         win.Add (appKeyListView);
 
         // View key events...
-        edit.KeyDown += (s, a) => { keyDownList.Add (a.ToString ()); };
+        edit.KeyDown += (_, a) => { keyDownList.Add (a.ToString ()); };
 
-        edit.KeyDownNotHandled += (s, a) =>
+        edit.KeyDownNotHandled += (_, a) =>
                                   {
                                       keyDownNotHandledList.Add ($"{a}");
                                   };
 
         // KeyDown
-        label = new Label
+        label = new ()
         {
             X = Pos.Right (appKeyListView) + 1,
             Y = Pos.Top (label),
@@ -106,7 +107,7 @@ public class Keys : Scenario
         };
         win.Add (label);
 
-        var onKeyDownListView = new ListView
+        ListView onKeyDownListView = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
@@ -118,7 +119,7 @@ public class Keys : Scenario
         win.Add (onKeyDownListView);
 
         // KeyDownNotHandled
-        label = new Label
+        label = new ()
         {
             X = Pos.Right (onKeyDownListView) + 1,
             Y = Pos.Top (label),
@@ -126,7 +127,7 @@ public class Keys : Scenario
         };
         win.Add (label);
 
-        var onKeyDownNotHandledListView = new ListView
+        ListView onKeyDownNotHandledListView = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
@@ -139,7 +140,7 @@ public class Keys : Scenario
 
 
         // Swallowed
-        label = new Label
+        label = new ()
         {
             X = Pos.Right (onKeyDownNotHandledListView) + 1,
             Y = Pos.Top (label),
@@ -147,7 +148,7 @@ public class Keys : Scenario
         };
         win.Add (label);
 
-        var onSwallowedListView = new ListView
+        ListView onSwallowedListView = new ()
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
@@ -158,20 +159,19 @@ public class Keys : Scenario
         appKeyListView.SchemeName = "Runnable";
         win.Add (onSwallowedListView);
 
-        Application.Driver!.GetInputProcessor ().AnsiSequenceSwallowed += (s, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
+        app.Driver!.GetInputProcessor ().AnsiSequenceSwallowed += (_, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
 
-        Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
+        app.Keyboard.KeyDown += (_, a) => KeyDownPressUp (a, "Down");
 
-        void KeyDownPressUp (Key args, string updown)
+        void KeyDownPressUp (Key args, string upDown)
         {
-            var msg = $"Key{updown,-7}: {args}";
+            string msg = $"Key{upDown,-7}: {args}";
             keyList.Add (msg);
             appKeyListView.MoveDown ();
             onKeyDownNotHandledListView.MoveDown ();
         }
 
-        Application.Run (win);
+        app.Run (win);
         win.Dispose ();
-        Application.Shutdown ();
     }
 }

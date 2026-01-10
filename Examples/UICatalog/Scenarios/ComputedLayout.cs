@@ -14,6 +14,7 @@ public class ComputedLayout : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window window = new ()
         {
@@ -23,7 +24,7 @@ public class ComputedLayout : Scenario
         // Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
         const string rule = "|123456789";
 
-        var horizontalRuler = new Label
+        Label horizontalRuler = new ()
         {
             X = 0,
             Y = 0,
@@ -38,7 +39,7 @@ public class ComputedLayout : Scenario
         // Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
         const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-        var verticalRuler = new Label
+        Label verticalRuler = new ()
         {
             X = 0,
             Y = 0,
@@ -48,7 +49,7 @@ public class ComputedLayout : Scenario
             Text = vrule
         };
 
-        window.SubViewsLaidOut += (s, a) =>
+        window.SubViewsLaidOut += (_, _) =>
                                {
                                    if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
                                    {
@@ -77,13 +78,13 @@ public class ComputedLayout : Scenario
         // Demonstrate using Dim to create a window that fills the parent with a margin
         var margin = 10;
 
-        var subWin = new Window
+        Window subWin = new ()
         {
             X = Pos.Center (), Y = 2, Width = Dim.Fill (margin), Height = 7,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
         };
 
-        subWin.Initialized += (s, a) =>
+        subWin.Initialized += (_, _) =>
                               {
                                   subWin.Title =
                                       $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
@@ -144,11 +145,11 @@ public class ComputedLayout : Scenario
                       );
         subWin.Add (labelList.ToArray ());
 
-        var frameView = new FrameView { X = 2, Y = Pos.Bottom (subWin), Width = 30, Height = 7 };
+        FrameView frameView = new () { X = 2, Y = Pos.Bottom (subWin), Width = 30, Height = 7 };
 
-        frameView.Initialized += (sender, args) =>
+        frameView.Initialized += (sender, _) =>
                                  {
-                                     var fv = sender as FrameView;
+                                     FrameView fv = (FrameView)sender!;
 
                                      fv.Title =
                                          $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
@@ -212,9 +213,9 @@ public class ComputedLayout : Scenario
             X = Pos.Right (frameView), Y = Pos.Top (frameView), Width = Dim.Fill (), Height = 7
         };
 
-        frameView.Initialized += (sender, args) =>
+        frameView.Initialized += (sender, _) =>
                                  {
-                                     var fv = sender as FrameView;
+                                     FrameView fv = (FrameView)sender!;
 
                                      fv.Title =
                                          $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
@@ -367,12 +368,12 @@ public class ComputedLayout : Scenario
         var anchorButton = new Button { Text = "Button using AnchorEnd", Y = Pos.AnchorEnd () };
         anchorButton.X = Pos.AnchorEnd ();
 
-        anchorButton.Accepting += (s, e) =>
+        anchorButton.Accepting += (_, _) =>
                                   {
                                       // This demonstrates how to have a dynamically sized button
                                       // Each time the button is clicked the button's text gets longer
                                       // The call to app.LayoutSubViews causes the Computed layout to
-                                      // get updated. 
+                                      // get updated.
                                       anchorButton.Text += "!";
                                   };
         window.Add (anchorButton);
@@ -414,7 +415,7 @@ public class ComputedLayout : Scenario
             Y = Pos.AnchorEnd () - 1
         };
 
-        leftButton.Accepting += (s, e) =>
+        leftButton.Accepting += (_, _) =>
                                 {
                                     // This demonstrates how to have a dynamically sized button
                                     // Each time the button is clicked the button's text gets longer
@@ -429,7 +430,7 @@ public class ComputedLayout : Scenario
             Y = Pos.AnchorEnd (2)
         };
 
-        centerButton.Accepting += (s, e) =>
+        centerButton.Accepting += (_, _) =>
                                   {
                                       // This demonstrates how to have a dynamically sized button
                                       // Each time the button is clicked the button's text gets longer
@@ -444,7 +445,7 @@ public class ComputedLayout : Scenario
             Y = Pos.Y (centerButton)
         };
 
-        rightButton.Accepting += (s, e) =>
+        rightButton.Accepting += (_, _) =>
                                  {
                                      // This demonstrates how to have a dynamically sized button
                                      // Each time the button is clicked the button's text gets longer
@@ -456,8 +457,7 @@ public class ComputedLayout : Scenario
         window.Add (centerButton);
         window.Add (rightButton);
 
-        Application.Run (window);
+        app.Run (window);
         window.Dispose ();
-        Application.Shutdown ();
     }
 }

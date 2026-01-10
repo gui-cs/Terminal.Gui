@@ -18,7 +18,7 @@ namespace UICatalog.Scenarios;
 // TODO: Better align rpPBFormat
 public class ProgressBarStyles : Scenario
 {
-    private const uint _timerTick = 20;
+    private const uint TIMER_TICK = 20;
     private Timer _fractionTimer;
     private Timer _pulseTimer;
     private ListView _pbList;
@@ -26,6 +26,7 @@ public class ProgressBarStyles : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window win = new ()
         {
@@ -201,7 +202,7 @@ public class ProgressBarStyles : Scenario
                                                               },
                                                               null,
                                                               0,
-                                                              _timerTick
+                                                              TIMER_TICK
                                                              );
                               }
                           };
@@ -292,9 +293,8 @@ public class ProgressBarStyles : Scenario
                                  0,
                                  300
                                 );
-        Application.Run (win);
+        app.Run (win);
         win.Dispose ();
-        Application.Shutdown ();
 
         return;
 

@@ -30,6 +30,7 @@ public class ColorPickers : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window window = new ()
         {
@@ -167,9 +168,9 @@ public class ColorPickers : Scenario
 
         var lblDriverName = new Label
         {
-            Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{Application.Driver?.GetName ()}`:"
+            Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{app.Driver?.GetName ()}`:"
         };
-        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
+        bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
 
         var cbSupportsTrueColor = new CheckBox
         {
@@ -186,20 +187,19 @@ public class ColorPickers : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 1,
             Y = Pos.Top (lblDriverName),
-            CheckedState = Application.Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = app.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Force16Colors"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Driver!.Force16Colors = evt.Result == CheckState.Checked; };
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { app.Driver!.Force16Colors = evt.Result == CheckState.Checked; };
         window.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
 
         // Set default colors.
         _foregroundColorPicker.SelectedColor = _demoView.SuperView!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
         _backgroundColorPicker.SelectedColor = _demoView.SuperView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
 
-        Application.Run (window);
+        app.Run (window);
         window.Dispose ();
-        Application.Shutdown ();
 
         return;
 
@@ -231,7 +231,7 @@ public class ColorPickers : Scenario
                 _foregroundColorPicker16.Visible = false;
                 _foregroundColorPicker.Visible = true;
 
-                if (e.Value is { })
+                if (e.Value is not null)
                 {
                     _foregroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
                     _foregroundColorPicker.ApplyStyleChanges ();

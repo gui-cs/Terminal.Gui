@@ -8,8 +8,9 @@ public class ChineseUI : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        var win = new Window
+        Window win = new ()
         {
             Title = GetQuitKeyAndName (),
             X = 0,
@@ -18,7 +19,7 @@ public class ChineseUI : Scenario
             Height = Dim.Fill ()
         };
 
-        var buttonPanel = new FrameView
+        FrameView buttonPanel = new ()
         {
             Title = "Command",
             X = 0,
@@ -28,12 +29,12 @@ public class ChineseUI : Scenario
         };
         win.Add (buttonPanel);
 
-        var btn = new Button { X = 1, Y = 1, Text = "你" }; // v1: A
+        Button btn = new () { X = 1, Y = 1, Text = "\u4f60" }; // v1: A (Chinese: you)
 
-        btn.Accepting += (s, e) =>
+        btn.Accepting += (s, _) =>
                       {
                           int? result = MessageBox.Query (
-                                                          (s as View)?.App,
+                                                          (s as View)?.App!,
                                                           "Confirm",
                                                          "Are you sure you want to quit ui?",
                                                          0,
@@ -43,20 +44,18 @@ public class ChineseUI : Scenario
 
                           if (result == 0)
                           {
-                              Application.RequestStop ();
+                              win.RequestStop ();
                           }
                       };
 
         buttonPanel.Add (
                          btn,
-                         new Button { X = 12, Y = 1, Text = "好" }, // v1: B
-                         new Button { X = 22, Y = 1, Text = "呀" } // v1: C
+                         new Button { X = 12, Y = 1, Text = "\u597d" }, // v1: B (Chinese: good)
+                         new Button { X = 22, Y = 1, Text = "\u5440" } // v1: C (Chinese: yeah)
                         );
 
-        Application.Run (win);
+        app.Run (win);
 
         win.Dispose ();
-
-        Application.Shutdown ();
     }
 }

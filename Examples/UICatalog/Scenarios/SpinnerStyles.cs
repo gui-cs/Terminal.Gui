@@ -13,6 +13,7 @@ public class SpinnerViewStyles : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window win = new ()
         {
@@ -208,15 +209,13 @@ public class SpinnerViewStyles : Scenario
             }
         }
 
-        Application.Run (win);
+        app.Run (win);
         win.IsRunningChanged -= WinIsRunningChanged;
-        if (spinner is { })
+        if (spinner is not null)
         {
             spinner.Dispose ();
             spinner = null;
         }
         win.Dispose ();
-
-        Application.Shutdown ();
     }
 }

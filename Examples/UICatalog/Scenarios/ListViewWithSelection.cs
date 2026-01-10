@@ -30,6 +30,7 @@ public class ListViewWithSelection : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         _appWindow = new ()
         {
@@ -111,16 +112,15 @@ public class ListViewWithSelection : Scenario
 
         bool? LogEvent (View sender, EventArgs args, string message)
         {
-            var msg = $"{message,-7}: {args}";
+            string msg = $"{message,-7}: {args}";
             _eventList.Add (msg);
             _eventListView.MoveDown ();
 
             return null;
         }
 
-        Application.Run (_appWindow);
+        app.Run (_appWindow);
         _appWindow.Dispose ();
-        Application.Shutdown ();
     }
 
     private void CustomRenderCB_Toggle (object sender, ResultEventArgs<CheckState> stateEventArgs)

@@ -8,13 +8,14 @@ public class MessageBoxes : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
 
-        var frame = new FrameView
+        FrameView frame = new ()
         {
             X = Pos.Center (),
             Y = 1,
@@ -36,7 +37,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var titleEdit = new TextField
+        TextField titleEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -58,7 +59,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var messageEdit = new TextView
+        TextView messageEdit = new ()
         {
             Text = "Message line 1.\nMessage line two. This is a really long line to force wordwrap. It needs to be long for it to work.",
             X = Pos.Right (label) + 1,
@@ -81,7 +82,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var numButtonsEdit = new TextField
+        TextField numButtonsEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -103,7 +104,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var defaultButtonEdit = new TextField
+        TextField defaultButtonEdit = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -125,7 +126,7 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        var styleOptionSelector = new OptionSelector
+        OptionSelector styleOptionSelector = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -145,7 +146,7 @@ public class MessageBoxes : Scenario
             Text = "Wra_p:"
         };
 
-        var ckbWrapMessage = new CheckBox
+        CheckBox ckbWrapMessage = new ()
         {
             X = Pos.Right (label) + 1, Y = Pos.Bottom (styleOptionSelector),
             CheckedState = CheckState.Checked,
@@ -161,7 +162,7 @@ public class MessageBoxes : Scenario
         };
         window.Add (label);
 
-        var buttonPressedLabel = new Label
+        Label buttonPressedLabel = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (label) + 1,
@@ -170,12 +171,12 @@ public class MessageBoxes : Scenario
             Text = " "
         };
 
-        var showMessageBoxButton = new Button
+        Button showMessageBoxButton = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (frame) + 2, IsDefault = true, Text = "_Show MessageBox"
         };
 
-        window.Accepting += (s, e) =>
+        window.Accepting += (_, e) =>
                          {
                              try
                              {
@@ -193,7 +194,7 @@ public class MessageBoxes : Scenario
                                  {
                                      buttonPressedLabel.Text =
                                          $"{MessageBox.Query (
-                                                              Application.Instance,
+                                                              app,
                                                               titleEdit.Text,
                                                               messageEdit.Text,
                                                               defaultButton,
@@ -204,7 +205,7 @@ public class MessageBoxes : Scenario
                                  else
                                  {
                                      buttonPressedLabel.Text =
-                                         $"{MessageBox.ErrorQuery (Application.Instance,
+                                         $"{MessageBox.ErrorQuery (app,
                                                                    titleEdit.Text,
                                                                    messageEdit.Text,
                                                                    defaultButton,
@@ -224,15 +225,13 @@ public class MessageBoxes : Scenario
 
         window.Add (buttonPressedLabel);
 
-        Application.Run (window);
+        app.Run (window);
         window.Dispose ();
-
-        Application.Shutdown ();
     }
 
     public override List<Key> GetDemoKeyStrokes (IApplication app)
     {
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         keys.Add (Key.S.WithAlt);
         keys.Add (Key.Esc);
@@ -276,7 +275,7 @@ public class MessageBoxes : Scenario
 
     private List<Key> GetKeysFromText (string text)
     {
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         foreach (char r in text)
         {
