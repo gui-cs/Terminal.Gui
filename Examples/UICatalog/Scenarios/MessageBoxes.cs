@@ -7,10 +7,11 @@ public class MessageBoxes : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -226,7 +227,6 @@ public class MessageBoxes : Scenario
         window.Add (buttonPressedLabel);
 
         app.Run (window);
-        window.Dispose ();
     }
 
     public override List<Key> GetDemoKeyStrokes (IApplication app)

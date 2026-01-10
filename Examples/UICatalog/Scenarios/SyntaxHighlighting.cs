@@ -115,12 +115,15 @@ public class SyntaxHighlighting : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
         Application.Init ();
         using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        _appWindow = new Runnable ();
+        using Runnable appWindow = new ();
+        _appWindow = appWindow;
 
         MenuBar menu = new ();
 
@@ -161,7 +164,6 @@ public class SyntaxHighlighting : Scenario
 
         // Run - Start the application.
         app.Run (_appWindow);
-        _appWindow.Dispose ();
     }
 
     private MenuItem CreateWordWrapMenuItem ()

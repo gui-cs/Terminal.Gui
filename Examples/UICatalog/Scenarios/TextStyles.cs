@@ -11,12 +11,14 @@ public sealed class TextStyles : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
         Application.Init ();
         using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Id = "appWindow",
             Title = GetQuitKeyAndName ()
@@ -48,7 +50,6 @@ public sealed class TextStyles : Scenario
 
         // Run - Start the application.
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     private void AddButtons (Window appWindow)

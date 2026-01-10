@@ -81,10 +81,11 @@ public class CollectionNavigatorTester : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window top = new ()
+        using Window top = new ()
         {
             SchemeName = "Base"
         };

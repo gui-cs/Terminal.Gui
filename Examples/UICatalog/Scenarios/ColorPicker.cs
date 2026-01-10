@@ -29,10 +29,11 @@ public class ColorPickers : Scenario
     /// <summary>Set up the scenario.</summary>
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -199,7 +200,6 @@ public class ColorPickers : Scenario
         _backgroundColorPicker.SelectedColor = _demoView.SuperView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
 
         app.Run (window);
-        window.Dispose ();
 
         return;
 

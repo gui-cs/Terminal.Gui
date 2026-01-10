@@ -15,6 +15,8 @@ public class TextInputControls : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
         Application.Init ();
 
@@ -22,7 +24,7 @@ public class TextInputControls : Scenario
         using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
 
         // TextField is a simple, single-line text input control
         Label label = new () { Text = " _TextField:" };
@@ -504,7 +506,6 @@ public class TextInputControls : Scenario
 
         // Run - Start the application.
         app.Run (win);
-        win.Dispose ();
 
         return;
 

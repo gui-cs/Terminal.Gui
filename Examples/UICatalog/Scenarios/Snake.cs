@@ -13,10 +13,12 @@ public class Snake : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
 
         var state = new SnakeState ();
 
@@ -52,7 +54,6 @@ public class Snake : Scenario
                  );
 
         app.Run (win);
-        win.Dispose ();
     }
 
     protected override void Dispose (bool disposing)

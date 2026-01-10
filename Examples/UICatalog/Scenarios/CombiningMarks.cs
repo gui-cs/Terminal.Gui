@@ -7,10 +7,11 @@ public class CombiningMarks : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Runnable top = new ();
+        using Runnable top = new ();
 
         top.DrawingContent += (_, _) =>
         {
@@ -95,6 +96,5 @@ public class CombiningMarks : Scenario
         };
 
         app.Run (top);
-        top.Dispose ();
     }
 }

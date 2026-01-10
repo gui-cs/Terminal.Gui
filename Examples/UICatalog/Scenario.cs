@@ -45,34 +45,38 @@ namespace UICatalog;
 ///     The example below is provided in the `Scenarios` directory as a generic sample that can be copied and re-named:
 ///     <code>
 /// using Terminal.Gui;
-/// 
+///
 /// namespace UICatalog.Scenarios;
-/// 
+///
 /// [ScenarioMetadata ("Generic", "Generic sample - A template for creating new Scenarios")]
 /// [ScenarioCategory ("Controls")]
 /// public sealed class MyScenario : Scenario
 /// {
 ///     public override void Main ()
 ///     {
+///         // Enable ConfigurationManager to pick up settings from the runner (UICatalog)
+///         ConfigurationManager.Enable (ConfigLocations.All);
+///
 ///         // Init
 ///         Application.Init ();
-/// 
+///         using IApplication app = Application.Instance;
+///
 ///         // Setup - Create a top-level application window and configure it.
-///         Window appWindow = new ()
+///         using Window appWindow = new ()
 ///         {
 ///             Title = GetQuitKeyAndName (),
 ///         };
-/// 
-///         var button = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
-///         button.Accept += (s, e) => MessageBox.ErrorQuery (App, "Error", "You pressed the button!", "Ok");
+///
+///         Button button = new () { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
+///         button.Accepting += (s, e) =&gt;
+///         {
+///             MessageBox.ErrorQuery (app, "Error", "You pressed the button!", "Ok");
+///             e.Handled = true;
+///         };
 ///         appWindow.Add (button);
-/// 
+///
 ///         // Run - Start the application.
-///         Application.Run (appWindow);
-///         appWindow.Dispose ();
-/// 
-///         // Shutdown - Calling Application.Shutdown is required.
-///         Application.Shutdown ();
+///         app.Run (appWindow);
 ///     }
 /// }
 ///  </code>

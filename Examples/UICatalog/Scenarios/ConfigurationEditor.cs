@@ -17,11 +17,12 @@ public class ConfigurationEditor : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        Window? win = new ();
+        using Window win = new ();
 
         _lenShortcut = new ()
         {
@@ -71,7 +72,6 @@ public class ConfigurationEditor : Scenario
         ConfigurationManager.Applied += ConfigurationManagerOnApplied;
 
         app.Run (win);
-        win.Dispose ();
 
         return;
 

@@ -48,11 +48,12 @@ public class ListColumns : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -285,7 +286,6 @@ public class ListColumns : Scenario
         appWindow.Add (menuBar, _listColView, selectedCellLabel, statusBar);
 
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     private void CloseExample ()

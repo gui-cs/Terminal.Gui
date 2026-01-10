@@ -17,10 +17,12 @@ public class TimeAndDate : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
         TimeField longTime = new ()
         {
             X = Pos.Center (),
@@ -142,7 +144,6 @@ public class TimeAndDate : Scenario
         win.Add (swapButton);
 
         app.Run (win);
-        win.Dispose ();
     }
 
     private void DateChanged (object? sender, EventArgs<DateTime> e)

@@ -14,10 +14,11 @@ public class Clipping : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
 
@@ -106,7 +107,6 @@ public class Clipping : Scenario
         progressTimer.Start ();
         app.Run (window);
         progressTimer.Stop ();
-        window.Dispose ();
     }
 
     private View CreateTiledView (int id, Pos x, Pos y)

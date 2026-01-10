@@ -7,10 +7,12 @@ public class ShadowStyles : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Id = "app",
             Title = GetQuitKeyAndName ()
@@ -100,7 +102,6 @@ public class ShadowStyles : Scenario
         editor.AutoSelectAdornments = false;
 
         app.Run (window);
-        window.Dispose ();
     }
 
     private void ButtonOnAccepting (object sender, CommandEventArgs e)

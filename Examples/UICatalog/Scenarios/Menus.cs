@@ -18,6 +18,7 @@ public class Menus : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Logging.Logger = CreateLogger ();
 
         using IApplication app = Application.Instance;

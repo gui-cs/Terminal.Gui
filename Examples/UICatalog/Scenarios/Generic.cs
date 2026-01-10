@@ -8,6 +8,7 @@ public sealed class Generic : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         // Init
         Application.Init ();
         using IApplication app = Application.Instance;

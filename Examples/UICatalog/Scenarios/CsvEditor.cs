@@ -28,11 +28,12 @@ public class CsvEditor : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetName ()
         };
@@ -198,7 +199,6 @@ public class CsvEditor : Scenario
         _tableView.KeyDown += TableViewKeyPress;
 
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     private void AddColumn ()

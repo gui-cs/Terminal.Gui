@@ -17,11 +17,12 @@ public class MultiColouredTable : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None,
@@ -80,7 +81,6 @@ public class MultiColouredTable : Scenario
         _tableView.Table = new DataTableSource (_table = dt);
 
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     private void EditCurrentCell (object? sender, CellActivatedEventArgs e)
