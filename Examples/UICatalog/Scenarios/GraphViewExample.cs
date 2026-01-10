@@ -21,11 +21,12 @@ public class GraphViewExample : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        Window window = new ()
+        using Window window = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -222,7 +223,6 @@ public class GraphViewExample : Scenario
         _viewDiagnostics = View.Diagnostics;
         app.Run (window);
         View.Diagnostics = _viewDiagnostics;
-        window.Dispose ();
     }
 
     private void DiagShortcut_Accept (object? sender, CommandEventArgs e)

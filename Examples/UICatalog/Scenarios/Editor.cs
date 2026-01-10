@@ -35,6 +35,7 @@ public class Editor : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         // Init
         Application.Init ();
 

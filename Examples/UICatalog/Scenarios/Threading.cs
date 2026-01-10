@@ -32,11 +32,13 @@ public class Threading : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
         _action = LoadData;
 
         _lambda = async () =>
@@ -172,7 +174,6 @@ public class Threading : Scenario
         win.IsModalChanged += WinLoaded;
 
         app.Run (win);
-        win.Dispose ();
     }
 
     private bool LogTimeout ()

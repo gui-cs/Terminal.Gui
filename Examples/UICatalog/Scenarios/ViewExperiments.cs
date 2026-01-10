@@ -11,10 +11,12 @@ public class ViewExperiments : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
@@ -109,7 +111,6 @@ public class ViewExperiments : Scenario
 
         app.Run (window);
         popoverView.Dispose ();
-        window.Dispose ();
     }
 
 

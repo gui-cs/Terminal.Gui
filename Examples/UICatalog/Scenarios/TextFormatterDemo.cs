@@ -9,10 +9,12 @@ public class TextFormatterDemo : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         using IApplication? app = Application.Instance;
         app.Init ();
 
-        using var window = new Window ();
+        using Window window = new ();
         window.Title = GetQuitKeyAndName ();
 
         // Make Win smaller so sizing the window horizontally will make the

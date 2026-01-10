@@ -9,10 +9,11 @@ public class LineCanvasExperiment : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -138,6 +139,5 @@ public class LineCanvasExperiment : Scenario
         //frame1.Add (marginWindow);
 
         app.Run (window);
-        window.Dispose ();
     }
 }

@@ -8,6 +8,8 @@ public sealed class Selectors : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
         Application.Init ();
         using IApplication app = Application.Instance;

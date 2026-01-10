@@ -25,6 +25,8 @@ public class TextViewAutocompletePopup : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
@@ -149,7 +151,7 @@ public class TextViewAutocompletePopup : Scenario
         _appWindow.SubViewLayout += Win_LayoutStarted;
 
         app.Run (_appWindow);
-        _appWindow.Dispose ();
+        _appWindow?.Dispose ();
     }
 
     private void Multiline ()

@@ -8,13 +8,14 @@ public class Keys : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         ObservableCollection<string> keyDownList = [];
         ObservableCollection<string> keyDownNotHandledList = [];
         ObservableCollection<string> swallowedList = [];
 
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
 
         Label label = new ()
         {
@@ -172,6 +173,5 @@ public class Keys : Scenario
         }
 
         app.Run (win);
-        win.Dispose ();
     }
 }

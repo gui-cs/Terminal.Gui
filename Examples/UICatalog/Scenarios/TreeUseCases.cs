@@ -15,11 +15,13 @@ public class TreeUseCases : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        Window appWindow = new ();
+        using Window appWindow = new ();
 
         // MenuBar
         MenuBar menu = new ();
@@ -84,7 +86,6 @@ public class TreeUseCases : Scenario
         };
 
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     private void LoadArmies (bool useDelegate)

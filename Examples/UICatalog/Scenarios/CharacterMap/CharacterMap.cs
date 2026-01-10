@@ -52,10 +52,11 @@ public class CharacterMap : Scenario
     // Don't create a Window, just return the top-level view
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window top = new ()
+        using Window top = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -212,7 +213,6 @@ public class CharacterMap : Scenario
         _charMap.SetFocus ();
 
         app.Run (top);
-        top.Dispose ();
 
         return;
 

@@ -24,6 +24,8 @@ public class RegionScenario : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
 
         using IApplication app = Application.Instance;

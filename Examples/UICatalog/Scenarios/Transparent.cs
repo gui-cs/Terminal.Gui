@@ -8,12 +8,14 @@ public sealed class Transparent : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
         Application.Init ();
         using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
         };
@@ -72,7 +74,6 @@ public sealed class Transparent : Scenario
 
         // Run - Start the application.
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     public class TransparentView : FrameView

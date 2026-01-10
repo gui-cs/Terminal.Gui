@@ -35,10 +35,12 @@ public class TreeViewFileSystem : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new ()
+        using Window win = new ()
         {
             Title = GetName (),
             Y = 1, // menu
@@ -266,7 +268,6 @@ public class TreeViewFileSystem : Scenario
         UpdateIconCheckedness ();
 
         app.Run (win);
-        win.Dispose ();
     }
 
     private string AspectGetter (IFileSystemInfo f) => (_iconProvider.GetIconWithOptionalSpace (f) + f.Name).Trim ();

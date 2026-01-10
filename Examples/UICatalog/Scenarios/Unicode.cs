@@ -17,10 +17,12 @@ public class UnicodeInMenu : Scenario
         string gitString =
             $"gui.cs 糊 (hú) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
 
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -218,6 +220,5 @@ public class UnicodeInMenu : Scenario
         appWindow.Add (statusBar);
 
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 }

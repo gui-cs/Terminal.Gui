@@ -496,13 +496,15 @@ public class TableEditor : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        Runnable appWindow = new ();
+        using Runnable appWindow = new ();
 
         _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
@@ -647,7 +649,6 @@ public class TableEditor : Scenario
 
         // Run - Start the application.
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     private MenuBarItem CreateViewMenu ()
