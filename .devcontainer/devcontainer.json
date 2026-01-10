@@ -5,7 +5,8 @@
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
-    }
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
 
   "postCreateCommand": "npm install -g @anthropic-ai/claude-code && dotnet restore",

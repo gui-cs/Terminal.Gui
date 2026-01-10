@@ -45,9 +45,9 @@ namespace UICatalog;
 ///     The example below is provided in the `Scenarios` directory as a generic sample that can be copied and re-named:
 ///     <code>
 /// using Terminal.Gui;
-///
+/// 
 /// namespace UICatalog.Scenarios;
-///
+/// 
 /// [ScenarioMetadata ("Generic", "Generic sample - A template for creating new Scenarios")]
 /// [ScenarioCategory ("Controls")]
 /// public sealed class MyScenario : Scenario
@@ -56,17 +56,17 @@ namespace UICatalog;
 ///     {
 ///         // Enable ConfigurationManager to pick up settings from the runner (UICatalog)
 ///         ConfigurationManager.Enable (ConfigLocations.All);
-///
+/// 
 ///         // Init
 ///         Application.Init ();
 ///         using IApplication app = Application.Instance;
-///
+/// 
 ///         // Setup - Create a top-level application window and configure it.
 ///         using Window appWindow = new ()
 ///         {
 ///             Title = GetQuitKeyAndName (),
 ///         };
-///
+/// 
 ///         Button button = new () { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 ///         button.Accepting += (s, e) =&gt;
 ///         {
@@ -74,7 +74,7 @@ namespace UICatalog;
 ///             e.Handled = true;
 ///         };
 ///         appWindow.Add (button);
-///
+/// 
 ///         // Run - Start the application.
 ///         app.Run (appWindow);
 ///     }
@@ -93,22 +93,22 @@ public class Scenario : IDisposable
     ///     <see cref="ScenarioCategory"/>)
     /// </summary>
     /// <returns>list of category names</returns>
-    public List<string> GetCategories () => ScenarioCategory.GetCategories (GetType ());
+    public List<string> GetCategories () { return ScenarioCategory.GetCategories (GetType ()); }
 
     /// <summary>Helper to get the <see cref="Scenario"/> Description (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetDescription () => ScenarioMetadata.GetDescription (GetType ());
+    public string GetDescription () { return ScenarioMetadata.GetDescription (GetType ()); }
 
     /// <summary>Helper to get the <see cref="Scenario"/> Name (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetName () => ScenarioMetadata.GetName (GetType ());
+    public string GetName () { return ScenarioMetadata.GetName (GetType ()); }
 
     /// <summary>
     ///     Helper to get the <see cref="Application.QuitKey"/> and the <see cref="Scenario"/> Name (defined in
     ///     <see cref="ScenarioMetadata"/>)
     /// </summary>
     /// <returns></returns>
-    public string GetQuitKeyAndName () => $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
+    public string GetQuitKeyAndName () { return $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"; }
 
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
@@ -274,7 +274,7 @@ public class Scenario : IDisposable
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
-    public override string ToString () => $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}";
+    public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
 
     #region IDispose
 
@@ -324,5 +324,5 @@ public class Scenario : IDisposable
         return categories;
     }
 
-    public virtual List<Key> GetDemoKeyStrokes (IApplication? app) => [];
+    public virtual List<Key> GetDemoKeyStrokes (IApplication? app) { return []; }
 }
