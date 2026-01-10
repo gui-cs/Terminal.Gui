@@ -26,7 +26,7 @@ public class HexEditor : Scenario
     public override void Main ()
     {
         Application.Init ();
-        using IApplication app = _hexView!.App!;
+        using IApplication app = Application.Instance;
         _app = app;
 
         _win = new ()

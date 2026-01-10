@@ -29,7 +29,7 @@ public class CsvEditor : Scenario
     public override void Main ()
     {
         Application.Init ();
-        using IApplication app = _tableView!.App!;
+        using IApplication app = Application.Instance;
         _app = app;
 
         Window appWindow = new ()
