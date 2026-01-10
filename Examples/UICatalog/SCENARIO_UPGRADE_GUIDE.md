@@ -118,7 +118,59 @@ public override List<Key> GetDemoKeyStrokes (IApplication? app)
 }
 ```
 
-### 5. Trailing Whitespace
+### 5. Lambda Parameters and Closures
+
+**Replace unused lambda parameters with discards:**
+```csharp
+// CORRECT
+textField.TextChanged += (_, _) => { /* ... */ };
+chxReadOnly.CheckedStateChanging += (_, args) => textView.ReadOnly = args.Result == CheckState.Checked;
+
+// WRONG
+textField.TextChanged += (s, prev) => { /* ... */ };  // s and prev unused
+```
+
+**Fix captured variable closures using sender:**
+
+When a variable is captured in a closure and modified in outer scope, use the sender parameter instead:
+```csharp
+// WRONG - textField captured, then reassigned later
+textField.TextChanged += (_, _) => { labelMirroringTextField.Text = textField.Text; };
+textField = new () { ... };  // textField reassigned - closure will reference wrong instance
+
+// CORRECT - use sender to get the actual instance that fired the event
+textField.TextChanged += (sender, _) => { labelMirroringTextField.Text = ((TextField)sender!).Text; };
+```
+
+If using sender is not possible, disable the ReSharper warning for that line:
+```csharp
+// ReSharper disable once AccessToModifiedClosure
+textField.TextChanged += (_, _) => { labelMirroringTextField.Text = textField.Text; };
+```
+
+### 6. Local Function Naming
+
+Use camelCase for local functions (not PascalCase or underscore_case):
+```csharp
+// CORRECT
+void textViewDrawContent (object? sender, DrawEventArgs e) { /* ... */ }
+
+// WRONG
+void TextView_DrawContent (object? sender, DrawEventArgs e) { /* ... */ }
+```
+
+### 7. Collection Expressions
+
+Use collection expressions `[...]` instead of `new () { ... }`:
+```csharp
+// CORRECT
+AllSuggestions = ["word1", "word2", "word3"]
+
+// WRONG
+AllSuggestions = new () { "word1", "word2", "word3" }
+```
+
+### 8. Trailing Whitespace
 
 Remove all trailing whitespace, including from comment lines:
 ```csharp
@@ -131,7 +183,7 @@ Remove all trailing whitespace, including from comment lines:
 // Next line of comment
 ```
 
-### 6. Field Initialization
+### 9. Field Initialization
 
 Move any field initializers that depend on `Application` to after `Application.Init()`:
 
