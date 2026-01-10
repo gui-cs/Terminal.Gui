@@ -17,6 +17,8 @@ public class Wizards : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
@@ -128,7 +130,7 @@ public class Wizards : Scenario
     {
         Wizard wizard = new ();
 
-        if (_titleEdit is { })
+        if (_titleEdit is not null)
         {
             wizard.Title = _titleEdit.Text;
         }

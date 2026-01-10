@@ -14,9 +14,12 @@ public class TextEffectsScenario : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        var w = new Window
+        Application.Init ();
+        using IApplication app = Application.Instance;
+
+        using Window w = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -51,7 +54,7 @@ public class TextEffectsScenario : Scenario
             Y = Pos.AnchorEnd (1)
         };
 
-        cbLooping.CheckedStateChanging += (s, e) =>
+        cbLooping.CheckedStateChanging += (_, e) =>
                             {
                                 _loopingGradient = e.Result == CheckState.Checked;
                                 SetupGradientLineCanvas (w, w.Frame.Size);
@@ -61,10 +64,7 @@ public class TextEffectsScenario : Scenario
 
         w.Add (gradientsView);
 
-        Application.Run (w);
-        w.Dispose ();
-
-        Application.Shutdown ();
+        app.Run (w);
     }
 
     private static void SetupGradientLineCanvas (View w, Size size)

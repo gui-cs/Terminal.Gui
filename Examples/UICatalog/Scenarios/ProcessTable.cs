@@ -8,25 +8,29 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TableView")]
 public class ProcessTable : Scenario
 {
-    private TableView tableView;
+    private TableView _tableView;
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
-        var win = new Window
+        using IApplication app = Application.Instance;
+
+        using Window win = new ()
         {
             Title = GetName (),
             Y = 1, // menu
             Height = Dim.Fill (1) // status bar
         };
 
-        tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _tableView = new TableView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         // First time
         CreateProcessTable ();
 
         // Then every second
-        Application.AddTimeout (
+        app.AddTimeout (
                                 TimeSpan.FromSeconds (1),
                                 () =>
                                 {
@@ -36,19 +40,17 @@ public class ProcessTable : Scenario
                                 }
                                );
 
-        win.Add (tableView);
+        win.Add (_tableView);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 
     private void CreateProcessTable ()
     {
-        int ro = tableView.RowOffset;
-        int co = tableView.ColumnOffset;
+        int ro = _tableView.RowOffset;
+        int co = _tableView.ColumnOffset;
 
-        tableView.Table = new EnumerableTableSource<Process> (
+        _tableView.Table = new EnumerableTableSource<Process> (
                                                               Process.GetProcesses (),
                                                               new Dictionary<string, Func<Process, object>>
                                                               {
@@ -60,8 +62,8 @@ public class ProcessTable : Scenario
                                                               }
                                                              );
 
-        tableView.RowOffset = ro;
-        tableView.ColumnOffset = co;
-        tableView.EnsureValidScrollOffsets ();
+        _tableView.RowOffset = ro;
+        _tableView.ColumnOffset = co;
+        _tableView.EnsureValidScrollOffsets ();
     }
 }

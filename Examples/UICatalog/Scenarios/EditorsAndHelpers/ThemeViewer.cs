@@ -83,7 +83,7 @@ public class ThemeViewer : FrameView
                 SchemeName = kvp.Key
             };
 
-            if (prevSchemeViewer is { })
+            if (prevSchemeViewer is not null)
             {
                 schemeViewer.Y = Pos.Bottom (prevSchemeViewer);
             }
@@ -100,7 +100,7 @@ public class ThemeViewer : FrameView
     {
         base.OnFocusedChanged (previousFocused, focused);
 
-        if (focused is { })
+        if (focused is not null)
         {
             SchemeName = focused.Title;
         }

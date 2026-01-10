@@ -17,7 +17,6 @@
 _ReSharper.**
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-.devcontainer/
 .vscode/
 .vs/
 
@@ -73,3 +72,7 @@ log.*
 !/Tests/coverage/.gitkeep   # keep folder in repo
 /Tests/report/
 *.cobertura.xml
+
+# Claude Code local settings
+.claude/settings.json
+.claude/settings.local.json

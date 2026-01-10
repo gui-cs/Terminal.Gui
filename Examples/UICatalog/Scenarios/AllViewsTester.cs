@@ -29,9 +29,11 @@ public class AllViewsTester : Scenario
     public override void Main ()
     {
         // Don't create a sub-win (Scenario.Win); just use Application.TopRunnable
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        var window = new Window
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
         };
@@ -60,7 +62,7 @@ public class AllViewsTester : Scenario
         };
         _classListView.Border!.Thickness = new (1);
 
-        _classListView.SelectedItemChanged += (s, args) =>
+        _classListView.SelectedItemChanged += (_, _) =>
                                               {
                                                   // Dispose existing current View, if any
                                                   DisposeCurrentView ();
@@ -68,7 +70,7 @@ public class AllViewsTester : Scenario
                                                   CreateCurrentView (_viewClasses.Values.ToArray () [_classListView.SelectedItem.Value]);
 
                                                   // Force ViewToEdit to be the view and not a subview
-                                                  if (_adornmentsEditor is { })
+                                                  if (_adornmentsEditor is not null)
                                                   {
                                                       _adornmentsEditor.AutoSelectSuperView = _curView;
 
@@ -76,7 +78,7 @@ public class AllViewsTester : Scenario
                                                   }
                                               };
 
-        _classListView.Accepting += (sender, args) =>
+        _classListView.Accepting += (_, args) =>
                                     {
                                         _curView?.SetFocus ();
                                         args.Handled = true;
@@ -110,7 +112,7 @@ public class AllViewsTester : Scenario
         };
         _arrangementEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
 
-        _arrangementEditor.ExpanderButton.CollapsedChanging += (sender, args) =>
+        _arrangementEditor.ExpanderButton.CollapsedChanging += (_, args) =>
                                                                {
                                                                    _adornmentsEditor.ExpanderButton.Collapsed = args.NewValue;
                                                                };
@@ -206,9 +208,7 @@ public class AllViewsTester : Scenario
 
         window.Initialized += App_Initialized;
 
-        Application.Run (window);
-        window.Dispose ();
-        Application.Shutdown ();
+        app.Run (window);
     }
 
     private void App_Initialized (object? sender, EventArgs e)
@@ -332,12 +332,12 @@ public class AllViewsTester : Scenario
             return;
         }
 
-        if (view.Width == Dim.Absolute (0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == Dim.Absolute (0) || view.Height is null)
+        if (view.Height == Dim.Absolute (0))
         {
             view.Height = Dim.Fill ();
         }

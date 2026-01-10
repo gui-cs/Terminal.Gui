@@ -13,12 +13,16 @@ public class ConfigurationEditor : Scenario
 {
     private TabView? _tabView;
     private Shortcut? _lenShortcut;
+    private IApplication? _app;
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
+        using IApplication app = Application.Instance;
+        _app = app;
 
-        Window? win = new ();
+        using Window win = new ();
 
         _lenShortcut = new ()
         {
@@ -37,7 +41,7 @@ public class ConfigurationEditor : Scenario
             Key = Key.F5.WithShift,
             Title = "Reload",
         };
-        reloadShortcut.Accepting += (s, e) =>
+        reloadShortcut.Accepting += (_, e) =>
                                     {
                                         Reload ();
                                         e.Handled = true;
@@ -60,27 +64,25 @@ public class ConfigurationEditor : Scenario
 
         win.Add (_tabView, statusBar);
 
-        win.IsModalChanged += (s, a) =>
+        win.IsModalChanged += (_, _) =>
                       {
                           Open ();
                       };
 
         ConfigurationManager.Applied += ConfigurationManagerOnApplied;
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
 
         return;
 
         void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
         {
-            Application.TopRunnableView?.SetNeedsDraw ();
+            _app?.TopRunnableView?.SetNeedsDraw ();
         }
     }
     public void Save ()
     {
-        if (Application.Navigation?.GetFocused () is ConfigTextView editor)
+        if (_app?.Navigation?.GetFocused () is ConfigTextView editor)
         {
             editor.Save ();
         }
@@ -90,10 +92,10 @@ public class ConfigurationEditor : Scenario
     {
         foreach (KeyValuePair<ConfigLocations, string> config in ConfigurationManager.SourcesManager!.Sources)
         {
-            var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
-            var fileInfo = new FileInfo (config.Value.Replace ("~", homeDir));
+            string homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
+            FileInfo fileInfo = new (config.Value.Replace ("~", homeDir));
 
-            var editor = new ConfigTextView
+            ConfigTextView editor = new ()
             {
                 Title = config.Value.StartsWith ("resource://") ? fileInfo.Name : config.Value,
                 Width = Dim.Fill (),
@@ -117,7 +119,7 @@ public class ConfigurationEditor : Scenario
 
             editor.Read ();
 
-            editor.ContentsChanged += (sender, args) =>
+            editor.ContentsChanged += (_, _) =>
                                       {
                                           _lenShortcut!.Title = _lenShortcut!.Title.Replace ("*", "");
                                           if (editor.IsDirty)
@@ -129,7 +131,7 @@ public class ConfigurationEditor : Scenario
             _lenShortcut!.Title = $"{editor.Title}";
         }
 
-        _tabView!.SelectedTabChanged += (sender, args) =>
+        _tabView!.SelectedTabChanged += (_, args) =>
                                        {
                                            _lenShortcut!.Title = $"{args.NewTab.View!.Title}";
                                        };
@@ -153,16 +155,16 @@ public class ConfigurationEditor : Scenario
                 continue;
             }
 
-            int? result = MessageBox.Query (editor?.App!,
+            int? result = MessageBox.Query (editor.App!,
                                            "Save Changes",
-                                           $"Save changes to {editor?.FileInfo!.Name}",
+                                           $"Save changes to {editor.FileInfo!.Name}",
                                            "_No",
                                            "_Yes");
 
             switch (result)
             {
                 case 1:
-                    editor?.Save ();
+                    editor.Save ();
 
                     break;
 
@@ -172,12 +174,12 @@ public class ConfigurationEditor : Scenario
             }
         }
 
-        Application.RequestStop ();
+        _tabView?.App?.RequestStop ();
     }
 
-    private static void Reload ()
+    private void Reload ()
     {
-        if (Application.Navigation?.GetFocused () is ConfigTextView editor)
+        if (_app?.Navigation?.GetFocused () is ConfigTextView editor)
         {
             editor.Read ();
         }
@@ -228,7 +230,7 @@ public class ConfigurationEditor : Scenario
 
             if (FileInfo!.FullName.Contains ("HardCoded"))
             {
-                Text = ConfigurationManager.GetHardCodedConfig ()!;
+                Text = ConfigurationManager.GetHardCodedConfig ();
                 ReadOnly = true;
                 Enabled = true;
             }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿#nullable enable
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios;
@@ -9,19 +10,27 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextInputControls : Scenario
 {
-    private Label _labelMirroringTimeField;
-    private TimeField _timeField;
+    private Label? _labelMirroringTimeField;
+    private TimeField? _timeField;
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
+        // Init
         Application.Init ();
-        var win = new Window { Title = GetQuitKeyAndName () };
+
+        // Prepping for modern app model
+        using IApplication app = Application.Instance;
+
+        // Setup - Create a top-level application window and configure it.
+        using Window win = new () { Title = GetQuitKeyAndName () };
 
         // TextField is a simple, single-line text input control
-        var label = new Label { Text = " _TextField:" };
+        Label label = new () { Text = " _TextField:" };
         win.Add (label);
 
-        var textField = new TextField
+        TextField textField = new ()
         {
             X = Pos.Right (label) + 1,
             Y = 0,
@@ -29,13 +38,13 @@ public class TextInputControls : Scenario
             Text = "TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!"
         };
 
-        var singleWordGenerator = new SingleWordSuggestionGenerator ();
+        SingleWordSuggestionGenerator singleWordGenerator = new ();
         textField.Autocomplete.SuggestionGenerator = singleWordGenerator;
         textField.TextChanging += TextFieldTextChanging;
 
-        void TextFieldTextChanging (object sender, ResultEventArgs<string> e)
+        void TextFieldTextChanging (object? sender, ResultEventArgs<string> e)
         {
-            singleWordGenerator.AllSuggestions = Regex.Matches (e.Result, "\\w+")
+            singleWordGenerator.AllSuggestions = Regex.Matches (e.Result ?? "", "\\w+")
                                                       .Select (s => s.Value)
                                                       .Distinct ()
                                                       .ToList ();
@@ -43,7 +52,7 @@ public class TextInputControls : Scenario
 
         win.Add (textField);
 
-        var labelMirroringTextField = new Label
+        Label labelMirroringTextField = new ()
         {
             X = Pos.Right (textField) + 1,
             Y = Pos.Top (textField),
@@ -53,9 +62,9 @@ public class TextInputControls : Scenario
             Text = textField.Text
         };
         win.Add (labelMirroringTextField);
-        textField.TextChanged += (s, prev) => { labelMirroringTextField.Text = textField.Text; };
+        textField.TextChanged += (sender, _) => { labelMirroringTextField.Text = ((TextField)sender!).Text; };
 
-        label = new Label
+        label = new ()
         {
             Text = "Te_xtField2:",
             X = 0,
@@ -68,40 +77,41 @@ public class TextInputControls : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Bottom (textField),
             Width = Dim.Percent (50) - 1,
-            Title = "TextField with caption and AppendAutoComplete",
+            Title = "TextField with caption and AppendAutoComplete"
         };
         textField.Autocomplete = new AppendAutocomplete (textField);
-        var appendSingleWordGenerator = new SingleWordSuggestionGenerator ();
+        SingleWordSuggestionGenerator appendSingleWordGenerator = new ();
         textField.Autocomplete.SuggestionGenerator = appendSingleWordGenerator;
         textField.TextChanging += AppendTextFieldTextChanging;
 
-        void AppendTextFieldTextChanging (object sender, ResultEventArgs<string> e)
+        void AppendTextFieldTextChanging (object? sender, ResultEventArgs<string> e)
         {
-            appendSingleWordGenerator.AllSuggestions = Regex.Matches (e.Result, "\\w+")
+            appendSingleWordGenerator.AllSuggestions = Regex.Matches (e.Result ?? "", "\\w+")
                                                             .Select (s => s.Value)
                                                             .Distinct ()
                                                             .ToList ();
         }
+
         win.Add (textField);
 
         // TextView is a rich (as in functionality, not formatting) text editing control
         label = new () { Text = "T_extView:", Y = Pos.Bottom (label) + 1 };
         win.Add (label);
 
-        var textView = new TextView
+        TextView textView = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Percent (50) - 1,
             Height = Dim.Percent (10)
         };
-        var textViewAppendSingleWordGenerator = new SingleWordSuggestionGenerator ();
+        SingleWordSuggestionGenerator textViewAppendSingleWordGenerator = new ();
         textView.Autocomplete.SuggestionGenerator = textViewAppendSingleWordGenerator;
-        textView.DrawingContent += TextView_DrawContent;
+        textView.DrawingContent += textViewDrawContent;
         textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
 
         // This shows how to enable autocomplete in TextView.
-        void TextView_DrawContent (object sender, DrawEventArgs e)
+        void textViewDrawContent (object? sender, DrawEventArgs e)
         {
             textViewAppendSingleWordGenerator.AllSuggestions = Regex.Matches (textView.Text, "\\w+")
                                                                     .Select (s => s.Value)
@@ -111,7 +121,7 @@ public class TextInputControls : Scenario
 
         win.Add (textView);
 
-        var labelMirroringTextView = new Label
+        Label labelMirroringTextView = new ()
         {
             X = Pos.Right (textView) + 1,
             Y = Pos.Top (textView),
@@ -124,7 +134,7 @@ public class TextInputControls : Scenario
         // Use ContentChanged to detect if the user has typed something in a TextView.
         // The TextChanged property is only fired if the TextView.Text property is
         // explicitly set
-        textView.ContentsChanged += (s, a) =>
+        textView.ContentsChanged += (_, _) =>
                                     {
                                         labelMirroringTextView.Enabled = !labelMirroringTextView.Enabled;
                                         labelMirroringTextView.Text = textView.Text;
@@ -134,31 +144,32 @@ public class TextInputControls : Scenario
         {
             X = Pos.Left (textView), Y = Pos.Bottom (textView), CheckedState = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
-        chxReadOnly.CheckedStateChanging += (sender, args) => textView.ReadOnly = args.Result == CheckState.Checked;
+        chxReadOnly.CheckedStateChanging += (_, args) => textView.ReadOnly = args.Result == CheckState.Checked;
         win.Add (chxReadOnly);
 
         // By default TextView is a multi-line control. It can be forced to 
         // single-line mode.
-        var chxMultiline = new CheckBox
+        CheckBox chxMultiline = new ()
         {
-            X = Pos.Right (chxReadOnly) + 2, Y = Pos.Bottom (textView), CheckedState = textView.Multiline ? CheckState.Checked : CheckState.UnChecked, Text = "_Multiline"
+            X = Pos.Right (chxReadOnly) + 2, Y = Pos.Bottom (textView), CheckedState = textView.Multiline ? CheckState.Checked : CheckState.UnChecked,
+            Text = "_Multiline"
         };
         win.Add (chxMultiline);
 
-        var chxWordWrap = new CheckBox
+        CheckBox chxWordWrap = new ()
         {
             X = Pos.Right (chxMultiline) + 2,
             Y = Pos.Top (chxMultiline),
             CheckedState = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.CheckedStateChanging += (s, e) => textView.WordWrap = e.Result == CheckState.Checked;
+        chxWordWrap.CheckedStateChanging += (_, e) => textView.WordWrap = e.Result == CheckState.Checked;
         win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
         // This means using Tab to navigate doesn't work by default. This shows
         // how to turn tab capture off.
-        var chxCaptureTabs = new CheckBox
+        CheckBox chxCaptureTabs = new ()
         {
             X = Pos.Right (chxWordWrap) + 2,
             Y = Pos.Top (chxWordWrap),
@@ -166,55 +177,69 @@ public class TextInputControls : Scenario
             Text = "_Capture Tabs"
         };
 
-        chxMultiline.CheckedStateChanging += (s, e) =>
-                                {
-                                    textView.Multiline = e.Result == CheckState.Checked;
+        chxMultiline.CheckedStateChanging += (_, e) =>
+                                             {
+                                                 textView.Multiline = e.Result == CheckState.Checked;
 
-                                    if (!textView.Multiline && chxWordWrap.CheckedState == CheckState.Checked)
-                                    {
-                                        chxWordWrap.CheckedState = CheckState.UnChecked;
-                                    }
+                                                 if (!textView.Multiline && chxWordWrap.CheckedState == CheckState.Checked)
+                                                 {
+                                                     chxWordWrap.CheckedState = CheckState.UnChecked;
+                                                 }
 
-                                    if (!textView.Multiline && chxCaptureTabs.CheckedState == CheckState.Checked)
-                                    {
-                                        chxCaptureTabs.CheckedState = CheckState.UnChecked;
-                                    }
-                                };
+                                                 if (!textView.Multiline && chxCaptureTabs.CheckedState == CheckState.Checked)
+                                                 {
+                                                     chxCaptureTabs.CheckedState = CheckState.UnChecked;
+                                                 }
+                                             };
 
-        Key keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
-        Key keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
+        Key? keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
+        Key? keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
 
-        chxCaptureTabs.CheckedStateChanging += (s, e) =>
-                                  {
-                                      if (e.Result == CheckState.Checked)
-                                      {
-                                          textView.KeyBindings.Add (keyTab, Command.NextTabStop);
-                                          textView.KeyBindings.Add (keyBackTab, Command.PreviousTabStop);
-                                      }
-                                      else
-                                      {
-                                          textView.KeyBindings.Remove (keyTab);
-                                          textView.KeyBindings.Remove (keyBackTab);
-                                      }
+        chxCaptureTabs.CheckedStateChanging += (_, e) =>
+                                               {
+                                                   if (e.Result == CheckState.Checked)
+                                                   {
+                                                       if (keyTab is not null)
+                                                       {
+                                                           textView.KeyBindings.Add (keyTab, Command.NextTabStop);
+                                                       }
 
-                                      textView.TabKeyAddsTab = e.Result == CheckState.Checked;
-                                  };
+                                                       if (keyBackTab is not null)
+                                                       {
+                                                           textView.KeyBindings.Add (keyBackTab, Command.PreviousTabStop);
+                                                       }
+                                                   }
+                                                   else
+                                                   {
+                                                       if (keyTab is not null)
+                                                       {
+                                                           textView.KeyBindings.Remove (keyTab);
+                                                       }
+
+                                                       if (keyBackTab is not null)
+                                                       {
+                                                           textView.KeyBindings.Remove (keyBackTab);
+                                                       }
+                                                   }
+
+                                                   textView.TabKeyAddsTab = e.Result == CheckState.Checked;
+                                               };
         win.Add (chxCaptureTabs);
 
         // Hex editor
         label = new () { Text = "_HexView:", Y = Pos.Bottom (chxMultiline) + 1 };
         win.Add (label);
 
-        var hexEditor =
-            new HexView (
-                         new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"))
-                        )
+        HexView hexEditor =
+            new (
+                 new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"))
+                )
             {
-                X = Pos.Right (label) + 1, Y = Pos.Bottom (chxMultiline) + 1, Width = Dim.Percent (50) - 1, Height = Dim.Percent (30),
+                X = Pos.Right (label) + 1, Y = Pos.Bottom (chxMultiline) + 1, Width = Dim.Percent (50) - 1, Height = Dim.Percent (30)
             };
         win.Add (hexEditor);
 
-        var labelMirroringHexEditor = new Label
+        Label labelMirroringHexEditor = new ()
         {
             X = Pos.Right (hexEditor) + 1,
             Y = Pos.Top (hexEditor),
@@ -222,14 +247,14 @@ public class TextInputControls : Scenario
             Width = Dim.Fill (1) - 1,
             Height = Dim.Height (hexEditor) - 1
         };
-        byte [] array = ((MemoryStream)hexEditor.Source).ToArray ();
+        byte [] array = ((MemoryStream)hexEditor.Source!).ToArray ();
         labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
 
-        hexEditor.Edited += (s, kv) =>
+        hexEditor.Edited += (_, _) =>
                             {
                                 hexEditor.ApplyEdits ();
-                                byte [] array = ((MemoryStream)hexEditor.Source).ToArray ();
-                                labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
+                                byte [] arr = ((MemoryStream)hexEditor.Source!).ToArray ();
+                                labelMirroringHexEditor.Text = Encoding.UTF8.GetString (arr, 0, arr.Length);
                             };
         win.Add (labelMirroringHexEditor);
 
@@ -237,10 +262,10 @@ public class TextInputControls : Scenario
         label = new () { Text = "_DateField:", Y = Pos.Bottom (hexEditor) + 1 };
         win.Add (label);
 
-        var dateField = new DateField (DateTime.Now) { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Width = 20 };
+        DateField dateField = new (DateTime.Now) { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Width = 20 };
         win.Add (dateField);
 
-        var labelMirroringDateField = new Label
+        Label labelMirroringDateField = new ()
         {
             X = Pos.Right (dateField) + 1,
             Y = Pos.Top (dateField),
@@ -251,7 +276,7 @@ public class TextInputControls : Scenario
         };
         win.Add (labelMirroringDateField);
 
-        dateField.TextChanged += (s, prev) => { labelMirroringDateField.Text = dateField.Text; };
+        dateField.TextChanged += (_, _) => { labelMirroringDateField.Text = dateField.Text; };
 
         // TimeField
         label = new () { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
@@ -281,7 +306,7 @@ public class TextInputControls : Scenario
         _timeField.TimeChanged += TimeChanged;
 
         // MaskedTextProvider - uses .NET MaskedTextProvider
-        var netProviderLabel = new Label
+        Label netProviderLabel = new ()
         {
             X = Pos.Left (dateField),
             Y = Pos.Bottom (dateField) + 1,
@@ -289,15 +314,15 @@ public class TextInputControls : Scenario
         };
         win.Add (netProviderLabel);
 
-        var netProvider = new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa");
+        NetMaskedTextProvider netProvider = new ("999 000 LLL >LLL |AAA aaa");
 
-        var netProviderField = new TextValidateField
+        TextValidateField netProviderField = new ()
         {
             X = Pos.Right (netProviderLabel) + 1, Y = Pos.Y (netProviderLabel), Provider = netProvider
         };
         win.Add (netProviderField);
 
-        var labelMirroringNetProviderField = new Label
+        Label labelMirroringNetProviderField = new ()
         {
             X = Pos.Right (netProviderField) + 1,
             Y = Pos.Top (netProviderField),
@@ -308,30 +333,30 @@ public class TextInputControls : Scenario
         };
         win.Add (labelMirroringNetProviderField);
 
-        netProviderField.Provider.TextChanged += (s, prev) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
+        netProviderField.Provider.TextChanged += (_, _) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
 
         // TextRegexProvider - Regex provider implemented by Terminal.Gui
-        var regexProvider = new Label
+        Label regexProviderLabel = new ()
         {
             X = Pos.Left (netProviderLabel),
             Y = Pos.Bottom (netProviderLabel) + 1,
             Text = "Text_RegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]:"
         };
-        win.Add (regexProvider);
+        win.Add (regexProviderLabel);
 
-        var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
+        TextRegexProvider provider2 = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
 
-        var regexProviderField = new TextValidateField
+        TextValidateField regexProviderField = new ()
         {
-            X = Pos.Right (regexProvider) + 1,
-            Y = Pos.Y (regexProvider),
+            X = Pos.Right (regexProviderLabel) + 1,
+            Y = Pos.Y (regexProviderLabel),
             Width = 30,
             TextAlignment = Alignment.Center,
             Provider = provider2
         };
         win.Add (regexProviderField);
 
-        var labelMirroringRegexProviderField = new Label
+        Label labelMirroringRegexProviderField = new ()
         {
             X = Pos.Right (regexProviderField) + 1,
             Y = Pos.Top (regexProviderField),
@@ -342,14 +367,14 @@ public class TextInputControls : Scenario
         };
         win.Add (labelMirroringRegexProviderField);
 
-        regexProviderField.Provider.TextChanged += (s, prev) => { labelMirroringRegexProviderField.Text = regexProviderField.Text; };
+        regexProviderField.Provider.TextChanged += (_, _) => { labelMirroringRegexProviderField.Text = regexProviderField.Text; };
 
-        var labelAppendAutocomplete = new Label
+        Label labelAppendAutocomplete = new ()
         {
-            Y = Pos.Y (regexProviderField) + 2, X = 1, Text = "_Append Autocomplete:"
+            Y = Pos.Y (regexProviderLabel) + 2, X = 1, Text = "_Append Autocomplete:"
         };
 
-        var appendAutocompleteTextField = new TextField
+        TextField appendAutocompleteTextField = new ()
         {
             X = Pos.Right (labelAppendAutocomplete) + 1, Y = Pos.Top (labelAppendAutocomplete), Width = Dim.Fill ()
         };
@@ -357,8 +382,8 @@ public class TextInputControls : Scenario
 
         appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator
         {
-            AllSuggestions = new ()
-            {
+            AllSuggestions =
+            [
                 "fish",
                 "flipper",
                 "fin",
@@ -461,7 +486,7 @@ public class TextInputControls : Scenario
                 "so",
                 "people",
                 "part"
-            }
+            ]
         };
 
         win.Add (labelAppendAutocomplete);
@@ -470,7 +495,7 @@ public class TextInputControls : Scenario
         Label acceptView = new ()
         {
             X = Pos.Center (),
-            Y = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd ()
         };
 
         win.Add (acceptView);
@@ -479,37 +504,36 @@ public class TextInputControls : Scenario
 
         ConfigurationManager.Applied += ConfigurationManagerOnApplied;
 
-        Application.Run (win);
-        win.Dispose ();
-        win = null;
-        Application.Shutdown ();
+        // Run - Start the application.
+        app.Run (win);
 
         return;
 
-        void WinOnAccept (object sender, CommandEventArgs e)
+        void WinOnAccept (object? sender, CommandEventArgs e)
         {
             e.Handled = true; // Don't let it close
 
-            acceptView.Text = $"Accept was Invoked via {win.Focused.GetType ().Name}";
+            acceptView.Text = $"Accept was Invoked via {win.Focused?.GetType ().Name}";
 
             // Start a task that will set acceptView.Text to an empty string after 1 second
-            System.Threading.Tasks.Task.Run (async () =>
-            {
-                await System.Threading.Tasks.Task.Delay (1000);
-                Application.Invoke (() => acceptView.Text = "");
-            });
+            Task.Run (async () =>
+                      {
+                          await Task.Delay (1000);
+                          app.Invoke (() => acceptView.Text = "");
+                      });
         }
 
-        void ConfigurationManagerOnApplied (object sender, ConfigurationManagerEventArgs e)
+        void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
         {
-            if (win is { })
-            {
-                win.SetNeedsDraw ();
-            }
+            win.SetNeedsDraw ();
         }
     }
 
-
-
-    private void TimeChanged (object sender, EventArgs<TimeSpan> e) { _labelMirroringTimeField.Text = _timeField.Text; }
+    private void TimeChanged (object? sender, EventArgs<TimeSpan> e)
+    {
+        if (_labelMirroringTimeField is not null && _timeField is not null)
+        {
+            _labelMirroringTimeField.Text = _timeField.Text;
+        }
+    }
 }

@@ -13,7 +13,9 @@ public class ListsAndCombos : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
+        using IApplication app = Application.Instance;
         //TODO: Duplicated code in Demo.cs Consider moving to shared assembly
         ObservableCollection<string> items = [];
 
@@ -31,9 +33,9 @@ public class ListsAndCombos : Scenario
             }
         }
 
-        var win = new Window { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
         // ListView
-        var lbListView = new Label
+        Label lbListView = new ()
         {
             SchemeName = "Runnable",
             X = 0,
@@ -42,7 +44,7 @@ public class ListsAndCombos : Scenario
             Text = "Listview"
         };
 
-        var listview = new ListView
+        ListView listview = new ()
         {
             X = 0,
             Y = Pos.Bottom (lbListView) + 2,
@@ -50,7 +52,13 @@ public class ListsAndCombos : Scenario
             Width = Dim.Percent (40),
             Source = new ListWrapper<string> (items)
         };
-        listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem.Value];
+        listview.SelectedItemChanged += (_, _) =>
+                                        {
+                                            if (listview.SelectedItem is { })
+                                            {
+                                                lbListView.Text = items [listview.SelectedItem.Value];
+                                            }
+                                        };
         win.Add (lbListView, listview);
 
         //var scrollBar = new ScrollBarView (listview, true);
@@ -89,7 +97,7 @@ public class ListsAndCombos : Scenario
         //                        };
 
         // ComboBox
-        var lbComboBox = new Label
+        Label lbComboBox = new ()
         {
             SchemeName = "Runnable",
             X = Pos.Right (lbListView) + 1,
@@ -98,7 +106,7 @@ public class ListsAndCombos : Scenario
             Text = "ComboBox"
         };
 
-        var comboBox = new ComboBox
+        ComboBox comboBox = new ()
         {
             X = Pos.Right (listview) + 1,
             Y = Pos.Bottom (lbListView) + 1,
@@ -107,7 +115,13 @@ public class ListsAndCombos : Scenario
         };
         comboBox.SetSource (items);
 
-        comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();
+        comboBox.SelectedItemChanged += (_, text) =>
+                                        {
+                                            if (text.Value is { })
+                                            {
+                                                lbComboBox.Text = text.Value.ToString () ?? string.Empty;
+                                            }
+                                        };
         win.Add (lbComboBox, comboBox);
 
         //var scrollBarCbx = new ScrollBarView (comboBox.SubViews.ElementAt (1), true);
@@ -145,19 +159,17 @@ public class ListsAndCombos : Scenario
         //                            scrollBarCbx.Refresh ();
         //                        };
 
-        var btnMoveUp = new Button { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
-        btnMoveUp.Accepting += (s, e) => { listview.MoveUp (); };
+        Button btnMoveUp = new () { X = 1, Y = Pos.Bottom (lbListView), Text = "Move _Up" };
+        btnMoveUp.Accepting += (_, _) => { listview.MoveUp (); };
 
-        var btnMoveDown = new Button
+        Button btnMoveDown = new ()
         {
             X = Pos.Right (btnMoveUp) + 1, Y = Pos.Bottom (lbListView), Text = "Move _Down"
         };
-        btnMoveDown.Accepting += (s, e) => { listview.MoveDown (); };
+        btnMoveDown.Accepting += (_, _) => { listview.MoveDown (); };
 
         win.Add (btnMoveUp, btnMoveDown);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 }

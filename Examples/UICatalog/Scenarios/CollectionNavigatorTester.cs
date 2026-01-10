@@ -81,9 +81,11 @@ public class CollectionNavigatorTester : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        Window top = new ()
+        using Window top = new ()
         {
             SchemeName = "Base"
         };
@@ -97,14 +99,14 @@ public class CollectionNavigatorTester : Scenario
             Title = "Allow _Marking"
         };
 
-        _allowMarkingCheckBox.CheckedStateChanged += (s, e) =>
+        _allowMarkingCheckBox.CheckedStateChanged += (_, _) =>
                                                      {
-                                                         if (_listView is { })
+                                                         if (_listView is not null)
                                                          {
                                                              _listView.AllowsMarking = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
                                                          }
 
-                                                         if (_allowMultiSelectionCheckBox is { })
+                                                         if (_allowMultiSelectionCheckBox is not null)
                                                          {
                                                              _allowMultiSelectionCheckBox.Enabled = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
                                                          }
@@ -116,9 +118,9 @@ public class CollectionNavigatorTester : Scenario
             Enabled = false
         };
 
-        _allowMultiSelectionCheckBox.CheckedStateChanged += (s, e) =>
+        _allowMultiSelectionCheckBox.CheckedStateChanged += (_, _) =>
                                                             {
-                                                                if (_listView is { })
+                                                                if (_listView is not null)
                                                                 {
                                                                     _listView.AllowsMultipleSelection =
                                                                         _allowMultiSelectionCheckBox.CheckedState == CheckState.Checked;
@@ -177,9 +179,8 @@ public class CollectionNavigatorTester : Scenario
         top.Add (vsep);
         CreateTreeView ();
 
-        Application.Run (top);
+        app.Run (top);
         top.Dispose ();
-        Application.Shutdown ();
     }
 
     private void CreateListView ()
@@ -213,7 +214,7 @@ public class CollectionNavigatorTester : Scenario
 
         _listView.SetSource (_items);
 
-        _listView.KeystrokeNavigator.SearchStringChanged += (s, e) => { label.Text = $"ListView: {e.SearchString}"; };
+        _listView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"ListView: {e.SearchString}"; };
     }
 
     private void CreateTreeView ()
@@ -261,8 +262,8 @@ public class CollectionNavigatorTester : Scenario
         _treeView.ExpandAll ();
         _treeView.GoToFirst ();
 
-        _treeView.KeystrokeNavigator.SearchStringChanged += (s, e) => { label.Text = $"TreeView: {e.SearchString}"; };
+        _treeView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"TreeView: {e.SearchString}"; };
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _top?.RequestStop (); }
 }

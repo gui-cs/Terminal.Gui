@@ -13,8 +13,11 @@ public class SingleBackgroundWorker : Scenario
 {
     public override void Main ()
     {
-        Application.Run<MainApp> ();
-        Application.Shutdown ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+
+        Application.Init ();
+        using IApplication app = Application.Instance;
+        app.Run<MainApp> ();
     }
 
     public class MainApp : Window
@@ -44,7 +47,7 @@ public class SingleBackgroundWorker : Scenario
                                            {
                                                Title = "_Quit",
                                                Key = Application.QuitKey,
-                                               Action = () => Application.RequestStop ()
+                                               Action = () => App?.RequestStop ()
                                            }
                                        ]
                                       )
@@ -53,7 +56,7 @@ public class SingleBackgroundWorker : Scenario
             // StatusBar
             StatusBar statusBar = new (
                                        [
-                                           new (Application.QuitKey, "Quit", () => Application.RequestStop ()),
+                                           new (Application.QuitKey, "Quit", () => App?.RequestStop ()),
                                            new (Key.R.WithCtrl, "Run Worker", RunWorker)
                                        ]
                                       );
@@ -89,7 +92,7 @@ public class SingleBackgroundWorker : Scenario
 
             Button cancel = new () { Text = "Cancel Worker" };
 
-            cancel.Accepting += (s, e) =>
+            cancel.Accepting += (_, _) =>
                                 {
                                     if (_worker is null)
                                     {
@@ -120,7 +123,7 @@ public class SingleBackgroundWorker : Scenario
                     new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Wait for worker to finish..." }
                    );
 
-            _worker.DoWork += (s, e) =>
+            _worker.DoWork += (_, e) =>
                               {
                                   List<string> stageResult = [];
 
@@ -139,15 +142,15 @@ public class SingleBackgroundWorker : Scenario
                                   }
                               };
 
-            _worker.RunWorkerCompleted += (s, e) =>
+            _worker.RunWorkerCompleted += (_, e) =>
                                           {
                                               if (md.IsCurrentTop)
                                               {
                                                   //Close the dialog
-                                                  Application.RequestStop ();
+                                                  md.RequestStop ();
                                               }
 
-                                              if (e.Error is { })
+                                              if (e.Error is not null)
                                               {
                                                   // Failed
                                                   _log.Add (
@@ -170,13 +173,13 @@ public class SingleBackgroundWorker : Scenario
                                                             $"Worker {_startStaging}.{_startStaging:fff} was completed at {DateTime.Now}."
                                                            );
                                                   _listLog.SetNeedsDraw ();
-                                                  Application.LayoutAndDraw ();
+                                                  App?.LayoutAndDraw ();
 
                                                   StagingUIController builderUI =
                                                       new (_startStaging, e.Result as ObservableCollection<string>);
-                                                  View? top = Application.TopRunnableView;
+                                                  View? top = App?.TopRunnableView;
 
-                                                  if (top is { })
+                                                  if (top is not null)
                                                   {
                                                       top.Visible = false;
                                                   }
@@ -184,7 +187,7 @@ public class SingleBackgroundWorker : Scenario
                                                   builderUI.Load ();
                                                   builderUI.Dispose ();
 
-                                                  if (top is { })
+                                                  if (top is not null)
                                                   {
                                                       top.Visible = true;
                                                   }
@@ -193,7 +196,7 @@ public class SingleBackgroundWorker : Scenario
                                               _worker = null;
                                           };
             _worker.RunWorkerAsync ();
-            Application.Run (md);
+            App?.Run (md);
             md.Dispose ();
         }
     }
@@ -211,7 +214,7 @@ public class SingleBackgroundWorker : Scenario
                 Height = Dim.Fill (),
             };
 
-            _top.KeyDown += (s, e) =>
+            _top.KeyDown += (_, e) =>
                             {
                                 // Prevents App.QuitKey from closing this.
                                 // Only Ctrl+C is allowed.
@@ -282,7 +285,7 @@ public class SingleBackgroundWorker : Scenario
             Title = $"Worker started at {start}.{start:fff}";
             SchemeName = "Base";
 
-            if (list is { })
+            if (list is not null)
             {
                 Add (
                      new ListView
@@ -301,7 +304,7 @@ public class SingleBackgroundWorker : Scenario
 
         public void Load ()
         {
-            if (_top is { })
+            if (_top is not null)
             {
                 App?.Run (_top);
                 _top.Dispose ();

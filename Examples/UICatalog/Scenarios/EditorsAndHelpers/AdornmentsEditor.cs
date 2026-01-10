@@ -26,22 +26,22 @@ public class AdornmentsEditor : EditorBase
     /// <inheritdoc/>
     protected override void OnViewToEditChanged ()
     {
-        if (MarginEditor is { })
+        if (MarginEditor is not null)
         {
             MarginEditor.AdornmentToEdit = ViewToEdit?.Margin ?? null;
         }
 
-        if (BorderEditor is { })
+        if (BorderEditor is not null)
         {
             BorderEditor.AdornmentToEdit = ViewToEdit?.Border ?? null;
         }
 
-        if (PaddingEditor is { })
+        if (PaddingEditor is not null)
         {
             PaddingEditor.AdornmentToEdit = ViewToEdit?.Padding ?? null;
         }
 
-        if (Padding is { })
+        if (Padding is not null)
         {
             Padding.Text = GetIdentifyingString (ViewToEdit);
         }
@@ -74,7 +74,7 @@ public class AdornmentsEditor : EditorBase
 
     public bool ShowViewIdentifier
     {
-        get => Padding is { } && Padding.Thickness != Thickness.Empty;
+        get => Padding is not null && Padding.Thickness != Thickness.Empty;
         set
         {
             if (Padding is null)
@@ -88,7 +88,7 @@ public class AdornmentsEditor : EditorBase
 
     private void AdornmentsEditor_Initialized (object? sender, EventArgs e)
     {
-        if (ExpanderButton is { })
+        if (ExpanderButton is not null)
         {
             ExpanderButton.Orientation = Orientation.Horizontal;
         }

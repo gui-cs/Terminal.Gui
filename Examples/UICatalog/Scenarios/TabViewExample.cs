@@ -18,9 +18,12 @@ public class TabViewExample : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window appWindow = new ()
+        Application.Init ();
+        using IApplication app = Application.Instance;
+
+        using Window appWindow = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -147,27 +150,27 @@ public class TabViewExample : Scenario
             Title = "_Show Top Line",
             CheckedState = CheckState.Checked
         };
-        _miShowTopLineCheckBox.CheckedStateChanged += (s, e) => ShowTopLine ();
+        _miShowTopLineCheckBox.CheckedStateChanged += (_, _) => ShowTopLine ();
 
         _miShowBorderCheckBox = new ()
         {
             Title = "_Show Border",
             CheckedState = CheckState.Checked
         };
-        _miShowBorderCheckBox.CheckedStateChanged += (s, e) => ShowBorder ();
+        _miShowBorderCheckBox.CheckedStateChanged += (_, _) => ShowBorder ();
 
         _miTabsOnBottomCheckBox = new ()
         {
             Title = "_Tabs On Bottom"
         };
-        _miTabsOnBottomCheckBox.CheckedStateChanged += (s, e) => SetTabsOnBottom ();
+        _miTabsOnBottomCheckBox.CheckedStateChanged += (_, _) => SetTabsOnBottom ();
 
         _miShowTabViewBorderCheckBox = new ()
         {
             Title = "_Show TabView Border",
             CheckedState = CheckState.Checked
         };
-        _miShowTabViewBorderCheckBox.CheckedStateChanged += (s, e) => ShowTabViewBorder ();
+        _miShowTabViewBorderCheckBox.CheckedStateChanged += (_, _) => ShowTabViewBorder ();
 
         menu.Add (
                   new MenuBarItem (
@@ -183,7 +186,7 @@ public class TabViewExample : Scenario
                                            Title = "_Clear SelectedTab",
                                            Action = () =>
                                                     {
-                                                        if (_tabView is { })
+                                                        if (_tabView is not null)
                                                         {
                                                             _tabView.SelectedTab = null;
                                                         }
@@ -224,9 +227,7 @@ public class TabViewExample : Scenario
 
         appWindow.Add (menu, _tabView, frameRight, frameBelow, statusBar);
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private void AddBlankTab () { _tabView?.AddTab (new (), false); }
@@ -275,7 +276,7 @@ public class TabViewExample : Scenario
         return interactiveTab;
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _tabView?.App?.RequestStop (); }
 
     private void SetTabsOnBottom ()
     {

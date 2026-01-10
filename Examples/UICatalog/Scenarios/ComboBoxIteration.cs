@@ -10,27 +10,29 @@ public class ComboBoxIteration : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
+        using IApplication app = Application.Instance;
         ObservableCollection<string> items = ["one", "two", "three"];
 
-        var win = new Window { Title = GetQuitKeyAndName () };
-        var lbListView = new Label { Width = 10, Height = 1 };
+        using Window win = new () { Title = GetQuitKeyAndName () };
+        Label lbListView = new () { Width = 10, Height = 1 };
         win.Add (lbListView);
 
-        var listview = new ListView
+        ListView listview = new ()
         {
             Y = Pos.Bottom (lbListView) + 1, Width = 10, Height = Dim.Fill (2), Source = new ListWrapper<string> (items)
         };
         win.Add (listview);
 
-        var lbComboBox = new Label
+        Label lbComboBox = new ()
         {
             SchemeName = "Runnable",
             X = Pos.Right (lbListView) + 1,
             Width = Dim.Percent (40)
         };
 
-        var comboBox = new ComboBox
+        ComboBox comboBox = new ()
         {
             X = Pos.Right (listview) + 1,
             Y = Pos.Bottom (lbListView) + 1,
@@ -40,26 +42,26 @@ public class ComboBoxIteration : Scenario
         };
         comboBox.SetSource (items);
 
-        listview.SelectedItemChanged += (s, e) =>
+        listview.SelectedItemChanged += (_, e) =>
                                         {
                                             lbListView.Text = items [e.Item!.Value];
                                             comboBox.SelectedItem = e.Item.Value;
                                         };
 
-        comboBox.SelectedItemChanged += (sender, text) =>
+        comboBox.SelectedItemChanged += (_, text) =>
                                         {
                                             if (text.Item != -1)
                                             {
-                                                lbComboBox.Text = text.Value.ToString ();
+                                                lbComboBox.Text = text.Value!.ToString ()!;
                                                 listview.SelectedItem = text.Item;
                                             }
                                         };
         win.Add (lbComboBox, comboBox);
         win.Add (new TextField { X = Pos.Right (listview) + 1, Y = Pos.Top (comboBox) + 3, Height = 1, Width = 20 });
 
-        var btnTwo = new Button { X = Pos.Right (comboBox) + 1, Text = "Two" };
+        Button btnTwo = new () { X = Pos.Right (comboBox) + 1, Text = "Two" };
 
-        btnTwo.Accepting += (s, e) =>
+        btnTwo.Accepting += (_, _) =>
                           {
                               items = ["one", "two"];
                               comboBox.SetSource (items);
@@ -68,19 +70,17 @@ public class ComboBoxIteration : Scenario
                           };
         win.Add (btnTwo);
 
-        var btnThree = new Button { X = Pos.Right (comboBox) + 1, Y = Pos.Top (comboBox), Text = "Three" };
+        Button btnThree = new () { X = Pos.Right (comboBox) + 1, Y = Pos.Top (comboBox), Text = "Three" };
 
-        btnThree.Accepting += (s, e) =>
+        btnThree.Accepting += (_, _) =>
                             {
-                                items =["one", "two", "three"];
+                                items = ["one", "two", "three"];
                                 comboBox.SetSource (items);
                                 listview.SetSource (items);
                                 listview.SelectedItem = 0;
                             };
         win.Add (btnThree);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 }

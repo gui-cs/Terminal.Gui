@@ -24,6 +24,8 @@ public class RegionScenario : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
 
         using IApplication app = Application.Instance;
@@ -214,7 +216,7 @@ internal class ToolsView : Window
 
         _regionOpSelector.ValueChanged += (_, a) =>
                                           {
-                                              if (a.Value is { })
+                                              if (a.Value is not null)
                                               {
                                                   RegionOpChanged?.Invoke (this, (RegionOp)a.Value);
                                               }

@@ -24,6 +24,7 @@ public class FileDialogExamples : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
 
         using IApplication app = Application.Instance;
@@ -150,7 +151,7 @@ public class FileDialogExamples : Scenario
         {
             if (File.Exists (e.Dialog.Path))
             {
-                int? result = MessageBox.Query (Application.Instance, "Overwrite?", "File already exists", "_No", "_Yes");
+                int? result = MessageBox.Query (e.Dialog.App!, "Overwrite?", "File already exists", "_No", "_Yes");
                 e.Cancel = result is 0 or null;
             }
         }
@@ -158,7 +159,7 @@ public class FileDialogExamples : Scenario
 
     private void CreateDialog (IApplication app)
     {
-        if (_osOpenMode.Value is { })
+        if (_osOpenMode.Value is not null)
         {
             using FileDialog fd = new ();
 

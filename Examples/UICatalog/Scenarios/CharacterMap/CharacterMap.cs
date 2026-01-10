@@ -52,9 +52,11 @@ public class CharacterMap : Scenario
     // Don't create a Window, just return the top-level view
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        var top = new Window
+        using Window top = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -193,7 +195,7 @@ public class CharacterMap : Scenario
                          new (
                               "_Quit",
                               $"{Application.QuitKey}",
-                              () => Application.RequestStop ()
+                              () => _charMap?.App?.RequestStop ()
                              )
                      }
                     ),
@@ -210,9 +212,7 @@ public class CharacterMap : Scenario
         _charMap.SelectedCodePoint = 0;
         _charMap.SetFocus ();
 
-        Application.Run (top);
-        top.Dispose ();
-        Application.Shutdown ();
+        app.Run (top);
 
         return;
 
@@ -354,7 +354,7 @@ public class CharacterMap : Scenario
 
         item.Action += () =>
                        {
-                           if (_charMap is { })
+                           if (_charMap is not null)
                            {
                                _charMap.ShowGlyphWidths = cb.CheckedState == CheckState.Checked;
                            }

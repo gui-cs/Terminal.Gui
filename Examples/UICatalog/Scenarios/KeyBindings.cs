@@ -10,16 +10,20 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public sealed class KeyBindings : Scenario
 {
+    private IApplication _app;
     private readonly ObservableCollection<string> _focusedBindings = [];
     private ListView _focusedBindingsListView;
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
+        _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             SuperViewRendersLineCanvas = true,
@@ -79,9 +83,9 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (appBindingsListView);
 
-        foreach (Key key in Application.KeyBindings.GetBindings().ToDictionary().Keys)
+        foreach (Key key in app.Keyboard.KeyBindings.GetBindings().ToDictionary().Keys)
         {
-            var binding = Application.KeyBindings.Get (key);
+            KeyBinding binding = app.Keyboard.KeyBindings.Get (key);
             appBindings.Add ($"{key} -> {binding.Target?.GetType ().Name} - {binding.Commands [0]}");
         }
 
@@ -101,7 +105,7 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (hotkeyBindingsListView);
 
-        foreach (var subview in appWindow.SubViews)
+        foreach (View subview in appWindow.SubViews)
         {
             foreach (KeyValuePair<Key, KeyBinding> binding in subview.HotKeyBindings.GetBindings ())
             {
@@ -124,31 +128,27 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (_focusedBindingsListView);
 
-        Application.Navigation!.FocusedChanged += Application_HasFocusChanged;
+        app.Navigation!.FocusedChanged += Application_HasFocusChanged;
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        Application.Navigation!.FocusedChanged -= Application_HasFocusChanged;
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
+        app.Navigation!.FocusedChanged -= Application_HasFocusChanged;
     }
 
 
     private void Application_HasFocusChanged (object sender, EventArgs e)
     {
-        View focused = Application.Navigation!.GetFocused ();
+        View focused = _app.Navigation?.GetFocused ();
 
         if (focused == null)
         {
             return;
         }
 
-        _focusedBindingsListView.Title = $"_Focused ({focused?.GetType ().Name}) Bindings";
+        _focusedBindingsListView.Title = $"_Focused ({focused.GetType ().Name}) Bindings";
 
         _focusedBindings.Clear ();
-        foreach (var binding in focused?.KeyBindings!.GetBindings ())
+        foreach (KeyValuePair<Key, KeyBinding> binding in focused.KeyBindings.GetBindings ())
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
         }
@@ -164,24 +164,28 @@ public class KeyBindingsDemo : View
 
         AddCommand (Command.Save, ctx =>
                                  {
-                                     MessageBox.Query (Application.Instance, $"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
+                                     MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", buttons: "Ok");
                                      return true;
                                  });
         AddCommand (Command.New, ctx =>
                                 {
-                                    MessageBox.Query (Application.Instance, $"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
+                                    MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", buttons: "Ok");
                                     return true;
                                 });
         AddCommand (Command.HotKey, ctx =>
         {
-            MessageBox.Query (Application.Instance, $"{ctx.Command}", $"Ctx: {ctx}\nCommand: {ctx.Command}", buttons: "Ok");
+            MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}\nCommand: {ctx?.Command}", buttons: "Ok");
             SetFocus ();
             return true;
         });
 
         KeyBindings.Add (Key.F2, Command.Save);
         KeyBindings.Add (Key.F3, Command.New); // same as specifying KeyBindingScope.Focused
-        Application.KeyBindings.Add (Key.F4, this, Command.New);
+        Initialized += (_, _) =>
+                       {
+                           App?.Keyboard.KeyBindings.Add (Key.F4, this, Command.New);
+                           App?.Keyboard.KeyBindings.Add (Key.Q.WithAlt, this, Command.Quit);
+                       };
 
         AddCommand (Command.Quit, ctx =>
                                          {
@@ -189,10 +193,9 @@ public class KeyBindingsDemo : View
                                              {
                                                  return false;
                                              }
-                                             MessageBox.Query (Application.Instance, $"{keyCommandContext.Binding}", $"Key: {keyCommandContext.Binding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
-                                             Application.RequestStop ();
+                                             MessageBox.Query (App, $"{keyCommandContext.Binding}", $"Key: {keyCommandContext.Binding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
+                                             App?.RequestStop ();
                                              return true;
                                          });
-        Application.KeyBindings.Add (Key.Q.WithAlt, this, Command.Quit);
     }
 }

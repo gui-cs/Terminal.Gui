@@ -21,7 +21,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             subview.Enabled = ViewToEdit is not Adornment;
         }
 
-        if (ViewToEdit is { } and not Adornment)
+        if (ViewToEdit is not null and not Adornment)
         {
             //ViewToEdit.VerticalScrollBar.AutoShow = true;
             //ViewToEdit.HorizontalScrollBar.AutoShow = true;

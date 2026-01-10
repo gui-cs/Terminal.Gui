@@ -18,6 +18,7 @@ public class Menus : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Logging.Logger = CreateLogger ();
 
         using IApplication app = Application.Instance;
@@ -221,7 +222,7 @@ public class Menus : Scenario
             // CB.
             // So that is needed is to mirror the two check boxes.
             var autoSaveMenuItemCb = menuBar.GetMenuItemsWithTitle ("_Auto Save").FirstOrDefault ()?.CommandView as CheckBox;
-            Debug.Assert (autoSaveMenuItemCb is { });
+            Debug.Assert (autoSaveMenuItemCb is not null);
 
             CheckBox autoSaveStatusCb = new ()
             {
@@ -252,7 +253,7 @@ public class Menus : Scenario
 
             enableOverwriteStatusCb.CheckedStateChanged += (_, _) =>
                                                            {
-                                                               if (enableOverwriteMenuItemCb is { })
+                                                               if (enableOverwriteMenuItemCb is not null)
                                                                {
                                                                    enableOverwriteMenuItemCb.CheckedState = enableOverwriteStatusCb.CheckedState;
                                                                }
@@ -306,7 +307,7 @@ public class Menus : Scenario
 
             editModeStatusCb.CheckedStateChanged += (_, _) =>
                                                     {
-                                                        if (editModeMenuItemCb is { })
+                                                        if (editModeMenuItemCb is not null)
                                                         {
                                                             editModeMenuItemCb.CheckedState = editModeStatusCb.CheckedState;
                                                         }
@@ -361,7 +362,7 @@ public class Menus : Scenario
                                          Logging.Debug ($"ContextMenu.Accepted: {args.Context?.Source?.Title}");
 
                                          // Forward the event to the MenuHost
-                                         if (args.Context is { })
+                                         if (args.Context is not null)
                                          {
                                              //InvokeCommand (args.Context.Command);
                                          }
@@ -408,7 +409,7 @@ public class Menus : Scenario
         /// <inheritdoc/>
         protected override void Dispose (bool disposing)
         {
-            if (ContextMenu is { })
+            if (ContextMenu is not null)
             {
                 ContextMenu.Dispose ();
                 ContextMenu = null;

@@ -14,9 +14,12 @@ public class Scrolling : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        var win = new Window
+        Application.Init ();
+        using IApplication app = Application.Instance;
+
+        using Window win = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -52,7 +55,7 @@ public class Scrolling : Scenario
             CheckedState = demoView.HorizontalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
         };
         win.Add (hCheckBox);
-        hCheckBox.CheckedStateChanged += (sender, args) => { demoView.HorizontalScrollBar.Visible = args.Value == CheckState.Checked; };
+        hCheckBox.CheckedStateChanged += (_, args) => { demoView.HorizontalScrollBar.Visible = args.Value == CheckState.Checked; };
 
         var vCheckBox = new CheckBox
         {
@@ -62,7 +65,7 @@ public class Scrolling : Scenario
             CheckedState = demoView.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked
         };
         win.Add (vCheckBox);
-        vCheckBox.CheckedStateChanged += (sender, args) => { demoView.VerticalScrollBar.Visible = args.Value == CheckState.Checked; };
+        vCheckBox.CheckedStateChanged += (_, args) => { demoView.VerticalScrollBar.Visible = args.Value == CheckState.Checked; };
 
         var ahCheckBox = new CheckBox
         {
@@ -72,16 +75,16 @@ public class Scrolling : Scenario
             CheckedState = demoView.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked
         };
 
-        ahCheckBox.CheckedStateChanging += (s, e) =>
+        ahCheckBox.CheckedStateChanging += (_, e) =>
                                            {
                                                demoView.HorizontalScrollBar.AutoShow = e.Result == CheckState.Checked;
                                                demoView.VerticalScrollBar.AutoShow = e.Result == CheckState.Checked;
                                            };
         win.Add (ahCheckBox);
 
-        demoView.VerticalScrollBar.VisibleChanging += (sender, args) => { vCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
+        demoView.VerticalScrollBar.VisibleChanging += (_, args) => { vCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
 
-        demoView.HorizontalScrollBar.VisibleChanging += (sender, args) =>
+        demoView.HorizontalScrollBar.VisibleChanging += (_, args) =>
                                                         {
                                                             hCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked;
                                                         };
@@ -97,10 +100,8 @@ public class Scrolling : Scenario
         win.Initialized += WinOnInitialized;
         win.IsRunningChanged += WinIsRunningChanged;
 
-        Application.Run (win);
+        app.Run (win);
         win.IsRunningChanged -= WinIsRunningChanged;
-        win.Dispose ();
-        Application.Shutdown ();
 
         return;
 
@@ -110,17 +111,17 @@ public class Scrolling : Scenario
             {
                 progress.Pulse ();
 
-                return _progressTimer is { };
+                return _progressTimer is not null;
             }
 
-            _progressTimer = Application.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
+            _progressTimer = app.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
         }
 
         void WinIsRunningChanged (object? sender, EventArgs<bool> args)
         {
-            if (!args.Value && _progressTimer is { })
+            if (!args.Value && _progressTimer is not null)
             {
-                Application.RemoveTimeout (_progressTimer);
+                app.RemoveTimeout (_progressTimer);
                 _progressTimer = null;
             }
         }

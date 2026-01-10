@@ -17,9 +17,13 @@ public class TimeAndDate : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
-        var win = new Window { Title = GetQuitKeyAndName () };
-        var longTime = new TimeField
+        using IApplication app = Application.Instance;
+
+        using Window win = new () { Title = GetQuitKeyAndName () };
+        TimeField longTime = new ()
         {
             X = Pos.Center (),
             Y = 2,
@@ -30,7 +34,7 @@ public class TimeAndDate : Scenario
         longTime.TimeChanged += TimeChanged;
         win.Add (longTime);
 
-        var shortTime = new TimeField
+        TimeField shortTime = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (longTime) + 1,
@@ -41,14 +45,14 @@ public class TimeAndDate : Scenario
         shortTime.TimeChanged += TimeChanged;
         win.Add (shortTime);
 
-        var shortDate = new DateField (DateTime.Now)
+        DateField shortDate = new (DateTime.Now)
         {
             X = Pos.Center (), Y = Pos.Bottom (shortTime) + 1, ReadOnly = true
         };
         shortDate.DateChanged += DateChanged;
         win.Add (shortDate);
 
-        var longDate = new DateField (DateTime.Now)
+        DateField longDate = new (DateTime.Now)
         {
             X = Pos.Center (), Y = Pos.Bottom (shortDate) + 1, ReadOnly = false
         };
@@ -121,12 +125,12 @@ public class TimeAndDate : Scenario
         };
         win.Add (_lblDateFmt);
 
-        var swapButton = new Button
+        Button swapButton = new ()
         {
             X = Pos.Center (), Y = Pos.Bottom (win) - 5, Text = "Swap Long/Short & Read/Read Only"
         };
 
-        swapButton.Accepting += (s, e) =>
+        swapButton.Accepting += (_, _) =>
                              {
                                  longTime.ReadOnly = !longTime.ReadOnly;
                                  shortTime.ReadOnly = !shortTime.ReadOnly;
@@ -139,9 +143,7 @@ public class TimeAndDate : Scenario
                              };
         win.Add (swapButton);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 
     private void DateChanged (object? sender, EventArgs<DateTime> e)
