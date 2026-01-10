@@ -71,14 +71,14 @@ public abstract class EditorBase : View
                 return;
             }
 
-            if (value is null && _viewToEdit is { })
+            if (value is null && _viewToEdit is not null)
             {
                 _viewToEdit.SubViewsLaidOut -= View_LayoutComplete;
             }
 
             _viewToEdit = value;
 
-            if (_viewToEdit is { })
+            if (_viewToEdit is not null)
             {
                 _viewToEdit.SubViewsLaidOut += View_LayoutComplete;
             }
@@ -134,7 +134,7 @@ public abstract class EditorBase : View
             return;
         }
 
-        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position!.Value))
+        if ((AutoSelectSuperView is not null && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position!.Value))
             || FrameToScreen ().Contains (mouse.Position!.Value))
         {
             return;

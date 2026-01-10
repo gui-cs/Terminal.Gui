@@ -10,6 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public class RuneWidthGreaterThanOne : Scenario
 {
+    private IApplication? _app;
     private Button? _button;
     private Label? _label;
     private Label? _labelR;
@@ -21,6 +22,8 @@ public class RuneWidthGreaterThanOne : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
+        _app = app;
 
         // Window (top-level)
         Window win = new ()
@@ -78,7 +81,7 @@ public class RuneWidthGreaterThanOne : Scenario
                         Title = "With Padding",
                         Action = () =>
                         {
-                            if (_win is { })
+                            if (_win is not null)
                             {
                                 _win.Padding!.Thickness = new (1);
                             }
@@ -89,7 +92,7 @@ public class RuneWidthGreaterThanOne : Scenario
                         Title = "Without Padding",
                         Action = () =>
                         {
-                            if (_win is { })
+                            if (_win is not null)
                             {
                                 _win.Padding!.Thickness = new (0);
                             }
@@ -108,7 +111,7 @@ public class RuneWidthGreaterThanOne : Scenario
                         Title = "Single",
                         Action = () =>
                         {
-                            if (_win is { })
+                            if (_win is not null)
                             {
                                 _win.BorderStyle = LineStyle.Single;
                             }
@@ -119,7 +122,7 @@ public class RuneWidthGreaterThanOne : Scenario
                         Title = "None",
                         Action = () =>
                         {
-                            if (_win is { })
+                            if (_win is not null)
                             {
                                 _win.BorderStyle = LineStyle.None;
                             }
@@ -157,16 +160,15 @@ public class RuneWidthGreaterThanOne : Scenario
 
         WideRunes ();
 
-        Application.Run (win);
+        app.Run (win);
         win.Dispose ();
-        Application.Shutdown ();
     }
 
     private void MixedMessage (object? sender, EventArgs e)
     {
-        if (_text is { })
+        if (_text is not null)
         {
-            MessageBox.Query (Application.Instance, "Say Hello 你", $"Hello {_text.Text}", "Ok");
+            MessageBox.Query (_text.App!, "Say Hello 你", $"Hello {_text.Text}", "Ok");
         }
     }
 
@@ -190,14 +192,14 @@ public class RuneWidthGreaterThanOne : Scenario
         _labelV.Text = "This is a test text 你";
         _win.Title = "HACC Demo 你";
         _lastRunesUsed = "Mixed";
-        Application.LayoutAndDraw ();
+        _app?.LayoutAndDraw ();
     }
 
     private void NarrowMessage (object? sender, EventArgs e)
     {
-        if (_text is { })
+        if (_text is not null)
         {
-            MessageBox.Query (Application.Instance, "Say Hello", $"Hello {_text.Text}", "Ok");
+            MessageBox.Query (_text.App!, "Say Hello", $"Hello {_text.Text}", "Ok");
         }
     }
 
@@ -221,7 +223,7 @@ public class RuneWidthGreaterThanOne : Scenario
         _labelV.Text = "This is a test text";
         _win.Title = "HACC Demo";
         _lastRunesUsed = "Narrow";
-        Application.LayoutAndDraw ();
+        _app?.LayoutAndDraw ();
     }
 
     private void UnsetClickedEvent ()
@@ -250,9 +252,9 @@ public class RuneWidthGreaterThanOne : Scenario
 
     private void WideMessage (object? sender, EventArgs e)
     {
-        if (_text is { })
+        if (_text is not null)
         {
-            MessageBox.Query (Application.Instance, "こんにちはと言う", $"こんにちは {_text.Text}", "Ok");
+            MessageBox.Query (_text.App!, "こんにちはと言う", $"こんにちは {_text.Text}", "Ok");
         }
     }
 
@@ -276,6 +278,6 @@ public class RuneWidthGreaterThanOne : Scenario
         _labelV.Text = "あなたの名前を入力してください";
         _win.Title = "デモエムポンズ";
         _lastRunesUsed = "Wide";
-        Application.LayoutAndDraw ();
+        _app?.LayoutAndDraw ();
     }
 }

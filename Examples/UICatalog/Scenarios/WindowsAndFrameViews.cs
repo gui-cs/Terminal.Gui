@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace UICatalog.Scenarios;
@@ -10,29 +10,21 @@ public class WindowsAndFrameViews : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
 
-        static int? About ()
-        {
-            return MessageBox.Query (Application.Instance,
-                                     "About UI Catalog",
-                                     "UI Catalog is a comprehensive sample library for Terminal.Gui",
-                                     "Ok"
-                                    );
-        }
-
-        var margin = 2;
-        var padding = 1;
-        var contentHeight = 7;
+        const int MARGIN = 2;
+        const int PADDING = 1;
+        const int CONTENT_HEIGHT = 7;
 
         // list of Windows we create
-        List<View> listWin = new ();
+        List<View> listWin = [];
 
-        var win = new Window
+        Window win = new ()
         {
             Title = $"{listWin.Count} - Scenario: {GetName ()}",
             X = Pos.Center (),
@@ -42,17 +34,21 @@ public class WindowsAndFrameViews : Scenario
             SchemeName = "Dialog",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
         };
-        win.Padding.Thickness = new (padding);
-        win.Margin!.Thickness = new (margin);
+        win.Padding!.Thickness = new (PADDING);
+        win.Margin!.Thickness = new (MARGIN);
 
-        var paddingButton = new Button
+        Button paddingButton = new ()
         {
             X = Pos.Center (),
             Y = 0,
             SchemeName = "Error",
-            Text = $"Padding of container is {padding}"
+            Text = $"Padding of container is {PADDING}"
         };
-        paddingButton.Accepting += (s, e) => About ();
+        paddingButton.Accepting += (_, _) => MessageBox.Query (app,
+                                                               "About UI Catalog",
+                                                               "UI Catalog is a comprehensive sample library for Terminal.Gui",
+                                                               "_Ok"
+                                                              );
         win.Add (paddingButton);
 
         win.Add (
@@ -69,40 +65,31 @@ public class WindowsAndFrameViews : Scenario
         // add it to our list
         listWin.Add (win);
 
-        // create 3 more Windows in a loop, adding them Application.TopRunnable
-        // Each with a
-        //	button
-        //  sub Window with
-        //		TextField
-        //	sub FrameView with
-        // 
-        for (var pad = 0; pad < 3; pad++)
+        for (int pad = 0; pad < 3; pad++)
         {
-            Window loopWin = null;
-
-            loopWin = new ()
+            Window loopWin = new ()
             {
                 Title = $"{listWin.Count} - Window Loop - padding = {pad}",
-                X = margin,
-                Y = Pos.Bottom (listWin.Last ()) + margin,
-                Width = Dim.Fill (margin),
-                Height = contentHeight + pad * 2 + 2,
+                X = MARGIN,
+                Y = Pos.Bottom (listWin.Last ()) + MARGIN,
+                Width = Dim.Fill (MARGIN),
+                Height = CONTENT_HEIGHT + pad * 2 + 2,
                 Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
             };
-            loopWin.Padding.Thickness = new (pad);
+            loopWin.Padding!.Thickness = new (pad);
 
             loopWin.SchemeName = "Dialog";
 
-            var pressMeButton = new Button
+            Button pressMeButton = new ()
             {
                 X = Pos.Center (), Y = 0, SchemeName = "Error", Text = "Press me! (Y = 0)",
             };
 
-            pressMeButton.Accepting += (s, e) =>
-                                        MessageBox.ErrorQuery ((s as View)?.App, loopWin.Title, "Neat?", "_No", "_Yes");
+            pressMeButton.Accepting += (s, _) =>
+                                        MessageBox.ErrorQuery ((s as View)?.App!, loopWin.Title, "Neat?", "_No", "_Yes");
             loopWin.Add (pressMeButton);
 
-            var subWin = new Window
+            Window subWin = new ()
             {
                 Title = "Sub Window",
                 X = Pos.Percent (0),
@@ -120,7 +107,7 @@ public class WindowsAndFrameViews : Scenario
                        );
             loopWin.Add (subWin);
 
-            var frameView = new FrameView
+            FrameView frameView = new ()
             {
                 X = Pos.Percent (50),
                 Y = 1,
@@ -140,14 +127,12 @@ public class WindowsAndFrameViews : Scenario
             listWin.Add (loopWin);
         }
 
-        FrameView frame = null;
-
-        frame = new ()
+        FrameView frame = new ()
         {
-            X = margin,
-            Y = Pos.Bottom (listWin.Last ()) + margin / 2,
-            Width = Dim.Fill (margin),
-            Height = contentHeight + 2, // 2 for default padding
+            X = MARGIN,
+            Y = Pos.Bottom (listWin.Last ()) + MARGIN / 2,
+            Width = Dim.Fill (MARGIN),
+            Height = CONTENT_HEIGHT + 2, // 2 for default padding
             Title = "This is a FrameView"
         };
         frame.SchemeName = "Dialog";
@@ -159,7 +144,7 @@ public class WindowsAndFrameViews : Scenario
                    }
                   );
 
-        var subWinofFV = new Window
+        Window subWinOfFrameView = new ()
         {
             Title = "This is a Sub-Window",
             X = Pos.Percent (0),
@@ -172,16 +157,16 @@ public class WindowsAndFrameViews : Scenario
 
         };
 
-        subWinofFV.Add (
+        subWinOfFrameView.Add (
                         new TextField { SchemeName = "Error", Text = "Edit Me" }
                        );
 
-        subWinofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
-        subWinofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
+        subWinOfFrameView.Add (new CheckBox { Y = 1, Text = "Check me" });
+        subWinOfFrameView.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
-        frame.Add (subWinofFV);
+        frame.Add (subWinOfFrameView);
 
-        var subFrameViewofFV = new FrameView
+        FrameView subFrameViewOfFrameView = new ()
         {
             X = Pos.Percent (50),
             Y = 1,
@@ -191,27 +176,26 @@ public class WindowsAndFrameViews : Scenario
             Text = "The Text in the FrameView",
             Title = "this is a Sub-FrameView"
         };
-        subFrameViewofFV.Add (new TextField { Width = 15, Text = "Edit Me" });
+        subFrameViewOfFrameView.Add (new TextField { Width = 15, Text = "Edit Me" });
 
-        subFrameViewofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
+        subFrameViewOfFrameView.Add (new CheckBox { Y = 1, Text = "Check me" });
 
-        subFrameViewofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
+        subFrameViewOfFrameView.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
         frame.Add (
                    new CheckBox { X = 0, Y = Pos.AnchorEnd (), Text = "Btn1 (Y = Pos.AnchorEnd ())" }
                   );
-        var c = new CheckBox { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Btn2 (Y = Pos.AnchorEnd ())" };
+        CheckBox c = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Btn2 (Y = Pos.AnchorEnd ())" };
         frame.Add (c);
 
-        frame.Add (subFrameViewofFV);
+        frame.Add (subFrameViewOfFrameView);
 
         window.Add (frame);
         listWin.Add (frame);
 
         window.SchemeName = "Base";
 
-        Application.Run (window);
+        app.Run (window);
         window.Dispose ();
-        Application.Shutdown ();
     }
 }

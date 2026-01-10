@@ -238,7 +238,7 @@ internal class ViewportSettingsDemoView : FrameView
     {
         Label? frameLabel = Padding?.SubViews.OfType<Label> ().FirstOrDefault ();
 
-        if (frameLabel is { })
+        if (frameLabel is not null)
         {
             frameLabel.Text = $"Viewport: {Viewport}\nFrame: {Frame}";
         }

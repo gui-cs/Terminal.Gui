@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+#nullable enable
+using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -81,14 +82,15 @@ public class SyntaxHighlighting : Scenario
     };
 
     private readonly string _path = "Cells.rce";
+    private Runnable? _appWindow;
     private Attribute _blue;
     private Attribute _green;
     private Attribute _magenta;
-    private TextView _textView;
+    private TextView? _textView;
     private Attribute _white;
 
     /// <summary>
-    ///     Reads an object instance from an Json file.
+    ///     Reads an object instance from a Json file.
     ///     <para>Object type must have a parameterless constructor.</para>
     /// </summary>
     /// <typeparam name="T">The type of object to read from the file.</typeparam>
@@ -96,21 +98,18 @@ public class SyntaxHighlighting : Scenario
     /// <returns>Returns a new instance of the object read from the Json file.</returns>
     public static T ReadFromJsonFile<T> (string filePath) where T : new ()
     {
-        TextReader reader = null;
+        TextReader? reader = null;
 
         try
         {
             reader = new StreamReader (filePath);
             string fileContents = reader.ReadToEnd ();
 
-            return (T)JsonSerializer.Deserialize (fileContents, typeof (T));
+            return JsonSerializer.Deserialize<T> (fileContents) ?? new T ();
         }
         finally
         {
-            if (reader != null)
-            {
-                reader.Close ();
-            }
+            reader?.Close ();
         }
     }
 
@@ -118,11 +117,12 @@ public class SyntaxHighlighting : Scenario
     {
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
-        Runnable appWindow = new ();
+        _appWindow = new Runnable ();
 
-        var menu = new MenuBar ();
+        MenuBar menu = new ();
 
         MenuItem wrapMenuItem = CreateWordWrapMenuItem ();
 
@@ -142,7 +142,7 @@ public class SyntaxHighlighting : Scenario
                                   )
                  );
 
-        appWindow.Add (menu);
+        _appWindow.Add (menu);
 
         _textView = new ()
         {
@@ -153,18 +153,15 @@ public class SyntaxHighlighting : Scenario
 
         ApplySyntaxHighlighting ();
 
-        appWindow.Add (_textView);
+        _appWindow.Add (_textView);
 
-        var statusBar = new StatusBar ([new (Application.QuitKey, "Quit", Quit)]);
+        StatusBar statusBar = new ([new (Application.QuitKey, "Quit", Quit)]);
 
-        appWindow.Add (statusBar);
+        _appWindow.Add (statusBar);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (_appWindow);
+        _appWindow.Dispose ();
     }
 
     private MenuItem CreateWordWrapMenuItem ()
@@ -175,9 +172,9 @@ public class SyntaxHighlighting : Scenario
             CheckedState = _textView?.WordWrap == true ? CheckState.Checked : CheckState.UnChecked
         };
 
-        checkBox.CheckedStateChanged += (s, e) =>
+        checkBox.CheckedStateChanged += (_, _) =>
                                         {
-                                            if (_textView is { })
+                                            if (_textView is not null)
                                             {
                                                 _textView.WordWrap = checkBox.CheckedState == CheckState.Checked;
                                             }
@@ -185,7 +182,7 @@ public class SyntaxHighlighting : Scenario
 
         MenuItem item = new () { CommandView = checkBox };
 
-        item.Accepting += (s, e) =>
+        item.Accepting += (_, e) =>
                           {
                               checkBox.AdvanceCheckState ();
                               e.Handled = true;
@@ -215,7 +212,7 @@ public class SyntaxHighlighting : Scenario
     /// </param>
     public static void WriteToJsonFile<T> (string filePath, T objectToWrite, bool append = false) where T : new ()
     {
-        TextWriter writer = null;
+        TextWriter? writer = null;
 
         try
         {
@@ -225,10 +222,7 @@ public class SyntaxHighlighting : Scenario
         }
         finally
         {
-            if (writer != null)
-            {
-                writer.Close ();
-            }
+            writer?.Close ();
         }
     }
 
@@ -238,13 +232,23 @@ public class SyntaxHighlighting : Scenario
 
         List<Cell> cells = new ();
 
-        foreach (KeyValuePair<string, Scheme> color in SchemeManager.GetSchemesForCurrentTheme ())
+        foreach (KeyValuePair<string, Scheme?> color in SchemeManager.GetSchemesForCurrentTheme ())
         {
+            if (color.Value is null)
+            {
+                continue;
+            }
+
             string csName = color.Key;
 
             cells.AddRange (Cell.ToCellList (csName, color.Value.Normal));
 
             cells.Add (new () { Grapheme = "\n", Attribute = color.Value.Focus });
+        }
+
+        if (_textView is null)
+        {
+            return;
         }
 
         if (File.Exists (_path))
@@ -265,6 +269,11 @@ public class SyntaxHighlighting : Scenario
     {
         ClearAllEvents ();
 
+        if (_textView is null)
+        {
+            return;
+        }
+
         _green = new (Color.Green, Color.Black);
         _blue = new (Color.Blue, Color.Black);
         _magenta = new (Color.Magenta, Color.Black);
@@ -280,11 +289,16 @@ public class SyntaxHighlighting : Scenario
         };
 
         // DrawingText happens before DrawingContent so we use it to highlight
-        _textView.DrawingText += (s, e) => HighlightTextBasedOnKeywords ();
+        _textView.DrawingText += (_, _) => HighlightTextBasedOnKeywords ();
     }
 
     private void ClearAllEvents ()
     {
+        if (_textView is null)
+        {
+            return;
+        }
+
         _textView.ClearEventHandlers ("DrawingText");
         _textView.InheritsPreviousAttribute = false;
     }
@@ -293,13 +307,18 @@ public class SyntaxHighlighting : Scenario
 
     private void HighlightTextBasedOnKeywords ()
     {
+        if (_textView is null)
+        {
+            return;
+        }
+
         // Comment blocks, quote blocks etc
         Dictionary<Rune, Scheme> blocks = new ();
 
-        var comments = new Regex (@"/\*.*?\*/", RegexOptions.Singleline);
+        Regex comments = new (@"/\*.*?\*/", RegexOptions.Singleline);
         MatchCollection commentMatches = comments.Matches (_textView.Text);
 
-        var singleQuote = new Regex (@"'.*?'", RegexOptions.Singleline);
+        Regex singleQuote = new (@"'.*?'", RegexOptions.Singleline);
         MatchCollection singleQuoteMatches = singleQuote.Matches (_textView.Text);
 
         // Find all keywords (ignoring for now if they are in comments, quotes etc)
@@ -343,7 +362,7 @@ public class SyntaxHighlighting : Scenario
         }
     }
 
-    private string IdxToWord (List<Rune> line, int idx)
+    private string? IdxToWord (List<Rune> line, int idx)
     {
         string [] words = Regex.Split (
                                        new (line.Select (r => (char)r.Value).ToArray ()),
@@ -351,7 +370,7 @@ public class SyntaxHighlighting : Scenario
                                       );
 
         var count = 0;
-        string current = null;
+        string? current = null;
 
         foreach (string word in words)
         {
@@ -367,23 +386,16 @@ public class SyntaxHighlighting : Scenario
         return current?.Trim ();
     }
 
-    private bool IsKeyword (List<Rune> line, int idx)
-    {
-        string word = IdxToWord (line, idx);
-
-        if (string.IsNullOrWhiteSpace (word))
-        {
-            return false;
-        }
-
-        return _keywords.Contains (word, StringComparer.CurrentCultureIgnoreCase);
-    }
-
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _appWindow?.RequestStop (); }
 
     private void SaveCells ()
     {
-        //Writing to file  
+        if (_textView is null)
+        {
+            return;
+        }
+
+        //Writing to file
         List<List<Cell>> cells = _textView.GetAllLines ();
         WriteToJsonFile (_path, cells);
     }
@@ -399,7 +411,7 @@ public static class EventExtensions
         }
 
         Type objType = obj.GetType ();
-        EventInfo eventInfo = objType.GetEvent (eventName);
+        EventInfo? eventInfo = objType.GetEvent (eventName);
 
         if (eventInfo == null)
         {
@@ -407,8 +419,8 @@ public static class EventExtensions
         }
 
         var isEventProperty = false;
-        Type type = objType;
-        FieldInfo eventFieldInfo = null;
+        Type? type = objType;
+        FieldInfo? eventFieldInfo = null;
 
         while (type != null)
         {
@@ -471,22 +483,22 @@ public static class EventExtensions
     private static void RemoveHandler<T> (object obj, FieldInfo eventFieldInfo)
     {
         Type objType = obj.GetType ();
-        object eventPropertyValue = eventFieldInfo.GetValue (obj);
+        object? eventPropertyValue = eventFieldInfo.GetValue (obj);
 
         if (eventPropertyValue == null)
         {
             return;
         }
 
-        PropertyInfo propertyInfo = objType.GetProperties (BindingFlags.NonPublic | BindingFlags.Instance)
-                                           .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
+        PropertyInfo? propertyInfo = objType.GetProperties (BindingFlags.NonPublic | BindingFlags.Instance)
+                                            .FirstOrDefault (p => p.Name == "Events" && p.PropertyType == typeof (T));
 
         if (propertyInfo == null)
         {
             return;
         }
 
-        object eventList = propertyInfo?.GetValue (obj, null);
+        object? eventList = propertyInfo.GetValue (obj, null);
 
         switch (eventList)
         {

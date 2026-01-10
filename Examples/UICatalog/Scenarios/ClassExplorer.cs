@@ -15,11 +15,14 @@ public class ClassExplorer : Scenario
     private TextView? _textView;
     private TreeView<object>? _treeView;
 
+    private Window? _win;
+
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        Window win = new ()
+        _win = new ()
         {
             Title = GetName (),
             BorderStyle = LineStyle.None
@@ -53,11 +56,11 @@ public class ClassExplorer : Scenario
         TreeViewTextFilter<object> filter = new (_treeView);
         _treeView.Filter = filter;
 
-        tfSearch.TextChanged += (s, e) =>
+        tfSearch.TextChanged += (_, _) =>
                                 {
                                     filter.Text = tfSearch.Text;
 
-                                    if (_treeView.SelectedObject is { })
+                                    if (_treeView.SelectedObject is not null)
                                     {
                                         _treeView.EnsureVisible (_treeView.SelectedObject);
                                     }
@@ -83,13 +86,13 @@ public class ClassExplorer : Scenario
         {
             Title = "_Include Private"
         };
-        _showPrivateCheckBox.CheckedStateChanged += (s, e) => ShowPrivate ();
+        _showPrivateCheckBox.CheckedStateChanged += (_, _) => ShowPrivate ();
 
         _highlightModelTextOnlyCheckBox = new ()
         {
             Title = "_Highlight Model Text Only"
         };
-        _highlightModelTextOnlyCheckBox.CheckedStateChanged += (s, e) => OnCheckHighlightModelTextOnly ();
+        _highlightModelTextOnlyCheckBox.CheckedStateChanged += (_, _) => OnCheckHighlightModelTextOnly ();
 
         menuBar.Add (
                      new MenuBarItem (
@@ -139,11 +142,10 @@ public class ClassExplorer : Scenario
                     );
 
         // Add views in order of visual appearance
-        win.Add (menuBar, lblSearch, tfSearch, _treeView, _textView);
+        _win.Add (menuBar, lblSearch, tfSearch, _treeView, _textView);
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (_win);
+        _win.Dispose ();
     }
 
     private bool CanExpand (object arg) => arg is Assembly or Type or ShowForType;
@@ -211,7 +213,7 @@ public class ClassExplorer : Scenario
         _treeView.SetNeedsDraw ();
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _win?.RequestStop (); }
 
     private void ShowPrivate ()
     {

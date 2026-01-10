@@ -105,10 +105,12 @@ public class LineDrawing : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = GetQuitKeyAndName () };
-        var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        using IApplication app = Application.Instance;
 
-        var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
+        Window win = new () { Title = GetQuitKeyAndName () };
+        DrawingArea canvas = new () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        ToolsView tools = new () { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
 
         tools.ColorChanged += (s, e) => canvas.SetCurrentAttribute (e);
         tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool { LineStyle = b };
@@ -121,9 +123,8 @@ public class LineDrawing : Scenario
 
         win.KeyDown += (s, e) => { e.Handled = canvas.NewKeyDownEvent (e); };
 
-        Application.Run (win);
+        app.Run (win);
         win.Dispose ();
-        Application.Shutdown ();
     }
 
     public static bool PromptForColor (string title, Color current, out Color newColor)
@@ -158,7 +159,7 @@ public class LineDrawing : Scenario
 
         d.Add (cp);
 
-        Application.Run (d);
+        d.App?.Run (d);
         accept = d.Result == 1;
         d.Dispose ();
         newColor = Driver.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
@@ -201,7 +202,7 @@ public class ToolsView : Window
         };
         _stylePicker.ValueChanged += (s, a) =>
                                      {
-                                         if (a.Value is { })
+                                         if (a.Value is not null)
                                          {
                                              SetStyle?.Invoke ((LineStyle)a.Value);
                                          }
@@ -240,7 +241,7 @@ public class DrawingArea : View
         {
             foreach (KeyValuePair<Point, Cell?> c in canvas.GetCellMap ())
             {
-                if (c.Value is { })
+                if (c.Value is not null)
                 {
                     SetCurrentAttribute (c.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
 

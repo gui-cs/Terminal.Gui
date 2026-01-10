@@ -21,17 +21,20 @@ public class TextViewAutocompletePopup : Scenario
     private TextView? _textViewTopLeft;
     private TextView? _textViewTopRight;
 
+    private Window? _appWindow;
+
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
-        Window appWindow = new ()
+        _appWindow = new ()
         {
             BorderStyle = LineStyle.None
         };
 
-        var width = 20;
-        var text = " jamp jemp jimp jomp jump";
+        int width = 20;
+        string text = " jamp jemp jimp jomp jump";
 
         // MenuBar
         MenuBar menu = new ();
@@ -44,7 +47,7 @@ public class TextViewAutocompletePopup : Scenario
             Text = text
         };
         _textViewTopLeft.DrawingContent += TextViewTopLeft_DrawContent;
-        appWindow.Add (_textViewTopLeft);
+        _appWindow.Add (_textViewTopLeft);
 
         _textViewTopRight = new ()
         {
@@ -55,7 +58,7 @@ public class TextViewAutocompletePopup : Scenario
             Text = text
         };
         _textViewTopRight.DrawingContent += TextViewTopRight_DrawContent;
-        appWindow.Add (_textViewTopRight);
+        _appWindow.Add (_textViewTopRight);
 
         _textViewBottomLeft = new ()
         {
@@ -65,7 +68,7 @@ public class TextViewAutocompletePopup : Scenario
             Text = text
         };
         _textViewBottomLeft.DrawingContent += TextViewBottomLeft_DrawContent;
-        appWindow.Add (_textViewBottomLeft);
+        _appWindow.Add (_textViewBottomLeft);
 
         _textViewBottomRight = new ()
         {
@@ -76,7 +79,7 @@ public class TextViewAutocompletePopup : Scenario
             Text = text
         };
         _textViewBottomRight.DrawingContent += TextViewBottomRight_DrawContent;
-        appWindow.Add (_textViewBottomRight);
+        _appWindow.Add (_textViewBottomRight);
 
         _textViewCentered = new ()
         {
@@ -87,7 +90,7 @@ public class TextViewAutocompletePopup : Scenario
             Text = text
         };
         _textViewCentered.DrawingContent += TextViewCentered_DrawContent;
-        appWindow.Add (_textViewCentered);
+        _appWindow.Add (_textViewCentered);
 
         // Setup menu checkboxes
         _miMultilineCheckBox = new ()
@@ -95,14 +98,14 @@ public class TextViewAutocompletePopup : Scenario
             Title = "_Multiline",
             CheckedState = _textViewTopLeft.Multiline ? CheckState.Checked : CheckState.UnChecked
         };
-        _miMultilineCheckBox.CheckedStateChanged += (s, e) => Multiline ();
+        _miMultilineCheckBox.CheckedStateChanged += (_, _) => Multiline ();
 
         _miWrapCheckBox = new ()
         {
             Title = "_Word Wrap",
             CheckedState = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked
         };
-        _miWrapCheckBox.CheckedStateChanged += (s, e) => WordWrap ();
+        _miWrapCheckBox.CheckedStateChanged += (_, _) => WordWrap ();
 
         menu.Add (
                   new MenuBarItem (
@@ -141,13 +144,12 @@ public class TextViewAutocompletePopup : Scenario
                                    ]
                                   );
 
-        appWindow.Add (menu, statusBar);
+        _appWindow.Add (menu, statusBar);
 
-        appWindow.SubViewLayout += Win_LayoutStarted;
+        _appWindow.SubViewLayout += Win_LayoutStarted;
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (_appWindow);
+        _appWindow.Dispose ();
     }
 
     private void Multiline ()
@@ -170,7 +172,7 @@ public class TextViewAutocompletePopup : Scenario
         _textViewCentered.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _appWindow?.RequestStop (); }
 
     private void SetAllSuggestions (TextView view)
     {
@@ -186,7 +188,7 @@ public class TextViewAutocompletePopup : Scenario
 
     private void SetMultilineStatusText ()
     {
-        if (_siMultiline is { } && _miMultilineCheckBox is { })
+        if (_siMultiline is not null && _miMultilineCheckBox is not null)
         {
             _siMultiline.Title = $"Multiline: {_miMultilineCheckBox.CheckedState == CheckState.Checked}";
         }
@@ -194,7 +196,7 @@ public class TextViewAutocompletePopup : Scenario
 
     private void SetWrapStatusText ()
     {
-        if (_siWrap is { } && _miWrapCheckBox is { })
+        if (_siWrap is not null && _miWrapCheckBox is not null)
         {
             _siWrap.Title = $"WordWrap: {_miWrapCheckBox.CheckedState == CheckState.Checked}";
         }
@@ -202,7 +204,7 @@ public class TextViewAutocompletePopup : Scenario
 
     private void TextViewBottomLeft_DrawContent (object? sender, DrawEventArgs e)
     {
-        if (_textViewBottomLeft is { })
+        if (_textViewBottomLeft is not null)
         {
             SetAllSuggestions (_textViewBottomLeft);
         }
@@ -210,7 +212,7 @@ public class TextViewAutocompletePopup : Scenario
 
     private void TextViewBottomRight_DrawContent (object? sender, DrawEventArgs e)
     {
-        if (_textViewBottomRight is { })
+        if (_textViewBottomRight is not null)
         {
             SetAllSuggestions (_textViewBottomRight);
         }
@@ -218,7 +220,7 @@ public class TextViewAutocompletePopup : Scenario
 
     private void TextViewCentered_DrawContent (object? sender, DrawEventArgs e)
     {
-        if (_textViewCentered is { })
+        if (_textViewCentered is not null)
         {
             SetAllSuggestions (_textViewCentered);
         }
@@ -226,7 +228,7 @@ public class TextViewAutocompletePopup : Scenario
 
     private void TextViewTopLeft_DrawContent (object? sender, DrawEventArgs e)
     {
-        if (_textViewTopLeft is { })
+        if (_textViewTopLeft is not null)
         {
             SetAllSuggestions (_textViewTopLeft);
         }
@@ -234,7 +236,7 @@ public class TextViewAutocompletePopup : Scenario
 
     private void TextViewTopRight_DrawContent (object? sender, DrawEventArgs e)
     {
-        if (_textViewTopRight is { })
+        if (_textViewTopRight is not null)
         {
             SetAllSuggestions (_textViewTopRight);
         }

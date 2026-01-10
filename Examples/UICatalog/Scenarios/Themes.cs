@@ -8,12 +8,15 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Configuration")]
 public sealed class Themes : Scenario
 {
+    private IApplication? _app;
     private View? _view;
 
     public override void Main ()
     {
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
+        _app = app;
 
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
@@ -22,7 +25,7 @@ public sealed class Themes : Scenario
             BorderStyle = LineStyle.None
         };
 
-        string[]  options = ThemeManager.GetThemeNames ().Select (option => option = "_" + option).ToArray ();
+        string [] options = ThemeManager.GetThemeNames ().Select (option => "_" + option).ToArray ();
         OptionSelector themeOptionSelector = new ()
         {
             Title = "_Themes",
@@ -37,18 +40,17 @@ public sealed class Themes : Scenario
 
         themeOptionSelector.ValueChanged += (sender, args) =>
                                              {
-                                                 OptionSelector? optionSelector = sender as OptionSelector;
-                                                 if (optionSelector is null)
+                                                 if (sender is not OptionSelector optionSelector)
                                                  {
                                                      return;
                                                  }
-                                                 var newTheme = optionSelector!.Labels! [(int)args.Value!] as string;
+                                                 string? newTheme = optionSelector.Labels! [(int)args.Value!] as string;
                                                  // strip off the leading underscore
                                                  ThemeManager.Theme = newTheme!.Substring (1);
                                                  ConfigurationManager.Apply ();
                                              };
 
-        var themeViewer = new ThemeViewer
+        ThemeViewer themeViewer = new ()
         {
             X = Pos.Right (themeOptionSelector)
         };
@@ -87,7 +89,7 @@ public sealed class Themes : Scenario
             Height = Dim.Auto (),
         };
 
-        FrameView? viewFrame = new ()
+        FrameView viewFrame = new ()
         {
             X = Pos.Right (viewListView),
             Y = Pos.Bottom(viewPropertiesEditor),
@@ -99,11 +101,9 @@ public sealed class Themes : Scenario
         };
         viewFrame.Border!.Thickness = new (0, 1, 0, 0);
 
-        viewListView.SelectedItemChanged += (sender, args) =>
+        viewListView.SelectedItemChanged += (_, args) =>
                                             {
-                                                var listView = sender as ListView;
-
-                                                if (_view is { })
+                                                if (_view is not null)
                                                 {
                                                     viewPropertiesEditor.ViewToEdit = null;
                                                     viewFrame.Remove (_view);
@@ -113,7 +113,7 @@ public sealed class Themes : Scenario
 
                                                 _view = CreateView (viewClasses [(args.Value as string)!]);
 
-                                                if (_view is { })
+                                                if (_view is not null)
                                                 {
                                                     viewFrame.Add (_view);
                                                     viewPropertiesEditor.ViewToEdit = _view;
@@ -125,11 +125,11 @@ public sealed class Themes : Scenario
 
         viewListView.SelectedItem = 0;
 
-        themeViewer.SchemeNameChanging += (sender, args) =>
+        themeViewer.SchemeNameChanging += (_, args) =>
                                           {
-                                              if (_view is { })
+                                              if (_view is not null)
                                               {
-                                                  Application.TopRunnableView!.SchemeName = args.NewValue;
+                                                  _app!.TopRunnableView!.SchemeName = args.NewValue;
 
                                                   if (_view.HasScheme)
                                                   {
@@ -142,7 +142,7 @@ public sealed class Themes : Scenario
 
         AllViewsView? allViewsView = null;
 
-        allViewsCheckBox.CheckedStateChanged += (sender, args) =>
+        allViewsCheckBox.CheckedStateChanged += (_, args) =>
                                                 {
                                                     if (args.Value == CheckState.Checked)
                                                     {
@@ -160,7 +160,7 @@ public sealed class Themes : Scenario
                                                             TabStop = TabBehavior.TabStop
                                                         };
 
-                                                        allViewsView.FocusedChanged += (s, a) =>
+                                                        allViewsView.FocusedChanged += (_, a) =>
                                                                                        {
                                                                                            allViewsView.Title =
                                                                                                $"All Views - Focused: {a.NewFocused?.Title}";
@@ -181,12 +181,9 @@ public sealed class Themes : Scenario
                                                 };
 
         // Run - Start the application.
-        Application.Run (appWindow);
+        app.Run (appWindow);
         viewFrame.Dispose ();
         appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
     }
 
     private static List<Type> GetAllViewClassesCollection ()
@@ -237,8 +234,8 @@ public sealed class Themes : Scenario
         }
 
         // Instantiate view
-        var view = (View)Activator.CreateInstance (type)!;
-        var demoText = "This, that, and the other thing.";
+        View view = (View)Activator.CreateInstance (type)!;
+        string demoText = "This, that, and the other thing.";
 
         if (view is IDesignable designable)
         {
@@ -262,12 +259,12 @@ public sealed class Themes : Scenario
             return;
         }
 
-        if (view.Width == Dim.Absolute (0) || view.Width is null)
+        if (view.Width == Dim.Absolute (0))
         {
             view.Width = Dim.Fill ();
         }
 
-        if (view.Height == Dim.Absolute (0) || view.Height is null)
+        if (view.Height == Dim.Absolute (0))
         {
             view.Height = Dim.Fill ();
         }

@@ -63,7 +63,7 @@ internal sealed class NumericUpDownEditor<T> : View where T : notnull
 
             _numericUpDown = value;
 
-            if (_numericUpDown is { } && _value is { })
+            if (_numericUpDown is not null && _value is not null)
             {
                 _value.Text = _numericUpDown.Text;
             }

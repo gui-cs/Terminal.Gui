@@ -17,10 +17,13 @@ public class GraphViewExample : Scenario
     private CheckBox? _diagCheckBox;
     private CheckBox? _showBorderCheckBox;
     private ViewDiagnosticFlags _viewDiagnostics;
+    private IApplication? _app;
 
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
+        _app = app;
 
         Window window = new ()
         {
@@ -217,10 +220,9 @@ public class GraphViewExample : Scenario
         _graphs [_currentGraph++ % _graphs.Length] ();
 
         _viewDiagnostics = View.Diagnostics;
-        Application.Run (window);
+        app.Run (window);
         View.Diagnostics = _viewDiagnostics;
         window.Dispose ();
-        Application.Shutdown ();
     }
 
     private void DiagShortcut_Accept (object? sender, CommandEventArgs e)
@@ -238,7 +240,7 @@ public class GraphViewExample : Scenario
         View.Diagnostics = _diagCheckBox?.CheckedState == CheckState.Checked
                                ? ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler
                                : ViewDiagnosticFlags.Off;
-        Application.LayoutAndDraw ();
+        _app?.LayoutAndDraw ();
     }
 
     private void Margin (bool left, bool increase)
@@ -331,7 +333,7 @@ public class GraphViewExample : Scenario
         _graphView.Annotations.Add (legend);
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _graphView?.App?.RequestStop (); }
 
     private void SetupDisco ()
     {
@@ -369,10 +371,10 @@ public class GraphViewExample : Scenario
                                    _graphView?.SetNeedsDraw ();
 
                                    // while the equaliser is showing
-                                   return _graphView is { } && _graphView.Series.Contains (series);
+                                   return _graphView is not null && _graphView.Series.Contains (series);
                                };
 
-        Application.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
+        _app?.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
 
         series.Bars = bars;
 

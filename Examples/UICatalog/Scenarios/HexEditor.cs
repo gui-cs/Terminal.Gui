@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System.Text;
 
@@ -12,6 +12,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Files and IO")]
 public class HexEditor : Scenario
 {
+    private IApplication? _app;
     private string? _fileName;
     private HexView? _hexView;
     private MenuItem? _miReadOnly;
@@ -20,12 +21,15 @@ public class HexEditor : Scenario
     private Shortcut? _scInfo;
     private Shortcut? _scPosition;
     private StatusBar? _statusBar;
+    private Window? _win;
 
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
+        _app = app;
 
-        var app = new Window ()
+        _win = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -47,9 +51,9 @@ public class HexEditor : Scenario
         _hexView.PositionChanged += _hexView_PositionChanged;
         _hexView.VerticalScrollBar.AutoShow = false;
 
-        app.Add (_hexView);
+        _win.Add (_hexView);
 
-        var menu = new MenuBar
+        MenuBar menu = new ()
         {
             Menus =
             [
@@ -75,41 +79,33 @@ public class HexEditor : Scenario
                     ),
                 new (
                      "_Options",
-                     new MenuItem []
-                     {
-                         _miReadOnly = new (
-                                              "_Read Only",
-                                              "",
-                                              ToggleReadOnly
-                                             )
-                         {
-
-                         }
-                     }
+                     [
+                         _miReadOnly = new ("_Read Only", "", ToggleReadOnly)
+                     ]
                     )
             ]
         };
 
-        CheckBox cb = new CheckBox ()
+        CheckBox cb = new ()
         {
             Title = _miReadOnly.Title,
             CheckedState = _hexView.ReadOnly ? CheckState.Checked : CheckState.None,
         };
         _miReadOnly.CommandView = cb;
-        app.Add (menu);
+        _win.Add (menu);
 
-        var addressWidthUpDown = new NumericUpDown
+        NumericUpDown addressWidthUpDown = new ()
         {
             Value = _hexView.AddressWidth
         };
 
-        NumericUpDown<long> addressUpDown = new NumericUpDown<long>
+        NumericUpDown<long> addressUpDown = new ()
         {
             Value = _hexView.Address,
             Format = $"0x{{0:X{_hexView.AddressWidth}}}"
         };
 
-        addressWidthUpDown.ValueChanging += (sender, args) =>
+        addressWidthUpDown.ValueChanging += (_, args) =>
                                             {
                                                 args.Cancel = args.NewValue is < 0 or > 8;
 
@@ -122,7 +118,7 @@ public class HexEditor : Scenario
                                                 }
                                             };
 
-        addressUpDown.ValueChanging += (sender, args) =>
+        addressUpDown.ValueChanging += (_, args) =>
                                        {
                                            args.Cancel = args.NewValue is < 0;
 
@@ -152,18 +148,17 @@ public class HexEditor : Scenario
         {
             AlignmentModes = AlignmentModes.IgnoreFirstOrLast
         };
-        app.Add (_statusBar);
+        _win.Add (_statusBar);
 
         _hexView.VerticalScrollBar.AutoShow = true;
         _hexView.HorizontalScrollBar.AutoShow = true;
 
         _hexView.Source = LoadFile ();
 
-        Application.Run (app);
+        app.Run (_win);
         addressUpDown.Dispose ();
         addressWidthUpDown.Dispose ();
-        app.Dispose ();
-        Application.Shutdown ();
+        _win.Dispose ();
     }
 
     private void _hexView_Edited (object? sender, HexViewEditEventArgs e) { _saved = false; }
@@ -181,11 +176,11 @@ public class HexEditor : Scenario
         }
     }
 
-    private void Copy () { MessageBox.ErrorQuery (Application.Instance, "Not Implemented", "Functionality not yet implemented.", "Ok"); }
+    private void Copy () { MessageBox.ErrorQuery (_hexView!.App!, "Not Implemented", "Functionality not yet implemented.", "Ok"); }
 
     private void CreateDemoFile (string fileName)
     {
-        var sb = new StringBuilder ();
+        StringBuilder sb = new ();
         sb.Append ("Hello world.\n");
         sb.Append ("This is a test of the Emergency Broadcast System.\n");
 
@@ -194,29 +189,15 @@ public class HexEditor : Scenario
         sw.Close ();
     }
 
-    private void CreateUnicodeDemoFile (string fileName)
-    {
-        var sb = new StringBuilder ();
-        sb.Append ("Hello world with wide codepoints: 𝔹Aℝ𝔽.\n");
-        sb.Append ("This is a test of the Emergency Broadcast System.\n");
-
-        byte [] buffer = Encoding.Unicode.GetBytes (sb.ToString ());
-        var ms = new MemoryStream (buffer);
-        var file = new FileStream (fileName, FileMode.Create, FileAccess.Write);
-        ms.WriteTo (file);
-        file.Close ();
-        ms.Close ();
-    }
-
-    private void Cut () { MessageBox.ErrorQuery (Application.Instance, "Not Implemented", "Functionality not yet implemented.", "Ok"); }
+    private void Cut () { MessageBox.ErrorQuery (_hexView!.App!, "Not Implemented", "Functionality not yet implemented.", "Ok"); }
 
     private Stream LoadFile ()
     {
-        var stream = new MemoryStream ();
+        MemoryStream stream = new ();
 
         if (!_saved && _hexView!.Edits.Count > 0 && _hexView.Source is {})
         {
-            if (MessageBox.ErrorQuery (Application.Instance,
+            if (MessageBox.ErrorQuery (_hexView!.App!,
                                        "Save",
                                        "The changes were not saved. Want to open without saving?",
                                        "_No",
@@ -231,7 +212,7 @@ public class HexEditor : Scenario
             _saved = true;
         }
 
-        if (_fileName is { })
+        if (_fileName is not null)
         {
             byte [] bin = File.ReadAllBytes (_fileName);
             stream.Write (bin);
@@ -254,8 +235,8 @@ public class HexEditor : Scenario
 
     private void Open ()
     {
-        var d = new OpenDialog { Title = "Open", AllowsMultipleSelection = false };
-        Application.Run (d);
+        OpenDialog d = new () { Title = "Open", AllowsMultipleSelection = false };
+        _app?.Run (d);
 
         if (!d.Canceled)
         {
@@ -267,14 +248,14 @@ public class HexEditor : Scenario
         d.Dispose ();
     }
 
-    private void Paste () { MessageBox.ErrorQuery (Application.Instance, "Not Implemented", "Functionality not yet implemented.", "_Ok"); }
-    private void Quit () { Application.RequestStop (); }
+    private void Paste () { MessageBox.ErrorQuery (_hexView!.App!, "Not Implemented", "Functionality not yet implemented.", "_Ok"); }
+    private void Quit () { _win?.RequestStop (); }
 
     private void Save ()
     {
         if (_fileName != null)
         {
-            using (var fs = new FileStream (_fileName, FileMode.OpenOrCreate))
+            using (FileStream fs = new (_fileName, FileMode.OpenOrCreate))
             {
                 _hexView?.ApplyEdits (fs);
 

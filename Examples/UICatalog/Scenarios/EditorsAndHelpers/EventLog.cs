@@ -69,7 +69,7 @@ public class EventLog : ListView
 
             _viewToLog = value;
 
-            if (_viewToLog is { })
+            if (_viewToLog is not null)
             {
                 _viewToLog.Initialized += (s, _) =>
                                           {

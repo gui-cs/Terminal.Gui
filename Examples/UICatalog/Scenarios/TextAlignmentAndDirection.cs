@@ -18,13 +18,14 @@ public class TextAlignmentAndDirection : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
 
-        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
+        string txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
 
         SchemeManager.AddScheme ("TextAlignmentAndDirection1", new () { Normal = new (Color.Black, Color.Gray) });
         SchemeManager.AddScheme ("TextAlignmentAndDirection2", new () { Normal = new (Color.Black, Color.DarkGray) });
@@ -443,7 +444,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        window.KeyDown += (s, m) =>
+        window.KeyDown += (_, _) =>
                      {
                          foreach (View v in singleLineLabels)
                          {
@@ -484,7 +485,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.CheckedStateChanging += (s, e) => ToggleJustify (e.Result != CheckState.Checked);
+        justifyCheckbox.CheckedStateChanging += (_, e) => ToggleJustify (e.Result != CheckState.Checked);
 
         justifyOptions.ValueChanged += (_, _) => { ToggleJustify (false, true); };
 
@@ -543,7 +544,7 @@ public class TextAlignmentAndDirection : Scenario
                                                  ToggleJustify (true);
                                              }
 
-                                             foreach (View v in multiLineLabels.Where (v => ev.Value is { }))
+                                             foreach (View v in multiLineLabels.Where (v => ev.Value is not null))
                                              {
                                                  v.TextDirection = (TextDirection)ev.Value!.Value;
                                              }
@@ -556,9 +557,8 @@ public class TextAlignmentAndDirection : Scenario
 
         window.Add (directionOptions);
 
-        Application.Run (window);
+        app.Run (window);
         window.Dispose ();
-        Application.Shutdown ();
 
         // Be a good citizen and remove the schemes we added
         SchemeManager.RemoveScheme ("TextAlignmentAndDirection1");

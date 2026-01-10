@@ -10,6 +10,7 @@ public class LineCanvasExperiment : Scenario
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         Window window = new ()
         {
@@ -136,8 +137,7 @@ public class LineCanvasExperiment : Scenario
 
         //frame1.Add (marginWindow);
 
-        Application.Run (window);
+        app.Run (window);
         window.Dispose ();
-        Application.Shutdown ();
     }
 }

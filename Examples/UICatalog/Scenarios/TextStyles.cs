@@ -13,6 +13,7 @@ public sealed class TextStyles : Scenario
     {
         // Init
         Application.Init ();
+        using IApplication app = Application.Instance;
 
         // Setup - Create a top-level application window and configure it.
         Window appWindow = new ()
@@ -46,11 +47,8 @@ public sealed class TextStyles : Scenario
         AddButtons (appWindow);
 
         // Run - Start the application.
-        Application.Run (appWindow);
+        app.Run (appWindow);
         appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
     }
 
     private void AddButtons (Window appWindow)
@@ -82,7 +80,7 @@ public sealed class TextStyles : Scenario
                                                       return;
                                                   }
 
-                                                  if (args.Result is { })
+                                                  if (args.Result is not null)
                                                   {
                                                       args.Result = args.Result.Value with { Style = style };
                                                   }
@@ -130,7 +128,7 @@ public sealed class TextStyles : Scenario
             };
             button.GettingAttributeForRole += (_, args) =>
                                               {
-                                                  if (args.Result is { })
+                                                  if (args.Result is not null)
                                                   {
                                                       args.Result = args.Result.Value with { Style = combination };
                                                   }

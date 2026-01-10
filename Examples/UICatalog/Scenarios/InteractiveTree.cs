@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -7,13 +7,17 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TreeView")]
 public class InteractiveTree : Scenario
 {
+    private IApplication? _app;
     private TreeView? _treeView;
+    private Window? _appWindow;
 
     public override void Main ()
     {
         Application.Init ();
+        using IApplication app = Application.Instance;
+        _app = app;
 
-        Window appWindow = new ()
+        _appWindow = new ()
         {
             Title = GetName (),
             BorderStyle = LineStyle.None
@@ -42,7 +46,7 @@ public class InteractiveTree : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (1)
         };
-        _treeView.KeyDown += TreeView_KeyPress;
+        _treeView.KeyDown += treeView_KeyPress;
 
         // StatusBar
         StatusBar statusBar = new (
@@ -54,11 +58,10 @@ public class InteractiveTree : Scenario
                                    ]
                                   );
 
-        appWindow.Add (menu, _treeView, statusBar);
+        _appWindow.Add (menu, _treeView, statusBar);
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (_appWindow);
+        _appWindow.Dispose ();
     }
 
     private void AddChildNode ()
@@ -70,7 +73,7 @@ public class InteractiveTree : Scenario
 
         ITreeNode? node = _treeView.SelectedObject;
 
-        if (node is { })
+        if (node is not null)
         {
             if (GetText ("Text", "Enter text for node:", "", out string entered))
             {
@@ -95,9 +98,9 @@ public class InteractiveTree : Scenario
 
     private bool GetText (string title, string label, string initialText, out string enteredText)
     {
-        var okPressed = false;
+        bool okPressed = false;
 
-        Dialog d = new Dialog
+        Dialog d = new ()
         {
             Title = title,
             Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
@@ -110,7 +113,7 @@ public class InteractiveTree : Scenario
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _app?.Run (d);
         okPressed = d.Result is 1;
 
         d.Dispose ();
@@ -120,7 +123,7 @@ public class InteractiveTree : Scenario
         return okPressed;
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _appWindow?.RequestStop (); }
 
     private void RenameNode ()
     {
@@ -131,7 +134,7 @@ public class InteractiveTree : Scenario
 
         ITreeNode? node = _treeView.SelectedObject;
 
-        if (node is { })
+        if (node is not null)
         {
             if (GetText ("Text", "Enter text for node:", node.Text, out string entered))
             {
@@ -141,7 +144,7 @@ public class InteractiveTree : Scenario
         }
     }
 
-    private void TreeView_KeyPress (object? sender, Key obj)
+    private void treeView_KeyPress (object? sender, Key obj)
     {
         if (_treeView is null)
         {
@@ -170,7 +173,7 @@ public class InteractiveTree : Scenario
 
                 if (parent is null)
                 {
-                    MessageBox.ErrorQuery (Application.Instance,
+                    MessageBox.ErrorQuery (_app!,
                                            "Could not delete",
                                            $"Parent of '{toDelete}' was unexpectedly null",
                                            "Ok"
