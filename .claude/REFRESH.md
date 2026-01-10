@@ -10,6 +10,8 @@
 4. **SubView/SuperView** - never say "child", "parent", or "container"
 5. **Unused lambda params** - use `_` discard: `(_, _) => { }`
 6. **Local functions** - use camelCase: `void myLocalFunc ()`
+7. **Backing fields** - place immediately before their property (ReSharper bug, must do manually)
+8. **ReShaper Formatting** - run ReSharper code cleanup with "Full Cleanup" profile (not the built-in one).
 
 ## Before Each File Edit
 
@@ -29,6 +31,7 @@ Re-read the relevant rule file in `.claude/rules/`:
 - `event-patterns.md` - lambdas, closures, handlers
 - `collection-expressions.md` - [...] syntax
 - `cwp-pattern.md` - Cancellable Workflow Pattern
+- `code-layout.md` - backing fields, member ordering
 
 ## Task-Specific Guides
 
