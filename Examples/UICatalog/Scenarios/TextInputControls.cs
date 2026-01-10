@@ -60,7 +60,7 @@ public class TextInputControls : Scenario
             Text = textField.Text
         };
         win.Add (labelMirroringTextField);
-        textField.TextChanged += (s, prev) => { labelMirroringTextField.Text = textField.Text; };
+        textField.TextChanged += (sender, _) => { labelMirroringTextField.Text = ((TextField)sender!).Text; };
 
         label = new ()
         {
@@ -105,13 +105,13 @@ public class TextInputControls : Scenario
         };
         SingleWordSuggestionGenerator textViewAppendSingleWordGenerator = new ();
         textView.Autocomplete.SuggestionGenerator = textViewAppendSingleWordGenerator;
-        textView.DrawingContent += TextView_DrawContent;
+        textView.DrawingContent += textViewDrawContent;
         textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
 
         // This shows how to enable autocomplete in TextView.
-        void TextView_DrawContent (object? sender, DrawEventArgs e)
+        void textViewDrawContent (object? sender, DrawEventArgs e)
         {
-            textViewAppendSingleWordGenerator.AllSuggestions = Regex.Matches (textView.Text ?? "", "\\w+")
+            textViewAppendSingleWordGenerator.AllSuggestions = Regex.Matches (textView.Text, "\\w+")
                                                                     .Select (s => s.Value)
                                                                     .Distinct ()
                                                                     .ToList ();
@@ -132,7 +132,7 @@ public class TextInputControls : Scenario
         // Use ContentChanged to detect if the user has typed something in a TextView.
         // The TextChanged property is only fired if the TextView.Text property is
         // explicitly set
-        textView.ContentsChanged += (s, a) =>
+        textView.ContentsChanged += (_, _) =>
                                     {
                                         labelMirroringTextView.Enabled = !labelMirroringTextView.Enabled;
                                         labelMirroringTextView.Text = textView.Text;
@@ -142,7 +142,7 @@ public class TextInputControls : Scenario
         {
             X = Pos.Left (textView), Y = Pos.Bottom (textView), CheckedState = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
-        chxReadOnly.CheckedStateChanging += (sender, args) => textView.ReadOnly = args.Result == CheckState.Checked;
+        chxReadOnly.CheckedStateChanging += (_, args) => textView.ReadOnly = args.Result == CheckState.Checked;
         win.Add (chxReadOnly);
 
         // By default TextView is a multi-line control. It can be forced to 
@@ -161,7 +161,7 @@ public class TextInputControls : Scenario
             CheckedState = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.CheckedStateChanging += (s, e) => textView.WordWrap = e.Result == CheckState.Checked;
+        chxWordWrap.CheckedStateChanging += (_, e) => textView.WordWrap = e.Result == CheckState.Checked;
         win.Add (chxWordWrap);
 
         // TextView captures Tabs (so users can enter /t into text) by default;
@@ -175,7 +175,7 @@ public class TextInputControls : Scenario
             Text = "_Capture Tabs"
         };
 
-        chxMultiline.CheckedStateChanging += (s, e) =>
+        chxMultiline.CheckedStateChanging += (_, e) =>
                                              {
                                                  textView.Multiline = e.Result == CheckState.Checked;
 
@@ -193,7 +193,7 @@ public class TextInputControls : Scenario
         Key? keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
         Key? keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
 
-        chxCaptureTabs.CheckedStateChanging += (s, e) =>
+        chxCaptureTabs.CheckedStateChanging += (_, e) =>
                                                {
                                                    if (e.Result == CheckState.Checked)
                                                    {
@@ -248,7 +248,7 @@ public class TextInputControls : Scenario
         byte [] array = ((MemoryStream)hexEditor.Source!).ToArray ();
         labelMirroringHexEditor.Text = Encoding.UTF8.GetString (array, 0, array.Length);
 
-        hexEditor.Edited += (s, kv) =>
+        hexEditor.Edited += (_, _) =>
                             {
                                 hexEditor.ApplyEdits ();
                                 byte [] arr = ((MemoryStream)hexEditor.Source!).ToArray ();
@@ -274,7 +274,7 @@ public class TextInputControls : Scenario
         };
         win.Add (labelMirroringDateField);
 
-        dateField.TextChanged += (s, prev) => { labelMirroringDateField.Text = dateField.Text; };
+        dateField.TextChanged += (_, _) => { labelMirroringDateField.Text = dateField.Text; };
 
         // TimeField
         label = new () { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
@@ -331,7 +331,7 @@ public class TextInputControls : Scenario
         };
         win.Add (labelMirroringNetProviderField);
 
-        netProviderField.Provider.TextChanged += (s, prev) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
+        netProviderField.Provider.TextChanged += (_, _) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
 
         // TextRegexProvider - Regex provider implemented by Terminal.Gui
         Label regexProviderLabel = new ()
@@ -365,7 +365,7 @@ public class TextInputControls : Scenario
         };
         win.Add (labelMirroringRegexProviderField);
 
-        regexProviderField.Provider.TextChanged += (s, prev) => { labelMirroringRegexProviderField.Text = regexProviderField.Text; };
+        regexProviderField.Provider.TextChanged += (_, _) => { labelMirroringRegexProviderField.Text = regexProviderField.Text; };
 
         Label labelAppendAutocomplete = new ()
         {
@@ -380,8 +380,8 @@ public class TextInputControls : Scenario
 
         appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator
         {
-            AllSuggestions = new ()
-            {
+            AllSuggestions =
+            [
                 "fish",
                 "flipper",
                 "fin",
@@ -484,7 +484,7 @@ public class TextInputControls : Scenario
                 "so",
                 "people",
                 "part"
-            }
+            ]
         };
 
         win.Add (labelAppendAutocomplete);
@@ -524,10 +524,7 @@ public class TextInputControls : Scenario
 
         void ConfigurationManagerOnApplied (object? sender, ConfigurationManagerEventArgs e)
         {
-            if (win is { })
-            {
-                win.SetNeedsDraw ();
-            }
+            win.SetNeedsDraw ();
         }
     }
 
