@@ -19,14 +19,16 @@ public class ClassExplorer : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        _win = new ()
+        using Window win = new ()
         {
             Title = GetName (),
             BorderStyle = LineStyle.None
         };
+        _win = win;
 
         // MenuBar
         MenuBar menuBar = new ();

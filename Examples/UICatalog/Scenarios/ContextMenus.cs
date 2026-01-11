@@ -19,6 +19,7 @@ public class ContextMenus : Scenario
     public override void Main ()
     {
         // Init
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
 
         // Prepping for modern app model
@@ -26,12 +27,13 @@ public class ContextMenus : Scenario
         _cultureInfos = Application.SupportedCultures;
 
         // Setup - Create a top-level application window and configure it.
-        _appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
             SchemeName = "Runnable"
         };
+        _appWindow = appWindow;
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so

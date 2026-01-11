@@ -12,10 +12,12 @@ public class SpinnerViewStyles : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new ()
+        using Window win = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -216,6 +218,5 @@ public class SpinnerViewStyles : Scenario
             spinner.Dispose ();
             spinner = null;
         }
-        win.Dispose ();
     }
 }

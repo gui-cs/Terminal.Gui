@@ -21,12 +21,14 @@ public class RuneWidthGreaterThanOne : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
         // Window (top-level)
-        Window win = new ()
+        using Window win = new ()
         {
             X = 5,
             Y = 5,
@@ -161,7 +163,6 @@ public class RuneWidthGreaterThanOne : Scenario
         WideRunes ();
 
         app.Run (win);
-        win.Dispose ();
     }
 
     private void MixedMessage (object? sender, EventArgs e)

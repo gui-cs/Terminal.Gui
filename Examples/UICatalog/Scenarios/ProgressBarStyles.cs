@@ -25,10 +25,12 @@ public class ProgressBarStyles : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new ()
+        using Window win = new ()
         {
             Title = GetQuitKeyAndName (), BorderStyle = LineStyle.Single,
         };
@@ -294,7 +296,6 @@ public class ProgressBarStyles : Scenario
                                  300
                                 );
         app.Run (win);
-        win.Dispose ();
 
         return;
 

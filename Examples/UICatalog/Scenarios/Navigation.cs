@@ -14,10 +14,11 @@ public class Navigation : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
@@ -207,7 +208,6 @@ public class Navigation : Scenario
         app.Run (window);
         app.Iteration -= OnApplicationIteration;
         // timer.Close ();
-        window.Dispose ();
 
         return;
 

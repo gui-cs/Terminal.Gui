@@ -13,17 +13,18 @@ public class Shortcuts : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
         Key quitKey = Application.QuitKey;
-        Window window = new ();
+        using Window window = new ();
 
         window.IsModalChanged += App_Loaded;
 
         app.Run (window);
-        window.Dispose ();
         Application.QuitKey = quitKey;
     }
 

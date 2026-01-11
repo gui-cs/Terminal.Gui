@@ -16,13 +16,14 @@ public sealed class KeyBindings : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         // Init
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             SuperViewRendersLineCanvas = true,
@@ -132,7 +133,6 @@ public sealed class KeyBindings : Scenario
         // Run - Start the application.
         app.Run (appWindow);
         app.Navigation!.FocusedChanged -= Application_HasFocusChanged;
-        appWindow.Dispose ();
     }
 
 

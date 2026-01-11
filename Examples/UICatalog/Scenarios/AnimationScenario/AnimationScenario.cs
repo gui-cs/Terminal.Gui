@@ -20,10 +20,11 @@ public class AnimationScenario : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new ()
+        using Window win = new ()
         {
             Title = GetQuitKeyAndName (),
             X = 0,
@@ -52,7 +53,6 @@ public class AnimationScenario : Scenario
         win.Initialized += OnWinOnInitialized;
 
         app.Run (win);
-        win.Dispose ();
     }
 
 

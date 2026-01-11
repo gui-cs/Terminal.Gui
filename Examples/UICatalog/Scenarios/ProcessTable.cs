@@ -12,10 +12,12 @@ public class ProcessTable : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new ()
+        using Window win = new ()
         {
             Title = GetName (),
             Y = 1, // menu
@@ -41,7 +43,6 @@ public class ProcessTable : Scenario
         win.Add (_tableView);
 
         app.Run (win);
-        win.Dispose ();
     }
 
     private void CreateProcessTable ()

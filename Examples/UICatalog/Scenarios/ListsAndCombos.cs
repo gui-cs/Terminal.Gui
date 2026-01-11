@@ -13,6 +13,7 @@ public class ListsAndCombos : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         //TODO: Duplicated code in Demo.cs Consider moving to shared assembly
@@ -32,7 +33,7 @@ public class ListsAndCombos : Scenario
             }
         }
 
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
         // ListView
         Label lbListView = new ()
         {
@@ -170,6 +171,5 @@ public class ListsAndCombos : Scenario
         win.Add (btnMoveUp, btnMoveDown);
 
         app.Run (win);
-        win.Dispose ();
     }
 }

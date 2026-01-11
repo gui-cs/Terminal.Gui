@@ -10,11 +10,12 @@ public class ComboBoxIteration : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         ObservableCollection<string> items = ["one", "two", "three"];
 
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
         Label lbListView = new () { Width = 10, Height = 1 };
         win.Add (lbListView);
 
@@ -81,6 +82,5 @@ public class ComboBoxIteration : Scenario
         win.Add (btnThree);
 
         app.Run (win);
-        win.Dispose ();
     }
 }

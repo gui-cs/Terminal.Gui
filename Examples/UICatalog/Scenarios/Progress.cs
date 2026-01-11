@@ -23,11 +23,14 @@ public class Progress : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
 
-        _win = new Window { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
+        _win = win;
         // Demo #1 - Use System.Timer (and threading)
         var systemTimerDemo = new ProgressDemo
         {
@@ -149,7 +152,6 @@ public class Progress : Scenario
         _win.Add (startBoth);
 
         app.Run (_win);
-        _win.Dispose ();
     }
 
     protected override void Dispose (bool disposing)

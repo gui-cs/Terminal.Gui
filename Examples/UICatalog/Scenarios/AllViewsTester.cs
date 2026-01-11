@@ -29,10 +29,11 @@ public class AllViewsTester : Scenario
     public override void Main ()
     {
         // Don't create a sub-win (Scenario.Win); just use Application.TopRunnable
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
         };
@@ -208,7 +209,6 @@ public class AllViewsTester : Scenario
         window.Initialized += App_Initialized;
 
         app.Run (window);
-        window.Dispose ();
     }
 
     private void App_Initialized (object? sender, EventArgs e)

@@ -104,10 +104,11 @@ public class LineDrawing : Scenario
 {
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new () { Title = GetQuitKeyAndName () };
         DrawingArea canvas = new () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
 
         ToolsView tools = new () { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
@@ -124,7 +125,6 @@ public class LineDrawing : Scenario
         win.KeyDown += (s, e) => { e.Handled = canvas.NewKeyDownEvent (e); };
 
         app.Run (win);
-        win.Dispose ();
     }
 
     public static bool PromptForColor (string title, Color current, out Color newColor)

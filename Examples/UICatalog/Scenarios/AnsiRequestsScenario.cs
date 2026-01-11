@@ -25,6 +25,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
     public override void Main ()
     {
         // Init
+        ConfigurationManager.Enable (ConfigLocations.All);
         Application.Init ();
         using IApplication app = Application.Instance;
         _app = app;
@@ -48,7 +49,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         tv.AddTab (bulk, false);
 
         // Setup - Create a top-level application window and configure it.
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
         };
@@ -59,7 +60,6 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         app.Run (appWindow);
         bulk.View.Dispose ();
         single.View.Dispose ();
-        appWindow.Dispose ();
 
         _app.RemoveTimeout (_updateTimeoutToken!);
         _app.RemoveTimeout (_sendDarTimeoutToken!);

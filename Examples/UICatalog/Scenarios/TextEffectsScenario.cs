@@ -14,10 +14,12 @@ public class TextEffectsScenario : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window w = new ()
+        using Window w = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -63,7 +65,6 @@ public class TextEffectsScenario : Scenario
         w.Add (gradientsView);
 
         app.Run (w);
-        w.Dispose ();
     }
 
     private static void SetupGradientLineCanvas (View w, Size size)

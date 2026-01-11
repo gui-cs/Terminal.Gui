@@ -18,10 +18,12 @@ public class TabViewExample : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         Application.Init ();
         using IApplication app = Application.Instance;
 
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -226,7 +228,6 @@ public class TabViewExample : Scenario
         appWindow.Add (menu, _tabView, frameRight, frameBelow, statusBar);
 
         app.Run (appWindow);
-        appWindow.Dispose ();
     }
 
     private void AddBlankTab () { _tabView?.AddTab (new (), false); }
