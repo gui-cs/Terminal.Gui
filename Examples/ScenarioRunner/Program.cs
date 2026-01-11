@@ -43,6 +43,11 @@ public static class Program
                                                     "Indicates Configuration Management should not be enabled.");
         disableConfigManagement.AddAlias ("-dcm");
 
+        Option<bool> force16Colors = new (
+                                          "--force-16-colors",
+                                          "Forces the driver to use 16-color mode instead of TrueColor.");
+        force16Colors.AddAlias ("-16");
+
         Option<uint> benchmarkTimeout = new (
                                              "--timeout",
                                              () => Scenario.BenchmarkTimeout,
@@ -87,9 +92,10 @@ public static class Program
 
         runCommand.AddOption (driverOption);
         runCommand.AddOption (disableConfigManagement);
+        runCommand.AddOption (force16Colors);
         runCommand.AddOption (debugLogLevel);
 
-        runCommand.SetHandler ((scenarioName, driver, disableCm, logLevel) =>
+        runCommand.SetHandler ((scenarioName, driver, disableCm, force16, logLevel) =>
                                {
                                    SetupLogging (logLevel);
 
@@ -107,12 +113,14 @@ public static class Program
                                        return;
                                    }
 
-                                   Runner runner = new (driver);
+                                   // Pass force16 only if explicitly set (default false means not set)
+                                   Runner runner = new (driver, force16 ? true : null);
                                    runner.RunScenario (scenario, false);
                                },
                                scenarioArgument,
                                driverOption,
                                disableConfigManagement,
+                               force16Colors,
                                debugLogLevel);
 
         // Benchmark command
@@ -128,11 +136,12 @@ public static class Program
 
         benchmarkCommand.AddOption (driverOption);
         benchmarkCommand.AddOption (disableConfigManagement);
+        benchmarkCommand.AddOption (force16Colors);
         benchmarkCommand.AddOption (benchmarkTimeout);
         benchmarkCommand.AddOption (resultsFile);
         benchmarkCommand.AddOption (debugLogLevel);
 
-        benchmarkCommand.SetHandler ((scenarioName, driver, disableCm, timeout, file, logLevel) =>
+        benchmarkCommand.SetHandler ((scenarioName, driver, disableCm, force16, timeout, file, logLevel) =>
                                      {
                                          SetupLogging (logLevel);
                                          Scenario.BenchmarkTimeout = timeout;
@@ -142,7 +151,8 @@ public static class Program
                                              ConfigurationManager.Enable (ConfigLocations.All);
                                          }
 
-                                         Runner runner = new (driver);
+                                         // Pass force16 only if explicitly set
+                                         Runner runner = new (driver, force16 ? true : null);
                                          List<BenchmarkResults> results;
 
                                          if (string.IsNullOrEmpty (scenarioName))
@@ -188,6 +198,7 @@ public static class Program
                                      benchmarkScenarioArgument,
                                      driverOption,
                                      disableConfigManagement,
+                                     force16Colors,
                                      benchmarkTimeout,
                                      resultsFile,
                                      debugLogLevel);

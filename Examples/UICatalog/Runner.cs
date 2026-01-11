@@ -1,8 +1,13 @@
 #nullable enable
 using System.Data;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Text.Json;
 using Terminal.Gui.App;
+using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
 using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
@@ -15,14 +20,42 @@ namespace UICatalog;
 public class Runner
 {
     private readonly string? _forceDriver;
+    private readonly bool? _force16Colors;
+    private string? _lastDriverName;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Runner"/> class.
     /// </summary>
     /// <param name="forceDriver">The driver to use, or null to use the default.</param>
-    public Runner (string? forceDriver = null)
+    /// <param name="force16Colors">
+    ///     Whether to force 16-color mode. If null, the current setting is preserved.
+    /// </param>
+    public Runner (string? forceDriver = null, bool? force16Colors = null)
     {
         _forceDriver = forceDriver;
+        _force16Colors = force16Colors;
+    }
+
+    /// <summary>
+    ///     Applies the runtime configuration settings (ForceDriver, Force16Colors) before running a scenario.
+    /// </summary>
+    /// <remarks>
+    ///     These settings are applied to the static configuration properties which are then used
+    ///     when Application.Init() is called by the scenario.
+    /// </remarks>
+    private void ApplyRuntimeConfig ()
+    {
+        // Apply ForceDriver if specified
+        if (_forceDriver is not null)
+        {
+            Application.ForceDriver = _forceDriver;
+        }
+
+        // Apply Force16Colors if specified
+        if (_force16Colors.HasValue)
+        {
+            Driver.Force16Colors = _force16Colors.Value;
+        }
     }
 
     /// <summary>
@@ -38,7 +71,7 @@ public class Runner
             scenario.StartBenchmark ();
         }
 
-        Application.ForceDriver = _forceDriver!;
+        ApplyRuntimeConfig ();
 
         scenario.Main ();
 
@@ -209,4 +242,232 @@ public class Runner
         benchmarkWindow.Dispose ();
         Application.Shutdown ();
     }
+
+    #region Interactive Mode
+
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "Private static field naming")]
+    private static readonly FileSystemWatcher _currentDirWatcher = new ();
+
+    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "Private static field naming")]
+    private static readonly FileSystemWatcher _homeDirWatcher = new ();
+
+    private bool _configWatcherStarted;
+
+    /// <summary>
+    ///     Runs in interactive mode, showing a UI to select scenarios and running them in a loop.
+    /// </summary>
+    /// <typeparam name="T">The Runnable type to use as the scenario browser UI.</typeparam>
+    /// <param name="getSelectedScenario">
+    ///     A function that returns the selected scenario after the browser UI exits,
+    ///     or null if the user wants to quit.
+    /// </param>
+    /// <param name="enableConfigWatcher">Whether to enable config file watching.</param>
+    public void RunInteractive<T> (Func<Scenario?> getSelectedScenario, bool enableConfigWatcher = true) where T : Runnable, new ()
+    {
+        // Apply runtime configuration (ForceDriver, Force16Colors) before starting
+        ApplyRuntimeConfig ();
+
+#if DEBUG_IDISPOSABLE
+        View.EnableDebugIDisposableAsserts = true;
+#endif
+
+        if (enableConfigWatcher)
+        {
+            StartConfigWatcher ();
+        }
+
+        try
+        {
+            // Show browser UI, get selected scenario, run it, repeat until user quits
+            while (true)
+            {
+                RunBrowserUI<T> ();
+
+                Scenario? selectedScenario = getSelectedScenario ();
+
+                if (selectedScenario is null)
+                {
+                    // User wants to quit
+                    break;
+                }
+
+#if DEBUG_IDISPOSABLE
+                VerifyObjectsWereDisposed ();
+                Stopwatch sw = new ();
+                string scenarioName = selectedScenario.GetName ();
+                Application.InitializedChanged += ApplicationOnInitializedChanged;
+#endif
+
+                RunScenario (selectedScenario, false);
+
+                VerifyObjectsWereDisposed ();
+
+#if DEBUG_IDISPOSABLE
+                Application.InitializedChanged -= ApplicationOnInitializedChanged;
+
+                void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
+                {
+                    if (e.Value)
+                    {
+                        sw.Start ();
+                        string? scenarioDriver = Application.Driver!.GetName ();
+                        Debug.Assert (scenarioDriver == _lastDriverName);
+                    }
+                    else
+                    {
+                        sw.Stop ();
+                        Logging.Trace ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
+                    }
+                }
+#endif
+            }
+        }
+        finally
+        {
+            if (enableConfigWatcher)
+            {
+                StopConfigWatcher ();
+            }
+
+            VerifyObjectsWereDisposed ();
+        }
+    }
+
+    /// <summary>
+    ///     Runs the browser UI.
+    /// </summary>
+    /// <typeparam name="T">The Runnable type to use as the browser UI.</typeparam>
+    private void RunBrowserUI<T> () where T : Runnable, new ()
+    {
+        Application.Init (_forceDriver);
+        _lastDriverName = Application.Driver!.GetName ();
+
+        Application.Run<T> ();
+        Application.Shutdown ();
+
+        VerifyObjectsWereDisposed ();
+    }
+
+    /// <summary>
+    ///     Starts watching for configuration file changes.
+    /// </summary>
+    public void StartConfigWatcher ()
+    {
+        if (_configWatcherStarted)
+        {
+            return;
+        }
+
+        // Set up a file system watcher for `./.tui/`
+        _currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
+
+        string assemblyLocation = Assembly.GetExecutingAssembly ().Location;
+        string tuiDir;
+
+        if (!string.IsNullOrEmpty (assemblyLocation))
+        {
+            FileInfo assemblyFile = new (assemblyLocation);
+            tuiDir = Path.Combine (assemblyFile.Directory!.FullName, ".tui");
+        }
+        else
+        {
+            tuiDir = Path.Combine (AppContext.BaseDirectory, ".tui");
+        }
+
+        if (!Directory.Exists (tuiDir))
+        {
+            Directory.CreateDirectory (tuiDir);
+        }
+
+        _currentDirWatcher.Path = tuiDir;
+        _currentDirWatcher.Filter = "*config.json";
+
+        // Set up a file system watcher for `~/.tui/`
+        _homeDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
+        FileInfo homeDir = new (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
+        tuiDir = Path.Combine (homeDir.FullName, ".tui");
+
+        if (!Directory.Exists (tuiDir))
+        {
+            Directory.CreateDirectory (tuiDir);
+        }
+
+        _homeDirWatcher.Path = tuiDir;
+        _homeDirWatcher.Filter = "*config.json";
+
+        _currentDirWatcher.Changed += ConfigFileChanged;
+        _currentDirWatcher.EnableRaisingEvents = true;
+
+        _homeDirWatcher.Changed += ConfigFileChanged;
+        _homeDirWatcher.EnableRaisingEvents = true;
+
+        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
+
+        _configWatcherStarted = true;
+    }
+
+    /// <summary>
+    ///     Stops watching for configuration file changes.
+    /// </summary>
+    public void StopConfigWatcher ()
+    {
+        if (!_configWatcherStarted)
+        {
+            return;
+        }
+
+        ThemeManager.ThemeChanged -= ThemeManagerOnThemeChanged;
+
+        _currentDirWatcher.EnableRaisingEvents = false;
+        _currentDirWatcher.Changed -= ConfigFileChanged;
+
+        _homeDirWatcher.EnableRaisingEvents = false;
+        _homeDirWatcher.Changed -= ConfigFileChanged;
+
+        _configWatcherStarted = false;
+    }
+
+    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e)
+    {
+        ConfigurationManager.Apply ();
+    }
+
+    private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
+    {
+        if (Application.TopRunnableView is null)
+        {
+            return;
+        }
+
+        Logging.Debug ($"{e.FullPath} {e.ChangeType} - Loading and Applying");
+        ConfigurationManager.Load (ConfigLocations.All);
+        ConfigurationManager.Apply ();
+    }
+
+    /// <summary>
+    ///     Verifies that all View objects were properly disposed (DEBUG_IDISPOSABLE only).
+    /// </summary>
+    public static void VerifyObjectsWereDisposed ()
+    {
+#if DEBUG_IDISPOSABLE
+        if (!View.EnableDebugIDisposableAsserts)
+        {
+            View.Instances.Clear ();
+
+            return;
+        }
+
+        // Validate there are no outstanding View instances
+        // after a scenario was selected to run. This proves the main UI Catalog
+        // 'app' closed cleanly.
+        foreach (View? inst in View.Instances)
+        {
+            Logging.Error ($"View instance not disposed: {inst}:{inst.Title}");
+        }
+
+        View.Instances.Clear ();
+#endif
+    }
+
+    #endregion Interactive Mode
 }

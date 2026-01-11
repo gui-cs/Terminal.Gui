@@ -14,7 +14,6 @@ using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -54,10 +53,6 @@ namespace UICatalog;
 public class UICatalog
 {
     private static string? _forceDriver;
-    private static string? _uiCatalogDriver;
-#if DEBUG_IDISPOSABLE
-    private static string? _scenarioDriver;
-#endif
     public static string LogFilePath { get; set; } = string.Empty;
     public static LoggingLevelSwitch LogLevelSwitch { get; } = new ();
     public const string LOGFILE_LOCATION = "logs";
@@ -109,6 +104,11 @@ public class UICatalog
         benchmarkFlag.AddAlias ("-b");
         benchmarkFlag.AddAlias ("--b");
 
+        Option<bool> force16ColorsOption = new (
+                                                "--force-16-colors",
+                                                "Forces the driver to use 16-color mode instead of TrueColor.");
+        force16ColorsOption.AddAlias ("-16");
+
         Option<uint> benchmarkTimeout = new (
                                              "--timeout",
                                              () => Scenario.BenchmarkTimeout,
@@ -143,12 +143,14 @@ public class UICatalog
 
         var rootCommand = new RootCommand ("A comprehensive sample library and test app for Terminal.Gui")
         {
-            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption, disableConfigManagement
+            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption, disableConfigManagement, force16ColorsOption
         };
 
         rootCommand.SetHandler (context =>
                                 {
-                                    var options = new UICatalogCommandLineOptions
+                                    bool force16 = context.ParseResult.GetValueForOption (force16ColorsOption);
+
+                                    UICatalogCommandLineOptions options = new ()
                                     {
                                         Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
                                         Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
@@ -156,8 +158,9 @@ public class UICatalog
                                         Benchmark = context.ParseResult.GetValueForOption (benchmarkFlag),
                                         BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
                                         ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
-                                        DebugLogLevel = context.ParseResult.GetValueForOption (debugLogLevel) ?? "Warning"
-                                        /* etc. */
+                                        DebugLogLevel = context.ParseResult.GetValueForOption (debugLogLevel) ?? "Warning",
+                                        // Only set Force16Colors if explicitly specified on command line
+                                        Force16Colors = force16 ? true : null
                                     };
 
                                     // See https://github.com/dotnet/command-line-api/issues/796 for the rationale behind this hackery
@@ -243,124 +246,14 @@ public class UICatalog
         return loggerFactory.CreateLogger ("Global Logger");
     }
 
-    /// <summary>
-    ///     Shows the UI Catalog selection UI. When the user selects a Scenario to run, the UI Catalog main app UI is
-    ///     killed and the Scenario is run as though it were Application.TopRunnable. When the Scenario exits, this function
-    ///     exits.
-    /// </summary>
-    /// <returns></returns>
-    private static Scenario RunUICatalogRunnable ()
-    {
-        // Run UI Catalog UI. When it exits, if _selectedScenario is != null then
-        // a Scenario was selected. Otherwise, the user wants to quit UI Catalog.
-
-        // If the user specified a driver on the command line then use it,
-        // ignoring Config files.
-
-        Application.Init (_forceDriver);
-
-        _uiCatalogDriver = Application.Driver!.GetName ();
-
-        Application.Run<UICatalogRunnable> ();
-        Application.Shutdown ();
-        VerifyObjectsWereDisposed ();
-
-        return UICatalogRunnable.CachedSelectedScenario!;
-    }
-
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    private static readonly FileSystemWatcher _currentDirWatcher = new ();
-
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    private static readonly FileSystemWatcher _homeDirWatcher = new ();
-
-    private static void StartConfigWatcher ()
-    {
-        // Set up a file system watcher for `./.tui/`
-        _currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
-
-        string assemblyLocation = Assembly.GetExecutingAssembly ().Location;
-        string tuiDir;
-
-        if (!string.IsNullOrEmpty (assemblyLocation))
-        {
-            var assemblyFile = new FileInfo (assemblyLocation);
-            tuiDir = Path.Combine (assemblyFile.Directory!.FullName, ".tui");
-        }
-        else
-        {
-            tuiDir = Path.Combine (AppContext.BaseDirectory, ".tui");
-        }
-
-        if (!Directory.Exists (tuiDir))
-        {
-            Directory.CreateDirectory (tuiDir);
-        }
-
-        _currentDirWatcher.Path = tuiDir;
-        _currentDirWatcher.Filter = "*config.json";
-
-        // Set up a file system watcher for `~/.tui/`
-        _homeDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
-        var f = new FileInfo (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
-        tuiDir = Path.Combine (f.FullName, ".tui");
-
-        if (!Directory.Exists (tuiDir))
-        {
-            Directory.CreateDirectory (tuiDir);
-        }
-
-        _homeDirWatcher.Path = tuiDir;
-        _homeDirWatcher.Filter = "*config.json";
-
-        _currentDirWatcher.Changed += ConfigFileChanged;
-
-        //_currentDirWatcher.Created += ConfigFileChanged;
-        _currentDirWatcher.EnableRaisingEvents = true;
-
-        _homeDirWatcher.Changed += ConfigFileChanged;
-
-        //_homeDirWatcher.Created += ConfigFileChanged;
-        _homeDirWatcher.EnableRaisingEvents = true;
-
-        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
-    }
-
-    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e) { CM.Apply (); }
-
-    private static void StopConfigWatcher ()
-    {
-        ThemeManager.ThemeChanged += ThemeManagerOnThemeChanged;
-
-        _currentDirWatcher.EnableRaisingEvents = false;
-        _currentDirWatcher.Changed -= ConfigFileChanged;
-        _currentDirWatcher.Created -= ConfigFileChanged;
-
-        _homeDirWatcher.EnableRaisingEvents = false;
-        _homeDirWatcher.Changed -= ConfigFileChanged;
-        _homeDirWatcher.Created -= ConfigFileChanged;
-    }
-
-    private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
-    {
-        if (Application.TopRunnableView == null)
-        {
-            return;
-        }
-
-        Logging.Debug ($"{e.FullPath} {e.ChangeType} - Loading and Applying");
-        ConfigurationManager.Load (ConfigLocations.All);
-        ConfigurationManager.Apply ();
-    }
-
     private static void UICatalogMain (UICatalogCommandLineOptions options)
     {
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
         Application.ForceDriver = _forceDriver = options.Driver;
 
-        // Create the runner for executing scenarios
-        Runner runner = new (_forceDriver);
+        // Create the runner for executing scenarios with runtime config options
+        Runner runner = new (_forceDriver, options.Force16Colors);
 
         // If a Scenario name has been provided on the commandline
         // run it and exit when done.
@@ -391,7 +284,7 @@ public class UICatalog
                                                              }));
             }
 
-            VerifyObjectsWereDisposed ();
+            Runner.VerifyObjectsWereDisposed ();
 
             return;
         }
@@ -416,75 +309,14 @@ public class UICatalog
             return;
         }
 
-#if DEBUG_IDISPOSABLE
-        View.EnableDebugIDisposableAsserts = true;
-#endif
-
+        // Interactive mode: show browser UI and run selected scenarios in a loop
         if (!Options.DontEnableConfigurationManagement)
         {
             ConfigurationManager.Enable (ConfigLocations.All);
-            StartConfigWatcher ();
         }
 
-        while (RunUICatalogRunnable () is { } scenario)
-        {
-#if DEBUG_IDISPOSABLE
-            VerifyObjectsWereDisposed ();
-
-            // Measure how long it takes for the app to shut down
-            var sw = new Stopwatch ();
-            string scenarioName = scenario.GetName ();
-            Application.InitializedChanged += ApplicationOnInitializedChanged;
-#endif
-
-            runner.RunScenario (scenario, false);
-
-            VerifyObjectsWereDisposed ();
-
-#if DEBUG_IDISPOSABLE
-            Application.InitializedChanged -= ApplicationOnInitializedChanged;
-
-            void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
-            {
-                if (e.Value)
-                {
-                    sw.Start ();
-                    _scenarioDriver = Application.Driver!.GetName ();
-                    Debug.Assert (_scenarioDriver == _uiCatalogDriver);
-                }
-                else
-                {
-                    sw.Stop ();
-                    Logging.Trace ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
-                }
-            }
-#endif
-        }
-
-        StopConfigWatcher ();
-        VerifyObjectsWereDisposed ();
-    }
-
-    private static void VerifyObjectsWereDisposed ()
-    {
-#if DEBUG_IDISPOSABLE
-        if (!View.EnableDebugIDisposableAsserts)
-        {
-            View.Instances.Clear ();
-
-            return;
-        }
-
-        // Validate there are no outstanding View instances 
-        // after a scenario was selected to run. This proves the main UI Catalog
-        // 'app' closed cleanly.
-        foreach (View? inst in View.Instances)
-        {
-            //Debug.Assert (inst.WasDisposed);
-            Logging.Error ($"View instance not disposed: {inst}:{inst.Title}");
-        }
-
-        View.Instances.Clear ();
-#endif
+        runner.RunInteractive<UICatalogRunnable> (
+                                                  () => UICatalogRunnable.CachedSelectedScenario,
+                                                  !Options.DontEnableConfigurationManagement);
     }
 }
