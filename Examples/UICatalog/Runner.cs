@@ -1,16 +1,7 @@
 #nullable enable
 using System.Data;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
-using Terminal.Gui.App;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
-using Terminal.Gui.Input;
-using Terminal.Gui.ViewBase;
-using Terminal.Gui.Views;
 
 namespace UICatalog;
 
@@ -21,7 +12,6 @@ public class Runner
 {
     private readonly string? _forceDriver;
     private readonly bool? _force16Colors;
-    private string? _lastDriverName;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Runner"/> class.
@@ -46,7 +36,7 @@ public class Runner
     private void ApplyRuntimeConfig ()
     {
         // Apply ForceDriver if specified
-        if (_forceDriver is not null)
+        if (_forceDriver is { })
         {
             Application.ForceDriver = _forceDriver;
         }
@@ -83,11 +73,6 @@ public class Runner
         }
 
         scenario.Dispose ();
-
-        if (Application.Driver is { })
-        {
-            Application.Shutdown ();
-        }
 
         return results;
     }
@@ -144,16 +129,15 @@ public class Runner
             return;
         }
 
-        Application.Init ();
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        Window benchmarkWindow = new ()
-        {
-            Title = "Benchmark Results"
-        };
+        using Window benchmarkWindow = new ();
+        benchmarkWindow.Title = "Benchmark Results";
 
         if (benchmarkWindow.Border is { })
         {
-            benchmarkWindow.Border!.Thickness = new Thickness (0, 0, 0, 0);
+            benchmarkWindow.Border!.Thickness = new (0, 0, 0, 0);
         }
 
         TableView resultsTableView = new ()
@@ -211,7 +195,7 @@ public class Runner
         BenchmarkResults totalRow = new ()
         {
             Scenario = "TOTAL",
-            Duration = new TimeSpan (results.Sum (r => r.Duration.Ticks)),
+            Duration = new (results.Sum (r => r.Duration.Ticks)),
             RefreshedCount = results.Sum (r => r.RefreshedCount),
             LaidOutCount = results.Sum (r => r.LaidOutCount),
             ClearedContentCount = results.Sum (r => r.ClearedContentCount),
@@ -238,17 +222,12 @@ public class Runner
 
         benchmarkWindow.Add (resultsTableView);
 
-        Application.Run (benchmarkWindow);
-        benchmarkWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (benchmarkWindow);
     }
 
     #region Interactive Mode
 
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "Private static field naming")]
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
-
-    [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "Private static field naming")]
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
 
     private bool _configWatcherStarted;
@@ -281,7 +260,7 @@ public class Runner
             // Show browser UI, get selected scenario, run it, repeat until user quits
             while (true)
             {
-                RunBrowserUI<T> ();
+                using IApplication app = RunBrowserUI<T> ();
 
                 Scenario? selectedScenario = getSelectedScenario ();
 
@@ -291,35 +270,35 @@ public class Runner
                     break;
                 }
 
-#if DEBUG_IDISPOSABLE
-                VerifyObjectsWereDisposed ();
-                Stopwatch sw = new ();
-                string scenarioName = selectedScenario.GetName ();
-                Application.InitializedChanged += ApplicationOnInitializedChanged;
-#endif
+//#if DEBUG_IDISPOSABLE
+//                VerifyObjectsWereDisposed ();
+//                Stopwatch sw = new ();
+//                string scenarioName = selectedScenario.GetName ();
+//                app.InitializedChanged += ApplicationOnInitializedChanged;
+//#endif
 
                 RunScenario (selectedScenario, false);
 
                 VerifyObjectsWereDisposed ();
 
-#if DEBUG_IDISPOSABLE
-                Application.InitializedChanged -= ApplicationOnInitializedChanged;
+//#if DEBUG_IDISPOSABLE
+//                Application.InitializedChanged -= ApplicationOnInitializedChanged;
 
-                void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
-                {
-                    if (e.Value)
-                    {
-                        sw.Start ();
-                        string? scenarioDriver = Application.Driver!.GetName ();
-                        Debug.Assert (scenarioDriver == _lastDriverName);
-                    }
-                    else
-                    {
-                        sw.Stop ();
-                        Logging.Trace ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
-                    }
-                }
-#endif
+//                void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
+//                {
+//                    if (e.Value)
+//                    {
+//                        sw.Start ();
+//                        string? scenarioDriver = Application.Driver!.GetName ();
+//                        Debug.Assert (scenarioDriver == _lastDriverName);
+//                    }
+//                    else
+//                    {
+//                        sw.Stop ();
+//                        Logging.Trace ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
+//                    }
+//                }
+//#endif
             }
         }
         finally
@@ -337,15 +316,15 @@ public class Runner
     ///     Runs the browser UI.
     /// </summary>
     /// <typeparam name="T">The Runnable type to use as the browser UI.</typeparam>
-    private void RunBrowserUI<T> () where T : Runnable, new ()
+    private IApplication RunBrowserUI<T> () where T : Runnable, new ()
     {
-        Application.Init (_forceDriver);
-        _lastDriverName = Application.Driver!.GetName ();
+        IApplication app = Application.Create ();
+        app.Init (_forceDriver);
 
-        Application.Run<T> ();
-        Application.Shutdown ();
+        app.Run<T> ();
 
-        VerifyObjectsWereDisposed ();
+        //VerifyObjectsWereDisposed ();
+        return app;
     }
 
     /// <summary>
@@ -427,18 +406,10 @@ public class Runner
         _configWatcherStarted = false;
     }
 
-    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e)
-    {
-        ConfigurationManager.Apply ();
-    }
+    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e) { ConfigurationManager.Apply (); }
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {
-        if (Application.TopRunnableView is null)
-        {
-            return;
-        }
-
         Logging.Debug ($"{e.FullPath} {e.ChangeType} - Loading and Applying");
         ConfigurationManager.Load (ConfigLocations.All);
         ConfigurationManager.Apply ();
@@ -460,7 +431,7 @@ public class Runner
         // Validate there are no outstanding View instances
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
-        foreach (View? inst in View.Instances)
+        foreach (View inst in View.Instances)
         {
             Logging.Error ($"View instance not disposed: {inst}:{inst.Title}");
         }

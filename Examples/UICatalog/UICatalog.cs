@@ -1,6 +1,5 @@
 ﻿global using Attribute = Terminal.Gui.Drawing.Attribute;
 global using Color = Terminal.Gui.Drawing.Color;
-global using CM = Terminal.Gui.Configuration.ConfigurationManager;
 global using Terminal.Gui.App;
 global using Terminal.Gui.ViewBase;
 global using Terminal.Gui.Drivers;
@@ -22,7 +21,6 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using Command = Terminal.Gui.Input.Command;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 #nullable enable
@@ -74,7 +72,7 @@ public class UICatalog
 
         // If no driver is provided, the default driver is used.
         // Get allowed driver names
-        string? [] allowedDrivers = Application.GetDriverTypes ().Item2.ToArray ();
+        string? [] allowedDrivers = DriverRegistry.GetDriverNames ().ToArray ();
 
         Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.")
             .FromAmong (allowedDrivers!);
@@ -159,6 +157,7 @@ public class UICatalog
                                         BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
                                         ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
                                         DebugLogLevel = context.ParseResult.GetValueForOption (debugLogLevel) ?? "Warning",
+
                                         // Only set Force16Colors if explicitly specified on command line
                                         Force16Colors = force16 ? true : null
                                     };
@@ -171,7 +170,7 @@ public class UICatalog
         var helpShown = false;
 
         Parser parser = new CommandLineBuilder (rootCommand)
-                        .UseHelp (ctx => helpShown = true)
+                        .UseHelp (_ => helpShown = true)
                         .Build ();
 
         parser.Invoke (args);
@@ -198,8 +197,6 @@ public class UICatalog
         Logging.Logger = CreateLogger ();
 
         UICatalogMain (Options);
-
-        Application.ForceDriver = string.Empty;
 
         return 0;
     }
@@ -265,7 +262,7 @@ public class UICatalog
             }
 
             int item = UICatalogRunnable.CachedScenarios!.IndexOf (
-                                                                   UICatalogRunnable.CachedScenarios!.FirstOrDefault (s =>
+                                                                   UICatalogRunnable.CachedScenarios.FirstOrDefault (s =>
                                                                            s.GetName ()
                                                                             .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
                                                                        )!);
