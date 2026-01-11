@@ -127,18 +127,18 @@ public class LineDrawing : Scenario
         app.Run (win);
     }
 
-    public static bool PromptForColor (string title, Color current, out Color newColor)
+    public static bool PromptForColor (IApplication app, string title, Color current, out Color newColor)
     {
         var accept = false;
 
-        Dialog d = new Dialog
+        Dialog d = new ()
         {
             Title = title,
             Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
         };
 
         View cp;
-        if (Driver.Force16Colors)
+        if (app.Driver!.Force16Colors)
         {
             cp = new ColorPicker16
             {
@@ -159,10 +159,10 @@ public class LineDrawing : Scenario
 
         d.Add (cp);
 
-        d.App?.Run (d);
+        app.Run (d);
         accept = d.Result == 1;
         d.Dispose ();
-        newColor = Driver.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
+        newColor = app.Driver!.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }
@@ -422,7 +422,7 @@ public class AttributeView : View
 
     private void ClickedInBackground ()
     {
-        if (LineDrawing.PromptForColor ("Background", Value.Background, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Background", Value.Background, out Color newColor))
         {
             Value = new (Value.Foreground, newColor, Value.Style);
             SetNeedsDraw ();
@@ -431,7 +431,7 @@ public class AttributeView : View
 
     private void ClickedInForeground ()
     {
-        if (LineDrawing.PromptForColor ("Foreground", Value.Foreground, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Foreground", Value.Foreground, out Color newColor))
         {
             Value = new (newColor, Value.Background);
             SetNeedsDraw ();

@@ -79,9 +79,10 @@ public class ProgressBarStyles : Scenario
         fgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
+                                                                         (s as View)!.App!,
                                                                          fgColorPickerBtn.Text,
                                                                          editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                         out var newColor
+                                                                         out Color newColor
                                                                         ))
                                         {
                                             return;
@@ -110,10 +111,11 @@ public class ProgressBarStyles : Scenario
         bgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
+                                                                         (s as View)!.App!,
                                                                          fgColorPickerBtn.Text,
                                                                          editor.ViewToEdit!.GetAttributeForRole (VisualRole.Active)
                                                                                .Background
-                                                                        , out var newColor))
+                                                                        , out Color newColor))
 
                                         {
                                             return;

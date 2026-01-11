@@ -345,7 +345,7 @@ internal class RegionAttributeView : View
 
     private void ClickedInBackground ()
     {
-        if (LineDrawing.PromptForColor ("Background", Value!.Value.Background, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Background", Value!.Value.Background, out Color newColor))
         {
             Value = new (Value!.Value.Foreground, newColor);
             SetNeedsDraw ();
@@ -354,7 +354,7 @@ internal class RegionAttributeView : View
 
     private void ClickedInForeground ()
     {
-        if (LineDrawing.PromptForColor ("Foreground", Value!.Value.Foreground, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Foreground", Value!.Value.Foreground, out Color newColor))
         {
             Value = new (newColor, Value!.Value.Background);
             SetNeedsDraw ();

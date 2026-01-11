@@ -69,6 +69,8 @@ public class ScenarioTests : TestsAllViews
         // Track if we've already unsubscribed to prevent double-removal
         var iterationHandlerRemoved = false;
 
+        Exception? scenarioException = null;
+
         try
         {
             scenario = Activator.CreateInstance (scenarioType) as Scenario;
@@ -81,6 +83,12 @@ public class ScenarioTests : TestsAllViews
             Application.ForceDriver = DriverRegistry.Names.ANSI;
             scenario!.Main ();
             Application.ForceDriver = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            // Catch exceptions to prevent test host crashes
+            scenarioException = ex;
+            _output.WriteLine ($"Scenario '{scenarioName}' threw exception: {ex}");
         }
         finally
         {
@@ -114,6 +122,9 @@ public class ScenarioTests : TestsAllViews
                      shutdownGracefully,
                      $"Scenario '{scenarioName}' failed to quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. "
                      + $"TimeoutFired={timeoutFired}");
+
+        // Fail the test if an exception was thrown (but don't crash the test host)
+        Assert.Null (scenarioException);
 
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
