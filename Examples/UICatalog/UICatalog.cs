@@ -274,7 +274,7 @@ public class UICatalog
         if (options.Scenario != "none")
         {
 
-            BenchmarkResults? results = runner.RunScenario (options.Scenario, false);
+            BenchmarkResults? results = runner.RunScenario (options.Scenario, options.Benchmark);
 
             if (results is { })
             {

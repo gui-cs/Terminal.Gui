@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Terminal.Gui.Testing;
 
 namespace UICatalog;
 
@@ -41,49 +42,18 @@ namespace UICatalog;
 ///         run the selected scenario. Press the default quit key to quit.
 ///     </para>
 /// </summary>
-/// <example>
-///     The example below is provided in the `Scenarios` directory as a generic sample that can be copied and re-named:
-///     <code>
-/// using Terminal.Gui;
-/// 
-/// namespace UICatalog.Scenarios;
-/// 
-/// [ScenarioMetadata ("Generic", "Generic sample - A template for creating new Scenarios")]
-/// [ScenarioCategory ("Controls")]
-/// public sealed class MyScenario : Scenario
-/// {
-///     public override void Main ()
-///     {
-///         // Enable ConfigurationManager to pick up settings from the runner (UICatalog)
-///         ConfigurationManager.Enable (ConfigLocations.All);
-/// 
-///         // Init
-///         Application.Init ();
-///         using IApplication app = Application.Instance;
-/// 
-///         // Setup - Create a top-level application window and configure it.
-///         using Window appWindow = new ()
-///         {
-///             Title = GetQuitKeyAndName (),
-///         };
-/// 
-///         Button button = new () { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
-///         button.Accepting += (s, e) =&gt;
-///         {
-///             MessageBox.ErrorQuery (app, "Error", "You pressed the button!", "Ok");
-///             e.Handled = true;
-///         };
-///         appWindow.Add (button);
-/// 
-///         // Run - Start the application.
-///         app.Run (appWindow);
-///     }
-/// }
-///  </code>
-/// </example>
 public class Scenario : IDisposable
 {
     private static int _maxScenarioNameLen = 30;
+
+    /// <summary>
+    ///     Gets the benchmark results collected during benchmarking mode.
+    /// </summary>
+    /// <remarks>
+    ///     This property is populated when <see cref="StartBenchmark"/> is called before <see cref="Main"/>
+    ///     and <see cref="EndBenchmark"/> is called after. The results include iteration counts, timing data,
+    ///     and various rendering metrics.
+    /// </remarks>
     public BenchmarkResults BenchmarkResults { get; } = new ();
 
     private bool _disposedValue;
@@ -93,22 +63,22 @@ public class Scenario : IDisposable
     ///     <see cref="ScenarioCategory"/>)
     /// </summary>
     /// <returns>list of category names</returns>
-    public List<string> GetCategories () { return ScenarioCategory.GetCategories (GetType ()); }
+    public List<string> GetCategories () => ScenarioCategory.GetCategories (GetType ());
 
     /// <summary>Helper to get the <see cref="Scenario"/> Description (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetDescription () { return ScenarioMetadata.GetDescription (GetType ()); }
+    public string GetDescription () => ScenarioMetadata.GetDescription (GetType ());
 
     /// <summary>Helper to get the <see cref="Scenario"/> Name (defined in <see cref="ScenarioMetadata"/>)</summary>
     /// <returns></returns>
-    public string GetName () { return ScenarioMetadata.GetName (GetType ()); }
+    public string GetName () => ScenarioMetadata.GetName (GetType ());
 
     /// <summary>
     ///     Helper to get the <see cref="Application.QuitKey"/> and the <see cref="Scenario"/> Name (defined in
     ///     <see cref="ScenarioMetadata"/>)
     /// </summary>
     /// <returns></returns>
-    public string GetQuitKeyAndName () { return $"{Application.QuitKey} to Quit - Scenario: {GetName ()}"; }
+    public string GetQuitKeyAndName () => $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
 
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
@@ -145,21 +115,56 @@ public class Scenario : IDisposable
     private const uint BENCHMARK_MAX_NATURAL_ITERATIONS = 500; // not including needed for demo keys
     private const int BENCHMARK_KEY_PACING = 10; // Must be non-zero
 
+    /// <summary>
+    ///     Gets or sets the maximum time in milliseconds to run a benchmark before forcing the scenario to quit.
+    /// </summary>
+    /// <remarks>
+    ///     If the scenario does not exit within this timeout, <see cref="IApplication.RequestStop()"/> will be called
+    ///     to force it to quit. The default value is 2500ms.
+    /// </remarks>
     public static uint BenchmarkTimeout { get; set; } = 2500;
 
     private readonly object _timeoutLock = new ();
     private object? _timeout;
     private Stopwatch? _stopwatch;
+    private IApplication? _benchmarkApp;
 
+    /// <summary>
+    ///     Starts benchmarking mode for this scenario.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Call this method before calling <see cref="Main"/> to enable benchmark metrics collection.
+    ///         This subscribes to <see cref="Application.InstanceInitialized"/> and <see cref="Application.InstanceDisposed"/>
+    ///         to track the application instance created by the scenario.
+    ///     </para>
+    ///     <para>
+    ///         When benchmarking is enabled, the scenario will automatically quit after <see cref="BenchmarkTimeout"/>
+    ///         milliseconds or after a maximum number of iterations, whichever comes first.
+    ///     </para>
+    /// </remarks>
+    /// <seealso cref="EndBenchmark"/>
+    /// <seealso cref="BenchmarkResults"/>
     public void StartBenchmark ()
     {
         BenchmarkResults.Scenario = GetName ();
-        Application.InitializedChanged += OnApplicationOnInitializedChanged;
+        Application.InstanceInitialized += OnApplicationInstanceInitialized;
+        Application.InstanceDisposed += OnApplicationInstanceDisposed;
     }
 
+    /// <summary>
+    ///     Ends benchmarking mode and returns the collected results.
+    /// </summary>
+    /// <returns>The <see cref="BenchmarkResults"/> containing metrics collected during the benchmark run.</returns>
+    /// <remarks>
+    ///     Call this method after <see cref="Main"/> returns to clean up benchmark subscriptions and
+    ///     retrieve the collected metrics.
+    /// </remarks>
+    /// <seealso cref="StartBenchmark"/>
     public BenchmarkResults EndBenchmark ()
     {
-        Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+        Application.InstanceInitialized -= OnApplicationInstanceInitialized;
+        Application.InstanceDisposed -= OnApplicationInstanceDisposed;
 
         lock (_timeoutLock)
         {
@@ -169,40 +174,44 @@ public class Scenario : IDisposable
             }
         }
 
+        _benchmarkApp = null;
+
         return BenchmarkResults;
     }
 
     private List<Key>? _demoKeys;
     private int _currentDemoKey;
 
-    private void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
+    private void OnApplicationInstanceInitialized (object? s, EventArgs<IApplication> a)
     {
-        if (a.Value)
+        _benchmarkApp = a.Value;
+
+        lock (_timeoutLock)
         {
-            lock (_timeoutLock!)
-            {
-                _timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (BenchmarkTimeout), ForceCloseCallback);
-            }
-
-            Application.Iteration += OnApplicationOnIteration;
-
-            Application.Driver!.ClearedContents += OnClearedContents;
-            Application.SessionBegun += OnApplicationSessionBegun;
-
-            _stopwatch = Stopwatch.StartNew ();
-        }
-        else
-        {
-            Application.Driver!.ClearedContents -= OnClearedContents;
-            Application.SessionBegun -= OnApplicationSessionBegun;
-            Application.Iteration -= OnApplicationOnIteration;
-            BenchmarkResults.Duration = _stopwatch!.Elapsed;
-            _stopwatch?.Stop ();
+            _timeout = _benchmarkApp.AddTimeout (TimeSpan.FromMilliseconds (BenchmarkTimeout), ForceCloseCallback);
         }
 
-        return;
+        _benchmarkApp.Iteration += OnApplicationOnIteration;
+        _benchmarkApp.Driver!.ClearedContents += OnClearedContents;
+        _benchmarkApp.SessionBegun += OnApplicationSessionBegun;
 
-        void OnClearedContents (object? sender, EventArgs args) { BenchmarkResults.ClearedContentCount++; }
+        _stopwatch = Stopwatch.StartNew ();
+    }
+
+    private void OnClearedContents (object? sender, EventArgs args) { BenchmarkResults.ClearedContentCount++; }
+
+    private void OnApplicationInstanceDisposed (object? s, EventArgs<IApplication> a)
+    {
+        if (a.Value != _benchmarkApp)
+        {
+            return;
+        }
+
+        _benchmarkApp.Driver!.ClearedContents -= OnClearedContents;
+        _benchmarkApp.SessionBegun -= OnApplicationSessionBegun;
+        _benchmarkApp.Iteration -= OnApplicationOnIteration;
+        BenchmarkResults.Duration = _stopwatch!.Elapsed;
+        _stopwatch?.Stop ();
     }
 
     private void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
@@ -215,27 +224,25 @@ public class Scenario : IDisposable
         }
     }
 
-    // BUGBUG: This is incompatible with modals. This should be using the new equivalent of Runnable.Ready 
-    // BUGBUG: which will be IsRunningChanged with newIsRunning == true
     private void OnApplicationSessionBegun (object? sender, SessionTokenEventArgs e)
     {
-        SubscribeAllSubViews (Application.TopRunnableView!);
+        SubscribeAllSubViews (_benchmarkApp!.TopRunnableView!);
 
-        _demoKeys = GetDemoKeyStrokes (Application.Instance);
+        _demoKeys = GetDemoKeyStrokes (_benchmarkApp);
 
-        Application.AddTimeout (
-                                new (0, 0, 0, 0, BENCHMARK_KEY_PACING),
-                                () =>
-                                {
-                                    if (_currentDemoKey >= _demoKeys.Count)
-                                    {
-                                        return false;
-                                    }
+        _benchmarkApp.AddTimeout (
+                                  new (0, 0, 0, 0, BENCHMARK_KEY_PACING),
+                                  () =>
+                                  {
+                                      if (_currentDemoKey >= _demoKeys.Count)
+                                      {
+                                          return false;
+                                      }
 
-                                    Application.RaiseKeyDownEvent (_demoKeys [_currentDemoKey++]);
+                                      _benchmarkApp.InjectKey (_demoKeys [_currentDemoKey++]);
 
-                                    return true;
-                                });
+                                      return true;
+                                  });
 
         return;
 
@@ -243,8 +250,8 @@ public class Scenario : IDisposable
         // and subscribe to their DrawComplete event
         void SubscribeAllSubViews (View view)
         {
-            view.DrawComplete += (s, a) => BenchmarkResults.DrawCompleteCount++;
-            view.SubViewsLaidOut += (s, a) => BenchmarkResults.LaidOutCount++;
+            view.DrawComplete += (_, _) => BenchmarkResults.DrawCompleteCount++;
+            view.SubViewsLaidOut += (_, _) => BenchmarkResults.LaidOutCount++;
 
             foreach (View subview in view.SubViews)
             {
@@ -264,17 +271,17 @@ public class Scenario : IDisposable
             }
         }
 
-        Logging.Trace (
+        Logging.Warning (
                        $@"  Failed to Quit with {Application.QuitKey} after {BenchmarkTimeout}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
 
-        Application.RequestStop ();
+        _benchmarkApp?.RequestStop ();
 
         return false;
     }
 
     /// <summary>Gets the Scenario Name + Description with the Description padded based on the longest known Scenario name.</summary>
     /// <returns></returns>
-    public override string ToString () { return $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}"; }
+    public override string ToString () => $"{GetName ().PadRight (_maxScenarioNameLen)}{GetDescription ()}";
 
     #region IDispose
 
@@ -324,5 +331,18 @@ public class Scenario : IDisposable
         return categories;
     }
 
-    public virtual List<Key> GetDemoKeyStrokes (IApplication? app) { return []; }
+    /// <summary>
+    ///     Gets a list of keystrokes to simulate during benchmarking to exercise the scenario's UI.
+    /// </summary>
+    /// <param name="app">The application instance running the scenario.</param>
+    /// <returns>
+    ///     A list of <see cref="Key"/> values to be simulated during benchmarking. Override this method
+    ///     to provide scenario-specific key sequences that exercise the UI.
+    /// </returns>
+    /// <remarks>
+    ///     During benchmarking, these keys are raised at intervals defined by the benchmark pacing constant
+    ///     to simulate user interaction. This allows scenarios to demonstrate their full functionality
+    ///     during automated benchmark runs.
+    /// </remarks>
+    public virtual List<Key> GetDemoKeyStrokes (IApplication? app) => [];
 }
