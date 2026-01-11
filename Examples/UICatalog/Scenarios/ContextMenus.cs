@@ -20,10 +20,10 @@ public class ContextMenus : Scenario
     {
         // Init
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
 
         // Prepping for modern app model
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         _cultureInfos = Application.SupportedCultures;
 
         // Setup - Create a top-level application window and configure it.

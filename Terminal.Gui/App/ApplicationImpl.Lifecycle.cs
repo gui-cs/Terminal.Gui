@@ -94,6 +94,9 @@ internal partial class ApplicationImpl
 
         _result = null;
 
+        // Raise static event for modern instance-based model
+        Application.RaiseInstanceInitialized (this);
+
         return this;
     }
 
@@ -166,6 +169,10 @@ internal partial class ApplicationImpl
 
         // Capture state before cleanup
         bool wasInitialized = Initialized;
+
+        // Raise static event for modern instance-based model BEFORE assertions
+        // This allows test code to unsubscribe from instance events before we check
+        Application.RaiseInstanceDisposed (this);
 
 #if DEBUG
 

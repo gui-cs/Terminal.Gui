@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.ObjectModel;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
@@ -10,8 +11,8 @@ using Serilog.Core;
 using Serilog.Events;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
+using Terminal.Gui.Drivers;
 using UICatalog;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace ScenarioRunner;
 
@@ -31,7 +32,7 @@ public static class Program
         // Process command line args
         // If no driver is provided, the default driver is used.
         // Get allowed driver names
-        string? [] allowedDrivers = Application.GetDriverTypes ().Item2.ToArray ();
+        string? [] allowedDrivers = DriverRegistry.GetDriverNames ().ToArray ();
 
         Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.")
             .FromAmong (allowedDrivers!);
@@ -59,24 +60,24 @@ public static class Program
 
         LogFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}";
 
-        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging.")
+        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", "The level to use for logging.")
             .FromAmong (Enum.GetNames<LogLevel> ());
         debugLogLevel.SetDefaultValue ("Warning");
         debugLogLevel.AddAlias ("-dl");
 
         // List command
-        System.CommandLine.Command listCommand = new ("list", "List all available scenarios");
+        Command listCommand = new ("list", "List all available scenarios");
 
         listCommand.SetHandler (() =>
                                 {
-                                    System.Collections.ObjectModel.ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
+                                    ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
 
-                                    Console.WriteLine ($"Available scenarios ({scenarios.Count}):");
+                                    Console.WriteLine (@$"Available scenarios ({scenarios.Count})");
                                     Console.WriteLine ();
 
                                     foreach (Scenario s in scenarios)
                                     {
-                                        Console.WriteLine ($"  {s.GetName (),-30} {s.GetDescription ()}");
+                                        Console.WriteLine (@$"  {s.GetName (),-30} {s.GetDescription ()}");
                                     }
                                 });
 
@@ -85,7 +86,7 @@ public static class Program
                                                  "scenario",
                                                  "The name of the Scenario to run.");
 
-        System.CommandLine.Command runCommand = new ("run", "Run a specific scenario")
+        Command runCommand = new ("run", "Run a specific scenario")
         {
             scenarioArgument
         };
@@ -95,7 +96,8 @@ public static class Program
         runCommand.AddOption (force16Colors);
         runCommand.AddOption (debugLogLevel);
 
-        runCommand.SetHandler ((scenarioName, driver, disableCm, force16, logLevel) =>
+        runCommand.SetHandler (
+                               (scenarioName, driver, disableCm, force16, logLevel) =>
                                {
                                    SetupLogging (logLevel);
 
@@ -129,7 +131,7 @@ public static class Program
                                                            () => null,
                                                            "The name of the Scenario to benchmark. If not specified, all scenarios are benchmarked.");
 
-        System.CommandLine.Command benchmarkCommand = new ("benchmark", "Benchmark scenarios")
+        Command benchmarkCommand = new ("benchmark", "Benchmark scenarios")
         {
             benchmarkScenarioArgument
         };
@@ -141,7 +143,8 @@ public static class Program
         benchmarkCommand.AddOption (resultsFile);
         benchmarkCommand.AddOption (debugLogLevel);
 
-        benchmarkCommand.SetHandler ((scenarioName, driver, disableCm, force16, timeout, file, logLevel) =>
+        benchmarkCommand.SetHandler (
+                                     (scenarioName, driver, disableCm, force16, timeout, file, logLevel) =>
                                      {
                                          SetupLogging (logLevel);
                                          Scenario.BenchmarkTimeout = timeout;
@@ -158,7 +161,7 @@ public static class Program
                                          if (string.IsNullOrEmpty (scenarioName))
                                          {
                                              // Benchmark all scenarios
-                                             System.Collections.ObjectModel.ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
+                                             ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
                                              results = runner.BenchmarkAllScenarios (scenarios);
                                          }
                                          else
@@ -179,7 +182,7 @@ public static class Program
 
                                          if (results.Count == 0)
                                          {
-                                             Console.WriteLine ("No benchmark results collected.");
+                                             Console.WriteLine (@"No benchmark results collected.");
 
                                              return;
                                          }
@@ -187,7 +190,7 @@ public static class Program
                                          if (!string.IsNullOrEmpty (file))
                                          {
                                              Runner.SaveResultsToFile (results, file);
-                                             Console.WriteLine ($"Results saved to {file}");
+                                             Console.WriteLine (@$"Results saved to {file}");
                                          }
                                          else
                                          {
@@ -219,14 +222,14 @@ public static class Program
 
     private static Scenario? FindScenario (string name)
     {
-        System.Collections.ObjectModel.ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
+        ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
 
         return scenarios.FirstOrDefault (s => s.GetName ().Equals (name, StringComparison.OrdinalIgnoreCase));
     }
 
     private static void SetupLogging (string logLevelName)
     {
-        LogLevel logLevel = Enum.Parse<LogLevel> (logLevelName);
+        var logLevel = Enum.Parse<LogLevel> (logLevelName);
         LogLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (logLevel);
 
         Log.Logger = new LoggerConfiguration ()
@@ -258,8 +261,6 @@ public static class Program
                    LogLevel.Information => LogEventLevel.Information,
                    LogLevel.Warning => LogEventLevel.Warning,
                    LogLevel.Error => LogEventLevel.Error,
-                   LogLevel.Critical => LogEventLevel.Fatal,
-                   LogLevel.None => LogEventLevel.Fatal,
                    _ => LogEventLevel.Fatal
                };
     }

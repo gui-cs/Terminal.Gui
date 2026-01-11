@@ -49,8 +49,8 @@ public class Localization : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-        _app = Application.Instance;
+        _app = Application.Create ();
+        _app.Init ();
 
         _win = new ()
         {

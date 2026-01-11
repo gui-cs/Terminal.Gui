@@ -26,8 +26,8 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
     {
         // Init
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         _app = app;
 
         TabView tv = new ()

@@ -36,11 +36,8 @@ public class Editor : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        // Init
-        Application.Init ();
-
-        // Prepping for modern app model
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         _app = app;
 
         _appWindow = new ()
@@ -162,7 +159,7 @@ public class Editor : Scenario
                                        new (Key.F2, "Open", Open),
                                        new (Key.F3, "Save", () => Save ()),
                                        new (Key.F4, "Save As", () => SaveAs ()),
-                                       new (Key.Empty, $"OS Clipboard IsSupported : {Application.Clipboard!.IsSupported}", null),
+                                       new (Key.Empty, $"OS Clipboard IsSupported : {app.Clipboard!.IsSupported}", null),
                                        siCursorPosition
                                    ]
                                   )
