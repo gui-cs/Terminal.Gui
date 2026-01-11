@@ -6,13 +6,10 @@ using System.Text.Json;
 namespace UICatalog;
 
 /// <summary>
-///     Provides functionality for running and benchmarking Terminal.Gui scenarios.
+///     Provides functionality for running and benchmarking Terminal.Gui <see cref="Scenario"/>s.
 /// </summary>
 public class Runner
 {
-    private readonly string? _forceDriver;
-    private readonly bool? _force16Colors;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Runner"/> class.
     /// </summary>
@@ -22,48 +19,47 @@ public class Runner
     /// </param>
     public Runner (string? forceDriver = null, bool? force16Colors = null)
     {
-        _forceDriver = forceDriver;
-        _force16Colors = force16Colors;
-    }
-
-    /// <summary>
-    ///     Applies the runtime configuration settings (ForceDriver, Force16Colors) before running a scenario.
-    /// </summary>
-    /// <remarks>
-    ///     These settings are applied to the static configuration properties which are then used
-    ///     when Application.Init() is called by the scenario.
-    /// </remarks>
-    private void ApplyRuntimeConfig ()
-    {
-        // Apply ForceDriver if specified
-        if (_forceDriver is { })
+        // Create runtime config JSON containing "Application.ForceDriver" and "Driver.Force16Colors" if specified
+        Dictionary<string, object> runtimeConfig = new ();
+        if (!string.IsNullOrEmpty (forceDriver))
         {
-            Application.ForceDriver = _forceDriver;
+            runtimeConfig ["Application.ForceDriver"] = forceDriver;
         }
-
-        // Apply Force16Colors if specified
-        if (_force16Colors.HasValue)
+        if (force16Colors.HasValue)
         {
-            Driver.Force16Colors = _force16Colors.Value;
+            runtimeConfig ["Driver.Force16Colors"] = force16Colors.Value;
         }
+        if (runtimeConfig.Count == 0)
+        {
+            return;
+        }
+        ConfigurationManager.RuntimeConfig = JsonSerializer.Serialize (runtimeConfig);
     }
-
     /// <summary>
     ///     Runs a single scenario with optional benchmarking.
     /// </summary>
-    /// <param name="scenario">The scenario to run.</param>
+    /// <param name="scenarioName"></param>
     /// <param name="benchmark">Whether to collect benchmark metrics.</param>
     /// <returns>Benchmark results if benchmarking was enabled, otherwise null.</returns>
-    public BenchmarkResults? RunScenario (Scenario scenario, bool benchmark)
+    public BenchmarkResults? RunScenario (string scenarioName, bool benchmark)
     {
+        // Mark log position so we can capture logs for just this scenario
+        UICatalog.LogCapture.MarkScenarioStart ();
+
+        // Create instance of the scenario
+        var scenario = (Scenario)Activator.CreateInstance (
+                                                           Scenario.GetScenarios ()
+                                                                   .FirstOrDefault (s => s.GetName ().Equals (scenarioName, StringComparison.OrdinalIgnoreCase))
+                                                                   !.GetType ())!;
+
         if (benchmark)
         {
             scenario.StartBenchmark ();
         }
 
-        ApplyRuntimeConfig ();
-
+        Logging.Information ($"Calling {scenario.GetName ()}.Main()");
         scenario.Main ();
+        Logging.Information ($"Returned from {scenario.GetName ()}.Main()");
 
         BenchmarkResults? results = null;
 
@@ -73,6 +69,9 @@ public class Runner
         }
 
         scenario.Dispose ();
+
+        // Check for undisposed views (logs errors if DEBUG_IDISPOSABLE is defined)
+        View.VerifyViewsWereDisposed ();
 
         return results;
     }
@@ -88,7 +87,7 @@ public class Runner
 
         foreach (Scenario s in scenarios)
         {
-            BenchmarkResults? result = RunScenario (s, true);
+            BenchmarkResults? result = RunScenario (s.GetName (), true);
 
             if (result is { })
             {
@@ -236,15 +235,10 @@ public class Runner
     ///     Runs in interactive mode, showing a UI to select scenarios and running them in a loop.
     /// </summary>
     /// <typeparam name="T">The Runnable type to use as the scenario browser UI.</typeparam>
-    /// <param name="getSelectedScenario">
-    ///     A function that returns the selected scenario after the browser UI exits,
-    ///     or null if the user wants to quit.
-    /// </param>
     /// <param name="enableConfigWatcher">Whether to enable config file watching.</param>
-    public void RunInteractive<T> (Func<Scenario?> getSelectedScenario, bool enableConfigWatcher = true) where T : Runnable, new ()
+    public void RunInteractive<T> (bool enableConfigWatcher = true) where T : Runnable, new()
     {
-        // Apply runtime configuration (ForceDriver, Force16Colors) before starting
-        ApplyRuntimeConfig ();
+        Logging.Information ($"{typeof (T).Name}");
 
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
@@ -260,45 +254,17 @@ public class Runner
             // Show browser UI, get selected scenario, run it, repeat until user quits
             while (true)
             {
-                using IApplication app = RunBrowserUI<T> ();
+                IApplication app = RunBrowserUI<T> ();
+                var selectedScenarioName = app.GetResult<string> ();
+                app.Dispose ();
 
-                Scenario? selectedScenario = getSelectedScenario ();
-
-                if (selectedScenario is null)
+                if (string.IsNullOrEmpty (selectedScenarioName))
                 {
                     // User wants to quit
                     break;
                 }
 
-//#if DEBUG_IDISPOSABLE
-//                VerifyObjectsWereDisposed ();
-//                Stopwatch sw = new ();
-//                string scenarioName = selectedScenario.GetName ();
-//                app.InitializedChanged += ApplicationOnInitializedChanged;
-//#endif
-
-                RunScenario (selectedScenario, false);
-
-                VerifyObjectsWereDisposed ();
-
-//#if DEBUG_IDISPOSABLE
-//                Application.InitializedChanged -= ApplicationOnInitializedChanged;
-
-//                void ApplicationOnInitializedChanged (object? sender, EventArgs<bool> e)
-//                {
-//                    if (e.Value)
-//                    {
-//                        sw.Start ();
-//                        string? scenarioDriver = Application.Driver!.GetName ();
-//                        Debug.Assert (scenarioDriver == _lastDriverName);
-//                    }
-//                    else
-//                    {
-//                        sw.Stop ();
-//                        Logging.Trace ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
-//                    }
-//                }
-//#endif
+                RunScenario (selectedScenarioName, false);
             }
         }
         finally
@@ -308,20 +274,23 @@ public class Runner
                 StopConfigWatcher ();
             }
 
-            VerifyObjectsWereDisposed ();
+            View.VerifyViewsWereDisposed ();
         }
     }
 
     /// <summary>
-    ///     Runs the browser UI.
+    ///     Runs the browser UI. The browser UI should set <see cref="IRunnable.Result"/> to the selected scenario name
     /// </summary>
     /// <typeparam name="T">The Runnable type to use as the browser UI.</typeparam>
-    private IApplication RunBrowserUI<T> () where T : Runnable, new ()
+    private IApplication RunBrowserUI<T> () where T : Runnable, new()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
         IApplication app = Application.Create ();
-        app.Init (_forceDriver);
+        app.Init ();
 
+        Logging.Information ($"{typeof (T).Name}");
         app.Run<T> ();
+        Logging.Information ($"{typeof (T).Name} Result: {app.GetResult<string> ()}");
 
         //VerifyObjectsWereDisposed ();
         return app;
@@ -413,31 +382,6 @@ public class Runner
         Logging.Debug ($"{e.FullPath} {e.ChangeType} - Loading and Applying");
         ConfigurationManager.Load (ConfigLocations.All);
         ConfigurationManager.Apply ();
-    }
-
-    /// <summary>
-    ///     Verifies that all View objects were properly disposed (DEBUG_IDISPOSABLE only).
-    /// </summary>
-    public static void VerifyObjectsWereDisposed ()
-    {
-#if DEBUG_IDISPOSABLE
-        if (!View.EnableDebugIDisposableAsserts)
-        {
-            View.Instances.Clear ();
-
-            return;
-        }
-
-        // Validate there are no outstanding View instances
-        // after a scenario was selected to run. This proves the main UI Catalog
-        // 'app' closed cleanly.
-        foreach (View inst in View.Instances)
-        {
-            Logging.Error ($"View instance not disposed: {inst}:{inst.Title}");
-        }
-
-        View.Instances.Clear ();
-#endif
     }
 
     #endregion Interactive Mode

@@ -117,7 +117,7 @@ public static class Program
 
                                    // Pass force16 only if explicitly set (default false means not set)
                                    Runner runner = new (driver, force16 ? true : null);
-                                   runner.RunScenario (scenario, false);
+                                   runner.RunScenario (scenarioName, false);
                                },
                                scenarioArgument,
                                driverOption,
@@ -176,7 +176,7 @@ public static class Program
                                                  return;
                                              }
 
-                                             BenchmarkResults? result = runner.RunScenario (scenario, true);
+                                             BenchmarkResults? result = runner.RunScenario (scenarioName, true);
                                              results = result is { } ? [result] : [];
                                          }
 

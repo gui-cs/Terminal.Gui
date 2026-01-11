@@ -50,11 +50,16 @@ namespace UICatalog;
 /// </remarks>
 public class UICatalog
 {
-    private static string? _forceDriver;
     public static string LogFilePath { get; set; } = string.Empty;
     public static LoggingLevelSwitch LogLevelSwitch { get; } = new ();
     public const string LOGFILE_LOCATION = "logs";
     public static UICatalogCommandLineOptions Options { get; set; }
+
+    /// <summary>
+    ///     Gets the in-memory log capture for scenario debugging.
+    ///     This captures all log output and allows retrieving logs since a scenario started.
+    /// </summary>
+    public static ScenarioLogCapture LogCapture { get; } = new ();
 
     private static int Main (string [] args)
     {
@@ -204,16 +209,16 @@ public class UICatalog
     public static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel)
     {
         return logLevel switch
-               {
-                   LogLevel.Trace => LogEventLevel.Verbose,
-                   LogLevel.Debug => LogEventLevel.Debug,
-                   LogLevel.Information => LogEventLevel.Information,
-                   LogLevel.Warning => LogEventLevel.Warning,
-                   LogLevel.Error => LogEventLevel.Error,
-                   LogLevel.Critical => LogEventLevel.Fatal,
-                   LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
-                   _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
-               };
+        {
+            LogLevel.Trace => LogEventLevel.Verbose,
+            LogLevel.Debug => LogEventLevel.Debug,
+            LogLevel.Information => LogEventLevel.Information,
+            LogLevel.Warning => LogEventLevel.Warning,
+            LogLevel.Error => LogEventLevel.Error,
+            LogLevel.Critical => LogEventLevel.Fatal,
+            LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
+            _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
+        };
     }
 
     private static ILogger CreateLogger ()
@@ -232,43 +237,44 @@ public class UICatalog
                      .CreateLogger ();
 
         // Create a logger factory compatible with Microsoft.Extensions.Logging
-        using ILoggerFactory loggerFactory = LoggerFactory.Create (builder =>
-                                                                   {
-                                                                       builder
-                                                                           .AddSerilog (dispose: true) // Integrate Serilog with ILogger
-                                                                           .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
-                                                                   });
+        // Note: Don't use 'using' here - we need the factory to stay alive for ScenarioLogCapture
+        ILoggerFactory loggerFactory = LoggerFactory.Create (builder =>
+                                                             {
+                                                                 builder
+                                                                     .AddSerilog (dispose: true) // Integrate Serilog with ILogger
+                                                                     .AddProvider (LogCapture) // Add in-memory capture for scenario debugging
+                                                                     .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
+                                                             });
 
         // Get an ILogger instance
-        return loggerFactory.CreateLogger ("Global Logger");
+        return loggerFactory.CreateLogger ("UICatalog");
     }
 
     private static void UICatalogMain (UICatalogCommandLineOptions options)
     {
-        // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
-        // regardless of what's in a config file.
-        Application.ForceDriver = _forceDriver = options.Driver;
-
         // Create the runner for executing scenarios with runtime config options
-        Runner runner = new (_forceDriver, options.Force16Colors);
+        Runner runner = new (options.Driver, options.Force16Colors);
+
+        if (!Options.DontEnableConfigurationManagement)
+        {
+            ConfigurationManager.Enable (ConfigLocations.All);
+        }
+        else
+        {
+            Application.ForceDriver = options.Driver;
+
+            if (options.Force16Colors is { })
+            {
+                Driver.Force16Colors = options.Force16Colors.Value;
+            }
+        }
 
         // If a Scenario name has been provided on the commandline
         // run it and exit when done.
         if (options.Scenario != "none")
         {
-            if (!Options.DontEnableConfigurationManagement)
-            {
-                ConfigurationManager.Enable (ConfigLocations.All);
-            }
 
-            int item = UICatalogRunnable.CachedScenarios!.IndexOf (
-                                                                   UICatalogRunnable.CachedScenarios.FirstOrDefault (s =>
-                                                                           s.GetName ()
-                                                                            .Equals (options.Scenario, StringComparison.OrdinalIgnoreCase)
-                                                                       )!);
-            UICatalogRunnable.CachedSelectedScenario = (Scenario)Activator.CreateInstance (UICatalogRunnable.CachedScenarios [item].GetType ())!;
-
-            BenchmarkResults? results = runner.RunScenario (UICatalogRunnable.CachedSelectedScenario, options.Benchmark);
+            BenchmarkResults? results = runner.RunScenario (options.Scenario, false);
 
             if (results is { })
             {
@@ -281,7 +287,7 @@ public class UICatalog
                                                              }));
             }
 
-            Runner.VerifyObjectsWereDisposed ();
+            View.VerifyViewsWereDisposed ();
 
             return;
         }
@@ -306,14 +312,6 @@ public class UICatalog
             return;
         }
 
-        // Interactive mode: show browser UI and run selected scenarios in a loop
-        if (!Options.DontEnableConfigurationManagement)
-        {
-            ConfigurationManager.Enable (ConfigLocations.All);
-        }
-
-        runner.RunInteractive<UICatalogRunnable> (
-                                                  () => UICatalogRunnable.CachedSelectedScenario,
-                                                  !Options.DontEnableConfigurationManagement);
+        runner.RunInteractive<UICatalogRunnable> (!Options.DontEnableConfigurationManagement);
     }
 }

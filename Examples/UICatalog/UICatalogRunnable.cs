@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using UICatalog.Scenarios;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 #nullable enable
@@ -72,7 +73,7 @@ public sealed class UICatalogRunnable : Runnable
             _shVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App!.Driver!.GetVersionInfo ()}";
         }
 
-        if (CachedSelectedScenario != null)
+        if (string.IsNullOrEmpty ((string?)Result))
         {
             _isFirstRunning = false;
         }
@@ -96,12 +97,24 @@ public sealed class UICatalogRunnable : Runnable
     {
         if (newIsRunning)
         {
+            // Show error dialog if any errors occurred during the scenario
+            if (UICatalog.LogCapture.HasErrors)
+            {
+                if (_scenarioList is { })
+                {
+                    ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
+                }
+
+                UICatalog.LogCapture.HasErrors = false;
+            }
+
             return;
         }
 
         ConfigurationManager.Applied -= ConfigAppliedHandler;
     }
 
+    // Track if this is the first time running the main UI Catalog screen
     private static bool _isFirstRunning = true;
 
     #region MenuBar
@@ -426,13 +439,9 @@ public sealed class UICatalogRunnable : Runnable
     #region Scenario List
 
     private TableView? _scenarioList;
-
     private static int _cachedScenarioIndex;
 
     public static ObservableCollection<Scenario>? CachedScenarios { get; set; }
-
-    // If set, holds the scenario the user selected to run
-    public static Scenario? CachedSelectedScenario { get; set; }
 
     private TableView CreateScenarioList ()
     {
@@ -508,18 +517,9 @@ public sealed class UICatalogRunnable : Runnable
         _cachedCategoryIndex = _categoryList!.SelectedItem;
         _cachedScenarioIndex = _scenarioList!.SelectedRow;
 
-        // Create new instance of scenario (even though Scenarios contains instances)
-        var selectedScenarioName = (string)_scenarioList.Table [_scenarioList.SelectedRow, 0];
-
-        CachedSelectedScenario = (Scenario)Activator.CreateInstance (
-                                                                     CachedScenarios!.FirstOrDefault (
-                                                                                                      s => s.GetName ()
-                                                                                                          == selectedScenarioName
-                                                                                                     )!
-                                                                                     .GetType ()
-                                                                    )!;
-
-        // Tell the main app to stop
+        // Set the Result to the selected scenario name
+        Result = (string)_scenarioList.Table [_scenarioList.SelectedRow, 0];
+        Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
         App?.RequestStop ();
     }
 
@@ -768,4 +768,38 @@ public sealed class UICatalogRunnable : Runnable
             Process.Start ("open", url);
         }
     }
+
+    /// <summary>
+    ///     Shows a dialog displaying error logs from a scenario run.
+    /// </summary>
+    /// <param name="app"></param>
+    /// <param name="scenarioName">The name of the scenario that was run.</param>
+    /// <param name="logs">The captured log output.</param>
+    private static void ShowScenarioErrorsDialog (IApplication app, string scenarioName, string logs)
+    {
+        using Dialog dialog = new ();
+        dialog.Title = $"Errors in {scenarioName}";
+
+        ListView eventLog = new ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Source = new ListWrapper<string> (new (logs.Split ([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries))),
+            SelectedItem = 0,
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error)
+        };
+        eventLog.HorizontalScrollBar.AutoShow = true;
+        eventLog.VerticalScrollBar.AutoShow = true;
+
+        Button okButton = new ()
+        {
+            Text = "OK",
+        };
+
+        dialog.Add (eventLog);
+        dialog.AddButton (okButton);
+
+        app.Run (dialog);
+    }
+
 }

@@ -89,7 +89,7 @@ if (result is { })
 }
 
 // Run it again, since it set the Screen size to just fit
-result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+app.Run<ViewDemoWindow> ().GetResult<string> ();
 
 string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
 app.Dispose ();

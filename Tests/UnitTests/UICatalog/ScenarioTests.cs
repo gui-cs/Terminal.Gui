@@ -127,7 +127,14 @@ public class ScenarioTests : TestsAllViews
         Assert.Null (scenarioException);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (View.Instances);
+        if (View.Instances.Count > 0)
+        {
+            foreach (View inst in View.Instances)
+            {
+                _output.WriteLine ($"Not Disposed: {inst.ToDebugString ()}");
+            }
+            Assert.Fail ($"Views were not disposed properly.");
+        }
 #endif
 
         return;
