@@ -48,6 +48,7 @@ jobs:
         uses: gittools/actions/gitversion/execute@v3.1.11
         with:
           useConfigFile: true
+          updateAssemblyInfo: true
         id: gitversion
 
       - name: Prepare Release Variables
@@ -103,26 +104,30 @@ jobs:
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NAME: ${{ steps.prepare.outputs.release_name }}
+          VERSION: ${{ steps.prepare.outputs.version }}
+          RELEASE_TYPE: ${{ steps.prepare.outputs.release_type }}
+          TAG: ${{ steps.prepare.outputs.tag }}
         run: |
           PRERELEASE_FLAG=""
-          if [ "${{ steps.prepare.outputs.release_type }}" != "stable" ]; then
+          if [ "$RELEASE_TYPE" != "stable" ]; then
             PRERELEASE_FLAG="--prerelease"
           fi
           
           # Create release notes
-          cat > /tmp/release_notes.md << 'EOF'
-          Release ${{ steps.prepare.outputs.release_name }}
+          cat > /tmp/release_notes.md << EOF
+          Release ${RELEASE_NAME}
 
           This release was created automatically using the release workflow.
 
-          - **Version:** ${{ steps.prepare.outputs.version }}
-          - **Type:** ${{ steps.prepare.outputs.release_type }}
+          - **Version:** ${VERSION}
+          - **Type:** ${RELEASE_TYPE}
 
           The package will be automatically published to NuGet.org via the publish workflow.
           EOF
           
-          gh release create "${{ steps.prepare.outputs.tag }}" \
-            --title "${{ steps.prepare.outputs.release_name }}" \
+          gh release create "$TAG" \
+            --title "$RELEASE_NAME" \
             $PRERELEASE_FLAG \
             --notes-file /tmp/release_notes.md
 
