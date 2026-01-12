@@ -7,38 +7,74 @@ public partial class View // Adornments
     /// </summary>
     private void SetupAdornments ()
     {
-        // TODO: Move this to Adornment as a static factory method
-        if (this is not Adornment)
+        // Adornments are now created lazily when first accessed
+        // Nothing to do here
+    }
+
+    /// <summary>
+    ///     Ensures the Margin is created if it doesn't exist.
+    /// </summary>
+    private Margin EnsureMargin ()
+    {
+        if (_margin is null && this is not Adornment)
         {
-            // TODO: Make the Adornments Lazy and only create them when needed
-            Margin = new (this);
-            Border = new (this);
-            Padding = new (this);
+            // Create a placeholder to prevent re-entrance during construction
+            var margin = new Margin (this);
+            _margin = margin;
         }
+        return _margin!;
+    }
+
+    /// <summary>
+    ///     Ensures the Border is created if it doesn't exist.
+    /// </summary>
+    private Border EnsureBorder ()
+    {
+        if (_border is null && this is not Adornment)
+        {
+            // Create a placeholder to prevent re-entrance during construction
+            var border = new Border (this);
+            _border = border;
+        }
+        return _border!;
+    }
+
+    /// <summary>
+    ///     Ensures the Padding is created if it doesn't exist.
+    /// </summary>
+    private Padding EnsurePadding ()
+    {
+        if (_padding is null && this is not Adornment)
+        {
+            // Create a placeholder to prevent re-entrance during construction
+            var padding = new Padding (this);
+            _padding = padding;
+        }
+        return _padding!;
     }
 
     private void BeginInitAdornments ()
     {
-        Margin?.BeginInit ();
-        Border?.BeginInit ();
-        Padding?.BeginInit ();
+        _margin?.BeginInit ();
+        _border?.BeginInit ();
+        _padding?.BeginInit ();
     }
 
     private void EndInitAdornments ()
     {
-        Margin?.EndInit ();
-        Border?.EndInit ();
-        Padding?.EndInit ();
+        _margin?.EndInit ();
+        _border?.EndInit ();
+        _padding?.EndInit ();
     }
 
     private void DisposeAdornments ()
     {
-        Margin?.Dispose ();
-        Margin = null;
-        Border?.Dispose ();
-        Border = null;
-        Padding?.Dispose ();
-        Padding = null;
+        _margin?.Dispose ();
+        _margin = null;
+        _border?.Dispose ();
+        _border = null;
+        _padding?.Dispose ();
+        _padding = null;
     }
 
     /// <summary>
@@ -62,7 +98,21 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
-    public Margin? Margin { get; private set; }
+    private Margin? _margin;
+    
+    /// <inheritdoc cref="_margin"/>
+    public Margin? Margin
+    {
+        get
+        {
+            if (_margin is null && this is not Adornment)
+            {
+                _margin = new Margin (this);
+            }
+            return _margin;
+        }
+        private set => _margin = value;
+    }
 
     private ShadowStyle _shadowStyle;
 
@@ -87,9 +137,24 @@ public partial class View // Adornments
 
             _shadowStyle = value;
 
-            if (Margin is { })
+            // Adornments don't have adornments, so don't try to create a Margin
+            if (this is Adornment)
             {
-                Margin.ShadowStyle = value;
+                return;
+            }
+
+            // Only propagate to margin if it already exists or if we're setting a non-None value
+            // This avoids creating a margin just to set it to None
+            if (value != ShadowStyle.None)
+            {
+                // Create margin if needed and set the shadow style
+                Margin margin = EnsureMargin();
+                margin.ShadowStyle = value;
+            }
+            else if (_margin is { })
+            {
+                // Margin already exists, just update it
+                _margin.ShadowStyle = value;
             }
         }
     }
@@ -118,7 +183,21 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
-    public Border? Border { get; private set; }
+    private Border? _border;
+    
+    /// <inheritdoc cref="_border"/>
+    public Border? Border
+    {
+        get
+        {
+            if (_border is null && this is not Adornment)
+            {
+                _border = new Border (this);
+            }
+            return _border;
+        }
+        private set => _border = value;
+    }
 
     // TODO: Make BorderStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
@@ -140,14 +219,9 @@ public partial class View // Adornments
     /// </remarks>
     public LineStyle BorderStyle
     {
-        get => Border?.LineStyle ?? LineStyle.Single;
+        get => _border?.LineStyle ?? LineStyle.Single;
         set
         {
-            if (Border is null)
-            {
-                return;
-            }
-
             SetBorderStyle (value);
             OnBorderStyleChanged ();
             BorderStyleChanged?.Invoke (this, EventArgs.Empty);
@@ -183,19 +257,21 @@ public partial class View // Adornments
     /// <param name="style"></param>
     internal void SetBorderStyle (LineStyle style)
     {
+        Border border = EnsureBorder();
+        
         if (style != LineStyle.None)
         {
-            if (Border!.Thickness == Thickness.Empty)
+            if (border.Thickness == Thickness.Empty)
             {
-                Border.Thickness = new (1);
+                border.Thickness = new (1);
             }
         }
         else
         {
-            Border!.Thickness = new (0);
+            border.Thickness = new (0);
         }
 
-        Border.LineStyle = style;
+        border.LineStyle = style;
 
         SetAdornmentFrames ();
         SetNeedsLayout ();
@@ -216,7 +292,21 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
-    public Padding? Padding { get; private set; }
+    private Padding? _padding;
+    
+    /// <inheritdoc cref="_padding"/>
+    public Padding? Padding
+    {
+        get
+        {
+            if (_padding is null && this is not Adornment)
+            {
+                _padding = new Padding (this);
+            }
+            return _padding;
+        }
+        private set => _padding = value;
+    }
 
     /// <summary>
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
@@ -231,19 +321,19 @@ public partial class View // Adornments
     {
         var result = Thickness.Empty;
 
-        if (Margin is { })
+        if (_margin is { })
         {
-            result += Margin.Thickness;
+            result += _margin.Thickness;
         }
 
-        if (Border is { })
+        if (_border is { })
         {
-            result += Border.Thickness;
+            result += _border.Thickness;
         }
 
-        if (Padding is { })
+        if (_padding is { })
         {
-            result += Padding.Thickness;
+            result += _padding.Thickness;
         }
 
         return result;
@@ -258,19 +348,19 @@ public partial class View // Adornments
             return;
         }
 
-        if (Margin is { })
+        if (_margin is { })
         {
-            Margin!.Frame = Rectangle.Empty with { Size = Frame.Size };
+            _margin.Frame = Rectangle.Empty with { Size = Frame.Size };
         }
 
-        if (Border is { } && Margin is { })
+        if (_border is { } && _margin is { })
         {
-            Border!.Frame = Margin!.Thickness.GetInside (Margin!.Frame);
+            _border.Frame = _margin.Thickness.GetInside (_margin.Frame);
         }
 
-        if (Padding is { } && Border is { })
+        if (_padding is { } && _border is { })
         {
-            Padding!.Frame = Border!.Thickness.GetInside (Border!.Frame);
+            _padding.Frame = _border.Thickness.GetInside (_border.Frame);
         }
     }
 }
