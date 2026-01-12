@@ -76,3 +76,6 @@ log.*
 # Claude Code local settings
 .claude/settings.json
 .claude/settings.local.json
+-e ".env\n.mcp.json" 
+-e ".env\n.mcp.json" 
+/.env
