@@ -1655,7 +1655,7 @@ public class GraphViewBorderTests : TestDriverBase
     [AutoInitShutdown]
     public void GraphView_WithBorder_RendersCorrectly ()
     {
-        // CoPilot - ChatGPT v4
+        // Copilot - ChatGPT v4
         // This test reproduces the issue where GraphView assumes Frame == Bounds
         // When a border is added, the graph content should be drawn inside the border,
         // not overlapping it.
@@ -1715,7 +1715,7 @@ public class GraphViewBorderTests : TestDriverBase
     [AutoInitShutdown]
     public void GraphView_Legend_WithBorder_UsesViewportNotFrame ()
     {
-        // CoPilot - ChatGPT v4
+        // Copilot - ChatGPT v4
         // This test verifies that when GraphView has adornments (border/margin/padding),
         // legends and other annotations positioned using Viewport.Width work correctly.
 
