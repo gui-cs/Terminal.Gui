@@ -37,8 +37,8 @@ public class TreeViewFileSystem : Scenario
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window win = new ()
         {

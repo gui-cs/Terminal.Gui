@@ -21,7 +21,7 @@ public class Menus : Scenario
         ConfigurationManager.Enable (ConfigLocations.All);
         Logging.Logger = CreateLogger ();
 
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
         app.Init ();
 
         using Runnable runnable = new ();

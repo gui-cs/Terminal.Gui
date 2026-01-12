@@ -15,24 +15,21 @@ public class Shortcuts : Scenario
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         _app = app;
 
-        Key quitKey = Application.QuitKey;
         using Window window = new ();
 
         window.IsModalChanged += App_Loaded;
 
         app.Run (window);
-        Application.QuitKey = quitKey;
     }
 
     // Setting everything up in Loaded handler because we change the
     // QuitKey and it only sticks if changed after init
     private void App_Loaded (object? sender, EventArgs e)
     {
-        Application.QuitKey = Key.F4.WithCtrl;
         _app!.TopRunnableView!.Title = GetQuitKeyAndName ();
 
         ObservableCollection<string> eventSource = new ();

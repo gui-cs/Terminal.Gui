@@ -79,7 +79,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     /// </summary>
     public AnsiInput ()
     {
-        Logging.Information ($"Creating {nameof (AnsiInput)}");
+        //Logging.Information ($"Creating {nameof (AnsiInput)}");
 
         try
         {

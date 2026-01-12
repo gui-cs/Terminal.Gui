@@ -25,9 +25,8 @@ public class FileDialogExamples : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         var y = 0;
         var x = 1;
         using Window win = new ();

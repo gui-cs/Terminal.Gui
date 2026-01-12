@@ -27,8 +27,8 @@ public class ProgressBarStyles : Scenario
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window win = new ()
         {
@@ -79,9 +79,10 @@ public class ProgressBarStyles : Scenario
         fgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
+                                                                         (s as View)!.App!,
                                                                          fgColorPickerBtn.Text,
                                                                          editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                         out var newColor
+                                                                         out Color newColor
                                                                         ))
                                         {
                                             return;
@@ -110,10 +111,11 @@ public class ProgressBarStyles : Scenario
         bgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
+                                                                         (s as View)!.App!,
                                                                          fgColorPickerBtn.Text,
                                                                          editor.ViewToEdit!.GetAttributeForRole (VisualRole.Active)
                                                                                .Background
-                                                                        , out var newColor))
+                                                                        , out Color newColor))
 
                                         {
                                             return;

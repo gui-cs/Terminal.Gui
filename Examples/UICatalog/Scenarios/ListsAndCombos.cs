@@ -14,8 +14,8 @@ public class ListsAndCombos : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         //TODO: Duplicated code in Demo.cs Consider moving to shared assembly
         ObservableCollection<string> items = [];
 

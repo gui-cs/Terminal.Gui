@@ -76,3 +76,6 @@ log.*
 # Claude Code local settings
 .claude/settings.json
 .claude/settings.local.json
+.mcp.json
+.env
+tmpclaude-*-cwd

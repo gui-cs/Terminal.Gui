@@ -9,8 +9,8 @@ public class DimAutoDemo : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         // Setup - Create a top-level application window and configure it.
         using Window appWindow = new ();

@@ -42,13 +42,6 @@ public class InitTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
 
         app.Dispose ();
-
-#if DEBUG_IDISPOSABLE
-        // Validate there are no outstanding Responder-based instances 
-        // after cleanup
-        // Note: We can't check View.Instances in parallel tests as it's a static field
-        // that would be shared across parallel test runs
-#endif
     }
 
     [Fact]

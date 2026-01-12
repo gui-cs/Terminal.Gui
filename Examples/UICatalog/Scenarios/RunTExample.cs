@@ -9,8 +9,8 @@ public class RunTExample : Scenario
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         app.Run<ExampleWindow> ();
     }
