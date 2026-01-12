@@ -71,7 +71,9 @@ public class Runner
         scenario.Dispose ();
 
         // Check for undisposed views (logs errors if DEBUG_IDISPOSABLE is defined)
+#if DEBUG_IDISPOSABLE
         View.VerifyViewsWereDisposed ();
+#endif
 
         return results;
     }
@@ -274,7 +276,9 @@ public class Runner
                 StopConfigWatcher ();
             }
 
+#if DEBUG_IDISPOSABLE
             View.VerifyViewsWereDisposed ();
+#endif
         }
     }
 

@@ -287,7 +287,9 @@ public class UICatalog
                                                              }));
             }
 
+#if DEBUG_IDISPOSABLE
             View.VerifyViewsWereDisposed ();
+#endif
 
             return;
         }
