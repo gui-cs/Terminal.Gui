@@ -30,6 +30,9 @@ public class StatusBar : Bar, IDesignable
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
+        // Enable clipping to prevent content from overwriting when items don't fit
+        ViewportSettings |= ViewportSettingsFlags.ClipContentOnly;
+
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
     }
 

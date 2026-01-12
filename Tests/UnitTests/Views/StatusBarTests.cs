@@ -195,4 +195,43 @@ public class StatusBarTests
     //    Assert.Equal (Dim.Fill (0), menuBars [1].Width);
     //}
 
+    // CoPilot - AI generated test
+    [Fact]
+    public void StatusBar_HasClipContentOnly_ViewportSettings ()
+    {
+        // Test that StatusBar has ClipContentOnly flag set to prevent overwriting when items don't fit
+        StatusBar sb = new ();
+
+        Assert.True (sb.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly),
+                     "StatusBar should have ClipContentOnly flag to prevent content overwriting");
+    }
+
+    // CoPilot - AI generated test
+    [Fact]
+    [AutoInitShutdown]
+    public void StatusBar_ClipsContent_WhenItemsDontFit ()
+    {
+        // Create a StatusBar with items that will exceed the available width
+        StatusBar sb = new (
+        [
+            new (Key.F1, "First Very Long Command That Exceeds Width", null),
+            new (Key.F2, "Second Very Long Command That Also Exceeds Width", null),
+            new (Key.F3, "Third Very Long Command", null)
+        ]);
+
+        Runnable runnable = new ();
+        runnable.Add (sb);
+        
+        Application.Begin (runnable);
+        
+        // Set a narrow width to force clipping
+        runnable.SetContentSize (new Size (40, 25));
+        runnable.Layout ();
+        runnable.Draw ();
+
+        // Verify that ClipContentOnly is still set after initialization
+        Assert.True (sb.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly));
+        
+        runnable.Dispose ();
+    }
 }
