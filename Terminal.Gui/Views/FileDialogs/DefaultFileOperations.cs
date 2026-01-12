@@ -132,44 +132,27 @@ public class DefaultFileOperations : IFileOperations
 
     private bool Prompt (string title, string defaultText, out string result)
     {
-        var confirm = false;
-        var btnOk = new Button { IsDefault = true, Text = Strings.btnOk };
-
-        btnOk.Accepting += (s, e) =>
-                         {
-                             confirm = true;
-                             (s as View)?.App?.RequestStop ();
-                             // When Accepting is handled, set e.Handled to true to prevent further processing.
-                             e.Handled = true;
-                         };
-        var btnCancel = new Button { Text = Strings.btnCancel };
-
-        btnCancel.Accepting += (s, e) =>
-                             {
-                                 confirm = false;
-                                 (s as View)?.App?.RequestStop ();
-                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
-                                 e.Handled = true;
-                             };
-
         var lbl = new Label { Text = Strings.fdRenamePrompt };
         var tf = new TextField { X = Pos.Right (lbl), Width = Dim.Fill (), Text = defaultText };
         tf.SelectAll ();
 
-        var dlg = new Dialog { Title = title, Width = Dim.Percent (50), Height = 4 };
-        dlg.Add (lbl);
-        dlg.Add (tf);
+        View container = new ()
+        {
+            Width = Dim.Percent (50),
+            Height = 4
+        };
+        container.Add (lbl);
+        container.Add (tf);
 
-        // Add buttons last so tab order is friendly
-        // and TextField gets focus
-        dlg.AddButton (btnOk);
-        dlg.AddButton (btnCancel);
-
-        Application.Run (dlg);
-        dlg.Dispose ();
+        bool accepted = Views.Prompt.Show (
+                                           Application.Instance!,
+                                           title,
+                                           container,
+                                           Strings.btnOk,
+                                           Strings.btnCancel);
 
         result = tf.Text;
 
-        return confirm;
+        return accepted;
     }
 }
