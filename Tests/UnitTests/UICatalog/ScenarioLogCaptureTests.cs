@@ -290,7 +290,7 @@ public class ScenarioLogCaptureTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void ThreadSafety_ConcurrentLogging ()
+    public async Task ThreadSafety_ConcurrentLogging ()
     {
         // Arrange
         ScenarioLogCapture capture = new ();
@@ -315,7 +315,7 @@ public class ScenarioLogCaptureTests (ITestOutputHelper output)
                                  }));
         }
 
-        Task.WaitAll ([.. tasks]);
+        await Task.WhenAll (tasks);
 
         // Assert - all logs should be captured (check by counting lines)
         string allLogs = capture.GetAllLogs ();

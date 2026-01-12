@@ -12,9 +12,16 @@ namespace NativeAot;
 
 public static class Program
 {
+    private static void Main (string [] args)
+    {
+#pragma warning disable IL2026, IL3050 // Run() has attributes for AOT compatibility
+        Run ();
+#pragma warning restore IL2026, IL3050
+    }
+
     [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
-    private static void Main (string [] args)
+    private static void Run ()
     {
         ConfigurationManager.Enable(ConfigLocations.All);
         Application.Init ();

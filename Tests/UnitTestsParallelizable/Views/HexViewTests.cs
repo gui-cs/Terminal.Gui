@@ -95,7 +95,7 @@ public class HexViewTests : TestDriverBase
 
         var readBuffer = new byte [hv.Source!.Length];
         hv.Source.Position = 0;
-        hv.Source.Read (readBuffer);
+        hv.Source.ReadExactly (readBuffer);
         Assert.Equal ("Fest", Encoding.Default.GetString (readBuffer));
 
         Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Tab)); // Move to left side
@@ -112,9 +112,9 @@ public class HexViewTests : TestDriverBase
 
         hv.ApplyEdits (original);
         original.Position = 0;
-        original.Read (buffer);
+        original.ReadExactly (buffer);
         copy.Position = 0;
-        copy.Read (readBuffer);
+        copy.ReadExactly (readBuffer);
         Assert.Equal ("Zest", Encoding.Default.GetString (buffer));
         Assert.Equal ("Zest", Encoding.Default.GetString (readBuffer));
         Assert.Equal (Encoding.Default.GetString (buffer), Encoding.Default.GetString (readBuffer));
