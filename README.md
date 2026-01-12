@@ -25,7 +25,7 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 Install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new TUI app, and run it:
 
 ```powershell
-dotnet new --install Terminal.Gui.templates
+dotnet new install Terminal.Gui.Templates::2.0.0-v2-develop.*
 dotnet new tui -n myproj
 cd myproj
 dotnet run
@@ -119,7 +119,11 @@ dotnet add package Terminal.Gui --version "2.0.0-develop.*"
 dotnet add package Terminal.Gui --version "1.*"
 ```
 
-Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
+Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
+
+```powershell
+dotnet new install Terminal.Gui.Templates::2.0.0-v2-develop.*
+```
 
 # Contributing
 
