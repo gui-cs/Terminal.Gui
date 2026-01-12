@@ -1,6 +1,5 @@
 using Terminal.Gui.ViewBase;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.AdornmentTests;
 
@@ -10,7 +9,7 @@ namespace ViewBaseTests.AdornmentTests;
 ///     Specifically tests issue #4549 - that focused arrangement buttons show focus colors
 ///     instead of mouse highlight colors.
 /// </summary>
-public class ArrangementFocusTests (ITestOutputHelper output)
+public class ArrangementFocusTests
 {
     [Fact]
     public void FocusedButton_WithMouseOver_ShowsFocusColors_NotHighlightColors ()
