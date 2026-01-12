@@ -113,16 +113,16 @@ dotnet add package Terminal.Gui --version "2.0.0-alpha.*"
 dotnet add package Terminal.Gui --version "2.0.0-develop.*"
 ```
 
-## v1 Legacy
-
-```powershell
-dotnet add package Terminal.Gui --version "1.*"
-```
-
 Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
 
 ```powershell
 dotnet new install Terminal.Gui.Templates::2.0.0-v2-develop.*
+```
+
+## v1 Legacy
+
+```powershell
+dotnet add package Terminal.Gui --version "1.*"
 ```
 
 # Contributing
