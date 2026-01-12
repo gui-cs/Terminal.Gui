@@ -77,7 +77,10 @@ jobs:
       - name: Check if tag already exists
         run: |
           if git rev-parse "${{ steps.prepare.outputs.tag }}" >/dev/null 2>&1; then
-            echo "Error: Tag ${{ steps.prepare.outputs.tag }} already exists"
+            echo "::error::Tag ${{ steps.prepare.outputs.tag }} already exists in the repository."
+            echo "::error::To resolve this:"
+            echo "::error::  - Choose a different version number, or"
+            echo "::error::  - Delete the existing tag if this is intentional: git push --delete origin ${{ steps.prepare.outputs.tag }}"
             exit 1
           fi
 
@@ -106,17 +109,22 @@ jobs:
             PRERELEASE_FLAG="--prerelease"
           fi
           
-          gh release create "${{ steps.prepare.outputs.tag }}" \
-            --title "${{ steps.prepare.outputs.release_name }}" \
-            $PRERELEASE_FLAG \
-            --notes "Release ${{ steps.prepare.outputs.release_name }}
+          # Create release notes
+          cat > /tmp/release_notes.md << 'EOF'
+          Release ${{ steps.prepare.outputs.release_name }}
 
           This release was created automatically using the release workflow.
 
           - **Version:** ${{ steps.prepare.outputs.version }}
           - **Type:** ${{ steps.prepare.outputs.release_type }}
 
-          The package has been published to NuGet.org automatically."
+          The package has been published to NuGet.org automatically.
+          EOF
+          
+          gh release create "${{ steps.prepare.outputs.tag }}" \
+            --title "${{ steps.prepare.outputs.release_name }}" \
+            $PRERELEASE_FLAG \
+            --notes-file /tmp/release_notes.md
 
       - name: Summary
         run: |
