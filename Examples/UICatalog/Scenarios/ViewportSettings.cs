@@ -11,8 +11,7 @@ public class ViewportSettings : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
         app.Init ();
 
         using Window mainWindow = new ();

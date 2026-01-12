@@ -9,21 +9,19 @@ public sealed class Generic : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        // Init
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        // Setup - Create a top-level application window and configure it.
+        // Setup - Create an IRunnable Window and configure it.
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
-        appWindow.BorderStyle = LineStyle.None;
+        appWindow.AssignHotKeys = true;
 
         Button button = new ()
         {
-            //CanFocus = true,
             X = Pos.Center (),
             Y = 1,
-            Text = "_Button",
+            Text = "Button"
         };
 
         button.Accepting += (s, e) =>

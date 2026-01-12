@@ -67,7 +67,7 @@ internal class MouseImpl : IMouse, IDisposable
 #if DEBUG_IDISPOSABLE
             if (View.EnableDebugIDisposableAsserts && deepestViewUnderMouse.WasDisposed)
             {
-                throw new ObjectDisposedException (deepestViewUnderMouse.GetType ().FullName);
+                throw new ObjectDisposedException (deepestViewUnderMouse.ToDebugString ());
             }
 #endif
             mouseEvent.View = deepestViewUnderMouse;
@@ -381,7 +381,7 @@ internal class MouseImpl : IMouse, IDisposable
 #if DEBUG_IDISPOSABLE
             if (View.EnableDebugIDisposableAsserts && MouseGrabView.WasDisposed)
             {
-                throw new ObjectDisposedException (MouseGrabView.GetType ().FullName);
+                throw new ObjectDisposedException (MouseGrabView.ToDebugString ());
             }
 #endif
 

@@ -22,8 +22,8 @@ public class GraphViewExample : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         _app = app;
 
         using Window window = new ()

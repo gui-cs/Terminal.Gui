@@ -200,7 +200,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         if (_stopCalled)
         {
-            Logging.Information ("Input loop exited cleanly");
+            Logging.Trace ("Input loop exited cleanly");
         }
         else
         {

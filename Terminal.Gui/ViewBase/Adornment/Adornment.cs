@@ -89,6 +89,12 @@ public class Adornment : View, IDesignable
     #region View Overrides
 
     /// <inheritdoc />
+    public override string ToDebugString ()
+    {
+        return $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
+    }
+
+    /// <inheritdoc />
     protected override IApplication? GetApp () => Parent?.App;
 
     /// <inheritdoc />

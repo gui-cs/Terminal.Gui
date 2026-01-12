@@ -94,6 +94,9 @@ internal partial class ApplicationImpl
 
         _result = null;
 
+        // Raise static event for modern instance-based model
+        Application.RaiseInstanceInitialized (this);
+
         return this;
     }
 
@@ -166,6 +169,10 @@ internal partial class ApplicationImpl
 
         // Capture state before cleanup
         bool wasInitialized = Initialized;
+
+        // Raise static event for modern instance-based model BEFORE assertions
+        // This allows test code to unsubscribe from instance events before we check
+        Application.RaiseInstanceDisposed (this);
 
 #if DEBUG
 
@@ -257,7 +264,7 @@ internal partial class ApplicationImpl
         // Don't dispose the TopRunnable. It's up to caller dispose it
         if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnableView is { })
         {
-            Debug.Assert (TopRunnableView.WasDisposed, $"Title = {TopRunnableView.Title}, Id = {TopRunnableView.Id}");
+            Debug.Assert (TopRunnableView.WasDisposed, TopRunnableView.ToDebugString ());
         }
 #endif
 

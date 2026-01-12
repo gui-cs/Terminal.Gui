@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Text Effects", "Text Effects.")]
@@ -16,8 +14,8 @@ public class TextEffectsScenario : Scenario
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window w = new ()
         {
@@ -28,19 +26,17 @@ public class TextEffectsScenario : Scenario
 
         w.IsModalChanged += (s, e) => { SetupGradientLineCanvas (w, w.Frame.Size); };
 
-        w.ViewportChanged += (s, e) =>
-                          {
-                              SetupGradientLineCanvas (w, e.NewViewport.Size);
-                          };
+        w.ViewportChanged += (s, e) => { SetupGradientLineCanvas (w, e.NewViewport.Size); };
 
-        w.SetScheme (new ()
-        {
-            Normal = new (ColorName16.White, ColorName16.Black),
-            Focus = new (ColorName16.Black, ColorName16.White),
-            HotNormal = new (ColorName16.White, ColorName16.Black),
-            HotFocus = new (ColorName16.White, ColorName16.Black),
-            Disabled = new (ColorName16.Gray, ColorName16.Black)
-        });
+        w.SetScheme (
+                     new ()
+                     {
+                         Normal = new (ColorName16.White, ColorName16.Black),
+                         Focus = new (ColorName16.Black, ColorName16.White),
+                         HotNormal = new (ColorName16.White, ColorName16.Black),
+                         HotFocus = new (ColorName16.White, ColorName16.Black),
+                         Disabled = new (ColorName16.Gray, ColorName16.Black)
+                     });
 
         var gradientsView = new GradientsView
         {
@@ -55,10 +51,10 @@ public class TextEffectsScenario : Scenario
         };
 
         cbLooping.CheckedStateChanging += (_, e) =>
-                            {
-                                _loopingGradient = e.Result == CheckState.Checked;
-                                SetupGradientLineCanvas (w, w.Frame.Size);
-                            };
+                                          {
+                                              _loopingGradient = e.Result == CheckState.Checked;
+                                              SetupGradientLineCanvas (w, w.Frame.Size);
+                                          };
 
         gradientsView.Add (cbLooping);
 

@@ -20,7 +20,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 
     public UnixInput ()
     {
-        Logging.Information ($"Creating {nameof (UnixInput)}");
+        //Logging.Information ($"Creating {nameof (UnixInput)}");
 
         try
         {

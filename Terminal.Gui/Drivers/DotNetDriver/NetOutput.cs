@@ -13,7 +13,7 @@ public class NetOutput : OutputBase, IOutput
     /// </summary>
     public NetOutput ()
     {
-        Logging.Information ($"Creating {nameof (NetOutput)}");
+        // Logging.Information ($"Creating {nameof (NetOutput)}");
 
         try
         {
