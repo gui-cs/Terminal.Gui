@@ -1,8 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿namespace ViewsTests;
 
-namespace ViewsTests;
-
-public class MessageBoxTests (ITestOutputHelper output)
+public class MessageBoxTests
 {
     [Fact]
     public void KeyBindings_Esc_Closes ()
