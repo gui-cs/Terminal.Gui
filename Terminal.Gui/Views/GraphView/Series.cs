@@ -37,7 +37,7 @@ public class ScatterSeries : ISeries
 
         foreach (PointF p in Points.Where (p => graphBounds.Contains (p)))
         {
-            Point screenPoint = graph.GraphSpaceToScreen (p);
+            Point screenPoint = graph.GraphSpaceToViewport (p);
             graph.AddRune (screenPoint.X, screenPoint.Y, Fill.Rune);
         }
     }
@@ -182,8 +182,8 @@ public class BarSeries : ISeries
             float endY = Orientation == Orientation.Horizontal ? yStart : Bars [i].Value;
 
             // translate to screen positions
-            Point screenStart = graph.GraphSpaceToScreen (new PointF (xStart, yStart));
-            Point screenEnd = graph.GraphSpaceToScreen (new PointF (endX, endY));
+            Point screenStart = graph.GraphSpaceToViewport (new PointF (xStart, yStart));
+            Point screenEnd = graph.GraphSpaceToViewport (new PointF (endX, endY));
 
             // Start the bar from wherever the axis is
             if (Orientation == Orientation.Horizontal)

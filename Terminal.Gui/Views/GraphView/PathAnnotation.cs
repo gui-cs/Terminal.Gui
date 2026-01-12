@@ -24,8 +24,8 @@ public class PathAnnotation : IAnnotation
 
         foreach (LineF line in PointsToLines ())
         {
-            Point start = graph.GraphSpaceToScreen (line.Start);
-            Point end = graph.GraphSpaceToScreen (line.End);
+            Point start = graph.GraphSpaceToViewport (line.Start);
+            Point end = graph.GraphSpaceToViewport (line.End);
             graph.DrawLine (start, end, LineRune);
         }
     }

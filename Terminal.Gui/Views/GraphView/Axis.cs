@@ -188,7 +188,7 @@ public class HorizontalAxis : Axis
         if (Minimum.HasValue)
         {
             // start at the screen location of the minimum
-            int minimumScreenX = graph.GraphSpaceToScreen (new PointF (Minimum.Value, y)).X;
+            int minimumScreenX = graph.GraphSpaceToViewport (new PointF (Minimum.Value, y)).X;
 
             // unless that is off the screen to the left
             xStart = Math.Max (xStart, minimumScreenX);
@@ -209,7 +209,7 @@ public class HorizontalAxis : Axis
     {
         // find the origin of the graph in screen space (this allows for 'crosshair' style
         // graphs where positive and negative numbers visible
-        Point origin = graph.GraphSpaceToScreen (new PointF (0, 0));
+        Point origin = graph.GraphSpaceToViewport (new PointF (0, 0));
 
         // float the X axis so that it accurately represents the origin of the graph
         // but anchor it to top/bottom if the origin is offscreen
@@ -250,7 +250,7 @@ public class HorizontalAxis : Axis
 
         while (current.X < end.X)
         {
-            int screenX = graph.GraphSpaceToScreen (new PointF (current.X, current.Y)).X;
+            int screenX = graph.GraphSpaceToViewport (new PointF (current.X, current.Y)).X;
 
             // The increment we will render (normally a top T unicode symbol)
             var toRender = new AxisIncrementToRender (Orientation, screenX, current.X);
@@ -382,7 +382,7 @@ public class VerticalAxis : Axis
     {
         // find the origin of the graph in screen space (this allows for 'crosshair' style
         // graphs where positive and negative numbers visible
-        Point origin = graph.GraphSpaceToScreen (new PointF (0, 0));
+        Point origin = graph.GraphSpaceToViewport (new PointF (0, 0));
 
         // float the Y axis so that it accurately represents the origin of the graph
         // but anchor it to left/right if the origin is offscreen
@@ -406,7 +406,7 @@ public class VerticalAxis : Axis
         //unless there is a minimum
         if (Minimum.HasValue)
         {
-            return graph.GraphSpaceToScreen (new PointF (0, Minimum.Value)).Y;
+            return graph.GraphSpaceToViewport (new PointF (0, Minimum.Value)).Y;
         }
 
         return graph.Viewport.Height;
@@ -438,7 +438,7 @@ public class VerticalAxis : Axis
 
         while (current.Y < end.Y)
         {
-            int screenY = graph.GraphSpaceToScreen (new PointF (current.X, current.Y)).Y;
+            int screenY = graph.GraphSpaceToViewport (new PointF (current.X, current.Y)).Y;
 
             // Create the axis symbol
             var toRender = new AxisIncrementToRender (Orientation, screenY, current.Y);
