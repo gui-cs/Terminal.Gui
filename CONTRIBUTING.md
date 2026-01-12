@@ -315,8 +315,6 @@ The workflow will:
 - Create a GitHub Release
 - Automatically trigger the publish workflow to push the package to NuGet.org
 
-**Note:** The legacy `Scripts/Release.ps1` script is kept for reference but should not be used for new releases.
-
 ## What NOT to Do
 
 - ❌ Don't add new linters/formatters (use existing)
