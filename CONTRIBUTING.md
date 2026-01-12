@@ -293,6 +293,30 @@ Welcome! This guide provides everything you need to know to contribute effective
 - `v2_release` - Stable releases, matches NuGet
 - `v1_develop`, `v1_release` - Legacy v1 (maintenance only)
 
+## Release Process
+
+### Automated Release Workflow
+
+Releases are now automated using GitHub Actions to prevent manual errors. To create a release:
+
+1. **Navigate to Actions tab** in the GitHub repository
+2. **Select "Create Release" workflow** from the left sidebar
+3. **Click "Run workflow"** button
+4. **Configure release parameters:**
+   - **Branch:** Ensure `v2_release` is selected
+   - **Release type:** Choose from `prealpha`, `alpha`, `beta`, `rc`, or `stable`
+   - **Version override:** (Optional) Specify exact version (e.g., `2.0.0`), otherwise GitVersion calculates it automatically
+5. **Click "Run workflow"** to start the automated release process
+
+The workflow will:
+- Create an annotated git tag (e.g., `v2.0.0-prealpha` or `v2.0.0`)
+- Create a release commit on `v2_release`
+- Push the tag and commit to the repository
+- Create a GitHub Release
+- Automatically trigger the publish workflow to push the package to NuGet.org
+
+**Note:** The legacy `Scripts/Release.ps1` script is kept for reference but should not be used for new releases.
+
 ## What NOT to Do
 
 - ❌ Don't add new linters/formatters (use existing)

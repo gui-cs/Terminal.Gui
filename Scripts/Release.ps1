@@ -1,4 +1,11 @@
 # Script for doing a Release of Terminal.Gui
+# 
+# ⚠️ DEPRECATED: This manual script is kept for reference only.
+# Please use the automated release workflow instead:
+# https://github.com/gui-cs/Terminal.Gui/actions/workflows/release.yml
+#
+# For instructions, see CONTRIBUTING.md - Release Process section.
+#
 # For now just does Alpha
 param(
     [Parameter(Mandatory=$true)]

@@ -1,0 +1,127 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - prealpha
+          - alpha
+          - beta
+          - rc
+          - stable
+        default: 'prealpha'
+      version_override:
+        description: 'Version override (optional, e.g., 2.0.0). If not provided, GitVersion will calculate it.'
+        required: false
+        type: string
+
+jobs:
+  create-release:
+    name: Create and Tag Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout v2_release
+        uses: actions/checkout@v4
+        with:
+          ref: v2_release
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.1.11
+        with:
+          versionSpec: '6.0.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v3.1.11
+        with:
+          useConfigFile: true
+        id: gitversion
+
+      - name: Prepare Release Variables
+        id: prepare
+        run: |
+          if [ -n "${{ github.event.inputs.version_override }}" ]; then
+            VERSION="${{ github.event.inputs.version_override }}"
+          else
+            VERSION="${{ steps.gitversion.outputs.MajorMinorPatch }}"
+          fi
+          
+          RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+          
+          if [ "$RELEASE_TYPE" = "stable" ]; then
+            TAG="v${VERSION}"
+            RELEASE_NAME="v${VERSION}"
+          else
+            TAG="v${VERSION}-${RELEASE_TYPE}"
+            RELEASE_NAME="v${VERSION}-${RELEASE_TYPE}"
+          fi
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "release_name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
+          echo "release_type=${RELEASE_TYPE}" >> $GITHUB_OUTPUT
+
+      - name: Check if tag already exists
+        run: |
+          if git rev-parse "${{ steps.prepare.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Error: Tag ${{ steps.prepare.outputs.tag }} already exists"
+            exit 1
+          fi
+
+      - name: Create Release Tag
+        run: |
+          git tag -a "${{ steps.prepare.outputs.tag }}" -m "Release ${{ steps.prepare.outputs.release_name }}"
+          echo "Created tag: ${{ steps.prepare.outputs.tag }}"
+
+      - name: Create Release Commit
+        run: |
+          git commit --allow-empty -m "Release ${{ steps.prepare.outputs.release_name }}"
+          echo "Created release commit"
+
+      - name: Push Changes
+        run: |
+          git push origin v2_release
+          git push origin "${{ steps.prepare.outputs.tag }}"
+          echo "Pushed branch and tag to origin"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.prepare.outputs.tag }}
+          release_name: ${{ steps.prepare.outputs.release_name }}
+          draft: false
+          prerelease: ${{ steps.prepare.outputs.release_type != 'stable' }}
+          body: |
+            Release ${{ steps.prepare.outputs.release_name }}
+            
+            This release was created automatically using the release workflow.
+            
+            Version: ${{ steps.prepare.outputs.version }}
+            Type: ${{ steps.prepare.outputs.release_type }}
+            
+            The package has been published to NuGet.org automatically.
+
+      - name: Summary
+        run: |
+          echo "## Release Created Successfully! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ steps.prepare.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.prepare.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type:** ${{ steps.prepare.outputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The publish workflow will automatically build and publish this release to NuGet.org." >> $GITHUB_STEP_SUMMARY
