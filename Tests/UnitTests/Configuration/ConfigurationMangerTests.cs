@@ -1579,4 +1579,55 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Disable (true);
         }
     }
+
+    [Fact]
+    public void ConfigLocations_All_LoadsInCorrectOrder ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            // Arrange - Set up all possible configuration sources
+            Enable (ConfigLocations.HardCoded);
+            ThrowOnJsonErrors = true;
+
+            // Set environment variable (second-highest priority)
+            Environment.SetEnvironmentVariable ("TUI_CONFIG", """
+                                                              {
+                                                                   "Application.QuitKey": "Ctrl+E"
+                                                              }
+                                                              """);
+
+            // Set runtime config (highest priority)
+            RuntimeConfig = """
+                            {
+                                 "Application.QuitKey": "Ctrl+R"
+                            }
+                            """;
+
+            // Act - Load all locations
+            Load (ConfigLocations.All);
+
+            // Assert - Runtime should win (highest priority)
+            Assert.Equal (Key.R.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+
+            // Now test without Runtime
+            RuntimeConfig = null;
+            LoadHardCodedDefaults ();
+            Environment.SetEnvironmentVariable ("TUI_CONFIG", """
+                                                              {
+                                                                   "Application.QuitKey": "Ctrl+E"
+                                                              }
+                                                              """);
+            Load (ConfigLocations.Env);
+
+            // Assert - Env should be used when Runtime is not set
+            Assert.Equal (Key.E.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable ("TUI_CONFIG", null);
+            Disable (true);
+        }
+    }
 }
