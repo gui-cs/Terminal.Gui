@@ -405,57 +405,11 @@ public static class ConfigurationManager
         if (locations == ConfigLocations.HardCoded)
         {
             LoadHardCodedDefaults ();
+            return;
         }
 
-        if (locations.HasFlag (ConfigLocations.LibraryResources))
-        {
-            SourcesManager?.Load (
-                                  Settings,
-                                  typeof (ConfigurationManager).Assembly,
-                                  $"Terminal.Gui.Resources.{_configFilename}",
-                                  ConfigLocations.LibraryResources);
-        }
-
-        if (locations.HasFlag (ConfigLocations.AppResources))
-        {
-            string? embeddedStylesResourceName = Assembly.GetEntryAssembly ()
-                                                         ?
-                                                         .GetManifestResourceNames ()
-                                                         .FirstOrDefault (x => x.EndsWith (_configFilename));
-
-            if (string.IsNullOrEmpty (embeddedStylesResourceName))
-            {
-                embeddedStylesResourceName = _configFilename;
-            }
-
-            SourcesManager?.Load (Settings, Assembly.GetEntryAssembly ()!, embeddedStylesResourceName!, ConfigLocations.AppResources);
-        }
-
-        // TODO: Determine if Runtime should be applied last.
-        if (locations.HasFlag (ConfigLocations.Runtime) && !string.IsNullOrEmpty (RuntimeConfig))
-        {
-            SourcesManager?.Load (Settings, RuntimeConfig, "ConfigurationManager.RuntimeConfig", ConfigLocations.Runtime);
-        }
-
-        if (locations.HasFlag (ConfigLocations.GlobalCurrent))
-        {
-            SourcesManager?.Load (Settings, $"./.tui/{_configFilename}", ConfigLocations.GlobalCurrent);
-        }
-
-        if (locations.HasFlag (ConfigLocations.GlobalHome))
-        {
-            SourcesManager?.Load (Settings, $"~/.tui/{_configFilename}", ConfigLocations.GlobalHome);
-        }
-
-        if (locations.HasFlag (ConfigLocations.AppCurrent))
-        {
-            SourcesManager?.Load (Settings, $"./.tui/{AppName}.{_configFilename}", ConfigLocations.AppCurrent);
-        }
-
-        if (locations.HasFlag (ConfigLocations.AppHome))
-        {
-            SourcesManager?.Load (Settings, $"~/.tui/{AppName}.{_configFilename}", ConfigLocations.AppHome);
-        }
+        // Use SourcesManager to load from all locations in the correct order
+        SourcesManager?.LoadFromLocations (Settings, locations);
     }
 
     // TODO: Rename to Loaded?

@@ -16,6 +16,95 @@ public class SourcesManager
     /// </summary>
     public ConcurrentDictionary<ConfigLocations, string> Sources { get; } = new ();
 
+    /// <summary>
+    ///     INTERNAL: Loads configuration from the specified locations in the order defined by the 
+    ///     <see cref="ConfigLocations"/> enum bit values (lower bit values are loaded first, higher bit values override).
+    /// </summary>
+    /// <param name="settingsScope">The Settings Scope object that will be updated.</param>
+    /// <param name="locations">The locations to load from.</param>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    internal void LoadFromLocations (SettingsScope? settingsScope, ConfigLocations locations)
+    {
+        if (settingsScope is null)
+        {
+            return;
+        }
+
+        // Get all defined ConfigLocations values (excluding None and All)
+        ConfigLocations[] allLocations = Enum.GetValues<ConfigLocations>()
+            .Where(loc => loc != ConfigLocations.None && loc != ConfigLocations.All)
+            .OrderBy(loc => (int)loc) // Order by bit value (lower bits first)
+            .ToArray();
+
+        foreach (ConfigLocations location in allLocations)
+        {
+            if (!locations.HasFlag(location))
+            {
+                continue;
+            }
+
+            switch (location)
+            {
+                case ConfigLocations.HardCoded:
+                    // HardCoded is handled separately in ConfigurationManager.Load
+                    break;
+
+                case ConfigLocations.LibraryResources:
+                    Load(
+                        settingsScope,
+                        typeof(ConfigurationManager).Assembly,
+                        $"Terminal.Gui.Resources.config.json",
+                        ConfigLocations.LibraryResources);
+                    break;
+
+                case ConfigLocations.AppResources:
+                    string? embeddedStylesResourceName = Assembly.GetEntryAssembly()
+                        ?.GetManifestResourceNames()
+                        .FirstOrDefault(x => x.EndsWith("config.json"));
+
+                    if (string.IsNullOrEmpty(embeddedStylesResourceName))
+                    {
+                        embeddedStylesResourceName = "config.json";
+                    }
+
+                    Load(settingsScope, Assembly.GetEntryAssembly()!, embeddedStylesResourceName!, ConfigLocations.AppResources);
+                    break;
+
+                case ConfigLocations.GlobalHome:
+                    Load(settingsScope, $"~/.tui/config.json", ConfigLocations.GlobalHome);
+                    break;
+
+                case ConfigLocations.GlobalCurrent:
+                    Load(settingsScope, $"./.tui/config.json", ConfigLocations.GlobalCurrent);
+                    break;
+
+                case ConfigLocations.AppHome:
+                    Load(settingsScope, $"~/.tui/{ConfigurationManager.AppName}.config.json", ConfigLocations.AppHome);
+                    break;
+
+                case ConfigLocations.AppCurrent:
+                    Load(settingsScope, $"./.tui/{ConfigurationManager.AppName}.config.json", ConfigLocations.AppCurrent);
+                    break;
+
+                case ConfigLocations.Env:
+                    string? envConfig = Environment.GetEnvironmentVariable("TUI_CONFIG");
+                    if (!string.IsNullOrEmpty(envConfig))
+                    {
+                        Load(settingsScope, envConfig, "Environment.GetEnvironmentVariable(\"TUI_CONFIG\")", ConfigLocations.Env);
+                    }
+                    break;
+
+                case ConfigLocations.Runtime:
+                    if (!string.IsNullOrEmpty(ConfigurationManager.RuntimeConfig))
+                    {
+                        Load(settingsScope, ConfigurationManager.RuntimeConfig, "ConfigurationManager.RuntimeConfig", ConfigLocations.Runtime);
+                    }
+                    break;
+            }
+        }
+    }
+
     /// <summary>INTERNAL: Loads <paramref name="stream"/> into the specified <see cref="SettingsScope"/>.</summary>
     /// <param name="settingsScope">The Settings Scope object that <paramref name="stream"/> will be loaded into.</param>
     /// <param name="stream">Json document to update the settings with.</param>
