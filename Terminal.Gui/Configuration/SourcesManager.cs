@@ -18,11 +18,17 @@ public class SourcesManager
 
     /// <summary>
     ///     Cached array of all defined ConfigLocations values (excluding None and All) ordered by bit value.
+    ///     Only includes single-flag values (powers of 2).
     /// </summary>
     private static readonly ConfigLocations[] _sortedLocations = Enum.GetValues<ConfigLocations>()
-        .Where(loc => loc != ConfigLocations.None && loc != ConfigLocations.All)
+        .Where(loc => loc != ConfigLocations.None && IsPowerOfTwo((int)loc))
         .OrderBy(loc => (int)loc)
         .ToArray();
+
+    /// <summary>
+    ///     Checks if a number is a power of 2 (i.e., a single flag value).
+    /// </summary>
+    private static bool IsPowerOfTwo(int value) => value > 0 && (value & (value - 1)) == 0;
 
     /// <summary>
     ///     INTERNAL: Loads configuration from the specified locations in the order defined by the 
@@ -56,37 +62,37 @@ public class SourcesManager
                     Load(
                         settingsScope,
                         typeof(ConfigurationManager).Assembly,
-                        $"Terminal.Gui.Resources.config.json",
+                        $"Terminal.Gui.Resources.{ConfigurationManager._configFilename}",
                         ConfigLocations.LibraryResources);
                     break;
 
                 case ConfigLocations.AppResources:
                     string? embeddedStylesResourceName = Assembly.GetEntryAssembly()
                         ?.GetManifestResourceNames()
-                        .FirstOrDefault(x => x.EndsWith("config.json"));
+                        .FirstOrDefault(x => x.EndsWith(ConfigurationManager._configFilename));
 
                     if (string.IsNullOrEmpty(embeddedStylesResourceName))
                     {
-                        embeddedStylesResourceName = "config.json";
+                        embeddedStylesResourceName = ConfigurationManager._configFilename;
                     }
 
                     Load(settingsScope, Assembly.GetEntryAssembly()!, embeddedStylesResourceName!, ConfigLocations.AppResources);
                     break;
 
                 case ConfigLocations.GlobalHome:
-                    Load(settingsScope, $"~/.tui/config.json", ConfigLocations.GlobalHome);
+                    Load(settingsScope, $"~/.tui/{ConfigurationManager._configFilename}", ConfigLocations.GlobalHome);
                     break;
 
                 case ConfigLocations.GlobalCurrent:
-                    Load(settingsScope, $"./.tui/config.json", ConfigLocations.GlobalCurrent);
+                    Load(settingsScope, $"./.tui/{ConfigurationManager._configFilename}", ConfigLocations.GlobalCurrent);
                     break;
 
                 case ConfigLocations.AppHome:
-                    Load(settingsScope, $"~/.tui/{ConfigurationManager.AppName}.config.json", ConfigLocations.AppHome);
+                    Load(settingsScope, $"~/.tui/{ConfigurationManager.AppName}.{ConfigurationManager._configFilename}", ConfigLocations.AppHome);
                     break;
 
                 case ConfigLocations.AppCurrent:
-                    Load(settingsScope, $"./.tui/{ConfigurationManager.AppName}.config.json", ConfigLocations.AppCurrent);
+                    Load(settingsScope, $"./.tui/{ConfigurationManager.AppName}.{ConfigurationManager._configFilename}", ConfigLocations.AppCurrent);
                     break;
 
                 case ConfigLocations.Env:

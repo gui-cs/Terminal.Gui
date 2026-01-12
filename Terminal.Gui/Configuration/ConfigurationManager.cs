@@ -367,6 +367,10 @@ public static class ConfigurationManager
     /// <summary>
     ///     INTERNAL: Loads all hard-coded configuration properties. Use <see cref="Apply"/> to cause the loaded settings to be
     ///     applied to the running application.
+    ///     <para>
+    ///         WARNING: This method clears <see cref="RuntimeConfig"/> and all existing <see cref="SourcesManager.Sources"/>.
+    ///         Only call this when you want to completely reset configuration to hard-coded defaults.
+    ///     </para>
     /// </summary>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
@@ -603,7 +607,7 @@ public static class ConfigurationManager
     }
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    private static readonly string _configFilename = "config.json";
+    internal static readonly string _configFilename = "config.json";
 
     #endregion Sources
 
