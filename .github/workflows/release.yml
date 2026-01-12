@@ -98,23 +98,25 @@ jobs:
           echo "Pushed branch and tag to origin"
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.prepare.outputs.tag }}
-          release_name: ${{ steps.prepare.outputs.release_name }}
-          draft: false
-          prerelease: ${{ steps.prepare.outputs.release_type != 'stable' }}
-          body: |
-            Release ${{ steps.prepare.outputs.release_name }}
-            
-            This release was created automatically using the release workflow.
-            
-            Version: ${{ steps.prepare.outputs.version }}
-            Type: ${{ steps.prepare.outputs.release_type }}
-            
-            The package has been published to NuGet.org automatically.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PRERELEASE_FLAG=""
+          if [ "${{ steps.prepare.outputs.release_type }}" != "stable" ]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+          
+          gh release create "${{ steps.prepare.outputs.tag }}" \
+            --title "${{ steps.prepare.outputs.release_name }}" \
+            $PRERELEASE_FLAG \
+            --notes "Release ${{ steps.prepare.outputs.release_name }}
+
+          This release was created automatically using the release workflow.
+
+          - **Version:** ${{ steps.prepare.outputs.version }}
+          - **Type:** ${{ steps.prepare.outputs.release_type }}
+
+          The package has been published to NuGet.org automatically."
 
       - name: Summary
         run: |
