@@ -915,14 +915,14 @@ public class ListViewTests (ITestOutputHelper output)
 └─────┘",
                                                        _output, app?.Driver);
 
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.Equal ("", selected);
         Assert.Null (lv.SelectedItem);
 
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonClicked
+                                        ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonPressed
                                     });
         Assert.Equal ("One", selected);
         Assert.Equal (0, lv.SelectedItem);
@@ -930,7 +930,7 @@ public class ListViewTests (ITestOutputHelper output)
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonClicked
+                                        ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonPressed
                                     });
         Assert.Equal ("Two", selected);
         Assert.Equal (1, lv.SelectedItem);
@@ -938,7 +938,7 @@ public class ListViewTests (ITestOutputHelper output)
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 3), Flags = MouseFlags.LeftButtonClicked
+                                        ScreenPosition = new (1, 3), Flags = MouseFlags.LeftButtonPressed
                                     });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
@@ -946,7 +946,7 @@ public class ListViewTests (ITestOutputHelper output)
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonClicked
+                                        ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonPressed
                                     });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
