@@ -42,7 +42,9 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
 # Simple Example
 
 ```csharp
-using Terminal.Gui;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
 
 using IApplication app = Application.Create ();
 app.Init ();
