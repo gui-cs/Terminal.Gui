@@ -118,7 +118,7 @@ jobs:
           - **Version:** ${{ steps.prepare.outputs.version }}
           - **Type:** ${{ steps.prepare.outputs.release_type }}
 
-          The package has been published to NuGet.org automatically.
+          The package will be automatically published to NuGet.org via the publish workflow.
           EOF
           
           gh release create "${{ steps.prepare.outputs.tag }}" \
