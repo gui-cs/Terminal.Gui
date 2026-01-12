@@ -467,8 +467,7 @@ public static class DeepCloner
     private static bool IsAotEnvironment () =>
 
         // Check if running in an AOT environment
-        Type.GetType ("System.Runtime.CompilerServices.RuntimeFeature")?.GetProperty ("IsDynamicCodeSupported")?.GetValue (null) is bool isDynamicCodeSupported
-        && !isDynamicCodeSupported;
+        Type.GetType ("System.Runtime.CompilerServices.RuntimeFeature")?.GetProperty ("IsDynamicCodeSupported")?.GetValue (null) is bool and false;
 
     /// <summary>
     ///     Attempts to clone an object using source-generated serialization from System.Text.Json.
