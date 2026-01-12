@@ -124,7 +124,7 @@ public class UICatalog
         resultsFile.AddAlias ("--f");
 
         // what's the app name?
-        LogFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}";
+        LogFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}.log";
 
         Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {LogFilePath})").FromAmong (
              Enum.GetNames<LogLevel> ()
