@@ -129,9 +129,9 @@ public class Runnable : View, IRunnable
     ///         // Check if user wants to save first
     ///         if (HasUnsavedChanges ())
     ///         {
-    ///             int result = MessageBox.Query (App, "Save?", "Save changes?", "Yes", "No", "Cancel");
-    ///             if (result == 2) return true;  // Cancel stopping
-    ///             if (result == 0) Save ();
+    ///             int result = MessageBox.Query (App, "Save?", "Save changes?", "_No", "_Yes");
+    ///             if (result == 0) return true;  // Cancel stopping
+    ///             if (result == 1) Save ();
     ///         }
     ///     }
     /// 
@@ -173,16 +173,17 @@ public class Runnable : View, IRunnable
         if (newIsModal)
         {
             // Set focus to self if becoming modal
-            if (HasFocus is false)
+            if (!HasFocus)
             {
                 SetFocus ();
             }
 
-            // Position cursor and update driver
-            if (App?.PositionCursor () == true)
-            {
-                App?.Driver?.UpdateCursor ();
-            }
+            //// BUGBUG: we should not have to do this here
+            //// Position cursor and update driver
+            //if (App?.PositionCursor () == true)
+            //{
+            //    App?.Navigation?.UpdateCursor ();
+            //}
         }
 
         // CWP Phase 3: Post-notification (work already done by Application)

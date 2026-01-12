@@ -2197,7 +2197,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2205,7 +2205,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl }
+                          new () { Position = new (1, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl }
                          );
 
         // should extend the selection
@@ -2215,8 +2215,8 @@ public class TableViewTests (ITestOutputHelper output)
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.DoesNotContain (new (0, 1), selected);
-        Assert.Contains (new (0, 2), selected);
+        Assert.DoesNotContain (new Point (0, 1), selected);
+        Assert.Contains (new Point (0, 2), selected);
     }
 
     [Fact]
@@ -2273,7 +2273,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2328,7 +2328,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2381,7 +2381,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 4), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 4), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2565,7 +2565,7 @@ A B C
 
         // Clicking in bottom row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 3), Flags = MouseFlags.Button1Clicked }
+                          new () { Position = new (1, 3), Flags = MouseFlags.LeftButtonClicked }
                          );
 
         // should select that row
@@ -2573,7 +2573,7 @@ A B C
 
         // shift clicking top row
         tv.NewMouseEvent (
-                          new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked | MouseFlags.ButtonShift }
+                          new () { Position = new (1, 2), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Shift }
                          );
 
         // should extend the selection
@@ -2582,7 +2582,7 @@ A B C
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.Contains (new (0, 1), selected);
+        Assert.Contains (new Point (0, 1), selected);
     }
 
     [Fact]

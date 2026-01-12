@@ -3,7 +3,7 @@ using UnitTests;
 
 namespace ViewsTests;
 
-public class TextValidateField_NET_Provider_Tests : FakeDriverBase
+public class TextValidateField_NET_Provider_Tests : TestDriverBase
 {
     [Fact]
     public void Backspace_Key_Deletes_Previous_Character ()
@@ -322,7 +322,7 @@ public class TextValidateField_NET_Provider_Tests : FakeDriverBase
         Assert.False (field.IsValid);
         Assert.Equal ("--(1   )--", field.Provider.Text);
 
-        field.NewMouseEvent (new MouseEventArgs { Position = new (25, 0), Flags = MouseFlags.Button1Pressed });
+        field.NewMouseEvent (new Mouse { Position = new (25, 0), Flags = MouseFlags.LeftButtonPressed });
 
         field.NewKeyDownEvent (Key.D1);
 
@@ -426,7 +426,7 @@ public class TextValidateField_NET_Provider_Tests : FakeDriverBase
     }
 }
 
-public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
+public class TextValidateField_Regex_Provider_Tests : TestDriverBase
 {
     [Fact]
     public void End_Key_End_Of_Input ()

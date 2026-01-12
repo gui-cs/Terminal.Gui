@@ -20,6 +20,8 @@ public static class CWPPropertyHelper
     ///     The type of the property value, which may be a nullable reference type (e.g., <see cref="string"/>
     ///     ?).
     /// </typeparam>
+    /// <param name="sender">The sender of the event. Will be provided as the sender in <paramref name="changingEvent"/>
+    /// and <paramref name="changedEvent"/>.</param>
     /// <param name="currentValue">
     ///     Reference to the current property value, which may be null for nullable types. If the change is not cancelled, this
     ///     will be set to <paramref name="finalValue"/>.
@@ -53,6 +55,7 @@ public static class CWPPropertyHelper
     ///     </code>
     /// </example>
     public static bool ChangeProperty<T> (
+        object? sender,
         ref T currentValue,
         T newValue,
         Func<ValueChangingEventArgs<T>, bool>? onChanging,
@@ -84,7 +87,7 @@ public static class CWPPropertyHelper
             }
         }
 
-        changingEvent?.Invoke (null, args);
+        changingEvent?.Invoke (sender, args);
 
         if (args.Handled)
         {
@@ -100,13 +103,14 @@ public static class CWPPropertyHelper
         }
 
         finalValue = args.NewValue;
-        
+
         // Do the work (set backing field, update related properties, etc.) BEFORE raising Changed events
         doWork (finalValue);
-        
+
         ValueChangedEventArgs<T> changedArgs = new (currentValue, finalValue);
         currentValue = finalValue;
         onChanged?.Invoke (changedArgs);
+        // BUGBUG: This should pass this not null; need to test
         changedEvent?.Invoke (null, changedArgs);
 
         return true;

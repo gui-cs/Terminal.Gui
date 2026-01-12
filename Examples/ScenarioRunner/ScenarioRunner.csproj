@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <!-- Version numbers are automatically updated by gitversion when a release is released -->
+        <!-- In the source tree the version will always be 2.0 for all projects. -->
+        <!-- Do not modify these. -->
+        <AssemblyVersion>2.0</AssemblyVersion>
+        <FileVersion>2.0</FileVersion>
+        <Version>2.0</Version>
+        <InformationalVersion>2.0</InformationalVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DefineConstants>TRACE</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="Serilog.Extensions.Logging" />
+        <PackageReference Include="Serilog.Sinks.Debug" />
+        <PackageReference Include="Serilog.Sinks.File" />
+        <PackageReference Include="System.CommandLine" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\UICatalog\UICatalog.csproj" />
+    </ItemGroup>
+</Project>

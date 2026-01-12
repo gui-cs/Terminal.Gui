@@ -361,10 +361,10 @@ public class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>
     ///     Mouse event to trigger <see cref="TreeView{T}.ObjectActivated"/>. Defaults to double click (
-    ///     <see cref="MouseFlags.Button1DoubleClicked"/>). Set to null to disable this feature.
+    ///     <see cref="MouseFlags.LeftButtonDoubleClicked"/>). Set to null to disable this feature.
     /// </summary>
     /// <value></value>
-    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.Button1DoubleClicked;
+    public MouseFlags? ObjectActivationButton { get; set; } = MouseFlags.LeftButtonDoubleClicked;
 
     // TODO: Update to use Key instead of KeyCode
     /// <summary>Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>. Defaults to Enter.</summary>
@@ -583,7 +583,31 @@ public class TreeView<T> : View, ITreeView where T : class
             }
         }
 
+        UpdateCursor ();
+
         SetNeedsDraw ();
+    }
+
+    private void UpdateCursor ()
+    {
+        if (!CanFocus || !HasFocus || !Visible || SelectedObject is null || !Cursor.IsVisible)
+        {
+            return;
+        }
+
+        IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+        int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
+
+        // if currently selected line is visible
+        if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
+        {
+            Branch<T> branch = map.ElementAt (idx);
+            int indent = branch.Depth + 2 + branch.Parent?.Depth ?? 1;
+            Cursor = Cursor with
+            {
+                Position = ViewportToScreen (new Point (indent - ScrollOffsetHorizontal, idx - ScrollOffsetVertical)),
+            };
+        }
     }
 
     /// <summary>Moves the selection to the last child in the currently selected level.</summary>
@@ -1011,11 +1035,11 @@ public class TreeView<T> : View, ITreeView where T : class
 
     // BUGBUG: OnMouseEvent is internal. TreeView should not be overriding.
     ///<inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
         // If it is not an event we care about
         if (me is { IsSingleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
-            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.Button1DoubleClicked))
+            && !me.Flags.HasFlag (ObjectActivationButton ?? MouseFlags.LeftButtonDoubleClicked))
         {
             // do nothing
             return false;
@@ -1056,17 +1080,17 @@ public class TreeView<T> : View, ITreeView where T : class
             return true;
         }
 
-        if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (me.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             // The line they clicked on a branch
-            Branch<T> clickedBranch = HitTest (me.Position.Y);
+            Branch<T> clickedBranch = HitTest (me.Position!.Value.Y);
 
             if (clickedBranch is null)
             {
                 return false;
             }
 
-            bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (me.Position.X);
+            bool isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (me.Position!.Value.X);
 
             // If we are already selected (double click)
             if (Equals (SelectedObject, clickedBranch.Model))
@@ -1109,7 +1133,7 @@ public class TreeView<T> : View, ITreeView where T : class
         if (ObjectActivationButton.HasValue && me.Flags.HasFlag (ObjectActivationButton.Value))
         {
             // The line they clicked on a branch
-            Branch<T> clickedBranch = HitTest (me.Position.Y);
+            Branch<T> clickedBranch = HitTest (me.Position!.Value.Y);
 
             if (clickedBranch is null)
             {
@@ -1239,26 +1263,6 @@ public class TreeView<T> : View, ITreeView where T : class
         return false;
     }
 
-    /// <summary>Positions the cursor at the start of the selected objects line (if visible).</summary>
-    public override Point? PositionCursor ()
-    {
-        if (CanFocus && HasFocus && Visible && SelectedObject is { })
-        {
-            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-            int idx = map.IndexOf (b => b.Model.Equals (SelectedObject));
-
-            // if currently selected line is visible
-            if (idx - ScrollOffsetVertical >= 0 && idx - ScrollOffsetVertical < Viewport.Height)
-            {
-                Move (0, idx - ScrollOffsetVertical);
-
-                return MultiSelect ? new (0, idx - ScrollOffsetVertical) : null;
-            }
-        }
-
-        return base.PositionCursor ();
-    }
-
     /// <summary>
     ///     Rebuilds the tree structure for all exposed objects starting with the root objects. Call this method when you
     ///     know there are changes to the tree but don't know which objects have changed (otherwise use
@@ -1355,6 +1359,7 @@ public class TreeView<T> : View, ITreeView where T : class
 
         multiSelectedRegions.Push (new (map.ElementAt (0), map.Count, map));
         SetNeedsDraw ();
+        UpdateCursor ();
 
         OnSelectionChanged (new (this, SelectedObject, SelectedObject));
     }

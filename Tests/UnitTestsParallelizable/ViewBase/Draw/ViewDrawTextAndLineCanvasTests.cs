@@ -4,14 +4,14 @@ using Xunit.Abstractions;
 
 namespace ViewBaseTests.Drawing;
 
-public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
+public class ViewDrawTextAndLineCanvasTests () : TestDriverBase
 {
     #region DrawText Tests
 
     [Fact]
     public void DrawText_EmptyText_DoesNotThrow ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -35,7 +35,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void DrawText_NullText_DoesNotThrow ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -59,7 +59,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void DrawText_DrawsTextToDriver ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -89,7 +89,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void DrawText_WithFocus_UsesFocusAttribute ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -119,7 +119,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void DrawText_WithoutFocus_UsesNormalAttribute ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -148,7 +148,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void DrawText_SetsSubViewNeedsDraw ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -180,7 +180,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void DrawingText_Event_Raised ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         bool eventRaised = false;
@@ -221,7 +221,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void RenderLineCanvas_DrawsLines ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -252,7 +252,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void RenderLineCanvas_ClearsAfterRendering ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -281,7 +281,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void RenderLineCanvas_WithSuperViewRendersLineCanvas_DoesNotClear ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -311,7 +311,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void SuperViewRendersLineCanvas_MergesWithParentCanvas ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var parent = new View
@@ -351,7 +351,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void OnRenderingLineCanvas_CanPreventRendering ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new TestView
@@ -414,7 +414,7 @@ public class ViewDrawTextAndLineCanvasTests () : FakeDriverBase
     [Fact]
     public void Draw_WithSuperViewRendersLineCanvas_SetsNeedsDraw ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var parent = new View

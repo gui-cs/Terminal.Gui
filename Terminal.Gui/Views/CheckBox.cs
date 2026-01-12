@@ -14,7 +14,7 @@ public class CheckBox : View
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultHighlightStates
+    public static MouseState DefaultMouseHighlightStates
     {
         get => _defaultHighlightStates;
         set => _defaultHighlightStates = value;
@@ -38,11 +38,12 @@ public class CheckBox : View
         // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
         // The default Accept handler does that.
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
 
         TitleChanged += Checkbox_TitleChanged;
 
-        HighlightStates = DefaultHighlightStates;
+        MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
     /// <inheritdoc />

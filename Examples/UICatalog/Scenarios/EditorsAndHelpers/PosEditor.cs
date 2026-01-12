@@ -1,8 +1,5 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace UICatalog.Scenarios;
 
@@ -102,7 +99,7 @@ public class PosEditor : EditorBase
             Text = $"{_value}"
         };
 
-        _valueEdit.Accepting += (s, args) =>
+        _valueEdit.Accepting += (_, args) =>
                                 {
                                     try
                                     {
@@ -123,7 +120,7 @@ public class PosEditor : EditorBase
 
     private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { PosChanged (); }
 
-    // These need to have same order 
+    // These need to have same order
     private readonly List<string> _posNames = ["Absolute", "Align", "AnchorEnd", "Center", "Func", "Percent"];
     private readonly string [] _optionLabels = ["Absolute(n)", "Align", "AnchorEnd", "Center", "Func(()=>n)", "Percent(n)"];
 
@@ -136,7 +133,7 @@ public class PosEditor : EditorBase
 
         try
         {
-            Pos? pos = _posOptionSelector!.Value switch
+            Pos pos = _posOptionSelector!.Value switch
                        {
                            0 => Pos.Absolute (_value),
                            1 => Pos.Align (Alignment.Start),
@@ -160,7 +157,7 @@ public class PosEditor : EditorBase
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery (App, "Exception", e.Message, "Ok");
+            MessageBox.ErrorQuery (App!, "Exception", e.Message, "Ok");
         }
     }
 }

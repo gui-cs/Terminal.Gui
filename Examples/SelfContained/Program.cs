@@ -13,8 +13,15 @@ namespace SelfContained;
 
 public static class Program
 {
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IDriver)")]
     private static void Main (string [] args)
+    {
+#pragma warning disable IL2026 // Run() has attributes for AOT compatibility
+        Run ();
+#pragma warning restore IL2026
+    }
+
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IDriver)")]
+    private static void Run ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
@@ -100,13 +107,13 @@ public class ExampleWindow : Runnable<string>
                            {
                                if (userNameText.Text == "admin" && passwordText.Text == "password")
                                {
-                                   MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
+                                   MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
                                    Result = userNameText.Text;
                                    App?.RequestStop ();
                                }
                                else
                                {
-                                   MessageBox.ErrorQuery (App, "Logging In", "Incorrect username or password", "Ok");
+                                   MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "Ok");
                                }
                                // When Accepting is handled, set e.Handled to true to prevent further processing.
                                e.Handled = true;

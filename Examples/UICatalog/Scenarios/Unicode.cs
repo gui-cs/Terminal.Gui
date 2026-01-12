@@ -11,15 +11,18 @@ public class UnicodeInMenu : Scenario
 {
     public override void Main ()
     {
-        var unicode =
+        string unicode =
             "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-        var gitString =
+        string gitString =
             $"gui.cs 糊 (hú) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
 
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window appWindow = new ()
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -48,7 +51,7 @@ public class UnicodeInMenu : Scenario
                                        new MenuItem
                                        {
                                            Title = "_Выход",
-                                           Action = () => Application.RequestStop ()
+                                           Action = () => appWindow.RequestStop ()
                                        }
                                    ]
                                   )
@@ -208,7 +211,7 @@ public class UnicodeInMenu : Scenario
                                        new (
                                             Application.QuitKey,
                                             "Выход",
-                                            () => Application.RequestStop ()
+                                            () => appWindow.RequestStop ()
                                            ),
                                        new (Key.F2, "Создать", null),
                                        new (Key.F3, "Со_хранить", null)
@@ -216,8 +219,6 @@ public class UnicodeInMenu : Scenario
                                   );
         appWindow.Add (statusBar);
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 }

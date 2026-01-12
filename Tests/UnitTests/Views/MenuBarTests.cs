@@ -364,7 +364,7 @@ public class MenuBarTests ()
         // Act
         Application.RaiseMouseEvent (new ()
         {
-            Flags = MouseFlags.ReportMousePosition
+            Flags = MouseFlags.PositionReport
         });
         Assert.True (menuBar.Active);
         Assert.False (menuBar.IsOpen ());
@@ -393,7 +393,11 @@ public class MenuBarTests ()
         // Act
         Application.RaiseMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonPressed
+        });
+        Application.RaiseMouseEvent (new ()
+        {
+            Flags = MouseFlags.LeftButtonReleased
         });
         Assert.True (menuBar.Active);
         Assert.True (menuBar.IsOpen ());
@@ -431,7 +435,7 @@ public class MenuBarTests ()
 
         Application.RaiseMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         });
         Assert.True (menuBar.IsOpen ());
         Assert.True (menuBar.HasFocus);
@@ -442,7 +446,7 @@ public class MenuBarTests ()
         // Act
         Application.RaiseMouseEvent (new ()
         {
-            Flags = MouseFlags.Button1Clicked
+            Flags = MouseFlags.LeftButtonClicked
         });
         Assert.False (menuBar.Active);
         Assert.False (menuBar.IsOpen ());

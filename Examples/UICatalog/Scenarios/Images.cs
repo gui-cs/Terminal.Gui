@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Text;
 using ColorHelper;
 using SixLabors.ImageSharp;
@@ -58,16 +58,20 @@ public class Images : Scenario
     // Start by assuming no support
     private SixelSupportResult _sixelSupportResult = new ();
     private CheckBox _cbSupportsSixel;
+    private IApplication _app;
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
         _win = new () { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
-        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
+        bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
 
-        var tabBasic = new Tab
+        Tab tabBasic = new ()
         {
             DisplayText = "Basic"
         };
@@ -77,10 +81,10 @@ public class Images : Scenario
             DisplayText = "Sixel"
         };
 
-        var lblDriverName = new Label { X = 0, Y = 0, Text = $"Driver is {Application.Driver?.GetType ().Name}" };
+        Label lblDriverName = new () { X = 0, Y = 0, Text = $"Driver is {app.Driver?.GetType ().Name}" };
         _win.Add (lblDriverName);
 
-        var cbSupportsTrueColor = new CheckBox
+        CheckBox cbSupportsTrueColor = new ()
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 0,
@@ -90,7 +94,7 @@ public class Images : Scenario
         };
         _win.Add (cbSupportsTrueColor);
 
-        _cbSupportsSixel = new()
+        _cbSupportsSixel = new ()
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 1,
@@ -98,7 +102,7 @@ public class Images : Scenario
             Text = "Supports Sixel"
         };
 
-        var lblSupportsSixel = new Label
+        Label lblSupportsSixel = new ()
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = Pos.Bottom (_cbSupportsSixel),
@@ -109,7 +113,7 @@ public class Images : Scenario
                                    ? CheckState.Checked
                                    : CheckState.UnChecked;*/
 
-        _cbSupportsSixel.CheckedStateChanging += (s, e) =>
+        _cbSupportsSixel.CheckedStateChanging += (_, e) =>
                                                  {
                                                      _sixelSupportResult.IsSupported = e.Result == CheckState.Checked;
                                                      SetupSixelSupported (e.Result == CheckState.Checked);
@@ -118,7 +122,7 @@ public class Images : Scenario
 
         _win.Add (_cbSupportsSixel);
 
-        var cbUseTrueColor = new CheckBox
+        CheckBox cbUseTrueColor = new ()
         {
             X = Pos.Right (cbSupportsTrueColor) + 2,
             Y = 0,
@@ -129,7 +133,7 @@ public class Images : Scenario
         cbUseTrueColor.CheckedStateChanging += (_, evt) => Driver.Force16Colors = evt.Result == CheckState.UnChecked;
         _win.Add (cbUseTrueColor);
 
-        var btnOpenImage = new Button { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
+        Button btnOpenImage = new () { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         _win.Add (btnOpenImage);
 
         _tabView = new ()
@@ -151,12 +155,11 @@ public class Images : Scenario
         _win.Add (_tabView);
 
         // Start trying to detect sixel support
-        var sixelSupportDetector = new SixelSupportDetector (Application.Driver);
+        SixelSupportDetector sixelSupportDetector = new (app.Driver);
         sixelSupportDetector.Detect (UpdateSixelSupportState);
 
-        Application.Run (_win);
+        app.Run (_win);
         _win.Dispose ();
-        Application.Shutdown ();
     }
 
     private void UpdateSixelSupportState (SixelSupportResult newResult)
@@ -183,7 +186,7 @@ public class Images : Scenario
 
         if (!_sixelSupportResult.SupportsTransparency)
         {
-            if (MessageBox.Query (Application.Instance,
+            if (MessageBox.Query (_app!,
                                   "Transparency Not Supported",
                                   "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
                                   "Yes",
@@ -201,7 +204,7 @@ public class Images : Scenario
 
         _fireFrameCounter = 0;
 
-        Application.AddTimeout (TimeSpan.FromMilliseconds (30), AdvanceFireTimerCallback);
+        _app?.AddTimeout (TimeSpan.FromMilliseconds (30), AdvanceFireTimerCallback);
     }
 
     private bool AdvanceFireTimerCallback ()
@@ -252,10 +255,10 @@ public class Images : Scenario
 
     private void OpenImage (object sender, CommandEventArgs e)
     {
-        var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
-        Application.Run (ofd);
+        OpenDialog ofd = new () { Title = "Open Image", AllowsMultipleSelection = false };
+        _app?.Run (ofd);
 
-        if (ofd.Path is { })
+        if (ofd.Path is not null)
         {
             Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
         }
@@ -289,14 +292,14 @@ public class Images : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Could not open file", ex.Message, "Ok");
+            MessageBox.ErrorQuery (_app!, "Could not open file", ex.Message, "Ok");
 
             return;
         }
 
         _imageView.SetImage (img);
         ApplyShowTabViewHack ();
-        Application.LayoutAndDraw ();
+        _app?.LayoutAndDraw ();
     }
 
     private void ApplyShowTabViewHack ()
@@ -304,7 +307,7 @@ public class Images : Scenario
         // TODO HACK: This hack seems to be required to make tabview actually refresh itself
         _tabView.SetNeedsDraw ();
         Tab orig = _tabView.SelectedTab;
-        _tabView.SelectedTab = _tabView.Tabs.Except (new [] { orig }).ElementAt (0);
+        _tabView.SelectedTab = _tabView.Tabs.Except ([orig]).ElementAt (0);
         _tabView.SelectedTab = orig;
     }
 
@@ -355,7 +358,7 @@ public class Images : Scenario
 
         _sixelSupported.Add (_sixelView);
 
-        var btnSixel = new Button
+        Button btnSixel = new ()
         {
             X = Pos.Right (_sixelView),
             Y = 0,
@@ -364,7 +367,7 @@ public class Images : Scenario
         btnSixel.Accepting += OutputSixelButtonClick;
         _sixelSupported.Add (btnSixel);
 
-        var btnStartFire = new Button
+        Button btnStartFire = new ()
         {
             X = Pos.Right (_sixelView),
             Y = Pos.Bottom (btnSixel),
@@ -373,7 +376,7 @@ public class Images : Scenario
         btnStartFire.Accepting += BtnStartFireOnAccept;
         _sixelSupported.Add (btnStartFire);
 
-        var lblPxX = new Label
+        Label lblPxX = new ()
         {
             X = Pos.Right (_sixelView),
             Y = Pos.Bottom (btnStartFire) + 1,
@@ -387,7 +390,7 @@ public class Images : Scenario
             Value = _sixelSupportResult.Resolution.Width
         };
 
-        var lblPxY = new Label
+        Label lblPxY = new ()
         {
             X = lblPxX.X,
             Y = Pos.Bottom (_pxX),
@@ -401,7 +404,7 @@ public class Images : Scenario
             Value = _sixelSupportResult.Resolution.Height
         };
 
-        var l1 = new Label
+        Label l1 = new ()
         {
             Text = "Palette Building Algorithm",
             Width = Dim.Auto (),
@@ -428,14 +431,14 @@ public class Images : Scenario
             Value = 8
         };
 
-        var lblPopThreshold = new Label
+        Label lblPopThreshold = new ()
         {
             Text = "(threshold)",
             X = Pos.Right (_popularityThreshold),
             Y = Pos.Top (_popularityThreshold)
         };
 
-        var l2 = new Label
+        Label l2 = new ()
         {
             Text = "Color Distance Algorithm",
             Width = Dim.Auto (),
@@ -445,11 +448,11 @@ public class Images : Scenario
 
         _osDistanceAlgorithm = new ()
         {
-            Labels = new []
-            {
+            Labels =
+            [
                 "Euclidian",
                 "CIE76"
-            },
+            ],
             X = Pos.Right (_sixelView) + 2,
             Y = Pos.Bottom (l2)
         };
@@ -493,7 +496,7 @@ public class Images : Scenario
     {
         if (_imageView.FullResImage == null)
         {
-            MessageBox.Query (Application.Instance, "No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
+            MessageBox.Query (_app!, "No Image Loaded", "You must first open an image.  Use the 'Open Image' button above.", "Ok");
 
             return;
         }
@@ -546,7 +549,7 @@ public class Images : Scenario
         int pixelsPerCellY
     )
     {
-        var encoder = new SixelEncoder ();
+        SixelEncoder encoder = new ();
         encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
         encoder.Quantizer.PaletteBuildingAlgorithm = GetPaletteBuilder ();
         encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();
@@ -567,24 +570,17 @@ public class Images : Scenario
 
         string encoded = encoder.EncodeSixel (ConvertToColorArray (resizedImage));
 
-        var pv = new PaletteView (encoder.Quantizer.Palette.ToList ());
+        PaletteView pv = new (encoder.Quantizer.Palette.ToList ());
 
-        var dlg = new Dialog
+        Dialog dlg = new ()
         {
-            Title = "Palette (Esc to close)",
-            Width = Dim.Fill (2),
-            Height = Dim.Fill (1)
+            Title = "Palette",
+            Buttons = [new () { Title = "_Cancel" }]
         };
 
-        var btn = new Button
-        {
-            Text = "Ok"
-        };
-
-        btn.Accepting += (s, e) => Application.RequestStop ();
         dlg.Add (pv);
-        dlg.AddButton (btn);
-        Application.Run (dlg);
+        _app?.Run (dlg);
+
         dlg.Dispose ();
 
         return encoded;
@@ -600,8 +596,8 @@ public class Images : Scenario
         double scale = Math.Min (widthScale, heightScale);
 
         // Calculate the new width and height while keeping the aspect ratio
-        var newWidth = (int)(originalWidth * scale);
-        var newHeight = (int)(originalHeight * scale);
+        int newWidth = (int)(originalWidth * scale);
+        int newHeight = (int)(originalHeight * scale);
 
         // Return the new size as a Size object
         return new (newWidth, newHeight);
@@ -614,9 +610,9 @@ public class Images : Scenario
         Color [,] colors = new Color [width, height];
 
         // Loop through each pixel and convert Rgba32 to Terminal.Gui color
-        for (var x = 0; x < width; x++)
+        for (int x = 0; x < width; x++)
         {
-            for (var y = 0; y < height; y++)
+            for (int y = 0; y < height; y++)
             {
                 Rgba32 pixel = image [x, y];
                 colors [x, y] = new (pixel.R, pixel.G, pixel.B); // Convert Rgba32 to Terminal.Gui color
@@ -646,9 +642,9 @@ public class Images : Scenario
                 _matchSize = FullResImage.Clone (x => x.Resize (Viewport.Width, Viewport.Height));
             }
 
-            for (var y = 0; y < Viewport.Height; y++)
+            for (int y = 0; y < Viewport.Height; y++)
             {
-                for (var x = 0; x < Viewport.Width; x++)
+                for (int x = 0; x < Viewport.Width; x++)
                 {
                     Rgba32 rgb = _matchSize [x, y];
 
@@ -681,9 +677,9 @@ public class Images : Scenario
 
         public PaletteView (List<Color> palette)
         {
-            _palette = palette ?? new List<Color> ();
-            Width = Dim.Fill ();
-            Height = Dim.Fill ();
+            _palette = palette ?? [];
+            Width = Dim.Fill (0, minimumContentDim: 50);
+            Height = Dim.Fill (0, minimumContentDim: 10);
         }
 
         // Automatically calculates rows and columns based on the available bounds
@@ -720,7 +716,7 @@ public class Images : Scenario
             (int columns, int rows) = CalculateGridSize (Viewport);
 
             // Draw the colors in the palette
-            for (var i = 0; i < _palette.Count && i < columns * rows; i++)
+            for (int i = 0; i < _palette.Count && i < columns * rows; i++)
             {
                 int row = i / columns;
                 int col = i % columns;
@@ -733,7 +729,7 @@ public class Images : Scenario
                 SetAttribute (new (_palette [i], _palette [i]));
 
                 // Draw the block (2 characters wide per block)
-                for (var dx = 0; dx < 2; dx++) // Fill the width of the block
+                for (int dx = 0; dx < 2; dx++) // Fill the width of the block
                 {
                     AddRune (x + dx, y, (Rune)' ');
                 }
@@ -830,7 +826,7 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
     {
         if (colors == null || colors.Count == 0 || maxColors <= 0)
         {
-            return new ();
+            return [];
         }
 
         return MedianCut (colors, maxColors);
@@ -838,12 +834,12 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
 
     private List<Color> MedianCut (List<Color> colors, int maxColors)
     {
-        List<List<Color>> cubes = new () { colors };
+        List<List<Color>> cubes = [colors];
 
         // Recursively split color regions
         while (cubes.Count < maxColors)
         {
-            var added = false;
+            bool added = false;
             cubes.Sort ((a, b) => Volume (a).CompareTo (Volume (b)));
 
             List<Color> largestCube = cubes.Last ();
@@ -941,9 +937,9 @@ public class MedianCutPaletteBuilder : IPaletteBuilder
 
     private Color AverageColor (List<Color> cube)
     {
-        var avgR = (byte)cube.Average (c => c.R);
-        var avgG = (byte)cube.Average (c => c.G);
-        var avgB = (byte)cube.Average (c => c.B);
+        byte avgR = (byte)cube.Average (c => c.R);
+        byte avgG = (byte)cube.Average (c => c.G);
+        byte avgB = (byte)cube.Average (c => c.B);
 
         return new (avgR, avgG, avgB);
     }
@@ -994,11 +990,11 @@ public class DoomFire
         _palette [0] = new (0, 0, 0, 0); // Transparent black (ARGB)
 
         // The rest of the palette is fire colors
-        for (var i = 1; i < 37; i++)
+        for (int i = 1; i < 37; i++)
         {
-            var r = (byte)Math.Min (255, i * 7);
-            var g = (byte)Math.Min (255, i * 5);
-            var b = (byte)Math.Min (255, i * 2);
+            byte r = (byte)Math.Min (255, i * 7);
+            byte g = (byte)Math.Min (255, i * 5);
+            byte b = (byte)Math.Min (255, i * 2);
             _palette [i] = new (r, g, b); // Full opacity
         }
     }
@@ -1006,15 +1002,15 @@ public class DoomFire
     public void InitializeFire ()
     {
         // Set the bottom row to full intensity (simulate the base of the fire).
-        for (var x = 0; x < _width; x++)
+        for (int x = 0; x < _width; x++)
         {
             _firePixels [x, _height - 1] = _palette [36]; // Max intensity fire.
         }
 
         // Set the rest of the pixels to black (transparent).
-        for (var y = 0; y < _height - 1; y++)
+        for (int y = 0; y < _height - 1; y++)
         {
-            for (var x = 0; x < _width; x++)
+            for (int x = 0; x < _width; x++)
             {
                 _firePixels [x, y] = _palette [0]; // Transparent black
             }
@@ -1024,9 +1020,9 @@ public class DoomFire
     public void AdvanceFrame ()
     {
         // Process every pixel except the bottom row
-        for (var x = 0; x < _width; x++)
+        for (int x = 0; x < _width; x++)
         {
-            for (var y = 1; y < _height; y++) // Skip the last row (which is always max intensity)
+            for (int y = 1; y < _height; y++) // Skip the last row (which is always max intensity)
             {
                 int srcX = x;
                 int srcY = y;

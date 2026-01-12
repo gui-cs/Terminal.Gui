@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace UICatalog.Scenarios;
 
@@ -11,15 +11,18 @@ public class ViewExperiments : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window app = new ()
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName (),
             TabStop = TabBehavior.TabGroup
         };
 
-        var editor = new AdornmentsEditor
+        AdornmentsEditor editor = new ()
         {
             X = 0,
             Y = 0,
@@ -27,7 +30,7 @@ public class ViewExperiments : Scenario
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true
         };
-        app.Add (editor);
+        window.Add (editor);
 
         FrameView testFrame = new ()
         {
@@ -37,7 +40,7 @@ public class ViewExperiments : Scenario
             Height = Dim.Fill (),
         };
 
-        app.Add (testFrame);
+        window.Add (testFrame);
 
         Button button = new ()
         {
@@ -55,7 +58,7 @@ public class ViewExperiments : Scenario
             Title = $"TopButton _{GetNextHotKey ()}",
         };
 
-        var popoverView = new View ()
+        View popoverView = new ()
         {
             X = Pos.Center (),
             Y = Pos.Center (),
@@ -86,11 +89,11 @@ public class ViewExperiments : Scenario
             //App?.Popover!.Visible = true;
         }
 
-        testFrame.Activating += (sender, e) =>
+        testFrame.Activating += (_, e) =>
         {
             if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
             {
-                if (mouseArgs.Flags == MouseFlags.Button3Clicked)
+                if (mouseArgs.Flags == MouseFlags.RightButtonClicked)
                 {
                     popoverView.X = mouseArgs.ScreenPosition.X;
                     popoverView.Y = mouseArgs.ScreenPosition.Y;
@@ -106,20 +109,12 @@ public class ViewExperiments : Scenario
         editor.AutoSelectSuperView = testFrame;
         editor.AutoSelectAdornments = true;
 
-        Application.Run (app);
+        app.Run (window);
         popoverView.Dispose ();
-        app.Dispose ();
-
-        Application.Shutdown ();
-
-        return;
     }
 
 
     private int _hotkeyCount;
 
-    private char GetNextHotKey ()
-    {
-        return (char)((int)'A' + _hotkeyCount++);
-    }
+    private char GetNextHotKey () => (char)('A' + _hotkeyCount++);
 }

@@ -115,15 +115,6 @@ public class ViewCommandTests
         Assert.Equal (1, superView.OnAcceptedCount);
     }
 
-    [Fact]
-    public void MouseClick_Does_Not_Invoke_Accept_Command ()
-    {
-        var view = new ViewEventTester ();
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
-
-        Assert.Equal (0, view.OnAcceptedCount);
-    }
-
     #endregion OnAccept/Accept tests
 
     #region Accepted tests
@@ -317,10 +308,10 @@ public class ViewCommandTests
     }
 
     [Fact]
-    public void MouseClick_Invokes_Activate_Command ()
+    public void LeftButtonPressed_Invokes_Activate_Command ()
     {
         var view = new ViewEventTester ();
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
+        view.NewMouseEvent (new () { Flags = MouseFlags.LeftButtonPressed, Position = Point.Empty, View = view });
 
         Assert.Equal (1, view.OnActivatingCount);
     }

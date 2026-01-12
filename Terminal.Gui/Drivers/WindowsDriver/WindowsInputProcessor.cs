@@ -12,18 +12,20 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     private readonly bool [] _lastWasPressed = new bool [4];
 
     /// <inheritdoc/>
-    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer) : base (inputBuffer, new WindowsKeyConverter ())
+    /// <param name="inputBuffer">The input buffer to process.</param>
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    public WindowsInputProcessor (ConcurrentQueue<InputRecord> inputBuffer, ITimeProvider? timeProvider = null)
+        : base (inputBuffer, new WindowsKeyConverter (), timeProvider)
     {
-        DriverName = "windows";
     }
 
     /// <inheritdoc />
-    public override void EnqueueMouseEvent (IApplication? app, MouseEventArgs mouseEvent)
+    public override void InjectMouseEvent (IApplication? app, Mouse mouse)
     {
         InputQueue.Enqueue (new ()
         {
             EventType = WindowsConsole.EventType.Mouse,
-            MouseEvent = ToMouseEventRecord (mouseEvent)
+            MouseEvent = ToMouseEventRecord (mouse)
         });
     }
 
@@ -34,8 +36,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         {
             case WindowsConsole.EventType.Key:
 
-                // TODO: v1 supported distinct key up/down events on Windows.
-                // TODO: For now ignore keyup because ANSI comes in as down+up which is confusing to try and parse/pair these things up
+                // Ignore keyup because TG v2 does not support keyup events
                 if (!inputEvent.KeyEvent.bKeyDown)
                 {
                     return;
@@ -71,20 +72,20 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
                 break;
 
             case WindowsConsole.EventType.Mouse:
-                MouseEventArgs me = ToMouseEvent (inputEvent.MouseEvent);
+                Mouse me = ToMouseEvent (inputEvent.MouseEvent);
 
-                RaiseMouseEvent (me);
+                RaiseSyntheticMouseEvent (me);
 
                 break;
         }
     }
 
     /// <summary>
-    ///     Converts a Windows-specific mouse event to a <see cref="MouseEventArgs"/>.
+    ///     Converts a Windows-specific mouse event to a <see cref="Mouse"/>.
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
-    public MouseEventArgs ToMouseEvent (WindowsConsole.MouseEventRecord e)
+    public Mouse ToMouseEvent (WindowsConsole.MouseEventRecord e)
     {
         var mouseFlags = MouseFlags.None;
 
@@ -92,16 +93,16 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
                                        mouseFlags,
                                        e.ButtonState,
                                        WindowsConsole.ButtonState.Button1Pressed,
-                                       MouseFlags.Button1Pressed,
-                                       MouseFlags.Button1Released,
+                                       MouseFlags.LeftButtonPressed,
+                                       MouseFlags.LeftButtonReleased,
                                        0);
 
         mouseFlags = UpdateMouseFlags (
                                        mouseFlags,
                                        e.ButtonState,
                                        WindowsConsole.ButtonState.Button2Pressed,
-                                       MouseFlags.Button2Pressed,
-                                       MouseFlags.Button2Released,
+                                       MouseFlags.MiddleButtonPressed,
+                                       MouseFlags.MiddleButtonReleased,
                                        1);
 
         mouseFlags = UpdateMouseFlags (
@@ -115,14 +116,14 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         // Deal with button 3 separately because it is considered same as 'rightmost button'
         if (e.ButtonState.HasFlag (WindowsConsole.ButtonState.Button3Pressed) || e.ButtonState.HasFlag (WindowsConsole.ButtonState.RightmostButtonPressed))
         {
-            mouseFlags |= MouseFlags.Button3Pressed;
+            mouseFlags |= MouseFlags.RightButtonPressed;
             _lastWasPressed [2] = true;
         }
         else
         {
             if (_lastWasPressed [2])
             {
-                mouseFlags |= MouseFlags.Button3Released;
+                mouseFlags |= MouseFlags.RightButtonReleased;
 
                 _lastWasPressed [2] = false;
             }
@@ -149,7 +150,7 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             switch (e.EventFlags)
             {
                 case WindowsConsole.EventFlags.MouseMoved:
-                    mouseFlags |= MouseFlags.ReportMousePosition;
+                    mouseFlags |= MouseFlags.PositionReport;
 
                     break;
             }
@@ -161,24 +162,26 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             {
                 case WindowsConsole.ControlKeyState.RightAltPressed:
                 case WindowsConsole.ControlKeyState.LeftAltPressed:
-                    mouseFlags |= MouseFlags.ButtonAlt;
+                    mouseFlags |= MouseFlags.Alt;
 
                     break;
                 case WindowsConsole.ControlKeyState.RightControlPressed:
                 case WindowsConsole.ControlKeyState.LeftControlPressed:
-                    mouseFlags |= MouseFlags.ButtonCtrl;
+                    mouseFlags |= MouseFlags.Ctrl;
 
                     break;
                 case WindowsConsole.ControlKeyState.ShiftPressed:
-                    mouseFlags |= MouseFlags.ButtonShift;
+                    mouseFlags |= MouseFlags.Shift;
 
                     break;
             }
         }
 
-        var result = new MouseEventArgs
+        var result = new Mouse
         {
+            Timestamp = DateTime.Now,
             Position = new (e.MousePosition.X, e.MousePosition.Y),
+            ScreenPosition = new (e.MousePosition.X, e.MousePosition.Y),
             Flags = mouseFlags
         };
 
@@ -213,74 +216,74 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
     }
 
     /// <summary>
-    ///     Converts a <see cref="MouseEventArgs"/> to a Windows-specific <see cref="WindowsConsole.MouseEventRecord"/>.
+    ///     Converts a <see cref="Mouse"/> to a Windows-specific <see cref="WindowsConsole.MouseEventRecord"/>.
     /// </summary>
-    /// <param name="mouseEvent"></param>
+    /// <param name="mouse"></param>
     /// <returns></returns>
-    public WindowsConsole.MouseEventRecord ToMouseEventRecord (MouseEventArgs mouseEvent)
+    public WindowsConsole.MouseEventRecord ToMouseEventRecord (Mouse mouse)
     {
         var buttonState = WindowsConsole.ButtonState.NoButtonPressed;
         var eventFlags = WindowsConsole.EventFlags.NoEvent;
         var controlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed;
 
         // Convert button states
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button1Pressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button2Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.MiddleButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button2Pressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button3Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.RightButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button3Pressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button4Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.Button4Pressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button4Pressed;
         }
 
         // Convert mouse wheel events
-        if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledUp))
+        if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
         {
             eventFlags = WindowsConsole.EventFlags.MouseWheeled;
             buttonState = (WindowsConsole.ButtonState)0x00780000; // Positive value for wheel up
         }
-        else if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledDown))
+        else if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
         {
             eventFlags = WindowsConsole.EventFlags.MouseWheeled;
             buttonState = (WindowsConsole.ButtonState)unchecked((int)0xFF880000); // Negative value for wheel down
         }
 
         // Convert movement flag
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition))
+        if (mouse.Flags.HasFlag (MouseFlags.PositionReport))
         {
             eventFlags |= WindowsConsole.EventFlags.MouseMoved;
         }
 
         // Convert modifier keys
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonAlt))
+        if (mouse.Flags.HasFlag (MouseFlags.Alt))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftAltPressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonCtrl))
+        if (mouse.Flags.HasFlag (MouseFlags.Ctrl))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftControlPressed;
         }
 
-        if (mouseEvent.Flags.HasFlag (MouseFlags.ButtonShift))
+        if (mouse.Flags.HasFlag (MouseFlags.Shift))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.ShiftPressed;
         }
 
-        return new WindowsConsole.MouseEventRecord
+        return new ()
         {
-            MousePosition = new WindowsConsole.Coord ((short)mouseEvent.Position.X, (short)mouseEvent.Position.Y),
+            MousePosition = new ((short)mouse.ScreenPosition.X, (short)mouse.ScreenPosition.Y),
             ButtonState = buttonState,
             ControlKeyState = controlKeyState,
             EventFlags = eventFlags

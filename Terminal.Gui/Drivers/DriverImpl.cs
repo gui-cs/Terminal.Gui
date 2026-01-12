@@ -32,12 +32,14 @@ internal class DriverImpl : IDriver
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
     /// </summary>
+    /// <param name="componentFactory">The component factory that created the driver components.</param>
     /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
     /// <param name="outputBuffer">The output buffer for managing screen state.</param>
     /// <param name="output">The output interface for rendering to the console.</param>
     /// <param name="ansiRequestScheduler">The scheduler for managing ANSI escape sequence requests.</param>
     /// <param name="sizeMonitor">The monitor for tracking terminal size changes.</param>
     public DriverImpl (
+        IComponentFactory componentFactory,
         IInputProcessor inputProcessor,
         IOutputBuffer outputBuffer,
         IOutput output,
@@ -45,22 +47,20 @@ internal class DriverImpl : IDriver
         ISizeMonitor sizeMonitor
     )
     {
+        _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
+        _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+
+        _inputProcessor.SyntheticMouseEvent += (s, e) =>
+                                               {
+                                                   //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
+                                                   MouseEvent?.Invoke (s, e);
+                                               };
+        _outputBuffer = outputBuffer;
         _output = output;
-        OutputBuffer = outputBuffer;
         _ansiRequestScheduler = ansiRequestScheduler;
-
-        GetInputProcessor ().KeyDown += (s, e) => KeyDown?.Invoke (s, e);
-        GetInputProcessor ().KeyUp += (s, e) => KeyUp?.Invoke (s, e);
-
-        GetInputProcessor ().MouseEvent += (s, e) =>
-                                           {
-                                               //Logging.Logger.LogTrace ($"Mouse {e.Flags} at x={e.ScreenPosition.X} y={e.ScreenPosition.Y}");
-                                               MouseEvent?.Invoke (s, e);
-                                           };
-
-        SizeMonitor = sizeMonitor;
-        SizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
+        _sizeMonitor = sizeMonitor;
+        _sizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
 
         CreateClipboard ();
 
@@ -75,18 +75,28 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public void Refresh ()
     {
-        _output.Write (OutputBuffer);
+        // Hide cursor during rendering to prevent flicker
+        Cursor cursor = _output.GetCursor ();
+        if (cursor.IsVisible)
+        {
+            Cursor hiddenCursor = cursor with { Position = null, Style = cursor.Style};
+            _output.SetCursor (hiddenCursor);
+            SetCursorNeedsUpdate (true);
+        }
+        _output.Write (_outputBuffer);
+
+        // Cursor visibility restored by ApplicationMainLoop to reduce flicker
     }
 
     /// <inheritdoc/>
-    public string? GetName () => GetInputProcessor ().DriverName?.ToLowerInvariant ();
+    public string? GetName () => _componentFactory.GetDriverName ();
 
     /// <inheritdoc/>
     public virtual string GetVersionInfo ()
     {
-        string type = GetInputProcessor ().DriverName ?? throw new InvalidOperationException ("Driver name is not set.");
+        string? driverName = GetName ();
 
-        return type;
+        return $"{driverName} driver";
     }
 
     /// <inheritdoc/>
@@ -135,7 +145,7 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public void Dispose ()
     {
-        SizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
+        _sizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
         Driver.Force16ColorsChanged -= OnDriverOnForce16ColorsChanged;
         _output.Dispose ();
     }
@@ -143,6 +153,11 @@ internal class DriverImpl : IDriver
     #endregion Driver Lifecycle
 
     #region Driver Components
+
+    private readonly IComponentFactory _componentFactory;
+
+    /// <inheritdoc/>
+    public IOutputBuffer GetOutputBuffer () => _outputBuffer;
 
     private readonly IOutput _output;
 
@@ -153,27 +168,15 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public IInputProcessor GetInputProcessor () => _inputProcessor;
 
-    /// <inheritdoc/>
-    public IOutputBuffer OutputBuffer { get; }
+    private readonly IOutputBuffer _outputBuffer;
+
+    private readonly ISizeMonitor _sizeMonitor;
 
     /// <inheritdoc/>
-    public ISizeMonitor SizeMonitor { get; }
-
-    /// <inheritdoc/>
-    public IClipboard? Clipboard { get; private set; } = new FakeClipboard ();
+    public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
 
     private void CreateClipboard ()
     {
-        if (GetInputProcessor ().DriverName is { } && GetInputProcessor ()!.DriverName!.Contains ("fake"))
-        {
-            if (Clipboard is null)
-            {
-                Clipboard = new FakeClipboard ();
-            }
-
-            return;
-        }
-
         PlatformID p = Environment.OSVersion.Platform;
 
         if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
@@ -188,8 +191,6 @@ internal class DriverImpl : IDriver
         {
             Clipboard = new WSLClipboard ();
         }
-
-        // Clipboard is set to FakeClipboard at initialization
     }
 
     #endregion Driver Components
@@ -197,12 +198,12 @@ internal class DriverImpl : IDriver
     #region Screen and Display
 
     /// <inheritdoc/>
-    public Rectangle Screen => new (0, 0, OutputBuffer.Cols, OutputBuffer.Rows);
+    public Rectangle Screen => new (0, 0, _outputBuffer.Cols, _outputBuffer.Rows);
 
     /// <inheritdoc/>
     public virtual void SetScreenSize (int width, int height)
     {
-        OutputBuffer.SetSize (width, height);
+        _outputBuffer.SetSize (width, height);
         _output.SetSize (width, height);
         SizeChanged?.Invoke (this, new (new (width, height)));
     }
@@ -215,29 +216,29 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public int Cols
     {
-        get => OutputBuffer.Cols;
-        set => OutputBuffer.Cols = value;
+        get => _outputBuffer.Cols;
+        set => _outputBuffer.Cols = value;
     }
 
     /// <inheritdoc/>
     public int Rows
     {
-        get => OutputBuffer.Rows;
-        set => OutputBuffer.Rows = value;
+        get => _outputBuffer.Rows;
+        set => _outputBuffer.Rows = value;
     }
 
     /// <inheritdoc/>
     public int Left
     {
-        get => OutputBuffer.Left;
-        set => OutputBuffer.Left = value;
+        get => _outputBuffer.Left;
+        set => _outputBuffer.Left = value;
     }
 
     /// <inheritdoc/>
     public int Top
     {
-        get => OutputBuffer.Top;
-        set => OutputBuffer.Top = value;
+        get => _outputBuffer.Top;
+        set => _outputBuffer.Top = value;
     }
 
     #endregion Screen and Display
@@ -263,22 +264,22 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public Cell [,]? Contents
     {
-        get => OutputBuffer.Contents;
-        set => OutputBuffer.Contents = value;
+        get => _outputBuffer.Contents;
+        set => _outputBuffer.Contents = value;
     }
 
     /// <inheritdoc/>
     public Region? Clip
     {
-        get => OutputBuffer.Clip;
-        set => OutputBuffer.Clip = value;
+        get => _outputBuffer.Clip;
+        set => _outputBuffer.Clip = value;
     }
 
     /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
-        OutputBuffer.ClearContents ();
-        ClearedContents?.Invoke (this, new MouseEventArgs ());
+        _outputBuffer.ClearContents ();
+        ClearedContents?.Invoke (this, EventArgs.Empty);
     }
 
     /// <inheritdoc/>
@@ -289,20 +290,20 @@ internal class DriverImpl : IDriver
     #region Drawing and Rendering
 
     /// <inheritdoc/>
-    public int Col => OutputBuffer.Col;
+    public int Col => _outputBuffer.Col;
 
     /// <inheritdoc/>
-    public int Row => OutputBuffer.Row;
+    public int Row => _outputBuffer.Row;
 
     /// <inheritdoc/>
     public Attribute CurrentAttribute
     {
-        get => OutputBuffer.CurrentAttribute;
-        set => OutputBuffer.CurrentAttribute = value;
+        get => _outputBuffer.CurrentAttribute;
+        set => _outputBuffer.CurrentAttribute = value;
     }
 
     /// <inheritdoc/>
-    public void Move (int col, int row) { OutputBuffer.Move (col, row); }
+    public void Move (int col, int row) { _outputBuffer.Move (col, row); }
 
     /// <inheritdoc/>
     public bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
@@ -316,31 +317,31 @@ internal class DriverImpl : IDriver
     ///     <see cref="IDriver.Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
-    public bool IsValidLocation (string text, int col, int row) => OutputBuffer.IsValidLocation (text, col, row);
+    public bool IsValidLocation (string text, int col, int row) => _outputBuffer.IsValidLocation (text, col, row);
 
     /// <inheritdoc/>
-    public void AddRune (Rune rune) { OutputBuffer.AddRune (rune); }
+    public void AddRune (Rune rune) { _outputBuffer.AddRune (rune); }
 
     /// <inheritdoc/>
-    public void AddRune (char c) { OutputBuffer.AddRune (c); }
+    public void AddRune (char c) { _outputBuffer.AddRune (c); }
 
     /// <inheritdoc/>
-    public void AddStr (string str) { OutputBuffer.AddStr (str); }
+    public void AddStr (string str) { _outputBuffer.AddStr (str); }
 
     /// <inheritdoc/>
-    public void FillRect (Rectangle rect, Rune rune = default) { OutputBuffer.FillRect (rect, rune); }
+    public void FillRect (Rectangle rect, Rune rune = default) { _outputBuffer.FillRect (rect, rune); }
 
     /// <inheritdoc/>
     public Attribute SetAttribute (Attribute newAttribute)
     {
-        Attribute currentAttribute = OutputBuffer.CurrentAttribute;
-        OutputBuffer.CurrentAttribute = newAttribute;
+        Attribute currentAttribute = _outputBuffer.CurrentAttribute;
+        _outputBuffer.CurrentAttribute = newAttribute;
 
         return currentAttribute;
     }
 
     /// <inheritdoc/>
-    public Attribute GetAttribute () => OutputBuffer.CurrentAttribute;
+    public Attribute GetAttribute () => _outputBuffer.CurrentAttribute;
 
     /// <inheritdoc/>
     public void WriteRaw (string ansi) { _output.Write (ansi); }
@@ -376,49 +377,49 @@ internal class DriverImpl : IDriver
     }
 
     /// <inheritdoc/>
-    public string ToAnsi () => _output.ToAnsi (OutputBuffer);
+    public string ToAnsi () => _output.ToAnsi (_outputBuffer);
 
     #endregion Drawing and Rendering
 
     #region Cursor
 
-    private CursorVisibility _lastCursor = CursorVisibility.Default;
-
-    /// <inheritdoc/>
-    public void UpdateCursor () { _output.SetCursorPosition (Col, Row); }
-
-    /// <inheritdoc/>
-    public bool GetCursorVisibility (out CursorVisibility current)
+    /// <inheritdoc />
+    public void SetCursor (Cursor cursor)
     {
-        current = _lastCursor;
-
-        return true;
+        _output.SetCursor (cursor);
     }
 
-    /// <inheritdoc/>
-    public bool SetCursorVisibility (CursorVisibility visibility)
+    /// <inheritdoc />
+    public Cursor GetCursor ()
     {
-        _lastCursor = visibility;
-        _output.SetCursorVisibility (visibility);
-
-        return true;
+        return _output.GetCursor ();
     }
+
+    // Cursor caching fields
+    private bool _cursorNeedsUpdate;
+
+    /// <inheritdoc />
+    public bool GetCursorNeedsUpdate ()
+    {
+        return _cursorNeedsUpdate;
+    }
+
+    /// <param name="needsUpdate"></param>
+    /// <inheritdoc />
+    public void SetCursorNeedsUpdate (bool needsUpdate) { _cursorNeedsUpdate = needsUpdate; }
 
     #endregion Cursor
 
     #region Input Events
 
-    /// <summary>Event fired when a mouse event occurs.</summary>
-    public event EventHandler<MouseEventArgs>? MouseEvent;
-
-    /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="IDriver.KeyUp"/>.</summary>
+    /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;
 
-    /// <inheritdoc/>
-    public event EventHandler<Key>? KeyUp;
+    /// <summary>Event fired when a mouse event occurs.</summary>
+    public event EventHandler<Mouse>? MouseEvent;
 
     /// <inheritdoc/>
-    public void EnqueueKeyEvent (Key key) { GetInputProcessor ().EnqueueKeyDownEvent (key); }
+    public void InjectMouseEvent (Mouse mouse) { GetInputProcessor ().InjectMouseEvent (null, mouse); }
 
     #endregion Input Events
 

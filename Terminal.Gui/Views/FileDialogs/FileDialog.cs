@@ -8,8 +8,6 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class FileDialog : Dialog, IDesignable
 {
-    private const int ALIGNMENT_GROUP_COMPLETE = 55;
-
     /// <summary>Gets the Path separators for the operating system</summary>
     // ReSharper disable once InconsistentNaming
     internal static char [] Separators =
@@ -62,62 +60,33 @@ public class FileDialog : Dialog, IDesignable
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem? fileSystem)
     {
-        Height = Dim.Percent (80);
-        Width = Dim.Percent (80);
-
-        // Assume canceled
-        Canceled = true;
+        HorizontalScrollBar.AutoShow = false;
+        HorizontalScrollBar.Visible = false;
+        VerticalScrollBar.AutoShow = false;
+        VerticalScrollBar.Visible = false;
 
         _fileSystem = fileSystem;
         Style = new (fileSystem);
 
-        _btnOk = new ()
-        {
-            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
-            Y = Pos.AnchorEnd (),
-            IsDefault = true, Text = Style.OkButtonText
-        };
-
-        _btnOk.Accepting += (s, e) =>
-                            {
-                                if (e.Handled)
-                                {
-                                    return;
-                                }
-
-                                Accept (true);
-                                e.Handled = true;
-                            };
+        ButtonAlignment = Alignment.End;
+        ButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
 
         _btnCancel = new ()
         {
-            X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
-            Y = Pos.AnchorEnd (),
             Text = Strings.btnCancel
         };
 
-        _btnCancel.Accepting += (s, e) =>
-                                {
-                                    if (e.Handled)
-                                    {
-                                        return;
-                                    }
+        _btnOk = new ()
+        {
+            Text = Style.OkButtonText
+        };
 
-                                    e.Handled = true;
-
-                                    if (IsModal)
-                                    {
-                                        (s as View)?.App?.RequestStop ();
-                                    }
-                                };
-
-        // Tree toggle button - shares alignment group with OK/Cancel
+        // Tree toggle button - Goes in Dialog Button Area
         _btnTreeToggle = new ()
         {
-            X = 0,//Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, ALIGNMENT_GROUP_COMPLETE),
-            Y = Pos.AnchorEnd (),
             NoPadding = true
         };
+
         _btnTreeToggle.Accepting += (s, e) =>
         {
             e.Handled = true;
@@ -148,7 +117,11 @@ public class FileDialog : Dialog, IDesignable
                                      e.Handled = true;
                                  };
 
-        _tbPath = new () { Width = Dim.Fill () };
+        _tbPath = new ()
+        {
+            // This sets the default width of the FileDialog as it is the widest subview
+            Width = Dim.Fill (0, minimumContentDim: 75),
+        };
 
         _tbPath.KeyDown += (s, k) =>
                            {
@@ -167,8 +140,8 @@ public class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30)),
-            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
+            Width = Dim.Func (_ => IsInitialized ? _tableViewContainer!.Frame.Width - 30 : 30),
+            Height = Dim.Func (_ => _tableViewContainer?.Frame.Height ?? 0),
             Visible = false
         };
 
@@ -178,7 +151,7 @@ public class FileDialog : Dialog, IDesignable
             X = 0,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
-            Height = Dim.Fill (Dim.Func (_ => IsInitialized ? _btnOk.Frame.Height : 1)),
+            Height = Dim.Fill (0, minimumContentDim: 15),
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Dashed,
             SuperViewRendersLineCanvas = true,
@@ -235,7 +208,7 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.TextChanged += (s, e) => PathChanged ();
 
         _tableView.CellActivated += CellActivate;
-        _tableView.KeyDown += (s, k) => k.Handled = TableView_KeyUp (k);
+        _tableView.KeyDown += (s, k) => k.Handled = TableView_KeyDown (k);
         _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
@@ -243,11 +216,18 @@ public class FileDialog : Dialog, IDesignable
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
         _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
 
+        // Changing the key-bindings of a View is not allowed, however,
+        // by default, Runnable doesn't bind to Command.Context, so
+        // we can take advantage of the CommandNotBound event to handle it
+        _tableView.CommandNotBound += TableViewHandleCommandNotBound;
+        _tableView.KeyBindings.Add (Key.Space.WithCtrl, Command.Context);
+        _tableView.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
+
         _tbFind = new ()
         {
             X = 0,
-            Width = Dim.Fill (),
-            Y = Pos.AnchorEnd (),
+            Width = Dim.Width (_tableView),
+            Y = Pos.Bottom (_tableView),
             Id = "_tbFind",
         };
 
@@ -281,22 +261,63 @@ public class FileDialog : Dialog, IDesignable
 
         UpdateNavigationVisibility ();
 
-        base.Add (_tbPath);
-        base.Add (_btnUp);
-        base.Add (_btnBack);
-        base.Add (_btnForward);
-        base.Add (_treeView);
-        base.Add (_tableViewContainer);
+        // Add the toggle along with OK/Cancel so they align as a group
+        AddButton (_btnTreeToggle);
+        AddButton (_btnCancel);
+        AddButton (_btnOk);
+
+        Add (_tbPath);
+        Add (_btnUp);
+        Add (_btnBack);
+        Add (_btnForward);
+        Add (_treeView);
+        Add (_tableViewContainer);
         _tableViewContainer.Add (_tbFind);
         _tableViewContainer.Add (_spinnerView);
 
-        // Add the toggle along with OK/Cancel so they align as a group
-        base.Add (_btnTreeToggle);
-        base.Add (_btnOk);
-        base.Add (_btnCancel);
-
         // Default: Tree hidden and splitter hidden
         SetTreeVisible (false);
+    }
+
+    private void TableViewHandleCommandNotBound (object? sender, CommandEventArgs e)
+    {
+        if (e.Context!.Command != Command.Context)
+        {
+            return;
+        }
+
+        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+        {
+            Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
+
+            if (clickedCol is { })
+            {
+                // right click in a header
+                ShowHeaderContextMenu (clickedCol.Value, mouse);
+            }
+            else if (clickedCell is { })
+            {
+                // right click in rest of table
+                ShowCellContextMenu (clickedCell, mouse);
+            }
+        }
+
+        if (e.Context is CommandContext<KeyBinding>)
+        {
+            PopoverMenu? contextMenu = new (
+                                            [
+                                                new (Strings.fdCtxNew, string.Empty, New),
+                                                new (Strings.fdCtxRename, string.Empty, () => Rename (App)),
+                                                new (Strings.fdCtxDelete, string.Empty, Delete)
+                                            ]);
+
+            // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
+            // and the context menu is disposed when it is closed.
+            App!.Popover?.Register (contextMenu);
+
+            Point pos = new Point (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight ());
+            contextMenu?.MakeVisible (pos);
+        }
     }
 
     /// <summary>
@@ -529,13 +550,6 @@ public class FileDialog : Dialog, IDesignable
             Title = GetDefaultTitle ();
         }
 
-        if (Style.FlipOkCancelButtonLayoutOrder)
-        {
-            _btnCancel.X = Pos.Func (CalculateOkButtonPosX);
-            _btnOk.X = Pos.Right (_btnCancel) + 1;
-            MoveSubViewTowardsStart (_btnCancel);
-        }
-
         // Ensure toggle button text matches current state after sizing
         SetTreeVisible (false);
 
@@ -660,6 +674,12 @@ public class FileDialog : Dialog, IDesignable
         ApplySort ();
     }
 
+    /// <inheritdoc />
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        return Accept (true);
+    }
+
     private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
         if (!AllowsMultipleSelection)
@@ -699,11 +719,11 @@ public class FileDialog : Dialog, IDesignable
         FinishAccept ();
     }
 
-    private void Accept (bool allowMulti)
+    private bool Accept (bool allowMulti)
     {
         if (allowMulti && TryAcceptMulti ())
         {
-            return;
+            return false;
         }
 
         if (!IsCompatibleWithOpenMode (_tbPath.Text, out string reason))
@@ -711,10 +731,10 @@ public class FileDialog : Dialog, IDesignable
             _feedback = reason;
             SetNeedsDraw ();
 
-            return;
+            return false;
         }
 
-        FinishAccept ();
+        return FinishAccept ();
     }
 
     private void AcceptIf (Key key, KeyCode isKey)
@@ -765,22 +785,6 @@ public class FileDialog : Dialog, IDesignable
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
     }
 
-    private int CalculateOkButtonPosX (View? _)
-    {
-        if (!IsInitialized || !_btnOk.IsInitialized || !_btnCancel.IsInitialized)
-        {
-            return 0;
-        }
-
-        return Viewport.Width
-               - _btnOk.Viewport.Width
-               - _btnCancel.Viewport.Width
-               - 1
-
-               // TODO: Fiddle factor, seems the Viewport are wrong for someone
-               - 2;
-    }
-
     private bool CancelSearch ()
     {
         if (State is SearchState search)
@@ -817,7 +821,6 @@ public class FileDialog : Dialog, IDesignable
             Accept (f);
         }
     }
-
     private void ClearFeedback () { _feedback = null; }
 
     private Scheme ColorGetter (CellColorGetterArgs args)
@@ -852,7 +855,7 @@ public class FileDialog : Dialog, IDesignable
         }
     }
 
-    private void FinishAccept ()
+    private bool FinishAccept ()
     {
         var e = new FilesSelectedEventArgs (this);
 
@@ -860,7 +863,7 @@ public class FileDialog : Dialog, IDesignable
 
         if (e.Cancel)
         {
-            return;
+            return false;
         }
 
         // if user uses Path selection mode (e.g. Enter in text box)
@@ -872,12 +875,17 @@ public class FileDialog : Dialog, IDesignable
                                 : new List<string> { Path }.AsReadOnly ();
         }
 
-        Canceled = false;
+        // TODO: TableView should not always return true from OnCellActivated.
+        Result = 2; // Ok button index
 
         if (IsModal)
         {
             App?.RequestStop ();
+
+            return true;
         }
+
+        return false;
     }
 
     private string GetBackButtonText () { return Glyphs.LeftArrow + "-"; }
@@ -1038,43 +1046,27 @@ public class FileDialog : Dialog, IDesignable
         {
             IFileSystemInfo created = FileOperationsHandler.New (App, _fileSystem!, State!.Directory);
 
-            if (created is { })
-            {
-                RefreshState ();
-                RestoreSelection (created);
-            }
+            RefreshState ();
+            RestoreSelection (created);
         }
     }
 
     private void OnTableViewActivating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
         {
             return;
         }
 
-        Point? clickedCell = _tableView.ScreenToCell (mouseArgs.Position.X, mouseArgs.Position.Y, out int? clickedCol);
+        _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
 
         if (clickedCol is { })
         {
-            if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+            if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);
-            }
-            else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
-            {
-                // right click in a header
-                ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
-            }
-        }
-        else
-        {
-            if (clickedCell is { } && mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
-            {
-                // right click in rest of table
-                ShowCellContextMenu (clickedCell, mouseArgs);
             }
         }
     }
@@ -1106,7 +1098,7 @@ public class FileDialog : Dialog, IDesignable
         }
 
         _tbPath.Autocomplete.GenerateSuggestions (
-                                                  new AutocompleteFilepathContext (_tbPath.Text, _tbPath.CursorPosition, State)
+                                                  new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State)
                                                  );
     }
 
@@ -1147,7 +1139,7 @@ public class FileDialog : Dialog, IDesignable
             State = newState;
 
             _tbPath.Autocomplete.GenerateSuggestions (
-                                                      new AutocompleteFilepathContext (_tbPath.Text, _tbPath.CursorPosition, State)
+                                                      new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State)
                                                      );
 
             WriteStateToTableView ();
@@ -1223,7 +1215,7 @@ public class FileDialog : Dialog, IDesignable
 
     private FileSystemInfoStats RowToStats (int rowIndex) { return State?.Children [rowIndex]!; }
 
-    private void ShowCellContextMenu (Point? clickedCell, MouseEventArgs e)
+    private void ShowCellContextMenu (Point? clickedCell, Mouse e)
     {
         if (clickedCell is null)
         {
@@ -1246,7 +1238,7 @@ public class FileDialog : Dialog, IDesignable
         contextMenu?.MakeVisible (e.ScreenPosition);
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, Mouse e)
     {
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
@@ -1309,7 +1301,7 @@ public class FileDialog : Dialog, IDesignable
         }
     }
 
-    private bool TableView_KeyUp (Key keyEvent)
+    private bool TableView_KeyDown (Key keyEvent)
     {
         if (keyEvent.KeyCode == KeyCode.Backspace)
         {
@@ -1490,7 +1482,7 @@ public class FileDialog : Dialog, IDesignable
             _tableViewContainer.X = 0;
             _tableViewContainer.Width = Dim.Fill ();
             _tableViewContainer.Arrangement = ViewArrangement.Fixed;
-            _tableViewContainer.Border!.Thickness = new (0, 0, 0, 0);
+            _tableViewContainer.Border!.Thickness = new (0);
         }
         _btnTreeToggle.Text = GetTreeToggleText (visible);
 
@@ -1637,7 +1629,7 @@ public class FileDialog : Dialog, IDesignable
                                     Parent._tbPath.Autocomplete.GenerateSuggestions (
                                                                                      new AutocompleteFilepathContext (
                                                                                           Parent._tbPath.Text,
-                                                                                          Parent._tbPath.CursorPosition,
+                                                                                          Parent._tbPath.InsertionPoint,
                                                                                           this
                                                                                          )
                                                                                     );

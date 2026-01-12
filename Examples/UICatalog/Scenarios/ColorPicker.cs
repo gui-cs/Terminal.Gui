@@ -29,9 +29,11 @@ public class ColorPickers : Scenario
     /// <summary>Set up the scenario.</summary>
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        Window app = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -48,13 +50,13 @@ public class ColorPickers : Scenario
             Width = Dim.Percent (50)
         };
         _foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
-        app.Add (_foregroundColorPicker);
+        window.Add (_foregroundColorPicker);
 
         _foregroundColorLabel = new ()
         {
             X = Pos.Left (_foregroundColorPicker), Y = Pos.Bottom (_foregroundColorPicker) + 1
         };
-        app.Add (_foregroundColorLabel);
+        window.Add (_foregroundColorLabel);
 
         // Background ColorPicker.
         _backgroundColorPicker = new ()
@@ -66,7 +68,7 @@ public class ColorPickers : Scenario
         };
 
         _backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
-        app.Add (_backgroundColorPicker);
+        window.Add (_backgroundColorPicker);
 
         _backgroundColorLabel = new ()
         {
@@ -74,7 +76,7 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (_backgroundColorPicker) + 1
         };
 
-        app.Add (_backgroundColorLabel);
+        window.Add (_backgroundColorLabel);
 
         ///////////////////////////////////////
         // 16 Color Pickers
@@ -89,7 +91,7 @@ public class ColorPickers : Scenario
             Visible = false // We default to HSV so hide old one
         };
         _foregroundColorPicker16.ColorChanged += ForegroundColor_ColorChanged;
-        app.Add (_foregroundColorPicker16);
+        window.Add (_foregroundColorPicker16);
 
         // Background ColorPicker 16.
         _backgroundColorPicker16 = new ()
@@ -102,7 +104,7 @@ public class ColorPickers : Scenario
         };
 
         _backgroundColorPicker16.ColorChanged += BackgroundColor_ColorChanged;
-        app.Add (_backgroundColorPicker16);
+        window.Add (_backgroundColorPicker16);
 
         // Demo Label.
         _demoView = new ()
@@ -117,7 +119,7 @@ public class ColorPickers : Scenario
             Height = 5,
             Width = 20
         };
-        app.Add (_demoView);
+        window.Add (_demoView);
 
         var osColorModel = new OptionSelector
         {
@@ -136,7 +138,7 @@ public class ColorPickers : Scenario
 
         osColorModel.ValueChanged += OnOsColorModelOnValueChanged;
 
-        app.Add (osColorModel);
+        window.Add (osColorModel);
 
         // Checkbox for switching show text fields on and off
         var cbShowTextFields = new CheckBox
@@ -149,7 +151,7 @@ public class ColorPickers : Scenario
         };
 
         cbShowTextFields.CheckedStateChanging += OnCbShowTextFieldsOnCheckedStateChanging;
-        app.Add (cbShowTextFields);
+        window.Add (cbShowTextFields);
 
         // Checkbox for switching show text fields on and off
         var cbShowName = new CheckBox
@@ -163,13 +165,13 @@ public class ColorPickers : Scenario
 
         cbShowName.CheckedStateChanging += OnCbShowTextFieldsOnCheckedStateChanging;
 
-        app.Add (cbShowName);
+        window.Add (cbShowName);
 
         var lblDriverName = new Label
         {
-            Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{Application.Driver?.GetName ()}`:"
+            Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{app.Driver?.GetName ()}`:"
         };
-        bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
+        bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
 
         var cbSupportsTrueColor = new CheckBox
         {
@@ -180,26 +182,24 @@ public class ColorPickers : Scenario
             Enabled = false,
             Text = "SupportsTrueColor"
         };
-        app.Add (cbSupportsTrueColor);
+        window.Add (cbSupportsTrueColor);
 
         var cbUseTrueColor = new CheckBox
         {
             X = Pos.Right (cbSupportsTrueColor) + 1,
             Y = Pos.Top (lblDriverName),
-            CheckedState = Application.Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            CheckedState = app.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Force16Colors"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => { Application.Driver!.Force16Colors = evt.Result == CheckState.Checked; };
-        app.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
+        cbUseTrueColor.CheckedStateChanging += (_, evt) => { app.Driver!.Force16Colors = evt.Result == CheckState.Checked; };
+        window.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
 
         // Set default colors.
         _foregroundColorPicker.SelectedColor = _demoView.SuperView!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
         _backgroundColorPicker.SelectedColor = _demoView.SuperView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
 
-        Application.Run (app);
-        app.Dispose ();
-        Application.Shutdown ();
+        app.Run (window);
 
         return;
 
@@ -231,7 +231,7 @@ public class ColorPickers : Scenario
                 _foregroundColorPicker16.Visible = false;
                 _foregroundColorPicker.Visible = true;
 
-                if (e.Value is { })
+                if (e.Value is not null)
                 {
                     _foregroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
                     _foregroundColorPicker.ApplyStyleChanges ();
@@ -292,7 +292,7 @@ public class ColorPickers : Scenario
                              });
     }
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication app)
     {
         List<Key> keys =
         [

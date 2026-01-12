@@ -9,7 +9,7 @@ using System;
 /// <remarks>
 ///     <para>
 ///         Used for workflows where an event is raised to allow cancellation or customization of a result,
-///         such as in <see cref="Application.RaiseKeyDownEvent"/>. The <see cref="Execute{T}"/> method invokes an
+///         such as in <see cref="IKeyboard.RaiseKeyDownEvent"/>. The <see cref="Execute{T}"/> method invokes an
 ///         event handler and returns whether the operation was handled, supporting result production
 ///         scenarios with <see cref="ResultEventArgs{T}"/>.
 ///     </para>
@@ -49,6 +49,7 @@ public static class CWPEventHelper
             return false;
         }
 
+        // BUGBUG: This should pass this not null; need to test
         eventHandler.Invoke (null, args);
         return args.Handled;
     }

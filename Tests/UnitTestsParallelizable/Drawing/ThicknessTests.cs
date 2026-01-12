@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace DrawingTests;
 
-public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
+public class ThicknessTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -625,7 +625,7 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void DrawTests ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (60, 40);
 
         var t = new Thickness (0, 0, 0, 0);
@@ -738,7 +738,7 @@ public class ThicknessTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void DrawTests_Ruler ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         // Add a frame so we can see the ruler
         var f = new FrameView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };

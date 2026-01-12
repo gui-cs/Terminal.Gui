@@ -12,9 +12,16 @@ namespace NativeAot;
 
 public static class Program
 {
+    private static void Main (string [] args)
+    {
+#pragma warning disable IL2026, IL3050 // Run() has attributes for AOT compatibility
+        Run ();
+#pragma warning restore IL2026, IL3050
+    }
+
     [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
-    private static void Main (string [] args)
+    private static void Run ()
     {
         ConfigurationManager.Enable(ConfigLocations.All);
         Application.Init ();
@@ -101,13 +108,13 @@ public class ExampleWindow : Window
         {
             if (userNameText.Text == "admin" && passwordText.Text == "password")
             {
-                MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
+                MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
                 UserName = userNameText.Text;
                 Application.RequestStop ();
             }
             else
             {
-                MessageBox.ErrorQuery (App, "Logging In", "Incorrect username or password", "Ok");
+                MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "Ok");
             }
             // Anytime Accepting is handled, make sure to set e.Handled to true.
             e.Handled = true;

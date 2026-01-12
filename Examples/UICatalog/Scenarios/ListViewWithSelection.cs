@@ -29,7 +29,9 @@ public class ListViewWithSelection : Scenario
     /// <inheritdoc />
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         _appWindow = new ()
         {
@@ -111,16 +113,15 @@ public class ListViewWithSelection : Scenario
 
         bool? LogEvent (View sender, EventArgs args, string message)
         {
-            var msg = $"{message,-7}: {args}";
+            string msg = $"{message,-7}: {args}";
             _eventList.Add (msg);
             _eventListView.MoveDown ();
 
             return null;
         }
 
-        Application.Run (_appWindow);
+        app.Run (_appWindow);
         _appWindow.Dispose ();
-        Application.Shutdown ();
     }
 
     private void CustomRenderCB_Toggle (object sender, ResultEventArgs<CheckState> stateEventArgs)

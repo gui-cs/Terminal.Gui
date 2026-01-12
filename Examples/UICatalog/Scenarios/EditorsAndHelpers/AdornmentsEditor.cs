@@ -14,8 +14,6 @@ public class AdornmentsEditor : EditorBase
 
         TabStop = TabBehavior.TabGroup;
 
-        ExpanderButton!.Orientation = Orientation.Horizontal;
-
         Initialized += AdornmentsEditor_Initialized;
 
         SchemeName = "Dialog";
@@ -28,26 +26,24 @@ public class AdornmentsEditor : EditorBase
     /// <inheritdoc/>
     protected override void OnViewToEditChanged ()
     {
-        //Enabled = ViewToEdit is not Adornment;
-
-        if (MarginEditor is { })
+        if (MarginEditor is not null)
         {
             MarginEditor.AdornmentToEdit = ViewToEdit?.Margin ?? null;
         }
 
-        if (BorderEditor is { })
+        if (BorderEditor is not null)
         {
             BorderEditor.AdornmentToEdit = ViewToEdit?.Border ?? null;
         }
 
-        if (PaddingEditor is { })
+        if (PaddingEditor is not null)
         {
             PaddingEditor.AdornmentToEdit = ViewToEdit?.Padding ?? null;
         }
 
-        if (Padding is { })
+        if (Padding is not null)
         {
-            Padding.Text = $"View: {GetIdentifyingString (ViewToEdit)}";
+            Padding.Text = GetIdentifyingString (ViewToEdit);
         }
     }
 
@@ -78,7 +74,7 @@ public class AdornmentsEditor : EditorBase
 
     public bool ShowViewIdentifier
     {
-        get => Padding is { } && Padding.Thickness != Thickness.Empty;
+        get => Padding is not null && Padding.Thickness != Thickness.Empty;
         set
         {
             if (Padding is null)
@@ -92,12 +88,17 @@ public class AdornmentsEditor : EditorBase
 
     private void AdornmentsEditor_Initialized (object? sender, EventArgs e)
     {
+        if (ExpanderButton is not null)
+        {
+            ExpanderButton.Orientation = Orientation.Horizontal;
+        }
+
         MarginEditor = new ()
         {
             X = -1,
             Y = 0,
             SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Single
+            BorderStyle = BorderStyle
         };
         MarginEditor.Border!.Thickness = MarginEditor.Border!.Thickness with { Bottom = 0 };
         Add (MarginEditor);
@@ -107,7 +108,7 @@ public class AdornmentsEditor : EditorBase
             X = Pos.Left (MarginEditor),
             Y = Pos.Bottom (MarginEditor),
             SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Single
+            BorderStyle = BorderStyle
         };
         BorderEditor.Border!.Thickness = BorderEditor.Border!.Thickness with { Bottom = 0 };
         Add (BorderEditor);
@@ -117,7 +118,7 @@ public class AdornmentsEditor : EditorBase
             X = Pos.Left (BorderEditor),
             Y = Pos.Bottom (BorderEditor),
             SuperViewRendersLineCanvas = true,
-            BorderStyle = LineStyle.Single
+            BorderStyle = BorderStyle
         };
         PaddingEditor.Border!.Thickness = PaddingEditor.Border!.Thickness with { Bottom = 0 };
         Add (PaddingEditor);

@@ -1,36 +1,63 @@
-
 namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
-    /// <summary>
-    ///     Gets or sets the cursor style to be used when the view is focused. The default is
-    ///     <see cref="Drivers.CursorVisibility.Invisible"/>.
-    /// </summary>
-    public CursorVisibility CursorVisibility { get; set; } = CursorVisibility.Invisible;
+    private Cursor _cursor = new () { Position = null };
 
     /// <summary>
-    ///     Positions the cursor in the right position based on the currently focused view in the chain.
+    ///     Gets or sets the cursor for this view. <see cref="Cursor.Position"/> must be in screen coordinates.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Views that are focusable should override <see cref="PositionCursor()"/> to make sure that the cursor is
-    ///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
-    ///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
-    ///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor()"/> will place the
-    ///         cursor at either the hotkey (if defined) or <c>0,0</c>.
+    ///         Use <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     </para>
+    ///     <para>
+    ///         To hide the cursor, set <see cref="Cursor.Position"/> to null or set the Style property to
+    ///         <see cref="CursorStyle.Hidden"/>.
+    ///     </para>
+    ///     <para>
+    ///         Common patterns:
+    ///         <code>
+    /// // Text cursor at column 5 in viewport - convert to screen coords
+    /// Point screenPos = ViewportToScreen(new Point(5, 0));
+    /// SetCursor(new Cursor { Position = screenPos, Shape = CursorStyle.BlinkingBar });
+    /// 
+    /// // Hide cursor
+    /// SetCursor(new Cursor { Position = null });
+    /// SetCursor(new Cursor { Style = CursorStyle.Hidden });
+    /// 
+    /// // Update position keeping same shape
+    /// Point newScreenPos = ViewportToScreen(new Point(6, 0));
+    /// SetCursor(_cursor with { Position = newScreenPos });
+    /// </code>
     ///     </para>
     /// </remarks>
-    /// <returns>Viewport-relative cursor position. Return <see langword="null"/> to ensure the cursor is not visible.</returns>
-    public virtual Point? PositionCursor ()
+    public Cursor Cursor
     {
-        if (IsInitialized && CanFocus && HasFocus)
+        get => _cursor;
+        set => SetCursor (value);
+    }
+
+    /// <summary>
+    ///     INTERNAL: Sets the cursor for this view.
+    /// </summary>
+    private void SetCursor (Cursor cursor)
+    {
+        if (_cursor == cursor)
         {
-            // By default, position the cursor at the hotkey (if any) or 0, 0.
-            Move (TextFormatter.HotKeyPos == -1 ? 0 : TextFormatter.CursorPosition, 0);
+            return;
         }
 
-        // Returning null will hide the cursor.
-        return null;
+        _cursor = cursor;
+
+        if (HasFocus)
+        {
+            SetCursorNeedsUpdate ();
+        }
     }
+
+    /// <summary>
+    ///     Signals that the cursor position needs to be updated without requiring a full redraw.
+    /// </summary>
+    public void SetCursorNeedsUpdate () { App?.Driver?.SetCursorNeedsUpdate (true); }
 }
