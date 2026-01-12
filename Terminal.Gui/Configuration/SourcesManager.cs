@@ -17,6 +17,14 @@ public class SourcesManager
     public ConcurrentDictionary<ConfigLocations, string> Sources { get; } = new ();
 
     /// <summary>
+    ///     Cached array of all defined ConfigLocations values (excluding None and All) ordered by bit value.
+    /// </summary>
+    private static readonly ConfigLocations[] _sortedLocations = Enum.GetValues<ConfigLocations>()
+        .Where(loc => loc != ConfigLocations.None && loc != ConfigLocations.All)
+        .OrderBy(loc => (int)loc)
+        .ToArray();
+
+    /// <summary>
     ///     INTERNAL: Loads configuration from the specified locations in the order defined by the 
     ///     <see cref="ConfigLocations"/> enum bit values (lower bit values are loaded first, higher bit values override).
     /// </summary>
@@ -31,13 +39,7 @@ public class SourcesManager
             return;
         }
 
-        // Get all defined ConfigLocations values (excluding None and All)
-        ConfigLocations[] allLocations = Enum.GetValues<ConfigLocations>()
-            .Where(loc => loc != ConfigLocations.None && loc != ConfigLocations.All)
-            .OrderBy(loc => (int)loc) // Order by bit value (lower bits first)
-            .ToArray();
-
-        foreach (ConfigLocations location in allLocations)
+        foreach (ConfigLocations location in _sortedLocations)
         {
             if (!locations.HasFlag(location))
             {

@@ -1428,7 +1428,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ThrowOnJsonErrors = true;
 
             // Test that each location overrides the previous ones
-            // Order should be: HardCoded < LibraryResources < AppResources < GlobalHome < GlobalCurrent < AppHome < AppCurrent < Env < Runtime
+            // Priority order (lowest to highest): HardCoded → LibraryResources → AppResources → GlobalHome → GlobalCurrent → AppHome → AppCurrent → Env → Runtime
 
             // Start with HardCoded
             Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);

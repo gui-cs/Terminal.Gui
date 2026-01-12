@@ -12,7 +12,7 @@ public enum ConfigLocations
     /// <summary>
     ///     No locations are specified. This is the default value.
     /// </summary>
-    None = 0b_0000_0000_0000,
+    None = 0,
 
     /// <summary>
     ///     Settings of the <see cref="ConfigurationPropertyAttribute"/> static properties when the module is
@@ -69,5 +69,5 @@ public enum ConfigLocations
     Runtime = 0b_0001_0000_0000,
 
     /// <summary>This constant is a combination of all locations</summary>
-    All = 0b_0001_1111_1111
+    All = HardCoded | LibraryResources | AppResources | GlobalHome | GlobalCurrent | AppHome | AppCurrent | Env | Runtime
 }
