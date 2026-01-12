@@ -7,12 +7,24 @@ using System.Text.Json;
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
-///    Manages the <see cref="ConfigurationManager"/> Sources and provides the API for loading them. Source is a location where a configuration can be stored. Sources are defined in <see cref="ConfigLocations"/>.
+///     Manages the <see cref="ConfigurationManager"/> Sources and provides the API for loading them. Source is a location
+///     where a configuration can be stored. Sources are defined in <see cref="ConfigLocations"/>.
 /// </summary>
 public class SourcesManager
 {
     /// <summary>
-    ///     Provides a map from each of the <see cref="ConfigLocations"/> to file system and resource paths that have been loaded by <see cref="ConfigurationManager"/>.
+    ///     Gets the name of the TUI configuration folder.
+    /// </summary>
+    public const string TUI_CONFIG_FOLDER_S = ".tui";
+
+    /// <summary>
+    ///     Gets the name of the TUI configuration environment variable.
+    /// </summary>
+    public const string TUI_CONFIG_ENV_S = "TUI_CONFIG";
+
+    /// <summary>
+    ///     Provides a map from each of the <see cref="ConfigLocations"/> to file system and resource paths that have been
+    ///     loaded by <see cref="ConfigurationManager"/>.
     /// </summary>
     public ConcurrentDictionary<ConfigLocations, string> Sources { get; } = new ();
 
@@ -20,18 +32,18 @@ public class SourcesManager
     ///     Cached array of all defined ConfigLocations values (excluding None and All) ordered by bit value.
     ///     Only includes single-flag values (powers of 2).
     /// </summary>
-    private static readonly ConfigLocations[] _sortedLocations = Enum.GetValues<ConfigLocations>()
-        .Where(loc => loc != ConfigLocations.None && IsPowerOfTwo((int)loc))
-        .OrderBy(loc => (int)loc)
-        .ToArray();
+    private static readonly ConfigLocations [] _sortedLocations = Enum.GetValues<ConfigLocations> ()
+                                                                      .Where (loc => loc != ConfigLocations.None && IsPowerOfTwo ((int)loc))
+                                                                      .OrderBy (loc => (int)loc)
+                                                                      .ToArray ();
 
     /// <summary>
     ///     Checks if a number is a power of 2 (i.e., a single flag value).
     /// </summary>
-    private static bool IsPowerOfTwo(int value) => value > 0 && (value & (value - 1)) == 0;
+    private static bool IsPowerOfTwo (int value) { return value > 0 && (value & (value - 1)) == 0; }
 
     /// <summary>
-    ///     INTERNAL: Loads configuration from the specified locations in the order defined by the 
+    ///     INTERNAL: Loads configuration from the specified locations in the order defined by the
     ///     <see cref="ConfigLocations"/> enum bit values (lower bit values are loaded first, higher bit values override).
     /// </summary>
     /// <param name="settingsScope">The Settings Scope object that will be updated.</param>
@@ -47,7 +59,7 @@ public class SourcesManager
 
         foreach (ConfigLocations location in _sortedLocations)
         {
-            if (!locations.HasFlag(location))
+            if (!locations.HasFlag (location))
             {
                 continue;
             }
@@ -59,55 +71,64 @@ public class SourcesManager
                     break;
 
                 case ConfigLocations.LibraryResources:
-                    Load(
-                        settingsScope,
-                        typeof(ConfigurationManager).Assembly,
-                        $"Terminal.Gui.Resources.{ConfigurationManager._configFilename}",
-                        ConfigLocations.LibraryResources);
+                    Load (
+                          settingsScope,
+                          typeof (ConfigurationManager).Assembly,
+                          $"Terminal.Gui.Resources.{ConfigurationManager.ConfigFilename}",
+                          ConfigLocations.LibraryResources);
+
                     break;
 
                 case ConfigLocations.AppResources:
-                    string? embeddedStylesResourceName = Assembly.GetEntryAssembly()
-                        ?.GetManifestResourceNames()
-                        .FirstOrDefault(x => x.EndsWith(ConfigurationManager._configFilename));
+                    string? embeddedStylesResourceName = Assembly.GetEntryAssembly ()
+                                                                 ?.GetManifestResourceNames ()
+                                                                 .FirstOrDefault (x => x.EndsWith (ConfigurationManager.ConfigFilename));
 
-                    if (string.IsNullOrEmpty(embeddedStylesResourceName))
+                    if (string.IsNullOrEmpty (embeddedStylesResourceName))
                     {
-                        embeddedStylesResourceName = ConfigurationManager._configFilename;
+                        embeddedStylesResourceName = ConfigurationManager.ConfigFilename;
                     }
 
-                    Load(settingsScope, Assembly.GetEntryAssembly()!, embeddedStylesResourceName!, ConfigLocations.AppResources);
+                    Load (settingsScope, Assembly.GetEntryAssembly ()!, embeddedStylesResourceName, ConfigLocations.AppResources);
+
                     break;
 
                 case ConfigLocations.GlobalHome:
-                    Load(settingsScope, $"~/.tui/{ConfigurationManager._configFilename}", ConfigLocations.GlobalHome);
+                    Load (settingsScope, $"~/{TUI_CONFIG_FOLDER_S}/{ConfigurationManager.ConfigFilename}", ConfigLocations.GlobalHome);
+
                     break;
 
                 case ConfigLocations.GlobalCurrent:
-                    Load(settingsScope, $"./.tui/{ConfigurationManager._configFilename}", ConfigLocations.GlobalCurrent);
+                    Load (settingsScope, $"./{TUI_CONFIG_FOLDER_S}/{ConfigurationManager.ConfigFilename}", ConfigLocations.GlobalCurrent);
+
                     break;
 
                 case ConfigLocations.AppHome:
-                    Load(settingsScope, $"~/.tui/{ConfigurationManager.AppName}.{ConfigurationManager._configFilename}", ConfigLocations.AppHome);
+                    Load (settingsScope, $"~/{TUI_CONFIG_FOLDER_S}/{ConfigurationManager.AppName}.{ConfigurationManager.ConfigFilename}", ConfigLocations.AppHome);
+
                     break;
 
                 case ConfigLocations.AppCurrent:
-                    Load(settingsScope, $"./.tui/{ConfigurationManager.AppName}.{ConfigurationManager._configFilename}", ConfigLocations.AppCurrent);
+                    Load (settingsScope, $"./{TUI_CONFIG_FOLDER_S}/{ConfigurationManager.AppName}.{ConfigurationManager.ConfigFilename}", ConfigLocations.AppCurrent);
+
                     break;
 
                 case ConfigLocations.Env:
-                    string? envConfig = Environment.GetEnvironmentVariable("TUI_CONFIG");
-                    if (!string.IsNullOrEmpty(envConfig))
+                    string? envConfig = Environment.GetEnvironmentVariable (TUI_CONFIG_ENV_S);
+
+                    if (!string.IsNullOrEmpty (envConfig))
                     {
-                        Load(settingsScope, envConfig, "Environment.GetEnvironmentVariable(\"TUI_CONFIG\")", ConfigLocations.Env);
+                        Load (settingsScope, envConfig, $"Environment.GetEnvironmentVariable(\"{TUI_CONFIG_ENV_S}\")", ConfigLocations.Env);
                     }
+
                     break;
 
                 case ConfigLocations.Runtime:
-                    if (!string.IsNullOrEmpty(ConfigurationManager.RuntimeConfig))
+                    if (!string.IsNullOrEmpty (ConfigurationManager.RuntimeConfig))
                     {
-                        Load(settingsScope, ConfigurationManager.RuntimeConfig, "ConfigurationManager.RuntimeConfig", ConfigLocations.Runtime);
+                        Load (settingsScope, ConfigurationManager.RuntimeConfig, "ConfigurationManager.RuntimeConfig", ConfigLocations.Runtime);
                     }
+
                     break;
             }
         }
@@ -134,15 +155,16 @@ public class SourcesManager
 #if DEBUG
             string? json = new StreamReader (stream).ReadToEnd ();
             stream.Position = 0;
-            Debug.Assert (json != null, "json != null");
+            Debug.Assert (json != null);
 #endif
-            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
+            var scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
             settingsScope.UpdateFrom (scope!);
             ConfigurationManager.OnUpdated ();
 
             AddSource (location, source);
 
             Logging.Trace ($"Read configuration from \"{source}\" - ConfigLocation: {location}");
+
             return true;
         }
         catch (JsonException e)
@@ -161,11 +183,13 @@ public class SourcesManager
     internal void AddSource (ConfigLocations location, string source)
     {
         // ConcurrentDictionary's AddOrUpdate is thread-safe
-        Sources.AddOrUpdate (location, source, (key, oldValue) => source);
+        Sources.AddOrUpdate (location, source, (_, _) => source);
     }
 
-
-    /// <summary>INTERNAL: Loads the `config.json` file a <paramref name="filePath"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <summary>
+    ///     INTERNAL: Loads the `config.json` file a <paramref name="filePath"/> into the specified
+    ///     <see cref="SettingsScope"/>.
+    /// </summary>
     /// <param name="settingsScope">The Settings Scope object that <paramref name="filePath"/> will be loaded into.</param>
     /// <param name="filePath">Json document to update the settings with.</param>
     /// <param name="location">The Config Location corresponding to <paramref name="filePath"/></param>
@@ -182,10 +206,11 @@ public class SourcesManager
 
             // Always add the source even if it doesn't exist.
             AddSource (location, filePath);
+
             return true;
         }
 
-        int retryCount = 0;
+        var retryCount = 0;
 
         // Sometimes when the config file is written by an external agent, the change notification comes
         // before the file is closed. This works around that.
@@ -193,7 +218,7 @@ public class SourcesManager
         {
             try
             {
-                FileStream? stream = File.OpenRead (realPath);
+                FileStream stream = File.OpenRead (realPath);
 
                 bool ret = Load (settingsScope, stream, filePath, location);
                 stream.Close ();
@@ -228,6 +253,7 @@ public class SourcesManager
         {
             return false;
         }
+
         var stream = new MemoryStream ();
         var writer = new StreamWriter (stream);
         writer.Write (json);
@@ -237,7 +263,10 @@ public class SourcesManager
         return Load (settingsScope, stream, source, location);
     }
 
-    /// <summary>INTERNAL: Loads the Json document from the resource named <paramref name="resourceName"/> from <paramref name="assembly"/> into the specified <see cref="SettingsScope"/>.</summary>
+    /// <summary>
+    ///     INTERNAL: Loads the Json document from the resource named <paramref name="resourceName"/> from
+    ///     <paramref name="assembly"/> into the specified <see cref="SettingsScope"/>.
+    /// </summary>
     /// <param name="settingsScope">The Settings Scope object that <paramref name="resourceName"/> will be loaded into.</param>
     /// <param name="assembly">The assembly containing the resource.</param>
     /// <param name="resourceName">The name of the resource containing the Json document was read from.</param>
@@ -250,6 +279,7 @@ public class SourcesManager
         if (string.IsNullOrEmpty (resourceName))
         {
             Logging.Warning ($"{resourceName} must not be null or empty.");
+
             return false;
         }
 
@@ -258,12 +288,12 @@ public class SourcesManager
         if (stream is null)
         {
             Logging.Warning ($"Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\".");
+
             return false;
         }
 
         return Load (settingsScope, stream, $"resource://[{assembly.GetName ().Name}]/{resourceName}", location);
     }
-
 
     /// <summary>
     ///     INTERNAL: Returns a JSON document with the configuration specified.
@@ -297,4 +327,3 @@ public class SourcesManager
         return stream;
     }
 }
-

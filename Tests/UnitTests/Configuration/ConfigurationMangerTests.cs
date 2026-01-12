@@ -7,6 +7,7 @@ using System.Text.Json;
 using Xunit.Abstractions;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using File = System.IO.File;
+using SourcesManager = Terminal.Gui.Configuration.SourcesManager;
 
 #pragma warning disable IDE1006
 
@@ -676,7 +677,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 }					
 			";
 
-           // ResetToCurrentValues ();
+            // ResetToCurrentValues ();
 
             ThrowOnJsonErrors = true;
             ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
@@ -1404,13 +1405,12 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
     public static bool? TestProperty { get; set; }
 
     private class CMTestsScope : Scope<CMTestsScope>
-    {
-    }
+    { }
 
     [Fact]
     public void GetConfigPropertiesByScope_Gets ()
     {
-        var props = GetUninitializedConfigPropertiesByScope ("CMTestsScope");
+        IEnumerable<KeyValuePair<string, ConfigProperty>> props = GetUninitializedConfigPropertiesByScope ("CMTestsScope");
 
         Assert.NotNull (props);
         Assert.NotEmpty (props);
@@ -1523,11 +1523,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ThrowOnJsonErrors = true;
 
             // Set environment variable
-            Environment.SetEnvironmentVariable ("TUI_CONFIG", """
-                                                              {
-                                                                   "Application.QuitKey": "Ctrl+Z"
-                                                              }
-                                                              """);
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+Z"
+                                                }
+                                                """);
 
             // Act
             Load (ConfigLocations.Env);
@@ -1537,7 +1539,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            Environment.SetEnvironmentVariable ("TUI_CONFIG", null);
+            Environment.SetEnvironmentVariable (SourcesManager.TUI_CONFIG_ENV_S, null);
             Disable (true);
         }
     }
@@ -1554,11 +1556,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ThrowOnJsonErrors = true;
 
             // Set Env config
-            Environment.SetEnvironmentVariable ("TUI_CONFIG", """
-                                                              {
-                                                                   "Application.QuitKey": "Ctrl+E"
-                                                              }
-                                                              """);
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+E"
+                                                }
+                                                """);
 
             // Set Runtime config
             RuntimeConfig = """
@@ -1575,7 +1579,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            Environment.SetEnvironmentVariable ("TUI_CONFIG", null);
+            Environment.SetEnvironmentVariable (SourcesManager.TUI_CONFIG_ENV_S, null);
             Disable (true);
         }
     }
@@ -1592,11 +1596,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ThrowOnJsonErrors = true;
 
             // Set environment variable (second-highest priority)
-            Environment.SetEnvironmentVariable ("TUI_CONFIG", """
-                                                              {
-                                                                   "Application.QuitKey": "Ctrl+E"
-                                                              }
-                                                              """);
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+E"
+                                                }
+                                                """);
 
             // Set runtime config (highest priority)
             RuntimeConfig = """
@@ -1614,11 +1620,14 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // Now test without Runtime
             RuntimeConfig = null;
             LoadHardCodedDefaults ();
-            Environment.SetEnvironmentVariable ("TUI_CONFIG", """
-                                                              {
-                                                                   "Application.QuitKey": "Ctrl+E"
-                                                              }
-                                                              """);
+
+            Environment.SetEnvironmentVariable (
+                                                SourcesManager.TUI_CONFIG_ENV_S,
+                                                """
+                                                {
+                                                     "Application.QuitKey": "Ctrl+E"
+                                                }
+                                                """);
             Load (ConfigLocations.Env);
 
             // Assert - Env should be used when Runtime is not set
@@ -1626,7 +1635,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         }
         finally
         {
-            Environment.SetEnvironmentVariable ("TUI_CONFIG", null);
+            Environment.SetEnvironmentVariable (SourcesManager.TUI_CONFIG_ENV_S, null);
             Disable (true);
         }
     }

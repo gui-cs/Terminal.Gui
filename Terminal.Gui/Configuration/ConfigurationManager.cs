@@ -99,7 +99,7 @@ public static class ConfigurationManager
     // The _initialized field is set to true when the module is loaded and the ConfigurationManager is initialized.
     private static bool _initialized;
 #pragma warning disable IDE1006 // Naming Styles
-    private static readonly object _initializedLock = new ();
+    private static readonly Lock _initializedLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
@@ -115,8 +115,8 @@ public static class ConfigurationManager
         }
     }
 
-    // TODO: Find a way to make this cache truly read-only at the leaf node level. 
-    // TODO: Right now, the dictionary is frozen, but the ConfigProperty instances can still be modified   
+    // TODO: Find a way to make this cache truly read-only at the leaf node level.
+    // TODO: Right now, the dictionary is frozen, but the ConfigProperty instances can still be modified
     // TODO: if the PropertyValue is a reference type.
     // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4288
     /// <summary>
@@ -126,9 +126,9 @@ public static class ConfigurationManager
 #pragma warning disable IDE1006 // Naming Styles
     internal static FrozenDictionary<string, ConfigProperty>? _hardCodedConfigPropertyCache;
 
-    private static readonly object _hardCodedConfigPropertyCacheLock = new ();
+    private static readonly Lock _hardCodedConfigPropertyCacheLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
-    internal static FrozenDictionary<string, ConfigProperty>? GetHardCodedConfigPropertyCache ()
+    internal static FrozenDictionary<string, ConfigProperty> GetHardCodedConfigPropertyCache ()
     {
         lock (_hardCodedConfigPropertyCacheLock)
         {
@@ -215,7 +215,7 @@ public static class ConfigurationManager
         // BUGBUG: ThemeScope is broken and needs to be fixed to not have the hard coded schemes get overwritten.
         // BUGBUG: This a partial workaround.
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
-        ThemeManager.Themes? [ThemeManager.Theme]?.Apply ();
+        ThemeManager.Themes? [ThemeManager.Theme].Apply ();
     }
 
     #endregion Initialization
@@ -386,7 +386,7 @@ public static class ConfigurationManager
         SourcesManager.AddSource (ConfigLocations.HardCoded, "HardCoded");
 
         Settings = new ();
-        Settings!.LoadHardCodedDefaults ();
+        Settings.LoadHardCodedDefaults ();
         ThemeManager.LoadHardCodedDefaults ();
         AppSettings!.LoadHardCodedDefaults ();
     }
@@ -411,6 +411,7 @@ public static class ConfigurationManager
         if (locations == ConfigLocations.HardCoded)
         {
             LoadHardCodedDefaults ();
+
             return;
         }
 
@@ -479,7 +480,7 @@ public static class ConfigurationManager
         try
         {
             settings = Settings?.Apply () ?? false;
-            themes = ThemeManager.Themes? [ThemeManager.Theme]?.Apply () ?? false;
+            themes = ThemeManager.Themes? [ThemeManager.Theme].Apply () ?? false;
             appSettings = AppSettings?.Apply () ?? false;
         }
         catch (JsonException e)
@@ -534,7 +535,7 @@ public static class ConfigurationManager
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static readonly SourceGenerationContext SerializerContext = new (
-                                                                              new()
+                                                                              new ()
                                                                               {
                                                                                   // Be relaxed
                                                                                   ReadCommentHandling = JsonCommentHandling.Skip,
@@ -607,7 +608,7 @@ public static class ConfigurationManager
     }
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly string _configFilename = "config.json";
+    internal static readonly string ConfigFilename = "config.json";
 
     #endregion Sources
 
@@ -665,7 +666,7 @@ public static class ConfigurationManager
             if (value != Settings! ["AppSettings"].PropertyValue)
             {
                 // Update the backing store
-                Settings! ["AppSettings"].PropertyValue = value;
+                Settings ["AppSettings"].PropertyValue = value;
 
                 //Instance.OnThemeChanged (previousThemeValue);
             }
@@ -752,7 +753,7 @@ public static class ConfigurationManager
         var emptyScope = new SettingsScope ();
         emptyScope.Clear ();
 
-        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext!);
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
     }
 
     /// <summary>Returns a Json document containing the hard-coded config.</summary>
@@ -775,11 +776,10 @@ public static class ConfigurationManager
             emptyScope [p.Key].PropertyValue = settingsDict [p.Key].PropertyValue;
         }
 
-        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext!);
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
     }
 
-    private static string _appName = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0]?.Trim ()!;
-    private static readonly object _appNameLock = new ();
+    private static readonly Lock _appNameLock = new ();
 
     /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
     public static string AppName
@@ -788,24 +788,24 @@ public static class ConfigurationManager
         {
             lock (_appNameLock)
             {
-                return _appName;
+                return field;
             }
         }
         set
         {
             lock (_appNameLock)
             {
-                _appName = value;
+                field = value;
             }
         }
-    }
+    } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0].Trim ()!;
 
     /// <summary>
     ///     INTERNAL: Retrieves all uninitialized configuration properties that belong to a specific scope from the cache.
     ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
     ///     cache. They do not have values and have <see cref="ConfigProperty.Immutable"/> set.
     /// </summary>
-    internal static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetUninitializedConfigPropertiesByScope (string scopeType)
+    internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetUninitializedConfigPropertiesByScope (string scopeType)
     {
         // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
         // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
@@ -824,7 +824,7 @@ public static class ConfigurationManager
         lock (_uninitializedConfigPropertiesCacheCacheLock)
         {
             // Filter properties by scope using the cached ScopeType property instead of reflection
-            IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache?.Where (cp => cp.Value.ScopeType == scopeType);
+            IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache.Where (cp => cp.Value.ScopeType == scopeType);
 
             Debug.Assert (filtered is { });
 
@@ -841,7 +841,7 @@ public static class ConfigurationManager
     ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
     ///     cache. They contain the hard coded values and have <see cref="ConfigProperty.Immutable"/> set.
     /// </summary>
-    internal static IEnumerable<KeyValuePair<string, ConfigProperty>>? GetHardCodedConfigPropertiesByScope (string scopeType)
+    internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetHardCodedConfigPropertiesByScope (string scopeType)
     {
         // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
         // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
@@ -861,7 +861,7 @@ public static class ConfigurationManager
         }
 
         // Use the cached ScopeType property instead of reflection
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? scopedCache = cache?.Where (cp => cp.Value.ScopeType == scopeType);
+        IEnumerable<KeyValuePair<string, ConfigProperty>> scopedCache = cache.Where (cp => cp.Value.ScopeType == scopeType);
 
         return scopedCache!;
     }
