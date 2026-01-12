@@ -81,15 +81,15 @@ jobs:
             exit 1
           fi
 
-      - name: Create Release Tag
-        run: |
-          git tag -a "${{ steps.prepare.outputs.tag }}" -m "Release ${{ steps.prepare.outputs.release_name }}"
-          echo "Created tag: ${{ steps.prepare.outputs.tag }}"
-
       - name: Create Release Commit
         run: |
           git commit --allow-empty -m "Release ${{ steps.prepare.outputs.release_name }}"
           echo "Created release commit"
+
+      - name: Create Release Tag
+        run: |
+          git tag -a "${{ steps.prepare.outputs.tag }}" -m "Release ${{ steps.prepare.outputs.release_name }}"
+          echo "Created tag: ${{ steps.prepare.outputs.tag }}"
 
       - name: Push Changes
         run: |
