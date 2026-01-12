@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Text;
-using UICatalog;
-using UICatalog.Scenarios;
+namespace UICatalog.Scenarios;
 
 // ReSharper disable AccessToDisposedClosure
 
@@ -26,16 +25,15 @@ public class RegionScenario : Scenario
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
         appWindow.TabStop = TabBehavior.TabGroup;
         appWindow.Padding!.Thickness = new (1);
 
-        ToolsView tools = new () { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
+        RegionToolsView tools = new () { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
         tools.CurrentAttribute = appWindow.GetAttributeForRole (VisualRole.HotNormal);
 
@@ -52,7 +50,7 @@ public class RegionScenario : Scenario
         appWindow.Add (tools);
 
         // Add drag handling to window
-        appWindow.MouseEvent += (s, e) =>
+        appWindow.MouseEvent += (_, e) =>
                                 {
                                     if (e.Flags.HasFlag (MouseFlags.LeftButtonPressed))
                                     {
@@ -167,10 +165,10 @@ internal enum RegionDrawStyles
     OuterBoundary = 2
 }
 
-internal class ToolsView : Window
+internal class RegionToolsView : Window
 {
     //private Button _addLayerBtn;
-    private readonly AttributeView _attributeView = new ();
+    private readonly RegionAttributeView _attributeView = new ();
     private OptionSelector<RegionDrawStyles>? _stylePicker;
     private OptionSelector<RegionOp>? _regionOpSelector;
 
@@ -180,7 +178,7 @@ internal class ToolsView : Window
         set => _attributeView.Value = value;
     }
 
-    public ToolsView ()
+    public RegionToolsView ()
     {
         BorderStyle = LineStyle.Dotted;
         Border!.Thickness = new (1, 2, 1, 1);
@@ -231,7 +229,7 @@ internal class ToolsView : Window
     public event Action<RegionDrawStyles>? SetStyle;
 }
 
-internal class AttributeView : View
+internal class RegionAttributeView : View
 {
     public event EventHandler<Attribute?>? ValueChanged;
     private Attribute? _value;
@@ -258,7 +256,7 @@ internal class AttributeView : View
         (1, 2), (2, 2), (3, 2)
     ];
 
-    public AttributeView ()
+    public RegionAttributeView ()
     {
         Width = Dim.Fill ();
         Height = 4;
@@ -347,7 +345,7 @@ internal class AttributeView : View
 
     private void ClickedInBackground ()
     {
-        if (LineDrawing.PromptForColor ("Background", Value!.Value.Background, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Background", Value!.Value.Background, out Color newColor))
         {
             Value = new (Value!.Value.Foreground, newColor);
             SetNeedsDraw ();
@@ -356,7 +354,7 @@ internal class AttributeView : View
 
     private void ClickedInForeground ()
     {
-        if (LineDrawing.PromptForColor ("Foreground", Value!.Value.Foreground, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Foreground", Value!.Value.Foreground, out Color newColor))
         {
             Value = new (newColor, Value!.Value.Background);
             SetNeedsDraw ();

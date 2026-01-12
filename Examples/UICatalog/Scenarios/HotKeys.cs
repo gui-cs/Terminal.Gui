@@ -10,9 +10,8 @@ public class HotKeys : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window mainWindow = new ()
         {

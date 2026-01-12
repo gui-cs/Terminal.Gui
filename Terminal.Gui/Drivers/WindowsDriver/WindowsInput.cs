@@ -40,7 +40,7 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
 
     public WindowsInput ()
     {
-        Logging.Information ($"Creating {nameof (WindowsInput)}");
+        //Logging.Information ($"Creating {nameof (WindowsInput)}");
 
         try
         {

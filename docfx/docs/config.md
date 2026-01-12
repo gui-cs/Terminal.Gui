@@ -55,8 +55,9 @@ class Program
     {
         // Enable configuration with all sources
         ConfigurationManager.Enable(ConfigLocations.All);
-        
-        Application.Init();
+
+        using IApplication app = Application.Create();
+        app.Init();
         // ... rest of app
     }
 }
@@ -720,13 +721,14 @@ See the default configuration file:
 
 **1. Enable Early**
 
-Enable ConfigurationManager at the start of `Main()`, before `Application.Init()`:
+Enable ConfigurationManager at the start of `Main()`, before creating the application:
 
 ```csharp
 static void Main()
 {
     ConfigurationManager.Enable(ConfigLocations.All);
-    Application.Init();
+    using IApplication app = Application.Create();
+    app.Init();
     // ...
 }
 ```

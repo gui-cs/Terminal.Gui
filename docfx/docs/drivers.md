@@ -35,7 +35,7 @@ Method 1: Set ForceDriver using Configuration Manager
 
 ```json
 {
-  "ForceDriver": "ansi"
+  "Application.ForceDriver": "ansi"
 }
 ```
 
@@ -377,7 +377,7 @@ The driver selection logic in `ApplicationImpl.Driver.cs` uses the **Driver Regi
 
 1. **Provided Component Factory**: If an `IComponentFactory` is explicitly provided to `ApplicationImpl`, it determines the driver via `factory.GetDriverName()`
 2. **Driver Name Parameter**: The `driverName` parameter passed to `Init()` is looked up in the registry
-3. **ForceDriver Configuration**: The `ForceDriver` property is checked and looked up in the registry
+3. **Application.ForceDriver Configuration**: The `Application.ForceDriver` property is checked and looked up in the registry
 4. **Platform Default**: `DriverRegistry.GetDefaultDriver()` selects based on current platform:
    - Windows (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
    - Unix/Linux/macOS → `UnixDriver`

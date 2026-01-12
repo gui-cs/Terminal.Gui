@@ -1,7 +1,5 @@
 ﻿#nullable enable
 
-using System.Diagnostics;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Scrolling", "Content scrolling, IScrollBars, etc...")]
@@ -10,14 +8,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public class Scrolling : Scenario
 {
-    private object? _progressTimer = null;
+    private object? _progressTimer;
 
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window win = new ()
         {
@@ -84,10 +82,7 @@ public class Scrolling : Scenario
 
         demoView.VerticalScrollBar.VisibleChanging += (_, args) => { vCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
 
-        demoView.HorizontalScrollBar.VisibleChanging += (_, args) =>
-                                                        {
-                                                            hCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked;
-                                                        };
+        demoView.HorizontalScrollBar.VisibleChanging += (_, args) => { hCheckBox.CheckedState = args.NewValue ? CheckState.Checked : CheckState.UnChecked; };
 
         // Add a progress bar to cause constant redraws
         var progress = new ProgressBar
@@ -111,7 +106,7 @@ public class Scrolling : Scenario
             {
                 progress.Pulse ();
 
-                return _progressTimer is not null;
+                return _progressTimer is { };
             }
 
             _progressTimer = app.AddTimeout (TimeSpan.FromMilliseconds (200), TimerFn);
@@ -119,7 +114,7 @@ public class Scrolling : Scenario
 
         void WinIsRunningChanged (object? sender, EventArgs<bool> args)
         {
-            if (!args.Value && _progressTimer is not null)
+            if (!args.Value && _progressTimer is { })
             {
                 app.RemoveTimeout (_progressTimer);
                 _progressTimer = null;

@@ -11,8 +11,8 @@ public class ComboBoxIteration : Scenario
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         ObservableCollection<string> items = ["one", "two", "three"];
 
         using Window win = new () { Title = GetQuitKeyAndName () };

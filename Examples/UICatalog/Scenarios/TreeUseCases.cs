@@ -17,8 +17,8 @@ public class TreeUseCases : Scenario
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
         _app = app;
 
         using Window appWindow = new ();

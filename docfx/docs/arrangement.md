@@ -542,9 +542,10 @@ container.Add(window1, window2);
 ```csharp
 using Terminal.Gui;
 
-Application.Init();
+using IApplication app = Application.Create();
+app.Init();
 
-var window = new Window
+Window window = new ()
 {
     Title = "Drag and Resize Me! (Ctrl+F5 for keyboard mode)",
     X = Pos.Center(),
@@ -555,7 +556,7 @@ var window = new Window
     BorderStyle = LineStyle.Double
 };
 
-var label = new Label
+Label label = new ()
 {
     Text = "Try dragging the border with mouse\nor press Ctrl+F5!",
     X = Pos.Center(),
@@ -563,18 +564,19 @@ var label = new Label
 };
 window.Add(label);
 
-Application.Run(window);
-Application.Shutdown();
+app.Run(window);
+window.Dispose();
 ```
 
 ### Example 2: Horizontal Resizable Splitter
 
 ```csharp
-Application.Init();
+using IApplication app = Application.Create();
+app.Init();
 
-var top = new Runnable();
+Runnable top = new ();
 
-var leftPane = new FrameView
+FrameView leftPane = new ()
 {
     Title = "Left Pane",
     X = 0,
@@ -583,7 +585,7 @@ var leftPane = new FrameView
     Height = Dim.Fill()
 };
 
-var rightPane = new FrameView
+FrameView rightPane = new ()
 {
     Title = "Right Pane (drag left edge)",
     X = Pos.Right(leftPane) - 1,
@@ -597,21 +599,22 @@ rightPane.Border.Thickness = new Thickness(1, 0, 0, 0);
 
 top.Add(leftPane, rightPane);
 
-Application.Run(top);
-Application.Shutdown();
+app.Run(top);
+top.Dispose();
 ```
 
 ### Example 3: Overlapped Windows
 
 ```csharp
-Application.Init();
+using IApplication app = Application.Create();
+app.Init();
 
-var desktop = new Runnable 
-{ 
-    Arrangement = ViewArrangement.Overlapped 
+Runnable desktop = new ()
+{
+    Arrangement = ViewArrangement.Overlapped
 };
 
-var window1 = new Window
+Window window1 = new ()
 {
     Title = "Window 1",
     X = 5,
@@ -621,7 +624,7 @@ var window1 = new Window
     Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
 };
 
-var window2 = new Window
+Window window2 = new ()
 {
     Title = "Window 2 (overlaps Window 1)",
     X = 15,
@@ -633,8 +636,8 @@ var window2 = new Window
 
 desktop.Add(window1, window2);
 
-Application.Run(desktop);
-Application.Shutdown();
+app.Run(desktop);
+desktop.Dispose();
 ```
 
 ### Example 4: Custom Arrange Key
@@ -643,16 +646,21 @@ Application.Shutdown();
 using Terminal.Gui;
 using Terminal.Gui.Configuration;
 
-// Change the arrange key
-Application.ArrangeKey = Key.F2;
+using IApplication app = Application.Create();
 
-var window = new Window
+// Change the arrange key
+app.Keyboard.ArrangeKey = Key.F2;
+
+app.Init();
+
+Window window = new ()
 {
     Title = "Press F2 to enter arrange mode",
     Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
 };
 
-Application.Run(window);
+app.Run(window);
+window.Dispose();
 ```
 
 ---
