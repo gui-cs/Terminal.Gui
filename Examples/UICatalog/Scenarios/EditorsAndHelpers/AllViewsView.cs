@@ -17,7 +17,7 @@ public class AllViewsView : View
                            {
                                if (sender is View sendingView)
                                {
-                                   sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
+                                  sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
                                }
                            };
 
@@ -59,9 +59,9 @@ public class AllViewsView : View
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
 
-        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
-        MouseBindings.ReplaceCommands (MouseFlags.Button3Clicked, Command.Context);
-        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.Context);
         MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
@@ -81,13 +81,13 @@ public class AllViewsView : View
         {
             View? view = CreateView (type);
 
-            if (view is { })
+            if (view is not null)
             {
                 FrameView frame = new ()
                 {
                     CanFocus = true,
                     Title = type.Name,
-                    Y = previousView is { } ? Pos.Bottom (previousView) : 0,
+                    Y = previousView is not null ? Pos.Bottom (previousView) : 0,
                     Width = Dim.Fill (),
                     Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: MAX_VIEW_FRAME_HEIGHT)
                 };

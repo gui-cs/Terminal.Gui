@@ -1,12 +1,13 @@
 using Xunit.Abstractions;
 
-namespace ApplicationTests.Mouse;
+namespace ApplicationTests.MouseTests;
 
 /// <summary>
 ///     Parallelizable tests for IMouse interface.
 ///     Tests the decoupled mouse handling without Application.Init or global state.
 /// </summary>
 [Trait ("Category", "Input")]
+[Collection("Application Tests")]
 public class MouseInterfaceTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
@@ -88,7 +89,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         // Arrange
         MouseImpl mouse = new ();
         var eventFired = false;
-        MouseEventArgs? capturedArgs = null;
+        Mouse? capturedArgs = null;
 
         mouse.MouseEvent += (sender, args) =>
                             {
@@ -96,10 +97,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
                                 capturedArgs = args;
                             };
 
-        MouseEventArgs testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (5, 10),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act
@@ -119,14 +120,14 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         MouseImpl mouse = new ();
         var eventCount = 0;
 
-        void Handler (object? sender, MouseEventArgs args) { eventCount++; }
+        void Handler (object? sender, Mouse args) { eventCount++; }
 
         mouse.MouseEvent += Handler;
 
-        MouseEventArgs testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act - Fire once
@@ -153,10 +154,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse.MouseEvent += (sender, args) => { eventFired = true; };
         mouse.IsMouseDisabled = true;
 
-        MouseEventArgs testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act
@@ -167,12 +168,12 @@ public class MouseInterfaceTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (MouseFlags.Button1Pressed)]
-    [InlineData (MouseFlags.Button1Released)]
-    [InlineData (MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed)]
+    [InlineData (MouseFlags.LeftButtonPressed)]
+    [InlineData (MouseFlags.LeftButtonReleased)]
+    [InlineData (MouseFlags.LeftButtonClicked)]
+    [InlineData (MouseFlags.MiddleButtonPressed)]
     [InlineData (MouseFlags.WheeledUp)]
-    [InlineData (MouseFlags.ReportMousePosition)]
+    [InlineData (MouseFlags.PositionReport)]
     public void Mouse_RaiseMouseEvent_CorrectlyPassesFlags (MouseFlags flags)
     {
         // Arrange
@@ -181,7 +182,7 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         mouse.MouseEvent += (sender, args) => { capturedFlags = args.Flags; };
 
-        MouseEventArgs testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (5, 5),
             Flags = flags
@@ -227,10 +228,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
 
         mouse.MouseEvent += (sender, args) => eventCount++;
 
-        MouseEventArgs testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Verify event fires before reset
@@ -296,10 +297,10 @@ public class MouseInterfaceTests (ITestOutputHelper output)
         mouse1.MouseEvent += (sender, args) => mouse1EventCount++;
         mouse2.MouseEvent += (sender, args) => mouse2EventCount++;
 
-        MouseEventArgs testEvent = new ()
+        Mouse testEvent = new ()
         {
             ScreenPosition = new (0, 0),
-            Flags = MouseFlags.Button1Pressed
+            Flags = MouseFlags.LeftButtonPressed
         };
 
         // Act

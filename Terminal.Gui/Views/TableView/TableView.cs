@@ -281,6 +281,8 @@ public class TableView : View, IDesignable
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
+
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     // TODO: Update to use Key instead of KeyCode
@@ -389,7 +391,7 @@ public class TableView : View, IDesignable
 
             if (oldValue != selectedColumn)
             {
-                OnSelectedCellChanged (
+                RaiseSelectedCellChanged (
                                        new (
                                             Table,
                                             oldValue,
@@ -414,7 +416,7 @@ public class TableView : View, IDesignable
 
             if (oldValue != selectedRow)
             {
-                OnSelectedCellChanged (
+                RaiseSelectedCellChanged (
                                        new (
                                             Table,
                                             SelectedColumn,
@@ -818,10 +820,10 @@ public class TableView : View, IDesignable
     }
 
     ///<inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+        if (!me.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+            && !me.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
             && me.Flags != MouseFlags.WheeledDown
             && me.Flags != MouseFlags.WheeledUp
             && me.Flags != MouseFlags.WheeledLeft
@@ -876,10 +878,10 @@ public class TableView : View, IDesignable
                 return true;
         }
 
-        int boundsX = me.Position.X;
-        int boundsY = me.Position.Y;
+        int boundsX = me.Position!.Value.X;
+        int boundsY = me.Position!.Value.Y;
 
-        if (me.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (me.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             if (scrollLeftPoint != null
                 && scrollLeftPoint.Value.X == boundsX
@@ -909,7 +911,7 @@ public class TableView : View, IDesignable
                 }
                 else
                 {
-                    SetSelection (hit.Value.X, hit.Value.Y, me.Flags.HasFlag (MouseFlags.ButtonShift));
+                    SetSelection (hit.Value.X, hit.Value.Y, me.Flags.HasFlag (MouseFlags.Shift));
                 }
 
                 Update ();
@@ -917,7 +919,7 @@ public class TableView : View, IDesignable
         }
 
         // Double clicking a cell activates
-        if (me.Flags == MouseFlags.Button1DoubleClicked)
+        if (me.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             Point? hit = ScreenToCell (boundsX, boundsY);
 
@@ -1054,30 +1056,7 @@ public class TableView : View, IDesignable
         ChangeSelectionByOffset (0, -(Viewport.Height - GetHeaderHeightIfAny ()), extend);
         Update ();
     }
-
-    /// <summary>
-    ///     Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base
-    ///     implementation if active cell is not visible due to scrolling or table is loaded etc
-    /// </summary>
-    public override Point? PositionCursor ()
-    {
-        if (TableIsNullOrInvisible ())
-        {
-            return base.PositionCursor ();
-        }
-
-        Point? screenPoint = CellToScreen (SelectedColumn, SelectedRow);
-
-        if (screenPoint is { })
-        {
-            Move (screenPoint.Value.X, screenPoint.Value.Y);
-
-            return null; //screenPoint;
-        }
-
-        return null;
-    }
-
+    
     /// <summary>
     ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
     ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
@@ -1272,6 +1251,7 @@ public class TableView : View, IDesignable
         SetNeedsDraw ();
     }
 
+    // TODO: Update this to follow CWP.
     /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> if the CellActivated event was raised.</returns>
@@ -1287,7 +1267,18 @@ public class TableView : View, IDesignable
     protected virtual void OnCellToggled (CellToggledEventArgs args) { CellToggled?.Invoke (this, args); }
 
     /// <summary>Invokes the <see cref="SelectedCellChanged"/> event</summary>
-    protected virtual void OnSelectedCellChanged (SelectedCellChangedEventArgs args) { SelectedCellChanged?.Invoke (this, args); }
+    private void RaiseSelectedCellChanged (SelectedCellChangedEventArgs args)
+    {
+        Point? screenPoint = CellToScreen (SelectedColumn, SelectedRow);
+
+        // If we wanted a visible console cursor, we'd uncomment this:
+        //if (screenPoint is { })
+        //{
+        //    Cursor = screenPoint.Value, CursorVisibility.Default;
+        //}
+
+        SelectedCellChanged?.Invoke (this, args);
+    }
 
     /// <summary>
     ///     Override to provide custom multi-coloring to cells. Use methods like <see cref="View.AddStr(string)"/>.
@@ -1680,7 +1671,7 @@ public class TableView : View, IDesignable
         return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString ();
     }
 
-    private bool HasControlOrAlt (MouseEventArgs me) { return me.Flags.HasFlag (MouseFlags.ButtonAlt) || me.Flags.HasFlag (MouseFlags.ButtonCtrl); }
+    private bool HasControlOrAlt (Mouse me) { return me.Flags.HasFlag (MouseFlags.Alt) || me.Flags.HasFlag (MouseFlags.Ctrl); }
 
     /// <summary>
     ///     Returns true if the given <paramref name="columnIndex"/> indexes a visible column otherwise false.  Returns

@@ -11,6 +11,7 @@ namespace ApplicationTests;
 ///     These tests ensure that the input thread starts, runs, and stops correctly when applications
 ///     are created, initialized, and disposed.
 /// </summary>
+[Collection("Application Tests")]
 public class MainLoopCoordinatorTests : IDisposable
 {
     private readonly List<IApplication> _createdApps = new ();
@@ -50,7 +51,7 @@ public class MainLoopCoordinatorTests : IDisposable
     {
         // Arrange
         IApplication app = CreateApp ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // The input thread should now be running
         Assert.NotNull (app.Driver);
@@ -80,7 +81,7 @@ public class MainLoopCoordinatorTests : IDisposable
     {
         // Arrange
         IApplication app = CreateApp ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // Act - Call Dispose() multiple times
         Exception? exception = Record.Exception (() =>
@@ -111,7 +112,7 @@ public class MainLoopCoordinatorTests : IDisposable
         for (var i = 0; i < COUNT; i++)
         {
             apps [i] = Application.Create ();
-            apps [i].Init ("fake");
+            apps [i].Init (DriverRegistry.Names.ANSI);
         }
 
         // Act - Dispose all applications
@@ -137,9 +138,9 @@ public class MainLoopCoordinatorTests : IDisposable
     [Fact (Skip = "Can't get this to run reliably.")]
     public void InputLoop_Throttle_Limits_Poll_Rate ()
     {
-        // Arrange - Create a FakeInput and manually run it with throttling
-        FakeInput input = new FakeInput ();
-        ConcurrentQueue<ConsoleKeyInfo> queue = new ConcurrentQueue<ConsoleKeyInfo> ();
+        // Arrange - Create a ANSIInput and manually run it with throttling
+        AnsiInput input = new AnsiInput ();
+        ConcurrentQueue<char> queue = new ConcurrentQueue<char> ();
         input.Initialize (queue);
 
         CancellationTokenSource cts = new CancellationTokenSource ();
@@ -188,7 +189,7 @@ public class MainLoopCoordinatorTests : IDisposable
         for (var i = 0; i < COUNT; i++)
         {
             apps [i] = Application.Create ();
-            apps [i].Init ("fake");
+            apps [i].Init (DriverRegistry.Names.ANSI);
         }
 
         // Let them run for a moment

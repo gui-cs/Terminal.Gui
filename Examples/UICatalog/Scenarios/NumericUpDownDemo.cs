@@ -1,6 +1,4 @@
-﻿#nullable enable 
-using System;
-
+﻿#nullable enable
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("NumericUpDown", "Demonstrates the NumericUpDown View")]
@@ -9,48 +7,48 @@ public class NumericUpDownDemo : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        Window app = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window mainWindow = new ();
+        mainWindow.Title = GetQuitKeyAndName ();
+        mainWindow.BorderStyle = LineStyle.None;
 
         NumericUpDownEditor<int> intEditor = new ()
         {
             X = 0,
             Y = 0,
-            Title = "int",
+            Title = "_int"
         };
-
-        app.Add (intEditor);
+        mainWindow.Add (intEditor);
 
         NumericUpDownEditor<float> floatEditor = new ()
         {
             X = Pos.Right (intEditor),
             Y = 0,
-            Title = "float",
+            Title = "_float"
         };
-        app.Add (floatEditor);
+        mainWindow.Add (floatEditor);
+        floatEditor.NumericUpDown!.Increment = 0.1F;
+        floatEditor.NumericUpDown!.Format = "{0:0.0}";
 
-        app.Initialized += AppInitialized;
-
-        void AppInitialized (object? sender, EventArgs e)
+        NumericUpDownEditor<int> hexEditor = new ()
         {
-            floatEditor!.NumericUpDown!.Increment = 0.1F;
-            floatEditor!.NumericUpDown!.Format = "{0:0.0}";
-        }
+            X = Pos.Right (floatEditor),
+            Y = 0,
+            Title = "_hex"
+        };
+        mainWindow.Add (floatEditor);
+        hexEditor.NumericUpDown!.Increment = 1;
+        hexEditor.NumericUpDown!.Format = "{0:X}";
+        mainWindow.Add (hexEditor);
 
-        intEditor.SetFocus ();
-
-        Application.Run (app);
-        app.Dispose ();
-        Application.Shutdown ();
+        app.Run (mainWindow);
     }
 }
 
-internal class NumericUpDownEditor<T> : View where T : notnull
+internal sealed class NumericUpDownEditor<T> : View where T : notnull
 {
     private NumericUpDown<T>? _numericUpDown;
 
@@ -63,18 +61,19 @@ internal class NumericUpDownEditor<T> : View where T : notnull
             {
                 return;
             }
+
             _numericUpDown = value;
 
-            if (_numericUpDown is { } && _value is { })
+            if (_numericUpDown is not null && _value is not null)
             {
                 _value.Text = _numericUpDown.Text;
             }
         }
     }
 
-    private TextField? _value;
-    private TextField? _format;
-    private TextField? _increment;
+    private readonly TextField? _value;
+    private readonly TextField? _format;
+    private readonly TextField? _increment;
 
     internal NumericUpDownEditor ()
     {
@@ -86,196 +85,167 @@ internal class NumericUpDownEditor<T> : View where T : notnull
         TabStop = TabBehavior.TabGroup;
         CanFocus = true;
 
-        Initialized += NumericUpDownEditorInitialized;
+        Label label = new ()
+        {
+            Title = "_Value: ",
+            Width = 12
+        };
+        label.TextFormatter.Alignment = Alignment.End;
+
+        _value = new ()
+        {
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Width = 8,
+            Title = "Value"
+        };
+        _value.Accepting += ValuedOnAccept;
+        Add (label, _value);
+
+        label = new ()
+        {
+            Y = Pos.Bottom (_value),
+            Width = 12,
+            Title = "_Format: "
+        };
+        label.TextFormatter.Alignment = Alignment.End;
+
+        _format = new ()
+        {
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Title = "Format",
+            Width = Dim.Width (_value)
+        };
+        _format.Accepting += FormatOnAccept;
+        Add (label, _format);
+
+        label = new ()
+        {
+            Y = Pos.Bottom (_format),
+            Width = 12,
+            Title = "_Increment: "
+        };
+        label.TextFormatter.Alignment = Alignment.End;
+
+        _increment = new ()
+        {
+            X = Pos.Right (label),
+            Y = Pos.Top (label),
+            Title = "Increment",
+            Width = Dim.Width (_value)
+        };
+
+        _increment.Accepting += IncrementOnAccept;
+        Add (label, _increment);
+
+        _numericUpDown = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (_increment) + 1,
+            Increment = NumericUpDown<int>.TryConvert (1, out T? increment) ? increment : default (T?)
+        };
+        _numericUpDown.ValueChanged += NumericUpDownOnValueChanged;
+        _numericUpDown.IncrementChanged += NumericUpDownOnIncrementChanged;
+        Add (_numericUpDown);
+
+        _value.Text = _numericUpDown.Text;
+        _format.Text = _numericUpDown.Format;
+        _increment.Text = _numericUpDown!.Increment?.ToString ()!;
 
         return;
 
-        void NumericUpDownEditorInitialized (object? sender, EventArgs e)
+        void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs) { _increment.Text = _numericUpDown!.Increment?.ToString ()!; }
+
+        void NumericUpDownOnValueChanged (object? o, EventArgs<T> eventArgs) { _value.Text = _numericUpDown.Text; }
+
+        void FormatOnAccept (object? o, EventArgs eventArgs)
         {
-            Label label = new ()
+            if (_numericUpDown is null)
             {
-                Title = "_Value: ",
-                Width = 12,
-            };
-            label.TextFormatter.Alignment = Alignment.End;
-            _value = new ()
-            {
-                X = Pos.Right (label),
-                Y = Pos.Top (label),
-                Width = 8,
-                Title = "Value",
-            };
-            _value.Accepting += ValuedOnAccept;
-
-            void ValuedOnAccept (object? sender, EventArgs e)
-            {
-                if (_numericUpDown is null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    if (string.IsNullOrEmpty (_value.Text))
-                    {
-                        // Handle empty or null text if needed
-                        _numericUpDown.Value = default!;
-                    }
-                    else
-                    {
-                        // Parse _value.Text and then convert to type T
-                        _numericUpDown.Value = (T)Convert.ChangeType (_value.Text, typeof (T));
-                    }
-
-                    _value.SetScheme (SuperView!.GetScheme ());
-
-                }
-                catch (System.FormatException)
-                {
-                    _value.SchemeName = "Error";
-                }
-                catch (InvalidCastException)
-                {
-                    _value.SchemeName = "Error";
-                }
-                finally
-                {
-                }
-
-            }
-            Add (label, _value);
-
-            label = new ()
-            {
-                Y = Pos.Bottom (_value),
-                Width = 12,
-                Title = "_Format: ",
-            };
-            label.TextFormatter.Alignment = Alignment.End;
-
-            _format = new ()
-            {
-                X = Pos.Right (label),
-                Y = Pos.Top (label),
-                Title = "Format",
-                Width = Dim.Width (_value),
-            };
-            _format.Accepting += FormatOnAccept;
-
-            void FormatOnAccept (object? o, EventArgs eventArgs)
-            {
-                if (_numericUpDown is null)
-                {
-                    return;
-                }
-
-                try
-                {
-                    // Test format to ensure it's valid
-                    _ = string.Format (_format.Text, _value);
-                    _numericUpDown.Format = _format.Text;
-
-                    _format.SetScheme (SuperView!.GetScheme ());
-
-                }
-                catch (System.FormatException)
-                {
-                    _format.SchemeName = "Error";
-                }
-                catch (InvalidCastException)
-                {
-                    _format.SchemeName = "Error";
-                }
-                finally
-                {
-                }
+                return;
             }
 
-            Add (label, _format);
-
-            label = new ()
+            try
             {
-                Y = Pos.Bottom (_format),
-                Width = 12,
-                Title = "_Increment: ",
-            };
-            label.TextFormatter.Alignment = Alignment.End;
-            _increment = new ()
+                // Test format to ensure it's valid
+                _ = string.Format (_format.Text, _value);
+                _numericUpDown.Format = _format.Text;
+
+                _format.SetScheme (SuperView!.GetScheme ());
+            }
+            catch (FormatException)
             {
-                X = Pos.Right (label),
-                Y = Pos.Top (label),
-                Title = "Increment",
-                Width = Dim.Width (_value),
-            };
-
-            _increment.Accepting += IncrementOnAccept;
-
-            void IncrementOnAccept (object? o, EventArgs eventArgs)
+                _format.SchemeName = "Error";
+            }
+            catch (InvalidCastException)
             {
-                if (_numericUpDown is null)
-                {
-                    return;
-                }
+                _format.SchemeName = "Error";
+            }
+        }
 
-                try
-                {
-                    if (string.IsNullOrEmpty (_value.Text))
-                    {
-                        // Handle empty or null text if needed
-                        _numericUpDown.Increment = default!;
-                    }
-                    else
-                    {
-                        // Parse _value.Text and then convert to type T
-                        _numericUpDown.Increment = (T)Convert.ChangeType (_increment.Text, typeof (T));
-                    }
-
-                    _increment.SetScheme (SuperView!.GetScheme ());
-
-                }
-                catch (System.FormatException)
-                {
-                    _increment.SchemeName = "Error";
-                }
-                catch (InvalidCastException)
-                {
-                    _increment.SchemeName = "Error";
-                }
-                finally
-                {
-                }
+        void IncrementOnAccept (object? o, EventArgs eventArgs)
+        {
+            if (_numericUpDown is null)
+            {
+                return;
             }
 
-            Add (label, _increment);
-
-            _numericUpDown = new ()
+            try
             {
-                X = Pos.Center (),
-                Y = Pos.Bottom (_increment) + 1,
-                Increment = NumericUpDown<int>.TryConvert (1, out T? increment) ? increment : default (T?),
-            };
+                if (string.IsNullOrEmpty (_value.Text))
+                {
+                    // Handle empty or null text if needed
+                    _numericUpDown.Increment = default (T?)!;
+                }
+                else
+                {
+                    // Parse _value.Text and then convert to type T
+                    _numericUpDown.Increment = (T)Convert.ChangeType (_increment.Text, typeof (T));
+                }
 
-            _numericUpDown.ValueChanged += NumericUpDownOnValueChanged;
-
-            void NumericUpDownOnValueChanged (object? o, EventArgs<T> eventArgs)
+                _increment.SetScheme (SuperView!.GetScheme ());
+            }
+            catch (FormatException)
             {
-                _value.Text = _numericUpDown.Text;
+                _increment.SchemeName = "Error";
+            }
+            catch (InvalidCastException)
+            {
+                _increment.SchemeName = "Error";
+            }
+        }
+
+        void ValuedOnAccept (object? sender, EventArgs e)
+        {
+            if (_numericUpDown is null)
+            {
+                return;
             }
 
-            _numericUpDown.IncrementChanged += NumericUpDownOnIncrementChanged;
-
-            void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs)
+            try
             {
-                _increment.Text = _numericUpDown!.Increment?.ToString ();
+                if (string.IsNullOrEmpty (_value.Text))
+                {
+                    // Handle empty or null text if needed
+                    _numericUpDown.Value = default (T)!;
+                }
+                else
+                {
+                    // Parse _value.Text and then convert to type T
+                    _numericUpDown.Value = (T)Convert.ChangeType (_value.Text, typeof (T));
+                }
+
+                _value.SetScheme (SuperView!.GetScheme ());
             }
-
-            Add (_numericUpDown);
-
-            _value.Text = _numericUpDown.Text;
-            _format.Text = _numericUpDown.Format;
-            _increment.Text = _numericUpDown!.Increment?.ToString ();
+            catch (FormatException)
+            {
+                _value.SchemeName = "Error";
+            }
+            catch (InvalidCastException)
+            {
+                _value.SchemeName = "Error";
+            }
         }
     }
-
-
 }

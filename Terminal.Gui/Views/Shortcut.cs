@@ -60,7 +60,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        HighlightStates = MouseState.None;
+        MouseHighlightStates = MouseState.None;
         CanFocus = true;
 
         if (Border is { })
@@ -71,6 +71,7 @@ public class Shortcut : View, IOrientation, IDesignable
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this);
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
@@ -472,7 +473,7 @@ public class Shortcut : View, IOrientation, IDesignable
                     || e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
-                    InvokeCommand<KeyBinding> (Command.Activate, new ([Command.Activate], null, this));
+                    InvokeCommand (Command.Activate, e);
                 }
 
                 e.Handled = true;
@@ -496,7 +497,7 @@ public class Shortcut : View, IOrientation, IDesignable
         CommandView.TextAlignment = Alignment.Start;
         CommandView.TextFormatter.WordWrap = false;
 
-        //CommandView.HighlightStates = HighlightStates.None;
+        //CommandView.MouseHighlightStates = MouseHighlightStates.None;
         CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
@@ -565,7 +566,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.VerticalTextAlignment = Alignment.Center;
         HelpView.TextAlignment = Alignment.Start;
         HelpView.TextFormatter.WordWrap = false;
-        HelpView.HighlightStates = MouseState.None;
+        HelpView.MouseHighlightStates = MouseState.None;
 
         HelpView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
@@ -634,9 +635,6 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _bindKeyToApplication;
         set
         {
-            App ??= SuperView?.App ?? Application.Instance; // HACK: Remove once legacy static Application is gone
-            Debug.Assert (App is { });
-
             if (value == _bindKeyToApplication)
             {
                 return;
@@ -703,7 +701,7 @@ public class Shortcut : View, IOrientation, IDesignable
         KeyView.TextAlignment = Alignment.End;
         KeyView.VerticalTextAlignment = Alignment.Center;
         KeyView.KeyBindings.Clear ();
-        KeyView.HighlightStates = MouseState.None;
+        KeyView.MouseHighlightStates = MouseState.None;
 
         KeyView.GettingAttributeForRole += (sender, args) =>
                                            {

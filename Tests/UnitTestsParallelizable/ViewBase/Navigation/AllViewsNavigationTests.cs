@@ -26,6 +26,11 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
         IApplication app = Application.Create ();
         app.Begin (new Runnable<bool> () { CanFocus = true });
 
@@ -45,7 +50,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
 
         if (view.TabStop == TabBehavior.TabGroup)
         {
-            navKeys = new [] { Key.F6, Key.F6.WithShift };
+            navKeys = [Key.F6, Key.F6.WithShift];
         }
 
         var left = false;
@@ -113,6 +118,11 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
             return;
         }
 
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
         IApplication app = Application.Create ();
         app.Begin (new Runnable<bool> () { CanFocus = true });
 
@@ -166,7 +176,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         {
             if (++tries > 10)
             {
-                Assert.Fail ($"{view} is not leaving.");
+                Assert.Fail ($"{view} is not leaving after {tries} attempts.");
             }
 
             switch (view.TabStop)
@@ -342,7 +352,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Fact]
-    public void GetMostFocused_NoSubViews_Returns_Null ()
+    public void GetMostFocused_NoSubViews_Returns_This ()
     {
         var view = new View ();
         Assert.Null (view.Focused);
@@ -351,7 +361,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.False (view.HasFocus);
         view.SetFocus ();
         Assert.True (view.HasFocus);
-        Assert.Null (view.MostFocused);
+        Assert.Equal (view, view.MostFocused);
     }
 
     [Fact]

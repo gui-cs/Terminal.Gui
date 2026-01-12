@@ -45,7 +45,7 @@ internal class TabRow : View
         Add (_rightScrollIndicator, _leftScrollIndicator);
     }
 
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
         View? parent = me.View is Adornment adornment ? adornment.Parent : me.View;
         Tab? hit = parent as Tab;

@@ -151,13 +151,13 @@ The table below describes the behavior of various `Pos` and `Dim` types when use
 
 It is common to build view classes that have a natural size based on their content. For example, the `Label` class is sized based on the `Text` property.
 
-`Slider` is a good example of a sophisticated `Dim.Auto`-friendly view. Developers using these views shouldn't need to know the details of how the view is sized; they should just be able to use the view and have it size itself correctly.
+`LinearRange` is a good example of a sophisticated `Dim.Auto`-friendly view. Developers using these views shouldn't need to know the details of how the view is sized; they should just be able to use the view and have it size itself correctly.
 
-For example, a vertical `Slider` with 3 options may be created like this, sized based on the number of options, its orientation, etc.:
+For example, a vertical `LinearRange` with 3 options may be created like this, sized based on the number of options, its orientation, etc.:
 
 ```cs
 List<object> options = new() { "Option 1", "Option 2", "Option 3" };
-Slider slider = new(options)
+LinearRange slider = new(options)
 {
     Orientation = Orientation.Vertical,
     Type = SliderType.Multiple,
@@ -165,9 +165,9 @@ Slider slider = new(options)
 view.Add(slider);
 ```
 
-Note the developer does not need to specify the size of the `Slider`; it will size itself based on the number of options and the orientation.
+Note the developer does not need to specify the size of the `LinearRange`; it will size itself based on the number of options and the orientation.
 
-Views like `Slider` achieve this by setting `Width` and `Height` to `Dim.Auto(DimAutoStyle.Content)` in the constructor and calling `SetContentSize()` whenever the desired content size changes. The view will then be sized to be big enough to fit the content.
+Views like `LinearRange` achieve this by setting `Width` and `Height` to `Dim.Auto(DimAutoStyle.Content)` in the constructor and calling `SetContentSize()` whenever the desired content size changes. The view will then be sized to be big enough to fit the content.
 
 Views that use `Text` for their content can set `Width` and `Height` to `Dim.Auto(DimAutoStyle.Text)`. It is recommended to use `Height = Dim.Auto(DimAutoStyle.Text, minimumContentDim: 1)` to ensure the view can show at least one line of text.
 

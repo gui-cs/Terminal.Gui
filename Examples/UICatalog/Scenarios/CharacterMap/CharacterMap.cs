@@ -23,7 +23,7 @@ public class CharacterMap : Scenario
     private CharMap? _charMap;
     private OptionSelector? _unicodeCategorySelector;
 
-    public override List<Key> GetDemoKeyStrokes ()
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         List<Key> keys = [];
 
@@ -52,9 +52,11 @@ public class CharacterMap : Scenario
     // Don't create a Window, just return the top-level view
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var top = new Window
+        using Window top = new ()
         {
             BorderStyle = LineStyle.None
         };
@@ -137,14 +139,14 @@ public class CharacterMap : Scenario
         _categoryList.Activating += (_, e) =>
                                    {
                                        // Only handle mouse clicks
-                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                       if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
                                        {
                                            return;
                                        }
 
-                                       _categoryList.ScreenToCell (mouseArgs.Position, out int? clickedCol);
+                                       _categoryList.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                       if (clickedCol != null && mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                       if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
                                        {
                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
@@ -193,7 +195,7 @@ public class CharacterMap : Scenario
                          new (
                               "_Quit",
                               $"{Application.QuitKey}",
-                              () => Application.RequestStop ()
+                              () => _charMap?.App?.RequestStop ()
                              )
                      }
                     ),
@@ -210,9 +212,7 @@ public class CharacterMap : Scenario
         _charMap.SelectedCodePoint = 0;
         _charMap.SetFocus ();
 
-        Application.Run (top);
-        top.Dispose ();
-        Application.Shutdown ();
+        app.Run (top);
 
         return;
 
@@ -354,7 +354,7 @@ public class CharacterMap : Scenario
 
         item.Action += () =>
                        {
-                           if (_charMap is { })
+                           if (_charMap is not null)
                            {
                                _charMap.ShowGlyphWidths = cb.CheckedState == CheckState.Checked;
                            }

@@ -37,8 +37,8 @@ public class ScenarioTests : TestsAllViews
             return;
         }
 
-        // Force a complete reset
-        ApplicationImpl.SetInstance (null);
+        // Force a complete reset - use ResetModelUsageTracking to allow both models in tests
+        ApplicationImpl.ResetModelUsageTracking ();
         CM.Disable (true);
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
@@ -63,29 +63,43 @@ public class ScenarioTests : TestsAllViews
         var iterationCount = 0;
         Key quitKey = Application.QuitKey;
 
+        // Track the current application instance for the modern model
+        IApplication? currentApp = null;
+
         // Track if we've already unsubscribed to prevent double-removal
         var iterationHandlerRemoved = false;
+
+        Exception? scenarioException = null;
 
         try
         {
             scenario = Activator.CreateInstance (scenarioType) as Scenario;
             scenarioName = scenario!.GetName ();
 
-            Application.InitializedChanged += OnApplicationOnInitializedChanged;
+            // Use thread-local events for modern instance-based model
+            Application.InstanceInitialized += OnInstanceInitialized;
+            Application.InstanceDisposed += OnInstanceDisposed;
 
-            Application.ForceDriver = "FakeDriver";
+            Application.ForceDriver = DriverRegistry.Names.ANSI;
             scenario!.Main ();
             Application.ForceDriver = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            // Catch exceptions to prevent test host crashes
+            scenarioException = ex;
+            _output.WriteLine ($"Scenario '{scenarioName}' threw exception: {ex}");
         }
         finally
         {
             // Ensure cleanup happens regardless of how we exit
-            Application.InitializedChanged -= OnApplicationOnInitializedChanged;
+            Application.InstanceInitialized -= OnInstanceInitialized;
+            Application.InstanceDisposed -= OnInstanceDisposed;
 
             // Remove iteration handler if it wasn't removed
-            if (!iterationHandlerRemoved)
+            if (!iterationHandlerRemoved && currentApp is { })
             {
-                Application.Iteration -= OnApplicationOnIteration;
+                currentApp.Iteration -= OnApplicationOnIteration;
                 iterationHandlerRemoved = true;
             }
 
@@ -109,28 +123,45 @@ public class ScenarioTests : TestsAllViews
                      $"Scenario '{scenarioName}' failed to quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. "
                      + $"TimeoutFired={timeoutFired}");
 
+        // Fail the test if an exception was thrown (but don't crash the test host)
+        Assert.Null (scenarioException);
+
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (View.Instances);
+        if (View.Instances.Count > 0)
+        {
+            foreach (View inst in View.Instances)
+            {
+                _output.WriteLine ($"Not Disposed: {inst.ToDebugString ()}");
+            }
+            Assert.Fail ($"Views were not disposed properly.");
+        }
 #endif
 
         return;
 
-        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
+        void OnInstanceInitialized (object? s, EventArgs<IApplication> a)
         {
-            if (a.Value)
-            {
-                Application.Iteration += OnApplicationOnIteration;
-                initialized = true;
+            currentApp = a.Value;
+            currentApp.Iteration += OnApplicationOnIteration;
+            initialized = true;
 
-                // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
-                watchdogTimer = new (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
-            }
-            else
+            // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
+            watchdogTimer = new (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
+
+            _output.WriteLine ($"Initialized; shutdownGracefully == {shutdownGracefully}.");
+        }
+
+        void OnInstanceDisposed (object? s, EventArgs<IApplication> a)
+        {
+            // Unsubscribe from Iteration before shutdown assertions
+            if (!iterationHandlerRemoved && currentApp is { })
             {
-                shutdownGracefully = true;
+                currentApp.Iteration -= OnApplicationOnIteration;
+                iterationHandlerRemoved = true;
             }
 
-            _output.WriteLine ($"Initialized == {a.Value}; shutdownGracefully == {shutdownGracefully}.");
+            shutdownGracefully = true;
+            _output.WriteLine ($"Disposed; shutdownGracefully == {shutdownGracefully}.");
         }
 
         // If the scenario doesn't close within abortTime ms, this will force it to quit
@@ -144,9 +175,9 @@ public class ScenarioTests : TestsAllViews
             // Just try to stop the application gracefully
             try
             {
-                if (Application.Initialized)
+                if (currentApp?.Initialized == true)
                 {
-                    Application.RequestStop ();
+                    currentApp.RequestStop ();
                 }
             }
             catch (Exception ex)
@@ -159,22 +190,22 @@ public class ScenarioTests : TestsAllViews
         {
             iterationCount++;
 
-            if (Application.Initialized)
+            if (currentApp?.Initialized == true)
             {
-                // Press QuitKey 
-                quitKey = Application.QuitKey;
+                // Press QuitKey
+                quitKey = currentApp.Keyboard.QuitKey;
                 _output.WriteLine ($"Attempting to quit with {quitKey} after {iterationCount} iterations.");
 
                 try
                 {
-                    Application.RaiseKeyDownEvent (quitKey);
+                    currentApp.Keyboard.RaiseKeyDownEvent (quitKey);
                 }
                 catch (Exception ex)
                 {
                     _output.WriteLine ($"Exception raising quit key: {ex.Message}");
                 }
 
-                Application.Iteration -= OnApplicationOnIteration;
+                currentApp.Iteration -= OnApplicationOnIteration;
                 iterationHandlerRemoved = true;
             }
         }
@@ -189,6 +220,9 @@ public class ScenarioTests : TestsAllViews
     [Fact]
     public void Run_All_Views_Tester_Scenario ()
     {
+        // Reset model usage tracking to allow legacy static model in this test
+        ApplicationImpl.ResetModelUsageTracking ();
+
         // Disable any UIConfig settings
         ConfigurationManager.Disable (true);
 
@@ -203,7 +237,7 @@ public class ScenarioTests : TestsAllViews
         List<string> posNames = ["Percent", "AnchorEnd", "Center", "Absolute"];
         List<string> dimNames = ["Auto", "Percent", "Fill", "Absolute"];
 
-        Application.Init ("fake");
+        Application.Init (DriverRegistry.Names.ANSI);
 
         var top = new Runnable ();
 

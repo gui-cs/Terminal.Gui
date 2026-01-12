@@ -157,6 +157,8 @@ public class ListView : View, IDesignable
         // Use the form of Add that lets us pass context to the handler
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
+
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     private bool _allowsMarking;
@@ -313,12 +315,14 @@ public class ListView : View, IDesignable
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the next item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveDown ()
+    public bool MoveDown ()
     {
         if (Source is null || Source.Count == 0)
         {
             return false; //Nothing for us to move to
         }
+
+        bool moved = false;
 
         if (SelectedItem is null || SelectedItem >= Source.Count)
         {
@@ -326,6 +330,7 @@ public class ListView : View, IDesignable
             // valid values range, we should select the first or bottommost valid value.
             // This can occur if the backing data source changes.
             SelectedItem = SelectedItem is null ? 0 : Source.Count - 1;
+            moved = true;
         }
         else if (SelectedItem + 1 < Source.Count)
         {
@@ -340,18 +345,20 @@ public class ListView : View, IDesignable
             {
                 Viewport = Viewport with { Y = SelectedItem.Value };
             }
+            moved = true;
         }
         else if (SelectedItem >= Viewport.Y + Viewport.Height)
         {
             Viewport = Viewport with { Y = Source.Count - Viewport.Height };
+            moved = true;
         }
 
-        return true;
+        return moved;
     }
 
     /// <summary>Changes the <see cref="SelectedItem"/> to last item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveEnd ()
+    public bool MoveEnd ()
     {
         if (Source is { Count: > 0 } && SelectedItem != Source.Count - 1)
         {
@@ -373,7 +380,7 @@ public class ListView : View, IDesignable
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the first item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveHome ()
+    public bool MoveHome ()
     {
         if (SelectedItem != 0)
         {
@@ -389,7 +396,7 @@ public class ListView : View, IDesignable
     ///     needed.
     /// </summary>
     /// <returns></returns>
-    public virtual bool MovePageDown ()
+    public bool MovePageDown ()
     {
         if (Source is null || Source.Count == 0)
         {
@@ -422,7 +429,7 @@ public class ListView : View, IDesignable
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the item at the top of the visible list.</summary>
     /// <returns></returns>
-    public virtual bool MovePageUp ()
+    public bool MovePageUp ()
     {
         if (Source is null || Source.Count == 0)
         {
@@ -447,19 +454,21 @@ public class ListView : View, IDesignable
 
     /// <summary>Changes the <see cref="SelectedItem"/> to the previous item in the list, scrolling the list if needed.</summary>
     /// <returns></returns>
-    public virtual bool MoveUp ()
+    public bool MoveUp ()
     {
         if (Source is null || Source.Count == 0)
         {
             return false; //Nothing for us to move to
         }
 
+        bool moved = false;
         if (SelectedItem is null || SelectedItem >= Source.Count)
         {
             // If SelectedItem is null or for some reason we are currently outside the
             // valid values range, we should select the bottommost valid value.
             // This can occur if the backing data source changes.
             SelectedItem = Source.Count - 1;
+            moved = true;
         }
         else if (SelectedItem > 0)
         {
@@ -478,13 +487,15 @@ public class ListView : View, IDesignable
             {
                 Viewport = Viewport with { Y = SelectedItem.Value - Viewport.Height + 1 };
             }
+            moved = true;
         }
         else if (SelectedItem < Viewport.Y)
         {
             Viewport = Viewport with { Y = SelectedItem.Value };
+            moved = true;
         }
 
-        return true;
+        return moved;
     }
 
     /// <summary>Invokes the <see cref="OpenSelectedItem"/> event if it is defined.</summary>
@@ -826,10 +837,10 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    protected override bool OnMouseEvent (Mouse me)
     {
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
+        if (!me.Flags.HasFlag (MouseFlags.LeftButtonClicked)
+            && !me.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
             && me.Flags != MouseFlags.WheeledDown
             && me.Flags != MouseFlags.WheeledUp
             && me.Flags != MouseFlags.WheeledRight
@@ -882,14 +893,14 @@ public class ListView : View, IDesignable
             return true;
         }
 
-        if (me.Position.Y + Viewport.Y >= Source.Count
-            || me.Position.Y + Viewport.Y < 0
-            || me.Position.Y + Viewport.Y > Viewport.Y + Viewport.Height)
+        if (me.Position!.Value.Y + Viewport.Y >= Source.Count
+            || me.Position!.Value.Y + Viewport.Y < 0
+            || me.Position!.Value.Y + Viewport.Y > Viewport.Y + Viewport.Height)
         {
             return true;
         }
 
-        SelectedItem = Viewport.Y + me.Position.Y;
+        SelectedItem = Viewport.Y + me.Position!.Value.Y;
 
         if (MarkUnmarkSelectedItem ())
         {
@@ -898,7 +909,7 @@ public class ListView : View, IDesignable
 
         SetNeedsDraw ();
 
-        if (me.Flags == MouseFlags.Button1DoubleClicked)
+        if (me.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             return InvokeCommand (Command.Accept) is true;
         }

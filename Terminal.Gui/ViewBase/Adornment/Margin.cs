@@ -53,7 +53,7 @@ public class Margin : Adornment
     // QUESTION: Why can't this just be the NeedsDisplay region?
     private Region? _cachedClip;
 
-    internal Region? GetCachedClip () { return _cachedClip; }
+    internal Region? GetCachedClip () => _cachedClip;
 
     internal void ClearCachedClip () { _cachedClip = null; }
 
@@ -67,15 +67,18 @@ public class Margin : Adornment
     }
 
     /// <summary>
-    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from <see cref="View.Draw"/> on each
+    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from
+    ///     <see cref="View.Draw(DrawContext)"/> on each
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
     /// <remarks>
     ///     Non-transparent margins are drawn as-normal in <see cref="View.DrawAdornments"/>.
     /// </remarks>
     /// <param name="views"></param>
-    /// <returns><see langword="true"/></returns>
-    internal static bool DrawTransparentMargins (IEnumerable<View> views)
+    /// <returns>
+    ///     <see langword="true"/>
+    /// </returns>
+    internal static bool DrawMargins (IEnumerable<View> views)
     {
         Stack<View> stack = new (views);
 
@@ -96,7 +99,10 @@ public class Margin : Adornment
                 margin.ClearCachedClip ();
             }
 
-            foreach (View subview in view.SubViews.OrderBy (v => v.HasFocus && v.ShadowStyle != ShadowStyle.None).Reverse ())
+            // Do not include Margin views of subviews; not supported
+            foreach (View subview in view.GetSubViews (false, includePadding: true, includeBorder: true)
+                                         .OrderBy (v => v.ShadowStyle != ShadowStyle.None)
+                                         .Reverse ())
             {
                 stack.Push (subview);
             }
@@ -141,17 +147,13 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Don't clear where the shadow goes
-            screen = Rectangle.Inflate (screen, -ShadowSize.Width, -ShadowSize.Height);
         }
 
         return true;
     }
 
-    /// <inheritdoc />
-    protected override bool OnDrawingText ()
-    {
-        return ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
-    }
+    /// <inheritdoc/>
+    protected override bool OnDrawingText () => ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
 
     #region Shadow
 
@@ -186,14 +188,23 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Turn off shadow
-            _originalThickness = new (Thickness.Left, Thickness.Top, Math.Max (Thickness.Right - ShadowSize.Width, 0), Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
+            _originalThickness = new (
+                                      Thickness.Left,
+                                      Thickness.Top,
+                                      Math.Max (Thickness.Right - ShadowSize.Width, 0),
+                                      Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
         }
 
         if (style != ShadowStyle.None)
         {
             // Turn on shadow
             _isThicknessChanging = true;
-            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right + ShadowSize.Width, _originalThickness.Value.Bottom + ShadowSize.Height);
+
+            Thickness = new (
+                             _originalThickness.Value.Left,
+                             _originalThickness.Value.Top,
+                             _originalThickness.Value.Right + ShadowSize.Width,
+                             _originalThickness.Value.Bottom + ShadowSize.Height);
             _isThicknessChanging = false;
         }
 
@@ -279,7 +290,7 @@ public class Margin : Adornment
     {
         result = newValue;
 
-        bool wasValid = true;
+        var wasValid = true;
 
         if (newValue.Width < 0)
         {
@@ -287,7 +298,6 @@ public class Margin : Adornment
 
             wasValid = false;
         }
-
 
         if (newValue.Height < 0)
         {
@@ -301,7 +311,7 @@ public class Margin : Adornment
             return false;
         }
 
-        bool wasUpdated = false;
+        var wasUpdated = false;
 
         if ((ShadowStyle == ShadowStyle.Opaque && newValue.Width != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue.Width < 1))
         {
@@ -327,8 +337,8 @@ public class Margin : Adornment
             return;
         }
 
-        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.HighlightStates.HasFlag (MouseState.Pressed);
-        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.HighlightStates.HasFlag (MouseState.PressedOutside);
+        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.MouseHighlightStates.HasFlag (MouseState.Pressed);
+        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.MouseHighlightStates.HasFlag (MouseState.PressedOutside);
 
         if (pressedOutside)
         {
@@ -341,6 +351,7 @@ public class Margin : Adornment
             // Note, for visual effects reasons, we only move horizontally.
             // TODO: Add a setting or flag that lets the view move vertically as well.
             _isThicknessChanging = true;
+
             Thickness = new (
                              Thickness.Left - PRESS_MOVE_HORIZONTAL,
                              Thickness.Top - PRESS_MOVE_VERTICAL,
@@ -369,6 +380,7 @@ public class Margin : Adornment
             // Note, for visual effects reasons, we only move horizontally.
             // TODO: Add a setting or flag that lets the view move vertically as well.
             _isThicknessChanging = true;
+
             Thickness = new (
                              Thickness.Left + PRESS_MOVE_HORIZONTAL,
                              Thickness.Top + PRESS_MOVE_VERTICAL,
@@ -421,5 +433,4 @@ public class Margin : Adornment
     }
 
     #endregion Shadow
-
 }

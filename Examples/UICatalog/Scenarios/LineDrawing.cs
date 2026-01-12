@@ -4,7 +4,7 @@ namespace UICatalog.Scenarios;
 
 public interface ITool
 {
-    void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent);
+    void OnMouseEvent (DrawingArea area, Mouse mouse);
 }
 
 internal class DrawLineTool : ITool
@@ -13,15 +13,15 @@ internal class DrawLineTool : ITool
     public LineStyle LineStyle { get; set; } = LineStyle.Single;
 
     /// <inheritdoc/>
-    public void OnMouseEvent (DrawingArea area, MouseEventArgs mouseEvent)
+    public void OnMouseEvent (DrawingArea area, Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
         {
             if (_currentLine == null)
             {
-                // Mouse pressed down
+                // MouseEventArgs pressed down
                 _currentLine = new (
-                                    mouseEvent.Position,
+                                    mouse.Position!.Value,
                                     0,
                                     Orientation.Vertical,
                                     LineStyle,
@@ -32,9 +32,9 @@ internal class DrawLineTool : ITool
             }
             else
             {
-                // Mouse dragged
+                // MouseEventArgs dragged
                 Point start = _currentLine.Start;
-                Point end = mouseEvent.Position;
+                Point end = mouse.Position!.Value;
                 var orientation = Orientation.Vertical;
                 int length = end.Y - start.Y;
 
@@ -62,7 +62,7 @@ internal class DrawLineTool : ITool
         }
         else
         {
-            // Mouse released
+            // MouseEventArgs released
             if (_currentLine != null)
             {
                 if (_currentLine.Length == 0)
@@ -93,7 +93,7 @@ internal class DrawLineTool : ITool
             }
         }
 
-        mouseEvent.Handled = true;
+        mouse.Handled = true;
     }
 }
 
@@ -104,11 +104,14 @@ public class LineDrawing : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
-        var win = new Window { Title = GetQuitKeyAndName () };
-        var canvas = new DrawingArea { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
+        using Window win = new () { Title = GetQuitKeyAndName () };
+        DrawingArea canvas = new () { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        ToolsView tools = new () { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
 
         tools.ColorChanged += (s, e) => canvas.SetCurrentAttribute (e);
         tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool { LineStyle = b };
@@ -121,60 +124,21 @@ public class LineDrawing : Scenario
 
         win.KeyDown += (s, e) => { e.Handled = canvas.NewKeyDownEvent (e); };
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 
-    public static bool PromptForColor (string title, Color current, out Color newColor)
+    public static bool PromptForColor (IApplication app, string title, Color current, out Color newColor)
     {
         var accept = false;
 
-        var d = new Dialog
+        Dialog d = new ()
         {
             Title = title,
-            Width = Driver.Force16Colors ? 35 : Dim.Auto (DimAutoStyle.Auto, Dim.Percent (80), Dim.Percent (90)),
-            Height = 10
+            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
         };
-
-        var btnOk = new Button
-        {
-            X = Pos.Center () - 5,
-            Y = Driver.Force16Colors ? 6 : 4,
-            Text = "Ok",
-            Width = Dim.Auto (),
-            IsDefault = true
-        };
-
-        btnOk.Accepting += (s, e) =>
-                        {
-                            accept = true;
-                            e.Handled = true;
-                            Application.RequestStop ();
-                        };
-
-        var btnCancel = new Button
-        {
-            X = Pos.Center () + 5,
-            Y = 4,
-            Text = "Cancel",
-            Width = Dim.Auto ()
-        };
-
-        btnCancel.Accepting += (s, e) =>
-                            {
-                                e.Handled = true;
-                                Application.RequestStop ();
-                            };
-
-        d.Add (btnOk);
-        d.Add (btnCancel);
-
-        d.AddButton (btnOk);
-        d.AddButton (btnCancel);
 
         View cp;
-        if (Driver.Force16Colors)
+        if (app.Driver!.Force16Colors)
         {
             cp = new ColorPicker16
             {
@@ -187,7 +151,7 @@ public class LineDrawing : Scenario
             cp = new ColorPicker
             {
                 SelectedColor = current,
-                Width = Dim.Fill (),
+                Width = Dim.Fill (0, minimumContentDim: 50),
                 Style = new () { ShowColorName = true, ShowTextFields = true }
             };
             ((ColorPicker)cp).ApplyStyleChanges ();
@@ -195,9 +159,10 @@ public class LineDrawing : Scenario
 
         d.Add (cp);
 
-        Application.Run (d);
+        app.Run (d);
+        accept = d.Result == 1;
         d.Dispose ();
-        newColor = Driver.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
+        newColor = app.Driver!.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
 
         return accept;
     }
@@ -237,7 +202,7 @@ public class ToolsView : Window
         };
         _stylePicker.ValueChanged += (s, a) =>
                                      {
-                                         if (a.Value is { })
+                                         if (a.Value is not null)
                                          {
                                              SetStyle?.Invoke ((LineStyle)a.Value);
                                          }
@@ -276,7 +241,7 @@ public class DrawingArea : View
         {
             foreach (KeyValuePair<Point, Cell?> c in canvas.GetCellMap ())
             {
-                if (c.Value is { })
+                if (c.Value is not null)
                 {
                     SetCurrentAttribute (c.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
 
@@ -325,11 +290,11 @@ public class DrawingArea : View
         return false;
     }
 
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        CurrentTool.OnMouseEvent (this, mouseEvent);
+        CurrentTool.OnMouseEvent (this, mouse);
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     internal void AddLayer ()
@@ -432,23 +397,23 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked))
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            if (IsForegroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            if (IsForegroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInForeground ();
             }
-            else if (IsBackgroundPoint (mouseEvent.Position.X, mouseEvent.Position.Y))
+            else if (IsBackgroundPoint (mouse.Position!.Value.X, mouse.Position!.Value.Y))
             {
                 ClickedInBackground ();
             }
 
-            mouseEvent.Handled = true;
+            mouse.Handled = true;
         }
 
-        return mouseEvent.Handled;
+        return mouse.Handled;
     }
 
     private bool IsForegroundPoint (int x, int y) { return ForegroundPoints.Contains ((x, y)); }
@@ -457,7 +422,7 @@ public class AttributeView : View
 
     private void ClickedInBackground ()
     {
-        if (LineDrawing.PromptForColor ("Background", Value.Background, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Background", Value.Background, out Color newColor))
         {
             Value = new (Value.Foreground, newColor, Value.Style);
             SetNeedsDraw ();
@@ -466,7 +431,7 @@ public class AttributeView : View
 
     private void ClickedInForeground ()
     {
-        if (LineDrawing.PromptForColor ("Foreground", Value.Foreground, out Color newColor))
+        if (LineDrawing.PromptForColor (App!, "Foreground", Value.Foreground, out Color newColor))
         {
             Value = new (newColor, Value.Background);
             SetNeedsDraw ();

@@ -6,7 +6,7 @@ namespace UnitTests;
 /// <summary>
 ///     Base class for tests that need to test all views.
 /// </summary>
-public class TestsAllViews : FakeDriverBase
+public class TestsAllViews : TestDriverBase
 {
     /// <summary>
     ///     Gets all view types.

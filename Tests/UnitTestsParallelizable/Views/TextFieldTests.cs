@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace ViewsTests;
 
-public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
+public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Cancel_TextChanging_ThenBackspace ()
@@ -226,22 +226,22 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         tf.BeginInit ();
         tf.EndInit ();
 
-        Assert.Equal (3, tf.CursorPosition);
+        Assert.Equal (3, tf.InsertionPoint);
 
         // now delete the C
         tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("AB", tf.Text);
-        Assert.Equal (2, tf.CursorPosition);
+        Assert.Equal (2, tf.InsertionPoint);
 
         // then delete the B
         tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("A", tf.Text);
-        Assert.Equal (1, tf.CursorPosition);
+        Assert.Equal (1, tf.InsertionPoint);
 
         // then delete the A
         tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("", tf.Text);
-        Assert.Equal (0, tf.CursorPosition);
+        Assert.Equal (0, tf.InsertionPoint);
     }
 
     [Fact]
@@ -249,7 +249,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     {
         var tf = new TextField { Text = "ABC" };
         tf.SetFocus ();
-        tf.CursorPosition = 2;
+        tf.InsertionPoint = 2;
         Assert.Equal ("ABC", tf.Text);
 
         // now delete the B
@@ -265,7 +265,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Equal ("C", tf.Text);
 
         // now delete the C
-        tf.CursorPosition = 1;
+        tf.InsertionPoint = 1;
         tf.NewKeyDownEvent (Key.Backspace);
         Assert.Equal ("", tf.Text);
     }
@@ -308,21 +308,21 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     {
         var tf = new TextField ();
         tf.Text = "fish";
-        tf.CursorPosition = tf.Text.Length;
+        tf.InsertionPoint = tf.Text.Length;
 
         tf.NewKeyDownEvent (Key.CursorLeft);
 
         tf.NewKeyDownEvent (Key.CursorLeft.WithShift);
         tf.NewKeyDownEvent (Key.CursorLeft.WithShift);
 
-        Assert.Equal (1, tf.CursorPosition);
+        Assert.Equal (1, tf.InsertionPoint);
         Assert.Equal (2, tf.SelectedLength);
         Assert.Equal ("is", tf.SelectedText);
 
         tf.Text = newText;
-        tf.CursorPosition = tf.Text.Length;
+        tf.InsertionPoint = tf.Text.Length;
 
-        Assert.Equal (newText.Length, tf.CursorPosition);
+        Assert.Equal (newText.Length, tf.InsertionPoint);
         Assert.Equal (0, tf.SelectedLength);
         Assert.Null (tf.SelectedText);
     }
@@ -332,12 +332,12 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     {
         var tf = new TextField { Width = 10, Text = " " };
 
-        var ev = new MouseEventArgs { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked };
+        var ev = new Mouse { Position = new (0, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
 
-        ev = new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked };
+        ev = new () { Position = new (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
 
         tf.NewMouseEvent (ev);
         Assert.Equal (1, tf.SelectedLength);
@@ -351,29 +351,29 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         tf.EndInit ();
 
         Assert.False (tf.UseSameRuneTypeForWords);
-        Assert.Equal (22, tf.CursorPosition);
+        Assert.Equal (22, tf.InsertionPoint);
 
         tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
-        Assert.Equal (15, tf.CursorPosition);
+        Assert.Equal (15, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
-        Assert.Equal (12, tf.CursorPosition);
+        Assert.Equal (12, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
-        Assert.Equal (10, tf.CursorPosition);
+        Assert.Equal (10, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
-        Assert.Equal (5, tf.CursorPosition);
+        Assert.Equal (5, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
-        Assert.Equal (0, tf.CursorPosition);
+        Assert.Equal (0, tf.InsertionPoint);
 
         tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
-        Assert.Equal (5, tf.CursorPosition);
+        Assert.Equal (5, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
-        Assert.Equal (10, tf.CursorPosition);
+        Assert.Equal (10, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
-        Assert.Equal (12, tf.CursorPosition);
+        Assert.Equal (12, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
-        Assert.Equal (15, tf.CursorPosition);
+        Assert.Equal (15, tf.InsertionPoint);
         tf.NewKeyDownEvent (Key.CursorRight.WithCtrl);
-        Assert.Equal (22, tf.CursorPosition);
+        Assert.Equal (22, tf.InsertionPoint);
     }
 
     [Fact]
@@ -404,14 +404,14 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
 
         Assert.True (
                      tf.NewMouseEvent (
-                                       new () { Position = new (idx, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                       new () { Position = new (idx, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }
                                       )
                     );
         Assert.Equal ("movie", tf.SelectedText);
 
         Assert.True (
                      tf.NewMouseEvent (
-                                       new () { Position = new (idx + 1, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
+                                       new () { Position = new (idx + 1, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }
                                       )
                     );
         Assert.Equal ("movie", tf.SelectedText);
@@ -468,7 +468,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         };
         tf.SetFocus ();
         tf.SelectAll ();
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
 
         // When there is selected text and the cursor is at the end of the text field
         Assert.Equal ("Hello", tf.SelectedText);
@@ -490,7 +490,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         };
         tf.SetFocus ();
 
-        tf.CursorPosition = 2;
+        tf.InsertionPoint = 2;
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
 
@@ -502,7 +502,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         Assert.Null (tf.SelectedText);
 
         // When clearing selected text with left the cursor should be at the start of the selection
-        Assert.Equal (0, tf.CursorPosition);
+        Assert.Equal (0, tf.InsertionPoint);
 
         // Now that the selection is cleared another left keypress should move focus
         Assert.False (tf.NewKeyDownEvent (Key.CursorLeft));
@@ -545,22 +545,23 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
         var tf = new TextField { Width = 5 };
         tf.BeginInit ();
         tf.EndInit ();
+        tf.SetFocus ();
 
         tf.NewKeyDownEvent (new ("📄"));
-        Assert.Equal (1, tf.CursorPosition);
-        Assert.Equal (new (2, 0), tf.PositionCursor ());
+        Assert.Equal (1, tf.InsertionPoint);
+        Assert.Equal (new (2, 0), tf.Cursor.Position);
         Assert.Equal ("📄", tf.Text);
 
         tf.NewKeyDownEvent (new (KeyCode.A));
-        Assert.Equal (2, tf.CursorPosition);
-        Assert.Equal (new (3, 0), tf.PositionCursor ());
+        Assert.Equal (2, tf.InsertionPoint);
+        Assert.Equal (new (3, 0), tf.Cursor.Position);
         Assert.Equal ("📄a", tf.Text);
     }
 
     [Fact]
     public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var tf = new TextField { Width = 3, Text = "ắ" };
         tf.Driver = driver;
@@ -611,7 +612,7 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Adjust_First ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var tf = new TextField { Width = Dim.Fill (), Text = "This is a test." };
         tf.Driver = driver;
@@ -636,42 +637,43 @@ public class TextFieldTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void PositionCursor_Treat_Zero_Width_As_One_Column ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextField tf = new () { Width = 10, Text = "\u001B[" };
         tf.Driver = driver;
         tf.SetRelativeLayout (new (10, 1));
+        tf.SetFocus ();
 
-        Assert.Equal (0, tf.CursorPosition);
+        Assert.Equal (0, tf.InsertionPoint);
 
-        tf.CursorPosition = 1;
-        Assert.Equal (new Point (1, 0), tf.PositionCursor ());
+        tf.InsertionPoint = 1;
+        Assert.Equal (new Point (1, 0), tf.Cursor.Position);
 
-        tf.CursorPosition = 2;
-        Assert.Equal (new Point (2, 0), tf.PositionCursor ());
+        tf.InsertionPoint = 2;
+        Assert.Equal (new Point (2, 0), tf.Cursor.Position);
     }
 
     [Fact]
     public void ScrollOffset_Treat_Negative_Width_As_One_Column ()
     {
-        View view = new () { Width = 10, Height = 1};
+        View view = new () { Width = 10, Height = 1 };
         TextField tf = new () { Width = 2, Text = "\u001B[" };
         view.Add (tf);
         tf.SetRelativeLayout (new (10, 1));
 
         Assert.Equal (0, tf.ScrollOffset);
-        Assert.Equal (0, tf.CursorPosition);
+        Assert.Equal (0, tf.InsertionPoint);
 
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (0, tf.ScrollOffset);
-        Assert.Equal (1, tf.CursorPosition);
+        Assert.Equal (1, tf.InsertionPoint);
 
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (1, tf.ScrollOffset);
-        Assert.Equal (2, tf.CursorPosition);
+        Assert.Equal (2, tf.InsertionPoint);
 
         Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (1, tf.ScrollOffset);
-        Assert.Equal (2, tf.CursorPosition);
+        Assert.Equal (2, tf.InsertionPoint);
     }
 }

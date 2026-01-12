@@ -28,7 +28,7 @@ public interface IApplication : IDisposable
 
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <param name="driverName">
-    ///     The short name (e.g. "dotnet", "windows", "unix", or "fake") of the
+    ///     The short name (<see cref="DriverRegistry.Names"/>) of the
     ///     <see cref="IDriver"/> to use. If not specified the default driver for the platform will be used.
     /// </param>
     /// <returns>This instance for fluent API chaining.</returns>
@@ -268,7 +268,7 @@ public interface IApplication : IDisposable
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new ();
+        where TRunnable : IRunnable, new();
 
     #region Iteration & Invoke
 
@@ -424,7 +424,7 @@ public interface IApplication : IDisposable
     ///     }
     ///     </code>
     /// </example>
-    T? GetResult<T> () where T : class => GetResult () as T;
+    T? GetResult<T> () where T : class { return GetResult () as T; }
 
     #endregion Result Management
 
@@ -447,10 +447,10 @@ public interface IApplication : IDisposable
     ///         <see cref="Driver"/> is not initialized.
     ///     </para>
     /// </remarks>
-    IClipboard? Clipboard { get; }
+    IClipboard? Clipboard { get; internal set; }
 
     /// <summary>
-    ///     Forces the use of the specified driver (one of "fake", "dotnet", "windows", or "unix"). If not
+    ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
     string ForceDriver { get; set; }
@@ -492,7 +492,32 @@ public interface IApplication : IDisposable
 
     #endregion Screen and Driver
 
-    #region Keyboard
+    #region Input (Mouse/Keyboard)
+
+    /// <summary>
+    ///     Gets the input injector for programmatic input injection in tests.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The input injector provides a simplified API for injecting keyboard and mouse events
+    ///         in tests. It handles encoding, queueing, and processing automatically.
+    ///     </para>
+    ///     <para>
+    ///         Use <see cref="Application.Create"/> to create an application with
+    ///         <see cref="VirtualTimeProvider"/> for deterministic, fast tests.
+    ///     </para>
+    ///     <para>
+    ///         Example usage:
+    ///         <code>
+    ///             VirtualTimeProvider time = new ();
+    ///             using IApplication app = Application.Create (time);
+    ///             app.Init ();
+    ///             app.InjectKey (Key.Enter);  // Extension method uses GetInputInjector()
+    ///         </code>
+    ///     </para>
+    /// </remarks>
+    /// <returns>The <see cref="IInputInjector"/> for input injection.</returns>
+    IInputInjector GetInputInjector ();
 
     /// <summary>
     ///     Handles keyboard input and key bindings at the Application level.
@@ -504,10 +529,6 @@ public interface IApplication : IDisposable
     /// </remarks>
     IKeyboard Keyboard { get; set; }
 
-    #endregion Keyboard
-
-    #region Mouse
-
     /// <summary>
     ///     Handles mouse event state and processing.
     /// </summary>
@@ -518,7 +539,7 @@ public interface IApplication : IDisposable
     /// </remarks>
     IMouse Mouse { get; set; }
 
-    #endregion Mouse
+    #endregion Input (Mouse/Keyboard)
 
     #region Layout and Drawing
 
@@ -541,18 +562,6 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     public void LayoutAndDraw (bool forceRedraw = false);
-
-    /// <summary>
-    ///     Calls <see cref="View.PositionCursor"/> on the most focused view.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Does nothing if there is no most focused view.</para>
-    ///     <para>
-    ///         If the most focused view is not visible within its superview, the cursor will be hidden.
-    ///     </para>
-    /// </remarks>
-    /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
-    public bool PositionCursor ();
 
     #endregion Layout and Drawing
 

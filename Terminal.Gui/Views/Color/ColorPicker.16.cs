@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
@@ -56,7 +54,7 @@ public class ColorPicker16 : View
     public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
 
     /// <summary>Cursor for the selected color.</summary>
-    public Point Cursor
+    public Point Caret
     {
         get => new (_selectColorIndex % COLS, _selectColorIndex / COLS);
         set
@@ -74,12 +72,13 @@ public class ColorPicker16 : View
         {
             return true;
         }
-        if (Cursor.Y < ROWS - 1)
+
+        if (Caret.Y < ROWS - 1)
         {
             SelectedColor += COLS;
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     /// <summary>Moves the selected item index to the previous column.</summary>
@@ -91,12 +90,12 @@ public class ColorPicker16 : View
             return true;
         }
 
-        if (Cursor.X > 0)
+        if (Caret.X > 0)
         {
             SelectedColor--;
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     /// <summary>Moves the selected item index to the next column.</summary>
@@ -107,12 +106,13 @@ public class ColorPicker16 : View
         {
             return true;
         }
-        if (Cursor.X < COLS - 1)
+
+        if (Caret.X < COLS - 1)
         {
             SelectedColor++;
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     /// <summary>Moves the selected item index to the previous row.</summary>
@@ -123,12 +123,13 @@ public class ColorPicker16 : View
         {
             return true;
         }
-        if (Cursor.Y > 0)
+
+        if (Caret.Y > 0)
         {
             SelectedColor -= COLS;
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     ///<inheritdoc/>
@@ -157,7 +158,7 @@ public class ColorPicker16 : View
                     SetAttribute (new ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimColor (), TextStyle.Faint));
                 }
 
-                bool selected = x == Cursor.X && y == Cursor.Y;
+                bool selected = x == Caret.X && y == Caret.Y;
                 DrawColorBox (x, y, selected);
                 colorIndex++;
             }
@@ -197,14 +198,18 @@ public class ColorPicker16 : View
 
         AddCommand (Command.Activate, (ctx) =>
                                     {
-                                        var set = false;
-
                                         if (ctx is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
                                         {
-                                            Cursor = new (mouseCommandContext.Binding.MouseEventArgs.Position.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position.Y / _boxHeight);
-                                            set = true;
+                                            if (RaiseActivating (ctx) == true)
+                                            {
+                                                return true;
+                                            }
+
+                                            Caret = new (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position!.Value.Y / _boxHeight);
+                                            return SetFocus ();
                                         }
-                                        return RaiseAccepting (ctx) == true || set;
+
+                                        return false;
                                     });
     }
 
@@ -215,6 +220,9 @@ public class ColorPicker16 : View
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.CursorDown, Command.Down);
+
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
     }
 
     // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
@@ -280,8 +288,6 @@ public class ColorPicker16 : View
 
     private void SetInitialProperties ()
     {
-        HighlightStates = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed;
-
         CanFocus = true;
         AddCommands ();
         AddKeyBindings ();

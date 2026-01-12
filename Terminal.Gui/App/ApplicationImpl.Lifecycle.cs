@@ -59,13 +59,9 @@ internal partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        // Debug.Assert (Navigation is null);
-        // Navigation = new ();
-
-        //Debug.Assert (Popover is null);
-        //Popover = new ();
-
         // Preserve existing keyboard settings if they exist
+        // BUGBUG: These should not be needed; KeyboardImpl subscribes to Application static property changes
+        // BUGBUG: and should set these automatically.
         bool hasExistingKeyboard = _keyboard is { };
         Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
         Key existingArrangeKey = _keyboard?.ArrangeKey ?? Application.ArrangeKey;
@@ -97,6 +93,9 @@ internal partial class ApplicationImpl
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
         _result = null;
+
+        // Raise static event for modern instance-based model
+        Application.RaiseInstanceInitialized (this);
 
         return this;
     }
@@ -170,6 +169,10 @@ internal partial class ApplicationImpl
 
         // Capture state before cleanup
         bool wasInitialized = Initialized;
+
+        // Raise static event for modern instance-based model BEFORE assertions
+        // This allows test code to unsubscribe from instance events before we check
+        Application.RaiseInstanceDisposed (this);
 
 #if DEBUG
 
@@ -261,7 +264,7 @@ internal partial class ApplicationImpl
         // Don't dispose the TopRunnable. It's up to caller dispose it
         if (View.EnableDebugIDisposableAsserts && !ignoreDisposed && TopRunnableView is { })
         {
-            Debug.Assert (TopRunnableView.WasDisposed, $"Title = {TopRunnableView.Title}, Id = {TopRunnableView.Id}");
+            Debug.Assert (TopRunnableView.WasDisposed, TopRunnableView.ToDebugString ());
         }
 #endif
 
@@ -282,20 +285,18 @@ internal partial class ApplicationImpl
 
         // === 6. Reset input systems ===
         // Dispose keyboard and mouse to unsubscribe from events
+        // Mouse and Keyboard will be lazy-initialized on next access
         if (_keyboard is IDisposable keyboardDisposable)
         {
             keyboardDisposable.Dispose ();
         }
+        _keyboard = null;
 
         if (_mouse is IDisposable mouseDisposable)
         {
             mouseDisposable.Dispose ();
         }
-
-        // Mouse and Keyboard will be lazy-initialized on next access
         _mouse = null;
-        _keyboard = null;
-        Mouse.ResetState ();
 
         // === 7. Clear navigation and screen state ===
         ScreenChanged = null;

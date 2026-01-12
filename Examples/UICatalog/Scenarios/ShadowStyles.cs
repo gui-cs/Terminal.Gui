@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.Metrics;
-using System.Linq;
-
-namespace UICatalog.Scenarios;
+﻿namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ShadowStyles Demo", "Demonstrates ShadowStyles Effects.")]
 [ScenarioCategory ("Layout")]
@@ -13,28 +7,29 @@ public class ShadowStyles : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window app = new ()
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window window = new ()
         {
             Id = "app",
             Title = GetQuitKeyAndName ()
         };
 
-
-        var editor = new AdornmentsEditor ()
+        AdornmentsEditor editor = new ()
         {
             Id = "editor",
             AutoSelectViewToEdit = true,
-            ShowViewIdentifier = true,
+            ShowViewIdentifier = true
         };
-        editor.Initialized += (sender, args) => editor.MarginEditor.ExpanderButton.Collapsed = false;
+        editor.Initialized += (_, _) => editor.MarginEditor!.ExpanderButton!.Collapsed = false;
 
-        app.Add (editor);
+        window.Add (editor);
 
         Window shadowWindow = new ()
         {
-
             Id = "shadowWindow",
             X = Pos.Right (editor),
             Y = 0,
@@ -43,16 +38,16 @@ public class ShadowStyles : Scenario
             Title = "Shadow Window",
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
             BorderStyle = LineStyle.Double,
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyle.Transparent
         };
 
-        app.DrawingContent += (s, e) =>
-                           {
-                               app!.FillRect (app!.Viewport, Glyphs.Dot);
-                               e.Cancel = true;
-                           };
+        window.DrawingContent += (_, e) =>
+                                 {
+                                     window!.FillRect (window!.Viewport, Glyphs.Dot);
+                                     e.Cancel = true;
+                                 };
 
-        var buttonInWin = new Button
+        Button buttonInWin = new ()
         {
             Id = "buttonInWin",
             X = Pos.Center (),
@@ -60,11 +55,10 @@ public class ShadowStyles : Scenario
             ShadowStyle = ShadowStyle.Opaque
         };
         shadowWindow.Add (buttonInWin);
-        app.Add (shadowWindow);
+        window.Add (shadowWindow);
 
         Window shadowWindow2 = new ()
         {
-
             Id = "shadowWindow2",
             X = Pos.Right (editor) + 10,
             Y = 10,
@@ -73,12 +67,11 @@ public class ShadowStyles : Scenario
             Title = "Shadow Window #2",
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
             BorderStyle = LineStyle.Double,
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyle.Transparent
         };
-        app.Add (shadowWindow2);
+        window.Add (shadowWindow2);
 
-
-        var button = new Button
+        Button button = new ()
         {
             Id = "button",
             X = Pos.Right (editor) + 10,
@@ -94,29 +87,26 @@ public class ShadowStyles : Scenario
             Id = "colorPicker16",
             X = Pos.Center (),
             Y = Pos.AnchorEnd (),
-            Width = Dim.Percent (80),
+            Width = Dim.Percent (80)
         };
-        colorPicker.ColorChanged += (sender, args) =>
+
+        colorPicker.ColorChanged += (_, args) =>
                                     {
-                                        var normal = app.GetScheme ().Normal;
-                                        app.SetScheme (app.GetScheme () with { Normal = new Attribute (normal.Foreground, args.Result) });
+                                        Attribute normal = window.GetScheme ().Normal;
+                                        window.SetScheme (window.GetScheme () with { Normal = new (normal.Foreground, args.Result) });
                                     };
-        app.Add (button, colorPicker);
+        window.Add (button, colorPicker);
 
         editor.AutoSelectViewToEdit = true;
-        editor.AutoSelectSuperView = app;
+        editor.AutoSelectSuperView = window;
         editor.AutoSelectAdornments = false;
 
-        Application.Run (app);
-        app.Dispose ();
-
-        Application.Shutdown ();
-
+        app.Run (window);
     }
 
     private void ButtonOnAccepting (object sender, CommandEventArgs e)
     {
-        MessageBox.Query ((sender as View)?.App, "Hello", "You pushed the button!");
+        MessageBox.Query ((sender as View)?.App!, "Hello", "You pushed the button!");
         e.Handled = true;
     }
 }

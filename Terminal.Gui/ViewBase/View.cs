@@ -45,13 +45,23 @@ public partial class View : IDisposable, ISupportInitializeNotification
     }
 
     /// <summary>
-    ///     Riased when the <see cref="View"/> is being disposed.
+    ///     Raised when the <see cref="View"/> is being disposed.
     /// </summary>
     public event EventHandler? Disposing;
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
     public override string ToString () => $"{GetType ().Name}({Id}){Frame}";
+
+    /// <summary>
+    ///     Pretty prints the View with more debug information.
+    /// </summary>
+    /// <returns></returns>
+    public virtual string ToDebugString ()
+    {
+        string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{Title}";
+        return $"{GetType ().Name}({identifyingText}) SuperView={(SuperView is { } ? SuperView.ToDebugString () : "null")}";
+    }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     /// <remarks>
@@ -237,7 +247,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
         BeginInitAdornments ();
 
-        if (InternalSubViews?.Count > 0)
+        if (InternalSubViews.Count > 0)
         {
             foreach (View view in InternalSubViews)
             {
@@ -282,8 +292,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
         }
 
         // Force a layout each time a View is initialized
+        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
+        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
         // See: https://github.com/gui-cs/Terminal.Gui/issues/3951
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/4204
         Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
 
         // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
@@ -492,7 +503,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 #if DEBUG_IDISPOSABLE
             if (EnableDebugIDisposableAsserts && WasDisposed)
             {
-                throw new ObjectDisposedException (GetType ().FullName);
+                throw new ObjectDisposedException (ToDebugString ());
             }
 #endif
             if (value == _title)
@@ -500,17 +511,27 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 return;
             }
 
-            if (!OnTitleChanging (ref value))
+            if (OnTitleChanging (ref value))
             {
-                string old = _title;
-                _title = value;
-                TitleTextFormatter.Text = _title;
-
-                SetTitleTextFormatterSize ();
-                SetHotKeyFromTitle ();
-                SetNeedsDraw ();
-                OnTitleChanged ();
+                return;
             }
+            CancelEventArgs<string> args = new (ref _title, ref value);
+            TitleChanging?.Invoke (this, args);
+
+            if (args.Cancel)
+            {
+                return;
+            }
+
+            _title = value;
+            TitleTextFormatter.Text = _title;
+
+            SetTitleTextFormatterSize ();
+            SetHotKeyFromTitle ();
+            SetNeedsDraw ();
+
+            OnTitleChanged ();
+            TitleChanged?.Invoke (this, new (in _title));
         }
     }
 
@@ -524,32 +545,26 @@ public partial class View : IDisposable, ISupportInitializeNotification
                                                   1);
     }
 
-    // TODO: Change this event to match the standard TG event model.
-    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
-    protected void OnTitleChanged () { TitleChanged?.Invoke (this, new (in _title)); }
-
     /// <summary>
     ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
     ///     be cancelled.
     /// </summary>
     /// <param name="newTitle">The new <see cref="View.Title"/> to be replaced.</param>
     /// <returns>`true` if an event handler canceled the Title change.</returns>
-    protected bool OnTitleChanging (ref string newTitle)
-    {
-        CancelEventArgs<string> args = new (ref _title, ref newTitle);
-        TitleChanging?.Invoke (this, args);
-
-        return args.Cancel;
-    }
-
-    /// <summary>Raised after the <see cref="View.Title"/> has been changed.</summary>
-    public event EventHandler<EventArgs<string>>? TitleChanged;
+    protected virtual bool OnTitleChanging (ref string newTitle) => false;
 
     /// <summary>
     ///     Raised when the <see cref="View.Title"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to `true`
     ///     to cancel the Title change.
     /// </summary>
     public event EventHandler<CancelEventArgs<string>>? TitleChanging;
+
+    /// <summary>Called when the <see cref="View.Title"/> has been changed. Invokes the <see cref="TitleChanged"/> event.</summary>
+    protected virtual void OnTitleChanged () { }
+
+    /// <summary>Raised after the <see cref="View.Title"/> has been changed.</summary>
+    public event EventHandler<EventArgs<string>>? TitleChanged;
+
 
     #endregion
 
@@ -585,6 +600,29 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public static ConcurrentBag<View> Instances { get; private set; } = [];
+
+    /// <summary>
+    ///     Verifies that all View objects were properly disposed (DEBUG_IDISPOSABLE only).
+    /// </summary>
+    public static void VerifyViewsWereDisposed ()
+    {
+#if DEBUG_IDISPOSABLE
+        if (!EnableDebugIDisposableAsserts)
+        {
+            Instances.Clear ();
+
+            return;
+        }
+
+        // Validate there are no outstanding View instances
+        foreach (View inst in Instances)
+        {
+            Logging.Error ($"Not Disposed: {inst.ToDebugString ()}");
+        }
+
+        Instances.Clear ();
+#endif
+    }
 #pragma warning restore CS0419 // Ambiguous reference in cref attribute
 #endif
 }

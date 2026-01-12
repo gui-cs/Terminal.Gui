@@ -55,8 +55,9 @@ class Program
     {
         // Enable configuration with all sources
         ConfigurationManager.Enable(ConfigLocations.All);
-        
-        Application.Init();
+
+        using IApplication app = Application.Create();
+        app.Init();
         // ... rest of app
     }
 }
@@ -489,10 +490,10 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
   "Application.Force16Colors": false,
   "Application.IsMouseDisabled": false,
   "Application.ArrangeKey": "Ctrl+F5",
-  "Application.NextTabKey": "Tab",
-  "Application.PrevTabKey": "Shift+Tab",
-  "Application.NextTabGroupKey": "F6",
-  "Application.PrevTabGroupKey": "Shift+F6",
+  "IKeyboard.NextTabKey": "Tab",
+  "IKeyboard.PrevTabKey": "Shift+Tab",
+  "IKeyboard.NextTabGroupKey": "F6",
+  "IKeyboard.PrevTabGroupKey": "Shift+F6",
   "Key.Separator": "+"
 }
 ```
@@ -720,13 +721,14 @@ See the default configuration file:
 
 **1. Enable Early**
 
-Enable ConfigurationManager at the start of `Main()`, before `Application.Init()`:
+Enable ConfigurationManager at the start of `Main()`, before creating the application:
 
 ```csharp
 static void Main()
 {
     ConfigurationManager.Enable(ConfigLocations.All);
-    Application.Init();
+    using IApplication app = Application.Create();
+    app.Init();
     // ...
 }
 ```

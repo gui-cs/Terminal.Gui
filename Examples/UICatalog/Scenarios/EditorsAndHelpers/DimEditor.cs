@@ -21,7 +21,7 @@ public class DimEditor : EditorBase
     /// <inheritdoc/>
     protected override void OnViewToEditChanged ()
     {
-        if (ViewToEdit is { })
+        if (ViewToEdit is not null)
         {
             ViewToEdit.SubViewsLaidOut += (_, _) => { OnUpdateLayoutSettings (); };
         }
@@ -60,7 +60,7 @@ public class DimEditor : EditorBase
                 break;
             case DimFill fill:
                 var margin = fill.Margin as DimAbsolute;
-                _valueEdit.Enabled = margin is { };
+                _valueEdit.Enabled = margin is not null;
                 _value = margin?.Size ?? 0;
                 _valueEdit!.Text = _value.ToString ();
 
@@ -160,7 +160,7 @@ public class DimEditor : EditorBase
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery (App, "Exception", e.Message, "Ok");
+            MessageBox.ErrorQuery (App!, "Exception", e.Message, "Ok");
         }
     }
 }

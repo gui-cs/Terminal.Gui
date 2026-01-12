@@ -4,6 +4,7 @@ using Terminal.Gui.App;
 
 namespace ApplicationTests.Popover;
 
+[Collection("Application Tests")]
 public class ApplicationPopoverTests
 {
     [Fact]

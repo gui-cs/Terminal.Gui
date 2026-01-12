@@ -10,18 +10,18 @@
 public enum ConfigLocations
 {
     /// <summary>
-    ///     No locaitons are specified. This is the default value.
+    ///     No locations are specified. This is the default value.
     /// </summary>
     None = 0b_0000_0000,
 
     /// <summary>
-    ///     Settings of the <see cref="ConfigurationPropertyAttribute"/> static properites when the module is
-    ///     initiallly loaded.
+    ///     Settings of the <see cref="ConfigurationPropertyAttribute"/> static properties when the module is
+    ///     initially loaded.
     ///     <para>
     ///         When the module is initialized, the <see cref="ConfigurationManager"/> will retrieve the values of the
     ///         configuration
     ///         properties
-    ///         from their corresponding static properties. These are default settigs available even if
+    ///         from their corresponding static properties. These are default settings available even if
     ///         <see cref="ConfigurationManager.IsEnabled"/>
     ///         is <see langword="false"/>.
     ///     </para>

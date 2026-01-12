@@ -93,7 +93,6 @@ public class MenuBar : Menu, IDesignable
         BorderStyle = DefaultBorderStyle;
 
         ConfigurationManager.Applied += OnConfigurationManagerApplied;
-        SuperViewChanged += OnSuperViewChanged;
 
         return;
 
@@ -102,7 +101,8 @@ public class MenuBar : Menu, IDesignable
         bool? MoveRight (ICommandContext? ctx) { return AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop); }
     }
 
-    private void OnSuperViewChanged (object? sender, SuperViewChangedEventArgs e)
+    /// <inheritdoc />
+    protected override void OnSuperViewChanged (ValueChangedEventArgs<View?> e)
     {
         if (SuperView is null)
         {
@@ -246,14 +246,17 @@ public class MenuBar : Menu, IDesignable
             _active = value;
             // Logging.Debug ($"Active set to {_active} - CanFocus: {CanFocus}, HasFocus: {HasFocus}");
 
+            // Change CanFocus based on Active state before hiding Popovers; this way when focus is restored,
+            // it won't be to the MenuBar
+            CanFocus = value;
+            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
+
             if (!_active)
             {
                 // Hide open Popovers
                 HideActiveItem ();
             }
 
-            CanFocus = value;
-            // Logging.Debug ($"Set CanFocus: {CanFocus}, HasFocus: {HasFocus}");
         }
     }
 
@@ -591,7 +594,7 @@ public class MenuBar : Menu, IDesignable
                                                            {
                                                                Title = "_File Settings...",
                                                                HelpText = "More file settings",
-                                                               Action = () => MessageBox.Query (App,
+                                                               Action = () => MessageBox.Query (App!,
                                                                                                 "File Settings",
                                                                                                 "This is the File Settings Dialog\n",
                                                                                                 "_Ok",
@@ -665,12 +668,12 @@ public class MenuBar : Menu, IDesignable
                                     new MenuItem
                                     {
                                         Title = "_Online Help...",
-                                        Action = () => MessageBox.Query (App, "Online Help", "https://gui-cs.github.io/Terminal.Gui", "Ok")
+                                        Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk)
                                     },
                                     new MenuItem
                                     {
                                         Title = "About...",
-                                        Action = () => MessageBox.Query (App, "About", "Something About Mary.", "Ok")
+                                        Action = () => MessageBox.Query (App!, "About", "Something About Mary.", Strings.btnOk)
                                     }
                                 ]
                                )
@@ -734,7 +737,7 @@ public class MenuBar : Menu, IDesignable
                 {
                     Title = "_Deeper Detail",
                     Text = "Deeper Detail",
-                    Action = () => { MessageBox.Query (App, "Deeper Detail", "Lots of details", "_Ok"); }
+                    Action = () => { MessageBox.Query (App!, "Deeper Detail", "Lots of details", "_Ok"); }
                 };
 
                 var belowLineDetail = new MenuItem
@@ -758,7 +761,6 @@ public class MenuBar : Menu, IDesignable
 
         if (disposing)
         {
-            SuperViewChanged += OnSuperViewChanged;
             ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }

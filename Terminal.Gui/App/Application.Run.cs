@@ -44,10 +44,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [Obsolete ("The legacy static Application object is going away.")]
     public static SessionToken Begin (IRunnable runnable) => ApplicationImpl.Instance.Begin (runnable)!;
 
-    /// <inheritdoc cref="IApplication.PositionCursor"/>
-    [Obsolete ("The legacy static Application object is going away.")]
-    public static bool PositionCursor () => ApplicationImpl.Instance.PositionCursor ();
-
     /// <inheritdoc cref="IApplication.Run{TRunnable}(Func{Exception, bool}, string)"/>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]

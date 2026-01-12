@@ -12,6 +12,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TableEditor : Scenario
 {
+    private IApplication? _app;
     private readonly HashSet<FileSystemInfo>? _checkedFileSystemInfos = [];
     private readonly List<IDisposable>? _toDispose = [];
 
@@ -495,11 +496,15 @@ public class TableEditor : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
-        Application.Init ();
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        Runnable appWindow = new ();
+        using Runnable appWindow = new ();
 
         _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
@@ -618,24 +623,24 @@ public class TableEditor : Scenario
                                      }
 
                                      // Only handle mouse clicks
-                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                     if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
                                      {
                                          return;
                                      }
 
-                                     _tableView!.ScreenToCell (mouseArgs.Position, out int? clickedCol);
+                                     _tableView!.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
                                      if (clickedCol != null)
                                      {
-                                         if (mouseArgs.Flags.HasFlag (MouseFlags.Button1Clicked))
+                                         if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
                                          {
                                              // left click in a header
                                              SortColumn (clickedCol.Value);
                                          }
-                                         else if (mouseArgs.Flags.HasFlag (MouseFlags.Button3Clicked))
+                                         else if (mouse.Flags.HasFlag (MouseFlags.RightButtonClicked))
                                          {
                                              // right click in a header
-                                             ShowHeaderContextMenu (clickedCol.Value, mouseArgs);
+                                             ShowHeaderContextMenu (clickedCol.Value, mouse);
                                          }
                                      }
                                  };
@@ -643,11 +648,7 @@ public class TableEditor : Scenario
         _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private MenuBarItem CreateViewMenu ()
@@ -1002,25 +1003,17 @@ public class TableEditor : Scenario
         var oldValue = _currentTable.Rows [e.Row] [tableCol].ToString ();
         var okPressed = false;
 
-        var ok = new Button { Text = "Ok", IsDefault = true };
-
-        ok.Accepting += (s, e) =>
-                        {
-                            okPressed = true;
-                            Application.RequestStop ();
-                        };
-        var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog { Title = title, Buttons = [ok, cancel] };
-
+        var ok = new Button { Text = "_Ok" };
+        var cancel = new Button { Text = "_Cancel" };
+        var d = new Dialog { Title = title, Buttons = [cancel, ok] };
         var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table.ColumnNames [e.Col] };
-
-        var tf = new TextField { Text = oldValue, X = 0, Y = 2, Width = Dim.Fill () };
+        var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _app?.Run (d);
+        okPressed = d.Result == 1;
         d.Dispose ();
 
         if (okPressed)
@@ -1032,7 +1025,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery ((sender as View)?.App, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery ((sender as View)?.App!, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1171,7 +1164,7 @@ public class TableEditor : Scenario
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery (_tableView?.App, "Could not find local drives", e.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView?.App!, "Could not find local drives", e.Message, "Ok");
         }
 
         _tableView!.Table = source;
@@ -1185,7 +1178,7 @@ public class TableEditor : Scenario
         _tableView?.Update ();
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _tableView?.App?.RequestStop (); }
 
     private void RunColumnWidthDialog (
         int? col,
@@ -1200,20 +1193,10 @@ public class TableEditor : Scenario
         }
 
         var accepted = false;
-        var ok = new Button { Text = "Ok", IsDefault = true };
-
-        ok.Accepting += (s, e) =>
-                        {
-                            accepted = true;
-                            (s as View)?.App?.RequestStop ();
-                        };
-        var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { (s as View)?.App?.RequestStop (); };
-
         var d = new Dialog
         {
             Title = prompt,
-            Buttons = [ok, cancel]
+            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
         };
 
         ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Value);
@@ -1225,6 +1208,7 @@ public class TableEditor : Scenario
         tf.SetFocus ();
 
         _tableView.App?.Run (d);
+        accepted = d.Result == 1;
         d.Dispose ();
 
         if (accepted)
@@ -1235,7 +1219,7 @@ public class TableEditor : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (_tableView.App, 60, 20, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView.App!, "Failed to set", ex.Message, "Ok");
             }
 
             _tableView!.Update ();
@@ -1380,7 +1364,7 @@ public class TableEditor : Scenario
         _tableView!.Update ();
     }
 
-    private void ShowHeaderContextMenu (int clickedCol, MouseEventArgs e)
+    private void ShowHeaderContextMenu (int clickedCol, Mouse e)
     {
         if (HasCheckboxes () && clickedCol == 0)
         {

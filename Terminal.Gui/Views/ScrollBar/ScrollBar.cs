@@ -1,5 +1,3 @@
-
-
 using System.ComponentModel;
 
 namespace Terminal.Gui.Views;
@@ -52,7 +50,7 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            WantContinuousButtonPressed = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
@@ -69,18 +67,21 @@ public class ScrollBar : View, IOrientation, IDesignable
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = ShadowStyle.None,
-            WantContinuousButtonPressed = true
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, _slider, _increaseButton);
 
         CanFocus = false;
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
 
         // This sets the width/height etc...
         OnOrientationChanged (Orientation);
+
+        MouseHoldRepeat = MouseFlags.LeftButtonReleased;
 
         return;
 
@@ -515,18 +516,11 @@ public class ScrollBar : View, IOrientation, IDesignable
         return true;
     }
 
-    // TODO: Change this to work OnMouseEvent with continuouse press and grab so it's continous.
     /// <inheritdoc/>
     protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
-        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
-        {
-            return base.OnActivating (args);
-        }
-
-        // Check if the mouse click is a single click
-        if (!mouseArgs.IsSingleClicked)
+        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
         {
             return base.OnActivating (args);
         }
@@ -537,12 +531,12 @@ public class ScrollBar : View, IOrientation, IDesignable
         if (Orientation == Orientation.Vertical)
         {
             sliderCenter = 1 + _slider.Frame.Y + _slider.Frame.Height / 2;
-            distanceFromCenter = mouseArgs.Position.Y - sliderCenter;
+            distanceFromCenter = mouse.Position!.Value.Y - sliderCenter;
         }
         else
         {
             sliderCenter = 1 + _slider.Frame.X + _slider.Frame.Width / 2;
-            distanceFromCenter = mouseArgs.Position.X - sliderCenter;
+            distanceFromCenter = mouse.Position!.Value.X - sliderCenter;
         }
 
 #if PROPORTIONAL_SCROLL_JUMP
@@ -571,38 +565,38 @@ public class ScrollBar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         if (SuperView is null)
         {
             return false;
         }
 
-        if (!mouseEvent.IsWheel)
+        if (!mouse.IsWheel)
         {
             return false;
         }
 
         if (Orientation == Orientation.Vertical)
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledDown))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
             {
                 Position += Increment;
             }
 
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledUp))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
             {
                 Position -= Increment;
             }
         }
         else
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledRight))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledRight))
             {
                 Position += Increment;
             }
 
-            if (mouseEvent.Flags.HasFlag (MouseFlags.WheeledLeft))
+            if (mouse.Flags.HasFlag (MouseFlags.WheeledLeft))
             {
                 Position -= Increment;
             }
@@ -614,7 +608,7 @@ public class ScrollBar : View, IOrientation, IDesignable
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        OrientationChanged += (sender, args) =>
+        OrientationChanged += (_, args) =>
                               {
                                   if (args.Value == Orientation.Vertical)
                                   {

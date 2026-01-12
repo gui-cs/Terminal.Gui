@@ -13,8 +13,12 @@ public class Snake : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
-        var win = new Window { Title = GetQuitKeyAndName () };
+        ConfigurationManager.Enable (ConfigLocations.All);
+
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window win = new () { Title = GetQuitKeyAndName () };
 
         var state = new SnakeState ();
 
@@ -36,7 +40,7 @@ public class Snake : Scenario
                           if (state.AdvanceState ())
                           {
                               // When updating from a Thread/Task always use Invoke
-                              Application.Invoke (() => { snakeView.SetNeedsDraw (); });
+                              snakeView.App?.Invoke (() => { snakeView.SetNeedsDraw (); });
                           }
 
                           long wait = state.SleepAfterAdvancingState - sw.ElapsedMilliseconds;
@@ -49,9 +53,7 @@ public class Snake : Scenario
                   }
                  );
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 
     protected override void Dispose (bool disposing)
@@ -70,27 +72,27 @@ public class Snake : Scenario
 
     private class SnakeState
     {
-        public const int AppleGrowRate = 5;
-        public const int MaxSpeed = 20;
-        public const int StartingLength = 10;
-        public const int StartingSpeed = 50;
-        private int step;
+        private const int APPLE_GROW_RATE = 5;
+        private const int MAX_SPEED = 20;
+        private const int STARTING_LENGTH = 10;
+        private const int STARTING_SPEED = 50;
+        private int _step;
 
         /// <summary>Current position of the Apple that the snake has to eat.</summary>
         public Point Apple { get; private set; }
 
-        public Direction CurrentDirection { get; private set; }
+        private Direction CurrentDirection { get; set; }
 
         /// <summary>Position of the snakes head</summary>
-        public Point Head => Snake.Last ();
+        private Point Head => Snake.Last ();
 
         public int Height { get; private set; }
         public Direction PlannedDirection { get; set; }
-        public int SleepAfterAdvancingState { get; private set; } = StartingSpeed;
+        public int SleepAfterAdvancingState { get; private set; } = STARTING_SPEED;
         public List<Point> Snake { get; private set; }
         public int Width { get; private set; }
 
-        public void GrowSnake ()
+        private void GrowSnake ()
         {
             Point tail = Snake.First ();
             Snake.Insert (0, tail);
@@ -106,14 +108,14 @@ public class Snake : Scenario
 
         internal bool AdvanceState ()
         {
-            step++;
+            _step++;
 
-            if (step < GetStepVelocity ())
+            if (_step < GetStepVelocity ())
             {
                 return false;
             }
 
-            step = 0;
+            _step = 0;
 
             UpdateDirection ();
 
@@ -129,7 +131,7 @@ public class Snake : Scenario
 
             if (newHead == Apple)
             {
-                GrowSnake (AppleGrowRate);
+                GrowSnake (APPLE_GROW_RATE);
                 Apple = GetNewRandomApplePoint ();
 
                 var delta = 5;
@@ -144,7 +146,7 @@ public class Snake : Scenario
                     delta = 2;
                 }
 
-                SleepAfterAdvancingState = Math.Max (MaxSpeed, SleepAfterAdvancingState - delta);
+                SleepAfterAdvancingState = Math.Max (MAX_SPEED, SleepAfterAdvancingState - delta);
             }
 
             return true;
@@ -169,9 +171,9 @@ public class Snake : Scenario
             Snake = new () { middle, middle };
             Apple = GetNewRandomApplePoint ();
 
-            SleepAfterAdvancingState = StartingSpeed;
+            SleepAfterAdvancingState = STARTING_SPEED;
 
-            GrowSnake (StartingLength);
+            GrowSnake (STARTING_LENGTH);
         }
 
         private bool AreOpposites (Direction a, Direction b)
@@ -282,23 +284,24 @@ public class Snake : Scenario
 
     private class SnakeView : View
     {
-        private readonly Rune _appleRune;
-        private readonly Attribute red = new (Color.Red, Color.Black);
-        private readonly Attribute white = new (Color.White, Color.Black);
+        private Rune _appleRune = Glyphs.Apple;
+        private readonly Attribute _red = new (Color.Red, Color.Black);
+        private readonly Attribute _white = new (Color.White, Color.Black);
 
         public SnakeView (SnakeState state)
         {
-            _appleRune = Glyphs.Apple;
-
-            if (!Application.Driver!.IsRuneSupported (_appleRune))
-            {
-                _appleRune = Glyphs.AppleBMP;
-            }
-
             State = state;
             CanFocus = true;
 
-            base.SetScheme (new (white));
+            base.SetScheme (new (_white));
+
+            Initialized += (_, _) =>
+                           {
+                               if (App?.Driver is { } driver && !driver.IsRuneSupported (_appleRune))
+                               {
+                                   _appleRune = Glyphs.AppleBMP;
+                               }
+                           };
 
             KeyBindings.Add (Key.CursorLeft, Command.Left);
             KeyBindings.Add (Key.CursorRight, Command.Right);
@@ -324,7 +327,7 @@ public class Snake : Scenario
 
         protected override bool OnDrawingContent (DrawContext context)
         {
-            SetAttribute (white);
+            SetAttribute (_white);
             ClearViewport ();
 
             var canvas = new LineCanvas ();
@@ -357,9 +360,9 @@ public class Snake : Scenario
                 AddRune (p.Key.X, p.Key.Y, p.Value);
             }
 
-            SetAttribute (red);
+            SetAttribute (_red);
             AddRune (State.Apple.X, State.Apple.Y, _appleRune);
-            SetAttribute (white);
+            SetAttribute (_white);
 
             return true;
         }

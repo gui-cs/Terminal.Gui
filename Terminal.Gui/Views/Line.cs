@@ -59,6 +59,7 @@ public class Line : View, IOrientation
         CanFocus = false;
         base.SuperViewRendersLineCanvas = true;
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
 

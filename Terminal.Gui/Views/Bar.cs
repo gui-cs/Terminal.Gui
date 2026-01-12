@@ -26,6 +26,7 @@ public class Bar : View, IOrientation, IDesignable
         Width = Dim.Auto ();
         Height = Dim.Auto ();
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this);
 
         // Initialized += Bar_Initialized;
@@ -42,7 +43,7 @@ public class Bar : View, IOrientation, IDesignable
         }
     }
 
-    private void OnMouseEvent (object? sender, MouseEventArgs e)
+    private void OnMouseEvent (object? sender, Mouse e)
     {
         NavigationDirection direction = NavigationDirection.Backward;
 

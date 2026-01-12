@@ -18,16 +18,19 @@ namespace UICatalog.Scenarios;
 // TODO: Better align rpPBFormat
 public class ProgressBarStyles : Scenario
 {
-    private const uint _timerTick = 20;
+    private const uint TIMER_TICK = 20;
     private Timer _fractionTimer;
     private Timer _pulseTimer;
     private ListView _pbList;
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window win = new ()
+        using IApplication app = Application.Create ();
+        app.Init ();
+
+        using Window win = new ()
         {
             Title = GetQuitKeyAndName (), BorderStyle = LineStyle.Single,
         };
@@ -76,9 +79,10 @@ public class ProgressBarStyles : Scenario
         fgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
+                                                                         (s as View)!.App!,
                                                                          fgColorPickerBtn.Text,
                                                                          editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                         out var newColor
+                                                                         out Color newColor
                                                                         ))
                                         {
                                             return;
@@ -107,10 +111,11 @@ public class ProgressBarStyles : Scenario
         bgColorPickerBtn.Accepting += (s, e) =>
                                     {
                                         if (!LineDrawing.PromptForColor (
+                                                                         (s as View)!.App!,
                                                                          fgColorPickerBtn.Text,
                                                                          editor.ViewToEdit!.GetAttributeForRole (VisualRole.Active)
                                                                                .Background
-                                                                        , out var newColor))
+                                                                        , out Color newColor))
 
                                         {
                                             return;
@@ -201,7 +206,7 @@ public class ProgressBarStyles : Scenario
                                                               },
                                                               null,
                                                               0,
-                                                              _timerTick
+                                                              TIMER_TICK
                                                              );
                               }
                           };
@@ -292,9 +297,7 @@ public class ProgressBarStyles : Scenario
                                  0,
                                  300
                                 );
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
 
         return;
 

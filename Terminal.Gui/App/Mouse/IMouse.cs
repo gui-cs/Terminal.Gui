@@ -18,7 +18,7 @@ public interface IMouse : IMouseGrabHandler
     IApplication? App { get; set; }
 
     /// <summary>
-    ///     Gets or sets the last known position of the mouse.
+    ///     Gets or sets the last known position of the mouse in screen coordinates.
     /// </summary>
     Point? LastMousePosition { get; set; }
 
@@ -37,27 +37,27 @@ public interface IMouse : IMouseGrabHandler
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="MouseEventArgs.ScreenPosition"/> coordinates are screen-relative.
+    ///         <see cref="Mouse.ScreenPosition"/> coordinates are screen-relative.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEventArgs.View"/> will be the deepest view under the mouse.
+    ///         <see cref="Mouse.View"/> will be the deepest view under the mouse.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEventArgs.Position"/> coordinates are view-relative. Only valid if <see cref="MouseEventArgs.View"/> is set.
+    ///         <see cref="Mouse.Position"/> coordinates are view-relative. Only valid if <see cref="Mouse.View"/> is set.
     ///     </para>
     ///     <para>
     ///         Use this even to handle mouse events at the application level, before View-specific handling.
     ///     </para>
     /// </remarks>
-    event EventHandler<MouseEventArgs>? MouseEvent;
+    event EventHandler<Mouse>? MouseEvent;
 
     /// <summary>
     ///     INTERNAL API: Called when a mouse event is raised by the driver. Determines the view under the mouse and
     ///     calls the appropriate View mouse event handlers.
     /// </summary>
-    /// <remarks>This method can be used to simulate a mouse event, e.g. in unit tests.</remarks>
-    /// <param name="mouseEvent">The mouse event with coordinates relative to the screen.</param>
-    void RaiseMouseEvent (MouseEventArgs mouseEvent);
+    /// <remarks>Can be used to simulate mouse events without a driver. Use <see cref="InputInjector"/> for input injection.</remarks>
+    /// <param name="mouse">The mouse event with coordinates relative to the screen.</param>
+    void RaiseMouseEvent (Mouse mouse);
 
     /// <summary>
     ///     INTERNAL: Raises the MouseEnter and MouseLeave events for the views that are under the mouse.

@@ -207,7 +207,7 @@ public class ListViewTests (ITestOutputHelper output)
         Assert.Null (lv.SelectedItem);
         Assert.True (lv.NewKeyDownEvent (Key.CursorDown));
         Assert.Equal (0, lv.SelectedItem);
-        Assert.True (lv.NewKeyDownEvent (Key.CursorUp));
+        Assert.False (lv.NewKeyDownEvent (Key.CursorUp));  // at top already
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.NewKeyDownEvent (Key.PageDown));
         Assert.Equal (2, lv.SelectedItem);
@@ -883,7 +883,7 @@ public class ListViewTests (ITestOutputHelper output)
     public void Clicking_On_Border_Is_Ignored ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var selected = "";
 
@@ -915,14 +915,14 @@ public class ListViewTests (ITestOutputHelper output)
 └─────┘",
                                                        _output, app?.Driver);
 
-        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.Button1Clicked });
+        app?.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal ("", selected);
         Assert.Null (lv.SelectedItem);
 
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 1), Flags = MouseFlags.Button1Clicked
+                                        ScreenPosition = new (1, 1), Flags = MouseFlags.LeftButtonClicked
                                     });
         Assert.Equal ("One", selected);
         Assert.Equal (0, lv.SelectedItem);
@@ -930,7 +930,7 @@ public class ListViewTests (ITestOutputHelper output)
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 2), Flags = MouseFlags.Button1Clicked
+                                        ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonClicked
                                     });
         Assert.Equal ("Two", selected);
         Assert.Equal (1, lv.SelectedItem);
@@ -938,7 +938,7 @@ public class ListViewTests (ITestOutputHelper output)
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked
+                                        ScreenPosition = new (1, 3), Flags = MouseFlags.LeftButtonClicked
                                     });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
@@ -946,7 +946,7 @@ public class ListViewTests (ITestOutputHelper output)
         app?.Mouse.RaiseMouseEvent (
                                     new ()
                                     {
-                                        ScreenPosition = new (1, 4), Flags = MouseFlags.Button1Clicked
+                                        ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonClicked
                                     });
         Assert.Equal ("Three", selected);
         Assert.Equal (2, lv.SelectedItem);
@@ -959,7 +959,7 @@ public class ListViewTests (ITestOutputHelper output)
     public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (12, 12);
 
         ObservableCollection<string> source = [];
@@ -1213,7 +1213,7 @@ public class ListViewTests (ITestOutputHelper output)
     public void EnsureSelectedItemVisible_SelectedItem ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (12, 12);
 
         ObservableCollection<string> source = [];
@@ -1260,7 +1260,7 @@ Item 6",
     public void EnsureSelectedItemVisible_Top ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         IDriver? driver = app.Driver;
         driver?.SetScreenSize (8, 2);
 
@@ -1301,7 +1301,7 @@ Item 6",
     public void LeftItem_TopItem_Tests ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         app.Driver?.SetScreenSize (12, 12);
 
         ObservableCollection<string> source = [];
@@ -1350,7 +1350,7 @@ Item 6",
     public void RowRender_Event ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var rendered = false;
         ObservableCollection<string> source = ["one", "two", "three"];
@@ -1372,7 +1372,7 @@ Item 6",
     public void Vertical_ScrollBar_Hides_And_Shows_As_Needed ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var lv = new ListView
         {
@@ -1413,7 +1413,7 @@ Five ",
     public void Mouse_Wheel_Scrolls ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var lv = new ListView
         {
@@ -1476,7 +1476,7 @@ Three",
     public void Horizontal_Scroll ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var lv = new ListView
         {

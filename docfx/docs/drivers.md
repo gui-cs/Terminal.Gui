@@ -6,6 +6,11 @@ The driver model is the mechanism by which Terminal.Gui supports multiple platfo
 
 Terminal.Gui v2 uses a sophisticated driver architecture that separates concerns and enables platform-specific optimizations while maintaining a consistent API. The architecture is based on the **Component Factory** pattern and uses **multi-threading** to ensure responsive input handling.
 
+**Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
+- `View.Move(col, row)` for positioning
+- `View.AddRune()` and `View.AddStr()` for drawing
+- `View.App.Screen` for screen dimensions
+ 
 ## Available Drivers
 
 Terminal.Gui provides console driver implementations optimized for different platforms:
@@ -13,44 +18,47 @@ Terminal.Gui provides console driver implementations optimized for different pla
 - **DotNetDriver (`dotnet`)** - A cross-platform driver that uses the .NET `System.Console` API. Works on all platforms (Windows, macOS, Linux). Best for maximum compatibility.
 - **WindowsDriver (`windows`)** - A Windows-optimized driver that uses native Windows Console APIs for enhanced performance and platform-specific features.
 - **UnixDriver (`unix`)** - A Unix/Linux/macOS-optimized driver that uses platform-specific APIs for better integration and performance.
-- **FakeDriver (`fake`)** - A mock driver designed for unit testing. Simulates console behavior without requiring a real terminal.
+- **AnsiDriver (`ansi`)** - A pure ANSI escape sequence driver for unit testing and headless environments. Simulates console behavior without requiring a real terminal.
 
 ### Automatic Driver Selection
 
-The appropriate driver is automatically selected based on the platform when you call `Application.Init()`:
+The appropriate driver is automatically selected based on the platform when `Application.Init()` is called:
 
 - **Windows** (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
 - **Unix/Linux/macOS** → `UnixDriver`
 
 ### Explicit Driver Selection
 
-You can explicitly specify a driver in several ways:
+Explicitly specify a driver in several ways:
 
 Method 1: Set ForceDriver using Configuration Manager
 
 ```json
 {
-  "ForceDriver": "fake"
+  "Application.ForceDriver": "ansi"
 }
 ```
 
 Method 2: Pass driver name to Init
 
 ```csharp
+// Using string directly
 Application.Init(driverName: "unix");
+
+// Or using type-safe constant
+Application.Init(driverName: DriverRegistry.Names.UNIX);
 ```
 
 Method 3: Set ForceDriver on instance
 
 ```csharp
+using Terminal.Gui.Drivers;
 using (IApplication app = Application.Create())
 {
-    app.ForceDriver = "fake";
+    app.ForceDriver = DriverRegistry.Names.ANSI;
     app.Init();
 }
 ```
-
-**Valid driver names**: `"dotnet"`, `"windows"`, `"unix"`, `"fake"`
 
 ### ForceDriver as Configuration Property
 
@@ -68,18 +76,19 @@ Application.ForceDriverChanged += (sender, e) =>
 };
 
 // Change driver
-Application.ForceDriver = "fake";
+Application.ForceDriver = DriverRegistry.Names.ANSI;
 ```
 
 ### Discovering Available Drivers
 
-Use `GetDriverTypes()` to discover which drivers are available at runtime:
+Terminal.Gui provides several methods to discover available drivers at runtime through the **Driver Registry**:
 
 ```csharp
-(List<Type?> driverTypes, List<string?> driverNames) = Application.GetDriverTypes();
+// Get driver names (AOT-friendly, no reflection)
+IEnumerable<string> driverNames = Application.GetRegisteredDriverNames();
 
 Console.WriteLine("Available drivers:");
-foreach (string? name in driverNames)
+foreach (string name in driverNames)
 {
     Console.WriteLine($"  - {name}");
 }
@@ -89,21 +98,117 @@ foreach (string? name in driverNames)
 //   - dotnet
 //   - windows
 //   - unix
-//   - fake
+//   - ansi
 ```
 
-**Note**: `GetDriverTypes()` uses reflection to discover driver implementations and is marked with `[RequiresUnreferencedCode("AOT")]` and `[Obsolete]` as part of the legacy static API.
+For more detailed information about each driver:
+
+```csharp
+// Get driver metadata
+foreach (var descriptor in Application.GetRegisteredDrivers())
+{
+    Console.WriteLine($"{descriptor.DisplayName}");
+    Console.WriteLine($"  Name: {descriptor.Name}");
+    Console.WriteLine($"  Description: {descriptor.Description}");
+    Console.WriteLine($"  Platforms: {string.Join(", ", descriptor.SupportedPlatforms)}");
+    Console.WriteLine();
+}
+
+// Output:
+// Windows Console Driver
+//   Name: windows
+//   Description: Optimized Windows Console API driver with native input handling
+//   Platforms: Win32NT, Win32S, Win32Windows
+//
+// .NET Cross-Platform Driver
+//   Name: dotnet
+//   Description: Cross-platform driver using System.Console API
+//   Platforms: Win32NT, Unix, MacOSX
+// ...
+```
+
+Validate driver names (useful for CLI argument validation):
+
+```csharp
+string userInput = args[0];
+
+if (Application.IsDriverNameValid(userInput))
+{
+    Application.Init(driverName: userInput);
+}
+else
+{
+    Console.WriteLine($"Invalid driver: {userInput}");
+    Console.WriteLine($"Valid options: {string.Join(", ", Application.GetRegisteredDriverNames())}");
+}
+```
+
+Use type-safe constants in code:
+
+```csharp
+using Terminal.Gui.Drivers;
+
+// Type-safe driver names from DriverRegistry.Names
+string driverName = DriverRegistry.Names.ANSI;  // "ansi"
+app.Init(driverName);
+```
+
+**Note**: The legacy `GetDriverTypes()` method is now obsolete. Use `GetRegisteredDriverNames()` or `GetRegisteredDrivers()` instead for AOT-friendly, reflection-free driver discovery.
 
 ## Architecture
 
+### Driver Registry
+
+Terminal.Gui v2 uses a **Driver Registry** pattern for managing available drivers without reflection. The registry provides:
+
+- **Type-safe driver names** via `DriverRegistry.Names` constants
+- **Driver metadata** including display names, descriptions, and supported platforms
+- **AOT compatibility** - no reflection, fully ahead-of-time compilation friendly
+- **Extensibility** - custom drivers can be registered via `DriverRegistry.Register()`
+
+```csharp
+// Access well-known driver name constants
+string windowsDriver = DriverRegistry.Names.WINDOWS;  // "windows"
+string unixDriver = DriverRegistry.Names.UNIX;        // "unix"
+string dotnetDriver = DriverRegistry.Names.DOTNET;    // "dotnet"
+string ansiDriver = DriverRegistry.Names.ANSI;        // "ansi"
+
+// Get detailed driver information
+if (DriverRegistry.TryGetDriver("windows", out var descriptor))
+{
+    Console.WriteLine($"Found: {descriptor.DisplayName}");
+    Console.WriteLine($"Description: {descriptor.Description}");
+    
+    // Check if supported on current platform
+    bool isSupported = descriptor.SupportedPlatforms.Contains(Environment.OSVersion.Platform);
+}
+
+// Get drivers supported on current platform
+foreach (var driver in DriverRegistry.GetSupportedDrivers())
+{
+    Console.WriteLine($"{driver.Name} - {driver.DisplayName}");
+}
+
+// Get the default driver for current platform
+var defaultDriver = DriverRegistry.GetDefaultDriver();
+Console.WriteLine($"Default driver: {defaultDriver.Name}");
+```
+
 ### Component Factory Pattern
 
-The v2 driver architecture uses the **Component Factory** pattern to create platform-specific components. Each driver has a corresponding factory:
+The v2 driver architecture uses the **Component Factory** pattern to create platform-specific components. Each driver has a corresponding factory that implements `IComponentFactory<T>`:
 
 - `NetComponentFactory` - Creates components for DotNetDriver
 - `WindowsComponentFactory` - Creates components for WindowsDriver  
 - `UnixComponentFactory` - Creates components for UnixDriver
-- `FakeComponentFactory` - Creates components for FakeDriver
+- `AnsiComponentFactory` - Creates components for AnsiDriver
+
+Each factory is responsible for:
+- Creating driver-specific components (`IInput<T>`, `IOutput`, `IInputProcessor`, etc.)
+- Providing the driver name via `GetDriverName()` (single source of truth for driver identity)
+- Being registered in the `DriverRegistry` with metadata
+
+The factory pattern ensures proper component creation and initialization while maintaining clean separation of concerns.
 
 ### Core Components
 
@@ -111,9 +216,9 @@ Each driver is composed of specialized components, each with a single responsibi
 
 #### IInput&lt;T&gt;
 Reads raw console input events from the terminal. The generic type `T` represents the platform-specific input type:
-- `ConsoleKeyInfo` for DotNetDriver and FakeDriver
+- `ConsoleKeyInfo` for DotNetDriver
 - `WindowsConsole.InputRecord` for WindowsDriver
-- `char` for UnixDriver
+- `char` for UnixDriver and AnsiDriver
 
 Runs on a dedicated input thread to avoid blocking the UI.
 
@@ -130,6 +235,10 @@ Translates raw console input into Terminal.Gui events:
 - Parses ANSI escape sequences (mouse events, special keys)
 - Generates `MouseEventArgs` for mouse input
 - Handles platform-specific key mappings
+- Uses `IKeyConverter<T>` to translate `TInputRecord` to `Key`:
+- `AnsiKeyConverter` - For `char` input (UnixDriver, AnsiDriver)
+- `NetKeyConverter` - For `ConsoleKeyInfo` input (DotNetDriver)
+- `WindowsKeyConverter` - For `WindowsConsole.InputRecord` input (WindowsDriver)
 
 #### IOutputBuffer
 Manages the screen buffer and drawing operations:
@@ -179,7 +288,7 @@ This separation ensures that input is never lost and the UI remains responsive d
 
 ### Initialization Flow
 
-When you call `Application.Init()`:
+When `Application.Init()` is called:
 
 1. **IApplication.Init()** is invoked
 2. Creates a `MainLoopCoordinator<T>` with the appropriate `ComponentFactory<T>`
@@ -238,12 +347,18 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 - `Refresh()`, `ToString()`, `ToAnsi()` - Output rendering
 
 #### Cursor
-- `UpdateCursor()` - Position cursor
-- `GetCursorVisibility()`, `SetCursorVisibility()` - Visibility management
+- `SetCursorPosition(int col, int row)` - Set cursor position in screen coordinates
+- `SetCursorVisibility(CursorStyle style)` - Set cursor style/visibility (ANSI DECSCUSR-based)
+- `SetCursorNeedsUpdate(bool needsUpdate)` - Signal cursor position needs update without redraw
+
+> [!NOTE]
+> The cursor system is managed by `ApplicationNavigation`. Drivers should not directly manage cursor state.
+> See [Cursor Management](cursor.md) for details.
 
 #### Input Events
-- `KeyDown`, `KeyUp`, `MouseEvent` - Input events
-- `EnqueueKeyEvent()` - Test support
+- `KeyDown`, `MouseEvent` - Input events
+- `InjectKeyEvent()` - Test support
+- `InjectMouseEvent()` - Test support
 
 #### ANSI Escape Sequences
 - `QueueAnsiRequest()` - ANSI request handling
@@ -256,17 +371,45 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 
 ### Driver Creation and Selection
 
-The driver selection logic in `ApplicationImpl.Driver.cs` prioritizes component factory type over the driver name parameter:
+The driver selection logic in `ApplicationImpl.Driver.cs` uses the **Driver Registry** to select and instantiate drivers:
 
-1. **Component Factory Type**: If an `IComponentFactory` is already set, it determines the driver
-2. **Driver Name Parameter**: The `driverName` parameter to `Init()` is checked next
-3. **ForceDriver Property**: The `ForceDriver` configuration property is evaluated
-4. **Platform Detection**: If none of the above specify a driver, the platform is detected:
+**Selection Priority Order:**
+
+1. **Provided Component Factory**: If an `IComponentFactory` is explicitly provided to `ApplicationImpl`, it determines the driver via `factory.GetDriverName()`
+2. **Driver Name Parameter**: The `driverName` parameter passed to `Init()` is looked up in the registry
+3. **Application.ForceDriver Configuration**: The `Application.ForceDriver` property is checked and looked up in the registry
+4. **Platform Default**: `DriverRegistry.GetDefaultDriver()` selects based on current platform:
    - Windows (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
    - Unix/Linux/macOS → `UnixDriver`
    - Other platforms → `DotNetDriver` (fallback)
 
-This prioritization ensures flexibility while maintaining deterministic behavior.
+**Driver Creation Process:**
+
+```csharp
+// Example of how driver creation works internally
+DriverRegistry.DriverDescriptor descriptor;
+
+if (DriverRegistry.TryGetDriver(driverName, out descriptor))
+{
+    // Create factory using descriptor's factory function
+    IComponentFactory factory = descriptor.CreateFactory();
+    
+    // Factory creates all driver components
+    var coordinator = new MainLoopCoordinator<TInputRecord>(
+        timedEvents,
+        inputQueue,
+        mainLoop,
+        factory  // Factory knows its driver name via GetDriverName()
+    );
+}
+```
+
+This architecture provides:
+- **Deterministic behavior** - clear priority order for driver selection
+- **Flexibility** - multiple ways to specify a driver
+- **Type safety** - use `DriverRegistry.Names` constants instead of strings
+- **Extensibility** - custom drivers can register themselves
+- **AOT compatibility** - no reflection required
 
 ## Platform-Specific Details
 
@@ -298,28 +441,118 @@ This ensures Terminal.Gui applications can be debugged directly in Visual Studio
 
 ### UnixDriver (UnixComponentFactory)
 
-- Uses Unix/Linux terminal APIs
-- Input: Reads raw `char` data from terminal
-- Output: Uses ANSI escape sequences
-- Supports Unix-specific features
+- Uses Unix/Linux terminal APIs via P/Invoke to libc
+- Input: Reads raw `char` data from stdin using `poll()` and `read()` syscalls
+- Output: Writes ANSI escape sequences to stdout using `write()` syscall
+- Terminal control: Uses termios for raw mode (via `UnixRawModeHelper`)
+- Size detection: Uses `ioctl(TIOCGWINSZ)` to get terminal dimensions
 - Automatically selected on Unix/Linux/macOS platforms
 
-### FakeDriver (FakeComponentFactory)
+### AnsiDriver (AnsiComponentFactory)
 
-- Simulates console behavior for unit testing
-- Uses `FakeConsole` for all operations
-- Allows injection of predefined input
-- Captures output for verification
-- Always used when `IApplication.ForceDriver` is `fake`
+- Pure ANSI escape sequence cross-platform driver
+- **Windows**: Uses Virtual Terminal Input mode (`ReadFile` API)
+- **Unix/Linux/macOS**: Uses the same low-level syscalls as UnixDriver (`poll()`, `read()`) via shared `UnixIOHelper`
+- Shares code with UnixDriver:
+  - `UnixRawModeHelper` - Terminal raw mode configuration (termios)
+  - `UnixIOHelper` - Shared Unix syscall wrappers (poll, read, write, ioctl)
+- Best for unit testing, headless environments, and maximum portability
+- Specify with `IApplication.ForceDriver = "ansi"` or `DriverRegistry.Names.ANSI`
 
-**Important:** View subclasses should not access `Application.Driver`. Use the View APIs instead:
-- `View.Move(col, row)` for positioning
-- `View.AddRune()` and `View.AddStr()` for drawing
-- `View.App.Screen` for screen dimensions
+## Testing and Input Injection
+
+Terminal.Gui provides a sophisticated input injection system for testing applications without requiring actual keyboard/mouse hardware or terminal interaction. The ANSI driver is the **recommended driver for testing** because:
+
+- ✅ **Cross-platform** - Works identically on all platforms
+- ✅ **Full pipeline testing** - Tests the complete ANSI encoding/parsing pipeline
+- ✅ **Deterministic** - Virtual time control eliminates timing-related test flakiness
+- ✅ **Fast** - No real delays needed for escape sequence handling
+
+### Simple Test Example
+
+```csharp
+// Create app with virtual time for testing
+VirtualTimeProvider time = new ();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);  // Use ANSI driver
+
+Button button = new () { Text = "Click Me" };
+bool acceptingCalled = false;
+button.Accepting += (s, e) => acceptingCalled = true;
+
+// Single-call injection - handles everything automatically
+app.InjectKey(Key.Enter);
+
+Assert.True(acceptingCalled);
+```
+
+### Virtual Time Control
+
+The input injection system supports **virtual time** via `VirtualTimeProvider`, enabling deterministic testing of timing-dependent behavior like double-clicks:
+
+```csharp
+// Test double-click with precise timing
+VirtualTimeProvider time = new ();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+// First click at T+0
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonPressed,
+    Position = new (5, 5)
+});
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonReleased,
+    Position = new (5, 5)
+});
+
+// Advance virtual time by 300ms (within double-click threshold)
+time.Advance(TimeSpan.FromMilliseconds(300));
+
+// Second click at T+300
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonPressed,
+    Position = new (5, 5)
+});
+app.InjectMouse(new () { 
+    Flags = MouseFlags.LeftButtonReleased,
+    Position = new (5, 5)
+});
+
+// Verify double-click was detected
+Assert.Contains(receivedEvents, e => e.Flags.HasFlag(MouseFlags.LeftButtonDoubleClicked));
+```
+
+### Input Injection Modes
+
+The input injection system supports two modes:
+
+- **Direct Mode** (default) - Bypasses ANSI encoding/decoding for faster, simpler tests. Input events are raised directly.
+- **Pipeline Mode** - Goes through full ANSI encoding → parsing → decoding pipeline. Use when testing ANSI escape sequence handling.
+
+```csharp
+// Test ANSI encoding/decoding pipeline
+VirtualTimeProvider time = new ();
+using IApplication app = Application.Create(time);
+app.Init(DriverRegistry.Names.ANSI);
+
+InputInjectionOptions options = new () 
+{ 
+    Mode = InputInjectionMode.Pipeline,
+    TimeProvider = time 
+};
+
+// This will encode to ANSI, parse back, and raise events
+app.InjectKey(Key.F1, options);
+```
+
+### Key Concepts
+
+- **Single-call injection** - `app.InjectKey(key)` and `app.InjectMouse(mouse)` handle injection, processing, and event raising in one call
+- **Virtual time** - Control time explicitly via `VirtualTimeProvider.Advance()` for deterministic tests
+- **No manual queue management** - The old 3-step dance (inject → simulate thread → process queue) is handled automatically
+- **Automatic escape handling** - Escape sequences are processed without manual `Thread.Sleep()` delays
+
+For complete documentation of the input injection architecture, see [Input Injection](input-injection-redesign.md).
 
 
-## See Also
-
-- @Terminal.Gui.Drivers - API Reference
-- @Terminal.Gui.App.IApplication - Application interface
-- @Terminal.Gui.App.MainLoopCoordinator`1 - Main loop coordination
