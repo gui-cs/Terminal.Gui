@@ -401,7 +401,9 @@ public static class ConfigurationManager
             throw new ConfigurationManagerNotEnabledException ();
         }
 
-        // Only load the hard-coded defaults if the user has not specified any locations.
+        // Only load the hard-coded defaults if the user specified HardCoded exclusively.
+        // LoadHardCodedDefaults clears RuntimeConfig and resets everything, so we only
+        // want to do this when HardCoded is the only location requested.
         if (locations == ConfigLocations.HardCoded)
         {
             LoadHardCodedDefaults ();
@@ -409,6 +411,9 @@ public static class ConfigurationManager
         }
 
         // Use SourcesManager to load from all locations in the correct order
+        // Note: SourcesManager.LoadFromLocations skips HardCoded because those are
+        // already loaded during Enable(). If HardCoded is included in locations with
+        // other flags, the hard-coded defaults are already in Settings.
         SourcesManager?.LoadFromLocations (Settings, locations);
     }
 
