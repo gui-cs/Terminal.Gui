@@ -1,6 +1,3 @@
-
-using System.ComponentModel;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Displays graphs (bar, scatter, etc...) with flexible labels, scaling, and scrolling</summary>
@@ -109,7 +106,8 @@ public class GraphView : View, IDesignable
     /// <summary>
     ///     Amount of space (in viewport columns) to reserve on the bottom of the graph for axis labels and legends.
     ///     Graph content (<see cref="Series"/>) will not be rendered in this internal margin area, but axis labels may be.
-    ///     This is separate from the View's <see cref="View.Margin"/>, <see cref="View.Border"/>, and <see cref="View.Padding"/> adornments,
+    ///     This is separate from the View's <see cref="View.Margin"/>, <see cref="View.Border"/>, and
+    ///     <see cref="View.Padding"/> adornments,
     ///     which create space outside the viewport.
     /// </summary>
     public uint MarginBottom { get; set; }
@@ -117,7 +115,8 @@ public class GraphView : View, IDesignable
     /// <summary>
     ///     Amount of space (in viewport columns) to reserve on the left of the graph for axis labels.
     ///     Graph content (<see cref="Series"/>) will not be rendered in this internal margin area, but axis labels may be.
-    ///     This is separate from the View's <see cref="View.Margin"/>, <see cref="View.Border"/>, and <see cref="View.Padding"/> adornments,
+    ///     This is separate from the View's <see cref="View.Margin"/>, <see cref="View.Border"/>, and
+    ///     <see cref="View.Padding"/> adornments,
     ///     which create space outside the viewport.
     /// </summary>
     public uint MarginLeft { get; set; }
@@ -130,7 +129,7 @@ public class GraphView : View, IDesignable
     public PointF ScrollOffset { get; set; } = new (0, 0);
 
     /// <summary>Collection of data series that are rendered in the graph.</summary>
-    public List<ISeries> Series { get; } = new ();
+    public List<ISeries> Series { get; } = [];
 
     #region Bresenham's line algorithm
 
@@ -189,7 +188,8 @@ public class GraphView : View, IDesignable
     ///     presented.  E.g. 0,0 for origin.
     /// </param>
     /// <returns>
-    ///     Viewport-relative position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that
+    ///     Viewport-relative position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note
+    ///     that
     ///     this can be outside the current content area of the view. Viewport-relative coordinates have (0,0) at the top-left
     ///     of the View's content area (after accounting for Border, Margin, and Padding).
     /// </returns>
