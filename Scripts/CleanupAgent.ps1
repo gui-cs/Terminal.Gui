@@ -297,31 +297,64 @@ function Process-CleanupFile {
                 $baseName = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
                 $partialFiles = Get-ChildItem "$directory\$baseName*.cs" -Exclude "*.backup"
 
-                Write-Status "Created $($partialFiles.Count) partial files. Process each individually." "Cyan"
-                return $true
+                Write-Status "Created $($partialFiles.Count) partial files. Processing each through cleanup..." "Cyan"
+
+                # Process each partial file through cleanup steps 2-5
+                foreach ($partial in $partialFiles) {
+                    Write-Status "Processing partial: $($partial.Name)" "Cyan"
+
+                    # Step 2: Run ReSharper cleanup
+                    if (-not (Invoke-ReSharperCleanup -FilePath $partial.FullName)) {
+                        Write-Status "ReSharper cleanup failed for $($partial.Name)" "Red"
+                        return $false
+                    }
+
+                    # Step 3: Fix backing field placement
+                    if (-not (Invoke-BackingFieldReorder -FilePath $partial.FullName)) {
+                        Write-Status "Backing field reordering failed for $($partial.Name)" "Red"
+                        return $false
+                    }
+
+                    # Step 4: Ensure #nullable enable (if needed)
+                    $nullableAdded = Invoke-EnableNullable -FilePath $partial.FullName
+                    if ($nullableAdded) {
+                        $Stats.NullableAdded++
+                    }
+
+                    # Step 5: Add CWP TODO comments
+                    $cwpTodos = Add-CWPTodoComments -FilePath $partial.FullName
+                    $Stats.CWPTodosAdded += $cwpTodos
+                }
+
+                Write-Status "Completed cleanup of all $($partialFiles.Count) partial files" "Green"
+
+                # Continue to rebuild and test (Steps 6-7)
             }
         }
+        else {
+            # No split needed - process single file through cleanup steps 2-5
 
-        # Step 2: Run ReSharper cleanup on specific file
-        if (-not (Invoke-ReSharperCleanup -FilePath $FilePath)) {
-            return $false
+            # Step 2: Run ReSharper cleanup on specific file
+            if (-not (Invoke-ReSharperCleanup -FilePath $FilePath)) {
+                return $false
+            }
+
+            # Step 3: Fix backing field placement
+            if (-not (Invoke-BackingFieldReorder -FilePath $FilePath)) {
+                Write-Status "Backing field reordering failed" "Red"
+                return $false
+            }
+
+            # Step 4: Ensure #nullable enable (if needed)
+            $nullableAdded = Invoke-EnableNullable -FilePath $FilePath
+            if ($nullableAdded) {
+                $Stats.NullableAdded++
+            }
+
+            # Step 5: Add CWP TODO comments
+            $cwpTodos = Add-CWPTodoComments -FilePath $FilePath
+            $Stats.CWPTodosAdded += $cwpTodos
         }
-
-        # Step 3: Fix backing field placement
-        if (-not (Invoke-BackingFieldReorder -FilePath $FilePath)) {
-            Write-Status "Backing field reordering failed" "Red"
-            return $false
-        }
-
-        # Step 4: Ensure #nullable enable (if needed)
-        $nullableAdded = Invoke-EnableNullable -FilePath $FilePath
-        if ($nullableAdded) {
-            $Stats.NullableAdded++
-        }
-
-        # Step 5: Add CWP TODO comments
-        $cwpTodos = Add-CWPTodoComments -FilePath $FilePath
-        $Stats.CWPTodosAdded += $cwpTodos
 
         # Step 6: Rebuild solution
         if (-not (Invoke-RebuildSolution)) {
