@@ -15,7 +15,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// </summary>
     public NetInput ()
     {
-        Logging.Information ($"Creating {nameof (NetInput)}");
+        //Logging.Information ($"Creating {nameof (NetInput)}");
 
         PlatformID p = Environment.OSVersion.Platform;
 

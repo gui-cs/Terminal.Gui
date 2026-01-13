@@ -101,7 +101,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
     public WindowsOutput ()
     {
-        Logging.Information ($"Creating {nameof (WindowsOutput)}");
+        //Logging.Information ($"Creating {nameof (WindowsOutput)}");
 
         if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {

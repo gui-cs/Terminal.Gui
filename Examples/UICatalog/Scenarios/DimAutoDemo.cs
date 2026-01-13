@@ -8,8 +8,9 @@ public class DimAutoDemo : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         // Setup - Create a top-level application window and configure it.
         using Window appWindow = new ();

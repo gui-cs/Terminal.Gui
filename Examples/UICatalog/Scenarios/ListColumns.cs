@@ -13,6 +13,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Scrolling")]
 public class ListColumns : Scenario
 {
+    private IApplication? _app;
     private Scheme? _alternatingScheme;
     private DataTable? _currentTable;
     private TableView? _listColView;
@@ -47,9 +48,12 @@ public class ListColumns : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None
@@ -97,7 +101,7 @@ public class ListColumns : Scenario
 
         _listColView.SelectedCellChanged += (s, e) =>
                                             {
-                                                if (_listColView is { })
+                                                if (_listColView is not null)
                                                 {
                                                     selectedCellLabel.Text = $"{_listColView.SelectedRow},{_listColView.SelectedColumn}";
                                                 }
@@ -281,14 +285,12 @@ public class ListColumns : Scenario
         // Add views in order of visual appearance
         appWindow.Add (menuBar, _listColView, selectedCellLabel, statusBar);
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private void CloseExample ()
     {
-        if (_listColView is { })
+        if (_listColView is not null)
         {
             _listColView.Table = null;
         }
@@ -296,7 +298,7 @@ public class ListColumns : Scenario
 
     private void OpenSimpleList (bool big) { SetTable (BuildSimpleList (big ? 1023 : 31)); }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _listColView?.App?.RequestStop (); }
 
     private void RunListWidthDialog (string prompt, Action<TableView, int> setter, Func<TableView, int> getter)
     {
@@ -317,7 +319,7 @@ public class ListColumns : Scenario
         d.Add (tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _app?.Run (d);
         accepted = d.Result == 1;
         d.Dispose ();
 
@@ -329,7 +331,7 @@ public class ListColumns : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (Application.Instance, "Failed to set", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_app!, "Failed to set", ex.Message, "Ok");
             }
         }
     }

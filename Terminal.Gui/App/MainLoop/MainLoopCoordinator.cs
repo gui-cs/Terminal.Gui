@@ -184,9 +184,9 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             {
                 _input.Run (_runCancellationTokenSource.Token);
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                //Logging.Debug ($"Input loop canceled: {ex.Message}");
+                //Logging.Debug ($"Input loop canceled");
             }
 
             _input.Dispose ();
@@ -200,7 +200,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         if (_stopCalled)
         {
-            Logging.Information ("Input loop exited cleanly");
+            Logging.Trace ("Input loop exited cleanly");
         }
         else
         {

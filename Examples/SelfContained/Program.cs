@@ -13,8 +13,15 @@ namespace SelfContained;
 
 public static class Program
 {
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IDriver)")]
     private static void Main (string [] args)
+    {
+#pragma warning disable IL2026 // Run() has attributes for AOT compatibility
+        Run ();
+#pragma warning restore IL2026
+    }
+
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IDriver)")]
+    private static void Run ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 

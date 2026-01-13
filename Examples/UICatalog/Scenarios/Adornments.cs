@@ -12,8 +12,9 @@ public class Adornments : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();

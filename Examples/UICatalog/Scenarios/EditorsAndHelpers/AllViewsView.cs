@@ -81,13 +81,13 @@ public class AllViewsView : View
         {
             View? view = CreateView (type);
 
-            if (view is { })
+            if (view is not null)
             {
                 FrameView frame = new ()
                 {
                     CanFocus = true,
                     Title = type.Name,
-                    Y = previousView is { } ? Pos.Bottom (previousView) : 0,
+                    Y = previousView is not null ? Pos.Bottom (previousView) : 0,
                     Width = Dim.Fill (),
                     Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: MAX_VIEW_FRAME_HEIGHT)
                 };

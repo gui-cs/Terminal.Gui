@@ -10,7 +10,8 @@ public class ViewportSettings : Scenario
 {
     public override void Main ()
     {
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
         app.Init ();
 
         using Window mainWindow = new ();
@@ -238,7 +239,7 @@ internal class ViewportSettingsDemoView : FrameView
     {
         Label? frameLabel = Padding?.SubViews.OfType<Label> ().FirstOrDefault ();
 
-        if (frameLabel is { })
+        if (frameLabel is not null)
         {
             frameLabel.Text = $"Viewport: {Viewport}\nFrame: {Frame}";
         }
