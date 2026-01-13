@@ -7,6 +7,7 @@ namespace ApplicationTests.Keyboard;
 ///     Parallelizable tests for keyboard handling.
 ///     These tests use isolated instances of <see cref="IKeyboard"/> to avoid static state dependencies.
 /// </summary>
+[Collection("Application Tests")]
 public class KeyboardTests
 {
 

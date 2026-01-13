@@ -141,43 +141,17 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         SizeMonitor.Poll ();
 
         // Layout and draw any views that need it
-        App?.LayoutAndDraw (forceRedraw: false);
+        App?.LayoutAndDraw (false);
 
         // Update the cursor
-        SetCursor ();
+        App?.Navigation?.UpdateCursor ();
 
-        Stopwatch swCallbacks = Stopwatch.StartNew ();
+        var swCallbacks = Stopwatch.StartNew ();
 
         // Run any timeout callbacks that are due
         TimedEvents.RunTimers ();
 
         Logging.IterationInvokesAndTimeouts.Record (swCallbacks.Elapsed.Milliseconds);
-    }
-
-    private void SetCursor ()
-    {
-        View? mostFocused = App?.TopRunnableView?.MostFocused;
-
-        if (mostFocused == null)
-        {
-            Output.SetCursorVisibility (CursorVisibility.Invisible);
-            return;
-        }
-
-        Point? to = mostFocused.PositionCursor ();
-
-        if (to.HasValue)
-        {
-            // Translate to screen coordinates
-            Point screenPos = mostFocused.ViewportToScreen (to.Value);
-
-            Output.SetCursorPosition (screenPos.X, screenPos.Y);
-            Output.SetCursorVisibility (mostFocused.CursorVisibility);
-        }
-        else
-        {
-            Output.SetCursorVisibility (CursorVisibility.Invisible);
-        }
     }
 
     /// <inheritdoc/>

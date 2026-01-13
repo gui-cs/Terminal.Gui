@@ -314,7 +314,7 @@ public class ComboBox : View, IDesignable
             {
                 _search.SetFocus ();
             }
-            _search.CursorPosition = _search.Text.GetRuneCount ();
+            _search.InsertionPoint = _search.Text.GetRuneCount ();
         }
         else
         {
@@ -584,7 +584,7 @@ public class ComboBox : View, IDesignable
     {
         if (_listview.HasFocus && _listview.SelectedItem == 0 && _searchSet?.Count > 0) // jump back to search
         {
-            _search.CursorPosition = _search.Text.GetRuneCount ();
+            _search.InsertionPoint = _search.Text.GetRuneCount ();
             _search.SetFocus ();
         }
         else
@@ -741,7 +741,7 @@ public class ComboBox : View, IDesignable
         }
 
         SetValue (_listview.SelectedItem is { } ? _searchSet [_listview.SelectedItem.Value] : _text);
-        _search.CursorPosition = _search.Text.GetColumns ();
+        _search.InsertionPoint = _search.Text.GetColumns ();
         ShowHideList (Text);
         OnOpenSelectedItem ();
         Reset (true);
@@ -783,7 +783,7 @@ public class ComboBox : View, IDesignable
         _search.TextChanged -= Search_Changed;
         // Note we set _text, to avoid set_Text from setting _search.Text again
         _text = _search.Text = text.ToString ();
-        _search.CursorPosition = 0;
+        _search.InsertionPoint = 0;
         _search.TextChanged += Search_Changed;
 
         if (!isFromSelectedItem)

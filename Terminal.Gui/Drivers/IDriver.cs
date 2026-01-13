@@ -71,8 +71,8 @@ public interface IDriver : IDisposable
     /// </summary>
     IOutput GetOutput ();
 
-    /// <summary>Get the operating system clipboard.</summary>
-    IClipboard? Clipboard { get; }
+    /// <summary>Gets or sets the clipboard.</summary>
+    IClipboard? Clipboard { get; set; }
 
     #endregion Driver Components
 
@@ -299,20 +299,38 @@ public interface IDriver : IDisposable
     #region Cursor
 
     /// <summary>
-    ///     Sets the position of the terminal cursor to <see cref="IDriver.Col"/> and
-    ///     <see cref="IDriver.Row"/>.
+    ///     Sets the cursor for this driver.
     /// </summary>
-    void UpdateCursor ();
+    /// <param name="cursor">
+    ///     The cursor to set. Position must be in screen-absolute coordinates.
+    ///     Use <c>ContentToScreen()</c> or <c>ViewportToScreen()</c> to convert from view-relative coordinates.
+    ///     Set Position to null to hide the cursor.
+    /// </param>
+    public void SetCursor (Cursor cursor);
 
-    /// <summary>Gets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool GetCursorVisibility (out CursorVisibility visibility);
+    /// <summary>
+    ///     Gets the current cursor for this driver.
+    /// </summary>
+    /// <returns></returns>
+    public Cursor GetCursor ();
 
-    /// <summary>Sets the terminal cursor visibility.</summary>
-    /// <param name="visibility">The wished <see cref="CursorVisibility"/></param>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool SetCursorVisibility (CursorVisibility visibility);
+    /// <summary>
+    ///     Gets whether the terminal cursor needs to be updated.
+    /// </summary>
+    /// <returns></returns>
+    bool GetCursorNeedsUpdate ();
+
+    /// <summary>
+    ///     Signals that the cursor needs to be updated without requiring a full redraw.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method is called by <see cref="View.SetCursorNeedsUpdate"/> when a view's cursor position
+    ///         or shape changes but the view content does not need to be redrawn.
+    ///     </para>
+    /// </remarks>
+    /// <param name="needsUpdate">Indicates whether the cursor needs to be updated.</param>
+    public void SetCursorNeedsUpdate (bool needsUpdate);
 
     #endregion Cursor
 

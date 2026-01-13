@@ -34,7 +34,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 10.x
         dotnet-quality: 'ga'
 
     - name: Download build artifacts
@@ -129,7 +129,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 10.x
         dotnet-quality: 'ga'
 
     - name: Download build artifacts
@@ -157,17 +157,34 @@ jobs:
     - name: Run UnitTestsParallelizable
       shell: bash
       run: |
-        # Run tests once for regular workflow runs (stress tests will run multiple iterations)
-        echo "============================================"
-        echo "Starting parallel unit tests"
-        echo "============================================"
-        
-        # Use default parallelization (2x CPU cores)
-        echo "Using default parallelization (2x)"
-        
-        # Run tests with or without coverage based on OS
+        # Detect CPU count and calculate optimal thread count
         if [ "${{ runner.os }}" == "Linux" ]; then
-          echo "Running with coverage collection on Linux"
+          CPU_COUNT=$(nproc)
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          CPU_COUNT=$(sysctl -n hw.ncpu)
+        else  # Windows
+          CPU_COUNT=$NUMBER_OF_PROCESSORS
+        fi
+        
+        # Use 2x CPU count for I/O-bound tests, capped at reasonable max
+        # macOS uses lower cap (4) to prevent thread pool exhaustion
+        MAX_THREADS=$((CPU_COUNT * 2))
+        if [ "${{ runner.os }}" == "macOS" ]; then
+          if [ $MAX_THREADS -gt 4 ]; then
+            MAX_THREADS=4
+          fi
+          HANG_TIMEOUT="120s"
+        else
+          if [ $MAX_THREADS -gt 16 ]; then
+            MAX_THREADS=16
+          fi
+          HANG_TIMEOUT="60s"
+        fi
+        
+        echo "Detected $CPU_COUNT CPUs, using $MAX_THREADS parallel threads"
+        
+        # Run tests with dynamic thread count
+        if [ "${{ runner.os }}" == "Linux" ]; then
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
             --verbosity normal \
@@ -177,9 +194,10 @@ jobs:
             --blame \
             --blame-crash \
             --blame-hang \
-            --blame-hang-timeout 60s \
+            --blame-hang-timeout $HANG_TIMEOUT \
             --blame-crash-collect-always \
-            -- xUnit.MaxParallelThreads=2x
+            -- xUnit.MaxParallelThreads=$MAX_THREADS \
+            -- xUnit.StopOnFail=true
         else
           dotnet test Tests/UnitTestsParallelizable \
             --no-build \
@@ -189,9 +207,10 @@ jobs:
             --blame \
             --blame-crash \
             --blame-hang \
-            --blame-hang-timeout 60s \
+            --blame-hang-timeout $HANG_TIMEOUT \
             --blame-crash-collect-always \
-            -- xUnit.MaxParallelThreads=2x
+            -- xUnit.MaxParallelThreads=$MAX_THREADS \
+            -- xUnit.StopOnFail=true
         fi
         
         echo "============================================"

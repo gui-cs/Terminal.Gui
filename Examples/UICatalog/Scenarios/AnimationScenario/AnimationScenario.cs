@@ -20,9 +20,11 @@ public class AnimationScenario : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var win = new Window
+        using Window win = new ()
         {
             Title = GetQuitKeyAndName (),
             X = 0,
@@ -50,9 +52,7 @@ public class AnimationScenario : Scenario
         // Start the animation after the window is initialized
         win.Initialized += OnWinOnInitialized;
 
-        Application.Run (win);
-        win.Dispose ();
-        Application.Shutdown ();
+        app.Run (win);
     }
 
 
@@ -88,14 +88,14 @@ public class AnimationScenario : Scenario
         Task.Run (
                   () =>
                   {
-                      while (Application.Initialized)
+                      while (_imageView?.App?.Initialized == true)
                       {
                           // When updating from a Thread/Task always use Invoke
-                          Application.Invoke (
+                          _imageView?.App?.Invoke (
                                               (_) =>
                                               {
-                                                  _imageView.NextFrame ();
-                                                  _imageView.SetNeedsDraw ();
+                                                  _imageView?.NextFrame ();
+                                                  _imageView?.SetNeedsDraw ();
                                               });
 
                           Task.Delay (100).Wait ();
@@ -198,7 +198,7 @@ public class AnimationScenario : Scenario
                 int newSize = Math.Min (Viewport.Width, Viewport.Height);
 
                 // generate one
-                if (_matchSizes is { } && imgFull is { })
+                if (_matchSizes is not null && imgFull is not null)
                 {
                     _matchSizes [_currentFrame] = imgScaled = imgFull.Clone (
                                                                              x => x.Resize (
@@ -209,7 +209,7 @@ public class AnimationScenario : Scenario
                 }
             }
 
-            if (braille == null && _brailleCache is { })
+            if (braille == null && _brailleCache is not null)
             {
                 _brailleCache [_currentFrame] = braille = GetBraille (_matchSizes? [_currentFrame]!);
             }

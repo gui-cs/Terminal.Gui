@@ -2215,8 +2215,8 @@ public class TableViewTests (ITestOutputHelper output)
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.DoesNotContain (new (0, 1), selected);
-        Assert.Contains (new (0, 2), selected);
+        Assert.DoesNotContain (new Point (0, 1), selected);
+        Assert.Contains (new Point (0, 2), selected);
     }
 
     [Fact]
@@ -2582,7 +2582,7 @@ A B C
         Point [] selected = tv.GetAllSelectedCells ().ToArray ();
 
         Assert.Contains (Point.Empty, selected);
-        Assert.Contains (new (0, 1), selected);
+        Assert.Contains (new Point (0, 1), selected);
     }
 
     [Fact]

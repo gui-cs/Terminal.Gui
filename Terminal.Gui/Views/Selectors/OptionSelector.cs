@@ -219,7 +219,7 @@ public class OptionSelector : SelectorBase, IDesignable
     ///         Maps to either the X or Y position within <see cref="View.Viewport"/> depending on <see cref="Orientation"/>.
     ///     </para>
     /// </remarks>
-    public int Cursor
+    public new int Cursor
     {
         get => !CanFocus ? 0 : SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
         set

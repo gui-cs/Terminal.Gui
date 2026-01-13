@@ -4,6 +4,7 @@ using System.ComponentModel;
 namespace ApplicationTests.MouseTests;
 
 [Trait ("Category", "Input")]
+[Collection("Application Tests")]
 public class ApplicationMouseEnterLeaveTests
 {
     private class TestView : View

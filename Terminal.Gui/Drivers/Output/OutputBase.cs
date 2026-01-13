@@ -49,13 +49,6 @@ public abstract class OutputBase
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
-    /// <summary>
-    ///     Changes the visibility of the cursor in the terminal to the specified <paramref name="visibility"/> e.g.
-    ///     the flashing indicator, invisible, box indicator etc.
-    /// </summary>
-    /// <param name="visibility"></param>
-    public abstract void SetCursorVisibility (CursorVisibility visibility);
-
     StringBuilder _lastOutputStringBuilder = new ();
 
     /// <summary>
@@ -72,9 +65,6 @@ public abstract class OutputBase
         int cols = buffer.Cols;
         Attribute? redrawAttr = null;
         int lastCol = -1;
-
-        // Hide cursor during rendering to prevent flicker
-        SetCursorVisibility (CursorVisibility.Invisible);
 
         // Process each row
         for (int row = top; row < rows; row++)
@@ -171,8 +161,6 @@ public abstract class OutputBase
             SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
             Write ((StringBuilder)new (s.SixelData));
         }
-
-        // Cursor visibility restored by ApplicationMainLoop.SetCursor() to prevent flicker
     }
 
     /// <inheritdoc cref="IOutput.GetLastOutput" />
@@ -191,7 +179,8 @@ public abstract class OutputBase
     protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
 
     /// <summary>
-    ///     When overriden in derived class, positions the terminal output cursor to the specified point on the screen.
+    ///     When overriden in derived class, positions the terminal draw cursor to the specified point on the screen.
+    ///     Note, this does NOT update any internal cursor position state - that is the responsibility of the caller.
     /// </summary>
     /// <param name="screenPositionX">Column to move cursor to</param>
     /// <param name="screenPositionY">Row to move cursor to</param>

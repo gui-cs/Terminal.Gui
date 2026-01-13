@@ -71,6 +71,7 @@ public class Shortcut : View, IOrientation, IDesignable
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this);
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
@@ -634,9 +635,6 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _bindKeyToApplication;
         set
         {
-            App ??= SuperView?.App ?? Application.Instance; // HACK: Remove once legacy static Application is gone
-            Debug.Assert (App is { });
-
             if (value == _bindKeyToApplication)
             {
                 return;

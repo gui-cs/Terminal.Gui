@@ -7,6 +7,7 @@ namespace DriverTests.Ansi;
 /// <summary>
 ///     Tests for the AnsiDriver to ensure it works properly with the modern component factory architecture.
 /// </summary>
+[Collection ("Driver Tests")]
 public class AnsiDriverTests (ITestOutputHelper output) : TestDriverBase
 {
     private readonly ITestOutputHelper _output = output;
@@ -121,7 +122,7 @@ public class AnsiDriverTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Clipboard_GetClipboarData_Works ()
+    public void Clipboard_GetClipboardData_Works ()
     {
         IDriver driver = CreateTestDriver ();
 

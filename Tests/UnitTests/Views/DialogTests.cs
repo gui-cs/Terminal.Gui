@@ -1,11 +1,9 @@
-using Xunit.Abstractions;
-
-namespace Terminal.Gui.ViewsTests;
+namespace ViewsTests;
 
 /// <summary>
 ///     Unit tests for <see cref="Dialog"/> that modify static properties and cannot run in parallel.
 /// </summary>
-public class DialogTests (ITestOutputHelper output)
+public class DialogTests
 {
     [Fact]
     public void DefaultBorderStyle_Get_Set ()

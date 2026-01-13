@@ -4,6 +4,7 @@
 
 namespace DriverTests.AnsiHandling;
 
+[Collection ("Driver Tests")]
 public class EscSeqUtilsTests
 {
     [Fact]

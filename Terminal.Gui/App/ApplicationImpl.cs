@@ -25,6 +25,8 @@ internal partial class ApplicationImpl : IApplication
         // Initialize TimedEvents with the time provider for testable timing
         _timedEvents = new TimedEvents (timeProvider);
 
+        ForceDriver = Application.ForceDriver;
+
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;
     }
@@ -179,7 +181,17 @@ internal partial class ApplicationImpl : IApplication
     #region Screen and Driver
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard => Driver?.Clipboard;
+    public IClipboard? Clipboard
+    {
+        get => Driver?.Clipboard;
+        set
+        {
+            if (Driver != null)
+            {
+                Driver.Clipboard = value;
+            }
+        }
+    }
 
     #endregion Screen and Driver
 

@@ -22,22 +22,22 @@ public class LayoutEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
-        if (_xEditor is { })
+        if (_xEditor is not null)
         {
             _xEditor.ViewToEdit = ViewToEdit;
         }
 
-        if (_yEditor is { })
+        if (_yEditor is not null)
         {
             _yEditor.ViewToEdit = ViewToEdit;
         }
 
-        if (_widthEditor is { })
+        if (_widthEditor is not null)
         {
             _widthEditor.ViewToEdit = ViewToEdit;
         }
 
-        if (_heightEditor is { })
+        if (_heightEditor is not null)
         {
             _heightEditor.ViewToEdit = ViewToEdit;
         }

@@ -45,10 +45,11 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     public AnsiOutput ()
     {
-        Logging.Information ($"Creating {nameof (AnsiOutput)}");
+        // Logging.Information ($"Creating {nameof (AnsiOutput)}");
 
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);
+        _currentCursor = new ();
 
         try
         {
@@ -103,16 +104,13 @@ public class AnsiOutput : OutputBase, IOutput
     ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
     ///     a reference to the buffer last written with <see cref="Write(IOutputBuffer)"/>.
     /// </summary>
-    public IOutputBuffer? GetLastBuffer () => _lastBuffer;
-
-    ///// <inheritdoc cref="IOutput.GetLastOutput"/>
-    //public override string GetLastOutput () => _outputStringBuilder.ToString ();
+    public IOutputBuffer? GetLastBuffer () { return _lastBuffer; }
 
     /// <inheritdoc/>
     public void SetSize (int width, int height) { _consoleSize = new (width, height); }
 
     /// <inheritdoc/>
-    public Size GetSize () => _consoleSize;
+    public Size GetSize () { return _consoleSize; }
 
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
@@ -159,36 +157,28 @@ public class AnsiOutput : OutputBase, IOutput
         base.Write (buffer);
     }
 
-    private Point? _lastCursorPosition;
-    private EscSeqUtils.DECSCUSR_Style? _currentDecscusrStyle;
+    private Cursor _currentCursor;
 
-    /// <inheritdoc/>
-    public Point GetCursorPosition () => _lastCursorPosition ?? Point.Empty;
-
-    /// <inheritdoc/>
-    public void SetCursorPosition (int col, int row) { SetCursorPositionImpl (col, row); }
-
-    /// <inheritdoc cref="IOutput.SetCursorVisibility"/>
-    public override void SetCursorVisibility (CursorVisibility visibility)
+    /// <inheritdoc />
+    public Cursor GetCursor ()
     {
-        if (!_terminalInitialized)
-        {
-            return;
-        }
+        return _currentCursor;
+    }
 
+    /// <inheritdoc />
+    public void SetCursor (Cursor cursor)
+    {
         try
         {
-            if (visibility == CursorVisibility.Invisible)
+            if (!cursor.IsVisible)
             {
                 Write (EscSeqUtils.CSI_HideCursor);
             }
             else
             {
-                if (_currentDecscusrStyle is null || _currentDecscusrStyle != (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF))
+                if (_currentCursor!.Style != cursor.Style)
                 {
-                    _currentDecscusrStyle = (EscSeqUtils.DECSCUSR_Style)(((int)visibility >> 24) & 0xFF);
-
-                    Write (EscSeqUtils.CSI_SetCursorStyle ((EscSeqUtils.DECSCUSR_Style)_currentDecscusrStyle));
+                    Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                 }
 
                 Write (EscSeqUtils.CSI_ShowCursor);
@@ -196,35 +186,35 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch
         {
-            // ignore
+            // Ignore any exceptions
+        }
+        finally
+        {
+            SetCursorPositionImpl (
+                                   cursor.Position?.X ?? 0,
+                                   cursor.Position?.Y ?? 0
+                                  );
+
+            _currentCursor = cursor;
         }
     }
 
     /// <inheritdoc/>
-    protected override bool SetCursorPositionImpl (int screenPositionX, int screenPositionY)
+    protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (_lastCursorPosition is { } && _lastCursorPosition.Value.X == screenPositionX && _lastCursorPosition.Value.Y == screenPositionY)
+        if (_currentCursor!.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
-            return true;
+            return false;
         }
-
-        _lastCursorPosition = new (screenPositionX, screenPositionY);
 
         if (!_terminalInitialized)
         {
             return true;
         }
 
-        try
-        {
-            // Convert from 0-based (Terminal.Gui) to 1-based (ANSI) coordinates
-            EscSeqUtils.CSI_WriteCursorPosition (Console.Out, screenPositionY + 1, screenPositionX + 1);
-        }
-        catch
-        {
-            // ignore
-        }
-
+        // + 1 is needed because non-Windows is based on 1 instead of 0 and
+        // Console.CursorTop/CursorLeft isn't reliable.
+        EscSeqUtils.CSI_WriteCursorPosition (Console.Out, row + 1, col + 1);
         return true;
     }
 

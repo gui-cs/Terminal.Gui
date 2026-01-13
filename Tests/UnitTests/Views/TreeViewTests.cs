@@ -106,14 +106,13 @@ public class TreeViewTests (ITestOutputHelper output)
 
         Assert.True (tv.MultiSelect);
         Assert.True (tv.HasFocus);
-        Assert.Equal (CursorVisibility.Invisible, tv.CursorVisibility);
+        Assert.False (tv.Cursor.IsVisible);
 
         tv.SelectAll ();
-        tv.CursorVisibility = CursorVisibility.Default;
-        Application.PositionCursor ();
-        Application.Driver!.GetCursorVisibility (out CursorVisibility visibility);
-        Assert.Equal (CursorVisibility.Default, tv.CursorVisibility);
-        Assert.Equal (CursorVisibility.Default, visibility);
+        tv.Cursor = tv.Cursor with { Position = new Point (0, 0), Style = CursorStyle.BlinkingBlock };
+        Assert.True (tv.Cursor.IsVisible);
+        Application.Navigation.UpdateCursor ();
+        Assert.True (Application.Driver!.GetCursor ().IsVisible);
         top.Dispose ();
     }
 

@@ -9,6 +9,7 @@ namespace DriverTests.MouseTests;
 ///     Extended unit tests for <see cref="MouseInterpreter"/> click detection and event generation.
 ///     Complements existing MouseInterpreterTests with additional coverage for HIGH and MEDIUM priority scenarios.
 /// </summary>
+[Collection ("Driver Tests")]
 [Trait ("Category", "Input")]
 public class MouseInterpreterExtendedTests (ITestOutputHelper output)
 {

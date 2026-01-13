@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 namespace DriverTests.AnsiHandling;
 
 // BUGBUG: These tests use TInputRecord of `int`, but that's not a realistic type for keyboard input.
+[Collection ("Driver Tests")]
 public class AnsiResponseParserTests (ITestOutputHelper output)
 {
     private readonly AnsiResponseParser<int> _parser1 = new (new SystemTimeProvider ());

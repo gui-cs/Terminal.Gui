@@ -180,6 +180,7 @@ public class InputInjectionExampleTests
         VirtualTimeProvider time = new ();
         using IApplication app = Application.Create (time);
         app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
 
         var ctrlCPressed = false;
         Key? receivedKey = null;

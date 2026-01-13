@@ -17,12 +17,12 @@ public class ViewPropertiesEditor : EditorBase
             Title = "CanFocus",
             X = 0,
             Y = 0,
-            CheckedState = ViewToEdit is { } ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
+            CheckedState = ViewToEdit is not null ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
         _canFocusCheckBox.CheckedStateChanged += (_, _) =>
                                                  {
-                                                     if (ViewToEdit is { })
+                                                     if (ViewToEdit is not null)
                                                      {
                                                          ViewToEdit.CanFocus = _canFocusCheckBox.CheckedState == CheckState.Checked;
                                                      }
@@ -34,12 +34,12 @@ public class ViewPropertiesEditor : EditorBase
             Title = "Enabled",
             X = Pos.Right (_canFocusCheckBox) + 1,
             Y = Pos.Top (_canFocusCheckBox),
-            CheckedState = ViewToEdit is { } ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
+            CheckedState = ViewToEdit is not null ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
         _enabledCheckBox.CheckedStateChanged += (_, _) =>
                                                 {
-                                                    if (ViewToEdit is { })
+                                                    if (ViewToEdit is not null)
                                                     {
                                                         ViewToEdit.Enabled = _enabledCheckBox.CheckedState == CheckState.Checked;
                                                     }
@@ -77,7 +77,7 @@ public class ViewPropertiesEditor : EditorBase
 
         _text.ContentsChanged += (_, _) =>
                                  {
-                                     if (ViewToEdit is { })
+                                     if (ViewToEdit is not null)
                                      {
                                          ViewToEdit.Text = _text.Text;
                                      }
@@ -98,7 +98,7 @@ public class ViewPropertiesEditor : EditorBase
     {
         Enabled = ViewToEdit is not Adornment;
 
-        if (ViewToEdit is { } and not Adornment)
+        if (ViewToEdit is not null and not Adornment)
         {
             _canFocusCheckBox!.CheckedState = ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked;
             _enabledCheckBox!.CheckedState = ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked;

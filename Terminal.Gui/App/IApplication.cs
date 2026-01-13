@@ -447,7 +447,7 @@ public interface IApplication : IDisposable
     ///         <see cref="Driver"/> is not initialized.
     ///     </para>
     /// </remarks>
-    IClipboard? Clipboard { get; }
+    IClipboard? Clipboard { get; internal set; }
 
     /// <summary>
     ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not
@@ -562,18 +562,6 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     public void LayoutAndDraw (bool forceRedraw = false);
-
-    /// <summary>
-    ///     Calls <see cref="View.PositionCursor"/> on the most focused view.
-    /// </summary>
-    /// <remarks>
-    ///     <para>Does nothing if there is no most focused view.</para>
-    ///     <para>
-    ///         If the most focused view is not visible within its superview, the cursor will be hidden.
-    ///     </para>
-    /// </remarks>
-    /// <returns><see langword="true"/> if a view positioned the cursor and the position is visible.</returns>
-    public bool PositionCursor ();
 
     #endregion Layout and Drawing
 

@@ -10,7 +10,8 @@ public class ViewportSettings : Scenario
 {
     public override void Main ()
     {
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
         app.Init ();
 
         using Window mainWindow = new ();
@@ -67,7 +68,7 @@ public class ViewportSettings : Scenario
             Y = 10,
             Title = "TextVie_w",
             Text = "I have a 3 row top border.\nMy border inherits from the SuperView.\nI have 3 lines of text with room for 2.",
-            AllowsTab = false,
+            TabKeyAddsTab = false,
             Width = 30,
             Height = 6 // TODO: Use Dim.Auto
         };
@@ -238,7 +239,7 @@ internal class ViewportSettingsDemoView : FrameView
     {
         Label? frameLabel = Padding?.SubViews.OfType<Label> ().FirstOrDefault ();
 
-        if (frameLabel is { })
+        if (frameLabel is not null)
         {
             frameLabel.Text = $"Viewport: {Viewport}\nFrame: {Frame}";
         }

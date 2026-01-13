@@ -7,6 +7,7 @@ namespace DriverTests.AnsiDriver;
 ///     Low-level tests for AnsiInput and AnsiOutput implementations.
 ///     These tests verify that ANSI driver components work correctly in all environments.
 /// </summary>
+[Collection ("Driver Tests")]
 public class AnsiInputOutputTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;

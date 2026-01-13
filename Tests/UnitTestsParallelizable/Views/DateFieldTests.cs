@@ -14,7 +14,7 @@ public class DateFieldTests
         var df = new DateField ();
         df.Layout ();
         Assert.Equal (DateTime.MinValue, df.Date);
-        Assert.Equal (1, df.CursorPosition);
+        Assert.Equal (1, df.InsertionPoint);
         Assert.Equal (new (0, 0, 12, 1), df.Frame);
         Assert.Equal (" 01/01/0001", df.Text);
 
@@ -22,14 +22,14 @@ public class DateFieldTests
         df = new (date);
         df.Layout ();
         Assert.Equal (date, df.Date);
-        Assert.Equal (1, df.CursorPosition);
+        Assert.Equal (1, df.InsertionPoint);
         Assert.Equal (new (0, 0, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
 
         df = new (date) { X = 1, Y = 2 };
         df.Layout ();
         Assert.Equal (date, df.Date);
-        Assert.Equal (1, df.CursorPosition);
+        Assert.Equal (1, df.InsertionPoint);
         Assert.Equal (new (1, 2, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
     }
@@ -40,6 +40,7 @@ public class DateFieldTests
     {
         IApplication app = Application.Create();
         app.Init(DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
 
         try
         {
@@ -50,7 +51,7 @@ public class DateFieldTests
             Assert.True (df2.NewKeyDownEvent (Key.End.WithShift));
             Assert.Equal (1, df2.SelectedStart);
             Assert.Equal (10, df2.SelectedLength);
-            Assert.Equal (11, df2.CursorPosition);
+            Assert.Equal (11, df2.InsertionPoint);
 
             // Copy from df2
             Assert.True (df2.NewKeyDownEvent (Key.C.WithCtrl));
@@ -58,7 +59,7 @@ public class DateFieldTests
             // Paste into df1
             Assert.True (df1.NewKeyDownEvent (Key.V.WithCtrl));
             Assert.Equal (" 12/31/2023", df1.Text);
-            Assert.Equal (11, df1.CursorPosition);
+            Assert.Equal (11, df1.InsertionPoint);
         }
         finally
         {
@@ -68,19 +69,19 @@ public class DateFieldTests
 
     [Fact]
     [TestDate]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
+    public void CursorPos_Min_Is_Always_One_Max_Is_Always_Max_Format ()
     {
         var df = new DateField ();
-        Assert.Equal (1, df.CursorPosition);
-        df.CursorPosition = 0;
-        Assert.Equal (1, df.CursorPosition);
-        df.CursorPosition = 11;
-        Assert.Equal (10, df.CursorPosition);
+        Assert.Equal (1, df.InsertionPoint);
+        df.InsertionPoint = 0;
+        Assert.Equal (1, df.InsertionPoint);
+        df.InsertionPoint = 11;
+        Assert.Equal (10, df.InsertionPoint);
     }
 
     [Fact]
     [TestDate]
-    public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
+    public void CursorPos_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
     {
         var df = new DateField ();
 
@@ -88,22 +89,22 @@ public class DateFieldTests
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.Equal (1, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
-        Assert.Equal (0, df.CursorPosition);
+        Assert.Equal (0, df.InsertionPoint);
 
         // Without selection
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal (-1, df.SelectedStart);
         Assert.Equal (0, df.SelectedLength);
-        Assert.Equal (1, df.CursorPosition);
-        df.CursorPosition = 10;
+        Assert.Equal (1, df.InsertionPoint);
+        df.InsertionPoint = 10;
         Assert.True (df.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (10, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
-        Assert.Equal (11, df.CursorPosition);
+        Assert.Equal (11, df.InsertionPoint);
         Assert.True (df.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (-1, df.SelectedStart);
         Assert.Equal (0, df.SelectedLength);
-        Assert.Equal (10, df.CursorPosition);
+        Assert.Equal (10, df.InsertionPoint);
     }
 
     [Fact]
@@ -126,7 +127,7 @@ public class DateFieldTests
         df.ReadOnly = false;
         Assert.True (df.NewKeyDownEvent (Key.D.WithCtrl));
         Assert.Equal (" 02/12/1971", df.Text);
-        df.CursorPosition = 4;
+        df.InsertionPoint = 4;
         df.ReadOnly = true;
         Assert.True (df.NewKeyDownEvent (Key.Delete));
         Assert.Equal (" 02/12/1971", df.Text);
@@ -134,26 +135,26 @@ public class DateFieldTests
         Assert.True (df.NewKeyDownEvent (Key.Backspace));
         Assert.Equal (" 02/02/1971", df.Text);
         Assert.True (df.NewKeyDownEvent (Key.Home));
-        Assert.Equal (1, df.CursorPosition);
+        Assert.Equal (1, df.InsertionPoint);
         Assert.True (df.NewKeyDownEvent (Key.End));
-        Assert.Equal (10, df.CursorPosition);
+        Assert.Equal (10, df.InsertionPoint);
         Assert.True (df.NewKeyDownEvent (Key.E.WithCtrl));
-        Assert.Equal (10, df.CursorPosition);
+        Assert.Equal (10, df.InsertionPoint);
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft));
-        Assert.Equal (9, df.CursorPosition);
+        Assert.Equal (9, df.InsertionPoint);
         Assert.True (df.NewKeyDownEvent (Key.CursorRight));
-        Assert.Equal (10, df.CursorPosition);
+        Assert.Equal (10, df.InsertionPoint);
 
         // Non-numerics are ignored
         Assert.False (df.NewKeyDownEvent (Key.A));
         df.ReadOnly = true;
-        df.CursorPosition = 1;
+        df.InsertionPoint = 1;
         Assert.True (df.NewKeyDownEvent (Key.D1));
         Assert.Equal (" 02/02/1971", df.Text);
         df.ReadOnly = false;
         Assert.True (df.NewKeyDownEvent (Key.D1));
         Assert.Equal (" 12/02/1971", df.Text);
-        Assert.Equal (2, df.CursorPosition);
+        Assert.Equal (2, df.InsertionPoint);
 #if UNIX_KEY_BINDINGS
         Assert.True (df.NewKeyDownEvent (Key.D.WithAlt));
         Assert.Equal (" 10/02/1971", df.Text);
@@ -167,21 +168,21 @@ public class DateFieldTests
         var df = new DateField (DateTime.Parse ("12/12/1971"))
         {
             // Start selection at before the first separator /
-            CursorPosition = 2
+            InsertionPoint = 2
         };
 
         // Now select the separator /
         Assert.True (df.NewKeyDownEvent (Key.CursorRight.WithShift));
         Assert.Equal (2, df.SelectedStart);
         Assert.Equal (1, df.SelectedLength);
-        Assert.Equal (3, df.CursorPosition);
+        Assert.Equal (3, df.InsertionPoint);
 
         // Type 3 over the separator
         Assert.True (df.NewKeyDownEvent (Key.D3));
 
         // The format was normalized and replaced again with /
         Assert.Equal (" 12/12/1971", df.Text);
-        Assert.Equal (4, df.CursorPosition);
+        Assert.Equal (4, df.InsertionPoint);
     }
 
     [Fact]
@@ -197,7 +198,7 @@ public class DateFieldTests
             var df = new DateField (DateTime.Parse ("12/12/1971"))
             {
                 // Move to the first 2
-                CursorPosition = 2
+                InsertionPoint = 2
             };
 
             // Type 3 over the separator
@@ -206,7 +207,7 @@ public class DateFieldTests
             // If InvariantCulture was used this will fail but not with PT culture
             Assert.Equal (" 13/12/1971", df.Text);
             Assert.Equal ("13/12/1971", df.Date!.Value.ToString (CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern));
-            Assert.Equal (4, df.CursorPosition);
+            Assert.Equal (4, df.InsertionPoint);
         }
         finally
         {

@@ -76,7 +76,7 @@ public class BorderEditor : AdornmentEditor
                 return;
             }
 
-            if (args.Value is { })
+            if (args.Value is not null)
             {
                 border.LineStyle = (LineStyle)args.Value;
             }

@@ -391,7 +391,7 @@ public class TableView : View, IDesignable
 
             if (oldValue != selectedColumn)
             {
-                OnSelectedCellChanged (
+                RaiseSelectedCellChanged (
                                        new (
                                             Table,
                                             oldValue,
@@ -416,7 +416,7 @@ public class TableView : View, IDesignable
 
             if (oldValue != selectedRow)
             {
-                OnSelectedCellChanged (
+                RaiseSelectedCellChanged (
                                        new (
                                             Table,
                                             SelectedColumn,
@@ -1056,30 +1056,7 @@ public class TableView : View, IDesignable
         ChangeSelectionByOffset (0, -(Viewport.Height - GetHeaderHeightIfAny ()), extend);
         Update ();
     }
-
-    /// <summary>
-    ///     Positions the cursor in the area of the screen in which the start of the active cell is rendered.  Calls base
-    ///     implementation if active cell is not visible due to scrolling or table is loaded etc
-    /// </summary>
-    public override Point? PositionCursor ()
-    {
-        if (TableIsNullOrInvisible ())
-        {
-            return base.PositionCursor ();
-        }
-
-        Point? screenPoint = CellToScreen (SelectedColumn, SelectedRow);
-
-        if (screenPoint is { })
-        {
-            Move (screenPoint.Value.X, screenPoint.Value.Y);
-
-            return null; //screenPoint;
-        }
-
-        return null;
-    }
-
+    
     /// <summary>
     ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
     ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
@@ -1290,7 +1267,18 @@ public class TableView : View, IDesignable
     protected virtual void OnCellToggled (CellToggledEventArgs args) { CellToggled?.Invoke (this, args); }
 
     /// <summary>Invokes the <see cref="SelectedCellChanged"/> event</summary>
-    protected virtual void OnSelectedCellChanged (SelectedCellChangedEventArgs args) { SelectedCellChanged?.Invoke (this, args); }
+    private void RaiseSelectedCellChanged (SelectedCellChangedEventArgs args)
+    {
+        Point? screenPoint = CellToScreen (SelectedColumn, SelectedRow);
+
+        // If we wanted a visible console cursor, we'd uncomment this:
+        //if (screenPoint is { })
+        //{
+        //    Cursor = screenPoint.Value, CursorVisibility.Default;
+        //}
+
+        SelectedCellChanged?.Invoke (this, args);
+    }
 
     /// <summary>
     ///     Override to provide custom multi-coloring to cells. Use methods like <see cref="View.AddStr(string)"/>.

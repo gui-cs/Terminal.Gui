@@ -12,7 +12,7 @@ See the [Views Overview](views.md) for a catalog of all built-in View subclasses
 - [View Lifecycle](#view-lifecycle)
 - [Subsystems](#subsystems)
 - [Common View Patterns](#common-view-patterns)
-- [Modal Views](#modal-views)
+- [Runnable](#runnable-views)
 
 ---
 
@@ -21,19 +21,19 @@ See the [Views Overview](views.md) for a catalog of all built-in View subclasses
 ### Terminology
 
 - **[View](~/api/Terminal.Gui.ViewBase.View.yml)** - The base class for all visible UI elements
-- **SubView** - A View that is contained in another View and rendered as part of the containing View's content area. SubViews are added via [View.Add](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Add_Terminal_Gui_ViewBase_View_)
-- **SuperView** - The View that contains SubViews. Each View has a [View.SuperView](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SuperView) property that references its container
+- **SubView** - A View that is contained in another View and rendered as part of the containing View's content area. SubViews are added via <xref:Terminal.Gui.ViewBase.View.Add(Terminal.Gui.ViewBase.View)>
+- **SuperView** - The View that contains SubViews. Each View has a <xref:Terminal.Gui.ViewBase.View.SuperView> property that references its container
 - **Child View** - A view that holds a reference to another view in a parent/child relationship (used sparingly; generally SubView/SuperView is preferred)
 - **Parent View** - A view that holds a reference to another view but is NOT a SuperView (used sparingly)
 
 ### Key Properties
 
-- [View.SubViews](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SubViews) - Read-only list of all SubViews added to this View
-- [View.SuperView](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SuperView) - The View's container (null if the View has no container)
-- [View.Id](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Id) - Unique identifier for the View (should be unique among siblings)
-- [View.Data](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Data) - Arbitrary data attached to the View
-- [View.App](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_App) - The application context this View belongs to
-- [View.Driver](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Driver) - The driver used for rendering (derived from App). This is a shortcut to `App.Driver` for convenience.
+- <xref:Terminal.Gui.ViewBase.View.SubViews> - Read-only list of all SubViews added to this View
+- <xref:Terminal.Gui.ViewBase.View.SuperView> - The View's container (null if the View has no container)
+- <xref:Terminal.Gui.ViewBase.View.Id> - Unique identifier for the View (should be unique among siblings)
+- <xref:Terminal.Gui.ViewBase.View.Data> - Arbitrary data attached to the View
+- <xref:Terminal.Gui.ViewBase.View.App> - The application context this View belongs to
+- <xref:Terminal.Gui.ViewBase.View.Driver> - The driver used for rendering (derived from App). This is a shortcut to `App.Driver` for convenience.
 
 ---
 
@@ -45,12 +45,12 @@ Views are composed of several nested layers that define how they are positioned,
 
 ### The Layers
 
-1. **[Frame](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Frame)** - The outermost rectangle defining the View's location and size relative to the SuperView's content area
+1. **<xref:Terminal.Gui.ViewBase.View.Frame>** - The outermost rectangle defining the View's location and size relative to the SuperView's content area
 2. **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Adornment that provides spacing between the View and other SubViews
 3. **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Adornment that draws the visual border and title
 4. **[Padding](~/api/Terminal.Gui.ViewBase.Padding.yml)** - Adornment that provides spacing between the border and the viewport
-5. **[Viewport](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Viewport)** - Rectangle describing the visible portion of the content area
-6. **Content Area** - The total area where content can be drawn (defined by [View.GetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_GetContentSize))
+5. **<xref:Terminal.Gui.ViewBase.View.Viewport>** - Rectangle describing the visible portion of the content area
+6. **Content Area** - The total area where content can be drawn (defined by <xref:Terminal.Gui.ViewBase.View.GetContentSize>)
 
 See the [Layout Deep Dive](layout.md) for complete details on View composition and layout.
 
@@ -75,7 +75,7 @@ view.Viewport = new Rectangle(0, 0, 45, 15); // Adjusted for adornments
 
 The **Content Area** is where the View's content is drawn. By default, the content area size matches the Viewport size. To enable scrolling:
 
-1. Call [View.SetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SetContentSize_System_Nullable_System_Drawing_Size__) with a size larger than the Viewport
+1. Call <xref:Terminal.Gui.ViewBase.View.SetContentSize(System.Nullable{System.Drawing.Size})> with a size larger than the Viewport
 2. Change `Viewport.Location` to scroll the content
 
 See the [Scrolling Deep Dive](scrolling.md) for complete details.
@@ -101,18 +101,18 @@ See the [Layout Deep Dive](layout.md) for complete details on adornments.
 Views implement [ISupportInitializeNotification](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.isupportinitializenotification):
 
 1. **Constructor** - Creates the View and sets up default state
-2. **[BeginInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_BeginInit)** - Signals initialization is starting
-3. **[EndInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_EndInit)** - Signals initialization is complete; raises [View.Initialized](~/api/Terminal.Gui.ViewBase.View.yml) event
-4. **[IsInitialized](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_IsInitialized)** - Property indicating if initialization is complete
+2. **<xref:Terminal.Gui.ViewBase.View.BeginInit>** - Signals initialization is starting
+3. **<xref:Terminal.Gui.ViewBase.View.EndInit>** - Signals initialization is complete; raises <xref:Terminal.Gui.ViewBase.View.Initialized> event
+4. **<xref:Terminal.Gui.ViewBase.View.IsInitialized>** - Property indicating if initialization is complete
 
-During initialization, [View.App](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_App) is set to reference the application context, enabling views to access application services like the driver and current session.
+During initialization, <xref:Terminal.Gui.ViewBase.View.App> is set to reference the application context, enabling views to access application services like the driver and current session.
 
 ### Disposal
 
 Views are [IDisposable](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable):
 
-- Call [View.Dispose](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Dispose) to clean up resources
-- The [View.Disposing](~/api/Terminal.Gui.ViewBase.View.yml) event is raised when disposal begins
+- Call <xref:Terminal.Gui.ViewBase.View.Dispose> to clean up resources
+- The <xref:Terminal.Gui.ViewBase.View.Disposing> event is raised when disposal begins
 - Automatically disposes SubViews, adornments, and scroll bars
 
 ---
@@ -135,19 +135,19 @@ See the [Command Deep Dive](command.md).
 
 See the [Keyboard Deep Dive](keyboard.md).
 
-- [View.KeyBindings](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_KeyBindings) - Maps keys to Commands
-- [View.HotKey](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HotKey) - The hot key for the View
-- [View.HotKeySpecifier](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HotKeySpecifier) - Character used to denote hot keys in text (default: '_')
+- <xref:Terminal.Gui.ViewBase.View.KeyBindings> - Maps keys to Commands
+- <xref:Terminal.Gui.ViewBase.View.HotKey> - The hot key for the View
+- <xref:Terminal.Gui.ViewBase.View.HotKeySpecifier> - Character used to denote hot keys in text (default: '_')
 - Events: `KeyDown`, `InvokingKeyBindings`
 
 #### Mouse
 
 See the [Mouse Deep Dive](mouse.md).
 
-- [View.MouseBindings](~/api/Terminal.Gui.ViewBase.View.yml) - Maps mouse events to Commands
-- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHoldRepeat) - Enables continuous button press events
-- [View.Highlight](~/api/Terminal.Gui.ViewBase.View.yml) - Event for visual feedback on mouse hover/click
-- [View.HighlightStyle](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HighlightStyle) - Visual style when highlighted
+- <xref:Terminal.Gui.ViewBase.View.MouseBindings> - Maps mouse events to Commands
+- <xref:Terminal.Gui.ViewBase.View.MouseHoldRepeat> - Enables continuous button press events
+- View.Highlight event - Event for visual feedback on mouse hover/click
+- View.HighlightStyle - Visual style when highlighted
 - Events: `MouseEnter`, `MouseLeave`, `MouseEvent`
 
 ### Layout and Arrangement
@@ -156,22 +156,22 @@ See the [Layout Deep Dive](layout.md) and [Arrangement Deep Dive](arrangement.md
 
 #### Position and Size
 
-- [View.X](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_X) - Horizontal position using [Pos](~/api/Terminal.Gui.Pos.yml)
-- [View.Y](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Y) - Vertical position using [Pos](~/api/Terminal.Gui.Pos.yml)
-- [View.Width](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Width) - Width using [Dim](~/api/Terminal.Gui.Dim.yml)
-- [View.Height](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Height) - Height using [Dim](~/api/Terminal.Gui.Dim.yml)
+- <xref:Terminal.Gui.ViewBase.View.X> - Horizontal position using [Pos](~/api/Terminal.Gui.ViewBase.Pos.yml)
+- <xref:Terminal.Gui.ViewBase.View.Y> - Vertical position using [Pos](~/api/Terminal.Gui.ViewBase.Pos.yml)
+- <xref:Terminal.Gui.ViewBase.View.Width> - Width using [Dim](~/api/Terminal.Gui.ViewBase.Dim.yml)
+- <xref:Terminal.Gui.ViewBase.View.Height> - Height using [Dim](~/api/Terminal.Gui.ViewBase.Dim.yml)
 
 #### Layout Features
 
-- [Dim.Auto](~/api/Terminal.Gui.Dim.yml#Terminal_Gui_Dim_Auto_Terminal_Gui_DimAutoStyle_Terminal_Gui_Dim_Terminal_Gui_Dim_) - Automatic sizing based on content
-- [Pos.AnchorEnd](~/api/Terminal.Gui.Pos.yml#Terminal_Gui_Pos_AnchorEnd_System_Int32_) - Anchor to right/bottom edges
-- [Pos.Align](~/api/Terminal.Gui.Pos.yml) - Align views relative to each other
-- [Pos.Center](~/api/Terminal.Gui.Pos.yml) - Center within SuperView
-- [Dim.Fill](~/api/Terminal.Gui.Dim.yml) - Fill available space
+- <xref:Terminal.Gui.ViewBase.Dim.Auto*> - Automatic sizing based on content
+- <xref:Terminal.Gui.ViewBase.Pos.AnchorEnd*> - Anchor to right/bottom edges
+- [Pos.Align](~/api/Terminal.Gui.ViewBase.Pos.yml) - Align views relative to each other
+- [Pos.Center](~/api/Terminal.Gui.ViewBase.Pos.yml) - Center within SuperView
+- [Dim.Fill](~/api/Terminal.Gui.ViewBase.Dim.yml) - Fill available space
 
 #### Arrangement
 
-- [View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Arrangement) - Controls if View is movable/resizable
+- <xref:Terminal.Gui.ViewBase.View.Arrangement> - Controls if View is movable/resizable
 - [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) - Flags: Fixed, Movable, Resizable, Overlapped
 
 #### Events
@@ -198,8 +198,12 @@ See the [Scheme Deep Dive](scheme.md) for details on color theming.
 - [View.Draw](~/api/Terminal.Gui.ViewBase.View.yml) - Main drawing method
 - [View.AddRune](~/api/Terminal.Gui.ViewBase.View.yml) - Draws a single Rune
 - [View.AddStr](~/api/Terminal.Gui.ViewBase.View.yml) - Draws a string
-- [View.Move](~/api/Terminal.Gui.ViewBase.View.yml) - Positions the cursor
+- [View.Move](~/api/Terminal.Gui.ViewBase.View.yml) - Positions the **Draw Cursor** (internal rendering position, NOT the visible Terminal Cursor)
 - [View.Clear](~/api/Terminal.Gui.ViewBase.View.yml) - Clears the View's content
+
+> [!WARNING]
+> `Move()` sets the **Draw Cursor** (where next character renders), NOT the **Terminal Cursor** (visible cursor indicator).
+> To position the Terminal Cursor, use the `View.Cursor` property. See [Cursor Management](cursor.md) for details.
 
 #### Drawing Events
 
@@ -217,10 +221,10 @@ See the [Scheme Deep Dive](scheme.md) for details on color theming.
 
 See the [Navigation Deep Dive](navigation.md).
 
-- [View.CanFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_CanFocus) - Whether the View can receive keyboard focus
-- [View.HasFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HasFocus) - Whether the View currently has focus
-- [View.TabStop](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_TabStop) - [TabBehavior](~/api/Terminal.Gui.Input.TabBehavior.yml) for tab navigation
-- [View.TabIndex](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_TabIndex) - Order in tab navigation
+- <xref:Terminal.Gui.ViewBase.View.CanFocus> - Whether the View can receive keyboard focus
+- <xref:Terminal.Gui.ViewBase.View.HasFocus> - Whether the View currently has focus
+- <xref:Terminal.Gui.ViewBase.View.TabStop> - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) for tab navigation
+- View.ZOrder - Order in tab navigation
 - [View.SetFocus](~/api/Terminal.Gui.ViewBase.View.yml) - Gives focus to the View
 
 Events:
@@ -235,23 +239,23 @@ Events:
 
 See the [Scrolling Deep Dive](scrolling.md).
 
-- [View.Viewport](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Viewport) - Visible portion of the content area
-- [View.GetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_GetContentSize) - Returns size of scrollable content
-- [View.SetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SetContentSize_System_Nullable_System_Drawing_Size__) - Sets size of scrollable content
-- [View.ScrollHorizontal](~/api/Terminal.Gui.ViewBase.View.yml) - Scrolls content horizontally
-- [View.ScrollVertical](~/api/Terminal.Gui.ViewBase.View.yml) - Scrolls content vertically
-- [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_VerticalScrollBar) - Built-in vertical scrollbar
-- [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HorizontalScrollBar) - Built-in horizontal scrollbar
-- [View.ViewportSettings](~/api/Terminal.Gui.ViewBase.View.yml) - [ViewportSettingsFlags](~/api/Terminal.Gui.ViewBase.ViewportSettingsFlags.yml) controlling scroll behavior
+- <xref:Terminal.Gui.ViewBase.View.Viewport> - Visible portion of the content area
+- <xref:Terminal.Gui.ViewBase.View.GetContentSize> - Returns size of scrollable content
+- <xref:Terminal.Gui.ViewBase.View.SetContentSize(System.Nullable{System.Drawing.Size})> - Sets size of scrollable content
+- <xref:Terminal.Gui.ViewBase.View.ScrollHorizontal(System.Int32)> - Scrolls content horizontally
+- <xref:Terminal.Gui.ViewBase.View.ScrollVertical(System.Int32)> - Scrolls content vertically
+- <xref:Terminal.Gui.ViewBase.View.VerticalScrollBar> - Built-in vertical scrollbar
+- <xref:Terminal.Gui.ViewBase.View.HorizontalScrollBar> - Built-in horizontal scrollbar
+- <xref:Terminal.Gui.ViewBase.View.ViewportSettings> - [ViewportSettingsFlags](~/api/Terminal.Gui.ViewBase.ViewportSettingsFlags.yml) controlling scroll behavior
 
 ### Text
 
-- [View.Text](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Text) - The View's text content
-- [View.Title](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Title) - The View's title (shown in Border)
-- [View.TextFormatter](~/api/Terminal.Gui.ViewBase.View.yml) - Handles text formatting and alignment
-- [View.TextDirection](~/api/Terminal.Gui.ViewBase.View.yml) - Text direction (LeftRight, RightToLeft, TopToBottom)
-- [View.TextAlignment](~/api/Terminal.Gui.ViewBase.View.yml) - Text alignment (Left, Centered, Right, Justified)
-- [View.VerticalTextAlignment](~/api/Terminal.Gui.ViewBase.View.yml) - Vertical alignment (Top, Middle, Bottom, Justified)
+- <xref:Terminal.Gui.ViewBase.View.Text> - The View's text content
+- <xref:Terminal.Gui.ViewBase.View.Title> - The View's title (shown in Border)
+- <xref:Terminal.Gui.ViewBase.View.TextFormatter> - Handles text formatting and alignment
+- <xref:Terminal.Gui.ViewBase.View.TextDirection> - Text direction (LeftRight, RightToLeft, TopToBottom)
+- <xref:Terminal.Gui.ViewBase.View.TextAlignment> - Text alignment (Left, Centered, Right, Justified)
+- <xref:Terminal.Gui.ViewBase.View.VerticalTextAlignment> - Vertical alignment (Top, Middle, Bottom, Justified)
 
 ---
 
@@ -271,11 +275,11 @@ View view = new ()
 
 ### 2. Initialization
 
-When a View is added to a SuperView or when [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_Run_Terminal_Gui_Views_Runnable_System_Func_System_Exception_System_Boolean__) is called:
+When a View is added to a SuperView or when Application.Run is called:
 
-1. [BeginInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_BeginInit) is called
-2. [EndInit](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_EndInit) is called
-3. [IsInitialized](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_IsInitialized) becomes true
+1. <xref:Terminal.Gui.ViewBase.View.BeginInit> is called
+2. <xref:Terminal.Gui.ViewBase.View.EndInit> is called
+3. <xref:Terminal.Gui.ViewBase.View.IsInitialized> becomes true
 4. [Initialized](~/api/Terminal.Gui.ViewBase.View.yml) event is raised
 
 ### 3. Layout
@@ -353,7 +357,7 @@ The keyboard subsystem processes key presses through:
 
 1. [View.KeyDown](~/api/Terminal.Gui.ViewBase.View.yml) event (cancellable)
 2. [View.OnKeyDown](~/api/Terminal.Gui.ViewBase.View.yml) virtual method
-3. [View.KeyBindings](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_KeyBindings) - Converts keys to commands
+3. <xref:Terminal.Gui.ViewBase.View.KeyBindings> - Converts keys to commands
 4. Command handlers (registered via [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml))
 
 #### Mouse
@@ -372,7 +376,7 @@ The mouse subsystem processes mouse events through:
 
 See the [Layout Deep Dive](layout.md) for complete details.
 
-Layout is declarative using [Pos](~/api/Terminal.Gui.Pos.yml) and [Dim](~/api/Terminal.Gui.Dim.yml):
+Layout is declarative using [Pos](~/api/Terminal.Gui.ViewBase.Pos.yml) and [Dim](~/api/Terminal.Gui.ViewBase.Dim.yml):
 
 ```csharp
 var label = new Label { Text = "Name:" };
@@ -420,9 +424,9 @@ See the [Navigation Deep Dive](navigation.md) for complete details.
 
 Navigation controls keyboard focus movement:
 
-- [View.CanFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_CanFocus) - Whether View can receive focus
-- [View.TabStop](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_TabStop) - [TabBehavior](~/api/Terminal.Gui.Input.TabBehavior.yml) (NoStop, TabStop, TabGroup)
-- [View.TabIndex](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_TabIndex) - Tab order within SuperView
+- <xref:Terminal.Gui.ViewBase.View.CanFocus> - Whether View can receive focus
+- <xref:Terminal.Gui.ViewBase.View.TabStop> - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) (NoStop, TabStop, TabGroup)
+- View.TabIndex - Tab order within SuperView
 - [View.SetFocus](~/api/Terminal.Gui.ViewBase.View.yml) - Requests focus
 - [View.AdvanceFocus](~/api/Terminal.Gui.ViewBase.View.yml) - Moves focus to next/previous View
 
@@ -556,7 +560,7 @@ view.AddCommand(Command.ScrollDown, () => { view.ScrollVertical(1); return true;
 
 ---
 
-## Runnable Views (IRunnable)
+## Runnable Views
 
 Views can implement [IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) to run as independent, blocking sessions with typed results. This decouples runnability from inheritance, allowing any View to participate in session management.
 
@@ -572,7 +576,7 @@ The **IRunnable** pattern provides:
 
 ### Creating a Runnable View
 
-Derive from [Runnable<TResult>](~/api/Terminal.Gui.ViewBase.Runnable-1.yml) or implement [IRunnable<TResult>](~/api/Terminal.Gui.App.IRunnable-1.yml):
+Derive from [Runnable<TResult>](~/api/Terminal.Gui.Views.Runnable-1.yml) or implement [IRunnable<TResult>](~/api/Terminal.Gui.App.IRunnable-1.yml):
 
 ```csharp
 public class ColorPickerDialog : Runnable<Color?>
@@ -778,7 +782,7 @@ Application.Run(wizard);
 
 ### View Diagnostics
 
-[View.Diagnostics](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Diagnostics) - [ViewDiagnosticFlags](~/api/Terminal.Gui.ViewBase.ViewDiagnosticFlags.yml) for debugging:
+<xref:Terminal.Gui.ViewBase.View.Diagnostics> - [ViewDiagnosticFlags](~/api/Terminal.Gui.ViewBase.ViewDiagnosticFlags.yml) for debugging:
 
 - `Ruler` - Shows a ruler around the View
 - `DrawIndicator` - Shows an animated indicator when drawing
@@ -786,14 +790,14 @@ Application.Run(wizard);
 
 ### View States
 
-- [View.Enabled](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Enabled) - Whether the View is enabled
-- [View.Visible](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Visible) - Whether the View is visible
-- [View.CanFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_CanFocus) - Whether the View can receive focus
-- [View.HasFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HasFocus) - Whether the View currently has focus
+- <xref:Terminal.Gui.ViewBase.View.Enabled> - Whether the View is enabled
+- <xref:Terminal.Gui.ViewBase.View.Visible> - Whether the View is visible
+- <xref:Terminal.Gui.ViewBase.View.CanFocus> - Whether the View can receive focus
+- <xref:Terminal.Gui.ViewBase.View.HasFocus> - Whether the View currently has focus
 
 ### Shadow Effects
 
-[View.ShadowStyle](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_ShadowStyle) - [ShadowStyle](~/api/Terminal.Gui.ViewBase.ShadowStyle.yml) for drop shadows:
+<xref:Terminal.Gui.ViewBase.View.ShadowStyle> - [ShadowStyle](~/api/Terminal.Gui.ViewBase.ShadowStyle.yml) for drop shadows:
 
 ```csharp
 view.ShadowStyle = ShadowStyle.Transparent;

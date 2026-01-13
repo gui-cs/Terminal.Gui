@@ -9,9 +9,9 @@ public class Dialogs : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
-
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName ();
@@ -277,7 +277,7 @@ public class Dialogs : Scenario
         {
             Y = Pos.Bottom (label),
             Width = Dim.Fill (0, minimumContentDim: 60),
-            Text = new string ("0123456789").Repeat (6)
+            Text = new string ("0123456789").Repeat (6)!
         };
         dialog.Add (textField);
 

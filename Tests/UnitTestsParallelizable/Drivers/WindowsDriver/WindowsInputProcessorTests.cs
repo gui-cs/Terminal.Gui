@@ -7,6 +7,7 @@ using MouseEventRecord = Terminal.Gui.Drivers.WindowsConsole.MouseEventRecord;
 
 namespace DriverTests.Windows;
 
+[Collection ("Driver Tests")]
 public class WindowsInputProcessorTests
 {
     [Fact]

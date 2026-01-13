@@ -7,8 +7,9 @@ public class NumericUpDownDemo : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName ();
@@ -63,7 +64,7 @@ internal sealed class NumericUpDownEditor<T> : View where T : notnull
 
             _numericUpDown = value;
 
-            if (_numericUpDown is { } && _value is { })
+            if (_numericUpDown is not null && _value is not null)
             {
                 _value.Text = _numericUpDown.Text;
             }
@@ -150,11 +151,11 @@ internal sealed class NumericUpDownEditor<T> : View where T : notnull
 
         _value.Text = _numericUpDown.Text;
         _format.Text = _numericUpDown.Format;
-        _increment.Text = _numericUpDown!.Increment?.ToString ();
+        _increment.Text = _numericUpDown!.Increment?.ToString ()!;
 
         return;
 
-        void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs) { _increment.Text = _numericUpDown!.Increment?.ToString (); }
+        void NumericUpDownOnIncrementChanged (object? o, EventArgs<T> eventArgs) { _increment.Text = _numericUpDown!.Increment?.ToString ()!; }
 
         void NumericUpDownOnValueChanged (object? o, EventArgs<T> eventArgs) { _value.Text = _numericUpDown.Text; }
 

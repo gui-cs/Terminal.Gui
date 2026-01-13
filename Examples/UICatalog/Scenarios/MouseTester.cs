@@ -9,8 +9,8 @@ public class MouseTester : Scenario
 {
     public override void Main ()
     {
-        // Prepping for modern app model
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
         app.Init ();
 
         using Runnable runnable = new ()

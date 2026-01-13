@@ -4,6 +4,90 @@ namespace Terminal.Gui.App;
 
 public static partial class Application // Lifecycle (Init/Shutdown)
 {
+    #region Modern Instance-Based Model Events (Thread-Local)
+
+    // Thread-local backing fields for events - each thread has its own subscribers
+    private static readonly ThreadLocal<EventHandler<EventArgs<IApplication>>?> _instanceCreated = new ();
+    private static readonly ThreadLocal<EventHandler<EventArgs<IApplication>>?> _instanceInitialized = new ();
+    private static readonly ThreadLocal<EventHandler<EventArgs<IApplication>>?> _instanceDisposed = new ();
+
+    /// <summary>
+    ///     Raised when an <see cref="IApplication"/> instance is created via <see cref="Create"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is for the modern instance-based model only. It fires immediately after
+    ///         <see cref="Create"/> creates a new instance, before <see cref="IApplication.Init"/> is called.
+    ///     </para>
+    ///     <para>
+    ///         This event is thread-local, meaning each thread has its own set of subscribers.
+    ///         This enables parallel test execution where each test thread can independently
+    ///         monitor application instances created on that thread.
+    ///     </para>
+    /// </remarks>
+    public static event EventHandler<EventArgs<IApplication>>? InstanceCreated
+    {
+        add => _instanceCreated.Value += value;
+        remove => _instanceCreated.Value -= value;
+    }
+
+    /// <summary>
+    ///     Raised when an <see cref="IApplication"/> instance completes initialization.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is for the modern instance-based model only. It fires after
+    ///         <see cref="IApplication.Init"/> completes successfully.
+    ///     </para>
+    ///     <para>
+    ///         This event is thread-local, meaning each thread has its own set of subscribers.
+    ///         This enables parallel test execution where each test thread can independently
+    ///         monitor application instances initialized on that thread.
+    ///     </para>
+    /// </remarks>
+    public static event EventHandler<EventArgs<IApplication>>? InstanceInitialized
+    {
+        add => _instanceInitialized.Value += value;
+        remove => _instanceInitialized.Value -= value;
+    }
+
+    /// <summary>
+    ///     Raised when an <see cref="IApplication"/> instance is disposed.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event is for the modern instance-based model only. It fires when
+    ///         <see cref="IDisposable.Dispose"/> is called on an instance.
+    ///     </para>
+    ///     <para>
+    ///         This event is thread-local, meaning each thread has its own set of subscribers.
+    ///         This enables parallel test execution where each test thread can independently
+    ///         monitor application instances disposed on that thread.
+    ///     </para>
+    /// </remarks>
+    public static event EventHandler<EventArgs<IApplication>>? InstanceDisposed
+    {
+        add => _instanceDisposed.Value += value;
+        remove => _instanceDisposed.Value -= value;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="InstanceCreated"/> event on the current thread.
+    /// </summary>
+    internal static void RaiseInstanceCreated (IApplication app) { _instanceCreated.Value?.Invoke (null, new (app)); }
+
+    /// <summary>
+    ///     Raises the <see cref="InstanceInitialized"/> event on the current thread.
+    /// </summary>
+    internal static void RaiseInstanceInitialized (IApplication app) { _instanceInitialized.Value?.Invoke (null, new (app)); }
+
+    /// <summary>
+    ///     Raises the <see cref="InstanceDisposed"/> event on the current thread.
+    /// </summary>
+    internal static void RaiseInstanceDisposed (IApplication app) { _instanceDisposed.Value?.Invoke (null, new (app)); }
+
+    #endregion Modern Instance-Based Model Events (Thread-Local)
+
     /// <summary>
     ///     Gets the singleton <see cref="IApplication"/> instance used by the legacy static Application model.
     /// </summary>
@@ -42,7 +126,10 @@ public static partial class Application // Lifecycle (Init/Shutdown)
         //Debug.Fail ("Application.Create() called");
         ApplicationImpl.MarkInstanceBasedModelUsed ();
 
-        return new ApplicationImpl (timeProvider ?? new SystemTimeProvider (), false);
+        IApplication app = new ApplicationImpl (timeProvider ?? new SystemTimeProvider (), false);
+        RaiseInstanceCreated (app);
+
+        return app;
     }
 
     /// <inheritdoc cref="IApplication.Init"/>

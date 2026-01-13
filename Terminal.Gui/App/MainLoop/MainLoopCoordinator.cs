@@ -61,7 +61,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="app">The <see cref="IApplication"/> instance that is running the input loop.</param>
     public async Task StartInputTaskAsync (IApplication? app)
     {
-        Logging.Trace ("Booting... ()");
+        //Logging.Trace ("Booting... ()");
 
         _inputTask = Task.Run (() => RunInput (app));
 
@@ -153,7 +153,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             app!.Driver = _driver;
 
             _startupSemaphore.Release ();
-            Logging.Trace ($"Driver: _input: {_input}, _output: {_output}");
+            //Logging.Trace ($"Driver: _input: {_input}, _output: {_output}");
         }
     }
 
@@ -184,9 +184,9 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             {
                 _input.Run (_runCancellationTokenSource.Token);
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                Logging.Debug ($"Input loop canceled: {ex.Message}");
+                //Logging.Debug ($"Input loop canceled");
             }
 
             _input.Dispose ();
@@ -200,7 +200,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         if (_stopCalled)
         {
-            Logging.Information ("Input loop exited cleanly");
+            Logging.Trace ("Input loop exited cleanly");
         }
         else
         {
