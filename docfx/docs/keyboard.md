@@ -11,7 +11,7 @@
 
 Tenets higher in the list have precedence over tenets lower in the list.
 
-* **Users Have Control** - *Terminal.Gui* provides default key bindings consistent with these tenets, but those defaults are configurable by the user. For example, @Terminal.Gui.Configuration.ConfigurationManager allows users to redefine key bindings for the system, a user, or an application.
+* **Users Have Control** - *Terminal.Gui* provides default key bindings consistent with these tenets, but those defaults are configurable by the user. For example, @Terminal.Gui.ConfigurationManager allows users to redefine key bindings for the system, a user, or an application.
 
 * **More Editor than Command Line** - Once a *Terminal.Gui* app starts, the user is no longer using the command line. Users expect keyboard idioms in TUI apps to be consistent with GUI apps (such as VS Code, Vim, and Emacs). For example, in almost all GUI apps, `Ctrl+V` is `Paste`. But the Linux shells often use `Shift+Insert`. *Terminal.Gui* binds `Ctrl+V` by default.
 
@@ -19,21 +19,21 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 * **The Source of Truth is Wikipedia** - We use this [Wikipedia article](https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts) as our guide for default key bindings.
 
-* **If It's Hot, It Works** - If a View with a @Terminal.Gui.ViewBase.View.HotKey is visible, and the HotKey is visible, the user should be able to press that HotKey and whatever behavior is defined for it should work. For example, in v1, when a Modal view was active, the HotKeys on MenuBar continued to show "hot". In v2 we strive to ensure this doesn't happen.
+* **If It's Hot, It Works** - If a View with a @Terminal.Gui.View.HotKey is visible, and the HotKey is visible, the user should be able to press that HotKey and whatever behavior is defined for it should work. For example, in v1, when a Modal view was active, the HotKeys on MenuBar continued to show "hot". In v2 we strive to ensure this doesn't happen.
 
 ## Keyboard APIs
 
 *Terminal.Gui* provides the following APIs for handling keyboard input:
 
-* **Key** - @Terminal.Gui.Input.Key provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible.
-* **Key Bindings** - Key Bindings provide a declarative method for handling keyboard input in View implementations. The View calls @Terminal.Gui.ViewBase.View.AddCommand(Terminal.Gui.Input.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.Input.KeyBindings to indicate which key presses will invoke the command. 
-* **Key Events** - The Key Bindings API is rich enough to support the vast majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. when capturing arbitrary typing by a user). Use @Terminal.Gui.ViewBase.View.KeyDown and related events in these cases.
+* **Key** - @Terminal.Gui.Key provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible.
+* **Key Bindings** - Key Bindings provide a declarative method for handling keyboard input in View implementations. The View calls @Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.KeyBindings to indicate which key presses will invoke the command. 
+* **Key Events** - The Key Bindings API is rich enough to support the vast majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. when capturing arbitrary typing by a user). Use @Terminal.Gui.View.KeyDown and related events in these cases.
 
 Each of these APIs are described more fully below.
 
 ### **[Key Bindings](~/api/Terminal.Gui.Input.KeyBindings.yml)**
 
-Key Bindings is the preferred way of handling keyboard input in View implementations. The View calls @Terminal.Gui.ViewBase.View.AddCommand(Terminal.Gui.Input.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.Input.KeyBindings to indicate which key presses will invoke the command. For example, if a View wants to respond to the user pressing the up arrow key to scroll up it would do this
+Key Bindings is the preferred way of handling keyboard input in View implementations. The View calls @Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.KeyBindings to indicate which key presses will invoke the command. For example, if a View wants to respond to the user pressing the up arrow key to scroll up it would do this
 
 ```cs
 public MyView : View
@@ -47,7 +47,7 @@ The `Character Map` Scenario includes a View called `CharMap` that is a good exa
 
 The [Command](~/api/Terminal.Gui.Input.Command.yml) enum lists generic operations that are implemented by views. For example `Command.Accept` in a `Button` results in the `Accepting` event 
 firing while in `TableView` it is bound to `CellActivated`. Not all commands
-are implemented by all views (e.g. you cannot scroll in a `Button`). Use the @Terminal.Gui.ViewBase.View.GetSupportedCommands method to determine which commands are implemented by a `View`. 
+are implemented by all views (e.g. you cannot scroll in a `Button`). Use the @Terminal.Gui.View.GetSupportedCommands method to determine which commands are implemented by a `View`. 
 
 The default key for activating a button is `Space`. You can change this using 
 `KeyBindings.ReplaceKey()`:
@@ -61,15 +61,15 @@ Key Bindings can be added at the `Application` or `View` level.
 
 For **Application-scoped Key Bindings** there are two categories of Application-scoped Key Bindings:
 
-1) **Application Command Key Bindings** - Bindings for `Command`s supported by @Terminal.Gui.App.Application. For example, @Terminal.Gui.App.Application.QuitKey, which is bound to `Command.Quit` and results in @Terminal.Gui.App.Application.RequestStop(Terminal.Gui.Views.Runnable) being called.
+1) **Application Command Key Bindings** - Bindings for `Command`s supported by @Terminal.Gui.Application. For example, @Terminal.Gui.Application.QuitKey, which is bound to `Command.Quit` and results in @Terminal.Gui.Application.RequestStop(Terminal.Gui.Runnable) being called.
 2) **Application Key Bindings** - Bindings for `Command`s supported on arbitrary `Views` that are meant to be invoked regardless of which part of the application is visible/active. 
 
-Use @Terminal.Gui.App.Application.Keyboard.KeyBindings to add or modify Application-scoped Key Bindings. For backward compatibility, @Terminal.Gui.App.Application.KeyBindings also provides access to the same key bindings.
+Use @Terminal.Gui.Application.Keyboard.KeyBindings to add or modify Application-scoped Key Bindings. For backward compatibility, @Terminal.Gui.Application.KeyBindings also provides access to the same key bindings.
 
 **View-scoped Key Bindings** also have two categories:
 
-1) **HotKey Bindings** - These bind to `Command`s that will be invoked regardless of whether the View has focus or not. The most common use-case for `HotKey` bindings is @Terminal.Gui.ViewBase.View.HotKey. For example, a `Button` with a `Title` of `_OK`, the user can press `Alt-O` and the button will be accepted regardless of whether it has focus or not. Add and modify HotKey bindings with @Terminal.Gui.ViewBase.View.HotKeyBindings.
-2) **Focused Bindings** - These bind to `Command`s that will be invoked only when the View has focus. Focused Key Bindings are the easiest way to enable a View to support responding to key events. Add and modify Focused bindings with @Terminal.Gui.ViewBase.View.KeyBindings.
+1) **HotKey Bindings** - These bind to `Command`s that will be invoked regardless of whether the View has focus or not. The most common use-case for `HotKey` bindings is @Terminal.Gui.View.HotKey. For example, a `Button` with a `Title` of `_OK`, the user can press `Alt-O` and the button will be accepted regardless of whether it has focus or not. Add and modify HotKey bindings with @Terminal.Gui.View.HotKeyBindings.
+2) **Focused Bindings** - These bind to `Command`s that will be invoked only when the View has focus. Focused Key Bindings are the easiest way to enable a View to support responding to key events. Add and modify Focused bindings with @Terminal.Gui.View.KeyBindings.
 
 **Application-Scoped** Key Bindings 
 
@@ -77,7 +77,7 @@ Use @Terminal.Gui.App.Application.Keyboard.KeyBindings to add or modify Applicat
 
 A **HotKey** is a key press that selects a visible UI item. For selecting items across `View`s (e.g. a `Button` in a `Dialog`) the key press must have the `Alt` modifier. For selecting items within a `View` that are not `View`s themselves, the key press can be key without the `Alt` modifier.  For example, in a `Dialog`, a `Button` with the text of "_Text" can be selected with `Alt+T`. Or, in a `Menu` with "_File _Edit", `Alt+F` will select (show) the "_File" menu. If the "_File" menu has a sub-menu of "_New" `Alt+N` or `N` will ONLY select the "_New" sub-menu if the "_File" menu is already opened.
 
-By default, the `Text` of a `View` is used to determine the `HotKey` by looking for the first occurrence of the @Terminal.Gui.ViewBase.View.HotKeySpecifier (which is underscore (`_`) by default). The character following the underscore is the `HotKey`. If the `HotKeySpecifier` is not found in `Text`, the first character of `Text` is used as the `HotKey`. The `Text` of a `View` can be changed at runtime, and the `HotKey` will be updated accordingly. @"Terminal.Gui.ViewBase.View.HotKey" is `virtual` enabling this behavior to be customized.
+By default, the `Text` of a `View` is used to determine the `HotKey` by looking for the first occurrence of the @Terminal.Gui.View.HotKeySpecifier (which is underscore (`_`) by default). The character following the underscore is the `HotKey`. If the `HotKeySpecifier` is not found in `Text`, the first character of `Text` is used as the `HotKey`. The `Text` of a `View` can be changed at runtime, and the `HotKey` will be updated accordingly. @"Terminal.Gui.View.HotKey" is `virtual` enabling this behavior to be customized.
 
 ### **Shortcut**
 
@@ -91,28 +91,28 @@ The Command can be invoked even if the `View` that defines them is not focused o
 
 ### **Key Events**
 
-Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises the @Terminal.Gui.Drivers.IDriver.KeyDown event which invokes @Terminal.Gui.App.Application.RaiseKeyDownEvent* respectively.
+Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises the @Terminal.Gui.IDriver.KeyDown event which invokes @Terminal.Gui.Application.RaiseKeyDownEvent* respectively.
 
 > [!NOTE]
 > Most drivers/platforms do not support sensing distinct KeyUp events, therefore Terminal.Gui does not support them.
 
-@Terminal.Gui.App.Application.RaiseKeyDownEvent* raises @Terminal.Gui.App.Application.KeyDown and then calls @Terminal.Gui.ViewBase.View.NewKeyDownEvent* on all runnable Views. If no View handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through @Terminal.Gui.App.Application.Keyboard.KeyBindings.
+@Terminal.Gui.Application.RaiseKeyDownEvent* raises @Terminal.Gui.Application.KeyDown and then calls @Terminal.Gui.View.NewKeyDownEvent* on all runnable Views. If no View handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through @Terminal.Gui.Application.Keyboard.KeyBindings.
 
-If a view is enabled, the @Terminal.Gui.ViewBase.View.NewKeyDownEvent* method will do the following: 
+If a view is enabled, the @Terminal.Gui.View.NewKeyDownEvent* method will do the following: 
 
 1) If the view has a subview that has focus, 'NewKeyDown' on the focused view will be called. This is recursive. If the most-focused view handles the key press, processing stops.
-2) If there is no most-focused sub-view, or a most-focused sub-view does not handle the key press, @Terminal.Gui.ViewBase.View.OnKeyDown* will be called. If the view handles the key press, processing stops.
-3) If @Terminal.Gui.ViewBase.View.OnKeyDown* does not handle the event. @Terminal.Gui.ViewBase.View.KeyDown will be raised.
-4) If the view does not handle the key down event, any bindings for the key will be invoked (see the @Terminal.Gui.ViewBase.View.KeyBindings property). If the key is bound and any of it's command handlers return true, processing stops.
-5) If the key is not bound, or the bound command handlers do not return true, @Terminal.Gui.ViewBase.View.OnKeyDownNotHandled* is called. 
+2) If there is no most-focused sub-view, or a most-focused sub-view does not handle the key press, @Terminal.Gui.View.OnKeyDown* will be called. If the view handles the key press, processing stops.
+3) If @Terminal.Gui.View.OnKeyDown* does not handle the event. @Terminal.Gui.View.KeyDown will be raised.
+4) If the view does not handle the key down event, any bindings for the key will be invoked (see the @Terminal.Gui.View.KeyBindings property). If the key is bound and any of it's command handlers return true, processing stops.
+5) If the key is not bound, or the bound command handlers do not return true, @Terminal.Gui.View.OnKeyDownNotHandled* is called. 
 
 ## **Application Key Handling**
 
-To define application key handling logic for an entire application in cases where the methods listed above are not suitable, use the @Terminal.Gui.App.Application.KeyDown event. 
+To define application key handling logic for an entire application in cases where the methods listed above are not suitable, use the @Terminal.Gui.Application.KeyDown event. 
 
 ## **Key Down/Up Events**
 
-*Terminal.Gui* supports key down events only via @Terminal.Gui.ViewBase.View.OnKeyDown*.
+*Terminal.Gui* supports key down events only via @Terminal.Gui.View.OnKeyDown*.
 
 # General input model
 
@@ -136,11 +136,11 @@ To define application key handling logic for an entire application in cases wher
 ## Application
 
 * Implements support for `KeyBindingScope.Application`.
-* Keyboard functionality is now encapsulated in the @Terminal.Gui.App.IKeyboard interface, accessed via @Terminal.Gui.App.Application.Keyboard.
-* @Terminal.Gui.App.Application.Keyboard provides access to @Terminal.Gui.Input.KeyBindings, key binding configuration (QuitKey, ArrangeKey, navigation keys), and keyboard event handling.
-* For backward compatibility, @Terminal.Gui.App.Application still exposes static properties/methods that delegate to @Terminal.Gui.App.Application.Keyboard (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`, `IApplication.QuitKey`).
+* Keyboard functionality is now encapsulated in the @Terminal.Gui.IKeyboard interface, accessed via @Terminal.Gui.Application.Keyboard.
+* @Terminal.Gui.Application.Keyboard provides access to @Terminal.Gui.KeyBindings, key binding configuration (QuitKey, ArrangeKey, navigation keys), and keyboard event handling.
+* For backward compatibility, @Terminal.Gui.Application still exposes static properties/methods that delegate to @Terminal.Gui.Application.Keyboard (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`, `IApplication.QuitKey`).
 * Exposes cancelable `KeyDown` events (via `Handled = true`). The `RaiseKeyDownEvent` method is public and can be used to simulate keyboard input, although it is preferred to use `InputInjector` for testing.
-* The @Terminal.Gui.App.IKeyboard interface enables testability with isolated keyboard instances that don't depend on static Application state.
+* The @Terminal.Gui.IKeyboard interface enables testability with isolated keyboard instances that don't depend on static Application state.
 
 ## View
 
@@ -150,17 +150,17 @@ To define application key handling logic for an entire application in cases wher
 
 ## IKeyboard Architecture
 
-The @Terminal.Gui.App.IKeyboard interface provides a decoupled, testable architecture for keyboard handling in Terminal.Gui. This design allows for:
+The @Terminal.Gui.IKeyboard interface provides a decoupled, testable architecture for keyboard handling in Terminal.Gui. This design allows for:
 
 ### Key Features
 
-1. **Decoupled State** - All keyboard-related state (key bindings, navigation keys, events) is encapsulated in @Terminal.Gui.App.IKeyboard, separate from the static @Terminal.Gui.App.Application class.
+1. **Decoupled State** - All keyboard-related state (key bindings, navigation keys, events) is encapsulated in @Terminal.Gui.IKeyboard, separate from the static @Terminal.Gui.Application class.
 
-2. **Dependency Injection** - The @Terminal.Gui.App.Keyboard implementation receives an @Terminal.Gui.App.IApplication reference, enabling it to interact with application state without static dependencies.
+2. **Dependency Injection** - The @Terminal.Gui.Keyboard implementation receives an @Terminal.Gui.IApplication reference, enabling it to interact with application state without static dependencies.
 
-3. **Testability** - Unit tests can create isolated @Terminal.Gui.App.IKeyboard instances with mock @Terminal.Gui.App.IApplication references, enabling parallel test execution without interference.
+3. **Testability** - Unit tests can create isolated @Terminal.Gui.IKeyboard instances with mock @Terminal.Gui.IApplication references, enabling parallel test execution without interference.
 
-4. **Backward Compatibility** - All existing @Terminal.Gui.App.Application keyboard APIs (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`, `Application.QuitKey`) remain available and delegate to `Application.Keyboard`.
+4. **Backward Compatibility** - All existing @Terminal.Gui.Application keyboard APIs (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`, `Application.QuitKey`) remain available and delegate to `Application.Keyboard`.
 
 ### Usage Examples
 
@@ -215,21 +215,21 @@ public class MyView : View
 
 ### Architecture Benefits
 
-- **Parallel Testing**: Multiple test methods can create and use separate @Terminal.Gui.App.IKeyboard instances simultaneously without state interference.
-- **Dependency Inversion**: @Terminal.Gui.App.Keyboard depends on @Terminal.Gui.App.IApplication interface rather than static @Terminal.Gui.App.Application class.
-- **Cleaner Code**: Keyboard functionality is organized in a dedicated interface rather than scattered across @Terminal.Gui.App.Application partial classes.
-- **Mockability**: Tests can provide mock @Terminal.Gui.App.IApplication implementations to test keyboard behavior in isolation.
+- **Parallel Testing**: Multiple test methods can create and use separate @Terminal.Gui.IKeyboard instances simultaneously without state interference.
+- **Dependency Inversion**: @Terminal.Gui.Keyboard depends on @Terminal.Gui.IApplication interface rather than static @Terminal.Gui.Application class.
+- **Cleaner Code**: Keyboard functionality is organized in a dedicated interface rather than scattered across @Terminal.Gui.Application partial classes.
+- **Mockability**: Tests can provide mock @Terminal.Gui.IApplication implementations to test keyboard behavior in isolation.
 
 ### Implementation Details
 
-The @Terminal.Gui.App.Keyboard class implements @Terminal.Gui.App.IKeyboard and maintains:
+The @Terminal.Gui.Keyboard class implements @Terminal.Gui.IKeyboard and maintains:
 
 - **KeyBindings**: Application-scoped key binding dictionary
 - **Navigation Keys**: QuitKey, ArrangeKey, NextTabKey, PrevTabKey, NextTabGroupKey, PrevTabGroupKey
 - **Events**: KeyDown event for application-level keyboard monitoring
 - **Command Implementations**: Handlers for Application-scoped commands (Quit, Suspend, Navigation, Refresh, Arrange)
 
-The @Terminal.Gui.App.IApplication implementations create and manage the @Terminal.Gui.App.IKeyboard instance, setting its `IApplication` property to `this` to provide the necessary @Terminal.Gui.App.IApplication reference.
+The @Terminal.Gui.IApplication implementations create and manage the @Terminal.Gui.IKeyboard instance, setting its `IApplication` property to `this` to provide the necessary @Terminal.Gui.IApplication reference.
 
 ## Testing Keyboard Input
 
