@@ -166,7 +166,7 @@ Configuration is loaded from multiple locations with increasing precedence (high
    - Useful for container environments and CI/CD pipelines
 
 9. **[ConfigLocations.Runtime](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)** (Highest Precedence)
-   - Settings in [ConfigurationManager.RuntimeConfig](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_RuntimeConfig) string property
+   - Settings in <xref:Terminal.Gui.Configuration.ConfigurationManager.RuntimeConfig> string property
    - In-memory configuration without files
 
 ### Precedence Diagram
@@ -412,7 +412,7 @@ This:
 
 ### Granular Control
 
-For more control, use [Load](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_Load_Terminal_Gui_Configuration_ConfigLocations_) and [Apply](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_Apply) separately:
+For more control, use ConfigurationManager.Load and <xref:Terminal.Gui.Configuration.ConfigurationManager.Apply> separately:
 
 ```csharp
 // Enable without loading
@@ -720,14 +720,6 @@ All configuration files must conform to the JSON schema:
   }
 }
 ```
-
-### Complete Example
-
-See the default configuration file:
-
-[!code-json[config.json](../../Terminal.Gui/Resources/config.json)]
-
----
 
 ## Best Practices
 
