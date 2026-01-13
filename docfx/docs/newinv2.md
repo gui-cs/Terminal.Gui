@@ -275,7 +275,7 @@ v2 provides full 24-bit color support by default:
 
 - **Implementation**: [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml) class handles RGB values
 - **Fallback**: Automatic 16-color mode for older terminals
-- **Driver Support**: [IConsoleDriver.SupportsTrueColor](~/api/Terminal.Gui.Drivers.IDriver.yml#Terminal_Gui_Drivers_IDriver_SupportsTrueColor) detection
+- **Driver Support**: <xref:Terminal.Gui.Drivers.IDriver.SupportsTrueColor> detection
 - **Usage**: Direct RGB input via [Color](~/api/Terminal.Gui.Drawing.Color.yml) struct
 
 ```csharp
@@ -465,12 +465,12 @@ v2 replaces `ScrollBarView` with [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.
 
 See the [Layout Deep Dive](layout.md) and [DimAuto Deep Dive](dimauto.md) for details.
 
-**[Dim.Auto](~/api/Terminal.Gui.ViewBase.Dim.yml#Terminal_Gui_ViewBase_Dim_Auto_Terminal_Gui_ViewBase_DimAutoStyle_Terminal_Gui_ViewBase_Dim_Terminal_Gui_ViewBase_Dim_):**
+**<xref:Terminal.Gui.ViewBase.Dim.Auto*>:**
 - Automatically sizes views based on content or subviews
 - Reduces manual layout calculations
 - Supports multiple styles (Text, Content, Position)
 
-**[Pos.AnchorEnd](~/api/Terminal.Gui.ViewBase.Pos.yml#Terminal_Gui_ViewBase_Pos_AnchorEnd_System_Int32_):**
+**<xref:Terminal.Gui.ViewBase.Pos.AnchorEnd*>:**
 - Anchor to right or bottom of SuperView
 - Enables flexible, responsive layouts
 
@@ -502,7 +502,7 @@ See the [Arrangement Deep Dive](arrangement.md) for complete details.
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via <xref:Terminal.Gui.App.Application.ArrangeKey>) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -612,8 +612,8 @@ private bool HandleAccept ()
 ```
 
 **Configurable Keys:**
-- [IKeyboard.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
-- [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
+- <xref:Terminal.Gui.App.Application.QuitKey> - Close app (default: Esc)
+- <xref:Terminal.Gui.App.Application.ArrangeKey> - Arrange mode (default: Ctrl+F5)
 - Navigation keys (Tab, F6, arrows)
 
 ### Mouse API
@@ -692,7 +692,7 @@ Logging.Debug ("Rendering view {ViewId}", view.Id);
 
 ### Metrics
 
-[Logging.Meter](~/api/Terminal.Gui.App.Logging.yml#Terminal_Gui_App_Logging_Meter) provides performance metrics:
+<xref:Terminal.Gui.App.Logging.Meter> provides performance metrics:
 
 - Frame rate tracking
 - Redraw times

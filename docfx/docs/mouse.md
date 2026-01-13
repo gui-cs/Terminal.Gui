@@ -71,7 +71,7 @@ view.MouseHoldRepeat = MouseFlags.LeftButtonReleased;
 view.Activating += (s, e) => { DoRepeatAction(); e.Handled = true; };
 ```
 
-## Tenets for Terminal.Gui Mouse Handling
+## Tenets for Mouse Handling
 
 Tenets higher in the list have precedence over tenets lower in the list.
 
