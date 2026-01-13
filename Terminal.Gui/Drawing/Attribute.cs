@@ -17,7 +17,9 @@ namespace Terminal.Gui.Drawing;
 /// <seealso cref="TextStyle"/>
 /// <seealso cref="VisualRole"/>
 /// <seealso cref="Scheme"/>
+#pragma warning disable IL2026 // AttributeJsonConverter is AOT-compatible
 [JsonConverter (typeof (AttributeJsonConverter))]
+#pragma warning restore IL2026
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
     /// <summary>Default empty attribute.</summary>
