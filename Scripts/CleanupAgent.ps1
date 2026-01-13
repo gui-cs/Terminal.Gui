@@ -120,6 +120,7 @@ function Get-ReSharperWarningCount {
         --include="$includeList" `
         --severity=WARNING `
         --no-build `
+        --format=Xml `
         --verbosity=ERROR 2>&1 | Out-Null
 
     if ($LASTEXITCODE -ne 0) {
@@ -128,7 +129,7 @@ function Get-ReSharperWarningCount {
     }
 
     # Parse XML and count warnings
-    [xml]$report = Get-Content $tempXml -ErrorAction SilentlyContinue
+    [xml]$report = Get-Content $tempXml -Raw -ErrorAction SilentlyContinue
     if (-not $report) {
         Write-Status "Failed to parse InspectCode report" "Red"
         return -1
@@ -399,10 +400,9 @@ function Process-CleanupFile {
                     $Stats.CWPTodosAdded += $cwpTodos
                 }
 
-                Write-Status "Completed cleanup of all $($partialFiles.Count) partial files" "Green"
+            Write-Status "Completed cleanup of all $($partialFiles.Count) partial files" "Green"
 
-                # Continue to rebuild and test (Steps 6-7)
-            }
+            # Continue to rebuild and test (Steps 6-7)
         }
         else {
             # No split needed - process single file through cleanup steps 2-5
