@@ -10,7 +10,7 @@
 | **Reset** | Reset configuration to current values or hard-coded defaults. Does not load configuration. |
 | **Scope** | Defines the context where configuration applies (Settings, Theme, or AppSettings). |
 | **Settings** | Runtime options including both system settings and application-specific settings. |
-| **Sources** | Set of locations where configuration can be stored (@Terminal.Gui.Configuration.ConfigLocations enum). |
+| **Sources** | Set of locations where configuration can be stored (@Terminal.Gui.ConfigLocations enum). |
 | **Theme** | Named instance containing specific appearance settings. |
 | **ThemeInheritance** | Mechanism where themes can inherit and override settings from other themes. |
 | **Themes** | Collection of named Theme definitions bundling visual and layout settings. |

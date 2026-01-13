@@ -14,6 +14,9 @@ try {
     # Force delete metadata
     Remove-Item ./api -Recurse -Force -ErrorAction SilentlyContinue
 
+    # Force delete generated _site
+    Remove-Item ./_site -Recurse -Force -ErrorAction SilentlyContinue
+
     $env:DOCFX_SOURCE_BRANCH_NAME="v2_develop"
 
     docfx --serve
