@@ -39,6 +39,10 @@ $Stats = @{
     FilesSplit = @()
     NullableAdded = 0
     CWPTodosAdded = 0
+    BuildWarningsBefore = 0
+    BuildWarningsAfter = 0
+    InspectWarningsBefore = 0
+    InspectWarningsAfter = 0
 }
 
 function Write-Status {
@@ -97,6 +101,63 @@ function Invoke-ReSharperCleanup {
     }
 
     return $true
+}
+
+function Get-ReSharperWarningCount {
+    param([string[]]$FilePaths)
+
+    $tempXml = Join-Path $env:TEMP "inspect-$(New-Guid).xml"
+
+    # Build include list (semicolon-separated relative paths)
+    $includeList = ($FilePaths | ForEach-Object {
+        (Resolve-Path -Relative $_).TrimStart(".\").Replace("\", "/")
+    }) -join ";"
+
+    Write-Status "Running ReSharper InspectCode to count warnings..."
+
+    jb inspectcode "$RepoRoot\Terminal.sln" `
+        --output="$tempXml" `
+        --include="$includeList" `
+        --severity=WARNING `
+        --no-build `
+        --verbosity=ERROR 2>&1 | Out-Null
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Status "InspectCode failed" "Red"
+        return -1
+    }
+
+    # Parse XML and count warnings
+    [xml]$report = Get-Content $tempXml -ErrorAction SilentlyContinue
+    if (-not $report) {
+        Write-Status "Failed to parse InspectCode report" "Red"
+        return -1
+    }
+
+    $warningCount = 0
+    if ($report.Report.Issues.Project.Issue) {
+        $warningCount = @($report.Report.Issues.Project.Issue).Count
+    }
+
+    Remove-Item $tempXml -ErrorAction SilentlyContinue
+    return $warningCount
+}
+
+function Get-BuildWarningCount {
+    Write-Status "Counting build warnings..."
+
+    $buildOutput = dotnet build "$RepoRoot\Terminal.sln" --no-restore --configuration Debug --verbosity normal 2>&1 | Out-String
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Status "Build failed" "Red"
+        return -1
+    }
+
+    # Count warnings in build output (lines containing "warning CS")
+    $warningCount = ([regex]::Matches($buildOutput, 'warning CS\d+')).Count
+
+    Write-Status "Build warnings: $warningCount" $(if ($warningCount -eq 0) { "Green" } else { "Yellow" })
+    return $warningCount
 }
 
 function Invoke-BackingFieldReorder {
@@ -282,6 +343,7 @@ function Process-CleanupFile {
     Write-Host "========================================" -ForegroundColor Cyan
 
     $wasSplit = $false
+    $filesToProcess = @($FilePath)
 
     try {
         # Step 1: Check file length & split if needed
@@ -296,10 +358,21 @@ function Process-CleanupFile {
                 $directory = Split-Path $FilePath -Parent
                 $baseName = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
                 $partialFiles = Get-ChildItem "$directory\$baseName*.cs" -Exclude "*.backup"
+                $filesToProcess = $partialFiles | ForEach-Object { $_.FullName }
 
                 Write-Status "Created $($partialFiles.Count) partial files. Processing each through cleanup..." "Cyan"
+            }
+        }
 
-                # Process each partial file through cleanup steps 2-5
+        # Capture baseline warning counts
+        Write-Host "`n--- Baseline Warning Counts ---" -ForegroundColor Cyan
+        $buildWarningsBefore = Get-BuildWarningCount
+        $inspectWarningsBefore = Get-ReSharperWarningCount -FilePaths $filesToProcess
+        Write-Status "Build warnings (before): $buildWarningsBefore" "Cyan"
+        Write-Status "InspectCode warnings (before): $inspectWarningsBefore" "Cyan"
+
+        if ($wasSplit) {
+            # Process each partial file through cleanup steps 2-5
                 foreach ($partial in $partialFiles) {
                     Write-Status "Processing partial: $($partial.Name)" "Cyan"
 
@@ -354,6 +427,40 @@ function Process-CleanupFile {
             # Step 5: Add CWP TODO comments
             $cwpTodos = Add-CWPTodoComments -FilePath $FilePath
             $Stats.CWPTodosAdded += $cwpTodos
+        }
+
+        # Verify warning counts after cleanup
+        Write-Host "`n--- Post-Cleanup Warning Counts ---" -ForegroundColor Cyan
+        $buildWarningsAfter = Get-BuildWarningCount
+        $inspectWarningsAfter = Get-ReSharperWarningCount -FilePaths $filesToProcess
+        Write-Status "Build warnings (after): $buildWarningsAfter" "Cyan"
+        Write-Status "InspectCode warnings (after): $inspectWarningsAfter" "Cyan"
+
+        # Track statistics
+        $Stats.BuildWarningsBefore += $buildWarningsBefore
+        $Stats.BuildWarningsAfter += $buildWarningsAfter
+        $Stats.InspectWarningsBefore += $inspectWarningsBefore
+        $Stats.InspectWarningsAfter += $inspectWarningsAfter
+
+        # HARD RULE: No new build warnings
+        $buildWarningsDelta = $buildWarningsAfter - $buildWarningsBefore
+        if ($buildWarningsDelta -gt 0) {
+            Write-Status "FAILED: Cleanup introduced $buildWarningsDelta NEW BUILD WARNINGS" "Red"
+            Invoke-RollbackFile -FilePath $FilePath
+            return $false
+        }
+        if ($buildWarningsDelta -lt 0) {
+            Write-Status "✓ Fixed $([Math]::Abs($buildWarningsDelta)) build warnings" "Green"
+        }
+
+        # SOFT GOAL: Report InspectCode warning changes
+        $inspectWarningsDelta = $inspectWarningsAfter - $inspectWarningsBefore
+        if ($inspectWarningsDelta -gt 0) {
+            Write-Status "⚠ InspectCode warnings increased by $inspectWarningsDelta (review recommended)" "Yellow"
+        } elseif ($inspectWarningsDelta -lt 0) {
+            Write-Status "✓ Fixed $([Math]::Abs($inspectWarningsDelta)) InspectCode warnings" "Green"
+        } else {
+            Write-Status "InspectCode warnings unchanged" "Cyan"
         }
 
         # Step 6: Rebuild solution
@@ -425,6 +532,15 @@ FILES SPLIT INTO PARTIALS: $($Stats.FilesSplit.Count)
 
 NULLABLE DIRECTIVES ADDED: $($Stats.NullableAdded)
 CWP TODO COMMENTS ADDED: $($Stats.CWPTodosAdded)
+
+WARNINGS:
+  Build Warnings (Before):    $($Stats.BuildWarningsBefore)
+  Build Warnings (After):     $($Stats.BuildWarningsAfter)
+  Build Warnings (Delta):     $(if ($Stats.BuildWarningsAfter -lt $Stats.BuildWarningsBefore) { "✓ Fixed $($Stats.BuildWarningsBefore - $Stats.BuildWarningsAfter)" } elseif ($Stats.BuildWarningsAfter -gt $Stats.BuildWarningsBefore) { "✗ Added $($Stats.BuildWarningsAfter - $Stats.BuildWarningsBefore)" } else { "Unchanged" })
+
+  InspectCode Warnings (Before): $($Stats.InspectWarningsBefore)
+  InspectCode Warnings (After):  $($Stats.InspectWarningsAfter)
+  InspectCode Warnings (Delta):  $(if ($Stats.InspectWarningsAfter -lt $Stats.InspectWarningsBefore) { "✓ Fixed $($Stats.InspectWarningsBefore - $Stats.InspectWarningsAfter)" } elseif ($Stats.InspectWarningsAfter -gt $Stats.InspectWarningsBefore) { "⚠ Added $($Stats.InspectWarningsAfter - $Stats.InspectWarningsBefore)" } else { "Unchanged" })
 
 FAILED FILES:
 $(if ($Stats.FailedFiles.Count -gt 0) { $Stats.FailedFiles | ForEach-Object { "  - $($_.Path): $($_.Reason)" } } else { "  None" })

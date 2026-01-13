@@ -79,7 +79,19 @@ Automated code cleanup, modernization, and refactoring for Terminal.Gui C# files
 - Identifies events without `Raise*` methods
 - Adds TODO comments for manual CWP refactoring
 
-### 6. Testing & Validation
+### 6. Warning Verification
+- **Build Warnings (HARD RULE)**:
+  - Counts compiler warnings before and after cleanup
+  - **FAILS** if any new build warnings are introduced
+  - Rolls back changes if new warnings detected
+- **InspectCode Warnings (SOFT GOAL)**:
+  - Counts ReSharper code quality warnings before and after
+  - Reports changes but doesn't fail on increase
+  - Goal is to drastically reduce warnings
+- Uses `dotnet build` for build warnings
+- Uses `jb inspectcode` for ReSharper warnings
+
+### 7. Testing & Validation
 - Rebuilds solution
 - Runs UnitTestsParallelizable test suite
 - Rolls back on failure (except for partial splits)
