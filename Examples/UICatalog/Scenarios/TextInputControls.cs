@@ -16,14 +16,15 @@ public class TextInputControls : Scenario
 
     public override void Main ()
     {
-        ConfigurationManager.Enable(Conf
+        ConfigurationManager.Enable (ConfigLocations.All);
 
         // Init
         using IApplication app = Application.Create ();
         app.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        using Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new ();
+        win.Title = GetQuitKeyAndName ();
 
         // TextField is a simple, single-line text input control
         Label label = new () { Text = " _TextField:" };
@@ -107,10 +108,10 @@ public class TextInputControls : Scenario
         };
         SingleWordSuggestionGenerator textViewAppendSingleWordGenerator = new ();
         textView.Autocomplete.SuggestionGenerator = textViewAppendSingleWordGenerator;
-        textView.DrawingContent += TextView_DrawContent;
+        textView.DrawingContent += TextViewDrawContent;
 
         // This shows how to enable autocomplete in TextView.
-        void textViewDrawContent (object? sender, DrawEventArgs e)
+        void TextViewDrawContent (object? sender, DrawEventArgs e)
         {
             textViewAppendSingleWordGenerator.AllSuggestions = Regex.Matches (textView.Text, "\\w+")
                                                                     .Select (s => s.Value)
@@ -194,20 +195,20 @@ public class TextInputControls : Scenario
         Key? keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
         Key? keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
 
-        chxCaptureTabs.CheckedStateChanging += (s, e) =>
+        chxCaptureTabs.CheckedStateChanging += (_, e) =>
                                   {
                                       textView.TabKeyAddsTab = e.Result == CheckState.Checked;
 
                                       // TODO: This should be in TextView.TabKeyAddsTab_set
                                       if (e.Result == CheckState.Checked)
                                       {
-                                          textView.KeyBindings.Add (keyTab, Command.NextTabStop);
-                                          textView.KeyBindings.Add (keyBackTab, Command.PreviousTabStop);
+                                          textView.KeyBindings.Add (keyTab!, Command.NextTabStop);
+                                          textView.KeyBindings.Add (keyBackTab!, Command.PreviousTabStop);
                                       }
                                       else
                                       {
-                                          textView.KeyBindings.Remove (keyTab);
-                                          textView.KeyBindings.Remove (keyBackTab);
+                                          textView.KeyBindings.Remove (keyTab!);
+                                          textView.KeyBindings.Remove (keyBackTab!);
                                       }
                                   };
         win.Add (chxCaptureTabs);
@@ -220,7 +221,7 @@ public class TextInputControls : Scenario
             CheckedState = textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked
         };
 
-        scrollBars.CheckedStateChanged += (s, e) =>
+        scrollBars.CheckedStateChanged += (_, _) =>
                                                         {
                                                             textView.ScrollBars = scrollBars.CheckedState == CheckState.Checked;
                                                         };
@@ -334,7 +335,7 @@ public class TextInputControls : Scenario
         netProviderField.Provider.TextChanged += (_, _) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
 
         // TextRegexProvider - Regex provider implemented by Terminal.Gui
-        Label regexProvider = new ()
+        Label regexProviderLabel = new ()
         {
             X = Pos.Left (netProviderLabel),
             Y = Pos.Bottom (netProviderLabel) + 1,
