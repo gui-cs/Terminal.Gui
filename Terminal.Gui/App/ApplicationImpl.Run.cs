@@ -81,7 +81,7 @@ internal partial class ApplicationImpl
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
-            action?.Invoke ();
+            action.Invoke ();
 
             return;
         }
@@ -90,7 +90,7 @@ internal partial class ApplicationImpl
                           TimeSpan.Zero,
                           () =>
                           {
-                              action?.Invoke ();
+                              action.Invoke ();
 
                               return false;
                           }
@@ -136,7 +136,7 @@ internal partial class ApplicationImpl
         lock (_sessionStackLock)
         {
             // Get the previous top BEFORE pushing new token
-            if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
+            if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken.Runnable is { })
             {
                 previousTop = previousToken.Runnable;
             }
@@ -187,7 +187,7 @@ internal partial class ApplicationImpl
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new()
+        where TRunnable : IRunnable, new ()
     {
         if (!Initialized)
         {
@@ -201,7 +201,7 @@ internal partial class ApplicationImpl
         }
 
         TRunnable runnable = new ();
-        object? result = Run (runnable, errorHandler);
+        Run (runnable, errorHandler);
 
         // We created the runnable, so dispose it if it's disposable
         if (runnable is IDisposable disposable)
@@ -338,7 +338,7 @@ internal partial class ApplicationImpl
             if (wasModal && SessionStack?.TryPop (out SessionToken? popped) == true && popped == token)
             {
                 // Restore previous top runnable
-                if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken?.Runnable is { })
+                if (SessionStack?.TryPeek (out SessionToken? previousToken) == true && previousToken.Runnable is { })
                 {
                     previousRunnable = previousToken.Runnable;
 
@@ -368,7 +368,7 @@ internal partial class ApplicationImpl
             previousRunnable.RaiseIsModalChangedEvent (true);
         }
 
-        Mouse?.UngrabMouse ();
+        Mouse.UngrabMouse ();
 
         runnable.RaiseIsRunningChangedEvent (false);
 

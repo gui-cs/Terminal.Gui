@@ -41,7 +41,7 @@ A toolkit for building rich console apps for .NET that run on Windows, the Mac, 
 
 * **[Clipboard support](~/api/Terminal.Gui.App.Clipboard.yml)** - Cut, Copy, and Paste is provided through the [`Clipboard`] class.
 
-* **Multi-tasking** - The [Mainloop](~/api/Terminal.Gui.App.MainLoop.yml) supports processing events, idle handlers, and timers. Most classes are safe for threading.
+* **Multi-tasking** - [IApplication](~/api/Terminal.Gui.App.IApplication.yml) supports processing events, idle handlers, and timers. Most classes are safe for threading.
 
 * **[Reactive Extensions](https://github.com/dotnet/reactive)** - Use reactive extensions and benefit from increased code readability, and the ability to apply the MVVM pattern and [ReactiveUI](https://www.reactiveui.net/) data bindings. See the [source code](https://github.com/gui-cs/Terminal.GuiV2Docs/tree/master/ReactiveExample) of a sample app.
 
@@ -63,9 +63,7 @@ This example shows a prompt and returns an integer value depending on which valu
 
 More interesting user interfaces can be created by composing some of the various `View` classes that are included. 
 
-In the example above, @Terminal.Gui.App.Application.Init* sets up the environment, initializes the color schemes, and clears the screen to start the application.
-
-The [Application](~/api/Terminal.Gui.App.Application.yml) class additionally creates an instance of the [Toplevel](~/api/Terminal.Gui.Views.Toplevel.yml) View available in the `Application.Top` property, and can be used like this:
+In the example above, @Terminal.Gui.App.IApplication.Init sets up the environment, initializes the color schemes, and clears the screen to start the application.
 
 ```csharp
 using Terminal.Gui;

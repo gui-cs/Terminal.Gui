@@ -45,7 +45,7 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     public AnsiOutput ()
     {
-        Logging.Information ($"Creating {nameof (AnsiOutput)}");
+        // Logging.Information ($"Creating {nameof (AnsiOutput)}");
 
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);

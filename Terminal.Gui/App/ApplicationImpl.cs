@@ -25,6 +25,8 @@ internal partial class ApplicationImpl : IApplication
         // Initialize TimedEvents with the time provider for testable timing
         _timedEvents = new TimedEvents (timeProvider);
 
+        ForceDriver = Application.ForceDriver;
+
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;
     }

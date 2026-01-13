@@ -45,13 +45,23 @@ public partial class View : IDisposable, ISupportInitializeNotification
     }
 
     /// <summary>
-    ///     Riased when the <see cref="View"/> is being disposed.
+    ///     Raised when the <see cref="View"/> is being disposed.
     /// </summary>
     public event EventHandler? Disposing;
 
     /// <summary>Pretty prints the View</summary>
     /// <returns></returns>
     public override string ToString () => $"{GetType ().Name}({Id}){Frame}";
+
+    /// <summary>
+    ///     Pretty prints the View with more debug information.
+    /// </summary>
+    /// <returns></returns>
+    public virtual string ToDebugString ()
+    {
+        string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{Title}";
+        return $"{GetType ().Name}({identifyingText}) SuperView={(SuperView is { } ? SuperView.ToDebugString () : "null")}";
+    }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     /// <remarks>
@@ -493,7 +503,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 #if DEBUG_IDISPOSABLE
             if (EnableDebugIDisposableAsserts && WasDisposed)
             {
-                throw new ObjectDisposedException (GetType ().FullName);
+                throw new ObjectDisposedException (ToDebugString ());
             }
 #endif
             if (value == _title)
@@ -590,6 +600,29 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     Only valid when DEBUG_IDISPOSABLE is defined.
     /// </summary>
     public static ConcurrentBag<View> Instances { get; private set; } = [];
+
+    /// <summary>
+    ///     Verifies that all View objects were properly disposed (DEBUG_IDISPOSABLE only).
+    /// </summary>
+    public static void VerifyViewsWereDisposed ()
+    {
+#if DEBUG_IDISPOSABLE
+        if (!EnableDebugIDisposableAsserts)
+        {
+            Instances.Clear ();
+
+            return;
+        }
+
+        // Validate there are no outstanding View instances
+        foreach (View inst in Instances)
+        {
+            Logging.Error ($"Not Disposed: {inst.ToDebugString ()}");
+        }
+
+        Instances.Clear ();
+#endif
+    }
 #pragma warning restore CS0419 // Ambiguous reference in cref attribute
 #endif
 }

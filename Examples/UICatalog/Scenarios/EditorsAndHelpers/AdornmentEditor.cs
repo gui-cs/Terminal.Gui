@@ -34,7 +34,7 @@ public class AdornmentEditor : EditorBase
         get => _adornment;
         set
         {
-            Enabled = value is { };
+            Enabled = value is not null;
 
             if (value == _adornment)
             {
@@ -158,7 +158,7 @@ public class AdornmentEditor : EditorBase
 
         _diagThicknessCheckBox = new () { Text = "_Thickness Diag." };
 
-        if (AdornmentToEdit is { })
+        if (AdornmentToEdit is not null)
         {
             _diagThicknessCheckBox.CheckedState =
                 AdornmentToEdit.Diagnostics.FastHasFlags (ViewDiagnosticFlags.Thickness) ? CheckState.Checked : CheckState.UnChecked;
@@ -185,7 +185,7 @@ public class AdornmentEditor : EditorBase
 
         _diagRulerCheckBox = new () { Text = "_Ruler" };
 
-        if (AdornmentToEdit is { })
+        if (AdornmentToEdit is not null)
         {
             _diagRulerCheckBox.CheckedState = AdornmentToEdit.Diagnostics.FastHasFlags (ViewDiagnosticFlags.Ruler) ? CheckState.Checked : CheckState.UnChecked;
         }

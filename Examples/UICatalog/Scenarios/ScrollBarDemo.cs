@@ -9,7 +9,8 @@ public class ScrollBarDemo : Scenario
 {
     public override void Main ()
     {
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
         app.Init ();
 
         using Window window = new ();

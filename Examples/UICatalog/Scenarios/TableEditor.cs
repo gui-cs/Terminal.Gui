@@ -12,6 +12,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TableEditor : Scenario
 {
+    private IApplication? _app;
     private readonly HashSet<FileSystemInfo>? _checkedFileSystemInfos = [];
     private readonly List<IDisposable>? _toDispose = [];
 
@@ -495,11 +496,15 @@ public class TableEditor : Scenario
 
     public override void Main ()
     {
+        ConfigurationManager.Enable (ConfigLocations.All);
+
         // Init
-        Application.Init ();
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        Runnable appWindow = new ();
+        using Runnable appWindow = new ();
 
         _tableView = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
@@ -643,11 +648,7 @@ public class TableEditor : Scenario
         _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         // Run - Start the application.
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-
-        // Shutdown - Calling Application.Shutdown is required.
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private MenuBarItem CreateViewMenu ()
@@ -1011,7 +1012,7 @@ public class TableEditor : Scenario
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _app?.Run (d);
         okPressed = d.Result == 1;
         d.Dispose ();
 
@@ -1177,7 +1178,7 @@ public class TableEditor : Scenario
         _tableView?.Update ();
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _tableView?.App?.RequestStop (); }
 
     private void RunColumnWidthDialog (
         int? col,

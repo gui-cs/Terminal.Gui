@@ -28,7 +28,7 @@ public sealed class ArrangementEditor : EditorBase
         _arrangementSelector.ValueChanged -= ArrangementFlagsOnValueChanged;
 
         // Set the appropriate options in the slider based on _viewToEdit.Arrangement
-        if (ViewToEdit is { })
+        if (ViewToEdit is not null)
         {
             _arrangementSelector.Value = ViewToEdit.Arrangement;
         }
@@ -38,7 +38,7 @@ public sealed class ArrangementEditor : EditorBase
 
     private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<ViewArrangement?> e)
     {
-        if (ViewToEdit is { } && e.Value is { })
+        if (ViewToEdit is not null && e.Value is not null)
         {
             ViewToEdit.Arrangement = (ViewArrangement)e.Value;
 

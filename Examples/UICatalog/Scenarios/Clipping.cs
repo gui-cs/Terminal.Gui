@@ -14,16 +14,18 @@ public class Clipping : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        Window window = new ()
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
 
             //BorderStyle = LineStyle.None
         };
 
-        window.DrawingContent += (s, e) =>
+        window.DrawingContent += (_, e) =>
                               {
                                   window!.FillRect (window!.Viewport, Glyphs.Dot);
                                   e.Cancel = true;
@@ -96,38 +98,15 @@ public class Clipping : Scenario
             AutoReset = true
         };
 
-        progressTimer.Elapsed += (s, e) =>
+        progressTimer.Elapsed += (_, _) =>
                                  {
                                      tiledProgressBar1.Pulse ();
                                      tiledProgressBar2.Pulse ();
                                  };
 
         progressTimer.Start ();
-        Application.Run (window);
+        app.Run (window);
         progressTimer.Stop ();
-        window.Dispose ();
-        Application.Shutdown ();
-    }
-
-    private View CreateOverlappedView (int id, Pos x, Pos y)
-    {
-        var overlapped = new View
-        {
-            X = x,
-            Y = y,
-            Height = Dim.Auto (minimumContentDim: 4),
-            Width = Dim.Auto (minimumContentDim: 14),
-            Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = SchemeManager.SchemesToSchemeName(Schemes.Runnable),
-            Id = $"Overlapped{id}",
-            ShadowStyle = ShadowStyle.Transparent,
-            BorderStyle = LineStyle.Double,
-            CanFocus = true, // Can't drag without this? BUGBUG
-            TabStop = TabBehavior.TabGroup,
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
-        };
-
-        return overlapped;
     }
 
     private View CreateTiledView (int id, Pos x, Pos y)

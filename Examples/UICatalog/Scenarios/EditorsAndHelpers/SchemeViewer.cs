@@ -20,7 +20,7 @@ public class SchemeViewer : FrameView
                 Role = role
             };
 
-            if (prevRoleViewer is { })
+            if (prevRoleViewer is not null)
             {
                 roleViewer.Y = Pos.Bottom (prevRoleViewer);
             }

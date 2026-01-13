@@ -11,21 +11,25 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TableView")]
 public class MultiColouredTable : Scenario
 {
+    private IApplication? _app;
     private DataTable? _table;
     private TableViewColors? _tableView;
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
-        Window appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             BorderStyle = LineStyle.None,
         };
 
         // MenuBar
-        var menu = new MenuBar ();
+        MenuBar menu = new ();
 
         menu.Add (
                   new MenuBarItem (
@@ -43,7 +47,7 @@ public class MultiColouredTable : Scenario
         _tableView = new () { X = 0, Y = Pos.Bottom (menu), Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         // StatusBar
-        var statusBar = new StatusBar (
+        StatusBar statusBar = new (
                                        [
                                            new (Application.QuitKey, "Quit", Quit)
                                        ]
@@ -76,9 +80,7 @@ public class MultiColouredTable : Scenario
 
         _tableView.Table = new DataTableSource (_table = dt);
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private void EditCurrentCell (object? sender, CellActivatedEventArgs e)
@@ -88,7 +90,7 @@ public class MultiColouredTable : Scenario
             return;
         }
 
-        var oldValue = e.Table [e.Row, e.Col].ToString ();
+        string? oldValue = e.Table [e.Row, e.Col].ToString ();
 
         if (GetText ("Enter new value", e.Table.ColumnNames [e.Col], oldValue ?? "", out string newText))
         {
@@ -99,7 +101,7 @@ public class MultiColouredTable : Scenario
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (Application.Instance, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView!.App!, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView.Update ();
@@ -108,8 +110,6 @@ public class MultiColouredTable : Scenario
 
     private bool GetText (string title, string label, string initialText, out string enteredText)
     {
-        var okPressed = false;
-
         Dialog d = new ()
         {
             Title = title,
@@ -123,8 +123,8 @@ public class MultiColouredTable : Scenario
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
-        okPressed = d.Result == 1;
+        _app?.Run (d);
+        bool okPressed = d.Result == 1;
         d.Dispose ();
 
         enteredText = okPressed ? tf.Text : string.Empty;
@@ -132,7 +132,7 @@ public class MultiColouredTable : Scenario
         return okPressed;
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _tableView?.App?.RequestStop (); }
 
     private class TableViewColors : TableView
     {

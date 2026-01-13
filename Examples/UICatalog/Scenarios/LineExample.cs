@@ -8,9 +8,11 @@ public class LineExample : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var window = new Window
+        using Window window = new ()
         {
             Title = GetQuitKeyAndName ()
         };
@@ -212,8 +214,6 @@ public class LineExample : Scenario
         };
         window.Add (helpLabel);
 
-        Application.Run (window);
-        window.Dispose ();
-        Application.Shutdown ();
+        app.Run (window);
     }
 }

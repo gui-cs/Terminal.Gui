@@ -17,8 +17,10 @@ public class Wizards : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window win = new ();
         win.Title = GetQuitKeyAndName ();
@@ -128,7 +130,7 @@ public class Wizards : Scenario
     {
         Wizard wizard = new ();
 
-        if (_titleEdit is { })
+        if (_titleEdit is not null)
         {
             wizard.Title = _titleEdit.Text;
         }

@@ -11,7 +11,7 @@ public class ContextMenus : Scenario
 {
     private PopoverMenu? _winContextMenu;
     private TextField? _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
-    private readonly List<CultureInfo>? _cultureInfos = Application.SupportedCultures;
+    private List<CultureInfo>? _cultureInfos;
     private readonly Key _winContextMenuKey = Key.Space.WithCtrl;
 
     private Window? _appWindow;
@@ -19,23 +19,26 @@ public class ContextMenus : Scenario
     public override void Main ()
     {
         // Init
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
         // Prepping for modern app model
-        using IApplication app = Application.Instance;
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _cultureInfos = Application.SupportedCultures;
 
         // Setup - Create a top-level application window and configure it.
-        _appWindow = new ()
+        using Window appWindow = new ()
         {
             Title = GetQuitKeyAndName (),
             Arrangement = ViewArrangement.Fixed,
             SchemeName = "Runnable"
         };
+        _appWindow = appWindow;
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so
         // we can take advantage of the CommandNotBound event to handle it
-        // 
+        //
         // An alternative implementation would be to create a Runnable subclass that
         // calls AddCommand/KeyBindings.Add in the constructor. See the Snake game scenario
         // for an example.
@@ -55,12 +58,12 @@ public class ContextMenus : Scenario
 
         void AppWindowOnInitialized (object? sender, EventArgs e)
         {
-            var text = "Context Menu";
-            var width = 20;
+            const string TEXT = "Context Menu";
+            const int WIDTH = 20;
 
             CreateWinContextMenu ((sender as Window)!.App);
 
-            var label = new Label
+            Label label = new ()
             {
                 X = Pos.Center (), Y = 1, Text = $"Press '{_winContextMenuKey}' to open the Window context menu."
             };
@@ -74,19 +77,19 @@ public class ContextMenus : Scenario
             };
             _appWindow.Add (label);
 
-            _tfTopLeft = new () { Id = "_tfTopLeft", Width = width, Text = text };
+            _tfTopLeft = new () { Id = "_tfTopLeft", Width = WIDTH, Text = TEXT };
             _appWindow.Add (_tfTopLeft);
 
-            _tfTopRight = new () { Id = "_tfTopRight", X = Pos.AnchorEnd (width), Width = width, Text = text };
+            _tfTopRight = new () { Id = "_tfTopRight", X = Pos.AnchorEnd (WIDTH), Width = WIDTH, Text = TEXT };
             _appWindow.Add (_tfTopRight);
 
-            _tfMiddle = new () { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = width, Text = text };
+            _tfMiddle = new () { Id = "_tfMiddle", X = Pos.Center (), Y = Pos.Center (), Width = WIDTH, Text = TEXT };
             _appWindow.Add (_tfMiddle);
 
-            _tfBottomLeft = new () { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = width, Text = text };
+            _tfBottomLeft = new () { Id = "_tfBottomLeft", Y = Pos.AnchorEnd (1), Width = WIDTH, Text = TEXT };
             _appWindow.Add (_tfBottomLeft);
 
-            _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (width), Y = Pos.AnchorEnd (1), Width = width, Text = text };
+            _tfBottomRight = new () { Id = "_tfBottomRight", X = Pos.AnchorEnd (WIDTH), Y = Pos.AnchorEnd (1), Width = WIDTH, Text = TEXT };
             _appWindow.Add (_tfBottomRight);
 
             CultureInfo originalCulture = Thread.CurrentThread.CurrentUICulture;
@@ -103,18 +106,20 @@ public class ContextMenus : Scenario
 
     private void HandleCommandNotBound (object? sender, CommandEventArgs e)
     {
-        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        switch (e.Context)
         {
-            // ReSharper disable once AccessToDisposedClosure
-            _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
-            e.Handled = true;
-        }
+            case CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs }:
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
+                e.Handled = true;
 
-        if (e.Context is CommandContext<KeyBinding> { Binding.Key: var key } && key! == _winContextMenuKey)
-        {
-            // ReSharper disable once AccessToDisposedClosure
-            _winContextMenu?.MakeVisible ();
-            e.Handled = true;
+                break;
+            case CommandContext<KeyBinding> { Binding.Key: { } key } when key == _winContextMenuKey:
+                // ReSharper disable once AccessToDisposedClosure
+                _winContextMenu?.MakeVisible ();
+                e.Handled = true;
+
+                break;
         }
     }
 
@@ -228,9 +233,7 @@ public class ContextMenus : Scenario
             supportedCultures.Add (culture);
         }
 
-        Menu menu = new (supportedCultures.ToArray ());
-
-        return menu;
+        return new (supportedCultures.ToArray ());
 
         void CreateAction (List<MenuItem> cultures, MenuItem culture)
         {
@@ -247,34 +250,29 @@ public class ContextMenus : Scenario
         }
     }
 
-    public override List<Key> GetDemoKeyStrokes (IApplication? app)
-    {
-        List<Key> keys =
-        [
-            Key.F10.WithShift,
-            Key.Esc,
-            Key.Space.WithCtrl,
-            Key.CursorDown,
-            Key.Enter,
-            Key.F10.WithShift,
-            Key.Esc,
-            Key.Tab,
-            Key.Space.WithCtrl,
-            Key.CursorDown,
-            Key.CursorDown,
-            Key.Enter,
-            Key.F10.WithShift,
-            Key.Esc,
-            Key.Tab,
-            Key.Space.WithCtrl,
-            Key.CursorDown,
-            Key.CursorDown,
-            Key.CursorDown,
-            Key.Enter,
-            Key.F10.WithShift,
-            Key.Esc
-        ];
-
-        return keys;
-    }
+    public override List<Key> GetDemoKeyStrokes (IApplication? app) =>
+    [
+        Key.F10.WithShift,
+        Key.Esc,
+        Key.Space.WithCtrl,
+        Key.CursorDown,
+        Key.Enter,
+        Key.F10.WithShift,
+        Key.Esc,
+        Key.Tab,
+        Key.Space.WithCtrl,
+        Key.CursorDown,
+        Key.CursorDown,
+        Key.Enter,
+        Key.F10.WithShift,
+        Key.Esc,
+        Key.Tab,
+        Key.Space.WithCtrl,
+        Key.CursorDown,
+        Key.CursorDown,
+        Key.CursorDown,
+        Key.Enter,
+        Key.F10.WithShift,
+        Key.Esc
+    ];
 }

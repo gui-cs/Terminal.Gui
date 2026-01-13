@@ -2,13 +2,41 @@
 
 > **📘 For complete contributor guidelines (humans and AI agents), see [CONTRIBUTING.md](CONTRIBUTING.md).**
 
-This repository uses [CONTRIBUTING.md](CONTRIBUTING.md) as the single source of truth for code style, testing, CI/CD, and contribution workflow. GitHub Copilot and other AI coding agents should also refer to [.github/copilot-instructions.md](.github/copilot-instructions.md) for a curated summary of non-negotiable rules.
+# Pre-Edit Checklist
 
-**Key highlights for AI agents:**
-- Always use explicit types (no `var` except for built-in simple types)
-- Always use target-typed `new()` syntax
-- Add new tests to `Tests/UnitTestsParallelizable/` when possible
-- Never decrease code coverage
-- Follow `.editorconfig` and `Terminal.sln.DotSettings` for formatting
+**READ THIS BEFORE MODIFYING ANY FILE.**
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for complete details.
+## Quick Rules (memorize these)
+
+1. **No `var`** except for: `int`, `string`, `bool`, `double`, `float`, `decimal`, `char`, `byte`
+2. **Use `new ()`** not `new TypeName()` when type is on left side
+3. **Use `[...]`** not `new () { ... }` for collections
+4. **SubView/SuperView** - never say "child", "parent", or "container"
+5. **Unused lambda params** - use `_` discard: `(_, _) => { }`
+6. **Local functions** - use camelCase: `void myLocalFunc ()`
+7. **Backing fields** - place immediately before their property (ReSharper bug, must do manually)
+8. **ReShaper Formatting** - run ReSharper code cleanup with "Full Cleanup" profile (not the built-in one).
+
+## Before Each File Edit
+
+Ask yourself:
+- [ ] Am I using explicit types (not var)?
+- [ ] Am I using target-typed new ()?
+- [ ] Am I using collection expressions []?
+- [ ] Are my lambda parameters discards if unused?
+- [ ] Am I using correct terminology (SubView, not child)?
+
+## If Unsure
+
+Re-read the relevant rule file in `.claude/rules/`:
+- `type-declarations.md` - var vs explicit types
+- `target-typed-new.md` - new() syntax
+- `terminology.md` - SubView/SuperView terms
+- `event-patterns.md` - lambdas, closures, handlers
+- `collection-expressions.md` - [...] syntax
+- `cwp-pattern.md` - Cancellable Workflow Pattern
+- `code-layout.md` - backing fields, member ordering
+
+## Task-Specific Guides
+
+Check `.claude/tasks/` for task-specific checklists before starting work.

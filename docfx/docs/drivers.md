@@ -35,7 +35,7 @@ Method 1: Set ForceDriver using Configuration Manager
 
 ```json
 {
-  "ForceDriver": "ansi"
+  "Application.ForceDriver": "ansi"
 }
 ```
 
@@ -364,9 +364,9 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 - `QueueAnsiRequest()` - ANSI request handling
 
 **Note:** The driver is internal to Terminal.Gui. View classes should not access `Driver` directly. Instead:
-- Use @Terminal.Gui.App.Application.Screen to get screen dimensions
-- Use @Terminal.Gui.ViewBase.View.Move for positioning (with viewport-relative coordinates)
-- Use @Terminal.Gui.ViewBase.View.AddRune and @Terminal.Gui.ViewBase.View.AddStr for drawing
+- Use @Terminal.Gui.Application.Screen to get screen dimensions
+- Use @Terminal.Gui.View.Move for positioning (with viewport-relative coordinates)
+- Use @Terminal.Gui.View.AddRune and @Terminal.Gui.View.AddStr for drawing
 - ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can access Driver when needed for framework implementation
 
 ### Driver Creation and Selection
@@ -377,7 +377,7 @@ The driver selection logic in `ApplicationImpl.Driver.cs` uses the **Driver Regi
 
 1. **Provided Component Factory**: If an `IComponentFactory` is explicitly provided to `ApplicationImpl`, it determines the driver via `factory.GetDriverName()`
 2. **Driver Name Parameter**: The `driverName` parameter passed to `Init()` is looked up in the registry
-3. **ForceDriver Configuration**: The `ForceDriver` property is checked and looked up in the registry
+3. **Application.ForceDriver Configuration**: The `Application.ForceDriver` property is checked and looked up in the registry
 4. **Platform Default**: `DriverRegistry.GetDefaultDriver()` selects based on current platform:
    - Windows (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
    - Unix/Linux/macOS → `UnixDriver`
@@ -552,7 +552,3 @@ app.InjectKey(Key.F1, options);
 - **Virtual time** - Control time explicitly via `VirtualTimeProvider.Advance()` for deterministic tests
 - **No manual queue management** - The old 3-step dance (inject → simulate thread → process queue) is handled automatically
 - **Automatic escape handling** - Escape sequences are processed without manual `Thread.Sleep()` delays
-
-For complete documentation of the input injection architecture, see [Input Injection](input-injection-redesign.md).
-
-

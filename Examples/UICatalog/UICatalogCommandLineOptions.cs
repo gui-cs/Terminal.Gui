@@ -16,5 +16,9 @@ public struct UICatalogCommandLineOptions
     public string ResultsFile { get; set; }
 
     public string DebugLogLevel { get; set; }
-    /* etc. */
+
+    /// <summary>
+    ///     Gets or sets whether to force 16-color mode. Null means use default/config setting.
+    /// </summary>
+    public bool? Force16Colors { get; set; }
 }

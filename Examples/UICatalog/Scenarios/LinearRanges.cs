@@ -9,8 +9,9 @@ public class LinearRanges : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
-        using IApplication app = Application.Instance;
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName ();
