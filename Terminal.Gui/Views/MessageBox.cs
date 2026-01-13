@@ -276,7 +276,7 @@ public static class MessageBox
         dialog.ButtonAlignment = DefaultButtonAlignment;
         dialog.BorderStyle = DefaultBorderStyle;
 
-        dialog.SchemeName = useErrorScheme ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+        //dialog.SchemeName = useErrorScheme ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
         dialog.HotKeySpecifier = new ('\xFFFF');
         dialog.Text = message;
