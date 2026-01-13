@@ -552,7 +552,3 @@ app.InjectKey(Key.F1, options);
 - **Virtual time** - Control time explicitly via `VirtualTimeProvider.Advance()` for deterministic tests
 - **No manual queue management** - The old 3-step dance (inject → simulate thread → process queue) is handled automatically
 - **Automatic escape handling** - Escape sequences are processed without manual `Thread.Sleep()` delays
-
-For complete documentation of the input injection architecture, see [Input Injection](input-injection-redesign.md).
-
-

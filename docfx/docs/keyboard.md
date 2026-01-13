@@ -31,7 +31,7 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 Each of these APIs are described more fully below.
 
-### **[Key Bindings](~/api/Terminal.Gui.KeyBindings.yml)**
+### **[Key Bindings](~/api/Terminal.Gui.Input.KeyBindings.yml)**
 
 Key Bindings is the preferred way of handling keyboard input in View implementations. The View calls @Terminal.Gui.View.AddCommand(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses @Terminal.Gui.KeyBindings to indicate which key presses will invoke the command. For example, if a View wants to respond to the user pressing the up arrow key to scroll up it would do this
 
@@ -45,7 +45,7 @@ public MyView : View
 
 The `Character Map` Scenario includes a View called `CharMap` that is a good example of the Key Bindings API. 
 
-The [Command](~/api/Terminal.Gui.Command.yml) enum lists generic operations that are implemented by views. For example `Command.Accept` in a `Button` results in the `Accepting` event 
+The [Command](~/api/Terminal.Gui.Input.Command.yml) enum lists generic operations that are implemented by views. For example `Command.Accept` in a `Button` results in the `Accepting` event 
 firing while in `TableView` it is bound to `CellActivated`. Not all commands
 are implemented by all views (e.g. you cannot scroll in a `Button`). Use the @Terminal.Gui.View.GetSupportedCommands method to determine which commands are implemented by a `View`. 
 
@@ -81,13 +81,13 @@ By default, the `Text` of a `View` is used to determine the `HotKey` by looking 
 
 ### **Shortcut**
 
-A **Shortcut** is an opinionated (visually & API) View for displaying a command, help text, key key press that invokes a [Command](~/api/Terminal.Gui.Command.yml).
+A **Shortcut** is an opinionated (visually & API) View for displaying a command, help text, key key press that invokes a [Command](~/api/Terminal.Gui.Input.Command.yml).
 
 The Command can be invoked even if the `View` that defines them is not focused or visible (but the `View` must be enabled). Shortcuts can be any key press; `Key.A`, `Key.A.WithCtrl`, `Key.A.WithCtrl.WithAlt`, `Key.Del`, and `Key.F1`, are all valid. 
 
 `Shortcuts` are used to define application-wide actions or actions that are not visible (e.g. `Copy`).
 
-[MenuBar](~/api/Terminal.Gui.MenuBar.yml), [PopoverMenu](~/api/Terminal.Gui.PopoverMenu.yml), and [StatusBar](~/api/Terminal.Gui.StatusBar.yml) support `Shortcut`s. 
+[MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml), [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml), and [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) support `Shortcut`s. 
 
 ### **Key Events**
 

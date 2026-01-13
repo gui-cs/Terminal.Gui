@@ -39,7 +39,7 @@ A toolkit for building rich console apps for .NET that run on Windows, the Mac, 
 
 * **[Machine, User, and App-Level Configuration](~/docs/config.md)** - Persistent configuration settings, including overriding default look & feel with Themes, keyboard bindings, and more via the [ConfigurationManager](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml) class.
 
-* **[Clipboard support](~/api/Terminal.Gui.App.Application.Clipboard.yml)** - Cut, Copy, and Paste is provided through the [`Clipboard`] class.
+* **[Clipboard support](~/api/Terminal.Gui.App.Clipboard.yml)** - Cut, Copy, and Paste is provided through the [`Clipboard`] class.
 
 * **Multi-tasking** - [IApplication](~/api/Terminal.Gui.App.IApplication.yml) supports processing events, idle handlers, and timers. Most classes are safe for threading.
 

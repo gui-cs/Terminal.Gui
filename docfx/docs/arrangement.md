@@ -377,20 +377,20 @@ See the [Multitasking Deep Dive](multitasking.md) for complete details on modal 
 
 A view is modal when:
 - Run via [Application.Run](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_Application_Run_Terminal_Gui_Runnable_System_Func_System_Exception_System_Boolean__)
-- [Runnable.Modal](~/api/Terminal.Gui.Runnable.yml#Terminal_Gui_Runnable_Modal) = `true`
+- [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.yml#Terminal_Gui_Runnable_Modal) = `true`
 
 ### Modal Characteristics
 
 - **Exclusive Input** - All keyboard and mouse input goes to the modal view
 - **Constrained Z-Order** - Modal view has Z-order of 1, everything else at 0
 - **Blocks Execution** - `Application.Run` blocks until [Application.RequestStop](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_Application_RequestStop_Terminal_Gui_Runnable_) is called
-- **Own RunState** - Each modal view has its own [RunState](~/api/Terminal.Gui.RunState.yml)
+- **Own RunState** - Each modal view has its own [RunState](~/api/Terminal.Gui.App.SessionToken.yml)
 
 ### Modal View Types
 
-- [Dialog](~/api/Terminal.Gui.Dialog.yml) - Centered modal window with button support
-- [MessageBox](~/api/Terminal.Gui.MessageBox.yml) - Simple message dialogs
-- [Wizard](~/api/Terminal.Gui.Wizard.yml) - Multi-step modal dialogs
+- [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) - Centered modal window with button support
+- [MessageBox](~/api/Terminal.Gui.Views.MessageBox.yml) - Simple message dialogs
+- [Wizard](~/api/Terminal.Gui.Views.Wizard.yml) - Multi-step modal dialogs
 
 ### Modal Example
 
@@ -424,7 +424,7 @@ Application.Run(dialog);
 
 ## Runnable Views
 
-**Runnable** views are those run via [Application.Run](~/api/Terminal.Gui.App.Application.yml). Each non-modal Runnable view operates as a self-contained "application" with its own [RunState](~/api/Terminal.Gui.RunState.yml).
+**Runnable** views are those run via [Application.Run](~/api/Terminal.Gui.App.Application.yml). Each non-modal Runnable view operates as a self-contained "application" with its own [RunState](~/api/Terminal.Gui.App.SessionToken.yml).
 
 See the [Multitasking Deep Dive](multitasking.md) for complete details.
 
@@ -683,7 +683,7 @@ When creating splitters, set [View.SuperViewRendersLineCanvas](~/api/Terminal.Gu
 rightPane.SuperViewRendersLineCanvas = true;
 ```
 
-This ensures [LineCanvas](~/api/Terminal.Gui.LineCanvas.yml) properly handles line intersections at borders.
+This ensures [LineCanvas](~/api/Terminal.Gui.Drawing.LineCanvas.yml) properly handles line intersections at borders.
 
 ### Z-Order Management
 
@@ -732,7 +732,7 @@ view.LayoutComplete += (s, e) =>
 - [ViewArrangement](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)
 - [Border](~/api/Terminal.Gui.ViewBase.Border.yml)
 - [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_Application_ArrangeKey)
-- [Runnable.Modal](~/api/Terminal.Gui.Runnable.yml#Terminal_Gui_Runnable_Modal)
+- [Runnable.Modal](~/api/Terminal.Gui.Views.Runnable.yml#Terminal_Gui_Runnable_Modal)
 
 ### UICatalog Examples
 

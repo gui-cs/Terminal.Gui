@@ -1,6 +1,6 @@
 # Configuration Management Deep Dive
 
-Terminal.Gui provides a comprehensive configuration system that allows users and developers to customize application behavior and appearance through JSON configuration files. The [ConfigurationManager](~/api/Terminal.Gui.ConfigurationManager.yml) enables persistent settings, themes, and application-specific preferences.
+Terminal.Gui provides a comprehensive configuration system that allows users and developers to customize application behavior and appearance through JSON configuration files. The [ConfigurationManager](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml) enables persistent settings, themes, and application-specific preferences.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ Terminal.Gui provides a comprehensive configuration system that allows users and
 
 ## Overview
 
-The [ConfigurationManager](~/api/Terminal.Gui.ConfigurationManager.yml) provides:
+The [ConfigurationManager](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml) provides:
 
 - **Persistent Settings** - User preferences stored in JSON files
 - **Theme System** - Named collections of visual settings
@@ -88,7 +88,7 @@ Terminal.Gui uses three configuration scopes, each serving a different purpose:
 
 ### 1. SettingsScope
 
-System-level settings that affect Terminal.Gui behavior. Only Terminal.Gui library developers can define [SettingsScope](~/api/Terminal.Gui.SettingsScope.yml) properties.
+System-level settings that affect Terminal.Gui behavior. Only Terminal.Gui library developers can define [SettingsScope](~/api/Terminal.Gui.Configuration.SettingsScope.yml) properties.
 
 ```csharp
 [ConfigurationProperty(Scope = typeof(SettingsScope))]
@@ -102,7 +102,7 @@ public static bool Force16Colors { get; set; } = false;
 
 ### 2. ThemeScope
 
-Visual appearance settings that can be themed. Only Terminal.Gui library developers can define [ThemeScope](~/api/Terminal.Gui.ThemeScope.yml) properties.
+Visual appearance settings that can be themed. Only Terminal.Gui library developers can define [ThemeScope](~/api/Terminal.Gui.Configuration.ThemeScope.yml) properties.
 
 ```csharp
 [ConfigurationProperty(Scope = typeof(ThemeScope))]
@@ -116,7 +116,7 @@ public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
 ### 3. AppSettingsScope (Default)
 
-Application-specific settings. Application developers can define [AppSettingsScope](~/api/Terminal.Gui.AppSettingsScope.yml) properties for their apps.
+Application-specific settings. Application developers can define [AppSettingsScope](~/api/Terminal.Gui.Configuration.AppSettingsScope.yml) properties for their apps.
 
 ```csharp
 [ConfigurationProperty] // AppSettingsScope is default
@@ -166,7 +166,7 @@ Configuration is loaded from multiple locations with increasing precedence (high
    - Useful for container environments and CI/CD pipelines
 
 9. **[ConfigLocations.Runtime](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)** (Highest Precedence)
-   - Settings in [ConfigurationManager.RuntimeConfig](~/api/Terminal.Gui.ConfigurationManager.yml#Terminal_Gui_ConfigurationManager_RuntimeConfig) string property
+   - Settings in [ConfigurationManager.RuntimeConfig](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_RuntimeConfig) string property
    - In-memory configuration without files
 
 ### Precedence Diagram
@@ -252,7 +252,7 @@ See the [Scheme Deep Dive](scheme.md) for complete details on the scheme system.
 
 #### Built-in Schemes
 
-[Schemes](~/api/Terminal.Gui.Schemes.yml) enum defines the standard schemes:
+[Schemes](~/api/Terminal.Gui.Drawing.Schemes.yml) enum defines the standard schemes:
 
 - **Runnable** - Top-level application windows
 - **Base** - Default for most views
@@ -288,7 +288,7 @@ SchemeManager.CollectionChanged += (sender, e) =>
 
 #### Scheme Structure
 
-Each [Scheme](~/api/Terminal.Gui.Scheme.yml) maps [VisualRole](~/api/Terminal.Gui.VisualRole.yml) to [Attribute](~/api/Terminal.Gui.Attribute.yml):
+Each [Scheme](~/api/Terminal.Gui.Drawing.Scheme.yml) maps [VisualRole](~/api/Terminal.Gui.Drawing.VisualRole.yml) to [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml):
 
 ```json
 {
@@ -327,7 +327,7 @@ Each [Scheme](~/api/Terminal.Gui.Scheme.yml) maps [VisualRole](~/api/Terminal.Gu
 
 ### Basic Property Definition
 
-Application developers define settings using the [ConfigurationPropertyAttribute](~/api/Terminal.Gui.ConfigurationPropertyAttribute.yml):
+Application developers define settings using the [ConfigurationPropertyAttribute](~/api/Terminal.Gui.Configuration.ConfigurationPropertyAttribute.yml):
 
 ```csharp
 public class MyApp
@@ -412,7 +412,7 @@ This:
 
 ### Granular Control
 
-For more control, use [Load](~/api/Terminal.Gui.ConfigurationManager.yml#Terminal_Gui_ConfigurationManager_Load_Terminal_Gui_ConfigLocations_) and [Apply](~/api/Terminal.Gui.ConfigurationManager.yml#Terminal_Gui_ConfigurationManager_Apply) separately:
+For more control, use [Load](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_Load_Terminal_Gui_Configuration_ConfigLocations_) and [Apply](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml#Terminal_Gui_Configuration_ConfigurationManager_Apply) separately:
 
 ```csharp
 // Enable without loading
@@ -496,7 +496,7 @@ SchemeManager.CollectionChanged += (sender, e) =>
 
 ### Application Settings
 
-System-wide settings from [SettingsScope](~/api/Terminal.Gui.SettingsScope.yml):
+System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.SettingsScope.yml):
 
 ```json
 {
@@ -514,7 +514,7 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.SettingsScope.yml):
 
 ### View-Specific Settings
 
-Settings for individual View types from [ThemeScope](~/api/Terminal.Gui.ThemeScope.yml):
+Settings for individual View types from [ThemeScope](~/api/Terminal.Gui.Configuration.ThemeScope.yml):
 
 ```json
 {
@@ -657,7 +657,7 @@ ConfigurationManager.Apply();
 
 ### TextStyle in Schemes
 
-Each [Attribute](~/api/Terminal.Gui.Attribute.yml) in a scheme now includes [TextStyle](~/api/Terminal.Gui.TextStyle.yml):
+Each [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml) in a scheme now includes [TextStyle](~/api/Terminal.Gui.Drawing.TextStyle.yml):
 
 ```json
 {
@@ -720,14 +720,6 @@ All configuration files must conform to the JSON schema:
   }
 }
 ```
-
-### Complete Example
-
-See the default configuration file:
-
-[!code-json[config.json](../../Terminal.Gui/Resources/config.json)]
-
----
 
 ## Best Practices
 
@@ -977,11 +969,11 @@ The UICatalog application demonstrates configuration management:
 
 ### API Reference
 
-- [ConfigurationManager](~/api/Terminal.Gui.ConfigurationManager.yml)
+- [ConfigurationManager](~/api/Terminal.Gui.Configuration.ConfigurationManager.yml)
 - [ConfigLocations](~/api/Terminal.Gui.Configuration.ConfigLocations.yml)
-- [SettingsScope](~/api/Terminal.Gui.SettingsScope.yml)
-- [ThemeScope](~/api/Terminal.Gui.ThemeScope.yml)
-- [AppSettingsScope](~/api/Terminal.Gui.AppSettingsScope.yml)
-- [ThemeManager](~/api/Terminal.Gui.ThemeManager.yml)
-- [SchemeManager](~/api/Terminal.Gui.SchemeManager.yml)
-- [ConfigurationPropertyAttribute](~/api/Terminal.Gui.ConfigurationPropertyAttribute.yml)
+- [SettingsScope](~/api/Terminal.Gui.Configuration.SettingsScope.yml)
+- [ThemeScope](~/api/Terminal.Gui.Configuration.ThemeScope.yml)
+- [AppSettingsScope](~/api/Terminal.Gui.Configuration.AppSettingsScope.yml)
+- [ThemeManager](~/api/Terminal.Gui.Configuration.ThemeManager.yml)
+- [SchemeManager](~/api/Terminal.Gui.Configuration.SchemeManager.yml)
+- [ConfigurationPropertyAttribute](~/api/Terminal.Gui.Configuration.ConfigurationPropertyAttribute.yml)

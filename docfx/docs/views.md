@@ -80,7 +80,7 @@ Shows a checkbox that can be cycled between two or three states.
 
 ## [ColorPicker](~/api/Terminal.Gui.Views.ColorPicker.yml)
 
-Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the [IColorNameResolver](~/api/Terminal.Gui.Views.IColorNameResolver.yml).
+Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the [IColorNameResolver](~/api/Terminal.Gui.Drawing.IColorNameResolver.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -129,7 +129,7 @@ Provides a drop-down list of items the user can select from.
 
 ## [DateField](~/api/Terminal.Gui.Views.DateField.yml)
 
-Provides date editing functionality with mouse support.
+Provides date editing functionality with specialized cursor behavior for date entry.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -147,15 +147,15 @@ Lets the user pick a date from a visual calendar.
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌────────────────────────────┐</span>
-<span style='color:#FFFFFF;background:#000000'>│Date:  12/21/2025           │</span>
+<span style='color:#FFFFFF;background:#000000'>│Date:  01/12/2026           │</span>
 <span style='color:#FFFFFF;background:#000000'>│┌───┬───┬───┬───┬───┬───┬──┐│</span>
 <span style='color:#FFFFFF;background:#000000'>││Sun│Mon│Tue│Wed│Thu│Fri│Sa││</span>
 <span style='color:#FFFFFF;background:#000000'>│├───┼───┼───┼───┼───┼───┼──┤│</span>
-<span style='color:#FFFFFF;background:#000000'>││-  │1  │2  │3  │4  │5  │6 ││</span>
-<span style='color:#FFFFFF;background:#000000'>││7  │8  │9  │10 │11 │12 │13││</span>
-<span style='color:#FFFFFF;background:#000000'>││14 │15 │16 │17 │18 │19 │20││</span>
-<span style='color:#FFFFFF;background:#000000'>││</span><span style='color:#828282;background:#7A7A7A;font-weight:900'>21 </span><span style='color:#FFFFFF;background:#000000'>│22 │23 │24 │25 │26 │27││</span>
-<span style='color:#FFFFFF;background:#000000'>││28 │29 │30 │31 │-  │-  │- ││</span>
+<span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │1  │2  │3 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││4  │5  │6  │7  │8  │9  │10││</span>
+<span style='color:#FFFFFF;background:#000000'>││11 │</span><span style='color:#828282;background:#7A7A7A;font-weight:900'>12 </span><span style='color:#FFFFFF;background:#000000'>│13 │14 │15 │16 │17││</span>
+<span style='color:#FFFFFF;background:#000000'>││18 │19 │20 │21 │22 │23 │24││</span>
+<span style='color:#FFFFFF;background:#000000'>││25 │26 │27 │28 │29 │30 │31││</span>
 <span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │-  │-  │- ││</span>
 <span style='color:#FFFFFF;background:#000000'>│└───┴───┴───┴───┴───┴───┴──┘│</span>
 <span style='color:#FFFFFF;background:#000000'>│           ◄◄  ►►           │</span>
@@ -166,28 +166,16 @@ Lets the user pick a date from a visual calendar.
 
 ## [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
 
-Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Views.Schemes.Dialog.yml) scheme.
+A modal dialog window with buttons across the bottom. When a button is pressed, [Terminal.Gui.App.IRunnable.Result](~/api/Terminal.Gui.App.IRunnable.Result.yml) is set to the button's index.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#87CEFA;background:#414A4C'>┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#87CEFA;background:#414A4C'>┃This is some demo text.                                         ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃                                                                ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
+<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Dialog Title</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>E</span><span style='color:#ADD8E6;background:#242124'>xample: </span><span style='color:#ADD8E6;background:#000000'>Type and press ENTER to accept.         </span><span style='color:#ADD8E6;background:#242124'> ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃                                                  ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                  </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                               ⟦ </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>C</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>ancel ⟧ ⟦► </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>O</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>K ◄⟧</span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
 
 </pre>
 
@@ -198,22 +186,28 @@ The base-class for [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) and [Sa
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#87CEFA;background:#414A4C'>┏┥</span><span style='color:#414A4C;background:#87CEFA'>Open</span><span style='color:#87CEFA;background:#414A4C'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#87CEFA;background:#414A4C'>┃</span><span style='color:#C5CCCE;background:#054A76;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#87CEFA;background:#000000'>                      </span><span style='color:#87CEFA;background:#414A4C'>┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃⟦▲⟧                                                           ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃┌────────────────────┬───────────────────────────────────────┐┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│Filename (▲)        │Size                                   │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃├────────────────────┼───────────────────────────────────────►┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│</span><span style='color:#C5CCCE;background:#054A76;font-weight:900'>..                  │                                       </span><span style='color:#87CEFA;background:#414A4C'>│┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\_exported_templates│                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\_site              │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\api                │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\apispec            │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\docs               │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\images             │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃</span><span style='color:#054A76;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#054A76;background:#000000'>ind</span><span style='color:#87CEFA;background:#000000'>                                                          </span><span style='color:#87CEFA;background:#414A4C'>┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃⟦►</span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>T</span><span style='color:#87CEFA;background:#414A4C'>ree⟧                                    ⟦► </span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>O</span><span style='color:#87CEFA;background:#414A4C'>K ◄⟧ ⟦ </span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>C</span><span style='color:#87CEFA;background:#414A4C'>ancel ⟧┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
+<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Open</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#ADD8E6;background:#000000'>                                   </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃⟦▲⟧                                                                        ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│Filename (▲)        │Size      │Modified                                 │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃├────────────────────┼──────────┼─────────────────────────────────────────►┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>..                  │          │                                         </span><span style='color:#ADD8E6;background:#242124'>│┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\_exported_templates│          │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\_site              │          │2026-01-12T21:04:46                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\api                │          │2026-01-12T21:04:11                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\apispec            │          │2026-01-12T20:55:38                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\docs               │          │2026-01-12T21:39:42                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\images             │          │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\includes           │          │2026-01-12T21:17:40                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\schemas            │          │2026-01-12T09:53:44                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\scripts            │          │2026-01-12T19:53:17                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#225A6D;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#225A6D;background:#000000'>ind</span><span style='color:#ADD8E6;background:#000000'>                                                                       </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃                                                                           ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                           </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
+<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
 
 </pre>
 
@@ -309,7 +303,7 @@ Provides a hex editor with the left side showing the hex values of the bytes in 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000000</span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#000000;background:#FFFFFF'>48</span><span style='color:#FFFFFF;background:#000000'> 65 78 56 ┊ 69 65 77 20 ┊ 64 61 74 61  HexView data                ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000000</span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#828282;background:#7A7A7A;font-weight:900'>48</span><span style='color:#FFFFFF;background:#000000'> 65 78 56 ┊ 69 65 77 20 ┊ 64 61 74 61  </span><span style='color:#828282;background:#7A7A7A;font-weight:900'>H</span><span style='color:#FFFFFF;background:#000000'>exView data                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>0000000c</span><span style='color:#FFFFFF;background:#000000'> 20 77 69 74 ┊ 68 20 77 69 ┊ 64 65 20 63   with wide c                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000018</span><span style='color:#FFFFFF;background:#000000'> 6f 64 65 70 ┊ 6f 69 6e 74 ┊ 73 3a 20 f0  odepoints: �                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000024</span><span style='color:#FFFFFF;background:#000000'> 9d 94 b9 41 ┊ e2 84 9d f0 ┊ 9d 94 bd 21  ���A�������!                ┊</span>
@@ -334,7 +328,7 @@ Provides a hex editor with the left side showing the hex values of the bytes in 
 
 ## [Label](~/api/Terminal.Gui.Views.Label.yml)
 
-Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.SubViews.yml). When the user presses a hotkey that matches the [View.HotKey](~/api/Terminal.Gui.ViewBase.HotKey.yml) of the Label, the next [View](~/api/Terminal.Gui.ViewBase.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.SubViews.yml) will be activated.
+Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When the user presses a hotkey that matches the [View.HotKey](~/api/Terminal.Gui.ViewBase.View.HotKey.yml) of the Label, the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml) will be activated.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -377,7 +371,7 @@ Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol defi
 
 ## [Line](~/api/Terminal.Gui.Views.Line.yml)
 
-Draws a single line using the [LineStyle](~/api/Terminal.Gui.Views.LineStyle.yml) specified by [Line.Style](~/api/Terminal.Gui.Views.Line.Style.yml).
+Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) specified by [Line.Style](~/api/Terminal.Gui.Views.Line.Style.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -513,22 +507,28 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#87CEFA;background:#414A4C'>┏┥</span><span style='color:#414A4C;background:#87CEFA'>Open</span><span style='color:#87CEFA;background:#414A4C'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#87CEFA;background:#414A4C'>┃</span><span style='color:#C5CCCE;background:#054A76;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#87CEFA;background:#000000'>                      </span><span style='color:#87CEFA;background:#414A4C'>┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃⟦▲⟧                                                           ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃┌────────────────────┬───────────────────────────────────────┐┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│Filename (▲)        │Size                                   │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃├────────────────────┼───────────────────────────────────────►┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│</span><span style='color:#C5CCCE;background:#054A76;font-weight:900'>..                  │                                       </span><span style='color:#87CEFA;background:#414A4C'>│┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\_exported_templates│                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\_site              │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\api                │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\apispec            │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\docs               │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\images             │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃</span><span style='color:#054A76;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#054A76;background:#000000'>ind</span><span style='color:#87CEFA;background:#000000'>                                                          </span><span style='color:#87CEFA;background:#414A4C'>┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃⟦►</span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>T</span><span style='color:#87CEFA;background:#414A4C'>ree⟧                                    ⟦► </span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>O</span><span style='color:#87CEFA;background:#414A4C'>K ◄⟧ ⟦ </span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>C</span><span style='color:#87CEFA;background:#414A4C'>ancel ⟧┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
+<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Open</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#ADD8E6;background:#000000'>                                   </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃⟦▲⟧                                                                        ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│Filename (▲)        │Size      │Modified                                 │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃├────────────────────┼──────────┼─────────────────────────────────────────►┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>..                  │          │                                         </span><span style='color:#ADD8E6;background:#242124'>│┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\_exported_templates│          │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\_site              │          │2026-01-12T21:04:46                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\api                │          │2026-01-12T21:04:11                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\apispec            │          │2026-01-12T20:55:38                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\docs               │          │2026-01-12T21:39:42                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\images             │          │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\includes           │          │2026-01-12T21:17:40                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\schemas            │          │2026-01-12T09:53:44                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\scripts            │          │2026-01-12T19:53:17                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#225A6D;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#225A6D;background:#000000'>ind</span><span style='color:#ADD8E6;background:#000000'>                                                                       </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃                                                                           ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                           </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
+<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
 
 </pre>
 
@@ -557,7 +557,7 @@ Provides a user interface for displaying and selecting a single item from a list
 
 ## [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml)
 
-A [Terminal.Gui.PopoverBaseImpl](~/api/Terminal.Gui.Views.PopoverBaseImpl.yml)-derived view that provides a cascading menu. Can be used as a context menu or a drop-down menu as part of [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml).
+A [Terminal.Gui.App.PopoverBaseImpl](~/api/Terminal.Gui.App.PopoverBaseImpl.yml)-derived view that provides a cascading menu. Can be used as a context menu or a drop-down menu as part of [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -600,7 +600,7 @@ A Progress Bar view that can indicate progress of an activity visually.
 
 ## [Runnable](~/api/Terminal.Gui.Views.Runnable.yml)
 
-Base implementation of [Terminal.Gui.IRunnable](~/api/Terminal.Gui.Views.IRunnable.yml) for views that can be run as blocking sessions without returning a result.
+Base implementation of [Terminal.Gui.App.IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) for views that can be run as blocking sessions without returning a result.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -630,13 +630,13 @@ Base implementation of [Terminal.Gui.IRunnable](~/api/Terminal.Gui.Views.IRunnab
 
 ## [Runnable\<T\>](~/api/Terminal.Gui.Views.Runnable-1.yml)
 
-Base implementation of [Terminal.Gui.IRunnable%601](~/api/Terminal.Gui.Views.IRunnable%601.yml) for views that can be run as blocking sessions.
+Base implementation of [Terminal.Gui.App.IRunnable%601](~/api/Terminal.Gui.App.IRunnable%601.yml) for views that can be run as blocking sessions.
 
 
 
 ## [RunnableWrapper\<T\>](~/api/Terminal.Gui.Views.RunnableWrapper-2.yml)
 
-Wraps any [View](~/api/Terminal.Gui.ViewBase.yml) to make it runnable with a typed result, similar to how [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) wraps [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml).
+Wraps any [View](~/api/Terminal.Gui.ViewBase.View.yml) to make it runnable with a typed result, similar to how [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) wraps [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml).
 
 
 
@@ -646,29 +646,35 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#87CEFA;background:#414A4C'>┏┥</span><span style='color:#414A4C;background:#87CEFA'>Save</span><span style='color:#87CEFA;background:#414A4C'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#87CEFA;background:#414A4C'>┃</span><span style='color:#C5CCCE;background:#054A76;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#87CEFA;background:#000000'>                      </span><span style='color:#87CEFA;background:#414A4C'>┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃⟦▲⟧                                                           ┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃┌────────────────────┬───────────────────────────────────────┐┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│Filename (▲)        │Size                                   │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃├────────────────────┼───────────────────────────────────────►┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│</span><span style='color:#C5CCCE;background:#054A76;font-weight:900'>..                  │                                       </span><span style='color:#87CEFA;background:#414A4C'>│┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\_exported_templates│                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\_site              │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\api                │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\apispec            │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\docs               │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃│\images             │                                       │┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃</span><span style='color:#054A76;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#054A76;background:#000000'>ind</span><span style='color:#87CEFA;background:#000000'>                                                          </span><span style='color:#87CEFA;background:#414A4C'>┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┃⟦►</span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>T</span><span style='color:#87CEFA;background:#414A4C'>ree⟧                                  ⟦► </span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>S</span><span style='color:#87CEFA;background:#414A4C'>ave ◄⟧ ⟦ </span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>C</span><span style='color:#87CEFA;background:#414A4C'>ancel ⟧┃</span>
-<span style='color:#87CEFA;background:#414A4C'>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
+<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Save</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#ADD8E6;background:#000000'>                                   </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃⟦▲⟧                                                                        ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│Filename (▲)        │Size      │Modified                                 │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃├────────────────────┼──────────┼─────────────────────────────────────────►┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>..                  │          │                                         </span><span style='color:#ADD8E6;background:#242124'>│┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\_exported_templates│          │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\_site              │          │2026-01-12T21:04:46                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\api                │          │2026-01-12T21:04:11                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\apispec            │          │2026-01-12T20:55:38                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\docs               │          │2026-01-12T21:39:42                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\images             │          │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\includes           │          │2026-01-12T21:17:40                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\schemas            │          │2026-01-12T09:53:44                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│\scripts            │          │2026-01-12T19:53:17                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14                      │┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#225A6D;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#225A6D;background:#000000'>ind</span><span style='color:#ADD8E6;background:#000000'>                                                                       </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃                                                                           ┃</span>
+<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                           </span><span style='color:#ADD8E6;background:#242124'>┃</span>
+<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
+<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
 
 </pre>
 
 
 ## [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml)
 
-Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.Viewport.yml).
+Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.View.Viewport.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -745,7 +751,7 @@ Displays a spinning glyph or combinations of glyphs to indicate progress or acti
 
 ## [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml)
 
-A status bar is a [View](~/api/Terminal.Gui.ViewBase.yml) that snaps to the bottom of the Viewport displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context-sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
+A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of the Viewport displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context-sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -902,7 +908,7 @@ Fully featured multi-line text editor
 
 ## [TimeField](~/api/Terminal.Gui.Views.TimeField.yml)
 
-Provides time editing functionality with mouse support
+Provides time editing functionality with specialized cursor behavior for time entry.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -981,31 +987,32 @@ An overlapped container for other views with a border and optional title.
 
 ## [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)
 
-A multistep user interface for collecting related data. Each [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml) can host arbitrary [View](~/api/Terminal.Gui.ViewBase.yml)s and display help text. Navigation buttons enable moving between steps.
+A multi-step dialog for collecting related data across sequential steps.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#ADD8E6;background:#242124'>┌┤</span><span style='color:#242124;background:#ADD8E6'>Wizard Title - Example Step</span><span style='color:#ADD8E6;background:#242124'>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>E</span><span style='color:#ADD8E6;background:#242124'>nter Text: </span><span style='color:#ADD8E6;background:#000000'>                    </span><span style='color:#ADD8E6;background:#242124'>                    </span><span style='color:#48A7C7;background:#000000'>This is some help text  </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊                                                    </span><span style='color:#48A7C7;background:#000000'>for the WizardStep.     </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊    </span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>A</span><span style='color:#ADD8E6;background:#242124'> List: ┌╌╌╌╌╌╌╌╌┐                              </span><span style='color:#48A7C7;background:#000000'>You can provide         </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>Item 1  </span><span style='color:#ADD8E6;background:#242124'>┆                              </span><span style='color:#48A7C7;background:#000000'>instructions or         </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 2  ┆                              </span><span style='color:#48A7C7;background:#000000'>information to guide the</span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 3  ┆                              </span><span style='color:#48A7C7;background:#000000'>user through this step  </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 4  ┆                              </span><span style='color:#48A7C7;background:#000000'>of the wizard.          </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 5  ┆                              </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            └╌╌╌╌╌╌╌╌┘                              </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊                                                    </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊                                                    </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#87CEFA;background:#414A4C'>                                                               ⟦► </span><span style='color:#87CEFA;background:#414A4C;text-decoration:underline 1px solid'>N</span><span style='color:#87CEFA;background:#414A4C'>ext... ◄⟧</span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
+<span style='color:#ADD8E6;background:#242124'>┌┤</span><span style='color:#242124;background:#ADD8E6'>Wizard Title - Example Step</span><span style='color:#ADD8E6;background:#242124'>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
+<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>E</span><span style='color:#ADD8E6;background:#242124'>nter Text: </span><span style='color:#ADD8E6;background:#000000'>                    </span><span style='color:#ADD8E6;background:#242124'>                  </span><span style='color:#48A7C7;background:#000000'>This is some help text  </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊                                                  </span><span style='color:#48A7C7;background:#000000'>for the WizardStep.     </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊    </span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>A</span><span style='color:#ADD8E6;background:#242124'> List: ┌╌╌╌╌╌╌╌╌┐                            </span><span style='color:#48A7C7;background:#000000'>You can provide         </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊            ┆</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>Item 1  </span><span style='color:#ADD8E6;background:#242124'>┆                            </span><span style='color:#48A7C7;background:#000000'>instructions or         </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 2  ┆                            </span><span style='color:#48A7C7;background:#000000'>information to guide the</span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 3  ┆                            </span><span style='color:#48A7C7;background:#000000'>user through this step  </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 4  ┆                            </span><span style='color:#48A7C7;background:#000000'>of the wizard.          </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 5  ┆                            </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊            └╌╌╌╌╌╌╌╌┘                            </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊                                                  </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊                                                  </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                          </span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                             ⟦► </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>N</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>ext... ◄⟧</span><span style='color:#ADD8E6;background:#242124'>┊</span>
+<span style='color:#ADD8E6;background:#242124'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
 ## [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml)
 
-A single step in a [Wizard](~/api/Terminal.Gui.Views.Wizard.yml). Can contain arbitrary [View](~/api/Terminal.Gui.ViewBase.yml)s and display help text in the right [Padding](~/api/Terminal.Gui.Views.Padding.yml).
+A single step in a [Wizard](~/api/Terminal.Gui.Views.Wizard.yml). Can contain arbitrary [View](~/api/Terminal.Gui.ViewBase.View.yml)s and display help text in the right [Padding](~/api/Terminal.Gui.ViewBase.Padding.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
