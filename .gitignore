@@ -37,6 +37,9 @@ _ReSharper.**
 **/[Pp]ackages/*
 !**/[Pp]ackages/build/
 
+# Local NuGet packages (build artifacts)
+local_packages/
+
 # API Docs
 docfx/api
 !docfx/api/index.md
