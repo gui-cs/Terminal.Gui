@@ -82,8 +82,9 @@ Automated code cleanup, modernization, and refactoring for Terminal.Gui C# files
 ### 6. Warning Verification
 - **Build Warnings (HARD RULE)**:
   - Counts compiler warnings before and after cleanup
-  - **FAILS** if any new build warnings are introduced
-  - Rolls back changes if new warnings detected
+  - **Attempts to fix** any new build warnings introduced
+  - Re-runs cleanup after fixes
+  - Rolls back only if unable to fix after multiple attempts
 - **InspectCode Warnings (SOFT GOAL)**:
   - Counts ReSharper code quality warnings before and after
   - Reports changes but doesn't fail on increase
@@ -102,12 +103,12 @@ Automated code cleanup, modernization, and refactoring for Terminal.Gui C# files
 
 The `--include` parameter **WORKS CORRECTLY** for single-file cleanup:
 
-```bash
+```powershell
 # Cleanup a single file
-jb cleanupcode Terminal.sln \
-    --profile="Full Cleanup" \
-    --include="Terminal.Gui/Views/TableView/TableView.cs" \
-    --no-build \
+jb cleanupcode Terminal.sln `
+    --profile="Full Cleanup" `
+    --include="Terminal.Gui/Views/TableView/TableView.cs" `
+    --no-build `
     --verbosity=WARN
 ```
 
@@ -123,13 +124,13 @@ jb cleanupcode Terminal.sln \
 
 ### inspectcode - Identify Code Issues
 
-```bash
+```powershell
 # Inspect a single file for warnings
-jb inspectcode Terminal.sln \
-    --output="inspect-report.xml" \
-    --include="Terminal.Gui/Views/TableView/TableView.cs" \
-    --severity=WARNING \
-    --no-build \
+jb inspectcode Terminal.sln `
+    --output="inspect-report.xml" `
+    --include="Terminal.Gui/Views/TableView/TableView.cs" `
+    --severity=WARNING `
+    --no-build `
     --format=Xml
 ```
 

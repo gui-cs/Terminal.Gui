@@ -144,21 +144,34 @@ function Get-ReSharperWarningCount {
     return $warningCount
 }
 
-function Get-BuildWarningCount {
-    Write-Status "Counting build warnings..."
+function Get-BuildWarnings {
+    param([switch]$CountOnly)
+
+    Write-Status "Analyzing build warnings..."
 
     $buildOutput = dotnet build "$RepoRoot\Terminal.sln" --no-restore --configuration Debug --verbosity normal 2>&1 | Out-String
 
     if ($LASTEXITCODE -ne 0) {
         Write-Status "Build failed" "Red"
-        return -1
+        return @{ Count = -1; Warnings = @(); Output = $buildOutput }
     }
 
-    # Count warnings in build output (lines containing "warning CS")
-    $warningCount = ([regex]::Matches($buildOutput, 'warning CS\d+')).Count
+    # Extract warning lines (full warning messages)
+    $warningLines = $buildOutput -split "`r?`n" | Where-Object { $_ -match 'warning CS\d+' }
+    $warningCount = $warningLines.Count
 
     Write-Status "Build warnings: $warningCount" $(if ($warningCount -eq 0) { "Green" } else { "Yellow" })
-    return $warningCount
+
+    if ($CountOnly) {
+        return @{ Count = $warningCount; Warnings = @(); Output = "" }
+    }
+
+    return @{ Count = $warningCount; Warnings = $warningLines; Output = $buildOutput }
+}
+
+function Get-BuildWarningCount {
+    $result = Get-BuildWarnings -CountOnly
+    return $result.Count
 }
 
 function Invoke-BackingFieldReorder {
@@ -431,10 +444,39 @@ function Process-CleanupFile {
 
         # Verify warning counts after cleanup
         Write-Host "`n--- Post-Cleanup Warning Counts ---" -ForegroundColor Cyan
-        $buildWarningsAfter = Get-BuildWarningCount
+        $buildResult = Get-BuildWarnings
+        $buildWarningsAfter = $buildResult.Count
         $inspectWarningsAfter = Get-ReSharperWarningCount -FilePaths $filesToProcess
         Write-Status "Build warnings (after): $buildWarningsAfter" "Cyan"
         Write-Status "InspectCode warnings (after): $inspectWarningsAfter" "Cyan"
+
+        # HARD RULE: No new build warnings - attempt to fix if found
+        $buildWarningsDelta = $buildWarningsAfter - $buildWarningsBefore
+        $fixAttempts = 0
+        $maxFixAttempts = 2
+
+        while ($buildWarningsDelta -gt 0 -and $fixAttempts -lt $maxFixAttempts) {
+            $fixAttempts++
+            Write-Status "Cleanup introduced $buildWarningsDelta NEW BUILD WARNINGS - attempting fix ($fixAttempts/$maxFixAttempts)..." "Yellow"
+
+            # Output the warnings for diagnosis
+            Write-Host "`n--- New Build Warnings ---" -ForegroundColor Yellow
+            foreach ($warning in $buildResult.Warnings) {
+                Write-Host "  $warning" -ForegroundColor Yellow
+            }
+            Write-Host ""
+
+            # Attempt fix: Re-run ReSharper cleanup (it sometimes fixes its own issues)
+            Write-Status "Re-running ReSharper cleanup to fix warnings..."
+            foreach ($file in $filesToProcess) {
+                Invoke-ReSharperCleanup -FilePath $file | Out-Null
+            }
+
+            # Re-check warnings
+            $buildResult = Get-BuildWarnings
+            $buildWarningsAfter = $buildResult.Count
+            $buildWarningsDelta = $buildWarningsAfter - $buildWarningsBefore
+        }
 
         # Track statistics
         $Stats.BuildWarningsBefore += $buildWarningsBefore
@@ -442,10 +484,14 @@ function Process-CleanupFile {
         $Stats.InspectWarningsBefore += $inspectWarningsBefore
         $Stats.InspectWarningsAfter += $inspectWarningsAfter
 
-        # HARD RULE: No new build warnings
-        $buildWarningsDelta = $buildWarningsAfter - $buildWarningsBefore
+        # Final check on build warnings
         if ($buildWarningsDelta -gt 0) {
-            Write-Status "FAILED: Cleanup introduced $buildWarningsDelta NEW BUILD WARNINGS" "Red"
+            Write-Status "FAILED: Unable to fix $buildWarningsDelta NEW BUILD WARNINGS after $maxFixAttempts attempts" "Red"
+            Write-Host "`n--- Unresolved Build Warnings ---" -ForegroundColor Red
+            foreach ($warning in $buildResult.Warnings) {
+                Write-Host "  $warning" -ForegroundColor Red
+            }
+            Write-Host ""
             Invoke-RollbackFile -FilePath $FilePath
             return $false
         }
