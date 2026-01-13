@@ -275,7 +275,7 @@ v2 provides full 24-bit color support by default:
 
 - **Implementation**: [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml) class handles RGB values
 - **Fallback**: Automatic 16-color mode for older terminals
-- **Driver Support**: [IConsoleDriver.SupportsTrueColor](~/api/Terminal.Gui.Drivers.IConsoleDriver.yml#Terminal_Gui_Drivers_IConsoleDriver_SupportsTrueColor) detection
+- **Driver Support**: <xref:Terminal.Gui.Drivers.IDriver.SupportsTrueColor> detection
 - **Usage**: Direct RGB input via [Color](~/api/Terminal.Gui.Drawing.Color.yml) struct
 
 ```csharp
@@ -428,11 +428,11 @@ v2 clarifies view ownership:
 
 See the [Scrolling Deep Dive](scrolling.md) for complete details.
 
-Every [View](~/api/Terminal.Gui.ViewBase.View.yml) supports scrolling inherently:
+Every [View](~/api/Terminal.Gui.ViewBase.yml) supports scrolling inherently:
 
-- **[Viewport](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Viewport)** - Visible rectangle (can have non-zero location)
-- **[GetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_GetContentSize)** - Returns total content size
-- **[SetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SetContentSize_System_Nullable_System_Drawing_Size__)** - Sets scrollable content size
+- **[Viewport](~/api/Terminal.Gui.ViewBase.yml)** - Visible rectangle (can have non-zero location)
+- **[GetContentSize](~/api/Terminal.Gui.ViewBase.yml)** - Returns total content size
+- **[SetContentSize](~/api/Terminal.Gui.ViewBase.yml)** - Sets scrollable content size
 - **ScrollVertical/ScrollHorizontal** - Helper methods
 
 **No need for ScrollView wrapper!**
@@ -459,22 +459,22 @@ v2 replaces `ScrollBarView` with [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.
 - Automatic show/hide
 - Proportional sizing with `ScrollSlider`
 - Integrated with View's scrolling system
-- Simple to add via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_VerticalScrollBar) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HorizontalScrollBar)
+- Simple to add via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.yml) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.yml)
 
 ### Advanced Layout Features
 
 See the [Layout Deep Dive](layout.md) and [DimAuto Deep Dive](dimauto.md) for details.
 
-**[Dim.Auto](~/api/Terminal.Gui.Dim.yml#Terminal_Gui_Dim_Auto_Terminal_Gui_DimAutoStyle_Terminal_Gui_Dim_Terminal_Gui_Dim_):**
+**<xref:Terminal.Gui.ViewBase.Dim.Auto*>:**
 - Automatically sizes views based on content or subviews
 - Reduces manual layout calculations
 - Supports multiple styles (Text, Content, Position)
 
-**[Pos.AnchorEnd](~/api/Terminal.Gui.Pos.yml#Terminal_Gui_Pos_AnchorEnd_System_Int32_):**
+**<xref:Terminal.Gui.ViewBase.Pos.AnchorEnd*>:**
 - Anchor to right or bottom of SuperView
 - Enables flexible, responsive layouts
 
-**[Pos.Align](~/api/Terminal.Gui.Pos.yml):**
+**[Pos.Align](~/api/Terminal.Gui.ViewBase.Pos.yml):**
 - Align multiple views (Left, Center, Right)
 - Simplifies creating aligned layouts
 
@@ -496,13 +496,13 @@ label2.X = Pos.Center ();
 
 See the [Arrangement Deep Dive](arrangement.md) for complete details.
 
-[View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Arrangement) enables interactive UI:
+[View.Arrangement](~/api/Terminal.Gui.ViewBase.yml) enables interactive UI:
 
 - **[ViewArrangement.Movable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Drag with mouse or move with keyboard
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via <xref:Terminal.Gui.App.Application.ArrangeKey>) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -518,8 +518,8 @@ See the [Navigation Deep Dive](navigation.md) for complete details.
 
 v2 decouples navigation concepts:
 
-- **[CanFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_CanFocus)** - Whether view can receive focus (defaults to `false` in v2)
-- **[TabStop](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_TabStop)** - [TabBehavior](~/api/Terminal.Gui.Input.TabBehavior.yml) enum (TabStop, TabGroup, NoStop)
+- **[CanFocus](~/api/Terminal.Gui.ViewBase.yml)** - Whether view can receive focus (defaults to `false` in v2)
+- **[TabStop](~/api/Terminal.Gui.ViewBase.yml)** - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) enum (TabStop, TabGroup, NoStop)
 - **[ApplicationNavigation](~/api/Terminal.Gui.App.ApplicationNavigation.yml)** - Centralized navigation logic
 
 **Navigation Keys (Configurable):**
@@ -595,7 +595,7 @@ if (key.Ctrl) { }
 **Key Bindings:**
 - Map keys to [Command](~/api/Terminal.Gui.Input.Command.yml) enums
 - Scopes: Application, Focused, HotKey
-- Views declare supported commands via [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml)
+- Views declare supported commands via [View.AddCommand](~/api/Terminal.Gui.ViewBase.yml)
 
 ```csharp
 // Add command handler
@@ -612,29 +612,29 @@ private bool HandleAccept ()
 ```
 
 **Configurable Keys:**
-- [IKeyboard.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
-- [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
+- <xref:Terminal.Gui.App.Application.QuitKey> - Close app (default: Esc)
+- <xref:Terminal.Gui.App.Application.ArrangeKey> - Arrange mode (default: Ctrl+F5)
 - Navigation keys (Tab, F6, arrows)
 
 ### Mouse API
 
 See the [Mouse Deep Dive](mouse.md) for complete details.
 
-**[MouseEventArgs](~/api/Terminal.Gui.Input.MouseEventArgs.yml):**
+**[MouseEventArgs](~/api/Terminal.Gui.Input.Mouse.yml):**
 - Replaces v1's `MouseEventEventArgs`
 - Cleaner structure for mouse data
 - [MouseFlags](~/api/Terminal.Gui.Input.MouseFlags.yml) for button states
 
 **Granular Events:**
-- [View.MouseClick](~/api/Terminal.Gui.ViewBase.View.yml) - High-level click events
+- [View.MouseClick](~/api/Terminal.Gui.ViewBase.yml) - High-level click events
 - Double-click support
 - Mouse movement tracking
 - Viewport-relative coordinates (not screen-relative)
 
 **Highlight and Repeat on Hold:**
-- [View.MouseHighlightStates](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHighlightStates) - Allows views to provide visual feedback on hover/click.
-- [View.MouseState](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseState) - Indicates whether the mouse is pressed, hovered, or outside.
-- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHoldRepeat) - Enables or disables whether mouse click events will be repeated when the user holds the mouse down
+- [View.MouseHighlightStates](~/api/Terminal.Gui.ViewBase.yml) - Allows views to provide visual feedback on hover/click.
+- [View.MouseState](~/api/Terminal.Gui.ViewBase.yml) - Indicates whether the mouse is pressed, hovered, or outside.
+- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.yml) - Enables or disables whether mouse click events will be repeated when the user holds the mouse down
 
 ## Configuration and Persistence
 
@@ -692,7 +692,7 @@ Logging.Debug ("Rendering view {ViewId}", view.Id);
 
 ### Metrics
 
-[Logging.Meter](~/api/Terminal.Gui.App.Logging.yml#Terminal_Gui_App_Logging_Meter) provides performance metrics:
+<xref:Terminal.Gui.App.Logging.Meter> provides performance metrics:
 
 - Frame rate tracking
 - Redraw times
@@ -725,7 +725,7 @@ v2 supports the Sixel protocol for rendering images:
 v2 ensures compatibility with Ahead-of-Time compilation:
 
 - Avoid reflection patterns problematic for AOT
-- Source generators for JSON serialization via [SourceGenerationContext](~/api/Terminal.Gui.Configuration.SourceGenerationContext.yml)
+- Source generators for JSON serialization via SourceGenerationContext
 - Single-file deployment support
 - Faster startup, reduced runtime overhead
 

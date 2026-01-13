@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		.github\workflows\quick-build.yml = .github\workflows\quick-build.yml
 		.github\workflows\README.md = .github\workflows\README.md
+		.github\workflows\release.yml = .github\workflows\release.yml
 		.github\workflows\stress-tests.yml = .github\workflows\stress-tests.yml
 		.github\workflows\unit-tests.yml = .github\workflows\unit-tests.yml
 	EndProjectSection

@@ -154,6 +154,10 @@
         <EnableSourceLink>true</EnableSourceLink>
         <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(VersionSuffix)' != '' ">
+    <!-- When there's a version suffix (prerelease), set the PRERELEASE flag -->
+    <FILEFLAGS>VS_FF_PRERELEASE</FILEFLAGS>
+</PropertyGroup>
     <ProjectExtensions>
         <VisualStudio>
             <UserProperties resources_4config_1json__JsonSchema="../../docfx/schemas/tui-config-schema.json" />
