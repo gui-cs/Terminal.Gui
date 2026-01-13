@@ -978,7 +978,7 @@ public class GraphViewExample : Scenario
 
             for (int y = end.Y; y <= start.Y; y++)
             {
-                float height = graph.ScreenToGraphSpace (x, y).Y;
+                float height = graph.ViewportToGraphSpace (x, y).Y;
 
                 Attribute attr = height switch
                                  {

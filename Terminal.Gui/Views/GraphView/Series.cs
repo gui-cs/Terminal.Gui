@@ -37,8 +37,8 @@ public class ScatterSeries : ISeries
 
         foreach (PointF p in Points.Where (p => graphBounds.Contains (p)))
         {
-            Point screenPoint = graph.GraphSpaceToViewport (p);
-            graph.AddRune (screenPoint.X, screenPoint.Y, Fill.Rune);
+            Point viewportPoint = graph.GraphSpaceToViewport (p);
+            graph.AddRune (viewportPoint.X, viewportPoint.Y, Fill.Rune);
         }
     }
 }
@@ -181,20 +181,20 @@ public class BarSeries : ISeries
             float endX = Orientation == Orientation.Horizontal ? Bars [i].Value : xStart;
             float endY = Orientation == Orientation.Horizontal ? yStart : Bars [i].Value;
 
-            // translate to screen positions
-            Point screenStart = graph.GraphSpaceToViewport (new PointF (xStart, yStart));
-            Point screenEnd = graph.GraphSpaceToViewport (new PointF (endX, endY));
+            // translate to viewport positions
+            Point viewportStart = graph.GraphSpaceToViewport (new PointF (xStart, yStart));
+            Point viewportEnd = graph.GraphSpaceToViewport (new PointF (endX, endY));
 
             // Start the bar from wherever the axis is
             if (Orientation == Orientation.Horizontal)
             {
-                screenStart.X = graph.AxisY.GetAxisXPosition (graph);
+                viewportStart.X = graph.AxisY.GetAxisXPosition (graph);
 
                 // don't draw bar off the right of the control
-                screenEnd.X = Math.Min (graph.Viewport.Width - 1, screenEnd.X);
+                viewportEnd.X = Math.Min (graph.Viewport.Width - 1, viewportEnd.X);
 
                 // if bar is off the screen
-                if (screenStart.Y < 0 || screenStart.Y > drawBounds.Height - graph.MarginBottom)
+                if (viewportStart.Y < 0 || viewportStart.Y > drawBounds.Height - graph.MarginBottom)
                 {
                     continue;
                 }
@@ -202,13 +202,13 @@ public class BarSeries : ISeries
             else
             {
                 // Start the axis
-                screenStart.Y = graph.AxisX.GetAxisYPosition (graph);
+                viewportStart.Y = graph.AxisX.GetAxisYPosition (graph);
 
                 // don't draw bar up above top of control
-                screenEnd.Y = Math.Max (0, screenEnd.Y);
+                viewportEnd.Y = Math.Max (0, viewportEnd.Y);
 
                 // if bar is off the screen
-                if (screenStart.X < graph.MarginLeft || screenStart.X > graph.MarginLeft + drawBounds.Width - 1)
+                if (viewportStart.X < graph.MarginLeft || viewportStart.X > graph.MarginLeft + drawBounds.Width - 1)
                 {
                     continue;
                 }
@@ -217,7 +217,7 @@ public class BarSeries : ISeries
             // draw the bar unless it has no height
             if (Bars [i].Value != 0)
             {
-                DrawBarLine (graph, screenStart, screenEnd, Bars [i]);
+                DrawBarLine (graph, viewportStart, viewportEnd, Bars [i]);
             }
 
             // If we are drawing labels and the bar has one
@@ -226,11 +226,11 @@ public class BarSeries : ISeries
                 // Add the label to the relevant axis
                 if (Orientation == Orientation.Horizontal)
                 {
-                    graph.AxisY.DrawAxisLabel (graph, screenStart.Y, Bars [i].Text);
+                    graph.AxisY.DrawAxisLabel (graph, viewportStart.Y, Bars [i].Text);
                 }
                 else if (Orientation == Orientation.Vertical)
                 {
-                    graph.AxisX.DrawAxisLabel (graph, screenStart.X, Bars [i].Text);
+                    graph.AxisX.DrawAxisLabel (graph, viewportStart.X, Bars [i].Text);
                 }
             }
         }

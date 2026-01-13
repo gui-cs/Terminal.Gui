@@ -33,8 +33,8 @@ public class TextAnnotation : IAnnotation
             return;
         }
 
-        Point screenPos = graph.GraphSpaceToViewport (GraphPosition);
-        DrawText (graph, screenPos.X, screenPos.Y);
+        Point viewportPos = graph.GraphSpaceToViewport (GraphPosition);
+        DrawText (graph, viewportPos.X, viewportPos.Y);
     }
 
     /// <summary>

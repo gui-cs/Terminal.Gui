@@ -187,11 +187,11 @@ public class HorizontalAxis : Axis
         // but if the x-axis has a minimum (minimum is in graph space units)
         if (Minimum.HasValue)
         {
-            // start at the screen location of the minimum
-            int minimumScreenX = graph.GraphSpaceToViewport (new PointF (Minimum.Value, y)).X;
+            // start at the viewport location of the minimum
+            int minimumViewportX = graph.GraphSpaceToViewport (new PointF (Minimum.Value, y)).X;
 
-            // unless that is off the screen to the left
-            xStart = Math.Max (xStart, minimumScreenX);
+            // unless that is off the viewport to the left
+            xStart = Math.Max (xStart, minimumViewportX);
         }
 
         for (int i = xStart; i < bounds.Width; i++)
@@ -201,13 +201,13 @@ public class HorizontalAxis : Axis
     }
 
     /// <summary>
-    ///     Returns the Y screen position of the origin (typically 0,0) of graph space. Return value is bounded by the
-    ///     screen i.e. the axis is always rendered even if the origin is offscreen.
+    ///     Returns the Y viewport position of the origin (typically 0,0) of graph space. Return value is bounded by the
+    ///     viewport i.e. the axis is always rendered even if the origin is offscreen.
     /// </summary>
     /// <param name="graph"></param>
     public int GetAxisYPosition (GraphView graph)
     {
-        // find the origin of the graph in screen space (this allows for 'crosshair' style
+        // find the origin of the graph in viewport space (this allows for 'crosshair' style
         // graphs where positive and negative numbers visible
         Point origin = graph.GraphSpaceToViewport (new PointF (0, 0));
 
@@ -237,8 +237,8 @@ public class HorizontalAxis : Axis
         var labels = 0;
         int y = GetAxisYPosition (graph);
 
-        RectangleF start = graph.ScreenToGraphSpace ((int)graph.MarginLeft, y);
-        RectangleF end = graph.ScreenToGraphSpace (viewport.Width, y);
+        RectangleF start = graph.ViewportToGraphSpace ((int)graph.MarginLeft, y);
+        RectangleF end = graph.ViewportToGraphSpace (viewport.Width, y);
 
         // don't draw labels below the minimum
         if (Minimum.HasValue)
@@ -250,10 +250,10 @@ public class HorizontalAxis : Axis
 
         while (current.X < end.X)
         {
-            int screenX = graph.GraphSpaceToViewport (new PointF (current.X, current.Y)).X;
+            int viewportX = graph.GraphSpaceToViewport (new PointF (current.X, current.Y)).X;
 
             // The increment we will render (normally a top T unicode symbol)
-            var toRender = new AxisIncrementToRender (Orientation, screenX, current.X);
+            var toRender = new AxisIncrementToRender (Orientation, viewportX, current.X);
 
             // Not every increment has to have a label
             if (ShowLabelsEvery != 0)
@@ -423,10 +423,10 @@ public class VerticalAxis : Axis
         var labels = 0;
         int x = GetAxisXPosition (graph);
 
-        // remember screen space is top down so the lowest graph
-        // space value is at the bottom of the screen
-        RectangleF start = graph.ScreenToGraphSpace (x, bounds.Height - (1 + (int)graph.MarginBottom));
-        RectangleF end = graph.ScreenToGraphSpace (x, 0);
+        // remember viewport space is top down so the lowest graph
+        // space value is at the bottom of the viewport
+        RectangleF start = graph.ViewportToGraphSpace (x, bounds.Height - (1 + (int)graph.MarginBottom));
+        RectangleF end = graph.ViewportToGraphSpace (x, 0);
 
         // don't draw labels below the minimum
         if (Minimum.HasValue)
@@ -438,10 +438,10 @@ public class VerticalAxis : Axis
 
         while (current.Y < end.Y)
         {
-            int screenY = graph.GraphSpaceToViewport (new PointF (current.X, current.Y)).Y;
+            int viewportY = graph.GraphSpaceToViewport (new PointF (current.X, current.Y)).Y;
 
             // Create the axis symbol
-            var toRender = new AxisIncrementToRender (Orientation, screenY, current.Y);
+            var toRender = new AxisIncrementToRender (Orientation, viewportY, current.Y);
 
             // and the label (if we are due one)
             if (ShowLabelsEvery != 0)

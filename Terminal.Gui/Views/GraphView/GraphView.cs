@@ -203,19 +203,6 @@ public class GraphView : View, IDesignable
                    );
     }
 
-    /// <summary>Calculates the viewport-relative location for a given point in graph space.</summary>
-    /// <param name="location">
-    ///     Point in graph space that may or may not be represented in the visible area of graph currently
-    ///     presented.  E.g. 0,0 for origin.
-    /// </param>
-    /// <returns>
-    ///     Viewport-relative position (Column/Row) which would be used to render the graph <paramref name="location"/>. Note that
-    ///     this can be outside the current content area of the view.
-    /// </returns>
-    [Obsolete ("Use GraphSpaceToViewport instead. This method uses viewport-relative coordinates, not screen coordinates.")]
-    [EditorBrowsable (EditorBrowsableState.Never)]
-    public Point GraphSpaceToScreen (PointF location) => GraphSpaceToViewport (location);
-
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
@@ -278,7 +265,7 @@ public class GraphView : View, IDesignable
 
         var drawBounds = new Rectangle ((int)MarginLeft, 0, graphScreenWidth, graphScreenHeight);
 
-        RectangleF graphSpace = ScreenToGraphSpace (drawBounds);
+        RectangleF graphSpace = ViewportToGraphSpace (drawBounds);
 
         foreach (ISeries s in Series.ToArray ())
         {
@@ -335,14 +322,6 @@ public class GraphView : View, IDesignable
                    );
     }
 
-    /// <summary>Returns the section of the graph that is represented by the given viewport-relative position.</summary>
-    /// <param name="col">Column in viewport-relative coordinates.</param>
-    /// <param name="row">Row in viewport-relative coordinates.</param>
-    /// <returns>The rectangle in graph space that corresponds to the viewport cell at the given position.</returns>
-    [Obsolete ("Use ViewportToGraphSpace instead. This method uses viewport-relative coordinates, not screen coordinates.")]
-    [EditorBrowsable (EditorBrowsableState.Never)]
-    public RectangleF ScreenToGraphSpace (int col, int row) => ViewportToGraphSpace (col, row);
-
     /// <summary>Returns the section of the graph that is represented by the viewport-relative area.</summary>
     /// <param name="viewportArea">Rectangle in viewport-relative coordinates.</param>
     /// <returns>The rectangle in graph space that corresponds to the viewport area.</returns>
@@ -353,13 +332,6 @@ public class GraphView : View, IDesignable
 
         return pos with { Width = viewportArea.Width * CellSize.X, Height = viewportArea.Height * CellSize.Y };
     }
-
-    /// <summary>Returns the section of the graph that is represented by the screen area.</summary>
-    /// <param name="screenArea">Rectangle in viewport-relative coordinates.</param>
-    /// <returns>The rectangle in graph space that corresponds to the viewport area.</returns>
-    [Obsolete ("Use ViewportToGraphSpace instead. This method uses viewport-relative coordinates, not screen coordinates.")]
-    [EditorBrowsable (EditorBrowsableState.Never)]
-    public RectangleF ScreenToGraphSpace (Rectangle screenArea) => ViewportToGraphSpace (screenArea);
 
     /// <summary>
     ///     Scrolls the view by a given number of units in graph space. See <see cref="CellSize"/> to translate this into
