@@ -165,13 +165,13 @@ view.MouseEnter += (sender, e) =>
 
 ## Application Level Navigation
 
-At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.App.Application.Navigation property.
+At the application level, navigation is encapsulated within the @Terminal.Gui.ApplicationNavigation helper class which is publicly exposed via the @Terminal.Gui.Application.Navigation property.
 
-@Terminal.Gui.App.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
+@Terminal.Gui.ApplicationNavigation.GetFocused gets the most-focused View in the application. Will return `null` if there is no view with focus (an extremely rare situation). This replaces `View.MostFocused` in v1.
 
-The @Terminal.Gui.App.ApplicationNavigation.FocusedChanged and @Terminal.Gui.App.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful for apps that want to override what view can be focused across an entire app. 
+The @Terminal.Gui.ApplicationNavigation.FocusedChanged and @Terminal.Gui.ApplicationNavigation.FocusedChanging events are raised when the most-focused View in the application is changing or has changed. `FocusedChanged` is useful for apps that want to do something with the most-focused view (e.g. see `AdornmentsEditor`). `FocusChanging` is useful for apps that want to override what view can be focused across an entire app. 
 
-The @Terminal.Gui.App.ApplicationNavigation.AdvanceFocus method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
+The @Terminal.Gui.ApplicationNavigation.AdvanceFocus method causes the focus to advance (forward or backwards) to the next View in the application view-hierarchy, using `behavior` as a filter.
 
 The implementation is simple:
 
@@ -214,9 +214,9 @@ Application.Navigation.AdvanceFocus(NavigationDirection.Backward, TabBehavior.Ta
 
 ## View Level Navigation
 
-@Terminal.Gui.ViewBase.View.AdvanceFocus is the primary method for developers to cause a view to gain or lose focus.
+@Terminal.Gui.View.AdvanceFocus is the primary method for developers to cause a view to gain or lose focus.
 
-Various events are raised when a View's focus is changing. For example, @Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged.
+Various events are raised when a View's focus is changing. For example, @Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged.
 
 ### View Focus Management
 
@@ -413,7 +413,7 @@ container.Add(button);  // Does not automatically set CanFocus on container
 
 ## Knowing When a View's Focus is Changing
 
-@Terminal.Gui.ViewBase.View.HasFocusChanging and @Terminal.Gui.ViewBase.View.HasFocusChanged are raised when a View's focus is changing.
+@Terminal.Gui.View.HasFocusChanging and @Terminal.Gui.View.HasFocusChanged are raised when a View's focus is changing.
 
 ```csharp
 // Monitor focus changes

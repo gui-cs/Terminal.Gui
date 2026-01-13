@@ -364,9 +364,9 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 - `QueueAnsiRequest()` - ANSI request handling
 
 **Note:** The driver is internal to Terminal.Gui. View classes should not access `Driver` directly. Instead:
-- Use @Terminal.Gui.App.Application.Screen to get screen dimensions
-- Use @Terminal.Gui.ViewBase.View.Move for positioning (with viewport-relative coordinates)
-- Use @Terminal.Gui.ViewBase.View.AddRune and @Terminal.Gui.ViewBase.View.AddStr for drawing
+- Use @Terminal.Gui.Application.Screen to get screen dimensions
+- Use @Terminal.Gui.View.Move for positioning (with viewport-relative coordinates)
+- Use @Terminal.Gui.View.AddRune and @Terminal.Gui.View.AddStr for drawing
 - ViewBase infrastructure classes (in `Terminal.Gui/ViewBase/`) can access Driver when needed for framework implementation
 
 ### Driver Creation and Selection

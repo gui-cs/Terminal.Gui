@@ -273,10 +273,10 @@ See the [Drawing Deep Dive](drawing.md) for complete details.
 
 v2 provides full 24-bit color support by default:
 
-- **Implementation**: [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml) class handles RGB values
+- **Implementation**: [Attribute](~/api/Terminal.Gui.Attribute.yml) class handles RGB values
 - **Fallback**: Automatic 16-color mode for older terminals
-- **Driver Support**: [IConsoleDriver.SupportsTrueColor](~/api/Terminal.Gui.Drivers.IConsoleDriver.yml#Terminal_Gui_Drivers_IConsoleDriver_SupportsTrueColor) detection
-- **Usage**: Direct RGB input via [Color](~/api/Terminal.Gui.Drawing.Color.yml) struct
+- **Driver Support**: [IConsoleDriver.SupportsTrueColor](~/api/Terminal.Gui.IConsoleDriver.yml#Terminal_Gui_IConsoleDriver_SupportsTrueColor) detection
+- **Usage**: Direct RGB input via [Color](~/api/Terminal.Gui.Color.yml) struct
 
 ```csharp
 // 24-bit RGB color
@@ -290,16 +290,16 @@ Color color = Color.Yellow; // Was "Brown" in v1
 
 See the [Layout Deep Dive](layout.md) for complete details.
 
-v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.Adornment.yml) system:
+v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.Adornment.yml) system:
 
 - **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Transparent spacing outside the border
 - **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Visual frame with title, multiple styles
 - **[Padding](~/api/Terminal.Gui.ViewBase.Padding.yml)** - Spacing inside the border
 
 **Border Features:**
-- Multiple [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) options: Single, Double, Heavy, Rounded, Dashed, Dotted
-- Automatic line intersection handling via [LineCanvas](~/api/Terminal.Gui.Drawing.LineCanvas.yml)
-- Configurable thickness per side via [Thickness](~/api/Terminal.Gui.Drawing.Thickness.yml)
+- Multiple [LineStyle](~/api/Terminal.Gui.LineStyle.yml) options: Single, Double, Heavy, Rounded, Dashed, Dotted
+- Automatic line intersection handling via [LineCanvas](~/api/Terminal.Gui.LineCanvas.yml)
+- Configurable thickness per side via [Thickness](~/api/Terminal.Gui.Thickness.yml)
 - Title display with alignment options
 
 ```csharp
@@ -318,8 +318,8 @@ See the [Configuration Deep Dive](config.md) and [Scheme Deep Dive](scheme.md) f
 v2 adds comprehensive theme support:
 
 - **ConfigurationManager**: Loads/saves color schemes from files
-- **Schemes**: Applied per-view or globally via [Scheme](~/api/Terminal.Gui.Drawing.Scheme.yml)
-- **Text Styles**: [TextStyle](~/api/Terminal.Gui.Drawing.TextStyle.yml) supports Bold, Italic, Underline, Strikethrough, Blink, Reverse, Faint
+- **Schemes**: Applied per-view or globally via [Scheme](~/api/Terminal.Gui.Scheme.yml)
+- **Text Styles**: [TextStyle](~/api/Terminal.Gui.TextStyle.yml) supports Bold, Italic, Underline, Strikethrough, Blink, Reverse, Faint
 - **User Customization**: End-users can personalize without code changes
 
 ```csharp
@@ -338,12 +338,12 @@ view.Scheme.Normal = new (
 
 See the [Drawing Deep Dive](drawing.md) for complete details.
 
-[LineCanvas](~/api/Terminal.Gui.Drawing.LineCanvas.yml) provides sophisticated line drawing:
+[LineCanvas](~/api/Terminal.Gui.LineCanvas.yml) provides sophisticated line drawing:
 
 - Auto-joining lines at intersections
 - Multiple line styles (Single, Double, Heavy, etc.)
 - Automatic glyph selection for corners and T-junctions
-- Used by [Border](~/api/Terminal.Gui.ViewBase.Border.yml), [Line](~/api/Terminal.Gui.Views.Line.yml), and custom views
+- Used by [Border](~/api/Terminal.Gui.ViewBase.Border.yml), [Line](~/api/Terminal.Gui.Line.yml), and custom views
 
 ```csharp
 // Line view uses LineCanvas
@@ -357,8 +357,8 @@ See the [Drawing Deep Dive](drawing.md) for details.
 
 v2 adds gradient support:
 
-- [Gradient](~/api/Terminal.Gui.Drawing.Gradient.yml) - Color transitions
-- [GradientFill](~/api/Terminal.Gui.Drawing.GradientFill.yml) - Fill patterns
+- [Gradient](~/api/Terminal.Gui.Gradient.yml) - Color transitions
+- [GradientFill](~/api/Terminal.Gui.GradientFill.yml) - Fill patterns
 - Uses TrueColor for smooth effects
 - Apply to borders, backgrounds, or custom elements
 
@@ -428,11 +428,11 @@ v2 clarifies view ownership:
 
 See the [Scrolling Deep Dive](scrolling.md) for complete details.
 
-Every [View](~/api/Terminal.Gui.ViewBase.View.yml) supports scrolling inherently:
+Every [View](~/api/Terminal.Gui.ViewBase.yml) supports scrolling inherently:
 
-- **[Viewport](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Viewport)** - Visible rectangle (can have non-zero location)
-- **[GetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_GetContentSize)** - Returns total content size
-- **[SetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SetContentSize_System_Nullable_System_Drawing_Size__)** - Sets scrollable content size
+- **[Viewport](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_Viewport)** - Visible rectangle (can have non-zero location)
+- **[GetContentSize](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_GetContentSize)** - Returns total content size
+- **[SetContentSize](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_SetContentSize_System_Nullable_System_Drawing_Size__)** - Sets scrollable content size
 - **ScrollVertical/ScrollHorizontal** - Helper methods
 
 **No need for ScrollView wrapper!**
@@ -459,22 +459,22 @@ v2 replaces `ScrollBarView` with [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.
 - Automatic show/hide
 - Proportional sizing with `ScrollSlider`
 - Integrated with View's scrolling system
-- Simple to add via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_VerticalScrollBar) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HorizontalScrollBar)
+- Simple to add via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_VerticalScrollBar) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_HorizontalScrollBar)
 
 ### Advanced Layout Features
 
 See the [Layout Deep Dive](layout.md) and [DimAuto Deep Dive](dimauto.md) for details.
 
-**[Dim.Auto](~/api/Terminal.Gui.Dim.yml#Terminal_Gui_Dim_Auto_Terminal_Gui_DimAutoStyle_Terminal_Gui_Dim_Terminal_Gui_Dim_):**
+**[Dim.Auto](~/api/Terminal.Gui.ViewBase.Dim.yml#Terminal_Gui_Dim_Auto_Terminal_Gui_DimAutoStyle_Terminal_Gui_Dim_Terminal_Gui_Dim_):**
 - Automatically sizes views based on content or subviews
 - Reduces manual layout calculations
 - Supports multiple styles (Text, Content, Position)
 
-**[Pos.AnchorEnd](~/api/Terminal.Gui.Pos.yml#Terminal_Gui_Pos_AnchorEnd_System_Int32_):**
+**[Pos.AnchorEnd](~/api/Terminal.Gui.ViewBase.Pos.yml#Terminal_Gui_Pos_AnchorEnd_System_Int32_):**
 - Anchor to right or bottom of SuperView
 - Enables flexible, responsive layouts
 
-**[Pos.Align](~/api/Terminal.Gui.Pos.yml):**
+**[Pos.Align](~/api/Terminal.Gui.ViewBase.Pos.yml):**
 - Align multiple views (Left, Center, Right)
 - Simplifies creating aligned layouts
 
@@ -496,13 +496,13 @@ label2.X = Pos.Center ();
 
 See the [Arrangement Deep Dive](arrangement.md) for complete details.
 
-[View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Arrangement) enables interactive UI:
+[View.Arrangement](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_Arrangement) enables interactive UI:
 
 - **[ViewArrangement.Movable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Drag with mouse or move with keyboard
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_Application_ArrangeKey)) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -518,8 +518,8 @@ See the [Navigation Deep Dive](navigation.md) for complete details.
 
 v2 decouples navigation concepts:
 
-- **[CanFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_CanFocus)** - Whether view can receive focus (defaults to `false` in v2)
-- **[TabStop](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_TabStop)** - [TabBehavior](~/api/Terminal.Gui.Input.TabBehavior.yml) enum (TabStop, TabGroup, NoStop)
+- **[CanFocus](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_CanFocus)** - Whether view can receive focus (defaults to `false` in v2)
+- **[TabStop](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_TabStop)** - [TabBehavior](~/api/Terminal.Gui.TabBehavior.yml) enum (TabStop, TabGroup, NoStop)
 - **[ApplicationNavigation](~/api/Terminal.Gui.App.ApplicationNavigation.yml)** - Centralized navigation logic
 
 **Navigation Keys (Configurable):**
@@ -576,7 +576,7 @@ See the [Views Overview](views.md) for a complete catalog.
 
 See the [Keyboard Deep Dive](keyboard.md) and [Command Deep Dive](command.md) for details.
 
-**[Key](~/api/Terminal.Gui.Input.Key.yml) Class:**
+**[Key](~/api/Terminal.Gui.Key.yml) Class:**
 - Replaces v1's `KeyEvent` struct
 - High-level abstraction over raw key codes
 - Properties for modifiers and key type
@@ -593,9 +593,9 @@ if (key.Ctrl) { }
 ```
 
 **Key Bindings:**
-- Map keys to [Command](~/api/Terminal.Gui.Input.Command.yml) enums
+- Map keys to [Command](~/api/Terminal.Gui.Command.yml) enums
 - Scopes: Application, Focused, HotKey
-- Views declare supported commands via [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml)
+- Views declare supported commands via [View.AddCommand](~/api/Terminal.Gui.ViewBase.yml)
 
 ```csharp
 // Add command handler
@@ -612,29 +612,29 @@ private bool HandleAccept ()
 ```
 
 **Configurable Keys:**
-- [IKeyboard.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
-- [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
+- [IKeyboard.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_Application_QuitKey) - Close app (default: Esc)
+- [IKeyboard.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
 - Navigation keys (Tab, F6, arrows)
 
 ### Mouse API
 
 See the [Mouse Deep Dive](mouse.md) for complete details.
 
-**[MouseEventArgs](~/api/Terminal.Gui.Input.MouseEventArgs.yml):**
+**[MouseEventArgs](~/api/Terminal.Gui.MouseEventArgs.yml):**
 - Replaces v1's `MouseEventEventArgs`
 - Cleaner structure for mouse data
-- [MouseFlags](~/api/Terminal.Gui.Input.MouseFlags.yml) for button states
+- [MouseFlags](~/api/Terminal.Gui.MouseFlags.yml) for button states
 
 **Granular Events:**
-- [View.MouseClick](~/api/Terminal.Gui.ViewBase.View.yml) - High-level click events
+- [View.MouseClick](~/api/Terminal.Gui.ViewBase.yml) - High-level click events
 - Double-click support
 - Mouse movement tracking
 - Viewport-relative coordinates (not screen-relative)
 
 **Highlight and Repeat on Hold:**
-- [View.MouseHighlightStates](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHighlightStates) - Allows views to provide visual feedback on hover/click.
-- [View.MouseState](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseState) - Indicates whether the mouse is pressed, hovered, or outside.
-- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_MouseHoldRepeat) - Enables or disables whether mouse click events will be repeated when the user holds the mouse down
+- [View.MouseHighlightStates](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_MouseHighlightStates) - Allows views to provide visual feedback on hover/click.
+- [View.MouseState](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_MouseState) - Indicates whether the mouse is pressed, hovered, or outside.
+- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.yml#Terminal_Gui_View_MouseHoldRepeat) - Enables or disables whether mouse click events will be repeated when the user holds the mouse down
 
 ## Configuration and Persistence
 
@@ -649,7 +649,7 @@ See the [Configuration Deep Dive](config.md) for complete details.
 - Key binding customization
 - View property persistence
 - [SettingsScope](~/api/Terminal.Gui.Configuration.SettingsScope.yml) - User, Application, Machine levels
-- [ConfigLocations](~/api/Terminal.Gui.Configuration.ConfigLocations.yml) - Where to search for configs
+- [ConfigLocations](~/api/Terminal.Gui.Configuration.Configuration.ConfigLocations.yml) - Where to search for configs
 
 ```csharp
 // Enable configuration
@@ -676,7 +676,7 @@ See the [Logging Deep Dive](logging.md) for complete details.
 
 ### Logging System
 
-[Logging](~/api/Terminal.Gui.App.Logging.yml) integrates with Microsoft.Extensions.Logging:
+[Logging](~/api/Terminal.Gui.Logging.yml) integrates with Microsoft.Extensions.Logging:
 
 - Multi-level logging (Trace, Debug, Info, Warning, Error)
 - Internal operation tracking (rendering, input, layout)
@@ -692,7 +692,7 @@ Logging.Debug ("Rendering view {ViewId}", view.Id);
 
 ### Metrics
 
-[Logging.Meter](~/api/Terminal.Gui.App.Logging.yml#Terminal_Gui_App_Logging_Meter) provides performance metrics:
+[Logging.Meter](~/api/Terminal.Gui.Logging.yml#Terminal_Gui_Logging_Meter) provides performance metrics:
 
 - Frame rate tracking
 - Redraw times
@@ -713,9 +713,9 @@ dotnet counters monitor --name MyApp Terminal.Gui
 
 v2 supports the Sixel protocol for rendering images:
 
-- [SixelEncoder](~/api/Terminal.Gui.Drawing.SixelEncoder.yml) - Encode images as Sixel data
-- [SixelSupportDetector](~/api/Terminal.Gui.Drawing.SixelSupportDetector.yml) - Detect terminal support
-- [SixelToRender](~/api/Terminal.Gui.Drawing.SixelToRender.yml) - Render Sixel images
+- [SixelEncoder](~/api/Terminal.Gui.SixelEncoder.yml) - Encode images as Sixel data
+- [SixelSupportDetector](~/api/Terminal.Gui.SixelSupportDetector.yml) - Detect terminal support
+- [SixelToRender](~/api/Terminal.Gui.SixelToRender.yml) - Render Sixel images
 - Compatible terminals: Windows Terminal, xterm, others
 
 **Use Cases**: Image previews, graphics in terminal apps
@@ -725,7 +725,7 @@ v2 supports the Sixel protocol for rendering images:
 v2 ensures compatibility with Ahead-of-Time compilation:
 
 - Avoid reflection patterns problematic for AOT
-- Source generators for JSON serialization via [SourceGenerationContext](~/api/Terminal.Gui.Configuration.SourceGenerationContext.yml)
+- Source generators for JSON serialization via [SourceGenerationContext](~/api/Terminal.Gui.SourceGenerationContext.yml)
 - Single-file deployment support
 - Faster startup, reduced runtime overhead
 
@@ -734,7 +734,7 @@ v2 ensures compatibility with Ahead-of-Time compilation:
 ### Enhanced Unicode Support
 
 - Correctly manages wide characters (CJK scripts)
-- [TextFormatter](~/api/Terminal.Gui.Text.TextFormatter.yml) accounts for Unicode width
+- [TextFormatter](~/api/Terminal.Gui.TextFormatter.yml) accounts for Unicode width
 - Fixes v1 layout issues with wide characters
 - International application support
 

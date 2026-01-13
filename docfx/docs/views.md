@@ -80,7 +80,7 @@ Shows a checkbox that can be cycled between two or three states.
 
 ## [ColorPicker](~/api/Terminal.Gui.Views.ColorPicker.yml)
 
-Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the [IColorNameResolver](~/api/Terminal.Gui.Drawing.IColorNameResolver.yml).
+Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the [IColorNameResolver](~/api/Terminal.Gui.Views.IColorNameResolver.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -166,7 +166,7 @@ Lets the user pick a date from a visual calendar.
 
 ## [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
 
-Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Drawing.Schemes.Dialog.yml) scheme.
+Supports a simple API for adding [Button](~/api/Terminal.Gui.Views.Button.yml)s across the bottom. By default, the [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) is centered and used the [Schemes.Dialog](~/api/Terminal.Gui.Views.Schemes.Dialog.yml) scheme.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -334,7 +334,7 @@ Provides a hex editor with the left side showing the hex values of the bytes in 
 
 ## [Label](~/api/Terminal.Gui.Views.Label.yml)
 
-Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When the user presses a hotkey that matches the [View.HotKey](~/api/Terminal.Gui.ViewBase.View.HotKey.yml) of the Label, the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml) will be activated.
+Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.SubViews.yml). When the user presses a hotkey that matches the [View.HotKey](~/api/Terminal.Gui.ViewBase.HotKey.yml) of the Label, the next [View](~/api/Terminal.Gui.ViewBase.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.SubViews.yml) will be activated.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -377,7 +377,7 @@ Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol defi
 
 ## [Line](~/api/Terminal.Gui.Views.Line.yml)
 
-Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) specified by [Line.Style](~/api/Terminal.Gui.Views.Line.Style.yml).
+Draws a single line using the [LineStyle](~/api/Terminal.Gui.Views.LineStyle.yml) specified by [Line.Style](~/api/Terminal.Gui.Views.Line.Style.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -557,7 +557,7 @@ Provides a user interface for displaying and selecting a single item from a list
 
 ## [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml)
 
-A [Terminal.Gui.App.PopoverBaseImpl](~/api/Terminal.Gui.App.PopoverBaseImpl.yml)-derived view that provides a cascading menu. Can be used as a context menu or a drop-down menu as part of [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml).
+A [Terminal.Gui.PopoverBaseImpl](~/api/Terminal.Gui.Views.PopoverBaseImpl.yml)-derived view that provides a cascading menu. Can be used as a context menu or a drop-down menu as part of [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -600,7 +600,7 @@ A Progress Bar view that can indicate progress of an activity visually.
 
 ## [Runnable](~/api/Terminal.Gui.Views.Runnable.yml)
 
-Base implementation of [Terminal.Gui.App.IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) for views that can be run as blocking sessions without returning a result.
+Base implementation of [Terminal.Gui.IRunnable](~/api/Terminal.Gui.Views.IRunnable.yml) for views that can be run as blocking sessions without returning a result.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -630,13 +630,13 @@ Base implementation of [Terminal.Gui.App.IRunnable](~/api/Terminal.Gui.App.IRunn
 
 ## [Runnable\<T\>](~/api/Terminal.Gui.Views.Runnable-1.yml)
 
-Base implementation of [Terminal.Gui.App.IRunnable%601](~/api/Terminal.Gui.App.IRunnable%601.yml) for views that can be run as blocking sessions.
+Base implementation of [Terminal.Gui.IRunnable%601](~/api/Terminal.Gui.Views.IRunnable%601.yml) for views that can be run as blocking sessions.
 
 
 
 ## [RunnableWrapper\<T\>](~/api/Terminal.Gui.Views.RunnableWrapper-2.yml)
 
-Wraps any [View](~/api/Terminal.Gui.ViewBase.View.yml) to make it runnable with a typed result, similar to how [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) wraps [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml).
+Wraps any [View](~/api/Terminal.Gui.ViewBase.yml) to make it runnable with a typed result, similar to how [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) wraps [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml).
 
 
 
@@ -668,7 +668,7 @@ Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for select
 
 ## [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml)
 
-Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.View.Viewport.yml).
+Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.Viewport.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -745,7 +745,7 @@ Displays a spinning glyph or combinations of glyphs to indicate progress or acti
 
 ## [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml)
 
-A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of the Viewport displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context-sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
+A status bar is a [View](~/api/Terminal.Gui.ViewBase.yml) that snaps to the bottom of the Viewport displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context-sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -981,7 +981,7 @@ An overlapped container for other views with a border and optional title.
 
 ## [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)
 
-A multistep user interface for collecting related data. Each [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml) can host arbitrary [View](~/api/Terminal.Gui.ViewBase.View.yml)s and display help text. Navigation buttons enable moving between steps.
+A multistep user interface for collecting related data. Each [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml) can host arbitrary [View](~/api/Terminal.Gui.ViewBase.yml)s and display help text. Navigation buttons enable moving between steps.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -1005,7 +1005,7 @@ A multistep user interface for collecting related data. Each [WizardStep](~/api/
 
 ## [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml)
 
-A single step in a [Wizard](~/api/Terminal.Gui.Views.Wizard.yml). Can contain arbitrary [View](~/api/Terminal.Gui.ViewBase.View.yml)s and display help text in the right [Padding](~/api/Terminal.Gui.ViewBase.Padding.yml).
+A single step in a [Wizard](~/api/Terminal.Gui.Views.Wizard.yml). Can contain arbitrary [View](~/api/Terminal.Gui.ViewBase.yml)s and display help text in the right [Padding](~/api/Terminal.Gui.Views.Padding.yml).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
