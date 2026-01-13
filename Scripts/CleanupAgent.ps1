@@ -72,20 +72,24 @@ function Invoke-PartialSplit {
 }
 
 function Invoke-ReSharperCleanup {
+    param([string]$FilePath)
+
     if ($SkipReSharper) {
         Write-Status "Skipping ReSharper (--SkipReSharper flag)" "Yellow"
         return $true
     }
 
-    Write-Status "Running ReSharper Full Cleanup on entire solution..." "Yellow"
-    Write-Status "WARNING: This will format the entire codebase!" "Red"
+    # Convert to relative path for ReSharper
+    $relativePath = (Resolve-Path -Relative $FilePath).TrimStart(".\").Replace("\", "/")
+    Write-Status "Running ReSharper Full Cleanup on: $relativePath" "Yellow"
 
-    # ReSharper cleanupcode doesn't respect --include properly, so we run on whole solution
-    # This is a known limitation - consider running manually in IDE instead
+    # Run cleanup on specific file using --include parameter
+    # Note: May show exceptions in output, but cleanup still completes successfully
     jb cleanupcode "$RepoRoot\Terminal.sln" `
         --profile="Full Cleanup" `
+        --include="$relativePath" `
         --no-build `
-        --verbosity=ERROR 2>&1 | Out-Null
+        --verbosity=WARN 2>&1 | Out-Host
 
     if ($LASTEXITCODE -ne 0) {
         Write-Status "ReSharper cleanup failed" "Red"
@@ -298,8 +302,8 @@ function Process-CleanupFile {
             }
         }
 
-        # Step 2: Run ReSharper cleanup (warning: processes entire solution)
-        if (-not (Invoke-ReSharperCleanup)) {
+        # Step 2: Run ReSharper cleanup on specific file
+        if (-not (Invoke-ReSharperCleanup -FilePath $FilePath)) {
             return $false
         }
 

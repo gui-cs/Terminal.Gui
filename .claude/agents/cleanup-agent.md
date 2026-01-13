@@ -60,8 +60,9 @@ Automated code cleanup, modernization, and refactoring for Terminal.Gui C# files
 
 ### 2. ReSharper Full Cleanup
 - Applies "Full Cleanup" profile from `Terminal.sln.DotSettings`
-- ⚠️ **WARNING**: May process entire solution (ReSharper CLI limitation)
+- Uses `--include` parameter to target specific files
 - Respects all project code style settings
+- Command: `jb cleanupcode Terminal.sln --profile="Full Cleanup" --include="path/to/file.cs" --no-build`
 
 ### 3. Backing Field Reordering
 - Places backing fields immediately before their properties
@@ -83,18 +84,96 @@ Automated code cleanup, modernization, and refactoring for Terminal.Gui C# files
 - Runs UnitTestsParallelizable test suite
 - Rolls back on failure (except for partial splits)
 
+## ReSharper Command Line Usage
+
+### cleanupcode - Apply Code Formatting
+
+The `--include` parameter **WORKS CORRECTLY** for single-file cleanup:
+
+```bash
+# Cleanup a single file
+jb cleanupcode Terminal.sln \
+    --profile="Full Cleanup" \
+    --include="Terminal.Gui/Views/TableView/TableView.cs" \
+    --no-build \
+    --verbosity=WARN
+```
+
+**Key Parameters:**
+- `--profile="Full Cleanup"` - Uses the profile defined in Terminal.sln.DotSettings
+- `--include="path/to/file.cs"` - Relative path from solution root (forward slashes recommended)
+- `--no-build` - Skips building before cleanup (recommended, saves time)
+- `--verbosity=WARN` - Recommended (ERROR=minimal, WARN=moderate, VERBOSE=detailed, use VERBOSE for full debugging)
+
+**Verified Behavior (Tested 2026-01-13):**
+- ✅ Only the specified file is modified (--include works correctly)
+- ⚠️ May display exceptions in output, but cleanup completes successfully
+
+### inspectcode - Identify Code Issues
+
+```bash
+# Inspect a single file for warnings
+jb inspectcode Terminal.sln \
+    --output="inspect-report.xml" \
+    --include="Terminal.Gui/Views/TableView/TableView.cs" \
+    --severity=WARNING \
+    --no-build \
+    --format=Xml
+```
+
+**Key Parameters:**
+- `--output="file.xml"` - Path to output XML report
+- `--include="path/to/file.cs"` - Filter to specific file (same format as cleanupcode)
+- `--severity=WARNING` - Minimum severity level (INFO, HINT, SUGGESTION, WARNING, ERROR)
+- `--format=Xml` - Output format (Xml, Html, Text, Sarif)
+
 ## Known Limitations
 
-### ReSharper CLI Issue
+### ReSharper Exceptions in Output
 
-**Problem**: ReSharper `cleanupcode` command may ignore the `--include` parameter and process the entire solution.
+**Observation:** ReSharper cleanupcode displays exceptions during execution, but completes successfully (exit code 0) and correctly modifies the target file.
 
-**Impact**: Running cleanup on a single file may modify hundreds of files across the codebase.
+Common exceptions observed:
 
-**Workarounds**:
-1. **Recommended**: Use `--SkipReSharper` flag and run Full Cleanup manually in Rider/Visual Studio
-2. Run cleanup on entire solution once, then use other agent features
-3. Review all changes carefully before committing
+**1. NuGet Version Parsing:**
+```
+Unable to parse version string 8.
+--- EXCEPTION #1/2 [InvalidOperationException]
+Message = "Unable to parse version string 8."
+```
+
+**2. Component Initialization:**
+```
+Must not be called inside a component constructor: Use GetLazyProvider
+--- EXCEPTION #1/1 [LoggerException]
+```
+
+**3. ConfigFileCache Warnings:**
+```
+Warning: <ConfigFileCache> Attention! Removing a mount point before rebuilding goes inconsistent.
+```
+
+**What We Know:**
+- ✅ Command completes with exit code 0
+- ✅ Target files are correctly modified with expected formatting changes
+- ✅ Only files matching --include pattern are modified
+- ❌ Exceptions appear in output (unclear if expected behavior or bugs)
+
+**Verification Steps:**
+1. Check exit code: `Main method ... returned exit code 0`
+2. Verify changes: `git diff` to see actual modifications
+3. Look for: `Saving document <filename>` in verbose output
+
+**Unknown:** Whether these exceptions indicate bugs in ReSharper CLI or are expected internal logging. If concerned, consider reporting to JetBrains support.
+
+### Performance Characteristics
+
+ReSharper cleanupcode loads the entire solution model even when `--include` specifies one file:
+- **First run on solution**: 30-60 seconds (builds caches, loads solution model)
+- **Subsequent runs**: 15-30 seconds (uses cached solution model)
+- **Large solutions**: May take 1-2 minutes
+
+This is expected behavior - ReSharper needs the full solution context for accurate code analysis, but **only modifies files matching the --include pattern**.
 
 ### Partial Splitting Limitations
 
