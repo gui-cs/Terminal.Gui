@@ -17,7 +17,7 @@ The API documentation is generated via a GitHub Action (`.github/workflows/api-d
 
 ## API Documentation Overview
 
-The API documentation for Terminal.Gui is a critical resource for developers, providing detailed information on classes, methods, properties, and events within the library. This documentation is hosted at [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui) and includes both auto-generated API references and conceptual guides. For a broader overview of the Terminal.Gui project, including project structure and contribution guidelines, refer to the main [Terminal.Gui README](../Terminal.Gui/README.md).
+The API documentation for Terminal.Gui is a critical resource for developers, providing detailed information on classes, methods, properties, and events within the library. This documentation is hosted at [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui) and includes both auto-generated API references and conceptual guides. For a broader overview of the Terminal.Gui project, including project structure and contribution guidelines, refer to the main [Terminal.Gui README](https://github.com/gui-cs/Terminal.Gui/blob/v2_develop/README.md).
 
 ### Scripts for Documentation Generation
 

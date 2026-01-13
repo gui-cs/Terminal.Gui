@@ -5,7 +5,7 @@
         {
           "src": "../Terminal.Gui",
           "files": [
-            "**/*.csproj"
+            "bin/Release/net10.0/Terminal.Gui.dll"
           ]
         }
       ],
@@ -37,8 +37,7 @@
     "content": [
       {
         "files": [
-          "**/*.{md,yml}",
-          "schemas/**.json"
+          "**/*.{md,yml}"
         ],
         "exclude": [
           "_site/**",
