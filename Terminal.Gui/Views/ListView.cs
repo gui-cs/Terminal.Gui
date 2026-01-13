@@ -43,11 +43,6 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class ListView : View, IDesignable
 {
-    // TODO: ListView has been upgraded to use Viewport and ContentSize instead of the
-    // TODO: bespoke _top and _left. It was a quick & dirty port. There is now duplicate logic
-    // TODO: that could be removed.
-    //private int _top, _left;
-
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
     ///     something.
@@ -283,8 +278,9 @@ public class ListView : View, IDesignable
             Source.SetMark (i, mark);
         }
 
-        return true;
+        SetNeedsDraw ();
 
+        return true;
     }
 
     /// <summary>Marks the <see cref="SelectedItem"/> if it is not already marked.</summary>
@@ -528,10 +524,7 @@ public class ListView : View, IDesignable
     /// <summary>
     ///     Allow resume the <see cref="CollectionChanged"/> event from being invoked,
     /// </summary>
-    public void ResumeSuspendCollectionChangedEvent ()
-    {
-        Source?.SuspendCollectionChangedEvent = false;
-    }
+    public void ResumeSuspendCollectionChangedEvent () { Source?.SuspendCollectionChangedEvent = false; }
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs>? RowRender;
@@ -561,7 +554,7 @@ public class ListView : View, IDesignable
         }
     }
 
-    // TODO: Use standard event model
+    // TODO: Use CWP event model
     /// <summary>Invokes the <see cref="SelectedItemChanged"/> event if it is defined.</summary>
     /// <returns></returns>
     public virtual bool OnSelectedChanged ()
@@ -577,7 +570,6 @@ public class ListView : View, IDesignable
         EnsureSelectedItemVisible ();
 
         return true;
-
     }
 
     /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
@@ -661,10 +653,7 @@ public class ListView : View, IDesignable
     /// <summary>
     ///     Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
     /// </summary>
-    public void SuspendCollectionChangedEvent ()
-    {
-        Source?.SuspendCollectionChangedEvent = true;
-    }
+    public void SuspendCollectionChangedEvent () { Source?.SuspendCollectionChangedEvent = true; }
 
     /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
     /// <remarks>
@@ -714,7 +703,6 @@ public class ListView : View, IDesignable
 
         return true;
     }
-
 
     /// <summary>
     ///     Call the event to raises the <see cref="CollectionChanged"/>.
@@ -827,7 +815,6 @@ public class ListView : View, IDesignable
         SetNeedsDraw ();
 
         return true;
-
     }
 
     /// <inheritdoc/>
@@ -846,7 +833,6 @@ public class ListView : View, IDesignable
 
         OnCollectionChanged (e);
     }
-
 
     /// <inheritdoc/>
     public bool EnableForDesign ()
