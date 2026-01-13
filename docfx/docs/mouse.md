@@ -1,4 +1,4 @@
-﻿# Mouse Deep Dive
+# Mouse Deep Dive
 
 > **Quick Start:** Jump to [Quick Reference](#quick-reference) for a condensed overview of the mouse pipeline and common patterns.
 
@@ -22,7 +22,7 @@
 ### The Pipeline (TL;DR)
 
 ```
-ANSI Input → AnsiMouseParser → MouseInterpreter → MouseImpl → View → Commands
+ANSI Input ? AnsiMouseParser ? MouseInterpreter ? MouseImpl ? View ? Commands
    (1-based)     (0-based screen)   (click synthesis)   (routing)  (viewport)  (Activate/Accept)
 ```
 
@@ -30,12 +30,12 @@ ANSI Input → AnsiMouseParser → MouseInterpreter → MouseImpl → View → C
 
 | Stage | Input | Output | Key Transformation |
 |-------|-------|--------|-------------------|
-| **ANSI** | User clicks | `ESC[<0;10;5M` | Hardware → ANSI escape sequence |
-| **Parser** | ANSI string | `Mouse{Pressed, Screen(9,4)}` | 1-based → 0-based, Button code → MouseFlags |
-| **Interpreter** | Press/Release | `Mouse{Clicked, Screen(9,4)}` | Press+Release → Clicked, Timing → DoubleClicked |
-| **MouseImpl** | Screen coords | `Mouse{Clicked, Viewport(2,1)}` | Screen → Viewport, Find view, Handle grab |
-| **View** | Viewport coords | Command invocation | Clicked → Command.Activate, MouseState updates |
-| **Commands** | Command | Event | Activate → Activating, Accept → Accepting |
+| **ANSI** | User clicks | `ESC[<0;10;5M` | Hardware ? ANSI escape sequence |
+| **Parser** | ANSI string | `Mouse{Pressed, Screen(9,4)}` | 1-based ? 0-based, Button code ? MouseFlags |
+| **Interpreter** | Press/Release | `Mouse{Clicked, Screen(9,4)}` | Press+Release ? Clicked, Timing ? DoubleClicked |
+| **MouseImpl** | Screen coords | `Mouse{Clicked, Viewport(2,1)}` | Screen ? Viewport, Find view, Handle grab |
+| **View** | Viewport coords | Command invocation | Clicked ? Command.Activate, MouseState updates |
+| **Commands** | Command | Event | Activate ? Activating, Accept ? Accepting |
 
 ### Coordinate Systems
 
@@ -71,7 +71,7 @@ view.MouseHoldRepeat = MouseFlags.LeftButtonReleased;
 view.Activating += (s, e) => { DoRepeatAction(); e.Handled = true; };
 ```
 
-## Tenets for Terminal.Gui Mouse Handling
+## Tenets for Mouse Handling
 
 Tenets higher in the list have precedence over tenets lower in the list.
 
@@ -85,11 +85,11 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 | Scenario | Visual State | `Command.Accept` Count | Notes |
 |----------|-------------|----------------------|-------|
-| **Single click** (press + release inside) | Pressed → Released | **1** on release | Standard click behavior |
-| **Hold** (MouseHoldRepeat = false) | Pressed → stays → Released | **1** on release | Normal push-button |
+| **Single click** (press + release inside) | Pressed ? Released | **1** on release | Standard click behavior |
+| **Hold** (MouseHoldRepeat = false) | Pressed ? stays ? Released | **1** on release | Normal push-button |
 | **Hold** (MouseHoldRepeat = true) | Same visual | **~10+** (timer ~500ms initial, ~50ms intervals) + **1 final** on release | Scrollbar arrow behavior |
-| **Drag outside → release outside** | Pressed → Released | **0** (canceled) | Standard click cancellation |
-| **Double-click** (MouseHoldRepeat = false) | Press→Release→Press→Release | **2** (one per release) | Two separate accepts |
+| **Drag outside ? release outside** | Pressed ? Released | **0** (canceled) | Standard click cancellation |
+| **Double-click** (MouseHoldRepeat = false) | Press?Release?Press?Release | **2** (one per release) | Two separate accepts |
 | **Double-click** (MouseHoldRepeat = true) | Same cycle | **2** (one per release) | Each press/release fires Accept |
 
 **Key Point for MouseHoldRepeat:** When enabled, the view responds to **Press and Release events only**. Each press starts the timer (which fires Accept repeatedly), and each release fires one final Accept (if released inside).
@@ -112,7 +112,7 @@ Terminal.Gui provides these APIs for handling mouse input:
 
 * **Mouse State** - `MouseState` property provides current interaction state for visual feedback.
 
-* **Mouse** class - Platform-independent abstraction (@Terminal.Gui.Input.Mouse) for mouse events.
+* **Mouse** class - Platform-independent abstraction (@Terminal.Gui.Mouse) for mouse events.
 
 ## Mouse Bindings
 
@@ -147,7 +147,7 @@ MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
 MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Context);
 ```
 
-When a mouse event occurs matching a binding, the bound command is invoked, which raises the corresponding event (e.g., `Command.Activate` → `Activating` event).
+When a mouse event occurs matching a binding, the bound command is invoked, which raises the corresponding event (e.g., `Command.Activate` ? `Activating` event).
 
 ### Common Binding Patterns
 
@@ -162,7 +162,7 @@ When a mouse event occurs matching a binding, the bound command is invoked, whic
 
 Mouse events are processed using the [Cancellable Work Pattern](cancellable-work-pattern.md):
 
-1. **Driver Level**: Captures platform-specific events → converts to `Mouse`
+1. **Driver Level**: Captures platform-specific events ? converts to `Mouse`
 2. **Application Level**: `IMouse.RaiseMouseEvent` determines target view and routes event
 3. **View Level**: `View.NewMouseEvent()` processes:
    - Pre-condition validation (enabled, visible, wants event type)
@@ -282,9 +282,9 @@ view.MouseStateChanged += (sender, e) =>
 Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled **automatically grab the mouse** when a button is pressed:
 
 **Grab Lifecycle:**
-1. **Press inside** → Auto-grab, set focus (if `CanFocus`), `MouseState |= Pressed`
-2. **Move outside** → `MouseState |= PressedOutside` (unless `MouseHoldRepeat`)
-3. **Release** → Ungrab, clear pressed state, invoke commands if inside
+1. **Press inside** ? Auto-grab, set focus (if `CanFocus`), `MouseState |= Pressed`
+2. **Move outside** ? `MouseState |= PressedOutside` (unless `MouseHoldRepeat`)
+3. **Release** ? Ungrab, clear pressed state, invoke commands if inside
 
 **Grabbed View Receives:**
 - ALL mouse events (even outside viewport)
@@ -336,15 +336,15 @@ view.MouseEvent += (s, e) =>
 Views provide methods to convert between coordinate systems:
 
 ```csharp
-// Screen ↔ Viewport
+// Screen ? Viewport
 Point viewportPos = view.ScreenToViewport(screenPos);
 Point screenPos = view.ViewportToScreen(viewportPos);
 
-// Screen ↔ Content  
+// Screen ? Content  
 Point contentPos = view.ScreenToContent(screenPos);
 Point screenPos = view.ContentToScreen(contentPos);
 
-// Screen ↔ Frame
+// Screen ? Frame
 Point framePos = view.ScreenToFrame(screenPos);
 Rectangle screenRect = view.FrameToScreen();
 ```
@@ -388,15 +388,15 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, 'm'=release)
 **Location:** `Terminal.Gui/Drivers/MouseInterpreter.cs`
 
 **Responsibilities:**
-1. Track press/release pairs → generate click events
+1. Track press/release pairs ? generate click events
 2. Detect multi-clicks (double/triple) based on:
    - Time between clicks (500ms threshold)
    - Position proximity  
    - Same button
 3. Emit synthetic events:
-   - Press+Release → `LeftButtonClicked`
-   - Second click within threshold → `LeftButtonDoubleClicked`
-   - Third click → `LeftButtonTripleClicked`
+   - Press+Release ? `LeftButtonClicked`
+   - Second click within threshold ? `LeftButtonDoubleClicked`
+   - Third click ? `LeftButtonTripleClicked`
 
 **Key Behavior:**
 - Press and Release events pass through immediately
@@ -527,14 +527,14 @@ if (MouseBindings.TryGet(mouse.Flags, out binding))
 ```
 
 **Default Bindings:**
-- `LeftButtonPressed` → `Command.Activate`
-- `LeftButtonPressed | Ctrl` → `Command.Context`
+- `LeftButtonPressed` ? `Command.Activate`
+- `LeftButtonPressed | Ctrl` ? `Command.Context`
 
 #### 5.5: Command Execution
 
 See [Command Deep Dive](command.md) for details.
 
-**Example - LeftButtonPressed → Command.Activate:**
+**Example - LeftButtonPressed ? Command.Activate:**
 ```csharp
 InvokeCommand(Command.Activate, context):
     OnActivating(args) || args.Cancel  // Subclass override
@@ -545,12 +545,12 @@ InvokeCommand(Command.Activate, context):
 ### Driver Architecture
 
 **Platform-Specific Input:**
-- **Windows**: `WindowsInputProcessor` - `ReadConsoleInput()` → direct `Mouse` conversion
+- **Windows**: `WindowsInputProcessor` - `ReadConsoleInput()` ? direct `Mouse` conversion
 - **Unix/ANSI**: ANSI escape sequence parsing pipeline
 
 **Input Processing:**
 ```
-Platform API → InputProcessorImpl → AnsiResponseParser → MouseInterpreter → Application
+Platform API ? InputProcessorImpl ? AnsiResponseParser ? MouseInterpreter ? Application
 ```
 
 This ensures consistent mouse behavior across platforms while maintaining platform-specific optimizations.
