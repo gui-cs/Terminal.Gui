@@ -144,9 +144,6 @@ public static class Prompt
         ArgumentNullException.ThrowIfNull (view);
         ArgumentNullException.ThrowIfNull (resultExtractor);
 
-        TResult? result = default;
-        var accepted = false;
-
         Dialog dialog = new ()
         {
             Title = title,
@@ -154,40 +151,23 @@ public static class Prompt
             ButtonAlignment = DefaultButtonAlignment
         };
 
-        Button btnOk = new ()
-        {
-            Text = okButtonText,
-            IsDefault = true
-        };
-
-        btnOk.Accepting += (s, e) =>
-        {
-            accepted = true;
-            result = resultExtractor (view);
-            e.Handled = true;
-            app.RequestStop ();
-        };
-
-        Button btnCancel = new ()
-        {
-            Text = cancelButtonText
-        };
-
-        btnCancel.Accepting += (s, e) =>
-        {
-            accepted = false;
-            e.Handled = true;
-            app.RequestStop ();
-        };
+        Button btnCancel = new () { Text = cancelButtonText };
+        Button btnOk = new () { Text = okButtonText, IsDefault = true };
 
         dialog.Add (view);
         dialog.AddButton (btnCancel);
         dialog.AddButton (btnOk);
 
-        app.Run (dialog);
+        int? buttonIndex = app.Run (dialog) as int?;
         dialog.Dispose ();
 
-        return accepted ? result : default;
+        // Check if OK was pressed (index 1, since Cancel is added first)
+        if (buttonIndex == 1)
+        {
+            return resultExtractor (view);
+        }
+
+        return default;
     }
 
     /// <summary>
@@ -238,8 +218,6 @@ public static class Prompt
         ArgumentNullException.ThrowIfNull (app);
         ArgumentNullException.ThrowIfNull (view);
 
-        var accepted = false;
-
         Dialog dialog = new ()
         {
             Title = title,
@@ -247,38 +225,17 @@ public static class Prompt
             ButtonAlignment = DefaultButtonAlignment
         };
 
-        Button btnOk = new ()
-        {
-            Text = okButtonText,
-            IsDefault = true
-        };
-
-        btnOk.Accepting += (s, e) =>
-        {
-            accepted = true;
-            e.Handled = true;
-            app.RequestStop ();
-        };
-
-        Button btnCancel = new ()
-        {
-            Text = cancelButtonText
-        };
-
-        btnCancel.Accepting += (s, e) =>
-        {
-            accepted = false;
-            e.Handled = true;
-            app.RequestStop ();
-        };
+        Button btnCancel = new () { Text = cancelButtonText };
+        Button btnOk = new () { Text = okButtonText, IsDefault = true };
 
         dialog.Add (view);
         dialog.AddButton (btnCancel);
         dialog.AddButton (btnOk);
 
-        app.Run (dialog);
+        int? buttonIndex = app.Run (dialog) as int?;
         dialog.Dispose ();
 
-        return accepted;
+        // Check if OK was pressed (index 1, since Cancel is added first)
+        return buttonIndex == 1;
     }
 }

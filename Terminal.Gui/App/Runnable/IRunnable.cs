@@ -249,6 +249,22 @@ public interface IRunnable
 public interface IRunnable<TResult> : IRunnable
 {
     /// <summary>
+    ///     Gets or sets the input data used to initialize the session state.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set this property before calling <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>
+    ///         to initialize the runnable's state. This is useful for prompts and dialogs that need to show
+    ///         a default value or pre-populate fields.
+    ///     </para>
+    ///     <para>
+    ///         <see langword="null"/> indicates no input data was provided.
+    ///         Non-<see langword="null"/> contains the type-safe initialization data.
+    ///     </para>
+    /// </remarks>
+    new TResult? Input { get; set; }
+
+    /// <summary>
     ///     Gets or sets the result data extracted when the session was accepted, or <see langword="null"/> if not accepted.
     /// </summary>
     /// <remarks>

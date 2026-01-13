@@ -30,6 +30,13 @@ public class Runnable<TResult> : Runnable, IRunnable<TResult>
     }
 
     /// <inheritdoc/>
+    public new TResult? Input
+    {
+        get => base.Input is TResult typedValue ? typedValue : default;
+        set => base.Input = value;
+    }
+
+    /// <inheritdoc/>
     public new TResult? Result
     {
         get => base.Result is TResult typedValue ? typedValue : default;

@@ -35,6 +35,9 @@ public class Runnable : View, IRunnable
     }
 
     /// <inheritdoc/>
+    public object? Input { get; set; }
+
+    /// <inheritdoc/>
     public object? Result { get; set; }
 
     #region IRunnable Implementation - IsRunning (from base interface)
