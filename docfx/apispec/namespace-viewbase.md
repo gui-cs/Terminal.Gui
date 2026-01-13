@@ -3,17 +3,17 @@ uid: Terminal.Gui.ViewBase
 summary: The `ViewBase` namespace contains the foundational view system and core UI building blocks.
 ---
 
-@Terminal.Gui.ViewBase.View provides the fundamental view architecture that forms the foundation of all Terminal.Gui user interface elements. This namespace contains the base View class, adornment system, layout primitives, and core view behaviors that enable the rich UI capabilities of Terminal.Gui.
+@Terminal.Gui.View provides the fundamental view architecture that forms the foundation of all Terminal.Gui user interface elements. This namespace contains the base View class, adornment system, layout primitives, and core view behaviors that enable the rich UI capabilities of Terminal.Gui.
 
 The View system implements the complete view lifecycle, coordinate systems, event handling, focus management, and the innovative adornment system that separates content from visual decoration.
 
 ## Key Components
 
-- @Terminal.Gui.ViewBase.View - Base class for all UI elements with complete lifecycle management
-- @Terminal.Gui.ViewBase.Adornment - Visual decorations (Margin, Border, Padding) outside content area
-- @Terminal.Gui.ViewBase.View.Viewport - Scrollable window into view content with built-in scrolling support
-- @Terminal.Gui.ViewBase.ViewArrangement - Flags controlling user interaction (Movable, Resizable, etc.)
-- @Terminal.Gui.ViewBase.Pos and @Terminal.Gui.ViewBase.Dim - Flexible positioning and sizing system with relative and absolute options
+- @Terminal.Gui.View - Base class for all UI elements with complete lifecycle management
+- @Terminal.Gui.Adornment - Visual decorations (Margin, Border, Padding) outside content area
+- @Terminal.Gui.View.Viewport - Scrollable window into view content with built-in scrolling support
+- @Terminal.Gui.ViewArrangement - Flags controlling user interaction (Movable, Resizable, etc.)
+- @Terminal.Gui.Pos and @Terminal.Gui.Dim - Flexible positioning and sizing system with relative and absolute options
 
 ## View Architecture
 
