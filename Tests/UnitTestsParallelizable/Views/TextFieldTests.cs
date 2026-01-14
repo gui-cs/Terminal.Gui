@@ -225,6 +225,9 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal ("ABC", tf.Text);
         tf.BeginInit ();
         tf.EndInit ();
+        
+        // Clear the automatic selection from focus
+        tf.ClearAllSelection ();
 
         Assert.Equal (3, tf.InsertionPoint);
 
@@ -249,6 +252,10 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     {
         var tf = new TextField { Text = "ABC" };
         tf.SetFocus ();
+        
+        // Clear the automatic selection from focus
+        tf.ClearAllSelection ();
+        
         tf.InsertionPoint = 2;
         Assert.Equal ("ABC", tf.Text);
 
@@ -489,6 +496,9 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
             Text = "Hello"
         };
         tf.SetFocus ();
+        
+        // Clear the automatic selection from focus
+        tf.ClearAllSelection ();
 
         tf.InsertionPoint = 2;
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
@@ -643,6 +653,10 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         tf.Driver = driver;
         tf.SetRelativeLayout (new (10, 1));
         tf.SetFocus ();
+        
+        // Clear the automatic selection from focus
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
 
         Assert.Equal (0, tf.InsertionPoint);
 
@@ -675,5 +689,149 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.False (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (1, tf.ScrollOffset);
         Assert.Equal (2, tf.InsertionPoint);
+    }
+
+    [Fact]
+    public void Focus_Via_Keyboard_Selects_All_Text ()
+    {
+        // Create a TextField with some text
+        TextField tf = new () { Text = "Hello World" };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Verify no selection initially
+        Assert.Null (tf.SelectedText);
+        Assert.Equal (0, tf.SelectedLength);
+
+        // Focus the TextField (simulating keyboard focus like Tab)
+        tf.SetFocus ();
+
+        // Verify all text is selected
+        Assert.Equal ("Hello World", tf.SelectedText);
+        Assert.Equal (11, tf.SelectedLength);
+        Assert.Equal (0, tf.SelectedStart);
+    }
+
+    [Fact]
+    public void Focus_Via_Keyboard_With_Empty_Text_Does_Not_Select ()
+    {
+        // Create a TextField with no text
+        TextField tf = new () { Text = "" };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Focus the TextField
+        tf.SetFocus ();
+
+        // Verify no selection (since there's no text)
+        Assert.Null (tf.SelectedText);
+        Assert.Equal (0, tf.SelectedLength);
+    }
+
+    [Fact]
+    public void Focus_Via_Mouse_Does_Not_Select_All_Text ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World", Width = 20, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Simulate mouse click to focus
+        Mouse ev = new () { Position = new (5, 0), Flags = MouseFlags.LeftButtonPressed };
+        tf.NewMouseEvent (ev);
+
+        // Verify text is NOT selected
+        Assert.Null (tf.SelectedText);
+        Assert.Equal (0, tf.SelectedLength);
+
+        // Verify cursor is positioned at click location
+        Assert.Equal (5, tf.InsertionPoint);
+    }
+
+    [Fact]
+    public void Focus_Via_Mouse_Clears_Existing_Selection ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World", Width = 20, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Select all text first
+        tf.SelectAll ();
+        Assert.Equal ("Hello World", tf.SelectedText);
+        Assert.Equal (11, tf.SelectedLength);
+
+        // Simulate mouse click
+        Mouse ev = new () { Position = new (5, 0), Flags = MouseFlags.LeftButtonPressed };
+        tf.NewMouseEvent (ev);
+
+        // Verify selection is cleared
+        Assert.Null (tf.SelectedText);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Equal (5, tf.InsertionPoint);
+    }
+
+    [Fact]
+    public void Focus_Twice_Via_Keyboard_Selects_All_Text_Each_Time ()
+    {
+        // Create two TextFields
+        TextField tf1 = new () { Text = "First", Width = 10, Height = 1 };
+        TextField tf2 = new () { Text = "Second", Width = 10, Height = 1 };
+        
+        Runnable container = new ();
+        container.Add (tf1, tf2);
+        
+        tf1.BeginInit ();
+        tf1.EndInit ();
+        tf2.BeginInit ();
+        tf2.EndInit ();
+
+        // Focus first field
+        tf1.SetFocus ();
+        Assert.Equal ("First", tf1.SelectedText);
+
+        // Focus second field
+        tf2.SetFocus ();
+        Assert.Equal ("Second", tf2.SelectedText);
+
+        // Focus first field again
+        tf1.SetFocus ();
+        Assert.Equal ("First", tf1.SelectedText);
+
+        container.Dispose ();
+    }
+
+    [Fact]
+    public void Mouse_Double_Click_Selects_Word_Not_All ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World Test", Width = 20, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Double click on "World"
+        Mouse ev = new () { Position = new (7, 0), Flags = MouseFlags.LeftButtonDoubleClicked };
+        tf.NewMouseEvent (ev);
+
+        // Should select the word (with trailing space by default), not all text
+        Assert.Equal ("World ", tf.SelectedText);
+        Assert.NotEqual ("Hello World Test", tf.SelectedText);
+    }
+
+    [Fact]
+    public void Mouse_Triple_Click_Selects_All ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World", Width = 20, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Triple click
+        Mouse ev = new () { Position = new (5, 0), Flags = MouseFlags.LeftButtonTripleClicked };
+        tf.NewMouseEvent (ev);
+
+        // Should select all text
+        Assert.Equal ("Hello World", tf.SelectedText);
+        Assert.Equal (11, tf.SelectedLength);
     }
 }

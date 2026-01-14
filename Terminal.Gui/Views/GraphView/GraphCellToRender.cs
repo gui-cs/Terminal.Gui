@@ -1,5 +1,4 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Describes how to render a single row/column of a <see cref="GraphView"/> based on the value(s) in

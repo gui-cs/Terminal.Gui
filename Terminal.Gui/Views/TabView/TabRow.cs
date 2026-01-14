@@ -50,7 +50,7 @@ internal class TabRow : View
         View? parent = me.View is Adornment adornment ? adornment.Parent : me.View;
         Tab? hit = parent as Tab;
 
-        if (me.IsSingleClicked)
+        if (me.IsPressed)
         {
             _host.OnTabClicked (new TabMouseEventArgs (hit!, me));
 
@@ -71,12 +71,12 @@ internal class TabRow : View
             SetFocus ();
         }
 
-        if (me is { IsSingleDoubleOrTripleClicked: false, IsWheel: false })
+        if (me is { IsPressed: false, IsWheel: false })
         {
             return false;
         }
 
-        if (me.IsSingleDoubleOrTripleClicked || me.IsWheel)
+        if (me.IsPressed || me.IsWheel)
         {
             var scrollIndicatorHit = 0;
 
