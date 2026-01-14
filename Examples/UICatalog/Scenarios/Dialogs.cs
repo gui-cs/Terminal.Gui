@@ -1,10 +1,46 @@
 ﻿#nullable enable
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Dialogs", "Demonstrates how to the Dialog class")]
+[ScenarioMetadata ("Dialogs", "Demonstrates how to use the Dialog and Dialog<TResult> classes")]
 [ScenarioCategory ("Dialogs")]
 public class Dialogs : Scenario
 {
+    /// <summary>
+    ///     Example of a custom Dialog that returns a <see cref="Color"/> instead of a button index.
+    ///     This demonstrates how to use <see cref="Dialog{TResult}"/> to create type-safe dialogs.
+    /// </summary>
+    private class ColorPickerDialog : Dialog<Color>
+    {
+        private readonly ColorPicker _colorPicker;
+
+        public ColorPickerDialog (Color initialColor)
+        {
+            Title = "Pick a Color";
+            _colorPicker = new ()
+            {
+                SelectedColor = initialColor
+            };
+            Add (_colorPicker);
+
+            // Add Cancel and OK buttons
+            AddButton (new () { Text = "_Cancel" });
+            AddButton (new () { Text = "_OK" });
+        }
+
+        /// <inheritdoc/>
+        protected override void OnButtonPressed (int buttonIndex)
+        {
+            if (buttonIndex == 1) // OK button
+            {
+                // Set the typed Result before closing
+                Result = _colorPicker.SelectedColor;
+            }
+            // If Cancel (buttonIndex == 0), Result remains null (canceled)
+
+            RequestStop ();
+        }
+    }
+
     private const int CODE_POINT = '你'; // We know this is a wide char
 
     public override void Main ()
@@ -212,6 +248,60 @@ public class Dialogs : Scenario
                                    };
 
         mainWindow.Add (showDialogButton, buttonPressedLabel);
+
+        // --- Dialog<TResult> Demo ---
+        // Demonstrates using Dialog<Color> to return a typed result instead of a button index
+
+        Label colorLabel = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (buttonPressedLabel) + 2,
+            Text = "Dialog<T> Demo - Selected Color:"
+        };
+        mainWindow.Add (colorLabel);
+
+        Label selectedColorLabel = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (colorLabel),
+            Width = 20,
+            Height = 1,
+            Text = "None",
+            SchemeName = "Error"
+        };
+        mainWindow.Add (selectedColorLabel);
+
+        Button showColorDialogButton = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Bottom (selectedColorLabel) + 1,
+            Text = "Show _Color Dialog<Color>"
+        };
+        mainWindow.Add (showColorDialogButton);
+
+        showColorDialogButton.Accepting += (_, e) =>
+        {
+            // Parse current color or default to Blue
+            Color currentColor = Color.Blue;
+
+            using ColorPickerDialog colorDialog = new (currentColor);
+
+            // Run the dialog and get the typed result
+            Color? result = app.Run (colorDialog) as Color?;
+
+            if (result.HasValue)
+            {
+                selectedColorLabel.Text = result.Value.ToString ();
+                selectedColorLabel.SetScheme (new () { Normal = new (result.Value, result.Value) });
+            }
+            else
+            {
+                selectedColorLabel.Text = "Canceled";
+                selectedColorLabel.SchemeName = "Error";
+            }
+
+            e.Handled = true;
+        };
 
         app.Run (mainWindow);
     }

@@ -1,12 +1,17 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A modal dialog window with buttons across the bottom. When a button is pressed, <see cref="IRunnable.Result"/>
-///     is set to the button's index.
+///     A generic modal dialog window with buttons across the bottom. Derive from this class
+///     to create dialogs that return custom result types.
 /// </summary>
+/// <typeparam name="TResult">
+///     The type of result data returned when the dialog closes.
+///     Since <see cref="IRunnable{TResult}.Result"/> is <c>TResult?</c>, use non-nullable types
+///     (e.g., <c>int</c> not <c>int?</c>) to allow <c>null</c> to indicate cancellation.
+/// </typeparam>
 /// <remarks>
 ///     <para>
-///         By default, <see cref="Dialog"/> is centered with <see cref="Dim.Auto"/> sizing and uses the
+///         By default, <see cref="Dialog{TResult}"/> is centered with <see cref="Dim.Auto"/> sizing and uses the
 ///         <see cref="Schemes.Dialog"/> color scheme when running.
 ///     </para>
 ///     <para>
@@ -18,56 +23,46 @@ namespace Terminal.Gui.Views;
 ///         becomes the default (<see cref="Button.IsDefault"/>). Button alignment is controlled by
 ///         <see cref="ButtonAlignment"/> and <see cref="ButtonAlignmentModes"/>.
 ///     </para>
+///     <para>
+///         Subclasses should set <see cref="IRunnable{TResult}.Result"/> before calling <see cref="Runnable.RequestStop"/>
+///         to return a value. If Result is not set (remains <c>null</c>), the dialog is considered canceled.
+///     </para>
 /// </remarks>
 /// <example>
 ///     <code>
-///     Dialog dialog = new () { Title = "Confirm" };
-///     
-///     dialog.AddButton (new () { Title = "Cancel" });
-///     dialog.AddButton (new () { Title = "OK" });
-///     
-///     Label label = new () { Text = "Are you sure?" };
-///     dialog.Add (label);
-///     
-///     Application.Run (dialog);
-///     
-///     if (dialog.Result == 1) // OK button (second button, index 1)
+///     // Custom dialog returning a Color
+///     public class ColorDialog : Dialog&lt;Color&gt;
 ///     {
-///         // User clicked OK
+///         private ColorPicker _picker;
+///
+///         public ColorDialog ()
+///         {
+///             _picker = new ColorPicker ();
+///             Add (_picker);
+///             AddButton (new Button { Text = "Cancel" });
+///             AddButton (new Button { Text = "OK" });
+///         }
+///
+///         protected override void OnButtonPressed (int buttonIndex)
+///         {
+///             if (buttonIndex == 1) // OK
+///             {
+///                 Result = _picker.SelectedColor;
+///             }
+///             RequestStop ();
+///         }
 ///     }
 ///     </code>
 /// </example>
-public class Dialog : Runnable<int?>, IDesignable
+public class Dialog<TResult> : Runnable<TResult>, IDesignable
 {
     /// <summary>
-    ///     The default border style for new <see cref="Dialog"/> instances. Can be configured via
-    ///     <see cref="ConfigurationManager"/> and theme files.
+    ///     The container view that holds the dialog buttons in the Padding area.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
+    protected readonly View? ButtonContainer;
 
     /// <summary>
-    ///     The default button alignment for new <see cref="Dialog"/> instances. Can be configured via theme files.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
-
-    /// <summary>
-    ///     The default button alignment modes for new <see cref="Dialog"/> instances. Can be configured via theme files.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
-
-    /// <summary>
-    ///     The default shadow style for new <see cref="Dialog"/> instances. Can be configured via theme files.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
-
-    private readonly View? _buttonContainer;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Dialog"/> class with no buttons.
+    ///     Initializes a new instance of the <see cref="Dialog{TResult}"/> class with no buttons.
     /// </summary>
     /// <remarks>
     ///     The dialog is positioned at <see cref="Pos.Center"/> with <see cref="Dim.Auto"/> sizing,
@@ -88,15 +83,15 @@ public class Dialog : Runnable<int?>, IDesignable
                            minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight () - _minimumButtonsSize.Height - (HorizontalScrollBar.Visible ? 1 : 0)),
                            maximumContentDim: Dim.Percent (100) - 2);
 
-        ButtonAlignment = DefaultButtonAlignment;
-        ButtonAlignmentModes = DefaultButtonAlignmentModes;
+        ButtonAlignment = Dialog.DefaultButtonAlignment;
+        ButtonAlignmentModes = Dialog.DefaultButtonAlignmentModes;
 
-        BorderStyle = DefaultBorderStyle;
-        base.ShadowStyle = DefaultShadow;
+        BorderStyle = Dialog.DefaultBorderStyle;
+        base.ShadowStyle = Dialog.DefaultShadow;
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
-        _buttonContainer = new ()
+        ButtonContainer = new ()
         {
             Id = "Dialog.ButtonContainer",
             CanFocus = true,
@@ -105,7 +100,7 @@ public class Dialog : Runnable<int?>, IDesignable
             Width = Dim.Fill (),
             Height = Dim.Auto ()
         };
-        Padding!.Add (_buttonContainer);
+        Padding!.Add (ButtonContainer);
 
         SetStyle ();
 
@@ -113,7 +108,7 @@ public class Dialog : Runnable<int?>, IDesignable
                     Command.Accept,
                     ctx =>
                     {
-                        View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
+                        View? isDefaultView = ButtonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
 
                         if (isDefaultView == this || isDefaultView is not Button { IsDefault: true })
                         {
@@ -188,7 +183,7 @@ public class Dialog : Runnable<int?>, IDesignable
     }
 
     /// <summary>
-    ///     INTERNAL: Gets the minimum width required for the <see cref="Dialog"/>. This takes into account
+    ///     INTERNAL: Gets the minimum width required for the <see cref="Dialog{TResult}"/>. This takes into account
     ///     the width required for the title, the buttons, and any subviews.
     /// </summary>
     /// <returns></returns>
@@ -208,7 +203,7 @@ public class Dialog : Runnable<int?>, IDesignable
     }
 
     /// <summary>
-    ///     INTERNAL: Gets the minimum height required for the <see cref="Dialog"/>. This takes into account
+    ///     INTERNAL: Gets the minimum height required for the <see cref="Dialog{TResult}"/>. This takes into account
     ///     the height required for the buttons.
     /// </summary>
     /// <returns></returns>
@@ -236,8 +231,8 @@ public class Dialog : Runnable<int?>, IDesignable
     ///         The last button added becomes the default (<see cref="Button.IsDefault"/> = <see langword="true"/>).
     ///     </para>
     ///     <para>
-    ///         When a button is pressed, <see cref="IRunnable.Result"/> is set to the button's index
-    ///         (0-based, in order of addition) and the dialog closes.
+    ///         When a button is pressed, <see cref="OnButtonPressed"/> is called with the button's index
+    ///         (0-based, in order of addition). Subclasses can override this to set <see cref="IRunnable{TResult}.Result"/>.
     ///     </para>
     /// </remarks>
     public void AddButton (Button button)
@@ -251,18 +246,19 @@ public class Dialog : Runnable<int?>, IDesignable
         foreach (Button dialogButton in _buttons)
         {
             dialogButton.IsDefault = false;
+            dialogButton.Accepting -= OnDialogButtonOnAccepting;
             dialogButton.Accepting += OnDialogButtonOnAccepting;
         }
         button.IsDefault = true;
 
-        _buttonContainer?.Add (button);
-        Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
-        _minimumButtonsSize = new (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
+        ButtonContainer?.Add (button);
+        Padding!.Thickness = Padding!.Thickness with { Bottom = ButtonContainer!.GetHeightRequiredForSubViews () };
+        _minimumButtonsSize = new (ButtonContainer?.GetWidthRequiredForSubViews () ?? 0, ButtonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
 #pragma warning disable TGUI001
     /// <summary>
-    ///     Handles button acceptance. Sets <see cref="IRunnable.Result"/> to the button's index and requests dialog closure.
+    ///     Handles button acceptance. Calls <see cref="OnButtonPressed"/> with the button's index.
     /// </summary>
     private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
     {
@@ -282,16 +278,36 @@ public class Dialog : Runnable<int?>, IDesignable
         }
 
         e.Handled = IsRunning;
-        Result = _buttonContainer!.SubViews.IndexOf (s);
-        RequestStop ();
+        int buttonIndex = ButtonContainer!.SubViews.IndexOf (s);
+        OnButtonPressed (buttonIndex);
     }
 #pragma warning restore
+
+    /// <summary>
+    ///     Called when a dialog button is pressed. Override this method to set <see cref="IRunnable{TResult}.Result"/>
+    ///     based on which button was pressed.
+    /// </summary>
+    /// <param name="buttonIndex">The 0-based index of the button that was pressed (in order of addition).</param>
+    /// <remarks>
+    ///     <para>
+    ///         The default implementation calls <see cref="Runnable.RequestStop"/> without setting a result,
+    ///         which means the dialog is considered canceled. Subclasses should override this to set
+    ///         <see cref="IRunnable{TResult}.Result"/> before calling <see cref="Runnable.RequestStop"/>.
+    ///     </para>
+    ///     <para>
+    ///         The non-generic <see cref="Dialog"/> class overrides this to set Result to the button index.
+    ///     </para>
+    /// </remarks>
+    protected virtual void OnButtonPressed (int buttonIndex)
+    {
+        RequestStop ();
+    }
 
     /// <summary>
     ///     Determines how buttons are aligned horizontally at the bottom of the dialog.
     /// </summary>
     /// <remarks>
-    ///     Default is <see cref="DefaultButtonAlignment"/> (typically <see cref="Alignment.End"/>).
+    ///     Default is <see cref="Dialog.DefaultButtonAlignment"/> (typically <see cref="Alignment.End"/>).
     /// </remarks>
     public Alignment ButtonAlignment { get; set; }
 
@@ -299,7 +315,7 @@ public class Dialog : Runnable<int?>, IDesignable
     ///     Controls button spacing and alignment behavior.
     /// </summary>
     /// <remarks>
-    ///     Default is <see cref="DefaultButtonAlignmentModes"/> (typically
+    ///     Default is <see cref="Dialog.DefaultButtonAlignmentModes"/> (typically
     ///     <see cref="AlignmentModes.StartToEnd"/> | <see cref="AlignmentModes.AddSpaceBetweenItems"/>).
     /// </remarks>
     public AlignmentModes ButtonAlignmentModes { get; set; }
@@ -323,15 +339,6 @@ public class Dialog : Runnable<int?>, IDesignable
         }
     }
 
-    /// <summary>
-    ///     Gets whether the dialog was canceled.
-    /// </summary>
-    /// <remarks>
-    ///     Returns <see langword="true"/> if <see cref="IRunnable.Result"/> is <see langword="null"/> or <c>1</c>
-    ///     (assuming button index 1 is the Cancel button).
-    /// </remarks>
-    public bool Canceled => Result is null or 1; // Cancel button is index 1
-
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)
     {
@@ -342,6 +349,7 @@ public class Dialog : Runnable<int?>, IDesignable
 
         base.OnIsRunningChanged (newIsModal);
     }
+
     private void SetStyle ()
     {
         if (IsRunning)
@@ -442,5 +450,113 @@ public class Dialog : Runnable<int?>, IDesignable
         Add (infoLabel, info);
 
         return true;
+    }
+}
+
+/// <summary>
+///     A modal dialog window with buttons across the bottom. When a button is pressed, <see cref="IRunnable{TResult}.Result"/>
+///     is set to the button's index (0-based).
+/// </summary>
+/// <remarks>
+///     <para>
+///         This is the standard dialog class for simple button-index-based results. For dialogs that need to return
+///         custom result types, derive from <see cref="Dialog{TResult}"/> instead.
+///     </para>
+///     <para>
+///         By default, <see cref="Dialog"/> is centered with <see cref="Dim.Auto"/> sizing and uses the
+///         <see cref="Schemes.Dialog"/> color scheme when running.
+///     </para>
+///     <para>
+///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
+///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default) or a button press.
+///     </para>
+///     <para>
+///         Buttons are added via <see cref="Dialog{TResult}.AddButton"/> or the <see cref="Dialog{TResult}.Buttons"/> property.
+///         The last button added becomes the default (<see cref="Button.IsDefault"/>). Button alignment is controlled by
+///         <see cref="Dialog{TResult}.ButtonAlignment"/> and <see cref="Dialog{TResult}.ButtonAlignmentModes"/>.
+///     </para>
+/// </remarks>
+/// <example>
+///     <code>
+///     Dialog dialog = new () { Title = "Confirm" };
+///
+///     dialog.AddButton (new () { Title = "Cancel" });
+///     dialog.AddButton (new () { Title = "OK" });
+///
+///     Label label = new () { Text = "Are you sure?" };
+///     dialog.Add (label);
+///
+///     Application.Run (dialog);
+///
+///     if (dialog.Result == 1) // OK button (second button, index 1)
+///     {
+///         // User clicked OK
+///     }
+///     </code>
+/// </example>
+public class Dialog : Dialog<int>
+{
+    /// <summary>
+    ///     The default border style for new <see cref="Dialog"/> instances. Can be configured via
+    ///     <see cref="ConfigurationManager"/> and theme files.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
+
+    /// <summary>
+    ///     The default button alignment for new <see cref="Dialog"/> instances. Can be configured via theme files.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+
+    /// <summary>
+    ///     The default button alignment modes for new <see cref="Dialog"/> instances. Can be configured via theme files.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+
+    /// <summary>
+    ///     The default shadow style for new <see cref="Dialog"/> instances. Can be configured via theme files.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+
+    /// <summary>
+    ///     Helper property that gets whether the dialog was canceled (Result is <see langword="null"/> or 1).
+    /// </summary>
+    /// <remarks>
+    ///     Returns <see langword="true"/> if <see cref="Result"/> is <see langword="null"/>
+    ///     (user pressed Escape or closed the dialog without pressing a button) or if the
+    ///     second button (index 1, typically "Cancel") was pressed.
+    /// </remarks>
+    public bool Canceled => Result is null or 1;
+
+    /// <summary>
+    ///     Gets or sets the result of the dialog, indicating which button was pressed.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The value is the zero-based index of the button that was pressed, or <see langword="null"/>
+    ///         if the dialog was dismissed without a button press (e.g., via Escape key).
+    ///     </para>
+    ///     <para>
+    ///         This property shadows the base <see cref="IRunnable{TResult}.Result"/> property to provide
+    ///         explicit <c>int?</c> nullability for backward compatibility.
+    ///     </para>
+    /// </remarks>
+    public new int? Result
+    {
+        get => ((IRunnable)this).Result is int value ? value : null;
+        set => ((IRunnable)this).Result = value;
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Sets <see cref="Result"/> to the button index and closes the dialog.
+    /// </remarks>
+    protected override void OnButtonPressed (int buttonIndex)
+    {
+        Result = buttonIndex;
+        RequestStop ();
     }
 }

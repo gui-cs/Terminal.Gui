@@ -37,16 +37,19 @@ public class Runnable<TResult> : Runnable, IRunnable<TResult>
     }
 
     /// <summary>
-    ///     Override to clear typed result when starting.
+    ///     Override to handle state changes when starting or stopping.
     ///     Called by base <see cref="Runnable.RaiseIsRunningChanging"/> before events are raised.
     /// </summary>
+    /// <remarks>
+    ///     The base class <see cref="Runnable.RaiseIsRunningChanging"/> already clears <c>Result</c>
+    ///     to <see langword="null"/> when starting. This allows callers to detect cancellation by
+    ///     checking if <c>Result</c> is <see langword="null"/> after the session ends.
+    /// </remarks>
     protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
     {
-        // Clear previous typed result when starting
-        if (newIsRunning)
-        {
-            Result = default;
-        }
+        // NOTE: Do NOT set Result = default here. The base class already sets base.Result = null
+        // when starting (newIsRunning = true). For value types, default(T) is a valid value
+        // (e.g., 0 for int), which would prevent callers from detecting cancellation.
 
         // Call base implementation to allow further customization
         return base.OnIsRunningChanging (oldIsRunning, newIsRunning);
