@@ -7,31 +7,39 @@ Automated code cleanup, modernization, and refactoring for Terminal.Gui C# files
 
 1. **PartialSplitter** - Roslyn tool that splits large files (>1000 lines) into semantic partials
 2. **BackingFieldReorderer** - Roslyn tool that fixes ReSharper bug RSRP-484963 (backing fields before properties)
-3. **CleanupAgent.ps1** - PowerShell orchestrator that coordinates the cleanup process
 
 ## Usage
 
-### Basic Invocation
+Users should be able to invoke the code cleanup agent by telling Claude Code "cleanup these files" and the agent will run the necessary steps to clean up the specified files.
 
-```powershell
-.\Scripts\CleanupAgent.ps1 -Files @("Terminal.Gui\Views\MessageBox.cs")
-```
+Claude performs these steps manually (calling individual tools) and uses its intelligence to handle errors, rollbacks, and reporting.
 
-### Options
+The steps the agent will perform are:
 
-```powershell
-# Skip ReSharper cleanup (for testing other features)
-.\Scripts\CleanupAgent.ps1 -Files @("file.cs") -SkipReSharper
+1. Build the solution and run the Unit tests to ensure a clean starting state.
+2. For each specified file:
+   - If the file is >1000 lines, run PartialSplitter to create partial class files.
+   - Build and test to ensure the split didn't break anything or add any new build warnings.
+   - For each split file (or the original if not split):
+       - Add `#nullable enable` directive if appropriate (based on project/global settings).
+       - Run BackingFieldReorderer to fix backing field ordering.
+       - Run ReSharper Command Line Tools to apply the "Full Cleanup" profile to the file.
+       - Run ReSharper InspectCode and collect warnings.
+       - Refactor to fix easy to fix InspectCode warnings and report harder ones, explaining why they were deemed hard.
+       - Detect CWP patterns and add TODO comments.
+       - Run ReSharper Command Line Tools to apply the "Full Cleanup" profile to the file again.
+       - Build and test to ensure no new build warnings or test failures.
 
-# Skip tests (for quick iteration)
-.\Scripts\CleanupAgent.ps1 -Files @("file.cs") -SkipTests
+## Acceptance Criteria
 
-# Skip partial splitting
-.\Scripts\CleanupAgent.ps1 -Files @("file.cs") -SkipPartialSplit
-
-# Combine flags
-.\Scripts\CleanupAgent.ps1 -Files @("file.cs") -SkipReSharper -SkipTests
-```
+Successfully cleaned files meet:
+- ✓ No new build warnings
+- ✓ `#nullable enable` directive (if appropriate) - all code should support nullable.
+- ✓ Splits >1000 lines into logical partials
+- ✓ Backing fields immediately before properties
+- ✓ Near-zero ReSharper InspectCode warnings
+- ✓ CWP candidates identified with TODO comments
+- ✓ All tests pass
 
 ## Prerequisites
 
@@ -42,7 +50,7 @@ Automated code cleanup, modernization, and refactoring for Terminal.Gui C# files
 - **.NET 8 SDK** (already required for Terminal.Gui)
 - **Git** (for rollback functionality)
 
-## What It Does
+## Step Details
 
 ### 1. File Splitting (>1000 lines)
 - Analyzes class members by naming patterns
@@ -140,154 +148,38 @@ jb inspectcode Terminal.sln `
 - `--severity=WARNING` - Minimum severity level (INFO, HINT, SUGGESTION, WARNING, ERROR)
 - `--format=Xml` - Output format (Xml, Html, Text, Sarif)
 
-## Known Limitations
+### Known Limitations
 
-### ReSharper Exceptions in Output
-
-**Observation:** ReSharper cleanupcode displays exceptions during execution, but completes successfully (exit code 0) and correctly modifies the target file.
-
-Common exceptions observed:
-
-**1. NuGet Version Parsing:**
-```
-Unable to parse version string 8.
---- EXCEPTION #1/2 [InvalidOperationException]
-Message = "Unable to parse version string 8."
-```
-
-**2. Component Initialization:**
-```
-Must not be called inside a component constructor: Use GetLazyProvider
---- EXCEPTION #1/1 [LoggerException]
-```
-
-**3. ConfigFileCache Warnings:**
-```
-Warning: <ConfigFileCache> Attention! Removing a mount point before rebuilding goes inconsistent.
-```
-
-**What We Know:**
-- ✅ Command completes with exit code 0
-- ✅ Target files are correctly modified with expected formatting changes
-- ✅ Only files matching --include pattern are modified
-- ❌ Exceptions appear in output (unclear if expected behavior or bugs)
-
-**Verification Steps:**
-1. Check exit code: `Main method ... returned exit code 0`
-2. Verify changes: `git diff` to see actual modifications
-3. Look for: `Saving document <filename>` in verbose output
-
-**Unknown:** Whether these exceptions indicate bugs in ReSharper CLI or are expected internal logging. If concerned, consider reporting to JetBrains support.
-
-### Performance Characteristics
-
-ReSharper cleanupcode loads the entire solution model even when `--include` specifies one file:
-- **First run on solution**: 30-60 seconds (builds caches, loads solution model)
-- **Subsequent runs**: 15-30 seconds (uses cached solution model)
-- **Large solutions**: May take 1-2 minutes
-
-This is expected behavior - ReSharper needs the full solution context for accurate code analysis, but **only modifies files matching the --include pattern**.
-
-### Partial Splitting Limitations
-
-- Heuristic-based grouping may not always be perfect
-- Review generated partials before committing
-- Some classes may not split well semantically
-
-## Examples
-
-### Split Large File
-
-```powershell
-# Split and clean TableView.cs (2399 lines)
-.\Scripts\CleanupAgent.ps1 -Files @("Terminal.Gui\Views\TableView\TableView.cs")
-
-# Result: TableView.cs + TableView.Mouse.cs + TableView.Drawing.cs + etc.
-```
-
-### Just Backing Fields + CWP Detection
-
-```powershell
-# Skip ReSharper and tests for quick iteration
-.\Scripts\CleanupAgent.ps1 -Files @("file.cs") -SkipReSharper -SkipTests
-```
-
-### Manual ReSharper Workflow
-
-```powershell
-# 1. Split file only
-.\Scripts\CleanupAgent.ps1 -Files @("file.cs") -SkipReSharper -SkipTests -SkipPartialSplit:$false
-
-# 2. Manually run ReSharper Full Cleanup in Rider
-
-# 3. Run backing field reorder on partials
-dotnet run --project Scripts/BackingFieldReorderer -- Terminal.Gui/Views/File.cs
-dotnet run --project Scripts/BackingFieldReorderer -- Terminal.Gui/Views/File.Mouse.cs
-# etc.
-```
-
-## Acceptance Criteria
-
-Successfully cleaned files meet:
-- ✓ Splits >1000 lines into logical partials
-- ✓ Backing fields immediately before properties
-- ✓ Zero ReSharper warnings
-- ✓ `#nullable enable` directive (if appropriate) - all code should support nullable.
-- ✓ CWP candidates identified with TODO comments
-- ✓ Solution builds
-- ✓ All tests pass
-
-## File Organization
-
-```
-Scripts/
-├── CleanupAgent.ps1              # Main orchestrator
-├── BackingFieldReorderer/
-│   ├── BackingFieldReorderer.csproj
-│   └── Program.cs                # Roslyn tool
-└── PartialSplitter/
-    ├── PartialSplitter.csproj
-    └── Program.cs                # Roslyn tool
-
-.claude/
-└── agents/
-    └── cleanup-agent.md          # This file
-```
+- **ReSharper exceptions**: May display exceptions during execution but completes successfully (exit code 0). Verify changes with `git diff`.
+- **Performance**: First run takes 30-60 seconds (caching), subsequent runs 15-30 seconds.
+- **Partial splitting**: Heuristic-based grouping may not always be perfect. Review generated partials before committing.
 
 ## Troubleshooting
 
 ### "Build failed after cleanup"
 - ReSharper may have introduced issues
-- Review changes and fix manually
-- Consider using `--SkipReSharper`
+- Review changes with `git diff` and fix manually
+- Roll back with `git checkout -- <file>`
 
 ### "Tests failed"
-- Changes rolled back automatically (except partial splits)
 - Review test failures to determine cause
 - May need test updates for structural changes
+- Roll back changes if unable to fix
 
 ### "Hundreds of files modified"
-- ReSharper CLI processed entire solution
-- Use `git checkout -- .` to revert
-- Next time: use `--SkipReSharper` or manual cleanup
+- ReSharper CLI processed entire solution (forgot `--include`)
+- Use `git checkout -- .` to revert all changes
+- Re-run with correct `--include` parameter
 
 ### "Partial split created confusing files"
 - Adjust grouping heuristics in PartialSplitter/Program.cs
 - Delete partials and restore from `.backup` file
-- Use `--SkipPartialSplit` to bypass
+- Skip splitting for files that don't split well semantically
 
 ## Best Practices
 
-1. **Test on small files first** - Verify agent behavior
-2. **Use feature flags** - `-SkipReSharper` while iterating
-3. **Review all changes** - Use `git diff` before committing
-4. **Work on branches** - Create `cleanup/batch-1` branches
-5. **Manual ReSharper recommended** - Due to CLI limitations
-
-## Future Improvements
-
-- [ ] Custom Roslyn analyzers instead of ReSharper CLI
-- [ ] Parallel file processing
-- [ ] Resume capability
-- [ ] Integration with CI/CD
-- [ ] Web UI for progress monitoring
+1. **Test on small files first** - Verify behavior before processing large files
+2. **Review all changes** - Use `git diff` before committing
+3. **Work on branches** - Create `cleanup/batch-1` branches
+4. **Build and test frequently** - Verify after each major step
+5. **Commit incrementally** - Commit after each successful file cleanup
