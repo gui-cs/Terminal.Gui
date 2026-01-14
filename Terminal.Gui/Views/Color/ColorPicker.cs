@@ -24,7 +24,6 @@ public partial class ColorPicker : View, IDesignable
 
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
-
     }
 
     private readonly Dictionary<IColorBar, TextField> _textFields = new ();
