@@ -65,7 +65,7 @@ function Invoke-PartialSplit {
     $lineCount = (Get-Content $FilePath).Count
     Write-Status "File has $lineCount lines, splitting into partials..." "Yellow"
 
-    dotnet run --project "$RepoRoot\Scripts\PartialSplitter" -- $FilePath 2>&1 | Out-Host
+    & "$RepoRoot\Scripts\PartialSplitter\bin\Debug\net8.0\PartialSplitter.exe" $FilePath 2>&1 | Out-Host
 
     if ($LASTEXITCODE -ne 0) {
         Write-Status "Partial split failed" "Red"
@@ -179,7 +179,7 @@ function Invoke-BackingFieldReorder {
 
     Write-Status "Reordering backing fields..."
 
-    dotnet run --project "$RepoRoot\Scripts\BackingFieldReorderer" -- $FilePath 2>&1 | Out-Null
+    & "$RepoRoot\Scripts\BackingFieldReorderer\bin\Debug\net8.0\BackingFieldReorderer.exe" $FilePath 2>&1 | Out-Null
 
     return $LASTEXITCODE -eq 0
 }
