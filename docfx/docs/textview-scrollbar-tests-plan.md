@@ -4,18 +4,22 @@
 
 Add failing unit tests that expose bugs in TextView's scrollbar integration when content changes. These tests should pass once the bugs are fixed.
 
-## Test Results (Verified)
+## Test Results (After Initial Fix)
 
 | Test | Result | Notes |
 |------|--------|-------|
 | `ContentSize_Updates_When_Lines_Inserted` | **PASS** | Content size IS updated via Model_LinesLoaded |
 | `ContentSize_Updates_When_Lines_Deleted` | **PASS** | Content size IS updated via Model_LinesLoaded |
-| `VerticalScrollBar_Becomes_Visible_When_Content_Exceeds_Viewport` | **FAIL** | Visibility not updated |
-| `VerticalScrollBar_Hides_When_Content_Fits_Viewport` | **FAIL** | Visibility not updated |
-| `ScrollBar_Position_Change_Updates_Viewport_After_Content_Change` | **FAIL** | Fails at visibility check |
+| `VerticalScrollBar_Becomes_Visible_When_Content_Exceeds_Viewport` | **PASS** | Fixed by adding UpdateHorizontalScrollBarVisibility() call |
+| `VerticalScrollBar_Hides_When_Content_Fits_Viewport` | **PASS** | Fixed by adding UpdateHorizontalScrollBarVisibility() call |
+| `ScrollBar_Position_Change_Updates_Viewport_After_Content_Change` | **PASS** | Fixed by adding UpdateHorizontalScrollBarVisibility() call |
 | `Viewport_Change_Updates_ScrollBar_Position` | **PASS** | Scrollbar position binding works |
-| `HorizontalScrollBar_Becomes_Visible_When_Line_Exceeds_Width` | **FAIL** | Visibility not updated |
+| `HorizontalScrollBar_Becomes_Visible_When_Line_Exceeds_Width` | **PASS** | Fixed by adding UpdateHorizontalScrollBarVisibility() call |
 | `WordWrap_Toggle_Updates_ContentSize` | **PASS** | WordWrap correctly updates content size |
+| `ScrollBar_VisibleContentSize_Is_Set_After_Layout` | **PASS** | VisibleContentSize is properly set |
+| `ScrollBar_Position_Change_Actually_Updates_Viewport` | **PASS** | Scrollbar position change works |
+| `ScrollBar_Position_Not_Reset_By_AdjustViewport_When_Cursor_At_Start` | **FAIL** | **NEW BUG** - AdjustViewport resets scroll position |
+| `ScrollBar_Position_Maintained_After_Focus` | **PASS** | Focus change doesn't reset scroll |
 
 ## Root Cause Analysis (Refined After Testing)
 
@@ -198,3 +202,36 @@ ListView calls `SetContentSize()` in `OnViewportChanged()` which triggers the Vi
 
 **Additional consideration for incremental edits:**
 The tests use `Text` property setter which triggers `Model_LinesLoaded`. For character-by-character typing (via keyboard commands), `OnContentsChanged()` is called but may not trigger the same path. This should be verified with additional tests if needed.
+
+## Secondary Bug: AdjustViewport Resets Scrollbar Position
+
+**The Problem:**
+When the user scrolls via scrollbar, `Viewport.Y` changes correctly. However, `AdjustViewport()` is called from `OnSubViewsLaidOut()` (and many other places) and it **resets the viewport to show the cursor**, effectively undoing the user's scroll action.
+
+**Evidence:**
+Test `ScrollBar_Position_Not_Reset_By_AdjustViewport_When_Cursor_At_Start` FAILS:
+1. Set `tv.VerticalScrollBar.Position = 5` → `Viewport.Y = 5`
+2. Call `tv.LayoutSubViews()`
+3. `Viewport.Y` is reset to 0 (cursor position)
+
+**Root Cause Location:**
+`AdjustViewport()` in TextView.Scrolling.cs:74-134 always adjusts viewport to ensure cursor is visible:
+```csharp
+// Handle vertical scrolling - this forces viewport to show cursor
+if (CurrentRow < Viewport.Y)
+{
+    Viewport = Viewport with { Y = CurrentRow };  // Forces viewport back to cursor!
+    need = true;
+}
+```
+
+When cursor is at row 0 and user scrolls to row 5, this condition `CurrentRow < Viewport.Y` (0 < 5) is true, so viewport is reset to 0.
+
+**Fix Approach:**
+`AdjustViewport()` should NOT adjust viewport when the user is explicitly scrolling via scrollbar. Options:
+1. Add a flag to track "user is scrolling" and skip cursor-following logic
+2. Only call `AdjustViewport()` when cursor position changes, not on every layout
+3. Separate "ensure cursor visible" logic from "adjust viewport" logic
+4. Check if cursor is already visible and only adjust if it's NOT visible
+
+The pattern from CharMap/HexView should be studied - they don't have this problem because they don't have an `AdjustViewport()` function that forces cursor visibility on every layout.

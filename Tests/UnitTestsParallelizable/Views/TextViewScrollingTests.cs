@@ -239,6 +239,142 @@ public class TextViewScrollingTests
     }
 
     /// <summary>
+    /// Tests that ScrollBar.VisibleContentSize is properly set after layout.
+    /// If VisibleContentSize is 0, scrollbar interaction is silently ignored (ScrollBar.cs:433-436).
+    /// </summary>
+    [Fact]
+    public void ScrollBar_VisibleContentSize_Is_Set_After_Layout ()
+    {
+        // Arrange: TextView with content exceeding viewport
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Verify scrollbar is visible
+        Assert.True (tv.VerticalScrollBar.Visible, "Scrollbar should be visible");
+
+        // BUG CHECK: If VisibleContentSize is 0, scrollbar interaction will be silently ignored
+        // because ScrollBar.SliderOnPositionChanged and SliderOnScroll return early when VisibleContentSize == 0
+        Assert.True (tv.VerticalScrollBar.VisibleContentSize > 0,
+            $"VisibleContentSize should be > 0, but was {tv.VerticalScrollBar.VisibleContentSize}. " +
+            "If 0, scrollbar interaction is silently ignored (see ScrollBar.cs:433-436)");
+
+        // Also verify ScrollableContentSize is correct
+        Assert.Equal (10, tv.VerticalScrollBar.ScrollableContentSize);
+    }
+
+    /// <summary>
+    /// Tests that scrollbar position change actually updates viewport.
+    /// This is the key integration test - if this fails, scrollbar dragging has no effect.
+    /// </summary>
+    [Fact]
+    public void ScrollBar_Position_Change_Actually_Updates_Viewport ()
+    {
+        // Arrange: TextView with content exceeding viewport
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Pre-conditions: scrollbar must be properly configured
+        Assert.True (tv.VerticalScrollBar.Visible, "Scrollbar must be visible");
+        Assert.True (tv.VerticalScrollBar.VisibleContentSize > 0, "VisibleContentSize must be > 0");
+        Assert.Equal (10, tv.VerticalScrollBar.ScrollableContentSize);
+
+        // Record initial viewport position
+        int initialViewportY = tv.Viewport.Y;
+
+        // Act: Change scrollbar position (simulating user dragging)
+        tv.VerticalScrollBar.Position = 5;
+
+        // Assert: Viewport should have changed
+        Assert.Equal (5, tv.Viewport.Y);
+        Assert.NotEqual (initialViewportY, tv.Viewport.Y);
+    }
+
+    /// <summary>
+    /// Tests that scrollbar position is not reset by AdjustViewport when cursor is at position 0.
+    /// This simulates the scenario where user scrolls but cursor is at the start of content.
+    /// </summary>
+    [Fact]
+    public void ScrollBar_Position_Not_Reset_By_AdjustViewport_When_Cursor_At_Start ()
+    {
+        // Arrange: TextView with content exceeding viewport, cursor at start
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Cursor should be at start (0, 0)
+        Assert.Equal (0, tv.CurrentRow);
+        Assert.Equal (0, tv.CurrentColumn);
+
+        // Act: Scroll down via scrollbar
+        tv.VerticalScrollBar.Position = 5;
+
+        // Verify viewport changed
+        Assert.Equal (5, tv.Viewport.Y);
+
+        // Now simulate something that might call AdjustViewport (like a redraw event)
+        // By setting NeedsDraw and calling LayoutSubViews
+        tv.SetNeedsDraw ();
+        tv.LayoutSubViews ();
+
+        // BUG CHECK: Does AdjustViewport reset the viewport to show the cursor?
+        // If cursor is at (0,0) and AdjustViewport is called, it might force Viewport.Y back to 0
+        // This would explain why "scrolling has no effect initially"
+        Assert.True (tv.Viewport.Y == 5, "Viewport.Y should remain at 5 after LayoutSubViews, not reset to cursor position");
+    }
+
+    /// <summary>
+    /// Tests that scrollbar position is maintained after focus changes.
+    /// </summary>
+    [Fact]
+    public void ScrollBar_Position_Maintained_After_Focus ()
+    {
+        // Arrange: TextView with content exceeding viewport
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Scroll down
+        tv.VerticalScrollBar.Position = 5;
+        Assert.Equal (5, tv.Viewport.Y);
+
+        // Simulate focus change (this might trigger PositionCursor or other methods)
+        tv.SetFocus ();
+
+        // Viewport should remain scrolled
+        Assert.True (tv.Viewport.Y == 5, "Viewport.Y should remain at 5 after SetFocus");
+    }
+
+    /// <summary>
     /// Tests that toggling WordWrap updates content size appropriately.
     /// When WordWrap is enabled, long lines wrap and increase the content height.
     /// </summary>
