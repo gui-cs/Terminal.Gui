@@ -475,7 +475,7 @@ public class TableViewTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsAre (expected, output);
 
         // revert the style change
-        style.MaxWidth = TableView.DefaultMaxCellWidth;
+        style.MaxWidth = TableView.DEFAULT_MAX_CELL_WIDTH;
 
         // another way API user can fix problem is to implement
         // RepresentationGetter and apply max length there
@@ -556,7 +556,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Viewport = new (0, 0, 25, 5);
 
         // revert style change
-        style.MinAcceptableWidth = TableView.DefaultMinAcceptableWidth;
+        style.MinAcceptableWidth = TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH;
 
         // Now let's test the global MaxCellWidth and MinCellWidth
         tableView.Style.ExpandLastColumn = false;
