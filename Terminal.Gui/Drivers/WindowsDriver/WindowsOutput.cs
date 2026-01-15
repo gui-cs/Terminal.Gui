@@ -419,7 +419,42 @@ internal partial class WindowsOutput : OutputBase, IOutput
         }
         else
         {
-            _everythingStringBuilder.Append (str);
+            try
+            {
+                ReadOnlySpan<char> span = str.AsSpan (); // still allocates the string
+
+                bool result = WriteConsole (_outputHandle, span, (uint)span.Length, out _, nint.Zero);
+
+                if (!result)
+                {
+                    int err = Marshal.GetLastWin32Error ();
+
+                    if (err == 1)
+                    {
+                        Logging.Error ($"Error: {Marshal.GetLastWin32Error ()} in {nameof (WindowsOutput)}");
+
+                        return;
+                    }
+
+                    if (err != 0)
+                    {
+                        throw new Win32Exception (err);
+                    }
+                }
+            }
+            catch (DllNotFoundException)
+            {
+                // Running unit tests or in an environment where writing is not possible.
+            }
+            catch (Exception e)
+            {
+                Logging.Error ($"Error: {e.Message} in {nameof (WindowsOutput)}");
+
+                if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+                {
+                    throw;
+                }
+            }
         }
     }
 
