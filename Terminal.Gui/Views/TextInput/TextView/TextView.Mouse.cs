@@ -202,12 +202,8 @@ public partial class TextView
                 StartSelecting ();
             }
 
-            (int startCol, int col, int row)? newPos = _model.ProcessDoubleClickSelection (
-                                                                                           SelectionStartColumn,
-                                                                                           CurrentColumn,
-                                                                                           CurrentRow,
-                                                                                           UseSameRuneTypeForWords,
-                                                                                           SelectWordOnlyOnDoubleClick);
+            (int startCol, int col, int row)? newPos =
+                _model.ProcessDoubleClickSelection (SelectionStartColumn, CurrentColumn, CurrentRow, UseSameRuneTypeForWords, SelectWordOnlyOnDoubleClick);
 
             if (newPos.HasValue)
             {

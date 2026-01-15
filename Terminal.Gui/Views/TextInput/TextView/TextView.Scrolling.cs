@@ -34,7 +34,7 @@ public partial class TextView
         AdjustViewport ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e)
     {
         base.OnViewportChanged (e);
@@ -42,7 +42,7 @@ public partial class TextView
     }
 
     /// <summary>
-    /// Updates the content size based on the current text model dimensions.
+    ///     Updates the content size based on the current text model dimensions.
     /// </summary>
     private void UpdateContentSize ()
     {
@@ -58,7 +58,7 @@ public partial class TextView
     }
 
     /// <summary>
-    /// Updates the horizontal scrollbar visibility based on WordWrap state.
+    ///     Updates the horizontal scrollbar visibility based on WordWrap state.
     /// </summary>
     private void UpdateHorizontalScrollBarVisibility ()
     {
@@ -69,7 +69,6 @@ public partial class TextView
 
         HorizontalScrollBar.Visible = ScrollBars && !WordWrap && Viewport.Width < GetContentSize ().Width;
         VerticalScrollBar.Visible = ScrollBars && Viewport.Height < GetContentSize ().Height;
-
     }
 
     private void AdjustViewport ()
@@ -85,13 +84,9 @@ public partial class TextView
             Viewport = Viewport with { X = CurrentColumn };
             need = true;
         }
-        else if (!_wordWrap
-                 && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size + 1 >= Viewport.Width))
+        else if (!_wordWrap && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size + 1 >= Viewport.Width))
         {
-            Viewport = Viewport with
-            {
-                X = TextModel.CalculateLeftColumn (line, Viewport.X, CurrentColumn, Viewport.Width, TabWidth)
-            };
+            Viewport = Viewport with { X = TextModel.CalculateLeftColumn (line, Viewport.X, CurrentColumn, Viewport.Width, TabWidth) };
             need = true;
         }
         else if ((_wordWrap && Viewport.X > 0) || (dSize.size < Viewport.Width && tSize.size < Viewport.Width))

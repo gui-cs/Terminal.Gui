@@ -11,7 +11,7 @@ public partial class TextView
     public bool HasHistoryChanges => _historyText.HasHistoryChanges;
 
     /// <summary>Allows clearing the <see cref="HistoryTextItemEventArgs"/> items updating the original text.</summary>
-    public void ClearHistoryChanges () { _historyText.Clear (_model.GetAllLines ()); }
+    public void ClearHistoryChanges () => _historyText.Clear (_model.GetAllLines ());
 
     private void HistoryText_ChangeText (object? sender, HistoryTextItemEventArgs? obj)
     {
@@ -53,8 +53,7 @@ public partial class TextView
                 {
                     _model.ReplaceLine (startLine, obj.Lines [i]);
                 }
-                else if (obj is { IsUndoing: true, LineStatus: TextEditingLineStatus.Removed }
-                                or { IsUndoing: false, LineStatus: TextEditingLineStatus.Added })
+                else if (obj is { IsUndoing: true, LineStatus: TextEditingLineStatus.Removed } or { IsUndoing: false, LineStatus: TextEditingLineStatus.Added })
                 {
                     _model.AddLine (startLine, obj.Lines [i]);
                 }

@@ -50,8 +50,7 @@ public partial class TextView
         }
         else if (!_wordWrap)
         {
-            int maxlength =
-                _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
+            int maxlength = _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
             Viewport = Viewport with { X = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0) };
         }
 
@@ -179,15 +178,11 @@ public partial class TextView
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow = CurrentRow + nPageDnShift > _model.Count
-                             ? _model.Count > 0 ? _model.Count - 1 : 0
-                             : CurrentRow + nPageDnShift;
+            CurrentRow = CurrentRow + nPageDnShift > _model.Count ? _model.Count > 0 ? _model.Count - 1 : 0 : CurrentRow + nPageDnShift;
 
             if (Viewport.Y < CurrentRow - nPageDnShift)
             {
-                Viewport = Viewport with { Y = CurrentRow >= _model.Count
-                              ? CurrentRow - nPageDnShift
-                              : Viewport.Y + nPageDnShift };
+                Viewport = Viewport with { Y = CurrentRow >= _model.Count ? CurrentRow - nPageDnShift : Viewport.Y + nPageDnShift };
                 SetNeedsDraw ();
             }
 
@@ -276,6 +271,7 @@ public partial class TextView
     {
         ResetColumnTrack ();
         StartSelecting ();
+
         return MoveHome ();
     }
 

@@ -80,6 +80,7 @@ public partial class TextView : View, IDesignable
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
 
     private CultureInfo? _currentCulture;
+
     //private Dim? _savedHeight;
 
     /// <summary>
@@ -92,7 +93,7 @@ public partial class TextView : View, IDesignable
         Used = true;
 
         // By default, disable hotkeys (in case someone sets Title)
-        base.HotKeySpecifier = new ('\xffff');
+        base.HotKeySpecifier = new Rune ('\xffff');
 
         _model.LinesLoaded += Model_LinesLoaded!;
         _historyText.ChangeText += HistoryText_ChangeText;
@@ -101,10 +102,10 @@ public partial class TextView : View, IDesignable
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        Cursor = new () { Style = DefaultCursorStyle };
+        Cursor = new Cursor { Style = DefaultCursorStyle };
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         Autocomplete.HostControl ??= this;
@@ -119,7 +120,7 @@ public partial class TextView : View, IDesignable
         base.EndInit ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         base.OnSubViewsLaidOut (args);
@@ -142,7 +143,7 @@ public partial class TextView : View, IDesignable
     /// </summary>
     public virtual void OnContentsChanged ()
     {
-        ContentsChanged?.Invoke (this, new (CurrentRow, CurrentColumn));
+        ContentsChanged?.Invoke (this, new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 
         ProcessInheritsPreviousScheme (CurrentRow, CurrentColumn);
         ProcessAutocomplete ();
@@ -155,6 +156,7 @@ public partial class TextView : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+
         if (newHasFocus)
         {
             PositionCursor ();
@@ -167,6 +169,7 @@ public partial class TextView : View, IDesignable
         if (!CanFocus || !Enabled || ReadOnly || Driver is null)
         {
             Cursor = Cursor with { Position = null };
+
             return;
         }
 
@@ -205,12 +208,13 @@ public partial class TextView : View, IDesignable
                     cols = Math.Max (cols, 1);
                 }
 
-                if (!TextModel.SetCol (ref col, Viewport.Width, cols))
+                if (TextModel.SetCol (ref col, Viewport.Width, cols))
                 {
-                    col = CurrentColumn;
-
-                    break;
+                    continue;
                 }
+                col = CurrentColumn;
+
+                break;
             }
         }
 
@@ -219,10 +223,7 @@ public partial class TextView : View, IDesignable
 
         if (posX > -1 && col >= posX && posX < Viewport.Width && Viewport.Y <= CurrentRow && posY < Viewport.Height)
         {
-            Cursor = Cursor with
-            {
-                Position = ViewportToScreen (new Point (col, CurrentRow - Viewport.Y))
-            };
+            Cursor = Cursor with { Position = ViewportToScreen (new Point (col, CurrentRow - Viewport.Y)) };
         }
         else
         {
@@ -232,17 +233,16 @@ public partial class TextView : View, IDesignable
 
     private PopoverMenu CreateContextMenu ()
     {
-        PopoverMenu menu = new (
-                                new List<View>
-                                {
-                                    new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
-                                    new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
-                                    new MenuItem (this, Command.Copy, Strings.ctxCopy),
-                                    new MenuItem (this, Command.Cut, Strings.ctxCut),
-                                    new MenuItem (this, Command.Paste, Strings.ctxPaste),
-                                    new MenuItem (this, Command.Undo, Strings.ctxUndo),
-                                    new MenuItem (this, Command.Redo, Strings.ctxRedo)
-                                });
+        PopoverMenu menu = new (new List<View>
+        {
+            new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
+            new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
+            new MenuItem (this, Command.Copy, Strings.ctxCopy),
+            new MenuItem (this, Command.Cut, Strings.ctxCut),
+            new MenuItem (this, Command.Paste, Strings.ctxPaste),
+            new MenuItem (this, Command.Undo, Strings.ctxUndo),
+            new MenuItem (this, Command.Redo, Strings.ctxRedo)
+        });
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 
@@ -253,7 +253,7 @@ public partial class TextView : View, IDesignable
     // Clears the contents of the selected region
     //
 
-    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) => KeyBindings.Replace (e.OldKey, e.NewKey);
 
     /// <summary>Get the Context Menu.</summary>
     public PopoverMenu? ContextMenu { get; private set; }
@@ -285,5 +285,4 @@ public partial class TextView : View, IDesignable
 
         base.Dispose (disposing);
     }
-
 }
