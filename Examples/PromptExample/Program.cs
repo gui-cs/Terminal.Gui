@@ -1,14 +1,17 @@
 // Example demonstrating the Prompt API for getting typed input from users
 
+using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
 using Terminal.Gui.Resources;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
+using Color = Terminal.Gui.Drawing.Color;
 
 ConfigurationManager.Enable (ConfigLocations.All);
-using IApplication app = Application.Create ().Init ();
+using IApplication app = Application.Create ().Init (DriverRegistry.Names.DOTNET);
 
 // Create a main window to host the prompts
 using Window mainWindow = new ();
@@ -32,7 +35,7 @@ textFieldButton.Accepting += (_, _) =>
                              {
                                  string? result = mainWindow.Prompt<TextField, string> (beginInitHandler: prompt =>
                                                                                         {
-                                                                                            prompt.Title = "Enter Your Name";
+                                                                                            prompt.Title = textFieldButton.Title;
                                                                                             prompt.GetWrappedView ().Width = 40;
                                                                                             prompt.GetWrappedView ().Text = "Default name";
                                                                                         });
@@ -41,6 +44,25 @@ textFieldButton.Accepting += (_, _) =>
                              };
 
 mainWindow.Add (textFieldButton);
+
+// Example 1: TextField with string result using auto-Text extraction
+Button textViewButton = new () { Title = "TextView (Auto-Text)", X = Pos.Center (), Y = buttonY++ };
+
+textViewButton.Accepting += (_, _) =>
+                            {
+                                string? result = mainWindow.Prompt<TextView, string> (beginInitHandler: prompt =>
+                                                                                                         {
+                                                                                                             prompt.Title = textViewButton.Title;
+                                                                                                             prompt.GetWrappedView ().Text = "Some text\nis nice.";
+                                                                                                             prompt.GetWrappedView ().Width = Dim.Fill (0, 40);
+                                                                                                             prompt.GetWrappedView ().Height = Dim.Fill (0, 8);
+                                                                                                         });
+
+                                MessageBox.Query (app, textViewButton.Title, result is { } ? $"You entered: {result}" : "Canceled", Strings.btnOk);
+                            };
+
+mainWindow.Add (textViewButton);
+
 
 // Example 2: DatePicker with DateTime result
 Button datePickerButton = new () { Title = "DatePicker (Typed Result)", X = Pos.Center (), Y = buttonY++ };
