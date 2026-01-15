@@ -80,12 +80,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
 
         // Set automatic width and height, with minimums based on content size. Also, subtract
         // Padding thickness in case the scrollbar is visible
-        Width = Dim.Auto (
-                          minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth () - (VerticalScrollBar.Visible ? 1 : 0)),
+        Width = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth () - (VerticalScrollBar.Visible ? 1 : 0)),
                           maximumContentDim: Dim.Percent (100) - 4);
 
-        Height = Dim.Auto (
-                           minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight () - _minimumButtonsSize.Height - (HorizontalScrollBar.Visible ? 1 : 0)),
+        Height = Dim.Auto (minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight () - _minimumButtonsSize.Height - (HorizontalScrollBar.Visible ? 1 : 0)),
                            maximumContentDim: Dim.Percent (100) - 4);
         ButtonAlignment = Dialog.DefaultButtonAlignment;
         ButtonAlignmentModes = Dialog.DefaultButtonAlignmentModes;
@@ -95,7 +93,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
-        _buttonContainer = new ()
+        _buttonContainer = new View
         {
             Id = "Dialog.ButtonContainer",
             CanFocus = true,
@@ -108,8 +106,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
 
         SetStyle ();
 
-        AddCommand (
-                    Command.Accept,
+        AddCommand (Command.Accept,
                     ctx =>
                     {
                         View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
@@ -142,7 +139,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
-        _minimumSubViewsSize = new (GetWidthRequiredForSubViews (), GetHeightRequiredForSubViews ());
+        _minimumSubViewsSize = new Size (GetWidthRequiredForSubViews (), GetHeightRequiredForSubViews ());
         UpdateSizes ();
         base.OnSubViewAdded (view);
     }
@@ -236,10 +233,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             subViewsHeight = Math.Max (subViewsHeight, Viewport.Height);
         }
 
-        SetContentSize (
-                        new Size (
-                                  Math.Max (_minimumButtonsSize.Width, subViewsWidth),
-                                  Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
+        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
     }
 
     /// <summary>
@@ -249,15 +243,11 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogWidth ()
     {
-        int minSize = Math.Max (
-                                Math.Max (
-                                          _minimumSubViewsSize.Width,
+        int minSize = Math.Max (Math.Max (_minimumSubViewsSize.Width,
 
                                           // Ensure space for title + borders
-                                          Title.GetColumns () + 4
-                                         ),
-                                _minimumButtonsSize.Width
-                               );
+                                          Title.GetColumns () + 4),
+                                _minimumButtonsSize.Width);
 
         return minSize;
     }
@@ -269,10 +259,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
-        int minSize = Math.Max (
-                                _minimumSubViewsSize.Height,
-                                _minimumButtonsSize.Height - Border!.Thickness.Vertical - Margin!.Thickness.Vertical
-                               );
+        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border!.Thickness.Vertical - Margin!.Thickness.Vertical);
 
         return minSize;
     }
@@ -313,7 +300,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
 
         _buttonContainer?.Add (dialogButton);
         Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
-        _minimumButtonsSize = new (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
+        _minimumButtonsSize = new Size (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
     /// <summary>
@@ -431,7 +418,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnDrewText () { _drawingText = false; }
+    protected override void OnDrewText () => _drawingText = false;
 
     /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
@@ -455,28 +442,17 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     {
         Title = "Dialog Title";
 
-        AddButton (
-                   new ()
-                   {
-                       Id = "btnCancel",
-                       Title = Strings.btnCancel
-                   });
+        AddButton (new Button { Id = "btnCancel", Title = Strings.btnCancel });
 
-        AddButton (
-                   new ()
-                   {
-                       Id = "btnOk",
-                       Title = Strings.btnOk
+        AddButton (new Button
+        {
+            Id = "btnOk", Title = Strings.btnOk
 
-                       // Dialog will automatically set IsDefault to the last button added
-                   });
+            // Dialog will automatically set IsDefault to the last button added
+        });
 
         // Add some example content to the dialog
-        Label infoLabel = new ()
-        {
-            Id = "infoLabel",
-            Text = "_Example:"
-        };
+        Label infoLabel = new () { Id = "infoLabel", Text = "_Example:" };
 
         TextField info = new ()
         {
