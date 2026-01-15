@@ -131,4 +131,28 @@ public class PromptDialog<TView, TResult> : Dialog<TResult> where TView : View
 
         base.EndInit ();
     }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     When the Ok button (the default button) is pressed, extracts the result using <see cref="ResultExtractor"/>
+    ///     and stores it in <see cref="IRunnable{TResult}.Result"/> before closing.
+    ///     When Cancel is pressed, closes without setting a result.
+    /// </remarks>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        if (base.OnAccepting (args))
+        {
+            return true;
+        }
+
+        // Only extract result if the default button (Ok) was pressed
+        Button? defaultButton = Buttons.FirstOrDefault (b => b.IsDefault);
+
+        if (args.Context?.Source == defaultButton && ResultExtractor is { } && _wrappedView is { })
+        {
+            Result = ResultExtractor (_wrappedView);
+        }
+
+        return false;
+    }
 }
