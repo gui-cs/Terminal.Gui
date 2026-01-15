@@ -25,14 +25,14 @@ namespace Terminal.Gui.Views;
 ///         <see cref="IRunnable{TResult}.Result"/> remains <see langword="null"/>.
 ///     </para>
 ///     <para>
-///         Use the <see cref="PromptExtensions.Prompt{TView,TResult}(IRunnable,string,TView,Func{TView,TResult},TResult,Action{Prompt{TView,TResult}}?)"/>
+///         Use the <see cref="PromptExtensions.Prompt{TView,TResult}"/>
 ///         extension method for a more convenient API.
 ///     </para>
 /// </remarks>
 /// <example>
 ///     <code>
 ///     // Create a prompt dialog with a DatePicker
-///     DatePicker datePicker = new () { Date = DateTime.Now };
+///     DatePicker datePicker = new () { Date = new DateTime (1966, 9, 10) };
 ///     Prompt&lt;DatePicker, DateTime&gt; prompt = new ()
 ///     {
 ///         Title = "Select Date",
@@ -50,42 +50,53 @@ namespace Terminal.Gui.Views;
 ///     }
 ///     </code>
 /// </example>
-public class Prompt<TView, TResult> : Dialog<TResult> where TView : View
+public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new()
 {
-    private TView? _wrappedView;
+    private readonly TView? _wrappedView;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="Prompt{TView, TResult}"/>.
     /// </summary>
+    /// <param name="wrappedView">
+    ///     The view to wrap. If null, a new instance of TView is created.
+    ///     Requires TView to have a parameterless constructor if null.
+    /// </param>
+    public Prompt (TView? wrappedView = null)
+    {
+        _wrappedView = wrappedView ?? new TView ();
+        AddSubViews ();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Prompt ()
     {
+        _wrappedView ??= new TView ();
+        AddSubViews ();
+    }
+
+    private void AddSubViews ()
+    {
+        Add (_wrappedView);
         // Add default Ok and Cancel buttons
+        // Note, users can override these by changing them in an
+        // initialization event (e.g. Initialized).
         AddButton (new () { Text = Strings.btnCancel });
         AddButton (new () { Text = Strings.btnOk });
     }
 
     /// <summary>
-    ///     Gets or sets the wrapped view that is displayed in the dialog.
+    ///     Gets the wrapped view that is displayed in the dialog.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This property must be set before the dialog is initialized.
-    ///         The wrapped view will be added as a subview during <see cref="EndInit"/>.
+    ///         The wrapped view will be added as a subview during construction.
     ///     </para>
     /// </remarks>
-    /// <exception cref="InvalidOperationException">Thrown if the property is set after initialization.</exception>
-    public required TView WrappedView
+    public TView? GetWrappedView ()
     {
-        get => _wrappedView ?? throw new InvalidOperationException ("WrappedView must be set before use.");
-        init
-        {
-            if (IsInitialized)
-            {
-                throw new InvalidOperationException ("WrappedView cannot be changed after initialization.");
-            }
-
-            _wrappedView = value;
-        }
+        return _wrappedView;
     }
 
     /// <summary>
@@ -103,43 +114,6 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View
     /// </remarks>
     public Func<TView, TResult?>? ResultExtractor { get; init; }
 
-    /// <summary>
-    ///     Gets or sets the text displayed on the Ok button.
-    /// </summary>
-    /// <remarks>
-    ///     Default is the localized "Ok" string from <see cref="Strings.btnOk"/>.
-    ///     Set this before initialization to customize the button text.
-    /// </remarks>
-    public string OkButtonText { get; init; } = Strings.btnOk;
-
-    /// <summary>
-    ///     Gets or sets the text displayed on the Cancel button.
-    /// </summary>
-    /// <remarks>
-    ///     Default is the localized "Cancel" string from <see cref="Strings.btnCancel"/>.
-    ///     Set this before initialization to customize the button text.
-    /// </remarks>
-    public string CancelButtonText { get; init; } = Strings.btnCancel;
-
-    /// <inheritdoc/>
-    public override void EndInit ()
-    {
-        // Update button text if customized
-        if (Buttons.Length >= 2)
-        {
-            Buttons [0].Text = CancelButtonText;
-            Buttons [1].Text = OkButtonText;
-        }
-
-        // Add the wrapped view as a subview
-        if (_wrappedView is { })
-        {
-            Add (_wrappedView);
-        }
-
-        base.EndInit ();
-    }
-
     /// <inheritdoc/>
     /// <remarks>
     ///     When the Ok button (the default button) is pressed, extracts the result using <see cref="ResultExtractor"/>
@@ -153,10 +127,7 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View
             return true;
         }
 
-        // Only extract result if the default button (Ok) was pressed
-        Button? defaultButton = Buttons.FirstOrDefault (b => b.IsDefault);
-
-        if (args.Context?.Source == defaultButton && ResultExtractor is { } && _wrappedView is { })
+        if (ResultExtractor is { } && _wrappedView is {})
         {
             Result = ResultExtractor (_wrappedView);
         }

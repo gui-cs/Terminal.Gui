@@ -17,9 +17,8 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            WrappedView = label,
             ResultExtractor = l => l.Text
         };
 
@@ -34,9 +33,8 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            WrappedView = label
         };
 
         Assert.True (dialog.CanFocus);
@@ -57,36 +55,27 @@ public class PromptTests : TestDriverBase
 
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            WrappedView = label
         };
 
-        Assert.Same (label, dialog.WrappedView);
+        Assert.Same (label, dialog.GetWrappedView ());
     }
 
     [Fact]
-    public void WrappedView_Added_As_SubView_On_EndInit ()
+    public void WrappedView_Added_As_SubView_In_Constructor ()
     {
-        IDriver driver = CreateTestDriver ();
-        driver.SetScreenSize (80, 25);
-
         Label label = new () { Text = "Test Label" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            Driver = driver,
-            WrappedView = label,
             ResultExtractor = l => l.Text
         };
 
         // Before EndInit, label is not in SubViews
-        Assert.DoesNotContain (label, dialog.SubViews);
+        Assert.Contains (label, dialog.SubViews);
 
-        dialog.BeginInit ();
-        dialog.EndInit ();
-
-        // After EndInit, label should be in SubViews
+        // After EndInit, label should still be in SubViews
         Assert.Contains (label, dialog.SubViews);
     }
 
@@ -99,9 +88,8 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Hello" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            WrappedView = label,
             ResultExtractor = l => l.Text
         };
 
@@ -113,9 +101,8 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Hello" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            WrappedView = label,
             ResultExtractor = null
         };
 
@@ -127,46 +114,18 @@ public class PromptTests : TestDriverBase
     #region Button Text Customization Tests
 
     [Fact]
-    public void OkButtonText_Default_Is_Localized ()
-    {
-        Label label = new () { Text = "Test" };
-
-        using Prompt<Label, string> dialog = new ()
-        {
-            WrappedView = label
-        };
-
-        Assert.Equal (Strings.btnOk, dialog.OkButtonText);
-    }
-
-    [Fact]
-    public void CancelButtonText_Default_Is_Localized ()
-    {
-        Label label = new () { Text = "Test" };
-
-        using Prompt<Label, string> dialog = new ()
-        {
-            WrappedView = label
-        };
-
-        Assert.Equal (Strings.btnCancel, dialog.CancelButtonText);
-    }
-
-    [Fact]
     public void Button_Text_Can_Be_Customized ()
     {
-        IDriver driver = CreateTestDriver ();
-        driver.SetScreenSize (80, 25);
-
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new ()
-        {
-            Driver = driver,
-            WrappedView = label,
-            OkButtonText = "Accept",
-            CancelButtonText = "Reject"
-        };
+        using Prompt<Label, string> dialog = new (label);
+
+        dialog.Initialized += (sender, args) =>
+                              {
+                                  dialog.Buttons [0].Text = "Reject";
+                                  dialog.Buttons [1].Text = "Accept";
+                                  dialog.SetNeedsLayout ();
+                              };
 
         dialog.BeginInit ();
         dialog.EndInit ();
@@ -184,9 +143,8 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using Prompt<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new (textField)
         {
-            WrappedView = textField,
             ResultExtractor = tf => tf.Text
         };
 
@@ -201,9 +159,8 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using Prompt<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new (textField)
         {
-            WrappedView = textField,
             ResultExtractor = tf => tf.Text
         };
 
@@ -221,9 +178,8 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using Prompt<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new (textField)
         {
-            WrappedView = textField,
             ResultExtractor = tf => tf.Text
         };
 
@@ -235,9 +191,8 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "Test" };
 
-        using Prompt<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new (textField)
         {
-            WrappedView = textField,
             ResultExtractor = tf => tf.Text
         };
 
@@ -258,16 +213,11 @@ public class PromptTests : TestDriverBase
     [Fact]
     public void PromptDialog_Layout_Works ()
     {
-        IDriver driver = CreateTestDriver ();
-        driver.SetScreenSize (80, 25);
-
         Label label = new () { Text = "Choose an option" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            Driver = driver,
             Title = "Prompt",
-            WrappedView = label,
             ResultExtractor = l => l.Text
         };
 
@@ -282,16 +232,11 @@ public class PromptTests : TestDriverBase
     [Fact]
     public void PromptDialog_Contains_WrappedView_After_EndInit ()
     {
-        IDriver driver = CreateTestDriver ();
-        driver.SetScreenSize (40, 12);
-
         Label label = new () { Text = "Hello World" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
-            Driver = driver,
             Title = "Test",
-            WrappedView = label,
             ResultExtractor = l => l.Text
         };
 
@@ -317,9 +262,8 @@ public class PromptTests : TestDriverBase
 
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, bool> dialog = new ()
+        using Prompt<Label, bool> dialog = new (label)
         {
-            WrappedView = label,
             ResultExtractor = _ => true
         };
 
@@ -334,9 +278,8 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, bool> dialog = new ()
+        using Prompt<Label, bool> dialog = new (label)
         {
-            WrappedView = label,
             ResultExtractor = _ => true
         };
 
@@ -353,9 +296,8 @@ public class PromptTests : TestDriverBase
     {
         DatePicker datePicker = new () { Date = new DateTime (2024, 6, 15) };
 
-        using Prompt<DatePicker, DateTime> dialog = new ()
+        using Prompt<DatePicker, DateTime> dialog = new (datePicker)
         {
-            WrappedView = datePicker,
             ResultExtractor = dp => dp.Date
         };
 
@@ -371,9 +313,8 @@ public class PromptTests : TestDriverBase
     {
         ColorPicker colorPicker = new () { SelectedColor = Color.Red };
 
-        using Prompt<ColorPicker, Color> dialog = new ()
+        using Prompt<ColorPicker, Color> dialog = new (colorPicker)
         {
-            WrappedView = colorPicker,
             ResultExtractor = cp => cp.SelectedColor
         };
 
@@ -389,9 +330,8 @@ public class PromptTests : TestDriverBase
     {
         TextField textField = new () { Text = "42" };
 
-        using Prompt<TextField, int> dialog = new ()
+        using Prompt<TextField, int> dialog = new (textField)
         {
-            WrappedView = textField,
             ResultExtractor = tf => int.TryParse (tf.Text, out int result) ? result : 0
         };
 
@@ -411,10 +351,9 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
             Title = "Select Item",
-            WrappedView = label
         };
 
         Assert.Equal ("Select Item", dialog.Title);
@@ -425,10 +364,9 @@ public class PromptTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using Prompt<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new (label)
         {
             Title = "选择日期",
-            WrappedView = label
         };
 
         Assert.Equal ("选择日期", dialog.Title);

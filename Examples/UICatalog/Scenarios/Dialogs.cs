@@ -185,7 +185,8 @@ public class Dialogs : Scenario
 
         showDialogButton.Accepting += (s, e) =>
                                       {
-                                          using Dialog? dlg = CreateDemoDialog (widthEdit,
+                                          using Dialog? dlg = CreateDemoDialog (
+                                                                                widthEdit,
                                                                                 heightEdit,
                                                                                 titleEdit,
                                                                                 numButtonsEdit,
@@ -307,46 +308,49 @@ public class Dialogs : Scenario
         promptSelectedColorLabel.SetScheme (new () { Normal = new (StandardColor.White, StandardColor.Cyan) });
         promptSelectedColorLabel.Text = promptSelectedColorLabel.GetScheme ().Normal.Background.ToString ();
 
-        showPromptDialogButton.Accepting += (_, e) =>
-                                            {
-                                                // Create a ColorPicker with the current color
-                                                ColorPicker colorPicker = new ()
-                                                {
-                                                    SelectedColor = promptSelectedColorLabel.GetScheme ().Normal.Background,
-                                                    Style = new ()
+        void OnShowPromptDialogButtonOnAccepting (object? _, CommandEventArgs e)
+        {
+            // Use the Prompt extension method - much simpler than custom Dialog<T>!
+            // mainWindow is an IRunnable so we can call Prompt on it
+            Color? result = mainWindow.Prompt<ColorPicker, Color?> (
+                                                                    resultExtractor: cp => cp.SelectedColor,
+                                                                    beginInitHandler: prompt =>
+                                                                    {
+                                                                        // Customize the Prompt dialog
+                                                                        prompt.Title = "Pick a Color (via Prompt)";
+
+                                                                        // Customize the wrapped view
+                                                                        prompt.GetWrappedView ()?.SelectedColor = promptSelectedColorLabel.GetScheme ()
+                                                                            .Normal.Background;
+
+                                                                        prompt.GetWrappedView ()?.Style = new () { ShowColorName = true, ShowTextFields = true };
+
+                                                                        prompt.GetWrappedView ()?.Width = Dim.Fill (0, 48);
+                                                                        prompt.GetWrappedView ()?.AssignHotKeys = true;
+                                                                        prompt.GetWrappedView ()?.ApplyStyleChanges ();
+                                                                    });
+
+            if (result is { } color)
+            {
+                promptSelectedColorLabel.Text = color.ToString ();
+                promptSelectedColorLabel.SetScheme (
+                                                    new ()
                                                     {
-                                                        ShowColorName = true,
-                                                        ShowTextFields = true
-                                                    },
-                                                    Width = Dim.Fill (0, 48),
-                                                    AssignHotKeys = true
-                                                };
-                                                colorPicker.ApplyStyleChanges ();
+                                                        Normal = new (
+                                                                      promptSelectedColorLabel.GetScheme ()
+                                                                                              .Normal.Foreground,
+                                                                      color)
+                                                    });
+            }
+            else
+            {
+                promptSelectedColorLabel.Text = "Canceled";
+            }
 
-                                                // Use the Prompt extension method - much simpler than custom Dialog<T>!
-                                                // mainWindow is an IRunnable so we can call Prompt on it
-                                                Color? result = mainWindow.Prompt<ColorPicker, Color?> (
-                                                    title: "Pick a Color (via Prompt)",
-                                                    view: colorPicker,
-                                                    resultExtractor: cp => cp.SelectedColor);
+            e.Handled = true;
+        }
 
-                                                if (result is { } color)
-                                                {
-                                                    promptSelectedColorLabel.Text = color.ToString ();
-
-                                                    promptSelectedColorLabel.SetScheme (
-                                                                                        new ()
-                                                                                        {
-                                                                                            Normal = new (promptSelectedColorLabel.GetScheme ().Normal.Foreground, color)
-                                                                                        });
-                                                }
-                                                else
-                                                {
-                                                    promptSelectedColorLabel.Text = "Canceled";
-                                                }
-
-                                                e.Handled = true;
-                                            };
+        showPromptDialogButton.Accepting += OnShowPromptDialogButtonOnAccepting;
 
         mainWindow.UsedHotKeys = frame.UsedHotKeys;
         mainWindow.AssignHotKeys = true;
@@ -515,6 +519,7 @@ public class Dialogs : Scenario
             {
                 return true;
             }
+
             Result = _colorPicker.SelectedColor;
 
             return false;

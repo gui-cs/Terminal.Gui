@@ -291,7 +291,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     ///         The last button added becomes the default (<see cref="Button.IsDefault"/> = <see langword="true"/>).
     ///     </para>
     ///     <para>
-    ///         When a button is pressed, the dialog's <see cref="Runnable.Accepting"/> event is raised.
+    ///         When a button is pressed, the dialog's <see cref="View.Accepting"/> event is raised.
     ///     </para>
     /// </remarks>
     public void AddButton (Button dialogButton)
