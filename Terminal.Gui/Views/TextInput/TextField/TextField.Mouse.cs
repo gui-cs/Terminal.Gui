@@ -12,6 +12,7 @@ public partial class TextField
 
     private bool _isButtonPressed;
     private bool _isButtonReleased;
+    private bool _focusSetByMouse;
 
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse ev)
@@ -32,6 +33,7 @@ public partial class TextField
 
         if (!HasFocus && ev.Flags != MouseFlags.PositionReport)
         {
+            _focusSetByMouse = true;
             SetFocus ();
         }
 
@@ -104,6 +106,7 @@ public partial class TextField
         {
             if (!HasFocus)
             {
+                _focusSetByMouse = true;
                 SetFocus ();
             }
         }

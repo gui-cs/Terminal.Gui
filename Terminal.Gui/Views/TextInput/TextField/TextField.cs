@@ -78,6 +78,16 @@ public partial class TextField : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+
+        // If gaining focus via keyboard (not mouse), select all text
+        if (newHasFocus && !_focusSetByMouse && _text.Count > 0)
+        {
+            SelectAll ();
+        }
+
+        // Reset the flag after handling focus change
+        _focusSetByMouse = false;
+
         UpdateCursor ();
     }
 
