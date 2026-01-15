@@ -4,7 +4,7 @@ Popovers are transient UI elements that appear above other content to display co
 
 ## Overview
 
-Normally, Views cannot draw outside of their `Viewport`. To display content that appears to "pop over" other views, Terminal.Gui provides the popover system via @Terminal.Gui.App.Application.Popover. Popovers differ from alternatives like modifying `Border` or `Margin` behavior because they:
+Normally, Views cannot draw outside of their `Viewport`. To display content that appears to "pop over" other views, Terminal.Gui provides the popover system via @Terminal.Gui.Application.Popover. Popovers differ from alternatives like modifying `Border` or `Margin` behavior because they:
 
 - Are managed centrally by the application
 - Support focus and keyboard event routing
@@ -15,7 +15,7 @@ Normally, Views cannot draw outside of their `Viewport`. To display content that
 
 ### Using PopoverMenu
 
-The easiest way to create a popover is to use @Terminal.Gui.Views.PopoverMenu, which provides a cascading menu implementation:
+The easiest way to create a popover is to use @Terminal.Gui.PopoverMenu, which provides a cascading menu implementation:
 
 ```csharp
 // Create a popover menu with menu items
@@ -37,7 +37,7 @@ contextMenu.MakeVisible (new Point (10, 5)); // Specific location
 
 ### Creating a Custom Popover
 
-To create a custom popover, inherit from @Terminal.Gui.App.PopoverBaseImpl:
+To create a custom popover, inherit from @Terminal.Gui.PopoverBaseImpl:
 
 ```csharp
 public class MyCustomPopover : PopoverBaseImpl
@@ -69,14 +69,14 @@ Application.Popover?.Show (myPopover);
 
 A View qualifies as a popover if it:
 
-1. **Implements @Terminal.Gui.App.IPopover** - Provides the `Current` property for runnable association
+1. **Implements @Terminal.Gui.IPopover** - Provides the `Current` property for runnable association
 2. **Is Focusable** - `CanFocus = true` to receive keyboard input
 3. **Is Transparent** - `ViewportSettings` includes both:
    - `ViewportSettings.Transparent` - Allows content beneath to show through
    - `ViewportSettings.TransparentMouse` - Mouse clicks outside subviews pass through
 4. **Handles Quit** - Binds `Application.QuitKey` to `Command.Quit` and sets `Visible = false`
 
-@Terminal.Gui.App.PopoverBaseImpl provides all these requirements by default.
+@Terminal.Gui.PopoverBaseImpl provides all these requirements by default.
 
 ## Registration and Lifecycle
 
@@ -155,7 +155,7 @@ Application.Popover?.Register (menu);
 
 ### Runnable Association
 
-The @Terminal.Gui.App.IPopover.Current property associates a popover with a specific @Terminal.Gui.IRunnable:
+The @Terminal.Gui.IPopover.Current property associates a popover with a specific @Terminal.Gui.IRunnable:
 
 - If `null`: Popover receives all keyboard events from the application
 - If set: Popover only receives events when the associated runnable is active
@@ -182,7 +182,7 @@ myPopover.Current = myWindow; // Only active when myWindow is the top runnable
 
 ### Default Layout
 
-@Terminal.Gui.App.PopoverBaseImpl sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()`, making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
+@Terminal.Gui.PopoverBaseImpl sets `Width = Dim.Fill ()` and `Height = Dim.Fill ()`, making the popover fill the screen by default. The transparent viewport settings allow content beneath to remain visible.
 
 ### Custom Sizing
 
@@ -201,7 +201,7 @@ public class MyPopover : PopoverBaseImpl
 
 ### Positioning with PopoverMenu
 
-@Terminal.Gui.Views.PopoverMenu provides positioning helpers:
+@Terminal.Gui.PopoverMenu provides positioning helpers:
 
 ```csharp
 // Position at specific screen coordinates
@@ -220,7 +220,7 @@ The menu automatically adjusts position to ensure it remains fully visible on sc
 
 ### PopoverMenu
 
-@Terminal.Gui.Views.PopoverMenu is a sophisticated cascading menu implementation used for:
+@Terminal.Gui.PopoverMenu is a sophisticated cascading menu implementation used for:
 - Context menus
 - @Terminal.Gui.MenuBar drop-down menus
 - Custom menu scenarios
@@ -356,13 +356,13 @@ Application.Popover?.Register (commandPalette);
 
 ## API Reference
 
-- @Terminal.Gui.App.IPopover - Interface for popover views
-- @Terminal.Gui.App.PopoverBaseImpl - Abstract base class for custom popovers
-- @Terminal.Gui.Views.PopoverMenu - Cascading menu implementation
-- @Terminal.Gui.App.ApplicationPopover - Popover manager (accessed via `Application.Popover`)
+- @Terminal.Gui.IPopover - Interface for popover views
+- @Terminal.Gui.PopoverBaseImpl - Abstract base class for custom popovers
+- @Terminal.Gui.PopoverMenu - Cascading menu implementation
+- @Terminal.Gui.ApplicationPopover - Popover manager (accessed via `Application.Popover`)
 
 ## See Also
 
 - [Keyboard Deep Dive](keyboard.md) - Understanding keyboard event routing
 - [Mouse Deep Dive](mouse.md) - Mouse event handling
-- [MenuBar Overview](menubar.md) - Using PopoverMenu with MenuBar
+- [View List](views.md) - Full list of views including MenuBar
