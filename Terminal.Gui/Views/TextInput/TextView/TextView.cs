@@ -125,7 +125,9 @@ public partial class TextView : View, IDesignable
     {
         base.OnSubViewsLaidOut (args);
         WrapTextModel ();
-        AdjustViewport ();
+        // Don't call AdjustViewport() here - it resets viewport to cursor position,
+        // undoing any user scrolling via scrollbar. AdjustViewport() is called when
+        // cursor actually moves (InsertionPoint setter, movement commands, etc.)
         UpdateContentSize ();
     }
 

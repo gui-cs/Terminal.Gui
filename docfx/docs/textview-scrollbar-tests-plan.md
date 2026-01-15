@@ -18,7 +18,7 @@ Add failing unit tests that expose bugs in TextView's scrollbar integration when
 | `WordWrap_Toggle_Updates_ContentSize` | **PASS** | WordWrap correctly updates content size |
 | `ScrollBar_VisibleContentSize_Is_Set_After_Layout` | **PASS** | VisibleContentSize is properly set |
 | `ScrollBar_Position_Change_Actually_Updates_Viewport` | **PASS** | Scrollbar position change works |
-| `ScrollBar_Position_Not_Reset_By_AdjustViewport_When_Cursor_At_Start` | **FAIL** | **NEW BUG** - AdjustViewport resets scroll position |
+| `ScrollBar_Position_Not_Reset_By_AdjustViewport_When_Cursor_At_Start` | **PASS** | Fixed by removing AdjustViewport() from OnSubViewsLaidOut() |
 | `ScrollBar_Position_Maintained_After_Focus` | **PASS** | Focus change doesn't reset scroll |
 
 ## Root Cause Analysis (Refined After Testing)
@@ -227,11 +227,29 @@ if (CurrentRow < Viewport.Y)
 
 When cursor is at row 0 and user scrolls to row 5, this condition `CurrentRow < Viewport.Y` (0 < 5) is true, so viewport is reset to 0.
 
-**Fix Approach:**
-`AdjustViewport()` should NOT adjust viewport when the user is explicitly scrolling via scrollbar. Options:
-1. Add a flag to track "user is scrolling" and skip cursor-following logic
-2. Only call `AdjustViewport()` when cursor position changes, not on every layout
-3. Separate "ensure cursor visible" logic from "adjust viewport" logic
-4. Check if cursor is already visible and only adjust if it's NOT visible
+**Fix Applied:**
+Removed `AdjustViewport()` call from `OnSubViewsLaidOut()` in TextView.cs.
 
-The pattern from CharMap/HexView should be studied - they don't have this problem because they don't have an `AdjustViewport()` function that forces cursor visibility on every layout.
+`AdjustViewport()` is still called when cursor actually moves (from `InsertionPoint` setter, movement commands, etc.), but NOT on every layout. This allows user scrolling via scrollbar to persist.
+
+**Before:**
+```csharp
+protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+{
+    base.OnSubViewsLaidOut (args);
+    WrapTextModel ();
+    AdjustViewport ();  // This was resetting scroll position!
+    UpdateContentSize ();
+}
+```
+
+**After:**
+```csharp
+protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+{
+    base.OnSubViewsLaidOut (args);
+    WrapTextModel ();
+    // AdjustViewport() removed - it's called when cursor moves, not on every layout
+    UpdateContentSize ();
+}
+```
