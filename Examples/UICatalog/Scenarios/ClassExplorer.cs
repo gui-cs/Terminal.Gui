@@ -98,11 +98,11 @@ public class ClassExplorer : Scenario
 
         menuBar.Add (
                      new MenuBarItem (
-                                      "_File",
+                                      Strings.menuFile,
                                       [
                                           new MenuItem
                                           {
-                                              Title = "_Quit",
+                                              Title = Strings.cmdQuit,
                                               Action = Quit
                                           }
                                       ]

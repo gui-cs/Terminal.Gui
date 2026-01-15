@@ -171,11 +171,11 @@ public class TreeViewFileSystem : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Key = Application.QuitKey,
                                            Action = Quit
                                        }

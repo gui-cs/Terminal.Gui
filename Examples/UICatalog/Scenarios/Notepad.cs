@@ -32,22 +32,22 @@ public class Notepad : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem
                                        {
-                                           Title = "_New",
+                                           Title = Strings.cmdNew,
                                            Key = Key.N.WithCtrl.WithAlt,
                                            Action = New
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Open",
+                                           Title = Strings.cmdOpen,
                                            Action = Open
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Save",
+                                           Title = Strings.cmdSave,
                                            Action = Save
                                        },
                                        new MenuItem
@@ -57,12 +57,12 @@ public class Notepad : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Close",
+                                           Title = Strings.cmdClose,
                                            Action = Close
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Action = Quit
                                        }
                                    ]

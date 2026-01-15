@@ -548,7 +548,7 @@ public class Shortcuts : Scenario
 
         if (sender is View view)
         {
-            MessageBox.Query (view.App!, "Hi", $"You clicked {view.Text}", "_Ok");
+            MessageBox.Query (view.App!, "Hi", $"You clicked {view.Text}", Strings.btnOk);
         }
     }
 }

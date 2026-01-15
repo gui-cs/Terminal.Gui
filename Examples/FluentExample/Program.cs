@@ -2,6 +2,7 @@
 
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Resources;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
@@ -78,7 +79,7 @@ public class ColorPickerView : Runnable<Color?>
         // Create Cancel button
         Button cancelButton = new ()
         {
-            Title = "_Cancel",
+            Title = Strings.btnCancel,
             X = Pos.Align (Alignment.Center),
             Y = Pos.AnchorEnd ()
         };

@@ -42,9 +42,9 @@ public partial class View // Keyboard APIs
     ///         with a Button with the text of "_Text" <c>Alt+T</c> will cause the button to gain focus and to raise its
     ///         <see cref="Accepting"/> event.
     ///         Or, in a
-    ///         <see cref="Menu"/> with "_File _Edit", <c>Alt+F</c> will select (show) the "_File" menu. If the "_File" menu
+    ///         <see cref="Menu"/> with "_File _Edit", <c>Alt+F</c> will select (show) the Strings.menuFile menu. If the Strings.menuFile menu
     ///         has a
-    ///         sub-menu of "_New" <c>Alt+N</c> or <c>N</c> will ONLY select the "_New" sub-menu if the "_File" menu is already
+    ///         sub-menu of Strings.cmdNew <c>Alt+N</c> or <c>N</c> will ONLY select the Strings.cmdNew sub-menu if the Strings.menuFile menu is already
     ///         opened.
     ///     </para>
     ///     <para>
@@ -264,7 +264,7 @@ public partial class View // Keyboard APIs
     ///         The assignment algorithm:
     ///         <list type="number">
     ///             <item>Checks if the subview already has a programmatically set <see cref="HotKey"/>; if so and the key is not already used, preserves that hotkey</item>
-    ///             <item>If no usable programmatic <see cref="HotKey"/> is found, checks if the subview's <see cref="Title"/> contains a hotkey specifier (e.g., "_File") and preserves it if the key is not already used</item>
+    ///             <item>If no usable programmatic <see cref="HotKey"/> is found, checks if the subview's <see cref="Title"/> contains a hotkey specifier (e.g., Strings.menuFile) and preserves it if the key is not already used</item>
     ///             <item>If neither a usable programmatic hotkey nor a usable title specifier is found, assigns a new hotkey from the first available character in the title</item>
     ///             <item>Skips characters that are already in <see cref="UsedHotKeys"/>, as well as spaces and control characters, when determining whether a hotkey is usable or when assigning a new one</item>
         ///         </list>

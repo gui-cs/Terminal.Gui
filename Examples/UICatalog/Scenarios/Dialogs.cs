@@ -193,7 +193,7 @@ public class Dialogs : Scenario
 
                                        if (dlg is null)
                                        {
-                                           MessageBox.ErrorQuery ((s as View)!.App!, "Error", "Could not create Dialog. Invalid options.", "_Ok");
+                                           MessageBox.ErrorQuery ((s as View)!.App!, "Error", "Could not create Dialog. Invalid options.", Strings.btnOk);
                                        }
                                        else
                                        {

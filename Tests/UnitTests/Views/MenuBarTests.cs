@@ -20,7 +20,7 @@ public class MenuBarTests ()
 
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
 
         menuBar.Add (menuBarItem);
@@ -125,7 +125,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -157,7 +157,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -266,7 +266,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -303,12 +303,12 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
 
-        var menuItem2 = new MenuItem { Id = "menuItem2", Title = "_Copy" };
+        var menuItem2 = new MenuItem { Id = "menuItem2", Title = Strings.cmdCopy };
         var menu2 = new Menu ([menuItem2]) { Id = "menu2" };
         var menuBarItem2 = new MenuBarItem () { Id = "menuBarItem2", Title = "_Edit" };
         var menuBarItemPopover2 = new PopoverMenu () { Id = "menuBarItemPopover2" };
@@ -348,7 +348,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -420,7 +420,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -467,7 +467,7 @@ public class MenuBarTests ()
         int action = 0;
         var menuItem = new MenuItem { Title = "_Item", Action = () => action++ };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Title = "_New" };
+        var menuBarItem = new MenuBarItem { Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -509,7 +509,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -540,7 +540,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -572,7 +572,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -610,7 +610,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -659,7 +659,7 @@ public class MenuBarTests ()
         // Arrange
         var menuItem = new MenuItem { Id = "menuItem", Title = "_Item" };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;
@@ -700,7 +700,7 @@ public class MenuBarTests ()
             Action = () => action++
         };
         var menu = new Menu ([menuItem]) { Id = "menu" };
-        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = "_New" };
+        var menuBarItem = new MenuBarItem { Id = "menuBarItem", Title = Strings.cmdNew };
         var menuBarItemPopover = new PopoverMenu ();
         menuBarItem.PopoverMenu = menuBarItemPopover;
         menuBarItemPopover.Root = menu;

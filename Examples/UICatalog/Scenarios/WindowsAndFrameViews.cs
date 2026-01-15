@@ -49,7 +49,7 @@ public class WindowsAndFrameViews : Scenario
         paddingButton.Accepting += (_, _) => MessageBox.Query (app,
                                                                "About UI Catalog",
                                                                "UI Catalog is a comprehensive sample library for Terminal.Gui",
-                                                               "_Ok"
+                                                               Strings.btnOk
                                                               );
         win.Add (paddingButton);
 
@@ -88,7 +88,7 @@ public class WindowsAndFrameViews : Scenario
             };
 
             pressMeButton.Accepting += (s, _) =>
-                                        MessageBox.ErrorQuery ((s as View)?.App!, loopWin.Title, "Neat?", "_No", "_Yes");
+                                        MessageBox.ErrorQuery ((s as View)?.App!, loopWin.Title, "Neat?", Strings.btnNo, Strings.btnYes);
             loopWin.Add (pressMeButton);
 
             Window subWin = new ()

@@ -67,7 +67,7 @@ namespace UICatalog {
 Text = "Press me!", 
 				X = Pos.Center (),
 				Y = Pos.Center (),
-				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "_No", "_Yes")
+				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", Strings.btnNo, Strings.btnYes)
 			});
 		}
 	}

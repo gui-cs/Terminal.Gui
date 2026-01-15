@@ -9,6 +9,7 @@ global using Terminal.Gui.Views;
 global using Terminal.Gui.Drawing;
 global using Terminal.Gui.Text;
 global using Terminal.Gui.FileServices;
+global using Terminal.Gui.Resources;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;

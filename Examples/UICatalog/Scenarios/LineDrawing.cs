@@ -119,7 +119,7 @@ public class LineDrawing : Scenario
     {
         var accept = false;
 
-        Dialog d = new () { Title = title, Buttons = [new Button { Title = "_Cancel" }, new Button { Title = "_Ok" }] };
+        Dialog d = new () { Title = title, Buttons = [new Button { Title = Strings.btnCancel }, new Button { Title = Strings.btnOk }] };
 
         View cp;
 

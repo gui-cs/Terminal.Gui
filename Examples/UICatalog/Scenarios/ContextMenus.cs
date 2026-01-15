@@ -185,7 +185,7 @@ public class ContextMenus : Scenario
                                    new Line (),
                                    new MenuItem
                                    {
-                                       Title = "_Quit",
+                                       Title = Strings.cmdQuit,
                                        Action = () => app!.RequestStop ()
                                    }
                                ])
