@@ -39,6 +39,11 @@ public partial class TextView
     {
         base.OnViewportChanged (e);
         UpdateHorizontalScrollBarVisibility ();
+
+        if (HasFocus)
+        {
+            PositionCursor ();
+        }
     }
 
     /// <summary>

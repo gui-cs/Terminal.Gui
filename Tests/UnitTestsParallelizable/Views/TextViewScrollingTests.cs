@@ -347,6 +347,7 @@ public class TextViewScrollingTests
 
     /// <summary>
     /// Tests that scrollbar position is maintained after focus changes.
+    /// Viewport should NOT scroll to cursor when gaining focus - only when cursor moves.
     /// </summary>
     [Fact]
     public void ScrollBar_Position_Maintained_After_Focus ()
@@ -370,8 +371,8 @@ public class TextViewScrollingTests
         // Simulate focus change (this might trigger PositionCursor or other methods)
         tv.SetFocus ();
 
-        // Viewport should remain scrolled
-        Assert.True (tv.Viewport.Y == 5, "Viewport.Y should remain at 5 after SetFocus");
+        // Viewport should remain scrolled - focus alone should not change scroll position
+        Assert.Equal (5, tv.Viewport.Y);
     }
 
     /// <summary>
