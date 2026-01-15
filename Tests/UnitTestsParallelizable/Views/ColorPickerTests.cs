@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace ViewsTests;
 
 /// <summary>
@@ -24,17 +22,17 @@ public class ColorPickerTests
                                Assert.Equal (cp.SelectedColor, e.Result);
                            };
 
-        cp.SelectedColor = new (1, 2, 3);
+        cp.SelectedColor = new Color (1, 2, 3);
         Assert.Equal (1, count);
-        Assert.Equal (new (1, 2, 3), newColor);
+        Assert.Equal (new Color (1, 2, 3), newColor);
 
-        cp.SelectedColor = new (2, 3, 4);
+        cp.SelectedColor = new Color (2, 3, 4);
 
         Assert.Equal (2, count);
-        Assert.Equal (new (2, 3, 4), newColor);
+        Assert.Equal (new Color (2, 3, 4), newColor);
 
         // Set to same value
-        cp.SelectedColor = new (2, 3, 4);
+        cp.SelectedColor = new Color (2, 3, 4);
 
         // Should have no effect
         Assert.Equal (2, count);
@@ -107,12 +105,10 @@ public class ColorPickerTests
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         // Click at the end of the Red bar
-        cp.Focused!.RaiseMouseEvent (
-                                     new ()
-                                     {
-                                         Flags = MouseFlags.LeftButtonPressed,
-                                         Position = new (19, 0) // Assuming 0-based indexing
-                                     });
+        cp.Focused!.RaiseMouseEvent (new Mouse
+        {
+            Flags = MouseFlags.LeftButtonPressed, Position = new Point (19, 0) // Assuming 0-based indexing
+        });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -140,12 +136,10 @@ public class ColorPickerTests
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         // Click beyond the bar
-        cp.Focused!.RaiseMouseEvent (
-                                     new ()
-                                     {
-                                         Flags = MouseFlags.LeftButtonPressed,
-                                         Position = new (21, 0) // Beyond the bar
-                                     });
+        cp.Focused!.RaiseMouseEvent (new Mouse
+        {
+            Flags = MouseFlags.LeftButtonPressed, Position = new Point (21, 0) // Beyond the bar
+        });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -173,12 +167,7 @@ public class ColorPickerTests
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         // Click on Green bar
-        cp.App!.Mouse.RaiseMouseEvent (
-                                       new ()
-                                       {
-                                           Flags = MouseFlags.LeftButtonPressed,
-                                           ScreenPosition = new (0, 1)
-                                       });
+        cp.App!.Mouse.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (0, 1) });
 
         //cp.SubViews.OfType<GBar> ()
         //  .Single ()
@@ -194,12 +183,7 @@ public class ColorPickerTests
         Assert.IsAssignableFrom<GBar> (cp.Focused);
 
         // Click on Blue bar
-        cp.App!.Mouse.RaiseMouseEvent (
-                                       new ()
-                                       {
-                                           Flags = MouseFlags.LeftButtonPressed,
-                                           ScreenPosition = new (0, 2)
-                                       });
+        cp.App!.Mouse.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (0, 2) });
 
         //cp.SubViews.OfType<BBar> ()
         //  .Single ()
@@ -519,24 +503,14 @@ public class ColorPickerTests
 
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
 
-        cp.Focused!.RaiseMouseEvent (
-                                     new ()
-                                     {
-                                         Flags = MouseFlags.LeftButtonPressed,
-                                         Position = new (3, 0)
-                                     });
+        cp.Focused!.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (3, 0) });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         Assert.Equal (3, r.TrianglePosition);
         Assert.Equal ("#0F0000", hex.Text);
 
-        cp.Focused.RaiseMouseEvent (
-                                    new ()
-                                    {
-                                        Flags = MouseFlags.LeftButtonPressed,
-                                        Position = new (4, 0)
-                                    });
+        cp.Focused.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (4, 0) });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -548,16 +522,14 @@ public class ColorPickerTests
 
     [Theory]
     [MemberData (nameof (ColorPickerTestData))]
-    public void RGB_NoText (
-        Color c,
-        string expectedR,
-        int expectedRTriangle,
-        string expectedG,
-        int expectedGTriangle,
-        string expectedB,
-        int expectedBTriangle,
-        string expectedHex
-    )
+    public void RGB_NoText (Color c,
+                            string expectedR,
+                            int expectedRTriangle,
+                            string expectedG,
+                            int expectedGTriangle,
+                            string expectedB,
+                            int expectedBTriangle,
+                            string expectedHex)
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
         cp.SelectedColor = c;
@@ -582,19 +554,17 @@ public class ColorPickerTests
 
     [Theory]
     [MemberData (nameof (ColorPickerTestData_WithTextFields))]
-    public void RGB_NoText_WithTextFields (
-        Color c,
-        string expectedR,
-        int expectedRTriangle,
-        int expectedRValue,
-        string expectedG,
-        int expectedGTriangle,
-        int expectedGValue,
-        string expectedB,
-        int expectedBTriangle,
-        int expectedBValue,
-        string expectedHex
-    )
+    public void RGB_NoText_WithTextFields (Color c,
+                                           string expectedR,
+                                           int expectedRTriangle,
+                                           int expectedRValue,
+                                           string expectedG,
+                                           int expectedGTriangle,
+                                           int expectedGValue,
+                                           string expectedB,
+                                           int expectedBTriangle,
+                                           int expectedBValue,
+                                           string expectedHex)
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true);
         cp.SelectedColor = c;
@@ -627,7 +597,7 @@ public class ColorPickerTests
     public void SwitchingColorModels_ResetsBars ()
     {
         ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
-        cp.SelectedColor = new (255, 0);
+        cp.SelectedColor = new Color (255, 0);
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -752,29 +722,13 @@ public class ColorPickerTests
 
     public static IEnumerable<object []> ColorPickerTestData ()
     {
-        yield return
-        [
-            new Color (255, 0),
-            "R:", 19, "G:", 2, "B:", 2, "#FF0000"
-        ];
+        yield return [new Color (255, 0), "R:", 19, "G:", 2, "B:", 2, "#FF0000"];
 
-        yield return
-        [
-            new Color (0, 255),
-            "R:", 2, "G:", 19, "B:", 2, "#00FF00"
-        ];
+        yield return [new Color (0, 255), "R:", 2, "G:", 19, "B:", 2, "#00FF00"];
 
-        yield return
-        [
-            new Color (0, 0, 255),
-            "R:", 2, "G:", 2, "B:", 19, "#0000FF"
-        ];
+        yield return [new Color (0, 0, 255), "R:", 2, "G:", 2, "B:", 19, "#0000FF"];
 
-        yield return
-        [
-            new Color (125, 125, 125),
-            "R:", 11, "G:", 11, "B:", 11, "#7D7D7D"
-        ];
+        yield return [new Color (125, 125, 125), "R:", 11, "G:", 11, "B:", 11, "#7D7D7D"];
     }
 
     public static IEnumerable<object []> ColorPickerTestData_WithTextFields ()
@@ -782,25 +736,61 @@ public class ColorPickerTests
         yield return
         [
             new Color (255, 0),
-            "R:", 15, 255, "G:", 2, 0, "B:", 2, 0, "#FF0000"
+            "R:",
+            15,
+            255,
+            "G:",
+            2,
+            0,
+            "B:",
+            2,
+            0,
+            "#FF0000"
         ];
 
         yield return
         [
             new Color (0, 255),
-            "R:", 2, 0, "G:", 15, 255, "B:", 2, 0, "#00FF00"
+            "R:",
+            2,
+            0,
+            "G:",
+            15,
+            255,
+            "B:",
+            2,
+            0,
+            "#00FF00"
         ];
 
         yield return
         [
             new Color (0, 0, 255),
-            "R:", 2, 0, "G:", 2, 0, "B:", 15, 255, "#0000FF"
+            "R:",
+            2,
+            0,
+            "G:",
+            2,
+            0,
+            "B:",
+            15,
+            255,
+            "#0000FF"
         ];
 
         yield return
         [
             new Color (125, 125, 125),
-            "R:", 9, 125, "G:", 9, 125, "B:", 9, 125, "#7D7D7D"
+            "R:",
+            9,
+            125,
+            "G:",
+            9,
+            125,
+            "B:",
+            9,
+            125,
+            "#7D7D7D"
         ];
     }
 
@@ -819,7 +809,7 @@ public class ColorPickerTests
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        var cp = new ColorPicker { Width = 20, SelectedColor = new (0, 0) };
+        var cp = new ColorPicker { Width = 20, SelectedColor = new Color (0, 0) };
         cp.Style.ColorModel = colorModel;
         cp.Style.ShowTextFields = showTextFields;
         cp.Style.ShowColorName = showName;
@@ -849,6 +839,7 @@ public class ColorPickerTests
                 }
 
                 return cp.SubViews.OfType<TextField> ().ElementAt ((int)toGet);
+
             case ColorPickerPart.ColorName:
                 if (!hasColorNameTextField)
                 {
@@ -856,12 +847,14 @@ public class ColorPickerTests
                 }
 
                 return cp.SubViews.OfType<TextField> ().ElementAt (hasBarValueTextFields ? (int)toGet : (int)toGet - 3);
+
             case ColorPickerPart.Hex:
 
                 int offset = hasBarValueTextFields ? 0 : 3;
                 offset += hasColorNameTextField ? 0 : 1;
 
                 return cp.SubViews.OfType<TextField> ().ElementAt ((int)toGet - offset);
+
             default:
                 throw new ArgumentOutOfRangeException (nameof (toGet), toGet, null);
         }
@@ -875,4 +868,128 @@ public class ColorPickerTests
         ColorName = 3,
         Hex = 4
     }
+
+    #region IValue<Color?> Tests
+
+    // Claude - Opus 4.5
+
+    [Fact]
+    public void Implements_IValue_Interface ()
+    {
+        ColorPicker picker = new ();
+        Assert.IsAssignableFrom<IValue<Color?>> (picker);
+    }
+
+    [Fact]
+    public void Value_Property_GetsSelectedColor ()
+    {
+        ColorPicker picker = new ();
+        picker.SelectedColor = Color.Red;
+        Assert.Equal (Color.Red, picker.Value);
+    }
+
+    [Fact]
+    public void Value_Property_SetsSelectedColor ()
+    {
+        ColorPicker picker = new ();
+        picker.Value = Color.Blue;
+        Assert.Equal (Color.Blue, picker.SelectedColor);
+    }
+
+    [Fact]
+    public void Value_Null_SetsBlack ()
+    {
+        ColorPicker picker = new ();
+        picker.SelectedColor = Color.Red;
+        picker.Value = null;
+        Assert.Equal (Color.Black, picker.SelectedColor);
+        Assert.Equal (Color.Black, picker.Value);
+    }
+
+    [Fact]
+    public void ValueChanging_CanCancel ()
+    {
+        ColorPicker picker = new ();
+        picker.SelectedColor = Color.Red;
+
+        picker.ValueChanging += (_, e) => e.Handled = true;
+        picker.Value = Color.Blue;
+
+        Assert.Equal (Color.Red, picker.Value);
+    }
+
+    [Fact]
+    public void ValueChanged_Fires_WhenValueChanges ()
+    {
+        ColorPicker picker = new ();
+        Color? received = null;
+        picker.ValueChanged += (_, e) => received = e.NewValue;
+
+        picker.Value = Color.Green;
+
+        Assert.Equal (Color.Green, received);
+    }
+
+    [Fact]
+    public void ValueChanged_DoesNotFire_WhenValueSame ()
+    {
+        ColorPicker picker = new ();
+        picker.SelectedColor = Color.Red;
+
+        var count = 0;
+        picker.ValueChanged += (_, _) => count++;
+
+        picker.Value = Color.Red; // Same value
+
+        Assert.Equal (0, count);
+    }
+
+    [Fact]
+    public void ColorChanged_StillFires_ForBackwardsCompatibility ()
+    {
+        ColorPicker picker = new ();
+        Color received = default;
+        picker.ColorChanged += (_, e) => received = e.Result;
+
+        picker.Value = Color.Cyan;
+
+        Assert.Equal (Color.Cyan, received);
+    }
+
+    [Fact]
+    public void ValueChanging_Fires_BeforeValueChanged ()
+    {
+        ColorPicker picker = new ();
+        List<string> events = [];
+
+        picker.ValueChanging += (_, _) => events.Add ("changing");
+        picker.ValueChanged += (_, _) => events.Add ("changed");
+
+        picker.Value = Color.Magenta;
+
+        Assert.Equal (["changing", "changed"], events);
+    }
+
+    [Fact]
+    public void ValueChanging_ReceivesOldAndNewValues ()
+    {
+        ColorPicker picker = new ();
+        picker.SelectedColor = Color.Red;
+
+        Color? receivedOld = null;
+        Color? receivedNew = null;
+
+        picker.ValueChanging += (_, e) =>
+                                {
+                                    receivedOld = e.CurrentValue;
+                                    receivedNew = e.NewValue;
+                                };
+
+        picker.Value = Color.Blue;
+
+        Assert.Equal (Color.Red, receivedOld);
+        Assert.Equal (Color.Blue, receivedNew);
+    }
+
+    #endregion
 }

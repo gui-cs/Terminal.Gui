@@ -97,8 +97,12 @@ jobs:
       with:
         name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTests    
+          logs/UnitTests/
+          Tests/UnitTests/logs/
           TestResults/
+          **/*.dmp
+        if-no-files-found: ignore
+        retention-days: 7
   
     - name: Upload Non-Parallel UnitTests Coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && always()
@@ -224,7 +228,11 @@ jobs:
         name: parallel_unittests-logs-${{ runner.os }}
         path: |
           logs/UnitTestsParallelizable/
+          Tests/UnitTestsParallelizable/logs/
           TestResults/
+          **/*.dmp
+        if-no-files-found: ignore
+        retention-days: 7
   
     - name: Upload Parallelizable UnitTests Coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && always()

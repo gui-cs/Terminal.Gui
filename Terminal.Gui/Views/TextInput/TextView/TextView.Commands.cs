@@ -173,14 +173,19 @@ public partial class TextView
     /// </summary>
     public bool PromptForColors ()
     {
-        if (!ColorPicker.Prompt (App!, "Colors", GetSelectedCellAttribute (), out Attribute newAttribute))
+        Attribute? attribute = App?.TopRunnable?.Prompt<AttributePicker, Attribute?> (input: GetSelectedCellAttribute (),
+                                                                                      beginInitHandler: prompt =>
+                                                                                                        {
+                                                                                                            // Customize the Prompt dialog
+                                                                                                            prompt.Title = "Pick an Attribute";
+                                                                                                        });
+
+        if (attribute is null)
         {
-            return false;
+            return true;
         }
 
-        Attribute attribute = new (newAttribute.Foreground, newAttribute.Background, newAttribute.Style);
-
-        ApplyCellsAttribute (attribute);
+        ApplyCellsAttribute (attribute.Value);
 
         return true;
     }

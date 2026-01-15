@@ -1,17 +1,14 @@
-
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with
 ///     sliders and color names from the <see cref="IColorNameResolver"/>.
 /// </summary>
-public partial class ColorPicker : View, IDesignable
+public class ColorPicker : View, IValue<Color?>, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="ColorPicker"/>. Use
-    ///     <see cref="Style"/> to change color model. Use <see cref="SelectedColor"/>
+    ///     <see cref="Style"/> to change color model. Use <see cref="Value"/>
     ///     to change initial <see cref="Color"/>.
     /// </summary>
     public ColorPicker ()
@@ -24,7 +21,6 @@ public partial class ColorPicker : View, IDesignable
 
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
-
     }
 
     private readonly Dictionary<IColorBar, TextField> _textFields = new ();
@@ -59,14 +55,10 @@ public partial class ColorPicker : View, IDesignable
             bar.Width = Dim.Fill (Style.ShowTextFields ? TEXT_FIELD_WIDTH : 0);
 
             TextField? tfValue = null;
+
             if (Style.ShowTextFields)
             {
-                tfValue = new TextField
-                {
-                    X = Pos.AnchorEnd (TEXT_FIELD_WIDTH),
-                    Y = y,
-                    Width = TEXT_FIELD_WIDTH
-                };
+                tfValue = new TextField { X = Pos.AnchorEnd (TEXT_FIELD_WIDTH), Y = y, Width = TEXT_FIELD_WIDTH };
                 tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
                 tfValue.Accepting += (s, _) => UpdateSingleBarValueFromTextField (s);
                 _textFields.Add (bar, tfValue);
@@ -106,7 +98,7 @@ public partial class ColorPicker : View, IDesignable
     protected override bool OnDrawingContent (DrawContext? context)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
-        SetAttribute (new (SelectedColor, normal.Background, Enabled ? TextStyle.None : TextStyle.Faint));
+        SetAttribute (new Attribute (SelectedColor, normal.Background, Enabled ? TextStyle.None : TextStyle.Faint));
         int y = _bars.Count + (Style.ShowColorName ? 1 : 0);
         AddRune (13, y, (Rune)'■');
 
@@ -114,12 +106,50 @@ public partial class ColorPicker : View, IDesignable
     }
 
     /// <summary>
-    ///     The color selected in the picker
+    ///     The color selected in the picker. Identical to <see cref="Value"/> but non-nullable.
     /// </summary>
-    public Color SelectedColor
+    public Color SelectedColor { get => _selectedColor; set => SetSelectedColor (value, true); }
+
+    /// <summary>
+    ///     Gets or sets the selected color. Implements <see cref="IValue{T}"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Setting <see langword="null"/> is equivalent to setting <see cref="Color.Black"/>.
+    /// </remarks>
+    public Color? Value { get => _selectedColor; set => SelectedColor = value ?? Color.Black; }
+
+    /// <summary>
+    ///     Raised when <see cref="Value"/> is about to change.
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<Color?>>? ValueChanging;
+
+    /// <summary>
+    ///     Raised when <see cref="Value"/> has changed.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<Color?>>? ValueChanged;
+
+    /// <summary>
+    ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
+    /// </summary>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<Color?> args) => false;
+
+    /// <summary>
+    ///     Called after <see cref="Value"/> has changed.
+    /// </summary>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<Color?> args) { }
+
+    /// <inheritdoc/>
+    public override string Text
     {
-        get => _selectedColor;
-        set => SetSelectedColor (value, true);
+        get => SelectedColor.ToString ();
+        set
+        {
+            if (_colorNameResolver.TryParseColor (value, out Color newColor))
+            {
+                SelectedColor = newColor;
+            }
+        }
     }
 
     /// <summary>
@@ -130,18 +160,11 @@ public partial class ColorPicker : View, IDesignable
 
     private void CreateNameField ()
     {
-        _lbName = new ()
-        {
-            Text = "Name:",
-            X = 0,
-            Y = 3
-        };
+        _lbName = new Label { Text = "Name:", X = 0, Y = 3 };
 
-        _tfName = new ()
+        _tfName = new TextField
         {
-            Y = 3,
-            X = 6,
-            Width = 20 // width of "LightGoldenRodYellow" - the longest w3c color name
+            Y = 3, X = 6, Width = 20 // width of "LightGoldenRodYellow" - the longest w3c color name
         };
 
         Add (_lbName);
@@ -149,10 +172,7 @@ public partial class ColorPicker : View, IDesignable
 
         var auto = new AppendAutocomplete (_tfName);
 
-        auto.SuggestionGenerator = new SingleWordSuggestionGenerator
-        {
-            AllSuggestions = _colorNameResolver.GetColorNames ().ToList ()
-        };
+        auto.SuggestionGenerator = new SingleWordSuggestionGenerator { AllSuggestions = _colorNameResolver.GetColorNames ().ToList () };
         _tfName.Autocomplete = auto;
 
         _tfName.HasFocusChanged += UpdateValueFromName;
@@ -168,19 +188,9 @@ public partial class ColorPicker : View, IDesignable
             y++;
         }
 
-        _lbHex = new ()
-        {
-            Text = "Hex:",
-            X = 0,
-            Y = y
-        };
+        _lbHex = new Label { Text = "Hex:", X = 0, Y = y };
 
-        _tfHex = new ()
-        {
-            Y = y,
-            X = 4,
-            Width = 8,
-        };
+        _tfHex = new TextField { Y = y, X = 4, Width = 8 };
 
         Add (_lbHex);
         Add (_tfHex);
@@ -205,7 +215,7 @@ public partial class ColorPicker : View, IDesignable
             bar.Dispose ();
         }
 
-        _bars = new ();
+        _bars = new List<IColorBar> ();
         _textFields.Clear ();
 
         if (_lbHex != null)
@@ -237,19 +247,43 @@ public partial class ColorPicker : View, IDesignable
         }
     }
 
-    private void RebuildColorFromBar (object? sender, EventArgs<int> e)
-    {
-        SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false);
-    }
+    private void RebuildColorFromBar (object? sender, EventArgs<int> e) => SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false);
 
     private void SetSelectedColor (Color value, bool syncBars)
     {
         if (_selectedColor != value)
         {
-            Color old = _selectedColor;
+            Color oldValue = _selectedColor;
+
+            // CWP: Fire ValueChanging (allows cancellation)
+            ValueChangingEventArgs<Color?> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                SyncSubViewValues (syncBars);
+
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                SyncSubViewValues (syncBars);
+
+                return;
+            }
+
+            // Do the work
             _selectedColor = value;
 
-            ColorChanged?.Invoke (this, new (value));
+            // Fire legacy event for backwards compatibility
+            ColorChanged?.Invoke (this, new ResultEventArgs<Color> (value));
+
+            // CWP: Fire ValueChanged
+            ValueChangedEventArgs<Color?> changedArgs = new (oldValue, value);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
 
         SyncSubViewValues (syncBars);
@@ -293,6 +327,7 @@ public partial class ColorPicker : View, IDesignable
         // it is a leave event so update
         UpdateSingleBarValueFromTextField (sender);
     }
+
     private void UpdateSingleBarValueFromTextField (object? sender)
     {
         foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
@@ -350,6 +385,7 @@ public partial class ColorPicker : View, IDesignable
         // it is a leave event so update
         UpdateValueFromTextField ();
     }
+
     private void UpdateValueFromTextField ()
     {
         if (_tfHex == null)
@@ -376,7 +412,7 @@ public partial class ColorPicker : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         DisposeOldViews ();
