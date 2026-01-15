@@ -97,7 +97,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
             SuperViewRendersLineCanvas = true,
             Style = colorPickerStyle,
         };
-        _foregroundPicker.ColorChanged += OnForegroundColorChanged;
+        _foregroundPicker.ValueChanged += OnForegroundColorChanged;
         _foregroundPicker.ApplyStyleChanges ();
 
         // Create background picker - positioned below foreground
@@ -111,7 +111,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
             Width = Dim.Width (_foregroundPicker),
             Style = colorPickerStyle
         };
-        _backgroundPicker.ColorChanged += OnBackgroundColorChanged;
+        _backgroundPicker.ValueChanged += OnBackgroundColorChanged;
         _backgroundPicker.ApplyStyleChanges ();
 
         // Create style selector - on the right side
@@ -170,9 +170,9 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
     /// </summary>
     protected virtual void OnValueChanged (ValueChangedEventArgs<Attribute?> args) { }
 
-    private void OnForegroundColorChanged (object? sender, ResultEventArgs<Color> e) => UpdateValueFromSubViews ();
+    private void OnForegroundColorChanged (object? sender, ValueChangedEventArgs<Color?> e) => UpdateValueFromSubViews ();
 
-    private void OnBackgroundColorChanged (object? sender, ResultEventArgs<Color> e) => UpdateValueFromSubViews ();
+    private void OnBackgroundColorChanged (object? sender, ValueChangedEventArgs<Color?> e) => UpdateValueFromSubViews ();
 
     private void OnStyleChanged (object? sender, EventArgs<TextStyle?> e) => UpdateValueFromSubViews ();
 
@@ -183,7 +183,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
             return;
         }
 
-        Attribute newValue = new (_foregroundPicker.SelectedColor, _backgroundPicker.SelectedColor, _styleSelector.Value ?? TextStyle.None);
+        Attribute newValue = new (_foregroundPicker.Value!.Value, _backgroundPicker.Value!.Value, _styleSelector.Value ?? TextStyle.None);
         Value = newValue;
     }
 
@@ -197,16 +197,16 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
         // Temporarily unhook events to prevent recursion
         if (_foregroundPicker is { })
         {
-            _foregroundPicker.ColorChanged -= OnForegroundColorChanged;
-            _foregroundPicker.SelectedColor = _value.Value.Foreground;
-            _foregroundPicker.ColorChanged += OnForegroundColorChanged;
+            _foregroundPicker.ValueChanged -= OnForegroundColorChanged;
+            _foregroundPicker.Value = _value.Value.Foreground;
+            _foregroundPicker.ValueChanged += OnForegroundColorChanged;
         }
 
         if (_backgroundPicker is { })
         {
-            _backgroundPicker.ColorChanged -= OnBackgroundColorChanged;
-            _backgroundPicker.SelectedColor = _value.Value.Background;
-            _backgroundPicker.ColorChanged += OnBackgroundColorChanged;
+            _backgroundPicker.ValueChanged -= OnBackgroundColorChanged;
+            _backgroundPicker.Value = _value.Value.Background;
+            _backgroundPicker.ValueChanged += OnBackgroundColorChanged;
         }
 
         if (_styleSelector is { })
@@ -249,12 +249,12 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
         {
             if (_foregroundPicker is { })
             {
-                _foregroundPicker.ColorChanged -= OnForegroundColorChanged;
+                _foregroundPicker.ValueChanged -= OnForegroundColorChanged;
             }
 
             if (_backgroundPicker is { })
             {
-                _backgroundPicker.ColorChanged -= OnBackgroundColorChanged;
+                _backgroundPicker.ValueChanged -= OnBackgroundColorChanged;
             }
 
             if (_styleSelector is { })

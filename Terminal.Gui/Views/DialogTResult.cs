@@ -40,7 +40,7 @@ namespace Terminal.Gui.Views;
 /// 
 ///         public ColorDialog (Color initialColor)
 ///         {
-///             _picker = new () { SelectedColor = initialColor };
+///             _picker = new () { Value = initialColor };
 ///             Add (_picker);
 ///             AddButton (new () { Text = "_Cancel" });
 ///             AddButton (new () { Text = "_Ok" });
@@ -52,7 +52,7 @@ namespace Terminal.Gui.Views;
 ///             {
 ///                 return true;
 ///             }
-///             Result = _picker.SelectedColor;
+///             Result = _picker.Value;
 ///             RequestStop ();
 ///             return false;
 ///         }

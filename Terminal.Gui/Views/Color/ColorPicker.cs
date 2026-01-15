@@ -4,11 +4,11 @@ namespace Terminal.Gui.Views;
 ///     Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with
 ///     sliders and color names from the <see cref="IColorNameResolver"/>.
 /// </summary>
-public partial class ColorPicker : View, IDesignable
+public class ColorPicker : View, IValue<Color?>, IDesignable
 {
     /// <summary>
     ///     Creates a new instance of <see cref="ColorPicker"/>. Use
-    ///     <see cref="Style"/> to change color model. Use <see cref="SelectedColor"/>
+    ///     <see cref="Style"/> to change color model. Use <see cref="Value"/>
     ///     to change initial <see cref="Color"/>.
     /// </summary>
     public ColorPicker ()
@@ -106,9 +106,38 @@ public partial class ColorPicker : View, IDesignable
     }
 
     /// <summary>
-    ///     The color selected in the picker
+    ///     The color selected in the picker. Identical to <see cref="Value"/> but non-nullable.
     /// </summary>
     public Color SelectedColor { get => _selectedColor; set => SetSelectedColor (value, true); }
+
+    /// <summary>
+    ///     Gets or sets the selected color. Implements <see cref="IValue{T}"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Setting <see langword="null"/> is equivalent to setting <see cref="Color.Black"/>.
+    /// </remarks>
+    public Color? Value { get => _selectedColor; set => SelectedColor = value ?? Color.Black; }
+
+    /// <summary>
+    ///     Raised when <see cref="Value"/> is about to change.
+    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<Color?>>? ValueChanging;
+
+    /// <summary>
+    ///     Raised when <see cref="Value"/> has changed.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<Color?>>? ValueChanged;
+
+    /// <summary>
+    ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
+    /// </summary>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<Color?> args) => false;
+
+    /// <summary>
+    ///     Called after <see cref="Value"/> has changed.
+    /// </summary>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<Color?> args) { }
 
     /// <inheritdoc/>
     public override string Text
@@ -224,10 +253,37 @@ public partial class ColorPicker : View, IDesignable
     {
         if (_selectedColor != value)
         {
-            Color old = _selectedColor;
+            Color oldValue = _selectedColor;
+
+            // CWP: Fire ValueChanging (allows cancellation)
+            ValueChangingEventArgs<Color?> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                SyncSubViewValues (syncBars);
+
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                SyncSubViewValues (syncBars);
+
+                return;
+            }
+
+            // Do the work
             _selectedColor = value;
 
+            // Fire legacy event for backwards compatibility
             ColorChanged?.Invoke (this, new ResultEventArgs<Color> (value));
+
+            // CWP: Fire ValueChanged
+            ValueChangedEventArgs<Color?> changedArgs = new (oldValue, value);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
 
         SyncSubViewValues (syncBars);

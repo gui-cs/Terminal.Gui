@@ -115,37 +115,6 @@ public class LineDrawing : Scenario
 
         app.Run (win);
     }
-
-    public static bool PromptForColor (IApplication app, string title, Color current, out Color newColor)
-    {
-        var accept = false;
-
-        Dialog d = new () { Title = title, Buttons = [new Button { Title = "_Cancel" }, new Button { Title = "_Ok" }] };
-
-        View cp;
-
-        if (app.Driver!.Force16Colors)
-        {
-            cp = new ColorPicker16 { SelectedColor = current.GetClosestNamedColor16 (), Width = Dim.Fill () };
-        }
-        else
-        {
-            cp = new ColorPicker
-            {
-                SelectedColor = current, Width = Dim.Fill (0, 50), Style = new ColorPickerStyle { ShowColorName = true, ShowTextFields = true }
-            };
-            ((ColorPicker)cp).ApplyStyleChanges ();
-        }
-
-        d.Add (cp);
-
-        app.Run (d);
-        accept = d.Result == 1;
-        d.Dispose ();
-        newColor = app.Driver!.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
-
-        return accept;
-    }
 }
 
 public class ToolsView : Window

@@ -427,7 +427,7 @@ public class Dialogs : Scenario
 
             _colorPicker = new ColorPicker
             {
-                SelectedColor = initialColor,
+                Value = initialColor,
                 Style = new ColorPickerStyle { ShowColorName = true, ShowTextFields = true },
                 Width = Dim.Fill (0, 48),
                 AssignHotKeys = true
@@ -448,7 +448,7 @@ public class Dialogs : Scenario
                 return true;
             }
 
-            Result = _colorPicker.SelectedColor;
+            Result = _colorPicker.Value!.Value;
 
             return false;
         }

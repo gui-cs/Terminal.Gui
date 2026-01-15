@@ -93,11 +93,10 @@ Button colorPickerButton = new () { Title = "ColorPicker (Typed Result)", X = Po
 
 colorPickerButton.Accepting += (_, _) =>
                                {
-                                   Color? result = mainWindow.Prompt<ColorPicker, Color> (resultExtractor: cp => cp.SelectedColor,
+                                   Color? result = mainWindow.Prompt<ColorPicker, Color?> (input: null,
                                                                                           beginInitHandler: prompt =>
                                                                                           {
                                                                                               prompt.Title = "Pick a Color";
-                                                                                              prompt.GetWrappedView ().SelectedColor = Color.Blue;
                                                                                           });
 
                                    if (result is { } selectedColor)
