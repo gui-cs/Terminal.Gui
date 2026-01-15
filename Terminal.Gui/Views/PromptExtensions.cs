@@ -13,7 +13,7 @@ namespace Terminal.Gui.Views;
 ///         <list type="bullet">
 ///             <item>
 ///                 <description>
-///                     <see cref="Prompt{TView,TResult}(IRunnable,string,TView,Func{TView,TResult},TResult,Action{PromptDialog{TView,TResult}}?)"/>
+///                     <see cref="Prompt{TView,TResult}(IRunnable,string,TView,Func{TView,TResult},TResult,Action{Prompt{TView,TResult}}?)"/>
 ///                     on <see cref="IRunnable"/> - For C# with type-safe result extraction and hosting relationship
 ///                 </description>
 ///             </item>
@@ -78,7 +78,7 @@ public static class PromptExtensions
         TView view,
         Func<TView, TResult?> resultExtractor,
         TResult? input = default,
-        Action<PromptDialog<TView, TResult>>? beginInitHandler = null)
+        Action<Prompt<TView, TResult>>? beginInitHandler = null)
         where TView : View
     {
         ArgumentNullException.ThrowIfNull (host);
@@ -87,7 +87,7 @@ public static class PromptExtensions
 
         IApplication app = (host as View)?.App ?? throw new InvalidOperationException ("Host runnable must have an associated IApplication.");
 
-        using PromptDialog<TView, TResult> dialog = new ()
+        using Prompt<TView, TResult> dialog = new ()
         {
             Title = title,
             WrappedView = view,
@@ -133,7 +133,7 @@ public static class PromptExtensions
         string title,
         Func<TView, TResult?> resultExtractor,
         TResult? input = default,
-        Action<PromptDialog<TView, TResult>>? beginInitHandler = null)
+        Action<Prompt<TView, TResult>>? beginInitHandler = null)
         where TView : View, new()
     {
         return host.Prompt (title, new TView (), resultExtractor, input, beginInitHandler);
@@ -190,7 +190,7 @@ public static class PromptExtensions
         ArgumentNullException.ThrowIfNull (app);
         ArgumentNullException.ThrowIfNull (view);
 
-        using PromptDialog<TView, bool> dialog = new ()
+        using Prompt<TView, bool> dialog = new ()
         {
             Title = title,
             WrappedView = view,

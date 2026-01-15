@@ -272,8 +272,8 @@ public class Dialogs : Scenario
                                                e.Handled = true;
                                            };
 
-        // --- PromptDialog Demo ---
-        // Demonstrates using PromptDialog<TView, TResult> with extension methods
+        // --- Prompt Demo ---
+        // Demonstrates using Prompt<TView, TResult> with extension methods
         // This is a simpler alternative to creating custom Dialog<TResult> subclasses
 
         Button showPromptDialogButton = new ()
@@ -290,7 +290,7 @@ public class Dialogs : Scenario
             Y = Pos.Bottom (showPromptDialogButton),
             Height = Dim.Auto (),
             Width = Dim.Auto (),
-            Text = "PromptDialog Demo - Selected Color:"
+            Text = "Prompt Demo - Selected Color:"
         };
         mainWindow.Add (promptColorLabel);
 

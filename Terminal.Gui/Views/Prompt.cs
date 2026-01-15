@@ -17,7 +17,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="IRunnable{TResult}.Result"/> remains <see langword="null"/>.
 ///     </para>
 ///     <para>
-///         Use the <see cref="PromptExtensions.Prompt{TView,TResult}(IRunnable,string,TView,Func{TView,TResult},TResult,Action{PromptDialog{TView,TResult}}?)"/>
+///         Use the <see cref="PromptExtensions.Prompt{TView,TResult}(IRunnable,string,TView,Func{TView,TResult},TResult,Action{Prompt{TView,TResult}}?)"/>
 ///         extension method for a more convenient API.
 ///     </para>
 /// </remarks>
@@ -25,7 +25,7 @@ namespace Terminal.Gui.Views;
 ///     <code>
 ///     // Create a prompt dialog with a DatePicker
 ///     DatePicker datePicker = new () { Date = DateTime.Now };
-///     PromptDialog&lt;DatePicker, DateTime&gt; prompt = new ()
+///     Prompt&lt;DatePicker, DateTime&gt; prompt = new ()
 ///     {
 ///         Title = "Select Date",
 ///         WrappedView = datePicker,
@@ -42,14 +42,14 @@ namespace Terminal.Gui.Views;
 ///     }
 ///     </code>
 /// </example>
-public class PromptDialog<TView, TResult> : Dialog<TResult> where TView : View
+public class Prompt<TView, TResult> : Dialog<TResult> where TView : View
 {
     private TView? _wrappedView;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="PromptDialog{TView, TResult}"/>.
+    ///     Initializes a new instance of <see cref="Prompt{TView, TResult}"/>.
     /// </summary>
-    public PromptDialog ()
+    public Prompt ()
     {
         // Add default Ok and Cancel buttons
         AddButton (new () { Text = Strings.btnCancel });

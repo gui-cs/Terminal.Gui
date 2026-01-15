@@ -32,7 +32,7 @@ public class Runnable<TResult> : Runnable, IRunnable<TResult>
     /// <inheritdoc/>
     public new TResult? Result
     {
-        get => base.Result is TResult typedValue ? typedValue : default;
+        get => base.Result is null ? default (TResult?) : (TResult)base.Result;
         set => base.Result = value;
     }
 

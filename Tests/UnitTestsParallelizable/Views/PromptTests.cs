@@ -3,21 +3,21 @@ using UnitTests;
 namespace ViewsTests;
 
 /// <summary>
-///     Unit tests for <see cref="PromptDialog{TView, TResult}"/> and <see cref="PromptExtensions"/>.
+///     Unit tests for <see cref="Prompt{TView, TResult}"/> and <see cref="PromptExtensions"/>.
 /// </summary>
 /// <remarks>
 ///     Claude - Opus 4.5
 /// </remarks>
-public class PromptDialogTests : TestDriverBase
+public class PromptTests : TestDriverBase
 {
-    #region PromptDialog Constructor Tests
+    #region Prompt Constructor Tests
 
     [Fact]
     public void Constructor_Initializes_With_OkCancel_Buttons ()
     {
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             WrappedView = label,
             ResultExtractor = l => l.Text
@@ -34,7 +34,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             WrappedView = label
         };
@@ -53,11 +53,11 @@ public class PromptDialogTests : TestDriverBase
     {
         // This test verifies the 'required' modifier works - the dialog cannot be created without WrappedView
         // The following would not compile:
-        // PromptDialog<Label, string> dialog = new ();
+        // Prompt<Label, string> dialog = new ();
 
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             WrappedView = label
         };
@@ -73,7 +73,7 @@ public class PromptDialogTests : TestDriverBase
 
         Label label = new () { Text = "Test Label" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             Driver = driver,
             WrappedView = label,
@@ -99,7 +99,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Hello" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             WrappedView = label,
             ResultExtractor = l => l.Text
@@ -113,7 +113,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Hello" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             WrappedView = label,
             ResultExtractor = null
@@ -131,7 +131,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             WrappedView = label
         };
@@ -144,7 +144,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             WrappedView = label
         };
@@ -160,7 +160,7 @@ public class PromptDialogTests : TestDriverBase
 
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             Driver = driver,
             WrappedView = label,
@@ -184,7 +184,7 @@ public class PromptDialogTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using PromptDialog<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new ()
         {
             WrappedView = textField,
             ResultExtractor = tf => tf.Text
@@ -201,7 +201,7 @@ public class PromptDialogTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using PromptDialog<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new ()
         {
             WrappedView = textField,
             ResultExtractor = tf => tf.Text
@@ -221,7 +221,7 @@ public class PromptDialogTests : TestDriverBase
     {
         TextField textField = new () { Text = "User Input" };
 
-        using PromptDialog<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new ()
         {
             WrappedView = textField,
             ResultExtractor = tf => tf.Text
@@ -235,7 +235,7 @@ public class PromptDialogTests : TestDriverBase
     {
         TextField textField = new () { Text = "Test" };
 
-        using PromptDialog<TextField, string> dialog = new ()
+        using Prompt<TextField, string> dialog = new ()
         {
             WrappedView = textField,
             ResultExtractor = tf => tf.Text
@@ -263,7 +263,7 @@ public class PromptDialogTests : TestDriverBase
 
         Label label = new () { Text = "Choose an option" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             Driver = driver,
             Title = "Prompt",
@@ -287,7 +287,7 @@ public class PromptDialogTests : TestDriverBase
 
         Label label = new () { Text = "Hello World" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             Driver = driver,
             Title = "Test",
@@ -317,7 +317,7 @@ public class PromptDialogTests : TestDriverBase
 
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, bool> dialog = new ()
+        using Prompt<Label, bool> dialog = new ()
         {
             WrappedView = label,
             ResultExtractor = _ => true
@@ -334,7 +334,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, bool> dialog = new ()
+        using Prompt<Label, bool> dialog = new ()
         {
             WrappedView = label,
             ResultExtractor = _ => true
@@ -353,7 +353,7 @@ public class PromptDialogTests : TestDriverBase
     {
         DatePicker datePicker = new () { Date = new DateTime (2024, 6, 15) };
 
-        using PromptDialog<DatePicker, DateTime> dialog = new ()
+        using Prompt<DatePicker, DateTime> dialog = new ()
         {
             WrappedView = datePicker,
             ResultExtractor = dp => dp.Date
@@ -371,7 +371,7 @@ public class PromptDialogTests : TestDriverBase
     {
         ColorPicker colorPicker = new () { SelectedColor = Color.Red };
 
-        using PromptDialog<ColorPicker, Color> dialog = new ()
+        using Prompt<ColorPicker, Color> dialog = new ()
         {
             WrappedView = colorPicker,
             ResultExtractor = cp => cp.SelectedColor
@@ -389,7 +389,7 @@ public class PromptDialogTests : TestDriverBase
     {
         TextField textField = new () { Text = "42" };
 
-        using PromptDialog<TextField, int> dialog = new ()
+        using Prompt<TextField, int> dialog = new ()
         {
             WrappedView = textField,
             ResultExtractor = tf => int.TryParse (tf.Text, out int result) ? result : 0
@@ -411,7 +411,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             Title = "Select Item",
             WrappedView = label
@@ -425,7 +425,7 @@ public class PromptDialogTests : TestDriverBase
     {
         Label label = new () { Text = "Test" };
 
-        using PromptDialog<Label, string> dialog = new ()
+        using Prompt<Label, string> dialog = new ()
         {
             Title = "选择日期",
             WrappedView = label
