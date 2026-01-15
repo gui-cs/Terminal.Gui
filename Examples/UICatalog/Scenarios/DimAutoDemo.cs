@@ -36,7 +36,8 @@ public class DimAutoDemo : Scenario
             //X = Pos.Center (),
             //Y = Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Content, minimumContentDim: Dim.Percent (25)),
-            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10)
+            Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 10),
+            Arrangement = ViewArrangement.Resizable
         };
         dimAutoFrameView.Margin!.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;

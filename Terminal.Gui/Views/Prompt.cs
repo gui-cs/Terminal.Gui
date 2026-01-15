@@ -144,6 +144,10 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
         {
             Result = ResultExtractor (GetWrappedView ());
         }
+        else if (GetWrappedView () is IValue<TResult> iValue)
+        {
+            Result = iValue.Value;
+        }
         else if (typeof (TResult) == typeof (string))
         {
             Result = (TResult?)(object?)GetWrappedView ().Text;

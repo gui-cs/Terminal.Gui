@@ -1,6 +1,3 @@
-
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -58,14 +55,10 @@ public partial class ColorPicker : View, IDesignable
             bar.Width = Dim.Fill (Style.ShowTextFields ? TEXT_FIELD_WIDTH : 0);
 
             TextField? tfValue = null;
+
             if (Style.ShowTextFields)
             {
-                tfValue = new TextField
-                {
-                    X = Pos.AnchorEnd (TEXT_FIELD_WIDTH),
-                    Y = y,
-                    Width = TEXT_FIELD_WIDTH
-                };
+                tfValue = new TextField { X = Pos.AnchorEnd (TEXT_FIELD_WIDTH), Y = y, Width = TEXT_FIELD_WIDTH };
                 tfValue.HasFocusChanged += UpdateSingleBarValueFromTextField;
                 tfValue.Accepting += (s, _) => UpdateSingleBarValueFromTextField (s);
                 _textFields.Add (bar, tfValue);
@@ -105,7 +98,7 @@ public partial class ColorPicker : View, IDesignable
     protected override bool OnDrawingContent (DrawContext? context)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
-        SetAttribute (new (SelectedColor, normal.Background, Enabled ? TextStyle.None : TextStyle.Faint));
+        SetAttribute (new Attribute (SelectedColor, normal.Background, Enabled ? TextStyle.None : TextStyle.Faint));
         int y = _bars.Count + (Style.ShowColorName ? 1 : 0);
         AddRune (13, y, (Rune)'■');
 
@@ -115,13 +108,9 @@ public partial class ColorPicker : View, IDesignable
     /// <summary>
     ///     The color selected in the picker
     /// </summary>
-    public Color SelectedColor
-    {
-        get => _selectedColor;
-        set => SetSelectedColor (value, true);
-    }
+    public Color SelectedColor { get => _selectedColor; set => SetSelectedColor (value, true); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string Text
     {
         get => SelectedColor.ToString ();
@@ -142,18 +131,11 @@ public partial class ColorPicker : View, IDesignable
 
     private void CreateNameField ()
     {
-        _lbName = new ()
-        {
-            Text = "Name:",
-            X = 0,
-            Y = 3
-        };
+        _lbName = new Label { Text = "Name:", X = 0, Y = 3 };
 
-        _tfName = new ()
+        _tfName = new TextField
         {
-            Y = 3,
-            X = 6,
-            Width = 20 // width of "LightGoldenRodYellow" - the longest w3c color name
+            Y = 3, X = 6, Width = 20 // width of "LightGoldenRodYellow" - the longest w3c color name
         };
 
         Add (_lbName);
@@ -161,10 +143,7 @@ public partial class ColorPicker : View, IDesignable
 
         var auto = new AppendAutocomplete (_tfName);
 
-        auto.SuggestionGenerator = new SingleWordSuggestionGenerator
-        {
-            AllSuggestions = _colorNameResolver.GetColorNames ().ToList ()
-        };
+        auto.SuggestionGenerator = new SingleWordSuggestionGenerator { AllSuggestions = _colorNameResolver.GetColorNames ().ToList () };
         _tfName.Autocomplete = auto;
 
         _tfName.HasFocusChanged += UpdateValueFromName;
@@ -180,19 +159,9 @@ public partial class ColorPicker : View, IDesignable
             y++;
         }
 
-        _lbHex = new ()
-        {
-            Text = "Hex:",
-            X = 0,
-            Y = y
-        };
+        _lbHex = new Label { Text = "Hex:", X = 0, Y = y };
 
-        _tfHex = new ()
-        {
-            Y = y,
-            X = 4,
-            Width = 8,
-        };
+        _tfHex = new TextField { Y = y, X = 4, Width = 8 };
 
         Add (_lbHex);
         Add (_tfHex);
@@ -217,7 +186,7 @@ public partial class ColorPicker : View, IDesignable
             bar.Dispose ();
         }
 
-        _bars = new ();
+        _bars = new List<IColorBar> ();
         _textFields.Clear ();
 
         if (_lbHex != null)
@@ -249,10 +218,7 @@ public partial class ColorPicker : View, IDesignable
         }
     }
 
-    private void RebuildColorFromBar (object? sender, EventArgs<int> e)
-    {
-        SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false);
-    }
+    private void RebuildColorFromBar (object? sender, EventArgs<int> e) => SetSelectedColor (_strategy.GetColorFromBars (_bars, Style.ColorModel), false);
 
     private void SetSelectedColor (Color value, bool syncBars)
     {
@@ -261,7 +227,7 @@ public partial class ColorPicker : View, IDesignable
             Color old = _selectedColor;
             _selectedColor = value;
 
-            ColorChanged?.Invoke (this, new (value));
+            ColorChanged?.Invoke (this, new ResultEventArgs<Color> (value));
         }
 
         SyncSubViewValues (syncBars);
@@ -305,6 +271,7 @@ public partial class ColorPicker : View, IDesignable
         // it is a leave event so update
         UpdateSingleBarValueFromTextField (sender);
     }
+
     private void UpdateSingleBarValueFromTextField (object? sender)
     {
         foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
@@ -362,6 +329,7 @@ public partial class ColorPicker : View, IDesignable
         // it is a leave event so update
         UpdateValueFromTextField ();
     }
+
     private void UpdateValueFromTextField ()
     {
         if (_tfHex == null)
@@ -388,7 +356,7 @@ public partial class ColorPicker : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         DisposeOldViews ();

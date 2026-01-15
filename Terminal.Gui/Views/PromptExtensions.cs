@@ -96,7 +96,7 @@ public static class PromptExtensions
         TResult? input = default,
         Action<Prompt<TView, TResult>>? beginInitHandler = null
     )
-        where TView : View, new ()
+        where TView : View, new()
     {
         ArgumentNullException.ThrowIfNull (host);
 
@@ -107,6 +107,11 @@ public static class PromptExtensions
         if (resultExtractor is { })
         {
             prompt.ResultExtractor = resultExtractor;
+        }
+
+        if (prompt.GetWrappedView () is IValue<TResult> iValue)
+        {
+            iValue.Value = input;
         }
 
         // prompt.ResultExtractor = view1 => view.Text;
@@ -184,7 +189,7 @@ public static class PromptExtensions
         this IApplication app,
         TView view
     )
-        where TView : View, new ()
+        where TView : View, new()
     {
         ArgumentNullException.ThrowIfNull (app);
         ArgumentNullException.ThrowIfNull (view);

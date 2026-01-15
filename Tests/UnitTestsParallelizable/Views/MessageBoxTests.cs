@@ -64,7 +64,7 @@ public class MessageBoxTests
 
             Assert.Equal (1, res);
 
-            void OnApplicationOnIteration (object? o, EventArgs<IApplication?> iterationEventArgs) { Assert.True (app.Keyboard.RaiseKeyDownEvent (key)); }
+            void OnApplicationOnIteration (object? o, EventArgs<IApplication?> iterationEventArgs) => Assert.True (app.Keyboard.RaiseKeyDownEvent (key));
         }
         finally
         {
@@ -84,9 +84,9 @@ public class MessageBoxTests
             int? res = MessageBox.Query (app, "hey", "IsDefault", "_No", "_Yes");
             app.Iteration -= OnApplicationOnIteration;
 
-            Assert.Equal (null, res);
+            Assert.Null (res);
 
-            void OnApplicationOnIteration (object? o, EventArgs<IApplication?> iterationEventArgs) { Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Esc)); }
+            void OnApplicationOnIteration (object? o, EventArgs<IApplication?> iterationEventArgs) => Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Esc));
         }
         finally
         {
