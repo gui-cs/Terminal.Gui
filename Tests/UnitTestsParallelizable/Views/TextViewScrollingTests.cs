@@ -1,0 +1,279 @@
+#nullable enable
+
+namespace ViewsTests.TextViewTests;
+
+/// <summary>
+/// Tests for TextView scrollbar integration when content changes.
+/// These tests expose bugs where scrollbars don't update after text modifications.
+/// Claude - Opus 4.5
+/// </summary>
+public class TextViewScrollingTests
+{
+    /// <summary>
+    /// Tests that content size height updates when lines are inserted.
+    /// </summary>
+    [Fact]
+    public void ContentSize_Updates_When_Lines_Inserted ()
+    {
+        // Arrange: TextView with small viewport
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Initial content: 1 line
+        tv.Text = "Line 1";
+        int initialHeight = tv.GetContentSize ().Height;
+
+        // Act: Insert text that adds lines (simulating typing)
+        tv.Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10";
+
+        // Assert: Content size height should reflect new line count
+        int newHeight = tv.GetContentSize ().Height;
+        Assert.Equal (10, newHeight);
+        Assert.True (newHeight > initialHeight, $"Expected content height to increase from {initialHeight} to at least 10, but got {newHeight}");
+    }
+
+    /// <summary>
+    /// Tests that content size height updates when lines are deleted.
+    /// </summary>
+    [Fact]
+    public void ContentSize_Updates_When_Lines_Deleted ()
+    {
+        // Arrange: TextView with multi-line content
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        int initialHeight = tv.GetContentSize ().Height;
+        Assert.Equal (10, initialHeight);
+
+        // Act: Delete text (reduce to 3 lines)
+        tv.Text = "Line 1\nLine 2\nLine 3";
+
+        // Assert: Content size height should reflect reduced line count
+        int newHeight = tv.GetContentSize ().Height;
+        Assert.Equal (3, newHeight);
+    }
+
+    /// <summary>
+    /// Tests that vertical scrollbar becomes visible when content grows to exceed viewport.
+    /// This is one of the key bug scenarios reported.
+    /// BUG: UpdateHorizontalScrollBarVisibility() is not called when Text property changes.
+    /// </summary>
+    [Fact]
+    public void VerticalScrollBar_Becomes_Visible_When_Content_Exceeds_Viewport ()
+    {
+        // Arrange: TextView with ScrollBars=true, content initially fits in viewport
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2" // 2 lines, fits in height=5
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Verify: Scrollbar should not be visible initially (content fits)
+        // Note: ContentSize is correctly updated (height=2), but visibility check isn't triggered
+        Assert.Equal (2, tv.GetContentSize ().Height); // This passes - content size IS updated
+        Assert.False (tv.VerticalScrollBar.Visible, "Scrollbar should not be visible when content fits in viewport");
+
+        // Act: Insert text that exceeds viewport height
+        tv.Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10";
+
+        // Verify content size is correctly updated
+        Assert.Equal (10, tv.GetContentSize ().Height); // This passes - content size IS updated
+
+        // BUG: Scrollbar visibility is NOT updated because UpdateHorizontalScrollBarVisibility()
+        // is not called when Text property changes (only called from EndInit, ScrollBars setter,
+        // and OnViewportChanged)
+        Assert.True (tv.VerticalScrollBar.Visible, "Scrollbar should be visible when content exceeds viewport");
+    }
+
+    /// <summary>
+    /// Tests that vertical scrollbar hides when content shrinks to fit viewport.
+    /// BUG: Scrollbar visibility is not updated when Text property changes.
+    /// </summary>
+    [Fact]
+    public void VerticalScrollBar_Hides_When_Content_Fits_Viewport ()
+    {
+        // Arrange: TextView with ScrollBars=true, content exceeds viewport (scrollbar visible)
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Verify content size is correct (10 lines)
+        Assert.Equal (10, tv.GetContentSize ().Height); // Content size IS updated correctly
+
+        // BUG: Scrollbar visibility is not updated even though content exceeds viewport
+        // This fails because UpdateHorizontalScrollBarVisibility() is not called when Text is set
+        Assert.True (tv.VerticalScrollBar.Visible, "Scrollbar should be visible initially when content exceeds viewport");
+
+        // Act: Delete text until content fits
+        tv.Text = "Line 1\nLine 2";
+
+        // Assert: Scrollbar should now be hidden
+        Assert.False (tv.VerticalScrollBar.Visible, "Scrollbar should hide when content fits in viewport");
+    }
+
+    /// <summary>
+    /// Tests that changing scrollbar position updates viewport after content change.
+    /// This is the specific bug reported: "moving the scrollbar initially has no effect".
+    /// BUG: Scrollbar visibility not updated, so scrollbar remains hidden and non-functional.
+    /// </summary>
+    [Fact]
+    public void ScrollBar_Position_Change_Updates_Viewport_After_Content_Change ()
+    {
+        // Arrange: TextView with ScrollBars=true
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Initial"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Act: Insert text exceeding viewport
+        tv.Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10";
+
+        // Verify content size is correctly updated
+        Assert.Equal (10, tv.GetContentSize ().Height); // This passes - content size IS updated
+
+        // BUG: Scrollbar ScrollableContentSize IS correctly updated (via ContentSizeChanged event)
+        // but scrollbar Visible is NOT updated (UpdateHorizontalScrollBarVisibility not called)
+        Assert.Equal (10, tv.VerticalScrollBar.ScrollableContentSize); // This should pass
+
+        // BUG: This fails - scrollbar visibility not updated when Text changes
+        Assert.True (tv.VerticalScrollBar.Visible, "Scrollbar should be visible after content change");
+
+        // Act: Change scrollbar position
+        tv.VerticalScrollBar.Position = 5;
+
+        // Assert: Viewport.Y should change to match scrollbar position
+        Assert.Equal (5, tv.Viewport.Y);
+    }
+
+    /// <summary>
+    /// Tests that viewport change updates scrollbar position.
+    /// </summary>
+    [Fact]
+    public void Viewport_Change_Updates_ScrollBar_Position ()
+    {
+        // Arrange: TextView with content exceeding viewport
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Act: Programmatically set Viewport.Y
+        tv.Viewport = tv.Viewport with { Y = 3 };
+
+        // Assert: ScrollBar position should match Viewport.Y
+        Assert.Equal (3, tv.VerticalScrollBar.Position);
+    }
+
+    /// <summary>
+    /// Tests that horizontal scrollbar becomes visible when line length exceeds width (WordWrap=false).
+    /// BUG: Same as vertical - visibility not updated when Text changes.
+    /// </summary>
+    [Fact]
+    public void HorizontalScrollBar_Becomes_Visible_When_Line_Exceeds_Width ()
+    {
+        // Arrange: TextView with ScrollBars=true, WordWrap=false
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            WordWrap = false,
+            Text = "Short"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Verify: Horizontal scrollbar should not be visible initially
+        Assert.False (tv.HorizontalScrollBar.Visible, "Horizontal scrollbar should not be visible when line fits");
+
+        // Act: Insert very long line
+        tv.Text = "This is a very long line that definitely exceeds the 20 character width of the viewport";
+
+        // Content width IS correctly updated (via UpdateContentSize -> SetContentSize -> ContentSizeChanged)
+        int contentWidth = tv.GetContentSize ().Width;
+        Assert.True (contentWidth > 20, $"Content width should exceed viewport width (20), but was {contentWidth}");
+
+        // BUG: Horizontal scrollbar visibility is NOT updated because UpdateHorizontalScrollBarVisibility()
+        // is not called when Text property changes
+        Assert.True (tv.HorizontalScrollBar.Visible, "Horizontal scrollbar should be visible when line exceeds width");
+    }
+
+    /// <summary>
+    /// Tests that toggling WordWrap updates content size appropriately.
+    /// When WordWrap is enabled, long lines wrap and increase the content height.
+    /// </summary>
+    [Fact]
+    public void WordWrap_Toggle_Updates_ContentSize ()
+    {
+        // Arrange: TextView with long lines that would wrap
+        string longLine = new ('X', 50); // 50 chars, viewport is 20 wide = ~3 wrapped lines
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 10,
+            ScrollBars = true,
+            WordWrap = false,
+            Text = longLine
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Record initial content size (1 line, unwrapped)
+        int unwrappedHeight = tv.GetContentSize ().Height;
+        Assert.Equal (1, unwrappedHeight);
+
+        // Act: Toggle WordWrap on
+        tv.WordWrap = true;
+        tv.LayoutSubViews (); // May need layout to apply wrapping
+
+        // Assert: Content height should increase (more lines from wrapping)
+        int wrappedHeight = tv.GetContentSize ().Height;
+        Assert.True (wrappedHeight > unwrappedHeight,
+            $"Wrapped content height ({wrappedHeight}) should be greater than unwrapped ({unwrappedHeight})");
+
+        // With 50 chars in 20-width viewport, expect at least 3 lines
+        Assert.True (wrappedHeight >= 3,
+            $"Expected at least 3 wrapped lines for 50 chars in 20-width viewport, got {wrappedHeight}");
+    }
+}
