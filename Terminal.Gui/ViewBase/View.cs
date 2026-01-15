@@ -522,7 +522,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     private void SetTitleTextFormatterSize () =>
         TitleTextFormatter.ConstrainToSize = new Size (TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                                       - (TitleTextFormatter.Text.Contains ((char)HotKeySpecifier.Value) == true
+                                                       - (TitleTextFormatter.Text.Contains ((char)HotKeySpecifier.Value)
                                                               ? Math.Max (HotKeySpecifier.GetColumns (), 0)
                                                               : 0),
                                                        1);

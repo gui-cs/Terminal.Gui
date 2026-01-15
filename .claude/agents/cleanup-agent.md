@@ -26,7 +26,7 @@ The steps the agent will perform are:
        - Run ReSharper Command Line Tools to apply the "Full Cleanup" profile to the file.
        - Run ReSharper InspectCode and collect warnings.
        - Refactor to fix easy to fix InspectCode warnings and report harder ones, explaining why they were deemed hard.
-       - Detect CWP patterns and add TODO comments.
+       - Detect CWP patterns and add `// TODO: Refactor to use CWP` comments in the source code.
        - Run ReSharper Command Line Tools to apply the "Full Cleanup" profile to the file again.
        - Build and test to ensure no new build warnings or test failures.
 
@@ -38,7 +38,7 @@ Successfully cleaned files meet:
 - ✓ Splits >1000 lines into logical partials
 - ✓ Backing fields immediately before properties
 - ✓ Near-zero ReSharper InspectCode warnings
-- ✓ CWP candidates identified with TODO comments
+- ✓ CWP candidates identified with `// TODO: Refactor to use CWP` comments added in source code
 - ✓ All tests pass
 
 ## Prerequisites
@@ -85,7 +85,12 @@ Successfully cleaned files meet:
 ### 5. CWP Pattern Detection
 - Identifies virtual `On*` methods without `Raise*` counterparts
 - Identifies events without `Raise*` methods
-- Adds TODO comments for manual CWP refactoring
+- **MUST add `// TODO: Refactor to use CWP` comments** in the source code at each location where CWP pattern should be applied:
+  - Above events that lack proper `Raise*` methods
+  - Above `On*` methods that lack corresponding `Raise*` methods
+  - Above direct event invocations (e.g., `Event?.Invoke(...)`) that should use CWP pattern
+- Use the Edit tool to add these TODO comments directly to the files
+- Format: `// TODO: Refactor to use CWP` (exact format, no variations)
 
 ### 6. Warning Verification
 - **Build Warnings (HARD RULE)**:
