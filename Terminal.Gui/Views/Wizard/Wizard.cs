@@ -354,6 +354,7 @@ public class Wizard : Dialog, IDesignable
                                                  StepChanging,
                                                  newValue =>
                                                  {
+                                                     // BUGBUG: the CWP helper already invokes OnStepChanging and StepChanging
                                                      ValueChangingEventArgs<WizardStep?> args = new (_currentStep, newValue);
                                                      StepChanging?.Invoke (this, args);
 

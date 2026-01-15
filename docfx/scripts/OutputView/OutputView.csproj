@@ -6,6 +6,7 @@
     <PackageReference Include="AnsiConsoleToHtml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Examples\PromptExample\PromptExample.csproj" />
     <ProjectReference Include="..\..\..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 </Project>
