@@ -325,7 +325,7 @@ public class Dialogs : Scenario
 
                                                 // Use the Prompt extension method - much simpler than custom Dialog<T>!
                                                 // mainWindow is an IRunnable so we can call Prompt on it
-                                                Color? result = mainWindow.Prompt<ColorPicker, Color> (
+                                                Color? result = mainWindow.Prompt<ColorPicker, Color?> (
                                                     title: "Pick a Color (via Prompt)",
                                                     view: colorPicker,
                                                     resultExtractor: cp => cp.SelectedColor);

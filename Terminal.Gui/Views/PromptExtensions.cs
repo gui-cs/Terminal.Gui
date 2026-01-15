@@ -32,7 +32,15 @@ public static class PromptExtensions
     ///     Shows a view in a modal dialog with Ok/Cancel buttons and extracts a typed result.
     /// </summary>
     /// <typeparam name="TView">The type of view to display.</typeparam>
-    /// <typeparam name="TResult">The type of result to extract.</typeparam>
+    /// <typeparam name="TResult">
+    ///     The type of result data returned when the session completes.
+    ///     <para>
+    ///         <strong>Important:</strong> Use nullable types (e.g., <c>Color?</c>, <c>int?</c>, <c>string?</c>)
+    ///         so that <see langword="null"/> can indicate cancellation. Using non-nullable value types
+    ///         (e.g., <c>Color</c>, <c>int</c>) will return their default values on cancellation, making
+    ///         it impossible to distinguish cancellation from a valid result.
+    ///     </para>
+    /// </typeparam>
     /// <param name="host">
     ///     The runnable that is "hosting" this prompt. Currently used only to get the <see cref="IApplication"/>.
     ///     In the future, this will enable positioning the prompt relative to the host.
@@ -109,7 +117,15 @@ public static class PromptExtensions
     ///     Shows a view in a modal dialog with Ok/Cancel buttons and creates it automatically.
     /// </summary>
     /// <typeparam name="TView">The type of view to display. Must have a parameterless constructor.</typeparam>
-    /// <typeparam name="TResult">The type of result to extract.</typeparam>
+    /// <typeparam name="TResult">
+    ///     The type of result data returned when the session completes.
+    ///     <para>
+    ///         <strong>Important:</strong> Use nullable types (e.g., <c>Color?</c>, <c>int?</c>, <c>string?</c>)
+    ///         so that <see langword="null"/> can indicate cancellation. Using non-nullable value types
+    ///         (e.g., <c>Color</c>, <c>int</c>) will return their default values on cancellation, making
+    ///         it impossible to distinguish cancellation from a valid result.
+    ///     </para>
+    /// </typeparam>
     /// <param name="host">
     ///     The runnable that is "hosting" this prompt. Currently used only to get the <see cref="IApplication"/>.
     /// </param>

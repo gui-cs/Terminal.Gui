@@ -3,7 +3,15 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     Base implementation of <see cref="IRunnable{TResult}"/> for views that can be run as blocking sessions.
 /// </summary>
-/// <typeparam name="TResult">The type of result data returned when the session completes.</typeparam>
+/// <typeparam name="TResult">
+///     The type of result data returned when the session completes.
+///     <para>
+///         <strong>Important:</strong> Use nullable types (e.g., <c>Color?</c>, <c>int?</c>, <c>string?</c>)
+///         so that <see langword="null"/> can indicate cancellation. Using non-nullable value types
+///         (e.g., <c>Color</c>, <c>int</c>) will return their default values on cancellation, making
+///         it impossible to distinguish cancellation from a valid result.
+///     </para>
+/// </typeparam>
 /// <remarks>
 ///     <para>
 ///         Views can derive from this class or implement <see cref="IRunnable{TResult}"/> directly.

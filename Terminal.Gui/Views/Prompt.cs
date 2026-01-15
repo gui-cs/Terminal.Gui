@@ -5,7 +5,15 @@ namespace Terminal.Gui.Views;
 ///     when the user accepts.
 /// </summary>
 /// <typeparam name="TView">The type of view being wrapped.</typeparam>
-/// <typeparam name="TResult">The type of result data returned when the user accepts.</typeparam>
+/// <typeparam name="TResult">
+///     The type of result data returned when the session completes.
+///     <para>
+///         <strong>Important:</strong> Use nullable types (e.g., <c>Color?</c>, <c>int?</c>, <c>string?</c>)
+///         so that <see langword="null"/> can indicate cancellation. Using non-nullable value types
+///         (e.g., <c>Color</c>, <c>int</c>) will return their default values on cancellation, making
+///         it impossible to distinguish cancellation from a valid result.
+///     </para>
+/// </typeparam>
 /// <remarks>
 ///     <para>
 ///         This class provides a convenient way to prompt the user with any view and get a typed result.
