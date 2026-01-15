@@ -1312,7 +1312,7 @@ public class TabViewTests (ITestOutputHelper output)
         Tab tab3;
 
         tv.AddTab (
-                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 4, Height = 1, Text = "hi3" } },
                    false);
 
         tv.Width = 20;
@@ -1499,7 +1499,7 @@ public class TabViewTests (ITestOutputHelper output)
         //tv.Scheme = new ();
 
         tv.AddTab (
-                   tab1 = new () { Id = "tab1", DisplayText = "Tab1", View = new TextField { Id = "tab1.TextField", Width = 2, Text = "hi" } },
+                   tab1 = new () { Id = "tab1", DisplayText = "Tab1", View = new TextField { Id = "tab1.TextField", Width = 4, Text = "hi" } },
                    false
                   );
         tv.AddTab (tab2 = new () { Id = "tab2", DisplayText = "Tab2", View = new Label { Id = "tab1.Label", Text = "hi2" } }, false);
