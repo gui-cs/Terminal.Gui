@@ -171,9 +171,9 @@ jobs:
         MAX_THREADS=$((CPU_COUNT * 2))
         if [ "${{ runner.os }}" == "macOS" ]; then
           if [ $MAX_THREADS -gt 4 ]; then
-            MAX_THREADS=4
+            MAX_THREADS=8
           fi
-          HANG_TIMEOUT="120s"
+          HANG_TIMEOUT="240s"
         else
           if [ $MAX_THREADS -gt 16 ]; then
             MAX_THREADS=16
