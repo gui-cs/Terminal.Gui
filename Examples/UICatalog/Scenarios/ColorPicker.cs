@@ -33,48 +33,30 @@ public class ColorPickers : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window window = new ()
-        {
-            Title = GetQuitKeyAndName ()
-        };
+        using Window window = new () { Title = GetQuitKeyAndName () };
 
         ///////////////////////////////////////
         // True Color Pickers
         ///////////////////////////////////////
 
         // Foreground ColorPicker.
-        _foregroundColorPicker = new ()
-        {
-            Title = "_Foreground Color",
-            BorderStyle = LineStyle.Single,
-            Width = Dim.Percent (50)
-        };
+        _foregroundColorPicker = new ColorPicker { Title = "_Foreground Color", BorderStyle = LineStyle.Single, Width = Dim.Percent (50) };
         _foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
         window.Add (_foregroundColorPicker);
 
-        _foregroundColorLabel = new ()
-        {
-            X = Pos.Left (_foregroundColorPicker), Y = Pos.Bottom (_foregroundColorPicker) + 1
-        };
+        _foregroundColorLabel = new Label { X = Pos.Left (_foregroundColorPicker), Y = Pos.Bottom (_foregroundColorPicker) + 1 };
         window.Add (_foregroundColorLabel);
 
         // Background ColorPicker.
-        _backgroundColorPicker = new ()
+        _backgroundColorPicker = new ColorPicker
         {
-            Title = "_Background Color",
-            X = Pos.AnchorEnd (),
-            Width = Dim.Percent (50),
-            BorderStyle = LineStyle.Single
+            Title = "_Background Color", X = Pos.AnchorEnd (), Width = Dim.Percent (50), BorderStyle = LineStyle.Single
         };
 
         _backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
         window.Add (_backgroundColorPicker);
 
-        _backgroundColorLabel = new ()
-        {
-            X = Pos.AnchorEnd (),
-            Y = Pos.Bottom (_backgroundColorPicker) + 1
-        };
+        _backgroundColorLabel = new Label { X = Pos.AnchorEnd (), Y = Pos.Bottom (_backgroundColorPicker) + 1 };
 
         window.Add (_backgroundColorLabel);
 
@@ -83,18 +65,15 @@ public class ColorPickers : Scenario
         ///////////////////////////////////////
 
         // Foreground ColorPicker 16.
-        _foregroundColorPicker16 = new ()
+        _foregroundColorPicker16 = new ColorPicker16
         {
-            Title = "_Foreground Color",
-            BorderStyle = LineStyle.Single,
-            Width = Dim.Percent (50),
-            Visible = false // We default to HSV so hide old one
+            Title = "_Foreground Color", BorderStyle = LineStyle.Single, Width = Dim.Percent (50), Visible = false // We default to HSV so hide old one
         };
         _foregroundColorPicker16.ColorChanged += ForegroundColor_ColorChanged;
         window.Add (_foregroundColorPicker16);
 
         // Background ColorPicker 16.
-        _backgroundColorPicker16 = new ()
+        _backgroundColorPicker16 = new ColorPicker16
         {
             Title = "_Background Color",
             X = Pos.AnchorEnd (),
@@ -107,7 +86,7 @@ public class ColorPickers : Scenario
         window.Add (_backgroundColorPicker16);
 
         // Demo Label.
-        _demoView = new ()
+        _demoView = new View
         {
             Title = "Color Sample",
             Text = "Lorem Ipsum",
@@ -126,13 +105,7 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (_demoView),
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            Labels =
-            [
-                "_RGB",
-                "_HSV",
-                "H_SL",
-                "_16 Colors"
-            ],
+            Labels = ["_RGB", "_HSV", "H_SL", "_16 Colors"],
             Value = (int)_foregroundColorPicker.Style.ColorModel
         };
 
@@ -167,10 +140,7 @@ public class ColorPickers : Scenario
 
         window.Add (cbShowName);
 
-        var lblDriverName = new Label
-        {
-            Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{app.Driver?.GetName ()}`:"
-        };
+        var lblDriverName = new Label { Y = Pos.Bottom (cbShowName) + 1, Text = $"Driver is `{app.Driver?.GetName ()}`:" };
         bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
 
         var cbSupportsTrueColor = new CheckBox
@@ -196,8 +166,8 @@ public class ColorPickers : Scenario
         window.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
 
         // Set default colors.
-        _foregroundColorPicker.SelectedColor = _demoView.SuperView!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
-        _backgroundColorPicker.SelectedColor = _demoView.SuperView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
+        _foregroundColorPicker.Value = _demoView.SuperView!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
+        _backgroundColorPicker.Value = _demoView.SuperView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
 
         app.Run (window);
 
@@ -231,7 +201,7 @@ public class ColorPickers : Scenario
                 _foregroundColorPicker16.Visible = false;
                 _foregroundColorPicker.Visible = true;
 
-                if (e.Value is not null)
+                if (e.Value is { })
                 {
                     _foregroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
                     _foregroundColorPicker.ApplyStyleChanges ();
@@ -244,8 +214,8 @@ public class ColorPickers : Scenario
                 _backgroundColorPicker.ApplyStyleChanges ();
 
                 // Switching to true colors
-                _foregroundColorPicker.SelectedColor = _foregroundColorPicker16.SelectedColor;
-                _backgroundColorPicker.SelectedColor = _backgroundColorPicker16.SelectedColor;
+                _foregroundColorPicker.Value = _foregroundColorPicker16.SelectedColor;
+                _backgroundColorPicker.Value = _backgroundColorPicker16.SelectedColor;
             }
         }
     }
@@ -253,20 +223,14 @@ public class ColorPickers : Scenario
     /// <summary>Fired when background color is changed.</summary>
     private void BackgroundColor_ColorChanged (object sender, ResultEventArgs<Color> e)
     {
-        UpdateColorLabel (
-                          _backgroundColorLabel,
-                          _backgroundColorPicker.Visible ? _backgroundColorPicker.SelectedColor : _backgroundColorPicker16.SelectedColor
-                         );
+        UpdateColorLabel (_backgroundColorLabel, _backgroundColorPicker.Visible ? _backgroundColorPicker.Value!.Value : _backgroundColorPicker16.SelectedColor);
         UpdateDemoLabel ();
     }
 
     /// <summary>Fired when foreground color is changed.</summary>
     private void ForegroundColor_ColorChanged (object sender, ResultEventArgs<Color> e)
     {
-        UpdateColorLabel (
-                          _foregroundColorLabel,
-                          _foregroundColorPicker.Visible ? _foregroundColorPicker.SelectedColor : _foregroundColorPicker16.SelectedColor
-                         );
+        UpdateColorLabel (_foregroundColorLabel, _foregroundColorPicker.Visible ? _foregroundColorPicker.Value!.Value : _foregroundColorPicker16.SelectedColor);
         UpdateDemoLabel ();
     }
 
@@ -275,29 +239,24 @@ public class ColorPickers : Scenario
     {
         label.ClearViewport ();
 
-        label.Text =
-            $"{color} ({(int)color}) #{color.R:X2}{color.G:X2}{color.B:X2}";
+        label.Text = $"{color} ({(int)color}) #{color.R:X2}{color.G:X2}{color.B:X2}";
     }
 
     /// <summary>Update Demo Label.</summary>
-    private void UpdateDemoLabel ()
-    {
-        _demoView.SetScheme (
-                             new ()
-                             {
-                                 Normal = new (
-                                               _foregroundColorPicker.Visible ? _foregroundColorPicker.SelectedColor : _foregroundColorPicker16.SelectedColor,
-                                               _backgroundColorPicker.Visible ? _backgroundColorPicker.SelectedColor : _backgroundColorPicker16.SelectedColor
-                                              )
-                             });
-    }
+    private void UpdateDemoLabel () =>
+        _demoView.SetScheme (new Scheme
+        {
+            Normal = new Attribute (_foregroundColorPicker.Visible
+                                        ? _foregroundColorPicker.Value!.Value
+                                        : _foregroundColorPicker16.SelectedColor,
+                                    _backgroundColorPicker.Visible
+                                        ? _backgroundColorPicker.Value!.Value
+                                        : _backgroundColorPicker16.SelectedColor)
+        });
 
     public override List<Key> GetDemoKeyStrokes (IApplication app)
     {
-        List<Key> keys =
-        [
-            Key.B.WithAlt
-        ];
+        List<Key> keys = [Key.B.WithAlt];
 
         for (var i = 0; i < 200; i++)
         {

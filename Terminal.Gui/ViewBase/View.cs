@@ -40,7 +40,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
         // Safely remove any disposed views from the Instances list
         List<View> itemsToKeep = Instances.Where (view => !view.WasDisposed).ToList ();
-        Instances = new (itemsToKeep);
+        Instances = new ConcurrentBag<View> (itemsToKeep);
 #endif
     }
 
@@ -60,6 +60,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     public virtual string ToDebugString ()
     {
         string identifyingText = !string.IsNullOrEmpty (Id) ? $"{Id}" : $"{Title}";
+
         return $"{GetType ().Name}({identifyingText}) SuperView={(SuperView is { } ? SuperView.ToDebugString () : "null")}";
     }
 
@@ -72,39 +73,40 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <param name="disposing"></param>
     protected virtual void Dispose (bool disposing)
     {
-        if (disposing)
+        if (!disposing)
         {
-            LineCanvas.Dispose ();
-
-            DisposeMouse ();
-            DisposeKeyboard ();
-            DisposeAdornments ();
-            DisposeScrollBars ();
-
-            if (App?.Mouse.MouseGrabView == this)
-            {
-                App.Mouse.UngrabMouse ();
-            }
-
-            for (int i = InternalSubViews.Count - 1; i >= 0; i--)
-            {
-                View subview = InternalSubViews [i];
-                Remove (subview);
-                subview.Dispose ();
-            }
-
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                _disposedValue = true;
-            }
-
-            Debug.Assert (InternalSubViews.Count == 0);
+            return;
         }
+        LineCanvas.Dispose ();
+
+        DisposeMouse ();
+        DisposeKeyboard ();
+        DisposeAdornments ();
+        DisposeScrollBars ();
+
+        if (App?.Mouse.MouseGrabView == this)
+        {
+            App.Mouse.UngrabMouse ();
+        }
+
+        for (int i = InternalSubViews.Count - 1; i >= 0; i--)
+        {
+            View subview = InternalSubViews [i];
+            Remove (subview);
+            subview.Dispose ();
+        }
+
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+            }
+
+            _disposedValue = true;
+        }
+
+        Debug.Assert (InternalSubViews.Count == 0);
     }
 
     #region Constructors and Initialization
@@ -130,11 +132,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///         of the View hierarchy (the top-most SuperView).
     ///     </para>
     /// </remarks>
-    public IApplication? App
-    {
-        get => GetApp ();
-        internal set => _app = value;
-    }
+    public IApplication? App { get => GetApp (); internal set => _app = value; }
 
     /// <summary>
     ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by
@@ -153,11 +151,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    internal IDriver? Driver
-    {
-        get => GetDriver ();
-        set => _driver = value;
-    }
+    internal IDriver? Driver { get => GetDriver (); set => _driver = value; }
 
     /// <summary>
     ///     Gets the <see cref="IDriver"/> instance for this view. Used internally to allow overrides by
@@ -247,14 +241,16 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
         BeginInitAdornments ();
 
-        if (InternalSubViews.Count > 0)
+        if (InternalSubViews.Count <= 0)
         {
-            foreach (View view in InternalSubViews)
+            return;
+        }
+
+        foreach (View view in InternalSubViews)
+        {
+            if (!view.IsInitialized)
             {
-                if (!view.IsInitialized)
-                {
-                    view.BeginInit ();
-                }
+                view.BeginInit ();
             }
         }
     }
@@ -328,11 +324,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 HasFocus = false;
             }
 
-            if (_enabled
-                && CanFocus
-                && Visible
-                && !HasFocus
-                && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
+            if (_enabled && CanFocus && Visible && !HasFocus && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
             }
@@ -340,10 +332,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             OnEnabledChanged ();
             SetNeedsDraw ();
 
-            if (Border is { })
-            {
-                Border.Enabled = _enabled;
-            }
+            Border?.Enabled = _enabled;
 
             foreach (View view in InternalSubViews)
             {
@@ -357,7 +346,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     // TODO: Change this event to match the standard TG event model.
     /// <summary>Invoked when the <see cref="Enabled"/> property from a view is changed.</summary>
-    public virtual void OnEnabledChanged () { EnabledChanged?.Invoke (this, EventArgs.Empty); }
+    public virtual void OnEnabledChanged () => EnabledChanged?.Invoke (this, EventArgs.Empty);
 
     private bool _visible = true;
 
@@ -399,11 +388,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 }
             }
 
-            if (_visible
-                && CanFocus
-                && Enabled
-                && !HasFocus
-                && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
+            if (_visible && CanFocus && Enabled && !HasFocus && SuperView is null or { HasFocus: true, Visible: true, Enabled: true, Focused: null })
             {
                 SetFocus ();
             }
@@ -531,19 +516,16 @@ public partial class View : IDisposable, ISupportInitializeNotification
             SetNeedsDraw ();
 
             OnTitleChanged ();
-            TitleChanged?.Invoke (this, new (in _title));
+            TitleChanged?.Invoke (this, new EventArgs<string> (in _title));
         }
     }
 
-    private void SetTitleTextFormatterSize ()
-    {
-        TitleTextFormatter.ConstrainToSize = new (
-                                                  TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
-                                                  - (TitleTextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-                                                         ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                                         : 0),
-                                                  1);
-    }
+    private void SetTitleTextFormatterSize () =>
+        TitleTextFormatter.ConstrainToSize = new Size (TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
+                                                       - (TitleTextFormatter.Text.Contains ((char)HotKeySpecifier.Value)
+                                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                                              : 0),
+                                                       1);
 
     /// <summary>
     ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can
@@ -564,7 +546,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>Raised after the <see cref="View.Title"/> has been changed.</summary>
     public event EventHandler<EventArgs<string>>? TitleChanged;
-
 
     #endregion
 

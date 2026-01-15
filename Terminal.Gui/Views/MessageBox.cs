@@ -275,9 +275,8 @@ public static class MessageBox
         dialog.Title = title;
         dialog.ButtonAlignment = DefaultButtonAlignment;
         dialog.BorderStyle = DefaultBorderStyle;
-
         dialog.SchemeName = useErrorScheme ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-
+        //dialog.Width = Dim.Auto (minimumContentDim: 80);
         dialog.HotKeySpecifier = new ('\xFFFF');
         dialog.Text = message;
         dialog.TextAlignment = Alignment.Center;
@@ -286,9 +285,19 @@ public static class MessageBox
         dialog.TextFormatter.MultiLine = !wrapMessage;
 
         dialog.Buttons = buttonList.ToArray ();
+        dialog.Buttons.FirstOrDefault (b => b.IsDefault)?.SetFocus ();
 
-        Button? defaultButton = dialog.Padding!.SubViews.OfType<Button> ().FirstOrDefault (b => b.IsDefault);
-        defaultButton?.SetFocus ();
+        dialog.Accepting += (sender, args) =>
+                            {
+                                if (args.Handled || sender is not Dialog d)
+                                {
+                                    return;
+                                }
+
+                                args.Handled = true;
+                                d.RequestStop ();
+                            };
+
         // Run the modal
         int? result = app.Run (dialog) as int?;
 

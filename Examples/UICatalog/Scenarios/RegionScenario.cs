@@ -345,18 +345,32 @@ internal class RegionAttributeView : View
 
     private void ClickedInBackground ()
     {
-        if (LineDrawing.PromptForColor (App!, "Background", Value!.Value.Background, out Color newColor))
+        Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
+                                                                       beginInitHandler: prompt =>
+                                                                                         {
+                                                                                             prompt.Title = "Background Color";
+                                                                                             prompt.GetWrappedView ().SelectedColor = Value!.Value.Background;
+                                                                                         });
+
+        if (result is { } selectedColor)
         {
-            Value = new (Value!.Value.Foreground, newColor);
+            Value = new Attribute (Value!.Value.Foreground, selectedColor, Value!.Value.Style);
             SetNeedsDraw ();
         }
     }
 
     private void ClickedInForeground ()
     {
-        if (LineDrawing.PromptForColor (App!, "Foreground", Value!.Value.Foreground, out Color newColor))
+        Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
+                                                                       beginInitHandler: prompt =>
+                                                                                         {
+                                                                                             prompt.Title = "Foreground Color";
+                                                                                             prompt.GetWrappedView ().SelectedColor = Value!.Value.Foreground;
+                                                                                         });
+
+        if (result is { } selectedColor)
         {
-            Value = new (newColor, Value!.Value.Background);
+            Value = new Attribute (selectedColor, Value!.Value.Background);
             SetNeedsDraw ();
         }
     }

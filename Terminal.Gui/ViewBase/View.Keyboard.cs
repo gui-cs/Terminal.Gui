@@ -342,7 +342,7 @@ public partial class View // Keyboard APIs
     /// </remarks>
     protected bool AssignHotKeyToView (View view)
     {
-        if (string.IsNullOrEmpty (view.Title))
+        if (string.IsNullOrEmpty (view.Title) || view.HotKeySpecifier == (Rune)'\xffff')
         {
             return false;
         }
@@ -371,7 +371,7 @@ public partial class View // Keyboard APIs
             return true;
         }
 
-        // Assign a new hotkey from available characters in the label
+        // Assign a new hotkey from available characters
         Rune [] runes = label.EnumerateRunes ().ToArray ();
 
         for (var i = 0; i < runes.Length; i++)
@@ -384,7 +384,7 @@ public partial class View // Keyboard APIs
                 continue;
             }
 
-            if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsControl (newKey.AsRune))
+            if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsPunctuation (newKey.AsRune) ||  Rune.IsControl (newKey.AsRune))
             {
                 continue;
             }
