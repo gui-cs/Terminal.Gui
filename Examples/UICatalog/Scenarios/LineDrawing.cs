@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Terminal.Gui.Resources;
 
 namespace UICatalog.Scenarios;
 
@@ -114,37 +115,6 @@ public class LineDrawing : Scenario
 
         app.Run (win);
     }
-
-    public static bool PromptForColor (IApplication app, string title, Color current, out Color newColor)
-    {
-        var accept = false;
-
-        Dialog d = new () { Title = title, Buttons = [new Button { Title = "_Cancel" }, new Button { Title = "_Ok" }] };
-
-        View cp;
-
-        if (app.Driver!.Force16Colors)
-        {
-            cp = new ColorPicker16 { SelectedColor = current.GetClosestNamedColor16 (), Width = Dim.Fill () };
-        }
-        else
-        {
-            cp = new ColorPicker
-            {
-                SelectedColor = current, Width = Dim.Fill (0, 50), Style = new ColorPickerStyle { ShowColorName = true, ShowTextFields = true }
-            };
-            ((ColorPicker)cp).ApplyStyleChanges ();
-        }
-
-        d.Add (cp);
-
-        app.Run (d);
-        accept = d.Result == 1;
-        d.Dispose ();
-        newColor = app.Driver!.Force16Colors ? ((ColorPicker16)cp).SelectedColor : ((ColorPicker)cp).SelectedColor;
-
-        return accept;
-    }
 }
 
 public class ToolsView : Window
@@ -216,7 +186,7 @@ public class DrawingArea : View
             {
                 if (c.Value is { })
                 {
-                    SetCurrentAttribute (c.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
+                    SetAttribute (c.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddStr (c.Key.X, c.Key.Y, c.Value.Value.Grapheme);
@@ -396,18 +366,32 @@ public class AttributeView : View
 
     private void ClickedInBackground ()
     {
-        if (LineDrawing.PromptForColor (App!, "Background", Value.Background, out Color newColor))
+        Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
+                                                               beginInitHandler: prompt =>
+                                                                                 {
+                                                                                     prompt.Title = "Background Color";
+                                                                                     prompt.GetWrappedView ().SelectedColor = Value.Background;
+                                                                                 });
+
+        if (result is { } selectedColor)
         {
-            Value = new Attribute (Value.Foreground, newColor, Value.Style);
+            Value = new Attribute (Value.Foreground, selectedColor, Value.Style);
             SetNeedsDraw ();
         }
     }
 
     private void ClickedInForeground ()
     {
-        if (LineDrawing.PromptForColor (App!, "Foreground", Value.Foreground, out Color newColor))
+        Color? result = App?.TopRunnable?.Prompt<ColorPicker, Color?> (resultExtractor: cp => cp.SelectedColor,
+                                                                      beginInitHandler: prompt =>
+                                                                                        {
+                                                                                            prompt.Title = "Foreground Color";
+                                                                                            prompt.GetWrappedView ().SelectedColor = Value.Foreground;
+                                                                                        });
+
+        if (result is { } selectedColor)
         {
-            Value = new Attribute (newColor, Value.Background);
+            Value = new Attribute (selectedColor, Value.Background);
             SetNeedsDraw ();
         }
     }

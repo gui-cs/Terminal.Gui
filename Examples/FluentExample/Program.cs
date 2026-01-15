@@ -70,7 +70,7 @@ public class ColorPickerView : Runnable<Color?>
         okButton.Accepting += (s, e) =>
                               {
                                   // Extract result before stopping
-                                  Result = colorPicker.SelectedColor;
+                                  Result = colorPicker.Value;
                                   RequestStop ();
                                   e.Handled = true;
                               };
