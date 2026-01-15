@@ -173,14 +173,19 @@ public partial class TextView
     /// </summary>
     public bool PromptForColors ()
     {
-        if (!ColorPicker.Prompt (App!, "Colors", GetSelectedCellAttribute (), out Attribute newAttribute))
+        Attribute? attribute = App?.TopRunnable?.Prompt<AttributePicker, Attribute?> (input: GetSelectedCellAttribute (),
+                                                                                      beginInitHandler: prompt =>
+                                                                                                        {
+                                                                                                            // Customize the Prompt dialog
+                                                                                                            prompt.Title = "Pick an Attribute";
+                                                                                                        });
+
+        if (attribute is null)
         {
-            return false;
+            return true;
         }
 
-        Attribute attribute = new (newAttribute.Foreground, newAttribute.Background, newAttribute.Style);
-
-        ApplyCellsAttribute (attribute);
+        ApplyCellsAttribute (attribute.Value);
 
         return true;
     }
@@ -495,7 +500,7 @@ public partial class TextView
 
             _historyText.Add ([[.. prevRow]], InsertionPoint);
 
-            List<List<Cell>> removedLines = [[..prevRow], [..GetCurrentLine ()]];
+            List<List<Cell>> removedLines = [[.. prevRow], [.. GetCurrentLine ()]];
 
             _historyText.Add (removedLines, new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Removed);
 
@@ -730,7 +735,7 @@ public partial class TextView
                 CurrentRow--;
                 currentLine = _model.GetLine (CurrentRow);
 
-                List<List<Cell>> removedLine = [[..currentLine], []];
+                List<List<Cell>> removedLine = [[.. currentLine], []];
 
                 _historyText.Add ([.. removedLine], InsertionPoint, TextEditingLineStatus.Removed);
 

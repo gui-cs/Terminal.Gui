@@ -367,23 +367,128 @@ DateTime date = mainWindow.Prompt<DatePicker, DateTime> (...);
 // Returns default(DateTime) on cancel - can't distinguish from actual default value!
 ```
 
-## Future Enhancements
+## The IValue\<T\> Interface
 
-The design anticipates future Terminal.Gui features:
+Views that implement `IValue<T>` provide automatic result extraction without requiring an explicit `resultExtractor`. This is the recommended pattern for views that have a primary value.
 
-### IValue<TResult> Interface (Planned)
+### Interface Definition
 
 ```csharp
 public interface IValue<TValue>
 {
     TValue? Value { get; set; }
+    event EventHandler<ValueChangingEventArgs<TValue?>>? ValueChanging;
+    event EventHandler<ValueChangedEventArgs<TValue?>>? ValueChanged;
 }
 ```
 
-Views implementing `IValue<T>` would enable:
-- Automatic result extraction without `resultExtractor`
-- Input value setting via `input` parameter
-- Example: `TextField` implements `IValue<string>`, `DatePicker` implements `IValue<DateTime>`
+The interface follows the Cancellable Work Pattern (CWP):
+- `ValueChanging` fires before the value changes; set `Handled = true` to cancel
+- `ValueChanged` fires after the value has changed
+
+### Automatic Result Extraction
+
+When the wrapped view implements `IValue<TResult>`, `Prompt` automatically extracts the result:
+
+```csharp
+// No resultExtractor needed - AttributePicker implements IValue<Attribute?>
+Attribute? attr = mainWindow.Prompt<AttributePicker, Attribute?> (
+    beginInitHandler: prompt =>
+    {
+        prompt.Title = "Select Text Attribute";
+        prompt.GetWrappedView ().Value = new Attribute (Color.White, Color.Blue);
+    });
+```
+
+### Implementing IValue\<T\> in Custom Views
+
+To make your custom view work seamlessly with `Prompt`, implement `IValue<T>` using `CWPPropertyHelper.ChangeProperty`:
+
+```csharp
+public class MyRatingView : View, IValue<int?>
+{
+    private int? _value;
+
+    public int? Value
+    {
+        get => _value;
+        set => CWPPropertyHelper.ChangeProperty (
+            this,
+            ref _value,
+            value,
+            OnValueChanging,
+            ValueChanging,
+            newValue =>
+            {
+                _value = newValue;
+                UpdateStarDisplay ();
+            },
+            OnValueChanged,
+            ValueChanged,
+            out _);
+    }
+
+    public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+    public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
+    protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
+}
+```
+
+Now your view works with `Prompt` without a custom extractor:
+
+```csharp
+int? rating = mainWindow.Prompt<MyRatingView, int?> (
+    beginInitHandler: prompt => prompt.Title = "Rate this item");
+```
+
+## Example: AttributePicker
+
+`AttributePicker` is a composite view that demonstrates the `IValue<T>` pattern. It allows users to select a complete `Attribute` (foreground color, background color, and text style).
+
+### Basic Usage
+
+```csharp
+// Simple - IValue<Attribute?> provides automatic extraction
+Attribute? result = mainWindow.Prompt<AttributePicker, Attribute?> (
+    beginInitHandler: prompt =>
+    {
+        prompt.Title = "Choose Text Style";
+        prompt.GetWrappedView ().SampleText = "Preview your selection";
+    });
+
+if (result.HasValue)
+{
+    myTextView.SetAttribute (result.Value);
+}
+```
+
+### With Initial Value and Validation
+
+```csharp
+AttributePicker picker = new ()
+{
+    Value = existingAttribute,
+    SampleText = "Sample Text Preview"
+};
+
+// Validate changes
+picker.ValueChanging += (_, e) =>
+{
+    // Prevent identical foreground/background
+    if (e.NewValue?.Foreground == e.NewValue?.Background)
+    {
+        e.Handled = true;
+    }
+};
+
+Attribute? result = mainWindow.Prompt<AttributePicker, Attribute?> (
+    view: picker,
+    beginInitHandler: prompt => prompt.Title = "Edit Attribute");
+```
+
+## Future Enhancements
 
 ### Hosted Modal Positioning (Planned)
 
@@ -400,3 +505,6 @@ DateTime? date = mainWindow.Prompt<DatePicker, DateTime> (...);
 - [Runnable](xref:Terminal.Gui.Runnable) - Session management and lifecycle
 - [Application Architecture](application.md) - Understanding the IApplication pattern
 - [View](View.md) - Base View class and Text property
+- [IValue\<T\>](xref:Terminal.Gui.IValue`1) - Interface for views with typed values
+- [AttributePicker](xref:Terminal.Gui.Views.AttributePicker) - Example IValue implementation
+- [Cancellable Work Pattern](cancellable-work-pattern.md) - CWP event pattern used by IValue
