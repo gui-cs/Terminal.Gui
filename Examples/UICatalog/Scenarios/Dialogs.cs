@@ -182,142 +182,156 @@ public class Dialogs : Scenario
                                                                                 glyphsNotWords,
                                                                                 alignmentOptionSelector);
 
-                                       if (dlg is null)
-                                       {
-                                           MessageBox.ErrorQuery ((s as View)!.App!, "Error", "Could not create Dialog. Invalid options.", Strings.btnOk);
-                                       }
-                                       else
-                                       {
-                                           if (app.Run (dlg) is int result)
-                                           {
-                                               buttonPressedLabel.Text = $"Button {(int?)result} pressed.";
-                                           }
-                                           else
-                                           {
-                                               buttonPressedLabel.Text = "Dialog canceled.";
-                                           }
+                                          if (dlg is null)
+                                          {
+                                              MessageBox.ErrorQuery ((s as View)!.App!, "Error", "Could not create Dialog. Invalid options.", Strings.btnOk);
+                                          }
+                                          else
+                                          {
+                                              if (app.Run (dlg) is int result)
+                                              {
+                                                  buttonPressedLabel.Text = $"Button {(int?)result} pressed.";
+                                              }
+                                              else
+                                              {
+                                                  buttonPressedLabel.Text = "Dialog canceled.";
+                                              }
 
-                                          e.Handled = true;
-                                      };
+                                              e.Handled = true;
+                                          }
+                                          ;
 
-        mainWindow.Add (showDialogButton, buttonPressedLabel);
+                                          mainWindow.Add (showDialogButton, buttonPressedLabel);
 
-        // --- Dialog<TResult> Demo ---
-        // Demonstrates using Dialog<Color> to return a typed result instead of a button index
+                                          // --- Dialog<TResult> Demo ---
+                                          // Demonstrates using Dialog<Color> to return a typed result instead of a button index
 
-        Button showColorDialogButton = new () { X = Pos.Center (), Y = Pos.Bottom (buttonPressedLabel) + 2, Text = "Show Color Dialog<Color>" };
-        mainWindow.Add (showColorDialogButton);
+                                          Button showColorDialogButton = new ()
+                                          {
+                                              X = Pos.Center (), Y = Pos.Bottom (buttonPressedLabel) + 2, Text = "Show Color Dialog<Color>"
+                                          };
+                                          mainWindow.Add (showColorDialogButton);
 
-        View colorLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (showColorDialogButton),
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            Text = "Dialog<T> Demo - Selected Color:"
-        };
-        mainWindow.Add (colorLabel);
+                                          View colorLabel = new ()
+                                          {
+                                              X = Pos.Center (),
+                                              Y = Pos.Bottom (showColorDialogButton),
+                                              Height = Dim.Auto (),
+                                              Width = Dim.Auto (),
+                                              Text = "Dialog<T> Demo - Selected Color:"
+                                          };
+                                          mainWindow.Add (colorLabel);
 
-        View selectedColorLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (colorLabel),
-            Height = 1,
-            Width = 15,
-            TextAlignment = Alignment.Center,
-            SchemeName = "Error"
-        };
-        mainWindow.Add (selectedColorLabel);
-        selectedColorLabel.SetScheme (new Scheme { Normal = new Attribute (StandardColor.White, StandardColor.OrangeRed) });
-        selectedColorLabel.Text = selectedColorLabel.GetScheme ().Normal.Background.ToString ();
+                                          View selectedColorLabel = new ()
+                                          {
+                                              X = Pos.Center (),
+                                              Y = Pos.Bottom (colorLabel),
+                                              Height = 1,
+                                              Width = 15,
+                                              TextAlignment = Alignment.Center,
+                                              SchemeName = "Error"
+                                          };
+                                          mainWindow.Add (selectedColorLabel);
+                                          selectedColorLabel.SetScheme (new Scheme { Normal = new Attribute (StandardColor.White, StandardColor.OrangeRed) });
+                                          selectedColorLabel.Text = selectedColorLabel.GetScheme ().Normal.Background.ToString ();
 
-        showColorDialogButton.Accepting += (_, e) =>
-                                           {
-                                               using ColorPickerDialog colorDialog = new (selectedColorLabel.GetScheme ().Normal.Background);
-                                               colorDialog.ButtonAlignment = alignmentOptionSelector.Value.Value;
+                                          showColorDialogButton.Accepting += (_, e) =>
+                                                                             {
+                                                                                 using ColorPickerDialog colorDialog =
+                                                                                     new (selectedColorLabel.GetScheme ().Normal.Background);
+                                                                                 colorDialog.ButtonAlignment = alignmentOptionSelector.Value.Value;
 
-                                               // Run the dialog and get the typed result
+                                                                                 // Run the dialog and get the typed result
 
-                                               if (app.Run (colorDialog) is Color result)
-                                               {
-                                                   selectedColorLabel.Text = result.ToString ();
+                                                                                 if (app.Run (colorDialog) is Color result)
+                                                                                 {
+                                                                                     selectedColorLabel.Text = result.ToString ();
 
-                                                   selectedColorLabel.SetScheme (new Scheme
-                                                   {
-                                                       Normal = new Attribute (selectedColorLabel.GetScheme ()
+                                                                                     selectedColorLabel.SetScheme (new Scheme
+                                                                                     {
+                                                                                         Normal = new Attribute (selectedColorLabel.GetScheme ()
                                                                                                  .Normal.Foreground,
-                                                                               result)
-                                                   });
-                                               }
-                                               else
-                                               {
-                                                   selectedColorLabel.Text = "Canceled";
-                                               }
+                                                                                             result)
+                                                                                     });
+                                                                                 }
+                                                                                 else
+                                                                                 {
+                                                                                     selectedColorLabel.Text = "Canceled";
+                                                                                 }
 
-                                               e.Handled = true;
-                                           };
+                                                                                 e.Handled = true;
+                                                                             };
 
-        // --- Prompt Demo ---
-        // Demonstrates using Prompt<TView, TResult> with extension methods
-        // This is a simpler alternative to creating custom Dialog<TResult> subclasses
+                                          // --- Prompt Demo ---
+                                          // Demonstrates using Prompt<TView, TResult> with extension methods
+                                          // This is a simpler alternative to creating custom Dialog<TResult> subclasses
 
-        Button showPromptDialogButton = new () { X = Pos.Center (), Y = Pos.Bottom (selectedColorLabel) + 2, Text = "Prompt<AttributePicker, Attribute>" };
-        mainWindow.Add (showPromptDialogButton);
+                                          Button showPromptDialogButton = new ()
+                                          {
+                                              X = Pos.Center (), Y = Pos.Bottom (selectedColorLabel) + 2, Text = "Prompt<AttributePicker, Attribute>"
+                                          };
+                                          mainWindow.Add (showPromptDialogButton);
 
-        View promptAttributeLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (showPromptDialogButton),
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            Text = "Prompt Demo - Selected Attribute:"
-        };
-        mainWindow.Add (promptAttributeLabel);
+                                          View promptAttributeLabel = new ()
+                                          {
+                                              X = Pos.Center (),
+                                              Y = Pos.Bottom (showPromptDialogButton),
+                                              Height = Dim.Auto (),
+                                              Width = Dim.Auto (),
+                                              Text = "Prompt Demo - Selected Attribute:"
+                                          };
+                                          mainWindow.Add (promptAttributeLabel);
 
-        View promptSelectedAttributeLabel = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (promptAttributeLabel),
-            Height = 1,
-            Width = Dim.Auto (),
-            TextAlignment = Alignment.Center,
-            SchemeName = "Error"
-        };
-        mainWindow.Add (promptSelectedAttributeLabel);
-        promptSelectedAttributeLabel.SetScheme (new Scheme { Normal = new Attribute (StandardColor.White, StandardColor.Cyan) });
-        promptSelectedAttributeLabel.Text = promptSelectedAttributeLabel.GetScheme ().Normal.Background.ToString ();
+                                          View promptSelectedAttributeLabel = new ()
+                                          {
+                                              X = Pos.Center (),
+                                              Y = Pos.Bottom (promptAttributeLabel),
+                                              Height = 1,
+                                              Width = Dim.Auto (),
+                                              TextAlignment = Alignment.Center,
+                                              SchemeName = "Error"
+                                          };
+                                          mainWindow.Add (promptSelectedAttributeLabel);
 
-        void OnShowPromptDialogButtonOnAccepting (object? _, CommandEventArgs e)
-        {
-            // Use the Prompt extension method - much simpler than custom Dialog<T>!
-            // mainWindow is an IRunnable so we can call Prompt on it
-            Attribute? result = mainWindow.Prompt<AttributePicker, Attribute?> (input: promptSelectedAttributeLabel.GetScheme ().Normal,
-                                                                                beginInitHandler: prompt =>
+                                          promptSelectedAttributeLabel.SetScheme (new Scheme
+                                          {
+                                              Normal = new Attribute (StandardColor.White, StandardColor.Cyan)
+                                          });
+                                          promptSelectedAttributeLabel.Text = promptSelectedAttributeLabel.GetScheme ().Normal.Background.ToString ();
+
+                                          void OnShowPromptDialogButtonOnAccepting (object? _, CommandEventArgs e)
+                                          {
+                                              // Use the Prompt extension method - much simpler than custom Dialog<T>!
+                                              // mainWindow is an IRunnable so we can call Prompt on it
+                                              Attribute? result =
+                                                  mainWindow.Prompt<AttributePicker, Attribute?> (input: promptSelectedAttributeLabel.GetScheme ().Normal,
+                                                                                                  beginInitHandler: prompt =>
                                                                                                   {
                                                                                                       // Customize the Prompt dialog
                                                                                                       prompt.Title = "Pick an Attribute";
                                                                                                   });
 
-            if (result is { } attribute)
-            {
-                promptSelectedAttributeLabel.Text = attribute.ToString ();
-                Scheme updatedScheme = promptAttributeLabel.GetScheme () with { Normal = attribute };
-                promptSelectedAttributeLabel.SetScheme (updatedScheme);
-            }
-            else
-            {
-                promptSelectedAttributeLabel.Text = "Canceled";
-            }
+                                              if (result is { } attribute)
+                                              {
+                                                  promptSelectedAttributeLabel.Text = attribute.ToString ();
+                                                  Scheme updatedScheme = promptAttributeLabel.GetScheme () with { Normal = attribute };
+                                                  promptSelectedAttributeLabel.SetScheme (updatedScheme);
+                                              }
+                                              else
+                                              {
+                                                  promptSelectedAttributeLabel.Text = "Canceled";
+                                              }
 
-            e.Handled = true;
-        }
+                                              e.Handled = true;
+                                          }
 
-        showPromptDialogButton.Accepting += OnShowPromptDialogButtonOnAccepting;
+                                          showPromptDialogButton.Accepting += OnShowPromptDialogButtonOnAccepting;
 
-        mainWindow.UsedHotKeys = frame.UsedHotKeys;
-        mainWindow.AssignHotKeys = true;
+                                          mainWindow.UsedHotKeys = frame.UsedHotKeys;
+                                          mainWindow.AssignHotKeys = true;
 
-        app.Run (mainWindow);
+                                          app.Run (mainWindow);
+                                      };
     }
 
     private static Dialog? CreateDemoDialog (TextField widthEdit,
