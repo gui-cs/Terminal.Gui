@@ -121,6 +121,19 @@ public partial class ColorPicker : View, IDesignable
         set => SetSelectedColor (value, true);
     }
 
+    /// <inheritdoc />
+    public override string Text
+    {
+        get => SelectedColor.ToString ();
+        set
+        {
+            if (_colorNameResolver.TryParseColor (value, out Color newColor))
+            {
+                SelectedColor = newColor;
+            }
+        }
+    }
+
     /// <summary>
     ///     Style settings for the color picker.  After making changes ensure you call
     ///     <see cref="ApplyStyleChanges"/>.

@@ -211,7 +211,7 @@ public class PromptTests : TestDriverBase
     #region Layout and Drawing Tests
 
     [Fact]
-    public void PromptDialog_Layout_Works ()
+    public void Prompt_Layout_Works ()
     {
         Label label = new () { Text = "Choose an option" };
 
@@ -230,7 +230,7 @@ public class PromptTests : TestDriverBase
     }
 
     [Fact]
-    public void PromptDialog_Contains_WrappedView_After_EndInit ()
+    public void Prompt_Contains_WrappedView_After_EndInit ()
     {
         Label label = new () { Text = "Hello World" };
 
@@ -292,7 +292,7 @@ public class PromptTests : TestDriverBase
     #region Various TResult Type Tests
 
     [Fact]
-    public void PromptDialog_Works_With_DateTime_Result ()
+    public void Prompt_Works_With_DateTime_Result ()
     {
         DatePicker datePicker = new () { Date = new DateTime (2024, 6, 15) };
 
@@ -309,7 +309,7 @@ public class PromptTests : TestDriverBase
     }
 
     [Fact]
-    public void PromptDialog_Works_With_Color_Result ()
+    public void Prompt_Works_With_Color_Result ()
     {
         ColorPicker colorPicker = new () { SelectedColor = Color.Red };
 
@@ -325,8 +325,27 @@ public class PromptTests : TestDriverBase
         Assert.Equal (Color.Red, result.Value);
     }
 
+
     [Fact]
-    public void PromptDialog_Works_With_Int_Result ()
+    public void Prompt_Works_With_Color_Text ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        ColorPicker colorPicker = new () { SelectedColor = Color.Red };
+
+        using Prompt<ColorPicker, string?> dialog = new (colorPicker);
+
+        app.StopAfterFirstIteration = true;
+        app.Iteration += (_, _) => { dialog.InvokeCommand (Command.Accept); };
+        object? result = app.Run (dialog);
+
+        Assert.NotNull (result);
+        Assert.Equal ("Red", result);
+    }
+
+    [Fact]
+    public void Prompt_Works_With_Int_Result ()
     {
         TextField textField = new () { Text = "42" };
 

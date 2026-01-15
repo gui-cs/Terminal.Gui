@@ -79,6 +79,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		docfx\docs\navigation.md = docfx\docs\navigation.md
 		docfx\docs\newinv2.md = docfx\docs\newinv2.md
 		docfx\docs\Popovers.md = docfx\docs\Popovers.md
+		docfx\docs\prompt.md = docfx\docs\prompt.md
 		README.md = README.md
 		docfx\docs\scheme.md = docfx\docs\scheme.md
 		docfx\docs\scrolling.md = docfx\docs\scrolling.md

@@ -28,57 +28,56 @@ namespace Terminal.Gui.Views;
 ///         Use the <see cref="PromptExtensions.Prompt{TView,TResult}"/>
 ///         extension method for a more convenient API.
 ///     </para>
+///     <para>
+///         For detailed usage patterns, customization options, and PowerShell examples,
+///         see the <a href="../docs/prompt.md">Prompt Deep Dive</a>.
+///     </para>
 /// </remarks>
 /// <example>
 ///     <code>
 ///     // Create a prompt dialog with a DatePicker
 ///     DatePicker datePicker = new () { Date = new DateTime (1966, 9, 10) };
-///     Prompt&lt;DatePicker, DateTime&gt; prompt = new ()
+///     Prompt&lt;DatePicker, DateTime&gt; prompt = new (datePicker)
 ///     {
 ///         Title = "Select Date",
-///         WrappedView = datePicker,
-///         ResultExtractor = dp => dp.Date
+///         ResultExtractor = dp =&gt; dp.Date
 ///     };
-///
+/// 
 ///     if (app.Run (prompt) is DateTime selectedDate)
 ///     {
-///         Console.WriteLine ($"Selected: {selectedDate}");
-///     }
-///     else
-///     {
-///         Console.WriteLine ("Canceled");
+///         MessageBox.Query ("Success", $"You selected: {selectedDate:yyyy-MM-dd}", Strings.btnOk);
 ///     }
 ///     </code>
 /// </example>
-public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new()
+public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
 {
     private readonly TView? _wrappedView;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="Prompt{TView, TResult}"/>.
+    ///     Initializes a new instance of <see cref="Prompt{TView, TResult}"/> with a specified instance of the View.
     /// </summary>
     /// <param name="wrappedView">
-    ///     The view to wrap. If null, a new instance of TView is created.
-    ///     Requires TView to have a parameterless constructor if null.
+    ///     The view to wrap.
     /// </param>
-    public Prompt (TView? wrappedView = null)
+    public Prompt (TView? wrappedView)
     {
         _wrappedView = wrappedView ?? new TView ();
         AddSubViews ();
     }
 
     /// <summary>
-    /// 
+    ///     Initializes a new instance of <see cref="Prompt{TView, TResult}"/> with a new instance of the View.
     /// </summary>
     public Prompt ()
     {
-        _wrappedView ??= new TView ();
+        _wrappedView ??= new ();
         AddSubViews ();
     }
 
     private void AddSubViews ()
     {
         Add (_wrappedView);
+
         // Add default Ok and Cancel buttons
         // Note, users can override these by changing them in an
         // initialization event (e.g. Initialized).
@@ -94,31 +93,45 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new()
     ///         The wrapped view will be added as a subview during construction.
     ///     </para>
     /// </remarks>
-    public TView? GetWrappedView ()
-    {
-        return _wrappedView;
-    }
+    public TView GetWrappedView () => _wrappedView!;
 
     /// <summary>
     ///     Gets or sets the function that extracts the result from the wrapped view.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This function is called when the user accepts the dialog (clicks Ok or presses Enter).
+    ///         This function is called when the user accepts the dialog (via Ok button, pressing Enter, or other accept
+    ///         action).
     ///         The return value is stored in <see cref="IRunnable{TResult}.Result"/>.
     ///     </para>
     ///     <para>
-    ///         If this property is <see langword="null"/>, <see cref="IRunnable{TResult}.Result"/>
-    ///         will remain <see langword="null"/> even when the user accepts.
+    ///         If this property is <see langword="null"/> and <typeparamref name="TResult"/> is <see cref="string"/>,
+    ///         the result will automatically be extracted from <see cref="View.Text"/>.
+    ///     </para>
+    ///     <para>
+    ///         If this property is <see langword="null"/> and <typeparamref name="TResult"/> is not <see cref="string"/>,
+    ///         <see cref="IRunnable{TResult}.Result"/> will remain <see langword="null"/> even when the user accepts.
     ///     </para>
     /// </remarks>
-    public Func<TView, TResult?>? ResultExtractor { get; init; }
+    public Func<TView, TResult?>? ResultExtractor { get; set; }
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     When the Ok button (the default button) is pressed, extracts the result using <see cref="ResultExtractor"/>
-    ///     and stores it in <see cref="IRunnable{TResult}.Result"/> before closing.
-    ///     When Cancel is pressed, closes without setting a result.
+    ///     <para>
+    ///         When the user accepts the dialog (via Ok button, pressing Enter, or other accept action),
+    ///         extracts the result using <see cref="ResultExtractor"/> and stores it in
+    ///         <see cref="IRunnable{TResult}.Result"/>
+    ///         before closing.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="ResultExtractor"/> is <see langword="null"/> and <typeparamref name="TResult"/> is
+    ///         <see cref="string"/>,
+    ///         automatically uses <see cref="View.Text"/> as the result.
+    ///     </para>
+    ///     <para>
+    ///         When the user cancels (via Cancel button, pressing Escape, or other cancel action), closes without setting a
+    ///         result.
+    ///     </para>
     /// </remarks>
     protected override bool OnAccepting (CommandEventArgs args)
     {
@@ -127,9 +140,13 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new()
             return true;
         }
 
-        if (ResultExtractor is { } && _wrappedView is {})
+        if (ResultExtractor is { })
         {
-            Result = ResultExtractor (_wrappedView);
+            Result = ResultExtractor (GetWrappedView ());
+        }
+        else if (typeof (TResult) == typeof (string))
+        {
+            Result = (TResult?)(object?)GetWrappedView ().Text;
         }
 
         return false;

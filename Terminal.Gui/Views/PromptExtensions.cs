@@ -25,6 +25,10 @@ namespace Terminal.Gui.Views;
 ///             </item>
 ///         </list>
 ///     </para>
+///     <para>
+///         For detailed usage patterns, customization options, and PowerShell examples,
+///         see the <a href="../docs/prompt.md">Prompt Deep Dive</a>.
+///     </para>
 /// </remarks>
 public static class PromptExtensions
 {
@@ -45,8 +49,15 @@ public static class PromptExtensions
     ///     The runnable that is "hosting" this prompt. Currently used only to get the <see cref="IApplication"/>.
     ///     In the future, this will enable positioning the prompt relative to the host.
     /// </param>
-    /// <param name="view">The view to display in the dialog. If not specified, ...</param>
-    /// <param name="resultExtractor">Function that extracts the result from the view when the user accepts.</param>
+    /// <param name="view">
+    ///     The view to display in the dialog. If <see langword="null"/>, a new instance of <typeparamref name="TView"/> is
+    ///     created.
+    /// </param>
+    /// <param name="resultExtractor">
+    ///     Function that extracts the result from the view when the user accepts.
+    ///     If <see langword="null"/> and <typeparamref name="TResult"/> is <see cref="string"/>, automatically uses
+    ///     <see cref="View.Text"/>.
+    /// </param>
     /// <param name="input">Optional initial value to pass to the view (for future use with Input property).</param>
     /// <param name="beginInitHandler">Optional callback to customize the dialog before it is displayed.</param>
     /// <returns>
@@ -61,17 +72,20 @@ public static class PromptExtensions
     ///         and the prompt. Currently, this is used only to obtain the <see cref="IApplication"/> instance.
     ///         In the future, this will enable prompts to be positioned relative to their host.
     ///     </para>
+    ///     <para>
+    ///         For detailed usage patterns and examples, see the <a href="../docs/prompt.md">Prompt Deep Dive</a>.
+    ///     </para>
     /// </remarks>
     /// <example>
     ///     <code>
     ///     // From within a Window or other Runnable:
-    ///     DateTime? date = this.Prompt&lt;DatePicker, DateTime&gt;(
-    ///         view: new DatePicker { Date = new DateTime (1966, 9, 10) },
-    ///         resultExtractor: dp => dp.Date);
-    ///
-    ///     if (date is not null)
+    ///     DateTime? date = this.Prompt&lt;DatePicker, DateTime&gt; (
+    ///                                                           view: new DatePicker { Date = new DateTime (1966, 9, 10) },
+    ///                                                           resultExtractor: dp =&gt; dp.Date);
+    /// 
+    ///     if (date is { } selectedDate)
     ///     {
-    ///         // User accepted
+    ///         MessageBox.Query ("Date Selected", $"You selected: {selectedDate:yyyy-MM-dd}", Strings.btnOk);
     ///     }
     ///     </code>
     /// </example>
@@ -80,26 +94,29 @@ public static class PromptExtensions
         TView? view = null,
         Func<TView, TResult?>? resultExtractor = null,
         TResult? input = default,
-        Action<Prompt<TView, TResult>>? beginInitHandler = null)
+        Action<Prompt<TView, TResult>>? beginInitHandler = null
+    )
         where TView : View, new ()
     {
         ArgumentNullException.ThrowIfNull (host);
 
         IApplication app = (host as View)?.App ?? throw new InvalidOperationException ("Host runnable must have an associated IApplication.");
 
-        using Prompt<TView, TResult> prompt = new (view)
-        {
-            ResultExtractor = resultExtractor
-        };
+        using Prompt<TView, TResult> prompt = new (view);
 
+        if (resultExtractor is { })
+        {
+            prompt.ResultExtractor = resultExtractor;
+        }
+
+        // prompt.ResultExtractor = view1 => view.Text;
         // TODO: We need to add a InitBegun event to View that is raised by BeginInit
         // TODO: but for now Initialized will work, but is suboptimal.
-        prompt.Initialized += (sender, args) =>
+        prompt.Initialized += (_, _) =>
                               {
                                   // Allow customization before initialization
                                   beginInitHandler?.Invoke (prompt);
                               };
-
 
         // TODO: In the future, we will add IValue<TResult> that Views can implement to
         // TODO: to have a typed Value property that Input_set and Result_get will use.
@@ -120,7 +137,8 @@ public static class PromptExtensions
     /// <param name="app">The application instance.</param>
     /// <param name="view">The view to display in the dialog.</param>
     /// <returns>
-    ///     <see langword="true"/> if the user accepted (clicked Ok), <see langword="false"/> if canceled.
+    ///     The text value from <see cref="View.Text"/> if the user accepted (clicked Ok), or <see langword="null"/> if
+    ///     canceled.
     /// </returns>
     /// <exception cref="ArgumentNullException">
     ///     Thrown if <paramref name="app"/> or <paramref name="view"/> is null.
@@ -131,38 +149,46 @@ public static class PromptExtensions
     ///         <c>Func&lt;TView, TResult?&gt;</c> delegates are difficult to use.
     ///     </para>
     ///     <para>
-    ///         Access the view's properties directly after this method returns to get the result.
+    ///         Returns the string representation from <see cref="View.Text"/>. Many views provide meaningful
+    ///         <see cref="View.Text"/> implementations (e.g., <see cref="ColorPicker"/> returns the color name/value,
+    ///         <see cref="DatePicker"/> returns the formatted date).
+    ///     </para>
+    ///     <para>
+    ///         For views where <see cref="View.Text"/> is not meaningful (e.g., <see cref="ListView"/> with multi-select),
+    ///         use the generic
+    ///         <see cref="Prompt{TView,TResult}"/>
+    ///         method with a custom result extractor, or create <see cref="Prompt{TView,TResult}"/> directly.
+    ///     </para>
+    ///     <para>
+    ///         For PowerShell examples and detailed usage, see the <a href="../docs/prompt.md">Prompt Deep Dive</a>.
     ///     </para>
     /// </remarks>
     /// <example>
     ///     <code>
     ///     // PowerShell usage:
-    ///     // $datePicker = [DatePicker]::new()
-    ///     // $accepted = $app.Prompt("Select Date", $datePicker)
-    ///     // if ($accepted) { $datePicker.Date }
+    ///     // $textField = [TextField]::new()
+    ///     // $result = $app.Prompt($textField)
+    ///     // if ($result) { Write-Output "User entered: $result" }
     /// 
     ///     // C# usage:
-    ///     DatePicker datePicker = new ();
-    ///     bool accepted = app.Prompt ("Select Date", datePicker);
-    ///     if (accepted)
+    ///     TextField textField = new ();
+    ///     string? result = app.Prompt (textField);
+    /// 
+    ///     if (result is { })
     ///     {
-    ///         Console.WriteLine (datePicker.Date);
+    ///         MessageBox.Query ("Input Received", $"You entered: {result}", Strings.btnOk);
     ///     }
     ///     </code>
     /// </example>
     public static string? Prompt<TView> (
         this IApplication app,
-        TView view)
+        TView view
+    )
         where TView : View, new ()
     {
         ArgumentNullException.ThrowIfNull (app);
         ArgumentNullException.ThrowIfNull (view);
 
-        using Prompt<TView, string?> dialog = new (view)
-        {
-            ResultExtractor = _ => view.Text
-        };
-
-        return app.Run (dialog) as string;
+        return app.Run (new Prompt<TView, string?> (view)) as string;
     }
 }
