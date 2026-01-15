@@ -94,6 +94,8 @@ public class Dialog : Runnable<int?>, IDesignable
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
 
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+
         _buttonContainer = new ()
         {
             Id = "Dialog.ButtonContainer",
@@ -101,8 +103,7 @@ public class Dialog : Runnable<int?>, IDesignable
             X = 0,
             Y = Pos.AnchorEnd (),
             Width = Dim.Fill (),
-            Height = Dim.Auto (),
-            SchemeName = "Menu"
+            Height = Dim.Auto ()
         };
         Padding!.Add (_buttonContainer);
 
@@ -345,8 +346,7 @@ public class Dialog : Runnable<int?>, IDesignable
     {
         if (IsRunning)
         {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            Padding!.SetScheme (SchemeManager.GetScheme (Schemes.Base));
+            //Padding!.SetScheme (SchemeManager.GetScheme (Schemes.Base));
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
         }
         else

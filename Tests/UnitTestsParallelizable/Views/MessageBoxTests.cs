@@ -77,4 +77,80 @@ public class MessageBoxTests
         yield return [Key.Enter];
         yield return [Key.Space];
     }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Query_Sets_Dialog_SchemeName ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        try
+        {
+            string? schemeName = null;
+            var iteration = 0;
+
+            app.Iteration += OnApplicationOnIteration;
+            int? result = MessageBox.Query (app, "Test", "Message", "OK");
+            app.Iteration -= OnApplicationOnIteration;
+
+            Assert.Equal ("Dialog", schemeName);
+
+            void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
+            {
+                iteration++;
+
+                if (iteration == 1)
+                {
+                    // Capture the SchemeName from the running dialog
+                    var dialog = app.TopRunnableView as Dialog;
+                    Assert.NotNull (dialog);
+                    schemeName = dialog.SchemeName;
+                    app.RequestStop ();
+                }
+            }
+        }
+        finally
+        {
+            app.Dispose ();
+        }
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void ErrorQuery_Sets_Error_SchemeName ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        try
+        {
+            string? schemeName = null;
+            var iteration = 0;
+
+            app.Iteration += OnApplicationOnIteration;
+            int? result = MessageBox.ErrorQuery (app, "Error", "Error Message", "OK");
+            app.Iteration -= OnApplicationOnIteration;
+
+            Assert.Equal ("Error", schemeName);
+
+            void OnApplicationOnIteration (object? s, EventArgs<IApplication?> a)
+            {
+                iteration++;
+
+                if (iteration == 1)
+                {
+                    // Capture the SchemeName from the running dialog
+                    var dialog = app.TopRunnableView as Dialog;
+                    Assert.NotNull (dialog);
+                    schemeName = dialog.SchemeName;
+                    app.RequestStop ();
+                }
+            }
+        }
+        finally
+        {
+            app.Dispose ();
+        }
+    }
 }

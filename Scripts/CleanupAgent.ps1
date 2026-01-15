@@ -594,4 +594,4 @@ $(if ($Stats.FailedFiles.Count -gt 0) { $Stats.FailedFiles | ForEach-Object { " 
 =========================================
 "@ -ForegroundColor Cyan
 
-exit $($Stats.FailedFiles.Count -gt 0 ? 1 : 0)
+if ($Stats.FailedFiles.Count -gt 0) { exit 1 } else { exit 0 }
