@@ -153,39 +153,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Canceled_True_When_Result_Is_1 ()
-    {
-        Dialog dialog = new ();
-
-        dialog.Result = 1;
-        Assert.True (dialog.Canceled);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Canceled_False_When_Result_Is_0 ()
-    {
-        Dialog dialog = new ();
-
-        dialog.Result = 0;
-        Assert.False (dialog.Canceled);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Canceled_False_When_Result_Is_2 ()
-    {
-        Dialog dialog = new ();
-
-        dialog.Result = 2;
-        Assert.False (dialog.Canceled);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
     public void Title_Get_Set ()
     {
         Dialog dialog = new ();
@@ -415,6 +382,8 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     public void Result_Can_Be_Set_And_Retrieved ()
     {
         Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
 
         Assert.Null (dialog.Result);
 
@@ -423,9 +392,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.Result = 1;
         Assert.Equal (1, dialog.Result);
-
-        dialog.Result = 5;
-        Assert.Equal (5, dialog.Result);
 
         dialog.Result = null;
         Assert.Null (dialog.Result);
@@ -739,9 +705,9 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (button2.Frame.Y, button3.Frame.Y);
 
         // Buttons should be aligned using PosAlign
-        Assert.True (button1.X.Has<PosAlign> (out PosAlign? align1));
-        Assert.True (button2.X.Has<PosAlign> (out PosAlign? align2));
-        Assert.True (button3.X.Has<PosAlign> (out PosAlign? align3));
+        Assert.True (button1.X.Has (out PosAlign align1));
+        Assert.True (button2.X.Has (out PosAlign align2));
+        Assert.True (button3.X.Has (out PosAlign align3));
 
         // All should use same GroupId (Dialog's hash code)
         Assert.Equal (align1!.GroupId, align2!.GroupId);
@@ -1145,24 +1111,13 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestColorDialog : Dialog<Color>
     {
-        public Color SelectedColor { get; set; } = Color.Blue;
+        public Color SelectedColor { get; init; } = Color.Blue;
 
         public TestColorDialog ()
         {
             Title = "Select Color";
             AddButton (new () { Title = "Cancel" });
             AddButton (new () { Title = "OK" });
-        }
-
-        protected override void OnButtonPressed (int buttonIndex)
-        {
-            if (buttonIndex == 1) // OK
-            {
-                Result = SelectedColor;
-            }
-            // Cancel leaves Result as default (null for reference types, default for value types)
-
-            RequestStop ();
         }
     }
 
@@ -1171,7 +1126,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestStringDialog : Dialog<string>
     {
-        public string InputText { get; set; } = "";
+        public string InputText { get; init; } = "";
 
         public TestStringDialog ()
         {
@@ -1180,14 +1135,16 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             AddButton (new () { Title = "OK" });
         }
 
-        protected override void OnButtonPressed (int buttonIndex)
+        /// <inheritdoc/>
+        protected override bool OnAccepting (CommandEventArgs args)
         {
-            if (buttonIndex == 1) // OK
+            if (base.OnAccepting (args))
             {
-                Result = InputText;
+                return true;
             }
+            Result = InputText;
 
-            RequestStop ();
+            return false;
         }
     }
 
@@ -1196,7 +1153,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     /// </summary>
     private class TestDateDialog : Dialog<DateTime>
     {
-        public DateTime SelectedDate { get; set; } = DateTime.Now;
+        private DateTime SelectedDate { get; init; } = DateTime.Now;
 
         public TestDateDialog ()
         {
@@ -1205,14 +1162,15 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             AddButton (new () { Title = "OK" });
         }
 
-        protected override void OnButtonPressed (int buttonIndex)
+        protected override bool OnAccepting (CommandEventArgs args)
         {
-            if (buttonIndex == 1) // OK
+            if (base.OnAccepting (args))
             {
-                Result = SelectedDate;
+                return true;
             }
+            Result = SelectedDate;
 
-            RequestStop ();
+            return false;
         }
     }
 
@@ -1263,6 +1221,22 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.Dispose ();
     }
 
+    [Fact]
+    public void GenericDialog_String_Input_Can_Be_Set ()
+    {
+        TestStringDialog dialog = new ()
+        {
+            InputText = "Initial Text"
+        };
+
+        Assert.Null (dialog.Result);
+
+        dialog.InvokeCommand (Command.Accept);
+
+        Assert.Equal (dialog.InputText, dialog.Result);
+
+        dialog.Dispose ();
+    }
     [Fact]
     public void GenericDialog_String_Result_Can_Be_Set ()
     {
@@ -1456,13 +1430,15 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     public void NonGenericDialog_Is_DialogOfInt ()
     {
         Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
 
         // Verify Dialog inherits from Dialog<int>
         Assert.IsAssignableFrom<Dialog<int>> (dialog);
 
         // Result should work as int
-        dialog.Result = 5;
-        Assert.Equal (5, dialog.Result);
+        dialog.Result = 1;
+        Assert.Equal (1, dialog.Result);
 
         dialog.Dispose ();
     }
@@ -1471,22 +1447,33 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     public void NonGenericDialog_Canceled_Works_As_Expected ()
     {
         Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
 
         // Initially null result means canceled
         Assert.Null (dialog.Result);
         Assert.True (dialog.Canceled);
 
-        // Result 0 means not canceled (first button pressed)
+        // Result 0 means Cancel button pressed
         dialog.Result = 0;
-        Assert.False (dialog.Canceled);
-
-        // Result 1 typically means cancel button pressed
-        dialog.Result = 1;
         Assert.True (dialog.Canceled);
 
-        // Result 2 or higher means some other button pressed
-        dialog.Result = 2;
+        // Result 1 means OK button pressed
+        dialog.Result = 1;
         Assert.False (dialog.Canceled);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void NonGenericDialog_Result_Throws_With_Invalid_Value ()
+    {
+        Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
+
+        Assert.Throws<ArgumentOutOfRangeException> (() => dialog.Result = -1);
+        Assert.Throws<ArgumentOutOfRangeException> (() => dialog.Result = 2);
 
         dialog.Dispose ();
     }

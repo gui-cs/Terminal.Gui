@@ -16,12 +16,14 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
-///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default) or a button press.
+///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default),
+///         a press of one of the <see cref="Dialog{TResult}.Buttons"/>, or if any subview receives the <see cref="Command.Accept"/>
+///         command
+///         and does not handle it.
 ///     </para>
 ///     <para>
-///         Buttons are added via <see cref="Dialog{TResult}.AddButton"/> or the <see cref="Dialog{TResult}.Buttons"/>
-///         property.
-///         The last button added becomes the default (<see cref="Button.IsDefault"/>). Button alignment is controlled by
+///         Buttons are added via <see cref="Dialog{TResult}.AddButton"/> or the <see cref="Dialog{TResult}.Buttons"/> property. The last button added
+///         becomes the default (<see cref="Button.IsDefault"/>). Button alignment is controlled by
 ///         <see cref="Dialog{TResult}.ButtonAlignment"/> and <see cref="Dialog{TResult}.ButtonAlignmentModes"/>.
 ///     </para>
 /// </remarks>
@@ -29,8 +31,8 @@ namespace Terminal.Gui.Views;
 ///     <code>
 ///     Dialog dialog = new () { Title = "Confirm" };
 /// 
-///     dialog.AddButton (new () { Title = "Cancel" });
-///     dialog.AddButton (new () { Title = "OK" });
+///     dialog.AddButton (new () { Title = "_Cancel" });
+///     dialog.AddButton (new () { Title = "_Ok" });
 /// 
 ///     Label label = new () { Text = "Are you sure?" };
 ///     dialog.Add (label);
@@ -75,10 +77,10 @@ public class Dialog : Dialog<int>
     /// </summary>
     /// <remarks>
     ///     Returns <see langword="true"/> if <see cref="Result"/> is <see langword="null"/>
-    ///     (user pressed Escape or closed the dialog without pressing a button) or if the
-    ///     second button (index 1, typically "Cancel") was pressed.
+    ///     (user pressed Escape or closed the dialog without pressing a button) or if any button
+    ///     other than the last one was pressed.
     /// </remarks>
-    public bool Canceled => Result is null or 1;
+    public bool Canceled => Result is null || Result != Buttons.Length - 1;
 
     /// <summary>
     ///     Gets or sets the result of the dialog, indicating which button was pressed.
@@ -96,16 +98,33 @@ public class Dialog : Dialog<int>
     public new int? Result
     {
         get => ((IRunnable)this).Result is int value ? value : null;
-        set => ((IRunnable)this).Result = value;
+        set
+        {
+            if (value > Buttons.Length - 1 || value < 0)
+            {
+                throw new ArgumentOutOfRangeException (nameof (value), @"Result value must be a valid button index or null.");
+            }
+
+            ((IRunnable)this).Result = value;
+        }
     }
 
-    /// <inheritdoc/>
-    /// <remarks>
-    ///     Sets <see cref="Result"/> to the button index and closes the dialog.
-    /// </remarks>
-    protected override void OnButtonPressed (int buttonIndex)
+    /// <summary>
+    ///     Overrides the default Accepting behavior to handle Dialog Button presses.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    protected override bool OnAccepting (CommandEventArgs args)
     {
-        Result = buttonIndex;
+        if (!Buttons.Contains (args.Context?.Source))
+        {
+            return false;
+        }
+
+        int buttonIndex = Buttons.IndexOf (args.Context?.Source);
+        Result = buttonIndex != -1 ? buttonIndex : Buttons.IndexOf (Buttons.FirstOrDefault (b => b.IsDefault));
+
         RequestStop ();
+        return true;
     }
 }

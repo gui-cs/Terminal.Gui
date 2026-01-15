@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 /// <typeparam name="TResult">
 ///     The type of result data returned when the dialog closes.
 ///     Since <see cref="IRunnable{TResult}.Result"/> is <c>TResult?</c>, use non-nullable types
-///     (e.g., <c>int</c> not <c>int?</c>) to allow <c>null</c> to indicate cancellation.
+///     (e.g., <c>string</c> not <c>string?</c>) to allow <c>null</c> to indicate cancellation.
 /// </typeparam>
 /// <remarks>
 ///     <para>
@@ -16,7 +16,10 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
-///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default) or a button press.
+///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default),
+///         a press of one of the <see cref="Buttons"/>, or if any subview receives the <see cref="Command.Accept"/>
+///         command
+///         and does not handle it.
 ///     </para>
 ///     <para>
 ///         Buttons are added via <see cref="AddButton"/> or the <see cref="Buttons"/> property. The last button added
@@ -34,22 +37,24 @@ namespace Terminal.Gui.Views;
 ///     public class ColorDialog : Dialog&lt;Color&gt;
 ///     {
 ///         private ColorPicker _picker;
-///
-///         public ColorDialog ()
+/// 
+///         public ColorDialog (Color initialColor)
 ///         {
-///             _picker = new ();
+///             _picker = new () { SelectedColor = initialColor };
 ///             Add (_picker);
-///             AddButton (new () { Text = "Cancel" });
-///             AddButton (new () { Text = "OK" });
+///             AddButton (new () { Text = "_Cancel" });
+///             AddButton (new () { Text = "_Ok" });
 ///         }
-///
-///         protected override void OnButtonPressed (int buttonIndex)
+/// 
+///         protected override bool OnAccepting (CommandEventArgs args)
 ///         {
-///             if (buttonIndex == 1) // OK
+///             if (base.OnAccepting (args))
 ///             {
-///                 Result = _picker.SelectedColor;
+///                 return true;
 ///             }
+///             Result = _picker.SelectedColor;
 ///             RequestStop ();
+///             return false;
 ///         }
 ///     }
 ///     </code>
@@ -77,12 +82,11 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         // Padding thickness in case the scrollbar is visible
         Width = Dim.Auto (
                           minimumContentDim: Dim.Func (_ => GetMinimumDialogWidth () - (VerticalScrollBar.Visible ? 1 : 0)),
-                          maximumContentDim: Dim.Percent (100) - 2);
+                          maximumContentDim: Dim.Percent (100) - 4);
 
         Height = Dim.Auto (
                            minimumContentDim: Dim.Func (_ => GetMinimumDialogHeight () - _minimumButtonsSize.Height - (HorizontalScrollBar.Visible ? 1 : 0)),
-                           maximumContentDim: Dim.Percent (100) - 2);
-
+                           maximumContentDim: Dim.Percent (100) - 4);
         ButtonAlignment = Dialog.DefaultButtonAlignment;
         ButtonAlignmentModes = Dialog.DefaultButtonAlignmentModes;
 
@@ -151,6 +155,62 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         HorizontalScrollBar.AutoShow = true;
         UpdateSizes ();
         base.OnSubViewLayout (args);
+    }
+
+#pragma warning disable TGUI001
+    /// <summary>
+    ///     Propagates the buttons in the Padding Accepting events to the Dialog's Accepting event.
+    /// </summary>
+    private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
+    {
+        if (e.Handled || !IsRunning)
+        {
+            return;
+        }
+
+        e.Handled = RaiseAccepting (e.Context) is true;
+
+        if (e.Handled)
+        {
+            return;
+        }
+
+        // Only RequestStop if we are running (modal)
+        if (!IsRunning)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        RequestStop ();
+    }
+#pragma warning restore
+
+    /// <summary>
+    ///     Overrides the default Accepting behavior to handle Dialog Button presses.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        if (!Buttons.Contains (args.Context?.Source))
+        {
+            return false;
+        }
+
+        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == args.Context?.Source)
+        {
+            // Default button pressed
+            return false;
+        }
+
+        // Any other Dialog Button pressed
+        if (IsRunning)
+        {
+            RequestStop ();
+        }
+
+        return true;
     }
 
     private void UpdateSizes ()
@@ -222,84 +282,39 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     private Size _minimumButtonsSize;
 
     /// <summary>
-    ///     Adds a <see cref="Button"/> to the bottom of the dialog.
+    ///     Adds a <see cref="Button"/> to the bottom of the dialog and to the <see cref="Buttons"/> collection.
     /// </summary>
-    /// <param name="button">The button to add. Its lifetime and layout will be managed by the dialog.</param>
+    /// <param name="dialogButton">The Dialog button to add. Its lifetime and layout will be managed by the Dialog.</param>
     /// <remarks>
     ///     <para>
     ///         Buttons are positioned according to <see cref="ButtonAlignment"/> and <see cref="ButtonAlignmentModes"/>.
     ///         The last button added becomes the default (<see cref="Button.IsDefault"/> = <see langword="true"/>).
     ///     </para>
     ///     <para>
-    ///         When a button is pressed, <see cref="OnButtonPressed"/> is called with the button's index
-    ///         (0-based, in order of addition). Subclasses can override this to set <see cref="IRunnable{TResult}.Result"/>.
+    ///         When a button is pressed, the dialog's <see cref="Runnable.Accepting"/> event is raised.
     ///     </para>
     /// </remarks>
-    public void AddButton (Button button)
+    public void AddButton (Button dialogButton)
     {
         // Use a distinct GroupId so users can use Pos.Align for other views in the Dialog
-        button.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
-        button.Y = 1;
+        dialogButton.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
+        dialogButton.Y = 1;
 
-        _buttons.Add (button);
+        _buttons.Add (dialogButton);
 
-        foreach (Button dialogButton in _buttons)
+        foreach (Button button in _buttons)
         {
-            dialogButton.IsDefault = false;
-            dialogButton.Accepting -= OnDialogButtonOnAccepting;
-            dialogButton.Accepting += OnDialogButtonOnAccepting;
+            button.IsDefault = false;
+            button.Accepting -= OnDialogButtonOnAccepting;
+            button.Accepting += OnDialogButtonOnAccepting;
         }
 
-        button.IsDefault = true;
+        dialogButton.IsDefault = true;
 
-        _buttonContainer?.Add (button);
+        _buttonContainer?.Add (dialogButton);
         Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
         _minimumButtonsSize = new (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
-
-#pragma warning disable TGUI001
-    /// <summary>
-    ///     Handles button acceptance. Calls <see cref="OnButtonPressed"/> with the button's index.
-    /// </summary>
-    private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
-    {
-        if (e.Handled || !IsRunning)
-        {
-            return;
-        }
-
-        if (s is Button { IsDefault: true })
-        {
-            e.Handled = RaiseAccepting (e.Context) is true;
-
-            if (e.Handled)
-            {
-                return;
-            }
-        }
-
-        e.Handled = IsRunning;
-        int buttonIndex = _buttonContainer!.SubViews.IndexOf (s);
-        OnButtonPressed (buttonIndex);
-    }
-#pragma warning restore
-
-    /// <summary>
-    ///     Called when a dialog button is pressed. Override this method to set <see cref="IRunnable{TResult}.Result"/>
-    ///     based on which button was pressed.
-    /// </summary>
-    /// <param name="buttonIndex">The 0-based index of the button that was pressed (in order of addition).</param>
-    /// <remarks>
-    ///     <para>
-    ///         The default implementation calls <see cref="Runnable.RequestStop"/> without setting a result,
-    ///         which means the dialog is considered canceled. Subclasses should override this to set
-    ///         <see cref="IRunnable{TResult}.Result"/> before calling <see cref="Runnable.RequestStop"/>.
-    ///     </para>
-    ///     <para>
-    ///         The non-generic <see cref="Dialog"/> class overrides this to set Result to the button index.
-    ///     </para>
-    /// </remarks>
-    protected virtual void OnButtonPressed (int buttonIndex) { RequestStop (); }
 
     /// <summary>
     ///     Determines how buttons are aligned horizontally at the bottom of the dialog.
@@ -316,7 +331,9 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             {
                 return;
             }
+
             field = value;
+
             foreach (Button dialogButton in _buttons)
             {
                 dialogButton.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
@@ -340,15 +357,21 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             {
                 return;
             }
+
             field = value;
+
             foreach (Button dialogButton in _buttons)
             {
                 dialogButton.X = Pos.Align (ButtonAlignment, ButtonAlignmentModes, GetHashCode ());
             }
+
             UpdateSizes ();
         }
     }
 
+    // BUGBUG: The setter of this property does not clear existing buttons, leading to potential duplicates.
+    // BUGBUG: Also, Buttons.Clear does not remove buttons from the _buttonContainer view (or even _buttons) because
+    // BUGBUG: the getter returns a copy of the internal list.
     /// <summary>
     ///     Gets or sets the buttons displayed at the bottom of the dialog.
     /// </summary>
@@ -371,19 +394,18 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsModal)
     {
+        base.OnIsRunningChanged (newIsModal);
+
         if (newIsModal)
         {
             SetStyle ();
         }
-
-        base.OnIsRunningChanged (newIsModal);
     }
 
     private void SetStyle ()
     {
         if (IsRunning)
         {
-            //Padding!.SetScheme (SchemeManager.GetScheme (Schemes.Base));
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
         }
         else
@@ -395,7 +417,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         }
     }
 
-    // Dialogs are Modal and Focus is indicated by their Border. The following code ensures the
+    // Dialogs are Modal and Focus is indicated by their Border. _drawingText ensures the
     // Text of the dialog (e.g. for a MessageBox) is always drawn using the Normal Attribute
     // instead of the Focus attribute.
     private bool _drawingText;
@@ -433,24 +455,12 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     {
         Title = "Dialog Title";
 
-        Button btnCancel = new ()
-        {
-            Id = "btnCancel",
-            Title = Strings.btnCancel
-        };
-
-        btnCancel.Accepting += (s, e) =>
-                               {
-                                   if (!IsRunning)
-                                   {
-                                       return;
-                                   }
-
-                                   (s as View)!.App?.RequestStop ();
-                                   e.Handled = true;
-                               };
-
-        AddButton (btnCancel);
+        AddButton (
+                   new ()
+                   {
+                       Id = "btnCancel",
+                       Title = Strings.btnCancel
+                   });
 
         AddButton (
                    new ()
@@ -477,6 +487,17 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             Width = 40
         };
         Add (infoLabel, info);
+
+        Accepting += (s, e) =>
+                     {
+                         if (e.Handled || !IsRunning)
+                         {
+                             return;
+                         }
+
+                         (s as View)?.App?.RequestStop ();
+                         e.Handled = true;
+                     };
 
         return true;
     }

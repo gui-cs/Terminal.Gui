@@ -435,6 +435,10 @@ public class Dialogs : Scenario
         /// <inheritdoc/>
         protected override bool OnAccepting (CommandEventArgs args)
         {
+            if (base.OnAccepting (args))
+            {
+                return true;
+            }
             Result = _colorPicker.SelectedColor;
 
             return false;
