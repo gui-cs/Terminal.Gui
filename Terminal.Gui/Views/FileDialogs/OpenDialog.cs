@@ -36,7 +36,7 @@ public class OpenDialog : FileDialog
     /// <summary>Returns the selected files, or an empty list if nothing has been selected</summary>
     /// <value>The file paths.</value>
     public IReadOnlyList<string> FilePaths =>
-        Result is null or 1 ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
+        ((IRunnable)this).Result is null || Result == 1 ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
         AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> ([Path]);
 
     /// <inheritdoc/>

@@ -116,7 +116,7 @@ See also [Keyboard](keyboard.md) where HotKey is covered more deeply...
 HotKeys are defined using the `HotKey` property and are activated using `Alt+` the specified key:
 
 ```csharp
-var saveButton = new Button() { Text = "_Save", HotKey = Key.S };
+var saveButton = new Button() { Text = Strings.cmdSave, HotKey = Key.S };
 var exitButton = new Button() { Text = "E_xit", HotKey = Key.X };
 
 // Alt+S will activate save, Alt+X will activate exit, regardless of current focus

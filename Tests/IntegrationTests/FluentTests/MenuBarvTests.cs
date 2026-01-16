@@ -48,14 +48,14 @@ public class MenuBarTests : TestsAllDrivers
                                                 menuItems =
                                                 [
                                                     new (
-                                                         "_File",
+                                                         Strings.menuFile,
                                                          [
-                                                             new MenuItem ("_Open", "Opens a file", () => { })
+                                                             new MenuItem (Strings.cmdOpen, "Opens a file", () => { })
                                                          ]),
                                                     new (
                                                          "_Edit",
                                                          [
-                                                             new MenuItem ("_Copy", "Copies selection", () => { })
+                                                             new MenuItem (Strings.cmdCopy, "Copies selection", () => { })
                                                          ])
                                                 ];
 
@@ -65,7 +65,7 @@ public class MenuBarTests : TestsAllDrivers
                                                 // First item should be the File menu
                                                 var fileMenu = menuBar.SubViews.ElementAt (0) as MenuBarItem;
                                                 Assert.NotNull (fileMenu);
-                                                Assert.Equal ("_File", fileMenu.Title);
+                                                Assert.Equal (Strings.menuFile, fileMenu.Title);
 
                                                 // Second item should be the Edit menu
                                                 var editMenu = menuBar.SubViews.ElementAt (1) as MenuBarItem;
@@ -86,7 +86,7 @@ public class MenuBarTests : TestsAllDrivers
                                                 // Set items through Menus property
                                                 menuBar.Menus =
                                                 [
-                                                    new ("_File"),
+                                                    new (Strings.menuFile),
                                                     new ("_Edit"),
                                                     new ("_View")
                                                 ];
@@ -212,10 +212,10 @@ public class MenuBarTests : TestsAllDrivers
                                                 app = a;
                                                 // Create a menu bar with items that have submenus
                                                 var fileMenuItem = new MenuBarItem (
-                                                                                      "_File",
+                                                                                      Strings.menuFile,
                                                                                       [
-                                                                                          new MenuItem ("_Open", string.Empty, null),
-                                                                                          new MenuItem ("_Save", string.Empty, null)
+                                                                                          new MenuItem (Strings.cmdOpen, string.Empty, null),
+                                                                                          new MenuItem (Strings.cmdSave, string.Empty, null)
                                                                                       ]);
 
                                                 var menuBar = new MenuBar ([fileMenuItem]) { App = app };
@@ -279,9 +279,9 @@ public class MenuBarTests : TestsAllDrivers
                                                 Assert.True (menuBar.SubViews.Count > 0);
 
                                                 // Should have File, Edit and Help menus
-                                                View? fileMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_File");
+                                                View? fileMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuFile);
                                                 View? editMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_Edit");
-                                                View? helpMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == "_Help");
+                                                View? helpMenu = menuBar.SubViews.FirstOrDefault (v => (v as MenuBarItem)?.Title == Strings.menuHelp);
 
                                                 Assert.NotNull (fileMenu);
                                                 Assert.NotNull (editMenu);
@@ -463,7 +463,7 @@ public class MenuBarTests : TestsAllDrivers
 
                                                          });
                                                 menuBar.EnableForDesign (ref top);
-                                                IEnumerable<MenuItem> items = menuBar.GetMenuItemsWithTitle ("_Quit");
+                                                IEnumerable<MenuItem> items = menuBar.GetMenuItemsWithTitle (Strings.cmdQuit);
 
                                                 foreach (MenuItem item in items)
                                                 {

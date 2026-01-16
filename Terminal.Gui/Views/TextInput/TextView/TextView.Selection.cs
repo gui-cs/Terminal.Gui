@@ -52,11 +52,10 @@ public partial class TextView
         {
             List<Cell> line = _model.GetLine (_selectionStartRow);
 
-            _selectionStartColumn = value < 0 ? 0 :
-                                    value > line.Count ? line.Count : value;
+            _selectionStartColumn = value < 0 ? 0 : value > line.Count ? line.Count : value;
             IsSelecting = true;
             SetNeedsDraw ();
-            Adjust ();
+            AdjustViewport ();
         }
     }
 
@@ -66,11 +65,10 @@ public partial class TextView
         get => _selectionStartRow;
         set
         {
-            _selectionStartRow = value < 0 ? 0 :
-                                 value > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value;
+            _selectionStartRow = value < 0 ? 0 : value > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value;
             IsSelecting = true;
             SetNeedsDraw ();
-            Adjust ();
+            AdjustViewport ();
         }
     }
 
@@ -89,7 +87,7 @@ public partial class TextView
         DoNeededAction ();
     }
 
-    private int GetSelectedLength () { return SelectedText.Length; }
+    private int GetSelectedLength () => SelectedText.Length;
 
     private string GetSelectedRegion ()
     {
@@ -115,8 +113,7 @@ public partial class TextView
 
     private bool PointInSelection (int col, int row)
     {
-        long start, end;
-        GetEncodedRegionBounds (out start, out end);
+        GetEncodedRegionBounds (out long start, out long end);
         long q = ((long)(uint)row << 32) | (uint)col;
 
         return q >= start && q <= end - 1;
@@ -133,6 +130,7 @@ public partial class TextView
         IsSelecting = true;
         _selectionStartColumn = CurrentColumn;
         _selectionStartRow = CurrentRow;
+        SetNeedsDraw ();
     }
 
     private void StopSelecting ()
@@ -146,5 +144,4 @@ public partial class TextView
         IsSelecting = false;
         _isButtonShift = false;
     }
-
 }

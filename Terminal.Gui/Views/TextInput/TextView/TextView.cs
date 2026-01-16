@@ -79,10 +79,9 @@ public partial class TextView : View, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
 
-    // The column we are tracking, or -1 if we are not tracking any column
-    private string? _currentCaller;
     private CultureInfo? _currentCulture;
-    private Dim? _savedHeight;
+
+    //private Dim? _savedHeight;
 
     /// <summary>
     ///     Initializes a <see cref="TextView"/> on the specified area, with dimensions controlled with the X, Y, Width
@@ -94,38 +93,45 @@ public partial class TextView : View, IDesignable
         Used = true;
 
         // By default, disable hotkeys (in case someone sets Title)
-        base.HotKeySpecifier = new ('\xffff');
+        base.HotKeySpecifier = new Rune ('\xffff');
 
         _model.LinesLoaded += Model_LinesLoaded!;
         _historyText.ChangeText += HistoryText_ChangeText;
-
-        Initialized += TextView_Initialized!;
-
-        SubViewsLaidOut += TextView_LayoutComplete;
 
         CreateCommandsAndBindings ();
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        Cursor = new () { Style = DefaultCursorStyle };
+        Cursor = new Cursor { Style = DefaultCursorStyle };
     }
 
-    private void TextView_Initialized (object sender, EventArgs e)
+    /// <inheritdoc/>
+    public override void EndInit ()
     {
         Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
         App?.Popover?.Register (ContextMenu);
         KeyBindings.Add (ContextMenu.Key, Command.Context);
+
+        UpdateScrollBars ();
+        UpdateContentSize ();
         PositionCursor ();
+        base.EndInit ();
     }
 
-    private void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
+    /// <inheritdoc/>
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
+        base.OnSubViewsLaidOut (args);
         WrapTextModel ();
-        Adjust ();
+        // Don't call AdjustViewport() here - it resets viewport to cursor position,
+        // undoing any user scrolling via scrollbar. AdjustViewport() is called when
+        // cursor actually moves (InsertionPoint setter, movement commands, etc.)
+        UpdateContentSize ();
     }
 
+    // TODO: Upgrade TextView events to use CWP
     /// <summary>Raised when the contents of the <see cref="TextView"/> are changed.</summary>
     /// <remarks>
     ///     Unlike the <see cref="View.TextChanged"/> event, this event is raised whenever the user types or otherwise changes
@@ -139,7 +145,7 @@ public partial class TextView : View, IDesignable
     /// </summary>
     public virtual void OnContentsChanged ()
     {
-        ContentsChanged?.Invoke (this, new (CurrentRow, CurrentColumn));
+        ContentsChanged?.Invoke (this, new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 
         ProcessInheritsPreviousScheme (CurrentRow, CurrentColumn);
         ProcessAutocomplete ();
@@ -152,6 +158,11 @@ public partial class TextView : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+
+        if (newHasFocus)
+        {
+            PositionCursor ();
+        }
     }
 
     /// <summary>Positions the cursor on the current row and column</summary>
@@ -160,6 +171,7 @@ public partial class TextView : View, IDesignable
         if (!CanFocus || !Enabled || ReadOnly || Driver is null)
         {
             Cursor = Cursor with { Position = null };
+
             return;
         }
 
@@ -168,7 +180,7 @@ public partial class TextView : View, IDesignable
 
         if (line.Count > 0)
         {
-            for (int idx = _leftColumn; idx < line.Count; idx++)
+            for (int idx = Viewport.X; idx < line.Count; idx++)
             {
                 if (idx >= CurrentColumn)
                 {
@@ -198,24 +210,22 @@ public partial class TextView : View, IDesignable
                     cols = Math.Max (cols, 1);
                 }
 
-                if (!TextModel.SetCol (ref col, Viewport.Width, cols))
+                if (TextModel.SetCol (ref col, Viewport.Width, cols))
                 {
-                    col = CurrentColumn;
-
-                    break;
+                    continue;
                 }
+                col = CurrentColumn;
+
+                break;
             }
         }
 
-        int posX = CurrentColumn - _leftColumn;
-        int posY = CurrentRow - _topRow;
+        int posX = CurrentColumn - Viewport.X;
+        int posY = CurrentRow - Viewport.Y;
 
-        if (posX > -1 && col >= posX && posX < Viewport.Width && _topRow <= CurrentRow && posY < Viewport.Height)
+        if (posX > -1 && col >= posX && posX < Viewport.Width && Viewport.Y <= CurrentRow && posY < Viewport.Height)
         {
-            Cursor = Cursor with
-            {
-                Position = ViewportToScreen (new Point (col, CurrentRow - _topRow))
-            };
+            Cursor = Cursor with { Position = ViewportToScreen (new Point (col, CurrentRow - Viewport.Y)) };
         }
         else
         {
@@ -225,17 +235,16 @@ public partial class TextView : View, IDesignable
 
     private PopoverMenu CreateContextMenu ()
     {
-        PopoverMenu menu = new (
-                                new List<View>
-                                {
-                                    new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
-                                    new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
-                                    new MenuItem (this, Command.Copy, Strings.ctxCopy),
-                                    new MenuItem (this, Command.Cut, Strings.ctxCut),
-                                    new MenuItem (this, Command.Paste, Strings.ctxPaste),
-                                    new MenuItem (this, Command.Undo, Strings.ctxUndo),
-                                    new MenuItem (this, Command.Redo, Strings.ctxRedo)
-                                });
+        PopoverMenu menu = new (new List<View>
+        {
+            new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
+            new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
+            new MenuItem (this, Command.Copy, Strings.ctxCopy),
+            new MenuItem (this, Command.Cut, Strings.ctxCut),
+            new MenuItem (this, Command.Paste, Strings.ctxPaste),
+            new MenuItem (this, Command.Undo, Strings.ctxUndo),
+            new MenuItem (this, Command.Redo, Strings.ctxRedo)
+        });
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 
@@ -246,7 +255,7 @@ public partial class TextView : View, IDesignable
     // Clears the contents of the selected region
     //
 
-    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) => KeyBindings.Replace (e.OldKey, e.NewKey);
 
     /// <summary>Get the Context Menu.</summary>
     public PopoverMenu? ContextMenu { get; private set; }

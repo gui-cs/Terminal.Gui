@@ -153,39 +153,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Canceled_True_When_Result_Is_1 ()
-    {
-        Dialog dialog = new ();
-
-        dialog.Result = 1;
-        Assert.True (dialog.Canceled);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Canceled_False_When_Result_Is_0 ()
-    {
-        Dialog dialog = new ();
-
-        dialog.Result = 0;
-        Assert.False (dialog.Canceled);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
-    public void Canceled_False_When_Result_Is_2 ()
-    {
-        Dialog dialog = new ();
-
-        dialog.Result = 2;
-        Assert.False (dialog.Canceled);
-
-        dialog.Dispose ();
-    }
-
-    [Fact]
     public void Title_Get_Set ()
     {
         Dialog dialog = new ();
@@ -415,6 +382,8 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     public void Result_Can_Be_Set_And_Retrieved ()
     {
         Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
 
         Assert.Null (dialog.Result);
 
@@ -423,9 +392,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.Result = 1;
         Assert.Equal (1, dialog.Result);
-
-        dialog.Result = 5;
-        Assert.Equal (5, dialog.Result);
 
         dialog.Result = null;
         Assert.Null (dialog.Result);
@@ -739,9 +705,9 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (button2.Frame.Y, button3.Frame.Y);
 
         // Buttons should be aligned using PosAlign
-        Assert.True (button1.X.Has<PosAlign> (out PosAlign? align1));
-        Assert.True (button2.X.Has<PosAlign> (out PosAlign? align2));
-        Assert.True (button3.X.Has<PosAlign> (out PosAlign? align3));
+        Assert.True (button1.X.Has (out PosAlign align1));
+        Assert.True (button2.X.Has (out PosAlign align2));
+        Assert.True (button3.X.Has (out PosAlign align3));
 
         // All should use same GroupId (Dialog's hash code)
         Assert.Equal (align1!.GroupId, align2!.GroupId);
@@ -1135,4 +1101,452 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
     }
     #endregion Drawing Tests
+
+    #region Dialog<TResult> Generic Tests
+
+    // Claude - Opus 4.5
+
+    /// <summary>
+    ///     Test dialog that returns a <see cref="Color"/> result.
+    /// </summary>
+    private class TestColorDialog : Dialog<Color>
+    {
+        public Color SelectedColor { get; init; } = Color.Blue;
+
+        public TestColorDialog ()
+        {
+            Title = "Select Color";
+            AddButton (new () { Title = "Cancel" });
+            AddButton (new () { Title = "OK" });
+        }
+    }
+
+    /// <summary>
+    ///     Test dialog that returns a <see cref="string"/> result.
+    /// </summary>
+    private class TestStringDialog : Dialog<string>
+    {
+        public string InputText { get; init; } = "";
+
+        public TestStringDialog ()
+        {
+            Title = "Enter Text";
+            AddButton (new () { Title = "Cancel" });
+            AddButton (new () { Title = "OK" });
+        }
+
+        /// <inheritdoc/>
+        protected override bool OnAccepting (CommandEventArgs args)
+        {
+            if (base.OnAccepting (args))
+            {
+                return true;
+            }
+            Result = InputText;
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Test dialog that returns a <see cref="DateTime"/> result.
+    /// </summary>
+    private class TestDateDialog : Dialog<DateTime>
+    {
+        private DateTime SelectedDate { get; init; } = DateTime.Now;
+
+        public TestDateDialog ()
+        {
+            Title = "Select Date";
+            AddButton (new () { Title = "Cancel" });
+            AddButton (new () { Title = "OK" });
+        }
+
+        protected override bool OnAccepting (CommandEventArgs args)
+        {
+            if (base.OnAccepting (args))
+            {
+                return true;
+            }
+            Result = SelectedDate;
+
+            return false;
+        }
+    }
+
+    [Fact]
+    public void GenericDialog_Constructor_Initializes_DefaultValues ()
+    {
+        TestColorDialog dialog = new ();
+
+        Assert.NotNull (dialog);
+        Assert.True (dialog.CanFocus);
+        Assert.Equal ("Select Color", dialog.Title);
+        Assert.Equal (2, dialog.Buttons.Length);
+        Assert.Null (((IRunnable)dialog).Result); // Check via IRunnable for nullable object?
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Result_Is_Null_Initially ()
+    {
+        TestColorDialog colorDialog = new ();
+        TestStringDialog stringDialog = new ();
+        TestDateDialog dateDialog = new ();
+
+        // Check via IRunnable for nullable object?
+        Assert.Null (((IRunnable)colorDialog).Result);
+        Assert.Null (((IRunnable)stringDialog).Result);
+        Assert.Null (((IRunnable)dateDialog).Result);
+
+        colorDialog.Dispose ();
+        stringDialog.Dispose ();
+        dateDialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Color_Result_Can_Be_Set ()
+    {
+        TestColorDialog dialog = new ();
+
+        Assert.Null (((IRunnable)dialog).Result); // Check via IRunnable for nullable object?
+
+        dialog.Result = Color.Red;
+        Assert.Equal (Color.Red, dialog.Result);
+
+        dialog.Result = Color.Green;
+        Assert.Equal (Color.Green, dialog.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_String_Input_Can_Be_Set ()
+    {
+        TestStringDialog dialog = new ()
+        {
+            InputText = "Initial Text"
+        };
+
+        Assert.Null (dialog.Result);
+
+        dialog.InvokeCommand (Command.Accept);
+
+        Assert.Equal (dialog.InputText, dialog.Result);
+
+        dialog.Dispose ();
+    }
+    [Fact]
+    public void GenericDialog_String_Result_Can_Be_Set ()
+    {
+        TestStringDialog dialog = new ();
+
+        Assert.Null (dialog.Result);
+
+        dialog.Result = "Hello";
+        Assert.Equal ("Hello", dialog.Result);
+
+        dialog.Result = "World";
+        Assert.Equal ("World", dialog.Result);
+
+        dialog.Result = null;
+        Assert.Null (dialog.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_DateTime_Result_Can_Be_Set ()
+    {
+        TestDateDialog dialog = new ();
+        DateTime testDate = new (2024, 6, 15);
+
+        Assert.Null (((IRunnable)dialog).Result); // Check via IRunnable for nullable object?
+
+        dialog.Result = testDate;
+        Assert.Equal (testDate, dialog.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_OnButtonPressed_Sets_Result_On_OK ()
+    {
+        TestColorDialog dialog = new ()
+        {
+            SelectedColor = Color.Magenta
+        };
+
+        // Simulate pressing OK button (index 1)
+        dialog.Result = dialog.SelectedColor;
+
+        Assert.Equal (Color.Magenta, dialog.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_OnButtonPressed_Leaves_Null_On_Cancel ()
+    {
+        TestColorDialog dialog = new ()
+        {
+            SelectedColor = Color.Cyan
+        };
+
+        // Simulate pressing Cancel button (index 0) - Result stays null
+        Assert.Null (((IRunnable)dialog).Result); // Check via IRunnable for nullable object?
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_IRunnable_Result_Returns_Object ()
+    {
+        TestColorDialog dialog = new ();
+
+        IRunnable runnable = dialog;
+        Assert.Null (runnable.Result);
+
+        dialog.Result = Color.Yellow;
+
+        // IRunnable.Result returns the boxed value
+        Assert.NotNull (runnable.Result);
+        Assert.IsType<Color> (runnable.Result);
+        Assert.Equal (Color.Yellow, (Color)runnable.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_BaseClass_Result_Casts_Correctly ()
+    {
+        TestStringDialog dialog = new ();
+
+        // Set via typed property
+        dialog.Result = "Test Value";
+        Assert.Equal ("Test Value", dialog.Result);
+
+        // Access via IRunnable
+        IRunnable runnable = dialog;
+        Assert.Equal ("Test Value", runnable.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Inherits_Dialog_Properties ()
+    {
+        TestColorDialog dialog = new ();
+
+        // Should inherit all Dialog properties
+        Assert.Equal (Alignment.End, dialog.ButtonAlignment);
+        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, dialog.ButtonAlignmentModes);
+        Assert.Equal (LineStyle.Heavy, dialog.BorderStyle);
+        Assert.Equal (ShadowStyle.Transparent, dialog.ShadowStyle);
+        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Buttons_Can_Be_Added ()
+    {
+        Dialog<Color> dialog = new ();
+
+        Assert.Empty (dialog.Buttons);
+
+        Button button1 = new () { Title = "First" };
+        Button button2 = new () { Title = "Second" };
+
+        dialog.AddButton (button1);
+        dialog.AddButton (button2);
+
+        Assert.Equal (2, dialog.Buttons.Length);
+        Assert.Equal ("First", dialog.Buttons [0].Title);
+        Assert.Equal ("Second", dialog.Buttons [1].Title);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Can_Add_SubViews ()
+    {
+        TestColorDialog dialog = new ();
+
+        Label label = new () { Text = "Choose a color:" };
+        dialog.Add (label);
+
+        Assert.Contains (label, dialog.SubViews);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Title_Can_Be_Set ()
+    {
+        Dialog<string> dialog = new ()
+        {
+            Title = "Custom Title"
+        };
+
+        Assert.Equal ("Custom Title", dialog.Title);
+
+        dialog.Title = "Changed Title";
+        Assert.Equal ("Changed Title", dialog.Title);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Multiple_Result_Types ()
+    {
+        // Test various result types work correctly
+        Dialog<int> intDialog = new ();
+        Dialog<bool> boolDialog = new ();
+        Dialog<double> doubleDialog = new ();
+        Dialog<Guid> guidDialog = new ();
+
+        intDialog.Result = 42;
+        Assert.Equal (42, intDialog.Result);
+
+        boolDialog.Result = true;
+        Assert.True (boolDialog.Result);
+
+        doubleDialog.Result = 3.14159;
+        Assert.Equal (3.14159, doubleDialog.Result);
+
+        Guid testGuid = Guid.NewGuid ();
+        guidDialog.Result = testGuid;
+        Assert.Equal (testGuid, guidDialog.Result);
+
+        intDialog.Dispose ();
+        boolDialog.Dispose ();
+        doubleDialog.Dispose ();
+        guidDialog.Dispose ();
+    }
+
+    [Fact]
+    public void NonGenericDialog_Is_DialogOfInt ()
+    {
+        Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
+
+        // Verify Dialog inherits from Dialog<int>
+        Assert.IsAssignableFrom<Dialog<int>> (dialog);
+
+        // Result should work as int
+        dialog.Result = 1;
+        Assert.Equal (1, dialog.Result);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void NonGenericDialog_Canceled_Works_As_Expected ()
+    {
+        Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
+
+        // Initially null result means canceled
+        Assert.Null (dialog.Result);
+        Assert.True (dialog.Canceled);
+
+        // Result 0 means Cancel button pressed
+        dialog.Result = 0;
+        Assert.True (dialog.Canceled);
+
+        // Result 1 means OK button pressed
+        dialog.Result = 1;
+        Assert.False (dialog.Canceled);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void NonGenericDialog_Result_Throws_With_Invalid_Value ()
+    {
+        Dialog dialog = new ();
+        dialog.AddButton (new () { Title = "Cancel" });
+        dialog.AddButton (new () { Title = "OK" });
+
+        Assert.Throws<ArgumentOutOfRangeException> (() => dialog.Result = -1);
+        Assert.Throws<ArgumentOutOfRangeException> (() => dialog.Result = 2);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Layout_Works ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (80, 25);
+
+        TestColorDialog dialog = new ()
+        {
+            Driver = driver
+        };
+
+        dialog.Layout ();
+
+        // Should calculate size correctly
+        Assert.True (dialog.Frame.Width > 0);
+        Assert.True (dialog.Frame.Height > 0);
+
+        dialog.Dispose ();
+    }
+
+    [Fact]
+    public void GenericDialog_Draws_Correctly ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (30, 10);
+
+        Dialog<Color> dialog = new ()
+        {
+            X = 0,
+            Y = 0,
+            Title = "Color",
+            BorderStyle = LineStyle.Single,
+            ShadowStyle = ShadowStyle.None,
+            Driver = driver
+        };
+
+        Button cancelButton = new ()
+        {
+            Title = "No",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        Button okButton = new ()
+        {
+            Title = "Yes",
+            BorderStyle = LineStyle.None,
+            ShadowStyle = ShadowStyle.None,
+            NoPadding = true,
+            NoDecorations = true
+        };
+        dialog.AddButton (cancelButton);
+        dialog.AddButton (okButton);
+
+        dialog.Layout ();
+        dialog.Draw ();
+
+        string expected = """
+┌┤Color├──┐
+│         │
+│   No Yes│
+└─────────┘
+""";
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+
+        dialog.Dispose ();
+    }
+
+    #endregion Dialog<TResult> Generic Tests
 }

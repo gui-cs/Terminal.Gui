@@ -111,7 +111,7 @@ public class TextViewAutocompletePopup : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem
                                        {
@@ -123,7 +123,7 @@ public class TextViewAutocompletePopup : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Action = Quit
                                        }
                                    ]
