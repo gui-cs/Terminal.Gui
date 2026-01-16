@@ -417,7 +417,7 @@ public class Bars : Scenario
     {
         Shortcut fileMenuBarItem = new ()
         {
-            Title = "_File",
+            Title = Strings.menuFile,
             HelpText = "File Menu",
             Key = Key.D0.WithAlt,
             MouseHighlightStates = MouseState.In
@@ -433,7 +433,7 @@ public class Bars : Scenario
 
         Shortcut helpMenuBarItem = new ()
         {
-            Title = "_Help",
+            Title = Strings.menuHelp,
             HelpText = "Halp Menu",
             Key = Key.D2.WithAlt,
             MouseHighlightStates = MouseState.In

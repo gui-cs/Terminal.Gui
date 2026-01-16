@@ -83,13 +83,13 @@ public class ViewportSettings : Scenario
         };
 
         charMap.Accepting += (s, _) =>
-                                 MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "_No", "_Yes");
+                                 MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
 
         Button buttonAnchored = new ()
         {
             X = Pos.AnchorEnd () - 10, Y = Pos.AnchorEnd () - 4, Text = "Bottom Rig_ht"
         };
-        buttonAnchored.Accepting += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", "_Ok");
+        buttonAnchored.Accepting += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", Strings.btnOk);
 
         view.Margin!.Data = "Margin";
         view.Margin!.Thickness = new (0);

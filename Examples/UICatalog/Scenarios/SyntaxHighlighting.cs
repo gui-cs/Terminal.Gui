@@ -140,7 +140,7 @@ public class SyntaxHighlighting : Scenario
                                        new MenuItem { Title = "_Load Text Cells", Action = ApplyLoadCells },
                                        new MenuItem { Title = "_Save Text Cells", Action = SaveCells },
                                        new Line (),
-                                       new MenuItem { Title = "_Quit", Action = Quit }
+                                       new MenuItem { Title = Strings.cmdQuit, Action = Quit }
                                    ]
                                   )
                  );

@@ -2,8 +2,6 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-    private void DoSetNeedsDraw (Rectangle rect) { SetNeedsDraw (); }
-
     /// <summary>
     ///     If <see langword="true"/> and the current <see cref="Cell.Attribute"/> is null will inherit from the
     ///     previous, otherwise if <see langword="false"/> (default) do nothing. If the text is load with
@@ -20,12 +18,11 @@ public partial class TextView
 
         SetAttributeForRole (Enabled ? VisualRole.Editable : VisualRole.Disabled);
 
-        (int width, int height) offB = OffSetBackground ();
-        int right = Viewport.Width + offB.width;
-        int bottom = Viewport.Height + offB.height;
+        int right = Viewport.Width;
+        int bottom = Viewport.Height;
         var row = 0;
 
-        for (int idxRow = _topRow; idxRow < _model.Count; idxRow++)
+        for (int idxRow = Viewport.Y; idxRow < _model.Count; idxRow++)
         {
             List<Cell> line = _model.GetLine (idxRow);
             int lineRuneCount = line.Count;
@@ -33,7 +30,7 @@ public partial class TextView
 
             Move (0, row);
 
-            for (int idxCol = _leftColumn; idxCol < lineRuneCount; idxCol++)
+            for (int idxCol = Viewport.X; idxCol < lineRuneCount; idxCol++)
             {
                 string text = idxCol >= lineRuneCount ? " " : line [idxCol].Grapheme;
                 int cols = text.GetColumns (false);
@@ -173,7 +170,7 @@ public partial class TextView
 
         if (cellAttribute!.Value.Foreground == cellAttribute.Value.Background)
         {
-            SetAttribute (new (cellAttribute.Value.Foreground, cellAttribute.Value.Background, cellAttribute.Value.Style));
+            SetAttribute (new Attribute (cellAttribute.Value.Foreground, cellAttribute.Value.Background, cellAttribute.Value.Style));
         }
         else
         {
@@ -203,7 +200,7 @@ public partial class TextView
         {
             Attribute? attribute = line [idxCol].Attribute;
             Attribute? active = GetAttributeForRole (VisualRole.Active);
-            SetAttribute (new (active.Value.Foreground, active.Value.Background, attribute!.Value.Style));
+            SetAttribute (new Attribute (active.Value.Foreground, active.Value.Background, attribute!.Value.Style));
         }
         else
         {
@@ -243,10 +240,8 @@ public partial class TextView
         }
     }
 
-    private void SetValidUsedColor (Attribute? attribute)
-    {
-        SetAttribute (new (attribute!.Value.Background, attribute.Value.Foreground, attribute.Value.Style));
-    }
+    private void SetValidUsedColor (Attribute? attribute) =>
+        SetAttribute (new Attribute (attribute!.Value.Background, attribute.Value.Foreground, attribute.Value.Style));
 
     /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
@@ -259,95 +254,6 @@ public partial class TextView
         }
 
         return base.OnGettingAttributeForRole (role, ref currentAttribute);
-    }
-
-    private void Adjust ()
-    {
-        (int width, int height) offB = OffSetBackground ();
-        List<Cell> line = GetCurrentLine ();
-        bool need = NeedsDraw || _wrapNeeded || !Used;
-        (int size, int length) tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
-        (int size, int length) dSize = TextModel.DisplaySize (line, _leftColumn, CurrentColumn, true, TabWidth);
-
-        if (!_wordWrap && CurrentColumn < _leftColumn)
-        {
-            _leftColumn = CurrentColumn;
-            need = true;
-        }
-        else if (!_wordWrap
-                 && (CurrentColumn - _leftColumn + 1 > Viewport.Width + offB.width || dSize.size + 1 >= Viewport.Width + offB.width))
-        {
-            _leftColumn = TextModel.CalculateLeftColumn (
-                                                         line,
-                                                         _leftColumn,
-                                                         CurrentColumn,
-                                                         Viewport.Width + offB.width,
-                                                         TabWidth
-                                                        );
-            need = true;
-        }
-        else if ((_wordWrap && _leftColumn > 0) || (dSize.size < Viewport.Width + offB.width && tSize.size < Viewport.Width + offB.width))
-        {
-            if (_leftColumn > 0)
-            {
-                _leftColumn = 0;
-                need = true;
-            }
-        }
-
-        if (CurrentRow < _topRow)
-        {
-            _topRow = CurrentRow;
-            need = true;
-        }
-        else if (CurrentRow - _topRow >= Viewport.Height + offB.height)
-        {
-            _topRow = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow);
-            need = true;
-        }
-        else if (_topRow > 0 && CurrentRow < _topRow)
-        {
-            _topRow = Math.Max (_topRow - 1, 0);
-            need = true;
-        }
-
-        if (need)
-        {
-            if (_wrapNeeded)
-            {
-                WrapTextModel ();
-                _wrapNeeded = false;
-            }
-
-            SetNeedsDraw ();
-        }
-        else
-        {
-            if (IsInitialized)
-            {
-                PositionCursor ();
-            }
-        }
-
-        OnUnwrappedCursorPosition ();
-    }
-
-    private (int width, int height) OffSetBackground ()
-    {
-        var w = 0;
-        var h = 0;
-
-        if (SuperView?.Viewport.Right - Viewport.Right < 0)
-        {
-            w = SuperView!.Viewport.Right - Viewport.Right - 1;
-        }
-
-        if (SuperView?.Viewport.Bottom - Viewport.Bottom < 0)
-        {
-            h = SuperView!.Viewport.Bottom - Viewport.Bottom - 1;
-        }
-
-        return (w, h);
     }
 
     private void ClearRegion (int left, int top, int right, int bottom)
@@ -425,70 +331,69 @@ public partial class TextView
         switch (cell.Attribute)
         {
             case { } when colWithColor == 0 && lineTo.Attribute is { }:
+            {
+                for (int r = row - 1; r > -1; r--)
                 {
-                    for (int r = row - 1; r > -1; r--)
+                    List<Cell> l = GetLine (r);
+
+                    for (int c = l.Count - 1; c > -1; c--)
                     {
-                        List<Cell> l = GetLine (r);
+                        Cell cell1 = l [c];
 
-                        for (int c = l.Count - 1; c > -1; c--)
+                        if (cell1.Attribute is null)
                         {
-                            Cell cell1 = l [c];
-
-                            if (cell1.Attribute is null)
-                            {
-                                cell1.Attribute = cell.Attribute;
-                                l [c] = cell1;
-                            }
-                            else
-                            {
-                                return;
-                            }
+                            cell1.Attribute = cell.Attribute;
+                            l [c] = cell1;
+                        }
+                        else
+                        {
+                            return;
                         }
                     }
-
-                    return;
                 }
+
+                return;
+            }
+
             case null:
+            {
+                for (int r = row; r > -1; r--)
                 {
-                    for (int r = row; r > -1; r--)
+                    List<Cell> l = GetLine (r);
+
+                    colWithColor = l.FindLastIndex (colWithColor > -1 ? colWithColor : l.Count - 1, c => c.Attribute != null);
+
+                    if (colWithColor > -1 && l [colWithColor].Attribute is { })
                     {
-                        List<Cell> l = GetLine (r);
+                        cell = l [colWithColor];
 
-                        colWithColor = l.FindLastIndex (
-                                                        colWithColor > -1 ? colWithColor : l.Count - 1,
-                                                        c => c.Attribute != null
-                                                       );
-
-                        if (colWithColor > -1 && l [colWithColor].Attribute is { })
-                        {
-                            cell = l [colWithColor];
-
-                            break;
-                        }
+                        break;
                     }
-
-                    break;
                 }
+
+                break;
+            }
+
             default:
+            {
+                int cRow = row;
+
+                while (cell.Attribute is null)
                 {
-                    int cRow = row;
-
-                    while (cell.Attribute is null)
+                    if ((colWithColor == 0 || cell.Attribute is null) && cRow > 0)
                     {
-                        if ((colWithColor == 0 || cell.Attribute is null) && cRow > 0)
-                        {
-                            line = GetLine (--cRow);
-                            colWithColor = line.Count - 1;
-                            cell = line [colWithColor];
-                        }
-                        else if (cRow == 0 && colWithColor < line.Count)
-                        {
-                            cell = line [colWithColor + 1];
-                        }
+                        line = GetLine (--cRow);
+                        colWithColor = line.Count - 1;
+                        cell = line [colWithColor];
                     }
-
-                    break;
+                    else if (cRow == 0 && colWithColor < line.Count)
+                    {
+                        cell = line [colWithColor + 1];
+                    }
                 }
+
+                break;
+            }
         }
 
         if (cell.Attribute is null || colWithColor <= -1 || colWithoutColor >= lineToSet.Count || lineTo.Attribute is { })
@@ -512,47 +417,39 @@ public partial class TextView
 
     internal void ApplyCellsAttribute (Attribute attribute)
     {
-        if (!ReadOnly && SelectedLength > 0)
+        if (ReadOnly || SelectedLength <= 0)
         {
-            int startRow = Math.Min (SelectionStartRow, CurrentRow);
-            int endRow = Math.Max (CurrentRow, SelectionStartRow);
-            int startCol = SelectionStartRow <= CurrentRow ? SelectionStartColumn : CurrentColumn;
-            int endCol = CurrentRow >= SelectionStartRow ? CurrentColumn : SelectionStartColumn;
-            List<List<Cell>> selectedCellsOriginal = [];
-            List<List<Cell>> selectedCellsChanged = [];
+            return;
+        }
+        int startRow = Math.Min (SelectionStartRow, CurrentRow);
+        int endRow = Math.Max (CurrentRow, SelectionStartRow);
+        int startCol = SelectionStartRow <= CurrentRow ? SelectionStartColumn : CurrentColumn;
+        int endCol = CurrentRow >= SelectionStartRow ? CurrentColumn : SelectionStartColumn;
+        List<List<Cell>> selectedCellsOriginal = [];
+        List<List<Cell>> selectedCellsChanged = [];
 
-            for (int r = startRow; r <= endRow; r++)
+        for (int r = startRow; r <= endRow; r++)
+        {
+            List<Cell> line = GetLine (r);
+
+            selectedCellsOriginal.Add ([.. line]);
+
+            for (int c = r == startRow ? startCol : 0; c < (r == endRow ? endCol : line.Count); c++)
             {
-                List<Cell> line = GetLine (r);
-
-                selectedCellsOriginal.Add ([.. line]);
-
-                for (int c = r == startRow ? startCol : 0;
-                     c < (r == endRow ? endCol : line.Count);
-                     c++)
-                {
-                    Cell cell = line [c]; // Copy value to a new variable
-                    cell.Attribute = attribute; // Modify the copy
-                    line [c] = cell; // Assign the modified copy back
-                }
-
-                selectedCellsChanged.Add ([.. GetLine (r)]);
+                Cell cell = line [c]; // Copy value to a new variable
+                cell.Attribute = attribute; // Modify the copy
+                line [c] = cell; // Assign the modified copy back
             }
 
-            GetSelectedRegion ();
-            IsSelecting = false;
-
-            _historyText.Add (
-                              [.. selectedCellsOriginal],
-                              new (startCol, startRow)
-                             );
-
-            _historyText.Add (
-                              [.. selectedCellsChanged],
-                              new (startCol, startRow),
-                              TextEditingLineStatus.Attribute
-                             );
+            selectedCellsChanged.Add ([.. GetLine (r)]);
         }
+
+        GetSelectedRegion ();
+        IsSelecting = false;
+
+        _historyText.Add ([.. selectedCellsOriginal], new Point (startCol, startRow));
+
+        _historyText.Add ([.. selectedCellsChanged], new Point (startCol, startRow), TextEditingLineStatus.Attribute);
     }
 
     private Attribute? GetSelectedCellAttribute ()
@@ -565,7 +462,7 @@ public partial class TextView
 
             if (line [Math.Min (SelectionStartColumn, line.Count - 1)].Attribute is { } attributeSel)
             {
-                return new (attributeSel);
+                return new Attribute (attributeSel);
             }
 
             return GetAttributeForRole (VisualRole.Active);
@@ -575,7 +472,7 @@ public partial class TextView
 
         if (line [Math.Min (CurrentColumn, line.Count - 1)].Attribute is { } attribute)
         {
-            return new (attribute);
+            return new Attribute (attribute);
         }
 
         return GetAttributeForRole (VisualRole.Active);

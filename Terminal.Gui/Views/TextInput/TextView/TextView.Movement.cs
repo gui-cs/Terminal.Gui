@@ -18,9 +18,9 @@ public partial class TextView
     public bool MoveHome ()
     {
         CurrentRow = 0;
-        _topRow = 0;
+        Viewport = Viewport with { Y = 0 };
         CurrentColumn = 0;
-        _leftColumn = 0;
+        Viewport = Viewport with { X = 0 };
         TrackColumn ();
         DoNeededAction ();
 
@@ -46,13 +46,12 @@ public partial class TextView
 
         if (isRow)
         {
-            _topRow = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0);
+            Viewport = Viewport with { Y = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0) };
         }
         else if (!_wordWrap)
         {
-            int maxlength =
-                _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
-            _leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
+            int maxlength = _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
+            Viewport = Viewport with { X = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0) };
         }
 
         PositionCursor ();
@@ -90,9 +89,9 @@ public partial class TextView
 
             CurrentRow++;
 
-            if (CurrentRow >= _topRow + Viewport.Height)
+            if (CurrentRow >= Viewport.Y + Viewport.Height)
             {
-                _topRow++;
+                Viewport = Viewport with { Y = Viewport.Y + 1 };
                 SetNeedsDraw ();
             }
 
@@ -101,7 +100,7 @@ public partial class TextView
         }
         else if (CurrentRow > Viewport.Height)
         {
-            Adjust ();
+            AdjustViewport ();
         }
         else
         {
@@ -134,9 +133,9 @@ public partial class TextView
             {
                 CurrentRow--;
 
-                if (CurrentRow < _topRow)
+                if (CurrentRow < Viewport.Y)
                 {
-                    _topRow--;
+                    Viewport = Viewport with { Y = Viewport.Y - 1 };
                     SetNeedsDraw ();
                 }
 
@@ -156,13 +155,13 @@ public partial class TextView
 
     private bool MoveLeftStart ()
     {
-        if (_leftColumn > 0)
+        if (Viewport.X > 0)
         {
             SetNeedsDraw ();
         }
 
         CurrentColumn = 0;
-        _leftColumn = 0;
+        Viewport = Viewport with { X = 0 };
         DoNeededAction ();
 
         return true;
@@ -179,15 +178,11 @@ public partial class TextView
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow = CurrentRow + nPageDnShift > _model.Count
-                             ? _model.Count > 0 ? _model.Count - 1 : 0
-                             : CurrentRow + nPageDnShift;
+            CurrentRow = CurrentRow + nPageDnShift > _model.Count ? _model.Count > 0 ? _model.Count - 1 : 0 : CurrentRow + nPageDnShift;
 
-            if (_topRow < CurrentRow - nPageDnShift)
+            if (Viewport.Y < CurrentRow - nPageDnShift)
             {
-                _topRow = CurrentRow >= _model.Count
-                              ? CurrentRow - nPageDnShift
-                              : _topRow + nPageDnShift;
+                Viewport = Viewport with { Y = CurrentRow >= _model.Count ? CurrentRow - nPageDnShift : Viewport.Y + nPageDnShift };
                 SetNeedsDraw ();
             }
 
@@ -213,9 +208,9 @@ public partial class TextView
 
             CurrentRow = CurrentRow - nPageUpShift < 0 ? 0 : CurrentRow - nPageUpShift;
 
-            if (CurrentRow < _topRow)
+            if (CurrentRow < Viewport.Y)
             {
-                _topRow = _topRow - nPageUpShift < 0 ? 0 : _topRow - nPageUpShift;
+                Viewport = Viewport with { Y = Viewport.Y - nPageUpShift < 0 ? 0 : Viewport.Y - nPageUpShift };
                 SetNeedsDraw ();
             }
 
@@ -243,9 +238,9 @@ public partial class TextView
                 CurrentRow++;
                 CurrentColumn = 0;
 
-                if (CurrentRow >= _topRow + Viewport.Height)
+                if (CurrentRow >= Viewport.Y + Viewport.Height)
                 {
-                    _topRow++;
+                    Viewport = Viewport with { Y = Viewport.Y + 1 };
                     SetNeedsDraw ();
                 }
             }
@@ -276,6 +271,7 @@ public partial class TextView
     {
         ResetColumnTrack ();
         StartSelecting ();
+
         return MoveHome ();
     }
 
@@ -290,9 +286,9 @@ public partial class TextView
 
             CurrentRow--;
 
-            if (CurrentRow < _topRow)
+            if (CurrentRow < Viewport.Y)
             {
-                _topRow--;
+                Viewport = Viewport with { Y = Viewport.Y - 1 };
                 SetNeedsDraw ();
             }
 
@@ -309,7 +305,7 @@ public partial class TextView
         return true;
     }
 
-    private bool MoveWordBackward ()
+    private bool MoveWordLeft ()
     {
         (int col, int row)? newPos = _model.WordBackward (CurrentColumn, CurrentRow, UseSameRuneTypeForWords);
 
@@ -324,7 +320,7 @@ public partial class TextView
         return true;
     }
 
-    private bool MoveWordForward ()
+    private bool MoveWordRight ()
     {
         (int col, int row)? newPos = _model.WordForward (CurrentColumn, CurrentRow, UseSameRuneTypeForWords);
 
@@ -495,7 +491,7 @@ public partial class TextView
         return MoveUp ();
     }
 
-    private bool ProcessMoveWordBackward ()
+    private bool ProcessMoveWordLeft ()
     {
         ResetAllTrack ();
 
@@ -504,18 +500,18 @@ public partial class TextView
             StopSelecting ();
         }
 
-        return MoveWordBackward ();
+        return MoveWordLeft ();
     }
 
-    private bool ProcessMoveWordBackwardExtend ()
+    private bool ProcessMoveWordLeftExtend ()
     {
         ResetAllTrack ();
         StartSelecting ();
 
-        return MoveWordBackward ();
+        return MoveWordLeft ();
     }
 
-    private bool ProcessMoveWordForward ()
+    private bool ProcessMoveWordRight ()
     {
         ResetAllTrack ();
 
@@ -524,15 +520,15 @@ public partial class TextView
             StopSelecting ();
         }
 
-        return MoveWordForward ();
+        return MoveWordRight ();
     }
 
-    private bool ProcessMoveWordForwardExtend ()
+    private bool ProcessMoveWordRightExtend ()
     {
         ResetAllTrack ();
         StartSelecting ();
 
-        return MoveWordForward ();
+        return MoveWordRight ();
     }
 
     private bool ProcessPageDown ()

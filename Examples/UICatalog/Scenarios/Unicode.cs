@@ -63,11 +63,11 @@ public class UnicodeInMenu : Scenario
                                    [
                                        new MenuItem
                                        {
-                                           Title = "_Copy"
+                                           Title = Strings.cmdCopy
                                        },
                                        new MenuItem
                                        {
-                                           Title = "C_ut"
+                                           Title = Strings.cmdCut
                                        },
                                        new MenuItem
                                        {

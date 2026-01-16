@@ -23,7 +23,8 @@ namespace Terminal.Gui.Views;
 ///         menu.MakeVisible (); // or Application.Popover?.Show (menu);
 ///     </code>
 ///     <para>
-///         See <see cref="PopoverBaseImpl"/> and <see cref="IPopover"/> for lifecycle, focus, and keyboard handling details.
+///         See <see cref="PopoverBaseImpl"/> and <see cref="IPopover"/> for lifecycle, focus, and keyboard handling
+///         details.
 ///     </para>
 /// </remarks>
 public class PopoverMenu : PopoverBaseImpl, IDesignable
@@ -41,12 +42,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <remarks>
     ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
     /// </remarks>
-    public PopoverMenu (IEnumerable<View>? menuItems) : this (
-                                                              new Menu (menuItems?.Select (item => item ?? new Line ()))
-                                                              {
-                                                                  Title = "Popover Root"
-                                                              })
-    { }
+    public PopoverMenu (IEnumerable<View>? menuItems) : this (new Menu (menuItems?.Select (item => item ?? new Line ())) { Title = "Popover Root" }) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified menu items.
@@ -55,12 +51,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
     /// <remarks>
     ///     Remember to call <see cref="ApplicationPopover.Register"/> before calling <see cref="MakeVisible"/>.
     /// </remarks>
-    public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (
-                                                                  new Menu (menuItems)
-                                                                  {
-                                                                      Title = "Popover Root"
-                                                                  })
-    { }
+    public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems) { Title = "Popover Root" }) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menu"/>.
@@ -173,7 +164,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             Key oldKey = _key;
             _key = value;
-            KeyChanged?.Invoke (this, new (oldKey, _key));
+            KeyChanged?.Invoke (this, new KeyChangedEventArgs (oldKey, _key));
         }
     }
 
@@ -261,6 +252,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Root.App ??= App;
             Root.BeginInit ();
             Root.EndInit ();
+
             // BUGBUG: This Layout call is a hack to work around some bug in Layout.
             // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
             Root.Layout ();
@@ -495,10 +487,8 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         {
             AddAndShowSubMenu (menuItem.SubMenu);
 
-            Point idealLocation = ScreenToViewport (
-                                                    new (
-                                                         menuItem.FrameToScreen ().Right - menuItem.SubMenu.GetAdornmentsThickness ().Left,
-                                                         menuItem.FrameToScreen ().Top - menuItem.SubMenu.GetAdornmentsThickness ().Top));
+            Point idealLocation = ScreenToViewport (new Point (menuItem.FrameToScreen ().Right - menuItem.SubMenu.GetAdornmentsThickness ().Left,
+                                                               menuItem.FrameToScreen ().Top - menuItem.SubMenu.GetAdornmentsThickness ().Top));
 
             Point pos = GetMostVisibleLocationForSubMenu (menuItem.SubMenu, idealLocation);
             menuItem.SubMenu.X = pos.X;
@@ -522,14 +512,9 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         var pos = Point.Empty;
 
         // Calculate the initial position to the right of the menu item
-        GetLocationEnsuringFullVisibility (
-                                           menu,
-                                           idealLocation.X,
-                                           idealLocation.Y,
-                                           out int nx,
-                                           out int ny);
+        GetLocationEnsuringFullVisibility (menu, idealLocation.X, idealLocation.Y, out int nx, out int ny);
 
-        return new (nx, ny);
+        return new Point (nx, ny);
     }
 
     private void AddAndShowSubMenu (Menu? menu)
@@ -548,7 +533,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             }
 
             menu.ClearFocus ();
-            base.Add (menu);
+            Add (menu);
 
             // IMPORTANT: This must be done after adding the menu to the super view or Add will try
             // to set focus to it.
@@ -575,7 +560,7 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
 
             menu.Visible = false;
             menu.ClearFocus ();
-            base.Remove (menu);
+            Remove (menu);
 
             if (menu == Root)
             {
@@ -667,11 +652,10 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         return false;
     }
 
-    private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e)
-    {
+    private void MenuOnSelectedMenuItemChanged (object? sender, MenuItem? e) =>
+
         // Logging.Debug ($"{Title} - e.Title: {e?.Title}");
         ShowSubMenu (e);
-    }
 
     /// <inheritdoc/>
     /// <exception cref="InvalidOperationException">
@@ -730,19 +714,15 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Note: This menu is used by unit tests. If you modify it, you'll likely have to update
         // unit tests.
 
-        Root = new (
-                    [
-                        new MenuItem (targetView as View, Command.Cut),
-                        new MenuItem (targetView as View, Command.Copy),
-                        new MenuItem (targetView as View, Command.Paste),
-                        new Line (),
-                        new MenuItem (targetView as View, Command.SelectAll),
-                        new Line (),
-                        new MenuItem (targetView as View, Command.Quit)
-                    ])
-        {
-            Title = "Popover Demo Root"
-        };
+        Root = new Menu ([
+                             new MenuItem (targetView as View, Command.Cut),
+                             new MenuItem (targetView as View, Command.Copy),
+                             new MenuItem (targetView as View, Command.Paste),
+                             new Line (),
+                             new MenuItem (targetView as View, Command.SelectAll),
+                             new Line (),
+                             new MenuItem (targetView as View, Command.Quit)
+                         ]) { Title = "Popover Demo Root" };
 
         // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
         // NOTE: without being activated via App?.Popover. But we want it to be visible.

@@ -141,7 +141,7 @@ public class CollectionNavigatorTester : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Key = Application.QuitKey,
                                            Action = Quit
                                        }
@@ -151,11 +151,11 @@ public class CollectionNavigatorTester : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_Quit",
+                                   Strings.cmdQuit,
                                    [
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Key = Application.QuitKey,
                                            Action = Quit
                                        }
