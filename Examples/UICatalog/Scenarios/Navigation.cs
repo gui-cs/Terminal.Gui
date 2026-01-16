@@ -62,7 +62,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
-        button.Accepting += (_, _) => MessageBox.Query (app, "hi", button.Title, "_Ok");
+        button.Accepting += (_, _) => MessageBox.Query (app, "hi", button.Title, Strings.btnOk);
 
         testFrame.Add (button);
 
@@ -170,7 +170,7 @@ public class Navigation : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
+        colorPicker.Value = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
         colorPicker.ColorChanged += ColorPickerColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;

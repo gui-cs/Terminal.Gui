@@ -513,14 +513,14 @@ public class TableEditor : Scenario
         // File menu
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem { Title = "_OpenBigExample", Action = () => OpenExample (true) },
                                        new MenuItem { Title = "_OpenSmallExample", Action = () => OpenExample (false) },
                                        new MenuItem { Title = "OpenCharacter_Map", Action = OpenUnicodeMap },
                                        new MenuItem { Title = "OpenTreeExample", Action = OpenTreeExample },
                                        new MenuItem { Title = "_CloseExample", Action = CloseExample },
-                                       new MenuItem { Title = "_Quit", Action = Quit }
+                                       new MenuItem { Title = Strings.cmdQuit, Action = Quit }
                                    ]
                                   )
                  );
@@ -1003,8 +1003,8 @@ public class TableEditor : Scenario
         var oldValue = _currentTable.Rows [e.Row] [tableCol].ToString ();
         var okPressed = false;
 
-        var ok = new Button { Text = "_Ok" };
-        var cancel = new Button { Text = "_Cancel" };
+        var ok = new Button { Text = Strings.btnOk };
+        var cancel = new Button { Text = Strings.btnCancel };
         var d = new Dialog { Title = title, Buttons = [cancel, ok] };
         var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table.ColumnNames [e.Col] };
         var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, minimumContentDim: 50) };
@@ -1196,7 +1196,7 @@ public class TableEditor : Scenario
         var d = new Dialog
         {
             Title = prompt,
-            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
+            Buttons = [new () { Title = Strings.btnCancel }, new () { Title = Strings.btnOk }]
         };
 
         ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Value);

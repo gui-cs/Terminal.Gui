@@ -5,6 +5,7 @@
 
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
+using Terminal.Gui.Drivers;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
@@ -12,12 +13,9 @@ using Terminal.Gui.Views;
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Amber Phosphor" }""";
 ConfigurationManager.Enable (ConfigLocations.All);
 
-IApplication app = Application.Create ();
+using IApplication app = Application.Create ().Init ();
 
 app.Run<ExampleWindow> ();
-
-// Dispose the app to clean up and enable Console.WriteLine below
-app.Dispose ();
 
 // To see this output on the screen it must be done after shutdown,
 // which restores the previous screen.

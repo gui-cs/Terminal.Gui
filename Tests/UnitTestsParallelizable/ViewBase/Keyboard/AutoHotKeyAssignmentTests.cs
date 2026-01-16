@@ -253,7 +253,7 @@ public class AutoHotKeyAssignmentTests
     {
         View superView = new () { AssignHotKeys = true };
 
-        View button1 = new () { Title = "_Save" }; // Uses 'S'
+        View button1 = new () { Title = Strings.cmdSave }; // Uses 'S'
         superView.Add (button1);
 
         View button2 = new () { Title = "_Save Again" }; // Also uses 'S'

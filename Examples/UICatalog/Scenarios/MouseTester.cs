@@ -19,7 +19,7 @@ public class MouseTester : Scenario
         };
 
         MenuBar menuBar = new ();
-        menuBar.Add (new MenuBarItem ("_File", [new MenuItem { Title = "_Quit", Action = () => app.RequestStop () }]));
+        menuBar.Add (new MenuBarItem (Strings.menuFile, [new MenuItem { Title = Strings.cmdQuit, Action = () => app.RequestStop () }]));
 
         FlagSelector<DemoMouseFlags> mouseFlagsFilter = new ()
         {

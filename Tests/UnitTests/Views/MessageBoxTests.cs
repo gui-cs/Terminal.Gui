@@ -51,7 +51,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                                       "",
                                       UICatalogRunnable.GetAboutBoxMessage (),
                                       wrapMessage: false,
-                                      buttons: "_Ok");
+                                      buttons: Strings.btnOk);
 
                     app.RequestStop ();
                 }
@@ -73,7 +73,7 @@ public class MessageBoxTests (ITestOutputHelper output)
                                        │   ║                                                           ║    │
                                        │   ║          https://github.com/gui-cs/Terminal.Gui           ║    │
                                        │   ║                                                           ║    │
-                                       │   ║                                                   ⟦► Ok ◄⟧║    │
+                                       │   ║                                                   ⟦► OK ◄⟧║    │
                                        │   ╚═══════════════════════════════════════════════════════════╝    │
                                        └────────────────────────────────────────────────────────────────────┘
                                        """;
