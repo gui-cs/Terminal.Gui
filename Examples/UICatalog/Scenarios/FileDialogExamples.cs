@@ -66,7 +66,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
         _osCaption = new () { X = x, Y = y };
-        _osCaption.Labels = ["_OK", "O_pen", "_Save"];
+        _osCaption.Labels = [Strings.btnOk, Strings.cmdOpen, Strings.cmdSave];
         win.Add (_osCaption);
 
         y = 0;
@@ -78,7 +78,7 @@ public class FileDialogExamples : Scenario
         win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
         _osOpenMode = new () { X = x, Y = y };
-        _osOpenMode.Labels = ["_File", "D_irectory", "_Mixed"];
+        _osOpenMode.Labels = [Strings.menuFile, "D_irectory", "_Mixed"];
         win.Add (_osOpenMode);
 
         y = 0;
@@ -132,7 +132,7 @@ public class FileDialogExamples : Scenario
                              }
                              catch (Exception ex)
                              {
-                                 MessageBox.ErrorQuery (app, "Error", ex.ToString (), "_OK");
+                                 MessageBox.ErrorQuery (app, "Error", ex.ToString (), Strings.btnOk);
                              }
                              finally
                              {
@@ -150,7 +150,7 @@ public class FileDialogExamples : Scenario
         {
             if (File.Exists (e.Dialog.Path))
             {
-                int? result = MessageBox.Query (e.Dialog.App!, "Overwrite?", "File already exists", "_No", "_Yes");
+                int? result = MessageBox.Query (e.Dialog.App!, "Overwrite?", "File already exists", Strings.btnNo, Strings.btnYes);
                 e.Cancel = result is 0 or null;
             }
         }
@@ -237,16 +237,16 @@ public class FileDialogExamples : Scenario
                                   app,
                                   "Canceled",
                                   "You canceled navigation and did not pick anything",
-                                  "_OK"
+                                  Strings.btnOk
                                  );
             }
             else if (_cbAllowMultipleSelection.CheckedState == CheckState.Checked)
             {
-                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)), "_OK");
+                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + string.Join (Environment.NewLine, multiSelected.Select (m => m)), Strings.btnOk);
             }
             else
             {
-                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + path, "_OK");
+                MessageBox.Query (app, "Chosen!", "You chose:" + Environment.NewLine + path, Strings.btnOk);
             }
         }
     }

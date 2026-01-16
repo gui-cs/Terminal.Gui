@@ -72,7 +72,7 @@ public class FileDialogTests : TestsAllDrivers
 
         using TestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
-                                  .Focus<Button> (b => b.Text == "_Cancel")
+                                  .Focus<Button> (b => b.Text == Strings.btnCancel)
                                   .AssertTrue (sd!.Canceled)
                                   .KeyDown (Key.Enter);
     }
@@ -85,7 +85,7 @@ public class FileDialogTests : TestsAllDrivers
 
         using TestContext c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
-                                  .LeftClick<Button> (b => b.Text == "_Cancel")
+                                  .LeftClick<Button> (b => b.Text == Strings.btnCancel)
                                   .AssertTrue (sd!.Canceled);
     }
 
@@ -110,7 +110,7 @@ public class FileDialogTests : TestsAllDrivers
 
         using TestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
-                                  .LeftClick<Button> (b => b.Text == "_Save")
+                                  .LeftClick<Button> (b => b.Text == Strings.cmdSave)
                                   .AssertFalse (sd!.Canceled)
                                   .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
     }
@@ -138,7 +138,7 @@ public class FileDialogTests : TestsAllDrivers
 
         using TestContext c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
                                   .ScreenShot ("Save dialog", _out)
-                                  .Focus<Button> (b => b.Text == "_Save")
+                                  .Focus<Button> (b => b.Text == Strings.cmdSave)
                                   .KeyDown (Key.Enter)
                                   .AssertFalse (sd!.Canceled)
                                   .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName)
@@ -355,7 +355,7 @@ public class FileDialogTests : TestsAllDrivers
              .AssertDoesNotContain ("hello", sd!.Path);
         }
 
-        c.LeftClick<Button> (b => b.Text == "_Save");
+        c.LeftClick<Button> (b => b.Text == Strings.cmdSave);
         c.AssertFalse (sd!.Canceled);
 
         if (preserve)

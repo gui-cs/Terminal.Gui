@@ -87,7 +87,7 @@ public class Localization : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuBarItem (
                                                         "_Language",
@@ -95,7 +95,7 @@ public class Localization : Scenario
                                                        ),
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Action = Quit
                                        }
                                    ]

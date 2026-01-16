@@ -575,7 +575,7 @@ public class Images : Scenario
         Dialog dlg = new ()
         {
             Title = "Palette",
-            Buttons = [new () { Title = "_Cancel" }]
+            Buttons = [new () { Title = Strings.btnCancel }]
         };
 
         dlg.Add (pv);

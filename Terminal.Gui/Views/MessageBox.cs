@@ -28,7 +28,7 @@ namespace Terminal.Gui.Views;
 ///     IApplication app = Application.Create();
 ///     app.Init();
 ///     
-///     int? result = MessageBox.Query(app, "Quit Demo", "Are you sure you want to quit?", "_No", "_Yes");
+///     int? result = MessageBox.Query(app, "Quit Demo", "Are you sure you want to quit?", Strings.btnNo, Strings.btnYes);
 ///     if (result == 1) // User clicked "Yes"
 ///         app.RequestStop();
 ///     else if (result == null) // User pressed Esc
@@ -42,7 +42,7 @@ namespace Terminal.Gui.Views;
 ///         <code>
 ///     Application.Init();
 ///     
-///     int? result = MessageBox.Query(ApplicationImpl.Instance, "Quit Demo", "Are you sure?", "_No", "_Yes");
+///     int? result = MessageBox.Query(ApplicationImpl.Instance, "Quit Demo", "Are you sure?", Strings.btnNo, Strings.btnYes);
 ///     if (result == 1) // User clicked "Yes"
 ///         Application.RequestStop();
 ///     

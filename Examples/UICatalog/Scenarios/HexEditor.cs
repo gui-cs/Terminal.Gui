@@ -59,23 +59,23 @@ public class HexEditor : Scenario
             Menus =
             [
                 new (
-                     "_File",
+                     Strings.menuFile,
                      new MenuItem []
                      {
-                         new ("_New", "", New),
-                         new ("_Open", "", Open),
-                         new ("_Save", "", Save),
+                         new (Strings.cmdNew, "", New),
+                         new (Strings.cmdOpen, "", Open),
+                         new (Strings.cmdSave, "", Save),
                          null!,                     // Passing null automatically creates a separator (a Line object).
-                         new ("_Quit", "", Quit)
+                         new (Strings.cmdQuit, "", Quit)
                      }
                     ),
                 new (
                      "_Edit",
                      new MenuItem []
                      {
-                         new ("_Copy", "", Copy),
-                         new ("C_ut", "", Cut),
-                         new ("_Paste", "", Paste)
+                         new (Strings.cmdCopy, "", Copy),
+                         new (Strings.cmdCut, "", Cut),
+                         new (Strings.cmdPaste, "", Paste)
                      }
                     ),
                 new (
@@ -201,8 +201,8 @@ public class HexEditor : Scenario
             if (MessageBox.ErrorQuery (_hexView!.App!,
                                        "Save",
                                        "The changes were not saved. Want to open without saving?",
-                                       "_No",
-                                       "_Yes"
+                                       Strings.btnNo,
+                                       Strings.btnYes
                                       )
                 == 0)
             {
@@ -249,7 +249,7 @@ public class HexEditor : Scenario
         d.Dispose ();
     }
 
-    private void Paste () { MessageBox.ErrorQuery (_hexView!.App!, "Not Implemented", "Functionality not yet implemented.", "_Ok"); }
+    private void Paste () { MessageBox.ErrorQuery (_hexView!.App!, "Not Implemented", "Functionality not yet implemented.", Strings.btnOk); }
     private void Quit () { _win?.RequestStop (); }
 
     private void Save ()
