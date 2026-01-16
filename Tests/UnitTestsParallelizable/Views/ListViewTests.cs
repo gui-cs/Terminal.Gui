@@ -166,7 +166,7 @@ public class ListViewTests (ITestOutputHelper output)
 #pragma warning restore CS0067
 
         public int Count => 0;
-        public int Length => 0;
+        public int MaxItemLength => 0;
 
         public bool SuspendCollectionChangedEvent
         {
@@ -1329,7 +1329,7 @@ Item 6",
             Source = new ListWrapper<string> (source)
         };
         lv.Height = lv.Source.Count;
-        lv.Width = lv.MaxLength;
+        lv.Width = lv.MaxItemLength;
         var top = new Runnable ();
         top.Add (lv);
         app.Begin (top);
@@ -1691,17 +1691,23 @@ hree - lon",
 
         // Click on first item - should mark it
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, lv.SelectedItem);
         Assert.True (lv.Source!.IsMarked (0));
 
         // Click on third item - should mark it (first should stay marked)
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 2), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (2, lv.SelectedItem);
         Assert.True (lv.Source.IsMarked (0)); // Still marked
         Assert.True (lv.Source.IsMarked (2)); // Newly marked
 
         // Click on fifth item - should mark it (first and third should stay marked)
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 4), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (4, lv.SelectedItem);
         Assert.True (lv.Source.IsMarked (0)); // Still marked
         Assert.True (lv.Source.IsMarked (2)); // Still marked
@@ -1709,6 +1715,8 @@ hree - lon",
 
         // Click on first item again - should toggle it off
         app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonReleased });
+        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (1, 0), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (0, lv.SelectedItem);
         Assert.False (lv.Source.IsMarked (0)); // Toggled off
         Assert.True (lv.Source.IsMarked (2)); // Still marked

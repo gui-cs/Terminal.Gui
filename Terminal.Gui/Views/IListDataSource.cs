@@ -46,7 +46,7 @@ public interface IListDataSource : IDisposable
     /// <remarks>
     ///     <see cref="ListView"/> uses this value to set its horizontal content size for scrolling.
     /// </remarks>
-    int Length { get; }
+    int MaxItemLength { get; }
 
     /// <summary>Renders the specified item to the <see cref="ListView"/>.</summary>
     /// <param name="listView">The <see cref="ListView"/> to render to.</param>
@@ -54,8 +54,8 @@ public interface IListDataSource : IDisposable
     ///     <see langword="true"/> if the item is currently selected; otherwise <see langword="false"/>.
     /// </param>
     /// <param name="item">The zero-based index of the item to render.</param>
-    /// <param name="col">The column in <paramref name="listView"/> where rendering starts.</param>
-    /// <param name="line">The line in <paramref name="listView"/> where rendering occurs.</param>
+    /// <param name="col">The column in <paramref name="listView"/> Viewport where rendering starts.</param>
+    /// <param name="row">The row in <paramref name="listView"/> Viewport where rendering starts.</param>
     /// <param name="width">The width available for rendering.</param>
     /// <param name="viewportX">The horizontal scroll offset.</param>
     /// <remarks>
@@ -72,7 +72,7 @@ public interface IListDataSource : IDisposable
         bool selected,
         int item,
         int col,
-        int line,
+        int row,
         int width,
         int viewportX = 0
     );

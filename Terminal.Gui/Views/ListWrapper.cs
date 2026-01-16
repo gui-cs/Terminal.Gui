@@ -24,7 +24,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
             _marks = new (_count);
             _source = source;
             _source.CollectionChanged += Source_CollectionChanged;
-            Length = GetMaxLengthItem ();
+            MaxItemLength = GetMaxLengthItem ();
         }
     }
 
@@ -41,7 +41,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     public int Count => _source?.Count ?? 0;
 
     /// <inheritdoc/>
-    public int Length { get; private set; }
+    public int MaxItemLength { get; private set; }
 
     /// <inheritdoc/>
     public bool SuspendCollectionChangedEvent
@@ -184,7 +184,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
             _marks = newMarks;
 
-            Length = GetMaxLengthItem ();
+            MaxItemLength = GetMaxLengthItem ();
         }
     }
 
