@@ -97,8 +97,12 @@ jobs:
       with:
         name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTests    
+          logs/UnitTests/
+          Tests/UnitTests/logs/
           TestResults/
+          **/*.dmp
+        if-no-files-found: ignore
+        retention-days: 7
   
     - name: Upload Non-Parallel UnitTests Coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && always()
@@ -171,9 +175,9 @@ jobs:
         MAX_THREADS=$((CPU_COUNT * 2))
         if [ "${{ runner.os }}" == "macOS" ]; then
           if [ $MAX_THREADS -gt 4 ]; then
-            MAX_THREADS=4
+            MAX_THREADS=2
           fi
-          HANG_TIMEOUT="120s"
+          HANG_TIMEOUT="240s"
         else
           if [ $MAX_THREADS -gt 16 ]; then
             MAX_THREADS=16
@@ -224,7 +228,11 @@ jobs:
         name: parallel_unittests-logs-${{ runner.os }}
         path: |
           logs/UnitTestsParallelizable/
+          Tests/UnitTestsParallelizable/logs/
           TestResults/
+          **/*.dmp
+        if-no-files-found: ignore
+        retention-days: 7
   
     - name: Upload Parallelizable UnitTests Coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && always()

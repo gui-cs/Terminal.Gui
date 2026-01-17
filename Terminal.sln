@@ -79,6 +79,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		docfx\docs\navigation.md = docfx\docs\navigation.md
 		docfx\docs\newinv2.md = docfx\docs\newinv2.md
 		docfx\docs\Popovers.md = docfx\docs\Popovers.md
+		docfx\docs\prompt.md = docfx\docs\prompt.md
 		README.md = README.md
 		docfx\docs\scheme.md = docfx\docs\scheme.md
 		docfx\docs\scrolling.md = docfx\docs\scrolling.md
@@ -129,7 +130,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{1A3C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentExample", "Examples\FluentExample\FluentExample.csproj", "{8C05292F-86C9-C29A-635B-A4DFC5955D1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunnableWrapperExample", "Examples\RunnableWrapperExample\RunnableWrapperExample.csproj", "{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromptExample", "Examples\PromptExample\PromptExample.csproj", "{26FDEE3C-9D1F-79A6-F48F-D0944C7F09F8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputView", "docfx\scripts\OutputView\OutputView.csproj", "{566AFB59-FF8C-FFF4-C1F4-049B6246E4A7}"
 EndProject

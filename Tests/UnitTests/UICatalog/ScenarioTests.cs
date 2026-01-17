@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -118,8 +119,7 @@ public class ScenarioTests : TestsAllViews
             _output.WriteLine ($"WARNING: Scenario '{scenarioName}' timed out after {abortTime}ms. This may indicate a performance issue on this runner.");
         }
 
-        Assert.True (
-                     shutdownGracefully,
+        Assert.True (shutdownGracefully,
                      $"Scenario '{scenarioName}' failed to quit with {quitKey} after {abortTime}ms and {iterationCount} iterations. "
                      + $"TimeoutFired={timeoutFired}");
 
@@ -133,7 +133,7 @@ public class ScenarioTests : TestsAllViews
             {
                 _output.WriteLine ($"Not Disposed: {inst.ToDebugString ()}");
             }
-            Assert.Fail ($"Views were not disposed properly.");
+            Assert.Fail ("Views were not disposed properly.");
         }
 #endif
 
@@ -146,7 +146,7 @@ public class ScenarioTests : TestsAllViews
             initialized = true;
 
             // Use a System.Threading.Timer for the watchdog to ensure it's not affected by Application.StopAllTimers
-            watchdogTimer = new (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
+            watchdogTimer = new Timer (_ => ForceCloseCallback (), null, (int)abortTime, Timeout.Infinite);
 
             _output.WriteLine ($"Initialized; shutdownGracefully == {shutdownGracefully}.");
         }
@@ -212,8 +212,7 @@ public class ScenarioTests : TestsAllViews
     }
 
     public static IEnumerable<object []> AllScenarioTypes =>
-        typeof (Scenario).Assembly
-                         .GetTypes ()
+        typeof (Scenario).Assembly.GetTypes ()
                          .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
                          .Select (type => new object [] { type });
 
@@ -262,7 +261,7 @@ public class ScenarioTests : TestsAllViews
             Height = Dim.Fill (),
             AllowsMarking = false,
             SchemeName = "Runnable",
-            Source = new ListWrapper<string> (new (viewClasses.Keys.ToList ()))
+            Source = new ListWrapper<string> (new ObservableCollection<string> (viewClasses.Keys.ToList ()))
         };
         leftPane.Add (classListView);
 
@@ -298,7 +297,7 @@ public class ScenarioTests : TestsAllViews
         locationFrame.Add (xOptionSelector);
 
         radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "Absolute(y)" };
-        label = new () { X = Pos.Right (xOptionSelector) + 1, Y = 0, Text = "y:" };
+        label = new Label { X = Pos.Right (xOptionSelector) + 1, Y = 0, Text = "y:" };
         locationFrame.Add (label);
         TextField yText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{yVal}" };
         locationFrame.Add (yText);
@@ -315,7 +314,7 @@ public class ScenarioTests : TestsAllViews
         };
 
         radioItems = new [] { "Auto()", "Percent(width)", "Fill(width)", "Absolute(width)" };
-        label = new () { X = 0, Y = 0, Text = "width:" };
+        label = new Label { X = 0, Y = 0, Text = "width:" };
         sizeFrame.Add (label);
         OptionSelector wOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = radioItems };
         TextField wText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{wVal}" };
@@ -323,7 +322,7 @@ public class ScenarioTests : TestsAllViews
         sizeFrame.Add (wOptionSelector);
 
         radioItems = new [] { "Auto()", "Percent(height)", "Fill(height)", "Absolute(height)" };
-        label = new () { X = Pos.Right (wOptionSelector) + 1, Y = 0, Text = "height:" };
+        label = new Label { X = Pos.Right (wOptionSelector) + 1, Y = 0, Text = "height:" };
         sizeFrame.Add (label);
         TextField hText = new () { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{hVal}" };
         sizeFrame.Add (hText);
@@ -441,9 +440,7 @@ public class ScenarioTests : TestsAllViews
 
                 if (curView is { })
                 {
-                    Assert.Equal (
-                                  curView.GetType ().Name,
-                                  viewClasses.Values.ToArray () [classListView.SelectedItem!.Value].Name);
+                    Assert.Equal (curView.GetType ().Name, viewClasses.Values.ToArray () [classListView.SelectedItem!.Value].Name);
                 }
             }
             else
@@ -467,14 +464,17 @@ public class ScenarioTests : TestsAllViews
                         view.X = Pos.Percent (xVal);
 
                         break;
+
                     case 1:
                         view.X = Pos.AnchorEnd (xVal);
 
                         break;
+
                     case 2:
                         view.X = Pos.Center ();
 
                         break;
+
                     case 3:
                         view.X = Pos.Absolute (xVal);
 
@@ -487,14 +487,17 @@ public class ScenarioTests : TestsAllViews
                         view.Y = Pos.Percent (yVal);
 
                         break;
+
                     case 1:
                         view.Y = Pos.AnchorEnd (yVal);
 
                         break;
+
                     case 2:
                         view.Y = Pos.Center ();
 
                         break;
+
                     case 3:
                         view.Y = Pos.Absolute (yVal);
 
@@ -507,10 +510,12 @@ public class ScenarioTests : TestsAllViews
                         view.Width = Dim.Percent (wVal);
 
                         break;
+
                     case 1:
                         view.Width = Dim.Fill (wVal);
 
                         break;
+
                     case 2:
                         view.Width = Dim.Absolute (wVal);
 
@@ -523,10 +528,12 @@ public class ScenarioTests : TestsAllViews
                         view.Height = Dim.Percent (hVal);
 
                         break;
+
                     case 1:
                         view.Height = Dim.Fill (hVal);
 
                         break;
+
                     case 2:
                         view.Height = Dim.Absolute (hVal);
 
@@ -570,7 +577,7 @@ public class ScenarioTests : TestsAllViews
             hText.Text = $"{view.Frame.Height}";
         }
 
-        void UpdateTitle (View? view) { hostPane.Title = $"{view!.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}"; }
+        void UpdateTitle (View? view) => hostPane.Title = $"{view!.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
 
         View? CreateClass (Type type)
         {
@@ -681,6 +688,6 @@ public class ScenarioTests : TestsAllViews
             return view;
         }
 
-        void LayoutCompleteHandler (object? sender, LayoutEventArgs args) { UpdateTitle (curView); }
+        void LayoutCompleteHandler (object? sender, LayoutEventArgs args) => UpdateTitle (curView);
     }
 }

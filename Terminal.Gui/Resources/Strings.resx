@@ -298,58 +298,52 @@
   <data name="failedGetting" xml:space="preserve">
     <value>failed getting</value>
   </data>
-  <data name="cmd.Open" xml:space="preserve">
+  <data name="cmdOpen" xml:space="preserve">
     <value>_Open...</value>
   </data>
-  <data name="cmd.Quit" xml:space="preserve">
-    <value>E_xit</value>
-  </data>
-  <data name="cmd.Save" xml:space="preserve">
+  <data name="cmdSave" xml:space="preserve">
     <value>_Save</value>
   </data>
-  <data name="cmd.SaveAs" xml:space="preserve">
+  <data name="cmdSaveAs" xml:space="preserve">
     <value>Save _As...</value>
   </data>
-  <data name="cmd.Cut" xml:space="preserve">
+  <data name="cmdCut" xml:space="preserve">
     <value>Cu_t</value>
   </data>
-  <data name="cmd.Copy" xml:space="preserve">
+  <data name="cmdCopy" xml:space="preserve">
     <value>_Copy</value>
   </data>
-  <data name="cmd.Paste" xml:space="preserve">
+  <data name="cmdPaste" xml:space="preserve">
     <value>_Paste</value>
   </data>
-  <data name="cmd.SelectAll" xml:space="preserve">
+  <data name="cmdSelectAll" xml:space="preserve">
     <value>_Select all</value>
   </data>
-  <data name="cmd.New" xml:space="preserve">
+  <data name="cmdNew" xml:space="preserve">
     <value>_New file</value>
   </data>
-  <data name="cmd.Open.Help" xml:space="preserve">
+  <data name="cmdOpen.Help" xml:space="preserve">
     <value>Open a file</value>
   </data>
-  <data name="cmd.Quit.Help" xml:space="preserve">
+  <data name="cmdQuitHelp" xml:space="preserve">
     <value />
   </data>
-  <data name="cmd.Save.Help" xml:space="preserve">
+  <data name="cmdSaveHelp" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="cmd.SaveAs.Help" xml:space="preserve">
+  <data name="cmdSaveAsHelp" xml:space="preserve">
     <value>Save file as</value>
   </data>
-  <data name="cmd.Cut.Help" xml:space="preserve">
+  <data name="cmdCut.Help" xml:space="preserve">
     <value>Cut to clipboard</value>
   </data>
-  <data name="cmd.Copy.Help" xml:space="preserve">
+  <data name="cmdCopyHelp" xml:space="preserve">
     <value>Copy to clipboard</value>
   </data>
-  <data name="cmd.Paste.Help" xml:space="preserve">
-    <value>Paste from clipboard</value>
-  </data>
-  <data name="cmd.SelectAll.Help" xml:space="preserve">
+  <data name="cmdSelectAllHelp" xml:space="preserve">
     <value>Select all</value>
   </data>
-  <data name="cmd.New.Help" xml:space="preserve">
+  <data name="cmdNewHelp" xml:space="preserve">
     <value>New file</value>
   </data>
   <data name="fdTree" xml:space="preserve">
@@ -358,5 +352,26 @@
   </data>
   <data name="fdSearchCaption" xml:space="preserve">
     <value>_Find</value>
+  </data>
+  <data name="cmdPasteHelp" xml:space="preserve">
+    <value>Paste from clipboard</value>
+  </data>
+  <data name="cmdQuit" xml:space="preserve">
+    <value>E_xit</value>
+  </data>
+  <data name="cmdClose" xml:space="preserve">
+    <value>_Close</value>
+  </data>
+  <data name="cmdFind" xml:space="preserve">
+    <value>_Find</value>
+  </data>
+  <data name="menuFile" xml:space="preserve">
+    <value>_File</value>
+  </data>
+  <data name="menuEdit" xml:space="preserve">
+    <value>_Edit</value>
+  </data>
+  <data name="menuHelp" xml:space="preserve">
+    <value>_Help</value>
   </data>
 </root>

@@ -28,7 +28,7 @@ public sealed class Generic : Scenario
                             {
                                 // When Accepting is handled, set e.Handled to true to prevent further processing.
                                 e.Handled = true;
-                                MessageBox.Query ((s as View)!.App!, "Nice Job", "You pressed the button!", "_Ok");
+                                MessageBox.Query ((s as View)!.App!, "Nice Job", "You pressed the button!", Strings.btnOk);
                             };
 
         appWindow.Add (button);
