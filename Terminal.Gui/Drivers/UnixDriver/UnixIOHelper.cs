@@ -78,7 +78,7 @@ internal static class UnixIOHelper
     /// <param name="timeout">Timeout in milliseconds (0 = non-blocking, -1 = infinite)</param>
     /// <returns>Number of file descriptors with events, or -1 on error</returns>
     [DllImport ("libc", SetLastError = true)]
-    public static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+    public static extern int poll ([In][Out] Pollfd [] ufds, uint nfds, int timeout);
 
     /// <summary>
     ///     Read bytes from a file descriptor.
@@ -171,6 +171,23 @@ internal static class UnixIOHelper
     /// <returns>0 on success, -1 on error</returns>
     [DllImport ("libc", SetLastError = true)]
     public static extern int ioctl (int fd, uint request, out WinSize ws);
+
+    /// <summary>
+    /// ioctl definition for Darwin/FreeBSD on ARM64.
+    /// See https://github.com/dotnet/runtime/issues/48796#issuecomment-3695794860.
+    /// </summary>
+    /// <param name="fd">File descriptor</param>
+    /// <param name="request">Request code (e.g., TIOCGWINSZ)</param>
+    /// <param name="r3">placeholder to pass <paramref name="ws"/> on stack</param>
+    /// <param name="r4">placeholder to pass <paramref name="ws"/> on stack</param>
+    /// <param name="r5">placeholder to pass <paramref name="ws"/> on stack</param>
+    /// <param name="r6">placeholder to pass <paramref name="ws"/> on stack</param>
+    /// <param name="r7">placeholder to pass <paramref name="ws"/> on stack</param>
+    /// <param name="r8">placeholder to pass <paramref name="ws"/> on stack</param>
+    /// <param name="ws">Window size structure (output)</param>
+    /// <returns>0 on success, -1 on error</returns>
+    [DllImport ("libc", EntryPoint = "ioctl", SetLastError = true)]
+    public static extern int ioctl_arm64 (int fd, ulong request, nint r3, nint r4, nint r5, nint r6, nint r7, nint r8, out WinSize ws);
 
     #endregion
 
@@ -281,7 +298,19 @@ internal static class UnixIOHelper
     {
         try
         {
-            if (ioctl (STDOUT_FILENO, TIOCGWINSZ, out WinSize ws) == 0)
+            int ioctlResult = 0;
+            WinSize ws;
+            if (RuntimeInformation.OSArchitecture == Architecture.Arm64 &&
+              (RuntimeInformation.IsOSPlatform (OSPlatform.OSX) || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD)))
+            {
+                ioctlResult = ioctl_arm64 (STDOUT_FILENO, TIOCGWINSZ, 0, 0, 0, 0, 0, 0, out ws);
+            }
+            else
+            {
+                ioctlResult = ioctl (STDOUT_FILENO, TIOCGWINSZ, out ws);
+            }
+
+            if (ioctlResult == 0)
             {
                 if (ws.ws_col > 0 && ws.ws_row > 0)
                 {
