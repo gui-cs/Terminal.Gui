@@ -258,6 +258,7 @@ public class Runner
             {
                 IApplication app = RunBrowserUI<T> ();
                 var selectedScenarioName = app.GetResult<string> ();
+                Logging.Trace($"Disposing app");
                 app.Dispose ();
 
                 if (string.IsNullOrEmpty (selectedScenarioName))

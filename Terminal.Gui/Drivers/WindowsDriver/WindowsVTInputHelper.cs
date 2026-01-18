@@ -1,4 +1,6 @@
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
@@ -32,6 +34,14 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+
+    [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
+    public static extern bool PeekConsoleInput (
+        nint hConsoleInput,
+        nint lpBuffer,
+        uint nLength,
+        out uint lpNumberOfEventsRead
+    );
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool ReadFile (
@@ -69,7 +79,15 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// <summary>
     ///     Gets whether VT input mode was successfully enabled.
     /// </summary>
-    public bool IsVTModeEnabled { get; private set; }
+    public bool IsVTModeEnabled
+    {
+        get => field;
+        private set
+        {
+            field = value;
+            Logging.Trace ($"{value}");
+        }
+    }
 
     /// <summary>
     ///     Gets the Windows console input handle.
@@ -183,14 +201,16 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         bytesRead = 0;
 
-        if (!IsVTModeEnabled || InputHandle == nint.Zero)
+        if (!IsVTModeEnabled || InputHandle == nint.Zero || !Console.KeyAvailable)
         {
             return false;
         }
 
         try
         {
+            Logging.Trace ("ReadFile...");
             bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
+            Logging.Trace ($"...{JsonSerializer.Serialize (Encoding.UTF8.GetString (buffer, 0, (int)numBytesRead))}");
 
             if (!success)
             {
@@ -252,5 +272,38 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         Restore ();
         _disposed = true;
+    }
+
+    public bool Peek ()
+    {
+        const int BUFFER_SIZE = 1; // We only need to check if there's at least one event
+        nint pRecord = Marshal.AllocHGlobal (Marshal.SizeOf<InputRecord> () * BUFFER_SIZE);
+
+        try
+        {
+            // Use PeekConsoleInput to inspect the input buffer without removing events
+            if (PeekConsoleInput (InputHandle, pRecord, BUFFER_SIZE, out uint numberOfEventsRead))
+            {
+                // Return true if there's at least one event in the buffer
+                return numberOfEventsRead > 0;
+            }
+            else
+            {
+                // Handle the failure of PeekConsoleInput
+                throw new InvalidOperationException ("Failed to peek console input.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Optionally log the exception
+            Logging.Error (@$"Error in Peek: {ex.Message}");
+
+            return false;
+        }
+        finally
+        {
+            // Free the allocated memory
+            Marshal.FreeHGlobal (pRecord);
+        }
     }
 }

@@ -48,7 +48,9 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
             {
                 while (Peek ())
                 {
-                    foreach (TInputRecord r in Read ())
+                    Logging.Trace($"Read...");
+                    var records = Read ();
+                    foreach (TInputRecord r in records)
                     {
                         _inputQueue.Enqueue (r);
                     }

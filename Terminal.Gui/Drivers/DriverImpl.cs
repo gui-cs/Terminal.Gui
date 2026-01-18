@@ -79,7 +79,7 @@ internal class DriverImpl : IDriver
         Cursor cursor = _output.GetCursor ();
         if (cursor.IsVisible)
         {
-            Cursor hiddenCursor = cursor with { Position = null, Style = cursor.Style};
+            Cursor hiddenCursor = cursor with { Position = null, Style = cursor.Style };
             _output.SetCursor (hiddenCursor);
             SetCursorNeedsUpdate (true);
         }
@@ -102,37 +102,42 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public void Suspend ()
     {
-        // BUGBUG: This is all platform-specific and should not be implemented here.
-        // BUGBUG: This needs to be in each platform's driver implementation.
-        if (Environment.OSVersion.Platform != PlatformID.Unix)
+        if (PlatformDetection.IsWindows ())
         {
             return;
         }
 
-        Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+        _output.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
         try
         {
+            // BUGBUG: We should NOT be calling Console. APIs here. We should use native
+            // BUGBUG: OS capabilities or ANSI sequences
             Console.ResetColor ();
+
+            // BUGBUG: We should NOT be calling Console. APIs here. We should use native
+            // BUGBUG: OS capabilities or ANSI sequences
             Console.Clear ();
 
             //Disable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            _output.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 
             //Set cursor key to cursor.
-            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+            _output.Write (EscSeqUtils.CSI_ShowCursor);
 
-            Platform.Suspend ();
-
-            //Enable alternative screen buffer.
-            Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            // BUGBUG: This is unix-specific and should not be implemented here.
+            if (SuspendHelper.Suspend ())
+            {
+                //Enable alternative screen buffer.
+                _output.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            }
         }
         catch (Exception ex)
         {
             Logging.Error ($"Error suspending terminal: {ex.Message}");
         }
 
-        Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+        _output.Write (EscSeqUtils.CSI_EnableMouseEvents);
     }
 
     /// <inheritdoc/>
@@ -187,7 +192,7 @@ internal class DriverImpl : IDriver
         {
             Clipboard = new MacOSXClipboard ();
         }
-        else if (PlatformDetection.IsWSLPlatform ())
+        else if (PlatformDetection.IsWSL ())
         {
             Clipboard = new WSLClipboard ();
         }

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drivers;
@@ -39,6 +40,23 @@ public class AnsiOutput : OutputBase, IOutput
     private IOutputBuffer? _lastBuffer;
     private readonly bool _terminalInitialized;
 
+    private readonly uint _originalOutputConsoleMode;
+    private readonly nint _outputHandle;
+    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+    private const int STD_OUTPUT_HANDLE = -11;
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern nint GetStdHandle (int nStdHandle);
+    [DllImport ("kernel32.dll")]
+    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
+
+
+    [DllImport ("kernel32.dll")]
+    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
+
+
+    [DllImport ("kernel32.dll")]
+    private static extern uint GetLastError ();
     /// <summary>
     ///     Initializes a new instance of <see cref="AnsiOutput"/>.
     ///     Checks if a real console is available for ANSI output and activates the alternate screen buffer.
@@ -49,7 +67,7 @@ public class AnsiOutput : OutputBase, IOutput
 
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);
-        _currentCursor = new ();
+        _currentCursor = new Cursor ();
 
         try
         {
@@ -61,35 +79,69 @@ public class AnsiOutput : OutputBase, IOutput
             }
             else
             {
-                Stream stream = Console.OpenStandardOutput ();
+                PlatformID p = Environment.OSVersion.Platform;
 
-                if (!stream.CanWrite)
+                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
                 {
-                    Logging.Warning ("Console output stream is not writable. Running in degraded mode.");
-                    _terminalInitialized = false;
+                    try
+                    {
+                        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+
+                        if (!GetConsoleMode (_outputHandle, out uint mode))
+                        {
+                            throw new ApplicationException ($"Failed to get output console mode, error code: {GetLastError ()}.");
+                        }
+
+                        _originalOutputConsoleMode = mode;
+
+                        if ((mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
+                        {
+                            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+                            if (!SetConsoleMode (_outputHandle, mode))
+                            {
+                                throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
+                            }
+                        }
+
+                    }
+                    catch (ApplicationException ex)
+                    {
+                        // Likely running as a unit test, or in a non-interactive session.
+                        Logging.Critical ($"NetWinVTConsole could not configure terminal modes. May indicate running in non-interactive session: {ex}");
+                        _terminalInitialized = false;
+                    }
                 }
                 else
                 {
-                    _terminalInitialized = true;
+                    Stream stream = Console.OpenStandardOutput ();
 
-                    // Initialize terminal for ANSI output
-                    // Activate alternate screen buffer, hide cursor, enable mouse tracking
-                    Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-                    Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
-                    Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
-                    Write (EscSeqUtils.CSI_HideCursor);
-                    Write (EscSeqUtils.CSI_EnableMouseEvents);
-
-                    // Flush to ensure all sequences are sent
-                    Console.Out.Flush ();
-                    Logging.Information ("ANSIOutput initialized successfully");
-
-                    // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
-                    // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
-                    // not the alternate screen buffer we just activated.
-                    // Start with default size; actual size will be set when ANSI response arrives.
-                    _consoleSize = new (80, 25);
+                    if (!stream.CanWrite)
+                    {
+                        Logging.Warning ("Console output stream is not writable. Running in degraded mode.");
+                        _terminalInitialized = false;
+                    }
                 }
+
+                _terminalInitialized = true;
+
+                // Initialize terminal for ANSI output
+                // Activate alternate screen buffer, hide cursor, enable mouse tracking
+                Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+                Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
+                Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
+                Write (EscSeqUtils.CSI_HideCursor);
+                Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+                // Flush to ensure all sequences are sent
+                Console.Out.Flush ();
+                Logging.Information ("ANSIOutput initialized successfully");
+
+                // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
+                // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
+                // not the alternate screen buffer we just activated.
+                // Start with default size; actual size will be set when ANSI response arrives.
+                _consoleSize = new Size (80, 25);
             }
         }
         catch (Exception ex)
@@ -104,13 +156,13 @@ public class AnsiOutput : OutputBase, IOutput
     ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
     ///     a reference to the buffer last written with <see cref="Write(IOutputBuffer)"/>.
     /// </summary>
-    public IOutputBuffer? GetLastBuffer () { return _lastBuffer; }
+    public IOutputBuffer? GetLastBuffer () => _lastBuffer;
 
     /// <inheritdoc/>
-    public void SetSize (int width, int height) { _consoleSize = new (width, height); }
+    public void SetSize (int width, int height) => _consoleSize = new Size (width, height);
 
     /// <inheritdoc/>
-    public Size GetSize () { return _consoleSize; }
+    public Size GetSize () => _consoleSize;
 
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
@@ -126,8 +178,10 @@ public class AnsiOutput : OutputBase, IOutput
         {
             Console.Out.Write (output);
         }
-        catch
+        catch (Exception e)
         {
+            Logging.Warning (e.Message);
+
             // ignore for unit tests
         }
     }
@@ -144,8 +198,10 @@ public class AnsiOutput : OutputBase, IOutput
         {
             Console.Out.Write (text);
         }
-        catch
+        catch (Exception e)
         {
+            Logging.Warning (e.Message);
+
             // ignore for unit tests
         }
     }
@@ -159,13 +215,10 @@ public class AnsiOutput : OutputBase, IOutput
 
     private Cursor _currentCursor;
 
-    /// <inheritdoc />
-    public Cursor GetCursor ()
-    {
-        return _currentCursor;
-    }
+    /// <inheritdoc/>
+    public Cursor GetCursor () => _currentCursor;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
         try
@@ -190,10 +243,7 @@ public class AnsiOutput : OutputBase, IOutput
         }
         finally
         {
-            SetCursorPositionImpl (
-                                   cursor.Position?.X ?? 0,
-                                   cursor.Position?.Y ?? 0
-                                  );
+            SetCursorPositionImpl (cursor.Position?.X ?? 0, cursor.Position?.Y ?? 0);
 
             _currentCursor = cursor;
         }
@@ -215,6 +265,7 @@ public class AnsiOutput : OutputBase, IOutput
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
         EscSeqUtils.CSI_WriteCursorPosition (Console.Out, row + 1, col + 1);
+
         return true;
     }
 
@@ -228,19 +279,9 @@ public class AnsiOutput : OutputBase, IOutput
         }
         else
         {
-            EscSeqUtils.CSI_AppendForegroundColorRGB (
-                                                      output,
-                                                      attr.Foreground.R,
-                                                      attr.Foreground.G,
-                                                      attr.Foreground.B
-                                                     );
+            EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
 
-            EscSeqUtils.CSI_AppendBackgroundColorRGB (
-                                                      output,
-                                                      attr.Background.R,
-                                                      attr.Background.G,
-                                                      attr.Background.B
-                                                     );
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
             EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
         }
     }
@@ -269,7 +310,7 @@ public class AnsiOutput : OutputBase, IOutput
                 // Group 2 is height, Group 3 is width
                 if (int.TryParse (match.Groups [2].Value, out int height) && int.TryParse (match.Groups [3].Value, out int width))
                 {
-                    _consoleSize = new (width, height);
+                    _consoleSize = new Size (width, height);
                 }
             }
         }
@@ -297,6 +338,17 @@ public class AnsiOutput : OutputBase, IOutput
         catch
         {
             // Ignore errors - we're shutting down
+        }
+        finally
+        {
+            Logging.Trace ("Flushing and closing Console.Out");
+            if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
+            {
+                throw new ApplicationException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
+            }
+
+            //Console.Out.Flush ();
+            //Console.Out.Close ();
         }
     }
 }
