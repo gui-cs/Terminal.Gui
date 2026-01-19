@@ -104,13 +104,14 @@ public class AnsiOutput : OutputBase, IOutput
             Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
             Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
             Write (EscSeqUtils.CSI_HideCursor);
+            // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_EnableMouseEvents);
 
             // Flush to ensure all sequences are sent
             // NOTE: Default implementation of Flush does nothing.
             Console.Out.Flush ();
 
-            Logging.Information ("ANSIOutput initialized successfully");
+            //Logging.Information ("ANSIOutput initialized successfully");
 
             // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
             // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
@@ -329,6 +330,7 @@ public class AnsiOutput : OutputBase, IOutput
         try
         {
             // Restore terminal state: disable mouse, restore buffer, show cursor
+            // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
             Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
             Write (EscSeqUtils.CSI_ShowCursor);

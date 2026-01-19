@@ -128,47 +128,13 @@ internal sealed class WindowsVTInputHelper : IDisposable
             Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
             IsEnabled = true;
-            Logging.Information ($"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
+            //Logging.Information ($"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
         }
         catch (Exception ex)
         {
             Logging.Warning ($"Failed to enable Windows VTS mode: {ex.Message}");
-
-            return false;
-        }
-    }
-
-    /// <summary>
-    ///     Checks if console input events are available.
-    /// </summary>
-    /// <param name="eventCount">Number of events available, if successful.</param>
-    /// <returns>True if check succeeded; false otherwise.</returns>
-    public bool TryGetInputEventCount (out uint eventCount)
-    {
-        eventCount = 0;
-
-        if (!IsEnabled || InputHandle == nint.Zero)
-        {
-            return false;
-        }
-
-        try
-        {
-            if (GetNumberOfConsoleInputEvents (InputHandle, out eventCount))
-            {
-                return true;
-            }
-
-            int error = Marshal.GetLastWin32Error ();
-            Logging.Warning ($"GetNumberOfConsoleInputEvents failed with error: {error}");
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Logging.Warning ($"Exception checking console input events: {ex.Message}");
 
             return false;
         }
@@ -240,7 +206,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             SetConsoleMode (InputHandle, _originalConsoleMode);
             IsEnabled = false;
-            Logging.Information ("Windows console mode restored.");
+            //Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)
         {

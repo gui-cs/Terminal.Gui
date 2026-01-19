@@ -56,7 +56,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
         // Set up the callback to queue ANSI requests through the driver
         _queueAnsiRequest = driver.QueueAnsiRequest;
 
-        Logging.Information ("ANSISizeMonitor: Initialized with driver, sending initial size query");
+        //Logging.Information ("ANSISizeMonitor: Initialized with driver, sending initial size query");
 
         // Send the initial size query - response will arrive asynchronously
         // once the input thread starts reading. We don't block here because:

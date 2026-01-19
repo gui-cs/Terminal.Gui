@@ -162,7 +162,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // NOTE: Output operations (alternate buffer, cursor visibility, mouse events)
             // NOTE: are handled by ANSIOutput, not here. ANSIInput only handles input.
 
-            Logging.Information ("ANSIInput initialized successfully");
+            //Logging.Information ("ANSIInput initialized successfully");
         }
         catch (Exception ex)
         {
