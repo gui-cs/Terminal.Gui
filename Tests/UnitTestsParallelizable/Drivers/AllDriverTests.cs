@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Text;
+﻿using System.Text;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -18,7 +17,6 @@ public class DriverTestCollection
 [Collection ("Driver Tests")]
 public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
 {
-
     [Theory]
     [InlineData ("", true)]
     [InlineData ("a", true)]
@@ -42,7 +40,7 @@ public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
         Assert.False (driver.IsValidLocation (text, driver.Cols, driver.Rows));
 
         // Define a clip rectangle
-        driver.Clip = new (new Rectangle (5, 5, 5, 5));
+        driver.Clip = new Region (new Rectangle (5, 5, 5, 5));
 
         // positive
         Assert.True (driver.IsValidLocation (text, 5, 5));
@@ -113,7 +111,7 @@ public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
 
         driver.SetScreenSize (6, 3);
 
-        driver!.Clip = new (driver.Screen);
+        driver!.Clip = new Region (driver.Screen);
 
         driver.Move (1, 0);
         driver.AddStr ("┌");
@@ -121,14 +119,12 @@ public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
         driver.AddStr ("─");
         driver.Move (3, 0);
         driver.AddStr ("┐");
-        driver.Clip.Exclude (new Region (new (1, 0, 3, 1)));
+        driver.Clip.Exclude (new Region (new Rectangle (1, 0, 3, 1)));
 
         driver.Move (0, 0);
         driver.AddStr ("🍎🍎🍎🍎");
 
-
-        DriverAssert.AssertDriverContentsAre (
-                                              """
+        DriverAssert.AssertDriverContentsAre ("""
                                               ①┌─┐🍎
                                               """,
                                               output,
@@ -136,8 +132,7 @@ public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
 
         driver.Refresh ();
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
-                                           output, driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;0;0;0m\x1b[48;2;0;0;0m①┌─┐🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m", output, driver);
     }
 }
 

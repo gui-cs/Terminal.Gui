@@ -74,25 +74,25 @@ public partial class TextView
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (_topRow + 1);
+            ScrollTo (Viewport.Y + 1);
         }
         else if (mouse.Flags == MouseFlags.WheeledUp)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (_topRow - 1);
+            ScrollTo (Viewport.Y - 1);
         }
         else if (mouse.Flags == MouseFlags.WheeledRight)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (_leftColumn + 1, false);
+            ScrollTo (Viewport.X + 1, false);
         }
         else if (mouse.Flags == MouseFlags.WheeledLeft)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (_leftColumn - 1, false);
+            ScrollTo (Viewport.X - 1, false);
         }
         else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
         {
@@ -101,36 +101,36 @@ public partial class TextView
 
             if (_model.Count > 0 && _shiftSelecting && IsSelecting)
             {
-                if (CurrentRow - _topRow >= Viewport.Height - 1 && _model.Count > _topRow + CurrentRow)
+                if (CurrentRow - Viewport.Y >= Viewport.Height - 1 && _model.Count > Viewport.Y + CurrentRow)
                 {
-                    ScrollTo (_topRow + Viewport.Height);
+                    ScrollTo (Viewport.Y + Viewport.Height);
                 }
-                else if (_topRow > 0 && CurrentRow <= _topRow)
+                else if (Viewport.Y > 0 && CurrentRow <= Viewport.Y)
                 {
-                    ScrollTo (_topRow - Viewport.Height);
+                    ScrollTo (Viewport.Y - Viewport.Height);
                 }
                 else if (mouse.Position!.Value.Y >= Viewport.Height)
                 {
                     ScrollTo (_model.Count);
                 }
-                else if (mouse.Position!.Value.Y < 0 && _topRow > 0)
+                else if (mouse.Position!.Value.Y < 0 && Viewport.Y > 0)
                 {
                     ScrollTo (0);
                 }
 
-                if (CurrentColumn - _leftColumn >= Viewport.Width - 1 && line.Count > _leftColumn + CurrentColumn)
+                if (CurrentColumn - Viewport.X >= Viewport.Width - 1 && line.Count > Viewport.X + CurrentColumn)
                 {
-                    ScrollTo (_leftColumn + Viewport.Width, false);
+                    ScrollTo (Viewport.X + Viewport.Width, false);
                 }
-                else if (_leftColumn > 0 && CurrentColumn <= _leftColumn)
+                else if (Viewport.X > 0 && CurrentColumn <= Viewport.X)
                 {
-                    ScrollTo (_leftColumn - Viewport.Width, false);
+                    ScrollTo (Viewport.X - Viewport.Width, false);
                 }
                 else if (mouse.Position!.Value.X >= Viewport.Width)
                 {
                     ScrollTo (line.Count, false);
                 }
-                else if (mouse.Position!.Value.X < 0 && _leftColumn > 0)
+                else if (mouse.Position!.Value.X < 0 && Viewport.X > 0)
                 {
                     ScrollTo (0, false);
                 }
@@ -202,12 +202,8 @@ public partial class TextView
                 StartSelecting ();
             }
 
-            (int startCol, int col, int row)? newPos = _model.ProcessDoubleClickSelection (
-                                                                                           SelectionStartColumn,
-                                                                                           CurrentColumn,
-                                                                                           CurrentRow,
-                                                                                           UseSameRuneTypeForWords,
-                                                                                           SelectWordOnlyOnDoubleClick);
+            (int startCol, int col, int row)? newPos =
+                _model.ProcessDoubleClickSelection (SelectionStartColumn, CurrentColumn, CurrentRow, UseSameRuneTypeForWords, SelectWordOnlyOnDoubleClick);
 
             if (newPos.HasValue)
             {
@@ -257,27 +253,27 @@ public partial class TextView
 
         if (_model.Count > 0)
         {
-            int maxCursorPositionableLine = Math.Max (_model.Count - 1 - _topRow, 0);
+            int maxCursorPositionableLine = Math.Max (_model.Count - 1 - Viewport.Y, 0);
 
             if (Math.Max (mouse.Position!.Value.Y, 0) > maxCursorPositionableLine)
             {
-                CurrentRow = maxCursorPositionableLine + _topRow;
+                CurrentRow = maxCursorPositionableLine + Viewport.Y;
             }
             else
             {
-                CurrentRow = Math.Max (mouse.Position!.Value.Y + _topRow, 0);
+                CurrentRow = Math.Max (mouse.Position!.Value.Y + Viewport.Y, 0);
             }
 
             r = GetCurrentLine ();
-            int idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (mouse.Position!.Value.X, 0), TabWidth);
+            int idx = TextModel.GetColFromX (r, Viewport.X, Math.Max (mouse.Position!.Value.X, 0), TabWidth);
 
-            if (idx - _leftColumn >= r.Count)
+            if (idx - Viewport.X >= r.Count)
             {
-                CurrentColumn = Math.Max (r.Count - _leftColumn - (ReadOnly ? 1 : 0), 0);
+                CurrentColumn = Math.Max (r.Count - Viewport.X - (ReadOnly ? 1 : 0), 0);
             }
             else
             {
-                CurrentColumn = idx + _leftColumn;
+                CurrentColumn = idx + Viewport.X;
             }
         }
 

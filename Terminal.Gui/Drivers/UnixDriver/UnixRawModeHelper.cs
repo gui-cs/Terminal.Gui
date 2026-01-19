@@ -93,9 +93,7 @@ internal sealed class UnixRawModeHelper : IDisposable
         }
 
         // Only attempt on Unix-like platforms
-        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Linux)
-            && !RuntimeInformation.IsOSPlatform (OSPlatform.OSX)
-            && !RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD))
+        if (!PlatformDetection.IsUnixLike())
         {
             return false;
         }

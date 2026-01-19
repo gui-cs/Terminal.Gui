@@ -78,9 +78,25 @@ public partial class TextField : View, IDesignable
         {
             App?.Mouse.UngrabMouse ();
         }
+
+        // If gaining focus via keyboard (not mouse), select all text
+        if (newHasFocus && !_focusSetByMouse && _text.Count > 0)
+        {
+            SelectAll ();
+        }
+
+        // Reset the flag after handling focus change
+        _focusSetByMouse = false;
+
         UpdateCursor ();
     }
 
+    /// <inheritdoc />
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    {
+        base.OnSubViewsLaidOut (args);
+        UpdateCursor ();
+    }
 
     /// <summary>Get the Context Menu for this view.</summary>
     public PopoverMenu? ContextMenu { get; private set; }

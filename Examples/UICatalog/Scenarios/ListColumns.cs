@@ -190,7 +190,7 @@ public class ListColumns : Scenario
 
         menuBar.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem
                                        {
@@ -209,7 +209,7 @@ public class ListColumns : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Action = Quit
                                        }
                                    ]
@@ -311,7 +311,7 @@ public class ListColumns : Scenario
         Dialog d = new Dialog
         {
             Title = prompt,
-            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
+            Buttons = [new () { Title = Strings.btnCancel }, new () { Title = Strings.btnOk }]
         };
 
         TextField tf = new () { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill (0, minimumContentDim: 50) };

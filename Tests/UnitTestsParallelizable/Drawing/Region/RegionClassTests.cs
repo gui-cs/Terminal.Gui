@@ -243,8 +243,8 @@ public class RegionClassTests
         region.Union (new Rectangle (100, 100, 20, 20));
         Rectangle [] scans = region.GetRectangles ();
         Assert.Equal (2, scans.Length);
-        Assert.Contains (new (10, 10, 50, 50), scans);
-        Assert.Contains (new (100, 100, 20, 20), scans);
+        Assert.Contains (new Rectangle (10, 10, 50, 50), scans);
+        Assert.Contains (new Rectangle (100, 100, 20, 20), scans);
     }
 
     [Fact]
@@ -347,8 +347,8 @@ public class RegionClassTests
 
         // Assert
         Assert.Equal (2, region.GetRectangles ().Length);
-        Assert.Contains (new (2, 2, 3, 2), region.GetRectangles ());
-        Assert.Contains (new (10, 2, 2, 2), region.GetRectangles ());
+        Assert.Contains (new Rectangle (2, 2, 3, 2), region.GetRectangles ());
+        Assert.Contains (new Rectangle (10, 2, 2, 2), region.GetRectangles ());
     }
 
     //[Fact]
@@ -923,9 +923,9 @@ public class RegionClassTests
         // Original & Updated (with normalization disabled) behavior:
         // Produces [(0,0,1,1), (1,0,1,2), (2,0,0,1)]
         Assert.Equal (3, result.Length);
-        Assert.Contains (new (0, 0, 1, 1), result);
-        Assert.Contains (new (1, 0, 1, 2), result);
-        Assert.Contains (new (2, 0, 0, 1), result);
+        Assert.Contains (new Rectangle (0, 0, 1, 1), result);
+        Assert.Contains (new Rectangle (1, 0, 1, 2), result);
+        Assert.Contains (new Rectangle (2, 0, 0, 1), result);
     }
 
     [Fact]

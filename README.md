@@ -25,8 +25,8 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 Install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new TUI app, and run it:
 
 ```powershell
-dotnet new --install Terminal.Gui.templates
-dotnet new tui -n myproj
+dotnet new install Terminal.Gui.Templates
+dotnet new tui-simple -n myproj
 cd myproj
 dotnet run
 ```
@@ -42,7 +42,9 @@ dotnet run --project Examples/UICatalog/UICatalog.csproj
 # Simple Example
 
 ```csharp
-using Terminal.Gui;
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
 
 using IApplication app = Application.Create ();
 app.Init ();
@@ -113,13 +115,17 @@ dotnet add package Terminal.Gui --version "2.0.0-alpha.*"
 dotnet add package Terminal.Gui --version "2.0.0-develop.*"
 ```
 
+Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
+
+```powershell
+dotnet new install Terminal.Gui.Templates
+```
+
 ## v1 Legacy
 
 ```powershell
 dotnet add package Terminal.Gui --version "1.*"
 ```
-
-Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
 
 # Contributing
 

@@ -163,11 +163,11 @@ public enum Command
 
     #region Editing Commands
 
-    /// <summary>Deletes the characters forwards.</summary>
-    KillWordForwards,
+    /// <summary>Deletes the word to the right of the cursor.</summary>
+    KillWordRight,
 
-    /// <summary>Deletes the characters backwards.</summary>
-    KillWordBackwards,
+    /// <summary>Deletes the word to left to the cursor.</summary>
+    KillWordLeft,
 
     /// <summary>
     ///     Toggles overwrite mode such that newly typed text overwrites the text that is already there (typically
@@ -255,10 +255,10 @@ public enum Command
     Paste,
 
     /// <summary>Cuts to the clipboard the characters from the current position to the end of the line.</summary>
-    CutToEndLine,
+    CutToEndOfLine,
 
     /// <summary>Cuts to the clipboard the characters from the current position to the start of the line.</summary>
-    CutToStartLine,
+    CutToStartOfLine,
 
     #endregion
 

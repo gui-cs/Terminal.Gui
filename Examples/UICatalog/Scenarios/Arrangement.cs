@@ -165,7 +165,7 @@ public class Arrangement : Scenario
         };
         colorPicker.ApplyStyleChanges ();
 
-        colorPicker.SelectedColor = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
+        colorPicker.Value = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
         colorPicker.ColorChanged += ColorPickerColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;

@@ -9,7 +9,6 @@ public partial class TextView
         SetWrapModel ();
         bool res = _model.CloseFile ();
         ResetPosition ();
-        SetNeedsDraw ();
         UpdateWrapModel ();
 
         return res;
@@ -20,7 +19,6 @@ public partial class TextView
     /// <param name="path">Path to the file to load.</param>
     public bool Load (string path)
     {
-        SetWrapModel ();
         bool res;
 
         try
@@ -33,11 +31,8 @@ public partial class TextView
         finally
         {
             UpdateWrapModel ();
-            SetNeedsDraw ();
-            Adjust ();
+            AdjustViewport ();
         }
-
-        UpdateWrapModel ();
 
         return res;
     }
@@ -51,7 +46,6 @@ public partial class TextView
         _model.LoadStream (stream);
         _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
-        SetNeedsDraw ();
         UpdateWrapModel ();
     }
 
@@ -63,7 +57,6 @@ public partial class TextView
         _model.LoadCells (cells, GetAttributeForRole (VisualRole.Focus));
         _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
-        SetNeedsDraw ();
         UpdateWrapModel ();
         InheritsPreviousAttribute = true;
     }
@@ -77,7 +70,6 @@ public partial class TextView
         _model.LoadListCells (cellsList, GetAttributeForRole (VisualRole.Focus));
         _historyText.Clear (_model.GetAllLines ());
         ResetPosition ();
-        SetNeedsDraw ();
         UpdateWrapModel ();
     }
 }

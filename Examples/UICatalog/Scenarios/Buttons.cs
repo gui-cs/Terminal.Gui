@@ -26,7 +26,7 @@ public class Buttons : Scenario
 
         // This is the default button (IsDefault = true); if user presses ENTER in the TextField
         // the scenario will quit
-        Button defaultButton = new () { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = "_Quit" };
+        Button defaultButton = new () { X = Pos.Center (), Y = Pos.AnchorEnd (), IsDefault = true, Text = Strings.cmdQuit };
 
         main.Add (defaultButton);
 
@@ -59,7 +59,7 @@ public class Buttons : Scenario
                                                                   (s as View)?.App!,
                                                                   "Error",
                                                                   "This button is no longer the Quit button; the Swap Default button is.",
-                                                                  "_Ok");
+                                                                  Strings.btnOk);
                                        }
                                    };
         main.Add (swapButton);
@@ -103,7 +103,7 @@ public class Buttons : Scenario
 
         button.Accepting += (s, e) =>
                             {
-                                MessageBox.Query ((s as View)?.App!, "Message", "Is There A Question?", "_No", "_Yes");
+                                MessageBox.Query ((s as View)?.App!, "Message", "Is There A Question?", Strings.btnNo, Strings.btnYes);
                                 e.Handled = true;
                             };
 
@@ -444,7 +444,7 @@ public class Buttons : Scenario
         {
             button.Accepting += (s, e) =>
                                 {
-                                    MessageBox.Query ((s as View)?.App!, "Message", $"Did you click {txt}?", "_No", "_Yes");
+                                    MessageBox.Query ((s as View)?.App!, "Message", $"Did you click {txt}?", Strings.btnNo, Strings.btnYes);
                                     e.Handled = true;
                                 };
         }

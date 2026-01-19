@@ -14,7 +14,7 @@ public partial class TextView
         private set
         {
             _currentColumn = value;
-            _insertionPoint = new (_currentColumn, _currentRow);
+            _insertionPoint = new Point (_currentColumn, _currentRow);
             PositionCursor ();
         }
     }
@@ -26,7 +26,7 @@ public partial class TextView
         private set
         {
             _currentRow = value;
-            _insertionPoint = new (_currentColumn, _currentRow);
+            _insertionPoint = new Point (_currentColumn, _currentRow);
             PositionCursor ();
         }
     }
@@ -43,13 +43,11 @@ public partial class TextView
 
             List<Cell> line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
 
-            CurrentColumn = value.X < 0 ? 0 :
-                            value.X > line.Count ? line.Count : value.X;
+            CurrentColumn = value.X < 0 ? 0 : value.X > line.Count ? line.Count : value.X;
 
-            CurrentRow = value.Y < 0 ? 0 :
-                         value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
+            CurrentRow = value.Y < 0 ? 0 : value.Y > _model.Count - 1 ? Math.Max (_model.Count - 1, 0) : value.Y;
 
-            Adjust ();
+            AdjustViewport ();
 
             // Signal cursor position changed without requiring additional redraw
             Point newPosition = new (CurrentColumn, CurrentRow);
@@ -65,18 +63,12 @@ public partial class TextView
     ///     Indicates whatever the text was changed or not. <see langword="true"/> if the text was changed
     ///     <see langword="false"/> otherwise.
     /// </summary>
-    public bool IsDirty
-    {
-        get => _historyText.IsDirty (_model.GetAllLines ());
-        set => _historyText.Clear (_model.GetAllLines ());
-    }
-
-    private int _leftColumn;
+    public bool IsDirty { get => _historyText.IsDirty (_model.GetAllLines ()); set => _historyText.Clear (_model.GetAllLines ()); }
 
     /// <summary>Gets or sets the left column.</summary>
     public int LeftColumn
     {
-        get => _leftColumn;
+        get => Viewport.X;
         set
         {
             if (value > 0 && _wordWrap)
@@ -84,7 +76,7 @@ public partial class TextView
                 return;
             }
 
-            _leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+            Viewport = Viewport with { X = Math.Max (Math.Min (value, Maxlength - 1), 0) };
         }
     }
 
@@ -92,7 +84,7 @@ public partial class TextView
     public int Lines => _model.Count;
 
     /// <summary>Gets the maximum visible length line.</summary>
-    public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Viewport.Height, TabWidth);
+    public int Maxlength => _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
 
     private bool _multiline = true;
 
@@ -109,7 +101,7 @@ public partial class TextView
                 TabKeyAddsTab = true;
             }
 
-            if (_multiline && !_enterKeyAddsLine)
+            if (_multiline && !EnterKeyAddsLine)
             {
                 EnterKeyAddsLine = true;
             }
@@ -119,12 +111,13 @@ public partial class TextView
                 EnterKeyAddsLine = false;
                 TabKeyAddsTab = false;
                 WordWrap = false;
+
                 // Don't reset cursor position - this causes unwanted scrolling (issue #3988)
                 // CurrentColumn = 0;
                 // CurrentRow = 0;
-                _savedHeight = Height;
+                //_savedHeight = Height;
 
-                Height = Dim.Auto (DimAutoStyle.Text, 1);
+                //Height = Dim.Auto (DimAutoStyle.Text, 1);
 
                 if (!IsInitialized)
                 {
@@ -133,9 +126,9 @@ public partial class TextView
 
                 SetNeedsDraw ();
             }
-            else if (_multiline && _savedHeight is { })
+            else if (_multiline /*&& _savedHeight is { }*/)
             {
-                Height = _savedHeight;
+                //Height = _savedHeight;
                 SetNeedsDraw ();
             }
 
@@ -153,15 +146,19 @@ public partial class TextView
         get => _isReadOnly;
         set
         {
-            if (value != _isReadOnly)
+            if (value == _isReadOnly)
             {
-                _isReadOnly = value;
-                CanFocus = !_isReadOnly;
-
-                SetNeedsDraw ();
-                WrapTextModel ();
-                Adjust ();
+                return;
             }
+            _isReadOnly = value;
+            CanFocus = !_isReadOnly;
+
+            SetNeedsDraw ();
+
+            // TODO: This call is probably not needed as Adjust also
+            // TODO: calls WrapTextModel
+            WrapTextModel ();
+            AdjustViewport ();
         }
     }
 
@@ -210,7 +207,7 @@ public partial class TextView
 
             if (_wordWrap)
             {
-                _wrapManager = new (_model);
+                _wrapManager = new WordWrapManager (_model);
                 _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
             }
 
@@ -222,11 +219,7 @@ public partial class TextView
     }
 
     /// <summary>Gets or sets the top row.</summary>
-    public int TopRow
-    {
-        get => _topRow;
-        set => _topRow = Math.Max (Math.Min (value, Lines - 1), 0);
-    }
+    public int TopRow { get => Viewport.Y; set => Viewport = Viewport with { Y = Math.Max (Math.Min (value, Lines - 1), 0) }; }
 
     /// <summary>
     ///     Tracks whether the text view should be considered "used", that is, that the user has moved in the entry, so
@@ -269,20 +262,18 @@ public partial class TextView
 
             try
             {
-                key = new (ch);
+                key = new Key (ch);
             }
             catch (Exception)
             {
-                throw new ArgumentException (
-                                             $"Cannot insert character '{ch}' because it does not map to a Key"
-                                            );
+                throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
             }
 
             InsertText (key);
 
             if (NeedsDraw)
             {
-                Adjust ();
+                AdjustViewport ();
             }
 
             PositionCursor ();
@@ -295,12 +286,7 @@ public partial class TextView
     /// <param name="matchWholeWord">The match whole word setting.</param>
     /// <param name="textToReplace">The text to replace.</param>
     /// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
-    public bool ReplaceAllText (
-        string textToFind,
-        bool matchCase = false,
-        bool matchWholeWord = false,
-        string? textToReplace = null
-    )
+    public bool ReplaceAllText (string textToFind, bool matchCase = false, bool matchWholeWord = false, string? textToReplace = null)
     {
         if (_isReadOnly || _model.Count == 0)
         {
@@ -310,9 +296,9 @@ public partial class TextView
         SetWrapModel ();
         ResetContinuousFind ();
 
-        (Point current, bool found) foundPos =
-            _model.ReplaceAllText (textToFind, matchCase, matchWholeWord, textToReplace);
+        (Point current, bool found) foundPos = _model.ReplaceAllText (textToFind, matchCase, matchWholeWord, textToReplace);
 
+        // Calls UpdateWrapModel internally
         return SetFoundText (textToFind, foundPos, textToReplace, false, true);
     }
 
@@ -320,33 +306,27 @@ public partial class TextView
     {
         SetWrapModel ();
 
-        long start, end;
         long currentEncoded = ((long)(uint)CurrentRow << 32) | (uint)CurrentColumn;
-        GetEncodedRegionBounds (out start, out end);
+        GetEncodedRegionBounds (out long start, out long end);
         var startRow = (int)(start >> 32);
-        var maxrow = (int)(end >> 32);
+        var maxRow = (int)(end >> 32);
         var startCol = (int)(start & 0xffffffff);
         var endCol = (int)(end & 0xffffffff);
         List<Cell> line = _model.GetLine (startRow);
 
-        _historyText.Add ([[.. line]], new (startCol, startRow));
+        _historyText.Add ([[.. line]], new Point (startCol, startRow));
 
         List<List<Cell>> removedLines = [];
 
-        if (startRow == maxrow)
+        if (startRow == maxRow)
         {
             removedLines.Add ([.. line]);
 
             line.RemoveRange (startCol, endCol - startCol);
+            SetNeedsDraw ();
             CurrentColumn = startCol;
 
-            SetNeedsDraw ();
-
-            _historyText.Add (
-                              [.. removedLines],
-                              InsertionPoint,
-                              TextEditingLineStatus.Removed
-                             );
+            _historyText.Add ([.. removedLines], InsertionPoint, TextEditingLineStatus.Removed);
 
             UpdateWrapModel ();
 
@@ -356,42 +336,30 @@ public partial class TextView
         removedLines.Add ([.. line]);
 
         line.RemoveRange (startCol, line.Count - startCol);
-        List<Cell> line2 = _model.GetLine (maxrow);
+        List<Cell> line2 = _model.GetLine (maxRow);
         line.AddRange (line2.Skip (endCol));
 
-        for (int row = startRow + 1; row <= maxrow; row++)
+        for (int row = startRow + 1; row <= maxRow; row++)
         {
             removedLines.Add ([.. _model.GetLine (startRow + 1)]);
 
             _model.RemoveLine (startRow + 1);
+            SetNeedsDraw ();
         }
 
         if (currentEncoded == end)
         {
-            CurrentRow -= maxrow - startRow;
+            CurrentRow -= maxRow - startRow;
         }
 
         CurrentColumn = startCol;
 
-        _historyText.Add (
-                          [.. removedLines],
-                          InsertionPoint,
-                          TextEditingLineStatus.Removed
-                         );
+        _historyText.Add ([.. removedLines], InsertionPoint, TextEditingLineStatus.Removed);
 
         UpdateWrapModel ();
-
-        SetNeedsDraw ();
     }
 
-    private void GetEncodedRegionBounds (
-        out long start,
-        out long end,
-        int? startRow = null,
-        int? startCol = null,
-        int? cRow = null,
-        int? cCol = null
-    )
+    private void GetEncodedRegionBounds (out long start, out long end, int? startRow = null, int? startCol = null, int? cRow = null, int? cCol = null)
     {
         long selection;
         long point;
@@ -419,14 +387,7 @@ public partial class TextView
         }
     }
 
-    internal string GetRegion (
-        out List<List<Cell>> cellsList,
-        int? sRow = null,
-        int? sCol = null,
-        int? cRow = null,
-        int? cCol = null,
-        TextModel? model = null
-    )
+    internal string GetRegion (out List<List<Cell>> cellsList, int? sRow = null, int? sCol = null, int? cRow = null, int? cCol = null, TextModel? model = null)
     {
         GetEncodedRegionBounds (out long start, out long end, sRow, sCol, cRow, cCol);
 
@@ -462,9 +423,7 @@ public partial class TextView
             cells = model == null ? _model.GetLine (row) : model.GetLine (row);
             cellsList.Add (cells);
 
-            res = res
-                  + Environment.NewLine
-                  + StringFromCells (cells);
+            res = res + Environment.NewLine + StringFromCells (cells);
         }
 
         line = model is null ? _model.GetLine (maxRow) : model.GetLine (maxRow);
@@ -495,9 +454,6 @@ public partial class TextView
             SetNeedsDraw ();
         }
     }
-
-    private string? _copiedText;
-    private List<List<Cell>> _copiedCellsList = [];
 
     private void InsertAllText (string text, bool fromClipboard = false)
     {
@@ -536,18 +492,13 @@ public partial class TextView
             line.InsertRange (CurrentColumn, lines [0]);
             CurrentColumn += lines [0].Count;
 
-            _historyText.Add (
-                              [[.. line]],
-                              InsertionPoint,
-                              TextEditingLineStatus.Replaced
-                             );
+            _historyText.Add ([[.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
-            if (!_wordWrap && CurrentColumn - _leftColumn > Viewport.Width)
+            if (!_wordWrap && CurrentColumn - Viewport.X > Viewport.Width)
             {
-                _leftColumn = Math.Max (CurrentColumn - Viewport.Width + 1, 0);
+                Viewport = Viewport with { X = Math.Max (CurrentColumn - Viewport.Width + 1, 0) };
             }
 
-            SetNeedsDraw ();
             UpdateWrapModel ();
             OnContentsChanged ();
 
@@ -591,7 +542,7 @@ public partial class TextView
         // Now adjust column and row positions
         CurrentRow += lines.Count - 1;
         CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
-        Adjust ();
+        AdjustViewport ();
 
         _historyText.Add ([[.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
@@ -630,27 +581,22 @@ public partial class TextView
         {
             if (Used)
             {
-                Insert (new () { Grapheme = a.AsRune.ToString (), Attribute = attribute });
+                Insert (new Cell { Grapheme = a.AsRune.ToString (), Attribute = attribute });
                 CurrentColumn++;
 
-                if (CurrentColumn >= _leftColumn + Viewport.Width)
+                if (CurrentColumn >= Viewport.X + Viewport.Width)
                 {
-                    _leftColumn++;
-                    SetNeedsDraw ();
+                    Viewport = Viewport with { X = Viewport.X + 1 };
                 }
             }
             else
             {
-                Insert (new () { Grapheme = a.AsRune.ToString (), Attribute = attribute });
+                Insert (new Cell { Grapheme = a.AsRune.ToString (), Attribute = attribute });
                 CurrentColumn++;
             }
         }
 
-        _historyText.Add (
-                          [[.. GetCurrentLine ()]],
-                          InsertionPoint,
-                          TextEditingLineStatus.Replaced
-                         );
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
         OnContentsChanged ();
@@ -668,8 +614,10 @@ public partial class TextView
         if (!_multiline && !IsInitialized)
         {
             CurrentColumn = Text.GetRuneCount ();
-            _leftColumn = CurrentColumn > Viewport.Width + 1 ? CurrentColumn - Viewport.Width + 1 : 0;
+            Viewport = Viewport with { X = CurrentColumn > Viewport.Width + 1 ? CurrentColumn - Viewport.Width + 1 : 0 };
         }
+
+        UpdateContentSize ();
     }
 
     private int _columnTrack = -1;
@@ -696,12 +644,13 @@ public partial class TextView
 
     private void ResetContinuousFind ()
     {
-        if (!_continuousFind)
+        if (_continuousFind)
         {
-            int col = IsSelecting ? _selectionStartColumn : CurrentColumn;
-            int row = IsSelecting ? _selectionStartRow : CurrentRow;
-            _model.ResetContinuousFind (new (col, row));
+            return;
         }
+        int col = IsSelecting ? _selectionStartColumn : CurrentColumn;
+        int row = IsSelecting ? _selectionStartRow : CurrentRow;
+        _model.ResetContinuousFind (new Point (col, row));
     }
 
     private void ResetContinuousFindTrack ()
@@ -712,21 +661,17 @@ public partial class TextView
         _continuousFind = false;
     }
 
-    private int _topRow;
-
+    /// <summary>
+    ///     Resets the Viewport and InsertionPoint to the top-left of the text content.
+    /// </summary>
     private void ResetPosition ()
     {
-        _topRow = _leftColumn = CurrentRow = CurrentColumn = 0;
+        Viewport = Viewport with { Y = 0, X = 0 };
+        CurrentRow = CurrentColumn = 0;
         StopSelecting ();
     }
 
-    private bool SetFoundText (
-        string text,
-        (Point current, bool found) foundPos,
-        string? textToReplace = null,
-        bool replace = false,
-        bool replaceAll = false
-    )
+    private bool SetFoundText (string text, (Point current, bool found) foundPos, string? textToReplace = null, bool replace = false, bool replaceAll = false)
     {
         if (foundPos.found)
         {
@@ -747,7 +692,7 @@ public partial class TextView
 
             if (!_isReadOnly && replace)
             {
-                Adjust ();
+                AdjustViewport ();
                 ClearSelectedRegion ();
                 InsertAllText (textToReplace!);
                 StartSelecting ();
@@ -756,8 +701,7 @@ public partial class TextView
             else
             {
                 UpdateWrapModel ();
-                SetNeedsDraw ();
-                Adjust ();
+                AdjustViewport ();
             }
 
             _continuousFind = true;
@@ -815,6 +759,6 @@ public partial class TextView
             CurrentColumn = line.Count;
         }
 
-        Adjust ();
+        AdjustViewport ();
     }
 }

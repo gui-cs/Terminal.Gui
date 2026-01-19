@@ -61,7 +61,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="app">The <see cref="IApplication"/> instance that is running the input loop.</param>
     public async Task StartInputTaskAsync (IApplication? app)
     {
-        //Logging.Trace ("Booting... ()");
+        Logging.Trace ($"Booting... app: {app?.MainThreadId}");
 
         _inputTask = Task.Run (() => RunInput (app));
 
@@ -83,10 +83,10 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                 throw _inputTask.Exception;
             }
 
-            Logging.Critical ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            Logging.Critical ($"app: {app?.MainThreadId} Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
-        Logging.Trace ("Booting complete");
+        Logging.Trace ($"app: {app?.MainThreadId} Booting complete");
     }
 
     /// <inheritdoc/>
@@ -153,7 +153,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             app!.Driver = _driver;
 
             _startupSemaphore.Release ();
-            //Logging.Trace ($"Driver: _input: {_input}, _output: {_output}");
+            Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
         }
     }
 
@@ -184,27 +184,27 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             {
                 _input.Run (_runCancellationTokenSource.Token);
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                //Logging.Debug ($"Input loop canceled: {ex.Message}");
+                Logging.Trace ($"app: {app?.MainThreadId}Input loop canceled");
             }
 
             _input.Dispose ();
         }
         catch (Exception e)
         {
-            Logging.Critical ($"Input loop crashed: {e}");
+            Logging.Critical ($"app: {app?.MainThreadId} Input loop crashed: {e}");
 
             throw;
         }
 
         if (_stopCalled)
         {
-            Logging.Trace ("Input loop exited cleanly");
+            Logging.Trace ($"app: {app?.MainThreadId} Input loop exited cleanly");
         }
         else
         {
-            Logging.Critical ("Input loop exited early (stop not called)");
+            Logging.Critical ($"app: {app?.MainThreadId}Input loop exited early (stop not called)");
         }
     }
 }
