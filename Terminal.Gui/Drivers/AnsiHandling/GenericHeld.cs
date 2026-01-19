@@ -6,16 +6,16 @@ namespace Terminal.Gui.Drivers;
 /// <typeparam name="TInputRecord"></typeparam>
 internal class GenericHeld<TInputRecord> : IHeld
 {
-    private readonly List<Tuple<char, TInputRecord>> held = [];
+    private readonly List<Tuple<char, TInputRecord>> _held = [];
 
-    public void ClearHeld () { held.Clear (); }
+    public void ClearHeld () => _held.Clear ();
 
-    public string? HeldToString () { return new (held.Select (h => h.Item1).ToArray ()); }
+    public string HeldToString () => new (_held.Select (h => h.Item1).ToArray ());
 
-    public IEnumerable<object> HeldToObjects () { return held; }
+    public IEnumerable<object> HeldToObjects () => _held;
 
-    public void AddToHeld (object o) { held.Add ((Tuple<char, TInputRecord>)o); }
+    public void AddToHeld (object o) => _held.Add ((Tuple<char, TInputRecord>)o);
 
     /// <inheritdoc/>
-    public int Length => held.Count;
+    public int Length => _held.Count;
 }
