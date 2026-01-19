@@ -240,7 +240,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
             case AnsiPlatform.Degraded:
             default:
-                Logging.Trace ("IsVTModeEnabled is NOT enabled");
+                // Logging.Trace ("IsVTModeEnabled is NOT enabled");
 
                 yield break;
         }
@@ -319,7 +319,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     // can cause ReadFile to block indefinitely.
                     if (_pollMap == null)
                     {
-                        Logging.Trace ("");
+                        //Logging.Trace ("");
 
                         return;
                     }

@@ -75,17 +75,11 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
                                                // Check if this is an incomplete mouse sequence (timing issue when Run() blocks)
                                                var mouseParser = new AnsiMouseParser ();
 
-                                               if (mouseParser.IsMouse ($"\u001b{cur}"))
-                                               {
-                                                   // Incomplete mouse sequences can arrive when Run() blocks the main thread
-                                                   // causing the escape timeout to fire before the sequence completes.
-                                                   // This is harmless - just swallow it silently.
-                                                   Logging.Trace ($"{nameof (InputProcessorImpl<TInputRecord>)} swallowed incomplete mouse sequence: '{cur}'");
-                                               }
-                                               else
-                                               {
-                                                   Logging.Information ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'");
-                                               }
+                                               Logging.Warning ($"{
+                                                   nameof (InputProcessorImpl<TInputRecord>)
+                                               } ignored unrecognized response '{
+                                                   cur
+                                               }'. See https://github.com/gui-cs/Terminal.Gui/issues/4587");
 
                                                AnsiSequenceSwallowed?.Invoke (this, cur);
 
@@ -130,7 +124,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     {
         foreach (Mouse expiredClick in _mouseInterpreter.CheckForExpiredClicks ())
         {
-            Logging.Trace ($"Emitting expired click: {expiredClick}");
+            //Logging.Trace ($"Emitting expired click: {expiredClick}");
             SyntheticMouseEvent?.Invoke (this, expiredClick);
         }
     }
@@ -267,7 +261,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <inheritdoc/>
     public void RaiseMouseEventParsed (Mouse mouse)
     {
-        Logging.Trace ($"{mouse}");
+        //Logging.Trace ($"{mouse}");
         MouseEventParsed?.Invoke (this, mouse);
         RaiseSyntheticMouseEvent (mouse);
     }
@@ -280,14 +274,14 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <param name="mouse"></param>
     public void RaiseSyntheticMouseEvent (Mouse mouse)
     {
-        Logging.Trace ($"{mouse}");
+        //Logging.Trace ($"{mouse}");
 
         // Process through MouseInterpreter to generate clicks
         // The interpreter yields the original event first, then any synthetic click events
         foreach (Mouse e in _mouseInterpreter.Process (mouse))
         {
             // Raise all events: original + synthetic clicks
-            Logging.Trace ($"Invoking SyntheticMouseEvent: {e}");
+            //Logging.Trace ($"Invoking SyntheticMouseEvent: {e}");
             SyntheticMouseEvent?.Invoke (this, e);
         }
     }

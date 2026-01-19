@@ -63,7 +63,6 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
         lock (_lockState)
         {
-            Logging.Trace ($"{_heldContent.HeldToString ()}");
             _heldContent.ClearHeld ();
         }
     }
@@ -254,10 +253,10 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             if (HandleMouse && IsMouse (cur))
             {
-                // BUGBUG: We are on the UI thread. This will 'block' as whatever handles the event does its work.
-                // BUGBUG: Thus, we should be calling ResetState first, to clear held content before raising event.
-                RaiseMouseEvent (cur);
+                // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
+                // we call ResetState first
                 ResetState ();
+                RaiseMouseEvent (cur);
 
                 return false;
             }
@@ -268,10 +267,10 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
                 if (pattern != null)
                 {
-                    // BUGBUG: We are on the UI thread. This will 'block' as whatever handles the event does its work.
-                    // BUGBUG: Thus, we should be calling ResetState first, to clear held content before raising event.
-                    RaiseKeyboardEvent (pattern, cur);
+                    // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
+                    // we call ResetState first
                     ResetState ();
+                    RaiseKeyboardEvent (pattern, cur);
 
                     return false;
                 }
@@ -465,7 +464,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
     private void RaiseMouseEvent (string? cur)
     {
-        Logging.Trace ($"{cur}");
+        //Logging.Trace ($"{cur}");
         Mouse? ev = _mouseParser.ProcessMouseInput (cur);
 
         if (ev != null)

@@ -100,7 +100,7 @@ public class AnsiMouseParser
 
         Mouse m = new () { Timestamp = DateTime.Now, ScreenPosition = new Point (x, y), Flags = GetFlags (buttonCode, terminator) };
 
-        Logging.Trace ($"{input} -> {m}");
+        //Logging.Trace ($"{input} -> {m}");
 
         return m;
     }

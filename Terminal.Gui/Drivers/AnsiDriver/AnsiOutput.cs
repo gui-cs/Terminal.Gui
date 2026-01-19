@@ -339,7 +339,7 @@ public class AnsiOutput : OutputBase, IOutput
         }
         finally
         {
-            Logging.Trace ("Flushing and closing.");
+            //Logging.Trace ("Flushing and closing.");
 
             _windowsVTOutput?.Dispose ();
         }

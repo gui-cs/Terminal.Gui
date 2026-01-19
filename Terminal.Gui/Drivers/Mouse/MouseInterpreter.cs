@@ -215,7 +215,7 @@ internal class MouseInterpreter
             // View is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
             // Position is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
         };
-        Logging.Trace ($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");
+        //Logging.Trace ($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");
 
         return newClick;
     }
