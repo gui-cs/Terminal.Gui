@@ -184,7 +184,7 @@ public class Dialogs : Scenario
 
                                           if (dlg is null)
                                           {
-                                              MessageBox.ErrorQuery ((s as View)!.App!, "Error", "Could not create Dialog. Invalid options.", "_Ok");
+                                              MessageBox.ErrorQuery ((s as View)!.App!, "Error", "Could not create Dialog. Invalid options.", Strings.btnOk);
                                           }
                                           else
                                           {
@@ -196,9 +196,9 @@ public class Dialogs : Scenario
                                               {
                                                   buttonPressedLabel.Text = "Dialog canceled.";
                                               }
-                                          }
 
-                                          e.Handled = true;
+                                              e.Handled = true;
+                                          }
                                       };
 
         mainWindow.Add (showDialogButton, buttonPressedLabel);
@@ -206,7 +206,10 @@ public class Dialogs : Scenario
         // --- Dialog<TResult> Demo ---
         // Demonstrates using Dialog<Color> to return a typed result instead of a button index
 
-        Button showColorDialogButton = new () { X = Pos.Center (), Y = Pos.Bottom (buttonPressedLabel) + 2, Text = "Show Color Dialog<Color>" };
+        Button showColorDialogButton = new ()
+        {
+            X = Pos.Center (), Y = Pos.Bottom (buttonPressedLabel) + 2, Text = "Show Color Dialog<Color>"
+        };
         mainWindow.Add (showColorDialogButton);
 
         View colorLabel = new ()
@@ -234,7 +237,8 @@ public class Dialogs : Scenario
 
         showColorDialogButton.Accepting += (_, e) =>
                                            {
-                                               using ColorPickerDialog colorDialog = new (selectedColorLabel.GetScheme ().Normal.Background);
+                                               using ColorPickerDialog colorDialog =
+                                                   new (selectedColorLabel.GetScheme ().Normal.Background);
                                                colorDialog.ButtonAlignment = alignmentOptionSelector.Value.Value;
 
                                                // Run the dialog and get the typed result
@@ -246,8 +250,8 @@ public class Dialogs : Scenario
                                                    selectedColorLabel.SetScheme (new Scheme
                                                    {
                                                        Normal = new Attribute (selectedColorLabel.GetScheme ()
-                                                                                                 .Normal.Foreground,
-                                                                               result)
+                                                               .Normal.Foreground,
+                                                           result)
                                                    });
                                                }
                                                else
@@ -262,7 +266,10 @@ public class Dialogs : Scenario
         // Demonstrates using Prompt<TView, TResult> with extension methods
         // This is a simpler alternative to creating custom Dialog<TResult> subclasses
 
-        Button showPromptDialogButton = new () { X = Pos.Center (), Y = Pos.Bottom (selectedColorLabel) + 2, Text = "Prompt<AttributePicker, Attribute>" };
+        Button showPromptDialogButton = new ()
+        {
+            X = Pos.Center (), Y = Pos.Bottom (selectedColorLabel) + 2, Text = "Prompt<AttributePicker, Attribute>"
+        };
         mainWindow.Add (showPromptDialogButton);
 
         View promptAttributeLabel = new ()
@@ -285,19 +292,24 @@ public class Dialogs : Scenario
             SchemeName = "Error"
         };
         mainWindow.Add (promptSelectedAttributeLabel);
-        promptSelectedAttributeLabel.SetScheme (new Scheme { Normal = new Attribute (StandardColor.White, StandardColor.Cyan) });
+
+        promptSelectedAttributeLabel.SetScheme (new Scheme
+        {
+            Normal = new Attribute (StandardColor.White, StandardColor.Cyan)
+        });
         promptSelectedAttributeLabel.Text = promptSelectedAttributeLabel.GetScheme ().Normal.Background.ToString ();
 
         void OnShowPromptDialogButtonOnAccepting (object? _, CommandEventArgs e)
         {
             // Use the Prompt extension method - much simpler than custom Dialog<T>!
             // mainWindow is an IRunnable so we can call Prompt on it
-            Attribute? result = mainWindow.Prompt<AttributePicker, Attribute?> (input: promptSelectedAttributeLabel.GetScheme ().Normal,
-                                                                                beginInitHandler: prompt =>
-                                                                                                  {
-                                                                                                      // Customize the Prompt dialog
-                                                                                                      prompt.Title = "Pick an Attribute";
-                                                                                                  });
+            Attribute? result =
+                mainWindow.Prompt<AttributePicker, Attribute?> (input: promptSelectedAttributeLabel.GetScheme ().Normal,
+                                                                beginInitHandler: prompt =>
+                                                                {
+                                                                    // Customize the Prompt dialog
+                                                                    prompt.Title = "Pick an Attribute";
+                                                                });
 
             if (result is { } attribute)
             {

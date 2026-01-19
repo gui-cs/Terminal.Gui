@@ -10,14 +10,12 @@ public partial class TextView
     /// <param name="textToReplace">The text to replace.</param>
     /// <param name="replace"><c>true</c>If is replacing.<c>false</c>otherwise.</param>
     /// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
-    public bool FindNextText (
-        string textToFind,
-        out bool gaveFullTurn,
-        bool matchCase = false,
-        bool matchWholeWord = false,
-        string? textToReplace = null,
-        bool replace = false
-    )
+    public bool FindNextText (string textToFind,
+                              out bool gaveFullTurn,
+                              bool matchCase = false,
+                              bool matchWholeWord = false,
+                              string? textToReplace = null,
+                              bool replace = false)
     {
         if (_model.Count == 0)
         {
@@ -42,14 +40,12 @@ public partial class TextView
     /// <param name="textToReplace">The text to replace.</param>
     /// <param name="replace"><c>true</c>If the text was found.<c>false</c>otherwise.</param>
     /// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
-    public bool FindPreviousText (
-        string textToFind,
-        out bool gaveFullTurn,
-        bool matchCase = false,
-        bool matchWholeWord = false,
-        string? textToReplace = null,
-        bool replace = false
-    )
+    public bool FindPreviousText (string textToFind,
+                                  out bool gaveFullTurn,
+                                  bool matchCase = false,
+                                  bool matchWholeWord = false,
+                                  string? textToReplace = null,
+                                  bool replace = false)
     {
         if (_model.Count == 0)
         {
@@ -67,5 +63,5 @@ public partial class TextView
     }
 
     /// <summary>Reset the flag to stop continuous find.</summary>
-    public void FindTextChanged () { _continuousFind = false; }
+    public void FindTextChanged () => _continuousFind = false;
 }

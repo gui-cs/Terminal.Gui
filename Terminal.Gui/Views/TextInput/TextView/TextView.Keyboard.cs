@@ -29,7 +29,7 @@ public partial class TextView
 
             if (_enterKeyAddsLine && !_multiline)
             {
-                // BUGBUG: Setting properties should not have side-effects like this. Multiline and AllowsReturn should be independent.
+                // BUGBUG: Setting properties should not have side effects like this. Multiline and AllowsReturn should be independent.
                 Multiline = true;
             }
 
@@ -37,7 +37,7 @@ public partial class TextView
             {
                 Multiline = false;
 
-                // BUGBUG: Setting properties should not have side-effects like this. Multiline and AllowsTab should be independent.
+                // BUGBUG: Setting properties should not have side effects like this. Multiline and AllowsTab should be independent.
                 TabKeyAddsTab = false;
             }
 
@@ -52,7 +52,8 @@ public partial class TextView
     ///     input. If
     ///     set to <see langword="false"/> and the user presses the <see cref="Key.Tab"/> the focus will move to the next
     ///     view.
-    ///     The default is <see langword="true"/> ; if the user presses <see cref="Key.Tab"/>, a tab character will be inserted into the
+    ///     The default is <see langword="true"/> ; if the user presses <see cref="Key.Tab"/>, a tab character will be inserted
+    ///     into the
     ///     text.
     /// </summary>
     /// <remarks>
@@ -176,12 +177,7 @@ public partial class TextView
         // draw autocomplete
         GenerateSuggestions ();
 
-        var renderAt = new Point (
-                                  Autocomplete.Context.CursorPosition,
-                                  Autocomplete.PopupInsideContainer
-                                      ? InsertionPoint.Y + 1 - TopRow
-                                      : 0
-                                 );
+        var renderAt = new Point (Autocomplete.Context.CursorPosition, Autocomplete.PopupInsideContainer ? InsertionPoint.Y + 1 - TopRow : 0);
 
         Autocomplete.RenderOverlay (renderAt);
     }
@@ -191,16 +187,8 @@ public partial class TextView
         List<Cell> currentLine = GetCurrentLine ();
         int cursorPosition = Math.Min (CurrentColumn, currentLine.Count);
 
-        Autocomplete.Context = new (
-                                    currentLine,
-                                    cursorPosition,
-                                    Autocomplete.Context != null
-                                        ? Autocomplete.Context.Canceled
-                                        : false
-                                   );
+        Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context != null ? Autocomplete.Context.Canceled : false);
 
-        Autocomplete.GenerateSuggestions (
-                                          Autocomplete.Context
-                                         );
+        Autocomplete.GenerateSuggestions (Autocomplete.Context);
     }
 }

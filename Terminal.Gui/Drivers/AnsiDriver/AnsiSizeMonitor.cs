@@ -56,7 +56,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
         // Set up the callback to queue ANSI requests through the driver
         _queueAnsiRequest = driver.QueueAnsiRequest;
 
-        Logging.Information ("ANSISizeMonitor: Initialized with driver, sending initial size query");
+        //Logging.Information ("ANSISizeMonitor: Initialized with driver, sending initial size query");
 
         // Send the initial size query - response will arrive asynchronously
         // once the input thread starts reading. We don't block here because:
@@ -86,6 +86,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Abandoned = () => { _expectingResponse = false; }
         };
 
+        //Logging.Trace($"{request.Request}");
         _queueAnsiRequest! (request);
     }
 
@@ -116,19 +117,19 @@ internal class AnsiSizeMonitor : ISizeMonitor
     {
         Size currentSize = _output.GetSize ();
 
-        if (currentSize != _lastSize)
+        if (currentSize == _lastSize)
         {
-            _lastSize = currentSize;
-            SizeChanged?.Invoke (this, new (currentSize));
-
-            return true;
+            return false;
         }
+        _lastSize = currentSize;
+        SizeChanged?.Invoke (this, new SizeChangedEventArgs (currentSize));
 
-        return false;
+        return true;
     }
 
     private void HandleSizeResponse (string? response)
     {
+        //Logging.Trace($"{response}");
         _expectingResponse = false;
 
         if (string.IsNullOrEmpty (response))

@@ -29,11 +29,11 @@ public class InteractiveTree : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Action = Quit
                                        }
                                    ]
@@ -104,7 +104,7 @@ public class InteractiveTree : Scenario
         Dialog d = new ()
         {
             Title = title,
-            Buttons = [new () { Title = "_Cancel" }, new () { Title = "_Ok" }]
+            Buttons = [new () { Title = Strings.btnCancel }, new () { Title = Strings.btnOk }]
         };
 
         Label lbl = new () { X = 0, Y = 1, Text = label };

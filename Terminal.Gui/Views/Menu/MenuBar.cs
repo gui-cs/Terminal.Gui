@@ -562,7 +562,7 @@ public class MenuBar : Menu, IDesignable
 
         Add (
              new MenuBarItem (
-                                "_File",
+                                Strings.menuFile,
                                 [
                                     new MenuItem (targetView as View, Command.New),
                                     new MenuItem (targetView as View, Command.Open),
@@ -597,8 +597,8 @@ public class MenuBar : Menu, IDesignable
                                                                Action = () => MessageBox.Query (App!,
                                                                                                 "File Settings",
                                                                                                 "This is the File Settings Dialog\n",
-                                                                                                "_Ok",
-                                                                                                "_Cancel")
+                                                                                                Strings.btnOk,
+                                                                                                Strings.btnCancel)
                                                            }
                                                        ]
                                                       )
@@ -663,7 +663,7 @@ public class MenuBar : Menu, IDesignable
 
         Add (
              new MenuBarItem (
-                                "_Help",
+                                Strings.menuHelp,
                                 [
                                     new MenuItem
                                     {
@@ -737,7 +737,7 @@ public class MenuBar : Menu, IDesignable
                 {
                     Title = "_Deeper Detail",
                     Text = "Deeper Detail",
-                    Action = () => { MessageBox.Query (App!, "Deeper Detail", "Lots of details", "_Ok"); }
+                    Action = () => { MessageBox.Query (App!, "Deeper Detail", "Lots of details", Strings.btnOk); }
                 };
 
                 var belowLineDetail = new MenuItem

@@ -56,8 +56,12 @@ namespace Terminal.Gui.Drivers;
 /// </remarks>
 public class AnsiInput : InputImpl<char>, ITestableInput<char>
 {
+    // Tracks which underlying platform APIs are in use
+    private readonly AnsiPlatform _platform;
+
     // Platform-specific helpers
     private readonly UnixRawModeHelper? _unixRawMode;
+    private readonly UnixIOHelper.Pollfd []? _pollMap;
     private readonly WindowsVTInputHelper? _windowsVTInput;
 
     // Queue for storing injected input that will be returned by Peek/Read
@@ -71,9 +75,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     /// </summary>
     internal int PeekCallCount => _peekCallCount;
 
-    private readonly bool _terminalInitialized;
-    private readonly UnixIOHelper.Pollfd []? _pollMap;
-
     /// <summary>
     ///     Creates a new ANSIInput.
     /// </summary>
@@ -81,55 +82,75 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     {
         //Logging.Information ($"Creating {nameof (AnsiInput)}");
 
+        _platform = AnsiPlatform.Degraded;
+
         try
         {
             // Check if we have a real console first
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
             {
-                Logging.Warning ("Console is redirected. Running in degraded mode.");
-                _terminalInitialized = false;
+                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
                 return;
             }
 
             // Initialize platform-specific input helpers
-            if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+            if (PlatformDetection.IsWindows ())
             {
-                _windowsVTInput = new ();
-                bool vtEnabled = _windowsVTInput.TryEnable ();
-                Logging.Information ($"Windows VT Input mode: {(vtEnabled ? "enabled" : "FAILED")}");
+                _windowsVTInput = new WindowsVTInputHelper ();
 
-                if (!vtEnabled)
+                if (!_windowsVTInput.TryEnable ())
                 {
-                    Logging.Warning ("Failed to enable Windows VT Input mode. Running in degraded mode.");
-                    _terminalInitialized = false;
+                    _windowsVTInput.Dispose ();
+                    _windowsVTInput = null;
+
+                    Logging.Warning ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+
+                    return;
+                }
+                _platform = AnsiPlatform.WindowsVT;
+            }
+            else if (PlatformDetection.IsUnixLike ())
+            {
+                try
+                {
+                    // Unix/Mac: Set up poll map for non-blocking input checks using shared helper
+                    _pollMap = UnixIOHelper.CreateStdinPollMap ();
+                    _unixRawMode = new UnixRawModeHelper ();
+
+                    if (!_unixRawMode.TryEnable ())
+                    {
+                        Logging.Warning ("Failed to enable Unix raw input mode. Terminal input will not work. Running in degraded mode.");
+                        _pollMap = null;
+                        _unixRawMode?.Dispose ();
+                        _unixRawMode = null;
+
+                        return;
+                    }
+                    _platform = AnsiPlatform.UnixRaw;
+                }
+                catch (DllNotFoundException ex)
+                {
+                    Logging.Warning ($"Failed to enable Unix raw input mode. libc not available: {ex.Message}. Running in degraded mode.");
 
                     return;
                 }
             }
             else
             {
-                // Unix/Mac: Set up poll map for non-blocking input checks using shared helper
-                _pollMap = UnixIOHelper.CreateStdinPollMap ();
+                Logging.Warning ("Unknown OS platform. Terminal input will not work. Running in degraded mode.");
 
-                _unixRawMode = new ();
-                bool rawModeEnabled = _unixRawMode.TryEnable ();
-                Logging.Information ($"Unix raw mode: {(rawModeEnabled ? "enabled" : "FAILED")}");
-
-                if (!rawModeEnabled)
-                {
-                    Logging.Warning ("Failed to enable Unix raw mode. Terminal input will not work. Running in degraded mode.");
-                    _terminalInitialized = false;
-
-                    return;
-                }
+                return;
             }
 
             // Try to disable Ctrl+C handling to allow raw input
             try
             {
+                // BUGBUG: This is not needed on Windows as we turn off ENABLE_PROCESSED_INPUT in _windowsVTInput.TryEnable () above
+                // BUGBUG: This does nothing if we're running Unix, because we are using raw mode
+
+                // All TreatConsoleCAsInput does is un-set ENABLE_PROCESSED_INPUT on the input handle
                 Console.TreatControlCAsInput = true;
-                Logging.Information ("Console.TreatControlCAsInput = true");
             }
             catch (Exception ex)
             {
@@ -141,19 +162,13 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // NOTE: Output operations (alternate buffer, cursor visibility, mouse events)
             // NOTE: are handled by ANSIOutput, not here. ANSIInput only handles input.
 
-            _terminalInitialized = true;
-            Logging.Information ("ANSIInput initialized successfully");
-        }
-        catch (DllNotFoundException ex)
-        {
-            Logging.Warning ($"AnsiInput: libc not available: {ex.Message}. Running in degraded mode.");
-            _terminalInitialized = false;
+            //Logging.Information ("ANSIInput initialized successfully");
         }
         catch (Exception ex)
         {
             Logging.Warning ($"Failed to initialize terminal: {ex.GetType ().Name}: {ex.Message}. Running in degraded mode.");
             Logging.Warning ($"Stack trace: {ex.StackTrace}");
-            _terminalInitialized = false;
+            _platform = AnsiPlatform.Degraded;
         }
     }
 
@@ -169,24 +184,18 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             return true;
         }
 
-        if (!_terminalInitialized)
+        switch (_platform)
         {
-            return false;
+            case AnsiPlatform.WindowsVT:
+                return _windowsVTInput!.Peek ();
+
+            case AnsiPlatform.UnixRaw:
+                return _pollMap != null && UnixIOHelper.IsInputAvailable (_pollMap);
+
+            case AnsiPlatform.Degraded:
+            default:
+                return false;
         }
-
-        // On Windows with VT mode, use helper to check for console input events
-        if (_windowsVTInput?.IsVTModeEnabled == true)
-        {
-            if (_windowsVTInput.TryGetInputEventCount (out uint numEvents))
-            {
-                return numEvents > 0;
-            }
-
-            return false;
-        }
-
-        // On Unix, use poll() via shared helper to check for input availability (non-blocking)
-        return _pollMap != null && UnixIOHelper.IsInputAvailable (_pollMap);
     }
 
     /// <inheritdoc/>
@@ -198,37 +207,42 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             yield return input;
         }
 
-        if (!_terminalInitialized)
-        {
-            yield break;
-        }
-
         var buffer = new byte [256];
 
-        // On Windows with VT mode, use helper to read ANSI sequences
-        if (_windowsVTInput?.IsVTModeEnabled == true)
+        switch (_platform)
         {
-            if (!_windowsVTInput.TryRead (buffer, out int bytesRead))
-            {
+            case AnsiPlatform.WindowsVT:
+                if (!_windowsVTInput!.TryRead (buffer, out int bytesRead))
+                {
+                    yield break;
+                }
+
+                // Convert UTF-8 bytes to characters
+                uint cp = WindowsVTInputHelper.GetConsoleCP ();
+                Encoding enc = Encoding.GetEncoding ((int)cp);
+
+                string text = enc.GetString (buffer, 0, bytesRead);
+
+                foreach (char ch in text)
+                {
+                    yield return ch;
+                }
+
+                break;
+
+            case AnsiPlatform.UnixRaw:
+                foreach (char c in ReadUnixInput (buffer))
+                {
+                    yield return c;
+                }
+
+                break;
+
+            case AnsiPlatform.Degraded:
+            default:
+                // Logging.Trace ("IsVTModeEnabled is NOT enabled");
+
                 yield break;
-            }
-
-            // Convert UTF-8 bytes to characters
-            string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
-
-            foreach (char ch in text)
-            {
-                yield return ch;
-            }
-        }
-
-        // On Unix, use poll() + read() syscalls via shared helper
-        else if (_pollMap != null)
-        {
-            foreach (char c in ReadUnixInput (buffer))
-            {
-                yield return c;
-            }
         }
     }
 
@@ -259,9 +273,11 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                         break;
                     }
+
                     case 0:
                         // EOF
                         yield break;
+
                     default:
                     {
                         // Error
@@ -287,61 +303,73 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     /// </summary>
     private void FlushInput ()
     {
-        if (!_terminalInitialized)
-        {
-            return;
-        }
+        // Flush any pending input (Unix only - Windows handles this automatically)
 
         try
         {
-            // On Unix, read with poll until no more data
-            // Note: On Windows, we skip flushing because the console handles it automatically
-            // when we restore the console mode, and attempting to flush while shutting down
-            // can cause ReadFile to block indefinitely.
-            if (_pollMap == null)
+            switch (_platform)
             {
-                return;
-            }
+                case AnsiPlatform.WindowsVT:
+                    break;
 
-            var buffer = new byte [256];
-            var flushCount = 0;
-            const int MAX_FLUSH_ATTEMPTS = 10;
-
-            while (flushCount < MAX_FLUSH_ATTEMPTS)
-            {
-                try
-                {
-                    // Check if data is available
-                    if (UnixIOHelper.IsInputAvailable (_pollMap, 5))
+                case AnsiPlatform.UnixRaw:
+                    // On Unix, read with poll until no more data
+                    // Note: On Windows, we skip flushing because the console handles it automatically
+                    // when we restore the console mode, and attempting to flush while shutting down
+                    // can cause ReadFile to block indefinitely.
+                    if (_pollMap == null)
                     {
-                        if (UnixIOHelper.TryReadStdin (buffer, out int bytesRead))
-                        {
-                            if (bytesRead <= 0)
-                            {
-                                break;
-                            }
+                        //Logging.Trace ("");
 
-                            flushCount++;
+                        return;
+                    }
+
+                    var buffer = new byte [256];
+                    var flushCount = 0;
+                    const int MAX_FLUSH_ATTEMPTS = 10;
+
+                    while (flushCount < MAX_FLUSH_ATTEMPTS)
+                    {
+                        try
+                        {
+                            // Check if data is available
+                            if (UnixIOHelper.IsInputAvailable (_pollMap, 5))
+                            {
+                                if (UnixIOHelper.TryReadStdin (buffer, out int bytesRead))
+                                {
+                                    if (bytesRead <= 0)
+                                    {
+                                        break;
+                                    }
+
+                                    flushCount++;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break; // No more data
+                            }
                         }
-                        else
+                        catch
                         {
                             break;
                         }
                     }
-                    else
-                    {
-                        break; // No more data
-                    }
-                }
-                catch
-                {
-                    break;
-                }
-            }
 
-            if (flushCount > 0)
-            {
-                Logging.Information ($"FlushInput: Flushed input buffer ({flushCount} read attempts)");
+                    if (flushCount > 0)
+                    {
+                        Logging.Information ($"FlushInput: Flushed input buffer ({flushCount} read attempts)");
+                    }
+
+                    break;
+
+                case AnsiPlatform.Degraded:
+                default:
+                    break;
             }
         }
         catch (Exception ex)
@@ -351,33 +379,41 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     }
 
     /// <inheritdoc/>
-    public void InjectInput (char input)
-    {
-        //Logging.Trace ($"Enqueuing input: {input.Key}");
+    public void InjectInput (char input) =>
 
+        //Logging.Trace ($"Enqueuing input: {input.Key}");
         // Will be called on the main loop thread.
         _testInput.Enqueue (input);
-    }
 
     /// <inheritdoc/>
     public override void Dispose ()
     {
         base.Dispose ();
 
-        if (!_terminalInitialized)
-        {
-            return;
-        }
-
         try
         {
-            // Flush any pending input (Unix only - Windows handles this automatically)
             // This prevents ANSI responses (like size queries) from leaking into the shell
             FlushInput ();
 
-            // Restore platform-specific terminal settings
-            _unixRawMode?.Dispose ();
-            _windowsVTInput?.Dispose ();
+            switch (_platform)
+            {
+                case AnsiPlatform.WindowsVT:
+                    _windowsVTInput?.Dispose ();
+
+                    break;
+
+                case AnsiPlatform.UnixRaw:
+
+                    // Restore platform-specific terminal settings
+                    _unixRawMode?.Dispose ();
+
+                    break;
+
+                case AnsiPlatform.Degraded:
+                default:
+
+                    return;
+            }
         }
         catch
         {

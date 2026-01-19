@@ -45,7 +45,7 @@ public class SingleBackgroundWorker : Scenario
                                            },
                                            new MenuItem
                                            {
-                                               Title = "_Quit",
+                                               Title = Strings.cmdQuit,
                                                Key = Application.QuitKey,
                                                Action = () => App?.RequestStop ()
                                            }
@@ -247,7 +247,7 @@ public class SingleBackgroundWorker : Scenario
                                        [
                                            new MenuItem
                                            {
-                                               Title = "_Close",
+                                               Title = Strings.cmdClose,
                                                Key = Key.C.WithCtrl,
                                                Action = () =>
                                                         {

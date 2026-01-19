@@ -116,7 +116,7 @@ public class GraphViewExample : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem
                                        {
@@ -160,7 +160,7 @@ public class GraphViewExample : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Action = Quit
                                        }
                                    ]

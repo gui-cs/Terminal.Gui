@@ -59,7 +59,7 @@ public class MessageBoxTests
         try
         {
             app.Iteration += OnApplicationOnIteration;
-            int? res = MessageBox.Query (app, "hey", "IsDefault", "_No", "_Yes");
+            int? res = MessageBox.Query (app, "hey", "IsDefault", Strings.btnNo, Strings.btnYes);
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Equal (1, res);

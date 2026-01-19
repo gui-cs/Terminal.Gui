@@ -1,4 +1,3 @@
-
 using System.ComponentModel;
 
 namespace Terminal.Gui.Views;
@@ -34,13 +33,11 @@ public class MenuItem : Shortcut
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
     /// <param name="subMenu">The submenu to display when the user selects this menu item.</param>
-    public MenuItem (View? targetView, Command command, string? commandText = null, string? helpText = null, Menu? subMenu = null)
-        : base (
-                targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
-                string.IsNullOrEmpty (commandText) ? GlobalResources.GetString ($"cmd.{command}") : commandText,
-                null,
-                string.IsNullOrEmpty (helpText) ? GlobalResources.GetString ($"cmd.{command}.Help") : helpText
-               )
+    public MenuItem (View? targetView, Command command, string? commandText = null, string? helpText = null, Menu? subMenu = null) :
+        base (targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
+              string.IsNullOrEmpty (commandText) ? GlobalResources.GetString ($"cmd{command}") : commandText,
+              null,
+              string.IsNullOrEmpty (helpText) ? GlobalResources.GetString ($"cmd{command}Help") : helpText)
     {
         TargetView = targetView;
         Command = command;
@@ -48,21 +45,18 @@ public class MenuItem : Shortcut
     }
 
     /// <inheritdoc/>
-    public MenuItem (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null)
-        : base (key ?? Key.Empty, commandText, action, helpText)
+    public MenuItem (string? commandText = null, string? helpText = null, Action? action = null, Key? key = null) : base (key ?? Key.Empty,
+        commandText,
+        action,
+        helpText)
     { }
 
     /// <inheritdoc/>
-    public MenuItem (string commandText, Key key, Action? action = null)
-        : base (key ?? Key.Empty, commandText, action, null)
-    { }
+    public MenuItem (string commandText, Key key, Action? action = null) : base (key ?? Key.Empty, commandText, action) { }
 
     /// <inheritdoc/>
-    public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null)
-        : base (Key.Empty, commandText, null, helpText)
-    {
+    public MenuItem (string? commandText = null, string? helpText = null, Menu? subMenu = null) : base (Key.Empty, commandText, null, helpText) =>
         SubMenu = subMenu;
-    }
 
     // TODO: Consider moving TargetView and Command to Shortcut?
 
@@ -105,7 +99,7 @@ public class MenuItem : Shortcut
         // Logging.Debug ($"{Title} - {commandContext?.Source?.Title} Command: {commandContext?.Command}");
         bool? ret = null;
 
-        bool quit = false;
+        var quit = false;
 
         if (commandContext is CommandContext<KeyBinding> keyCommandContext)
         {
@@ -114,6 +108,7 @@ public class MenuItem : Shortcut
                 // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
                 // Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");
                 quit = true;
+
                 //ret = true;
             }
         }
@@ -182,6 +177,7 @@ public class MenuItem : Shortcut
             {
                 SubMenu!.App ??= App;
                 SubMenu!.Visible = false;
+
                 // TODO: This is a temporary hack - add a flag or something instead
                 KeyView.Text = $"{Glyphs.RightArrow}";
                 _subMenu.SuperMenuItem = this;
@@ -199,8 +195,6 @@ public class MenuItem : Shortcut
 
         return base.OnMouseEnter (eventArgs);
     }
-
-
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

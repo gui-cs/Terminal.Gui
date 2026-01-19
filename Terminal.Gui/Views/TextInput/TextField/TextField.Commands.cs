@@ -17,14 +17,14 @@ public partial class TextField
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
         AddCommand (Command.Right, () => MoveRight ());
-        AddCommand (Command.CutToEndLine, () => KillToEnd ());
-        AddCommand (Command.CutToStartLine, () => KillToStart ());
+        AddCommand (Command.CutToEndOfLine, () => KillToEnd ());
+        AddCommand (Command.CutToStartOfLine, () => KillToStart ());
         AddCommand (Command.Undo, () => Undo ());
         AddCommand (Command.Redo, () => Redo ());
         AddCommand (Command.WordLeft, () => MoveWordLeft ());
         AddCommand (Command.WordRight, () => MoveWordRight ());
-        AddCommand (Command.KillWordForwards, () => KillWordForwards ());
-        AddCommand (Command.KillWordBackwards, () => KillWordBackwards ());
+        AddCommand (Command.KillWordRight, () => KillWordForwards ());
+        AddCommand (Command.KillWordLeft, () => KillWordBackwards ());
         AddCommand (Command.ToggleOverwrite, () => SetOverwrite (!Used));
         AddCommand (Command.EnableOverwrite, () => SetOverwrite (true));
         AddCommand (Command.DisableOverwrite, () => SetOverwrite (false));
@@ -96,8 +96,8 @@ public partial class TextField
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.F.WithCtrl, Command.Right);
 
-        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndLine);
-        KeyBindings.Add (Key.K.WithCtrl.WithShift, Command.CutToStartLine);
+        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine);
+        KeyBindings.Add (Key.K.WithCtrl.WithShift, Command.CutToStartOfLine);
 
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
 
@@ -109,8 +109,8 @@ public partial class TextField
         KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
         KeyBindings.Add (Key.CursorDown.WithCtrl, Command.WordRight);
 
-        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordForwards);
-        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordBackwards);
+        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordRight);
+        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordLeft);
         KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
         KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
         KeyBindings.Add (Key.X.WithCtrl, Command.Cut);

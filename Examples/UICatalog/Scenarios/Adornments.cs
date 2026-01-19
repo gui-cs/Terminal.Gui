@@ -64,7 +64,7 @@ public class Adornments : Scenario
         Button button = new () { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
         button.Accepting += (_, _) =>
-                                MessageBox.Query (appWindow.App!, "Hi", $"Am I a {window.GetType ().Name}?", "_No", "_Yes");
+                                MessageBox.Query (appWindow.App!, "Hi", $"Am I a {window.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
 
         TextView label = new ()
         {
