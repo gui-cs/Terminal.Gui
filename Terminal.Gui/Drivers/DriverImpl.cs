@@ -38,14 +38,12 @@ internal class DriverImpl : IDriver
     /// <param name="output">The output interface for rendering to the console.</param>
     /// <param name="ansiRequestScheduler">The scheduler for managing ANSI escape sequence requests.</param>
     /// <param name="sizeMonitor">The monitor for tracking terminal size changes.</param>
-    public DriverImpl (
-        IComponentFactory componentFactory,
-        IInputProcessor inputProcessor,
-        IOutputBuffer outputBuffer,
-        IOutput output,
-        AnsiRequestScheduler ansiRequestScheduler,
-        ISizeMonitor sizeMonitor
-    )
+    public DriverImpl (IComponentFactory componentFactory,
+                       IInputProcessor inputProcessor,
+                       IOutputBuffer outputBuffer,
+                       IOutput output,
+                       AnsiRequestScheduler ansiRequestScheduler,
+                       ISizeMonitor sizeMonitor)
     {
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
@@ -70,13 +68,14 @@ internal class DriverImpl : IDriver
     #region Driver Lifecycle
 
     /// <inheritdoc/>
-    public void Init () { throw new NotSupportedException (); }
+    public void Init () => throw new NotSupportedException ();
 
     /// <inheritdoc/>
     public void Refresh ()
     {
         // Hide cursor during rendering to prevent flicker
         Cursor cursor = _output.GetCursor ();
+
         if (cursor.IsVisible)
         {
             Cursor hiddenCursor = cursor with { Position = null, Style = cursor.Style };
@@ -141,11 +140,7 @@ internal class DriverImpl : IDriver
     }
 
     /// <inheritdoc/>
-    public bool IsLegacyConsole
-    {
-        get => _output.IsLegacyConsole;
-        set => _output.IsLegacyConsole = value;
-    }
+    public bool IsLegacyConsole { get => _output.IsLegacyConsole; set => _output.IsLegacyConsole = value; }
 
     /// <inheritdoc/>
     public void Dispose ()
@@ -210,41 +205,25 @@ internal class DriverImpl : IDriver
     {
         _outputBuffer.SetSize (width, height);
         _output.SetSize (width, height);
-        SizeChanged?.Invoke (this, new (new (width, height)));
+        SizeChanged?.Invoke (this, new SizeChangedEventArgs (new Size (width, height)));
     }
 
     /// <inheritdoc/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
-    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e) { SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height); }
+    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e) => SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
 
     /// <inheritdoc/>
-    public int Cols
-    {
-        get => _outputBuffer.Cols;
-        set => _outputBuffer.Cols = value;
-    }
+    public int Cols { get => _outputBuffer.Cols; set => _outputBuffer.Cols = value; }
 
     /// <inheritdoc/>
-    public int Rows
-    {
-        get => _outputBuffer.Rows;
-        set => _outputBuffer.Rows = value;
-    }
+    public int Rows { get => _outputBuffer.Rows; set => _outputBuffer.Rows = value; }
 
     /// <inheritdoc/>
-    public int Left
-    {
-        get => _outputBuffer.Left;
-        set => _outputBuffer.Left = value;
-    }
+    public int Left { get => _outputBuffer.Left; set => _outputBuffer.Left = value; }
 
     /// <inheritdoc/>
-    public int Top
-    {
-        get => _outputBuffer.Top;
-        set => _outputBuffer.Top = value;
-    }
+    public int Top { get => _outputBuffer.Top; set => _outputBuffer.Top = value; }
 
     #endregion Screen and Display
 
@@ -254,31 +233,19 @@ internal class DriverImpl : IDriver
     public bool SupportsTrueColor => !IsLegacyConsole;
 
     /// <inheritdoc/>
-    public bool Force16Colors
-    {
-        get => _output.Force16Colors;
-        set => _output.Force16Colors = value;
-    }
+    public bool Force16Colors { get => _output.Force16Colors; set => _output.Force16Colors = value; }
 
-    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) { Force16Colors = e.NewValue; }
+    private void OnDriverOnForce16ColorsChanged (object? _, ValueChangedEventArgs<bool> e) => Force16Colors = e.NewValue;
 
     #endregion Color Support
 
     #region Content Buffer
 
     /// <inheritdoc/>
-    public Cell [,]? Contents
-    {
-        get => _outputBuffer.Contents;
-        set => _outputBuffer.Contents = value;
-    }
+    public Cell [,]? Contents { get => _outputBuffer.Contents; set => _outputBuffer.Contents = value; }
 
     /// <inheritdoc/>
-    public Region? Clip
-    {
-        get => _outputBuffer.Clip;
-        set => _outputBuffer.Clip = value;
-    }
+    public Region? Clip { get => _outputBuffer.Clip; set => _outputBuffer.Clip = value; }
 
     /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
     public void ClearContents ()
@@ -301,14 +268,10 @@ internal class DriverImpl : IDriver
     public int Row => _outputBuffer.Row;
 
     /// <inheritdoc/>
-    public Attribute CurrentAttribute
-    {
-        get => _outputBuffer.CurrentAttribute;
-        set => _outputBuffer.CurrentAttribute = value;
-    }
+    public Attribute CurrentAttribute { get => _outputBuffer.CurrentAttribute; set => _outputBuffer.CurrentAttribute = value; }
 
     /// <inheritdoc/>
-    public void Move (int col, int row) { _outputBuffer.Move (col, row); }
+    public void Move (int col, int row) => _outputBuffer.Move (col, row);
 
     /// <inheritdoc/>
     public bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
@@ -325,16 +288,16 @@ internal class DriverImpl : IDriver
     public bool IsValidLocation (string text, int col, int row) => _outputBuffer.IsValidLocation (text, col, row);
 
     /// <inheritdoc/>
-    public void AddRune (Rune rune) { _outputBuffer.AddRune (rune); }
+    public void AddRune (Rune rune) => _outputBuffer.AddRune (rune);
 
     /// <inheritdoc/>
-    public void AddRune (char c) { _outputBuffer.AddRune (c); }
+    public void AddRune (char c) => _outputBuffer.AddRune (c);
 
     /// <inheritdoc/>
-    public void AddStr (string str) { _outputBuffer.AddStr (str); }
+    public void AddStr (string str) => _outputBuffer.AddStr (str);
 
     /// <inheritdoc/>
-    public void FillRect (Rectangle rect, Rune rune = default) { _outputBuffer.FillRect (rect, rune); }
+    public void FillRect (Rectangle rect, Rune rune = default) => _outputBuffer.FillRect (rect, rune);
 
     /// <inheritdoc/>
     public Attribute SetAttribute (Attribute newAttribute)
@@ -349,7 +312,7 @@ internal class DriverImpl : IDriver
     public Attribute GetAttribute () => _outputBuffer.CurrentAttribute;
 
     /// <inheritdoc/>
-    public void WriteRaw (string ansi) { _output.Write (ansi); }
+    public void WriteRaw (string ansi) => _output.Write (ansi);
 
     /// <inheritdoc/>
     public ConcurrentQueue<SixelToRender> GetSixels () => _output.GetSixels ();
@@ -388,30 +351,21 @@ internal class DriverImpl : IDriver
 
     #region Cursor
 
-    /// <inheritdoc />
-    public void SetCursor (Cursor cursor)
-    {
-        _output.SetCursor (cursor);
-    }
+    /// <inheritdoc/>
+    public void SetCursor (Cursor cursor) => _output.SetCursor (cursor);
 
-    /// <inheritdoc />
-    public Cursor GetCursor ()
-    {
-        return _output.GetCursor ();
-    }
+    /// <inheritdoc/>
+    public Cursor GetCursor () => _output.GetCursor ();
 
     // Cursor caching fields
     private bool _cursorNeedsUpdate;
 
-    /// <inheritdoc />
-    public bool GetCursorNeedsUpdate ()
-    {
-        return _cursorNeedsUpdate;
-    }
+    /// <inheritdoc/>
+    public bool GetCursorNeedsUpdate () => _cursorNeedsUpdate;
 
     /// <param name="needsUpdate"></param>
-    /// <inheritdoc />
-    public void SetCursorNeedsUpdate (bool needsUpdate) { _cursorNeedsUpdate = needsUpdate; }
+    /// <inheritdoc/>
+    public void SetCursorNeedsUpdate (bool needsUpdate) => _cursorNeedsUpdate = needsUpdate;
 
     #endregion Cursor
 
@@ -424,7 +378,7 @@ internal class DriverImpl : IDriver
     public event EventHandler<Mouse>? MouseEvent;
 
     /// <inheritdoc/>
-    public void InjectMouseEvent (Mouse mouse) { GetInputProcessor ().InjectMouseEvent (null, mouse); }
+    public void InjectMouseEvent (Mouse mouse) => GetInputProcessor ().InjectMouseEvent (null, mouse);
 
     #endregion Input Events
 
@@ -433,7 +387,7 @@ internal class DriverImpl : IDriver
     private readonly AnsiRequestScheduler _ansiRequestScheduler;
 
     /// <inheritdoc/>
-    public virtual void QueueAnsiRequest (AnsiEscapeSequenceRequest request) { _ansiRequestScheduler.SendOrSchedule (this, request); }
+    public virtual void QueueAnsiRequest (AnsiEscapeSequenceRequest request) => _ansiRequestScheduler.SendOrSchedule (this, request);
 
     #endregion ANSI Escape Sequences
 }

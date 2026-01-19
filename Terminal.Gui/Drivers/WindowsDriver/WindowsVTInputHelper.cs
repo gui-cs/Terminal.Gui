@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
@@ -37,27 +36,13 @@ internal sealed class WindowsVTInputHelper : IDisposable
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
 
     [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
-    public static extern bool PeekConsoleInput (
-        nint hConsoleInput,
-        nint lpBuffer,
-        uint nLength,
-        out uint lpNumberOfEventsRead
-    );
+    public static extern bool PeekConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool ReadFile (
-        nint hFile,
-        byte [] lpBuffer,
-        uint nNumberOfBytesToRead,
-        out uint lpNumberOfBytesRead,
-        nint lpOverlapped
-    );
+    private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern bool GetNumberOfConsoleInputEvents (
-        nint hConsoleInput,
-        out uint lpcNumberOfEvents
-    );
+    private static extern bool GetNumberOfConsoleInputEvents (nint hConsoleInput, out uint lpcNumberOfEvents);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
@@ -217,6 +202,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
             //Logging.Trace ("ReadFile...");
             bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
 #pragma warning disable IL3050
+
             //Logging.Trace ($"...{JsonSerializer.Serialize (Encoding.UTF8.GetString (buffer, 0, (int)numBytesRead))}");
 #pragma warning restore IL3050
 

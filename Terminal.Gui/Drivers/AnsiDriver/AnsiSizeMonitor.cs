@@ -117,15 +117,14 @@ internal class AnsiSizeMonitor : ISizeMonitor
     {
         Size currentSize = _output.GetSize ();
 
-        if (currentSize != _lastSize)
+        if (currentSize == _lastSize)
         {
-            _lastSize = currentSize;
-            SizeChanged?.Invoke (this, new (currentSize));
-
-            return true;
+            return false;
         }
+        _lastSize = currentSize;
+        SizeChanged?.Invoke (this, new SizeChangedEventArgs (currentSize));
 
-        return false;
+        return true;
     }
 
     private void HandleSizeResponse (string? response)

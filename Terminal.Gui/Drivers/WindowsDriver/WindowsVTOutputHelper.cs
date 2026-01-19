@@ -1,6 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text.Json;
-using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
 
@@ -43,12 +41,7 @@ internal sealed class WindowsVTOutputHelper : IDisposable
     private static extern uint GetLastError ();
 
     [DllImport ("kernel32.dll")]
-    public static extern bool WriteFile (
-        nint hConsoleHandle,
-        byte [] lpBuffer,
-        uint nNumberOfBytesToWrite,
-        out uint lpNumberOfBytesWritten, 
-        nint lpOverlapped);
+    public static extern bool WriteFile (nint hConsoleHandle, byte [] lpBuffer, uint nNumberOfBytesToWrite, out uint lpNumberOfBytesWritten, nint lpOverlapped);
 
     #endregion
 
