@@ -163,7 +163,7 @@ public class AnsiOutput : OutputBase, IOutput
                     break;
             }
         }
-        catch (Exception _)
+        catch (Exception)
         {
             //Logging.Warning (e.Message);
 
@@ -196,7 +196,7 @@ public class AnsiOutput : OutputBase, IOutput
                     break;
             }
         }
-        catch (Exception _)
+        catch (Exception)
         {
             //Logging.Warning (e.Message);
 
