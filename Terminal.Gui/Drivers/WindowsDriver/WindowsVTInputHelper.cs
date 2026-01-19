@@ -51,20 +51,35 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
 
-    // Console mode flags
+    // Standard handles.
     private const int STD_INPUT_HANDLE = -10;
-    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
-    private const uint ENABLE_PROCESSED_INPUT = 0x0001;
-    private const uint ENABLE_LINE_INPUT = 0x0002;
-    private const uint ENABLE_ECHO_INPUT = 0x0004;
-    private const uint ENABLE_MOUSE_INPUT = 0x0010;
-    private const uint ENABLE_QUICK_EDIT_MODE = 0x0040;
-    private const uint ENABLE_EXTENDED_FLAGS = 0x0080;
+    private const int STD_OUTPUT_HANDLE = -11;
+    private const int STD_ERROR_HANDLE = -12;
+
+    // Input console modes flags.
+    private const uint ENABLE_PROCESSED_INPUT = 1;
+    private const uint ENABLE_LINE_INPUT = 2;
+    private const uint ENABLE_ECHO_INPUT = 4;
+    private const uint ENABLE_WINDOW_INPUT = 8;
+    private const uint ENABLE_MOUSE_INPUT = 16;
+    private const uint ENABLE_INSERT_MODE = 32;
+    private const uint ENABLE_QUICK_EDIT_MODE = 64;
+    private const uint ENABLE_EXTENDED_FLAGS = 128;
+    private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 512;
+
+    // Output console modes flags.
+    private const uint ENABLE_PROCESSED_OUTPUT = 1;
+    private const uint ENABLE_WRAP_AT_EOL_OUTPUT = 2;
+    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+    private const uint DISABLE_NEWLINE_AUTO_RETURN = 8;
+    private const uint ENABLE_LVB_GRID_WORLDWIDE = 10;
 
     #endregion
 
-    private uint _originalConsoleMode;
+    private uint _originalInputConsoleMode;
     private bool _disposed;
+    private nint _outputHandle;
+    private uint _originalOutputConsoleMode;
 
     /// <summary>
     ///     Gets whether VT input mode was successfully enabled.
@@ -104,9 +119,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
                 return false;
             }
 
-            if (!GetConsoleMode (InputHandle, out _originalConsoleMode))
+            if (!GetConsoleMode (InputHandle, out _originalInputConsoleMode))
             {
-                Logging.Warning ("Failed to get Windows console mode.");
+                Logging.Warning ("Failed to get Windows input console mode.");
 
                 return false;
             }
@@ -115,19 +130,45 @@ internal sealed class WindowsVTInputHelper : IDisposable
             // - Enable: VT input, mouse input, extended flags
             // - Disable: processed input, line input, echo, quick edit
             // This allows raw ANSI sequence reading
-            uint newMode = _originalConsoleMode;
+            uint newMode = _originalInputConsoleMode;
             newMode |= ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
             newMode &= ~(ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_QUICK_EDIT_MODE);
 
             if (!SetConsoleMode (InputHandle, newMode))
             {
-                Logging.Warning ("Failed to set Windows VT console mode.");
+                Logging.Warning ("Failed to set Windows VT input console mode.");
+
+                return false;
+            }
+
+            _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+
+            if (_outputHandle == nint.Zero || _outputHandle == new nint (-1))
+            {
+                Logging.Warning ("Failed to get Windows output console handle.");
+
+                return false;
+            }
+
+            if (!GetConsoleMode (_outputHandle, out _originalOutputConsoleMode))
+            {
+                Logging.Warning ("Failed to get Windows output console mode.");
+
+                return false;
+            }
+
+            newMode = _originalOutputConsoleMode;
+            newMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+            if (!SetConsoleMode (_outputHandle, newMode))
+            {
+                Logging.Warning ("Failed to set Windows VT output console mode.");
 
                 return false;
             }
 
             IsVTModeEnabled = true;
-            Logging.Information ($"Windows VT input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
+            Logging.Information ($"Windows VT input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalInputConsoleMode:X})");
 
             return true;
         }
@@ -190,6 +231,11 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
+            if (!Console.KeyAvailable)
+            {
+                return false;
+            }
+
             bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
 
             if (!success)
@@ -222,6 +268,8 @@ internal sealed class WindowsVTInputHelper : IDisposable
             return;
         }
 
+        IsVTModeEnabled = false;
+
         try
         {
             // Flush the input buffer to clear any pending INPUT_RECORD structures
@@ -232,7 +280,16 @@ internal sealed class WindowsVTInputHelper : IDisposable
                 Logging.Warning ($"FlushConsoleInputBuffer failed with error: {error}");
             }
 
-            SetConsoleMode (InputHandle, _originalConsoleMode);
+            if (!SetConsoleMode (InputHandle, _originalInputConsoleMode))
+            {
+                throw new ApplicationException ($"Failed to restore input console mode, error code: {Marshal.GetLastPInvokeError ()}.");
+            }
+
+            if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
+            {
+                throw new ApplicationException ($"Failed to restore output console mode, error code: {Marshal.GetLastPInvokeError ()}.");
+            }
+
             IsVTModeEnabled = false;
             Logging.Information ("Windows console mode restored.");
         }

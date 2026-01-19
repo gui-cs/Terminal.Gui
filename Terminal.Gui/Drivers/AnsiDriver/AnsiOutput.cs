@@ -72,18 +72,6 @@ public class AnsiOutput : OutputBase, IOutput
                 {
                     _terminalInitialized = true;
 
-                    // Initialize terminal for ANSI output
-                    // Activate alternate screen buffer, hide cursor, enable mouse tracking
-                    Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-                    Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
-                    Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
-                    Write (EscSeqUtils.CSI_HideCursor);
-                    Write (EscSeqUtils.CSI_EnableMouseEvents);
-
-                    // Flush to ensure all sequences are sent
-                    Console.Out.Flush ();
-                    Logging.Information ("ANSIOutput initialized successfully");
-
                     // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
                     // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
                     // not the alternate screen buffer we just activated.
@@ -285,18 +273,6 @@ public class AnsiOutput : OutputBase, IOutput
         if (!_terminalInitialized)
         {
             return;
-        }
-
-        try
-        {
-            // Restore terminal state: disable mouse, restore buffer, show cursor
-            Write (EscSeqUtils.CSI_DisableMouseEvents);
-            Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-            Write (EscSeqUtils.CSI_ShowCursor);
-        }
-        catch
-        {
-            // Ignore errors - we're shutting down
         }
     }
 }

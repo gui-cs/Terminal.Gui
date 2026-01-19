@@ -142,6 +142,25 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // NOTE: are handled by ANSIOutput, not here. ANSIInput only handles input.
 
             _terminalInitialized = true;
+
+            try
+            {
+                // Initialize terminal for ANSI output
+                // Activate alternate screen buffer, hide cursor, enable mouse tracking
+                Console.Out.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+                Console.Out.Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
+                Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
+                Console.Out.Write (EscSeqUtils.CSI_HideCursor);
+                Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+                // Flush to ensure all sequences are sent
+                Console.Out.Flush ();
+            }
+            catch
+            {
+                // Swallow any exceptions during initialization for unit tests
+            }
+
             Logging.Information ("ANSIInput initialized successfully");
         }
         catch (DllNotFoundException ex)
@@ -371,6 +390,11 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
         try
         {
+            // Restore terminal state: disable mouse, restore buffer, show cursor
+            Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
+            Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+            Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+
             // Flush any pending input (Unix only - Windows handles this automatically)
             // This prevents ANSI responses (like size queries) from leaking into the shell
             FlushInput ();
