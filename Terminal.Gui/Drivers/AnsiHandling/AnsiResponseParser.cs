@@ -43,7 +43,7 @@ internal class AnsiResponseParser (ITimeProvider timeProvider) : AnsiResponsePar
 
     private void AppendOutput (StringBuilder output, char c)
     {
-        // Logging.Trace ($"AnsiResponseParser releasing '{c}'");
+        //Logging.Trace ($"AnsiResponseParser releasing '{c}'");
         output.Append (c);
     }
 

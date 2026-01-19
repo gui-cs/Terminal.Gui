@@ -53,12 +53,10 @@ internal sealed class WindowsVTOutputHelper : IDisposable
     /// </summary>
     public bool IsEnabled
     {
-        get => field;
-        private set
-        {
-            field = value;
-            Logging.Trace ($"{value}");
-        }
+        get;
+        private set;
+
+        //Logging.Trace ($"{value}");
     }
 
     /// <summary>

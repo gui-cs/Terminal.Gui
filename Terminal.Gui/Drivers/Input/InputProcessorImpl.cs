@@ -52,8 +52,8 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter, ITimeProvider? timeProvider = null)
     {
         ITimeProvider tp = timeProvider ?? new SystemTimeProvider ();
-        Parser = new (tp);
-        _mouseInterpreter = new (tp);
+        Parser = new AnsiResponseParser<TInputRecord> (tp);
+        _mouseInterpreter = new MouseInterpreter (tp);
 
         InputQueue = inputBuffer;
         KeyConverter = keyConverter;
@@ -65,16 +65,28 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         // Enable keyboard handling
         Parser.HandleKeyboard = true;
 
-        Parser.Keyboard += (_, keyEvent) =>
-                           {
-                               RaiseKeyDownEvent (keyEvent);
-                           };
+        Parser.Keyboard += (_, keyEvent) => { RaiseKeyDownEvent (keyEvent); };
 
         // Configure unexpected response handler
         Parser.UnexpectedResponseHandler = str =>
                                            {
                                                var cur = new string (str.Select (k => k.Item1).ToArray ());
-                                               Logging.Information ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'");
+
+                                               // Check if this is an incomplete mouse sequence (timing issue when Run() blocks)
+                                               var mouseParser = new AnsiMouseParser ();
+
+                                               if (mouseParser.IsMouse ($"\u001b{cur}"))
+                                               {
+                                                   // Incomplete mouse sequences can arrive when Run() blocks the main thread
+                                                   // causing the escape timeout to fire before the sequence completes.
+                                                   // This is harmless - just swallow it silently.
+                                                   Logging.Trace ($"{nameof (InputProcessorImpl<TInputRecord>)} swallowed incomplete mouse sequence: '{cur}'");
+                                               }
+                                               else
+                                               {
+                                                   Logging.Information ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'");
+                                               }
+
                                                AnsiSequenceSwallowed?.Invoke (this, cur);
 
                                                return true;
@@ -86,7 +98,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     #region Core Processing
 
     /// <inheritdoc/>
-    public IAnsiResponseParser GetParser () { return Parser; }
+    public IAnsiResponseParser GetParser () => Parser;
 
     /// <inheritdoc/>
     public void ProcessQueue ()
@@ -118,7 +130,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     {
         foreach (Mouse expiredClick in _mouseInterpreter.CheckForExpiredClicks ())
         {
-            //Logging.Trace ($"Emitting expired click: {expiredClick}");
+            Logging.Trace ($"Emitting expired click: {expiredClick}");
             SyntheticMouseEvent?.Invoke (this, expiredClick);
         }
     }
@@ -229,7 +241,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public event EventHandler<Key>? KeyDown;
 
     /// <inheritdoc/>
-    public void RaiseKeyDownEvent (Key a) { KeyDown?.Invoke (this, a); }
+    public void RaiseKeyDownEvent (Key a) => KeyDown?.Invoke (this, a);
 
     /// <inheritdoc/>
     public virtual void InjectKeyDownEvent (Key key)
@@ -255,7 +267,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <inheritdoc/>
     public void RaiseMouseEventParsed (Mouse mouse)
     {
-        //Logging.Trace ($"{mouse}");
+        Logging.Trace ($"{mouse}");
         MouseEventParsed?.Invoke (this, mouse);
         RaiseSyntheticMouseEvent (mouse);
     }
@@ -264,7 +276,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     public event EventHandler<Mouse>? SyntheticMouseEvent;
 
     /// <summary>
-    ///     
     /// </summary>
     /// <param name="mouse"></param>
     public void RaiseSyntheticMouseEvent (Mouse mouse)
@@ -274,12 +285,13 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         foreach (Mouse e in _mouseInterpreter.Process (mouse))
         {
             // Raise all events: original + synthetic clicks
+            Logging.Trace ($"{mouse}");
             SyntheticMouseEvent?.Invoke (this, e);
         }
     }
 
     /// <inheritdoc/>
-    public virtual void InjectMouseEvent (IApplication? app, Mouse mouse) { mouse.Timestamp ??= DateTime.Now; }
+    public virtual void InjectMouseEvent (IApplication? app, Mouse mouse) => mouse.Timestamp ??= DateTime.Now;
 
     #endregion
 
@@ -293,7 +305,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     #region Disposal
 
     /// <inheritdoc/>
-    public void Dispose () { ExternalCancellationTokenSource?.Dispose (); }
+    public void Dispose () => ExternalCancellationTokenSource?.Dispose ();
 
     #endregion
 }

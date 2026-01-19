@@ -1,4 +1,5 @@
-﻿using UnitTests;
+﻿using DriverTests.AnsiHandling;
+using UnitTests;
 
 namespace ApplicationTests.MouseTests;
 
@@ -624,6 +625,64 @@ public class ApplicationMouseTests : TestDriverBase
         return;
 
         void MouseEventHandler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
+
+    }
+
+    [Fact]
+    public void InjectMouseEvent_Pipeline ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init ("ansi");
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        List<MouseFlags> receivedFlags = [];
+        app.Mouse.MouseEvent += MouseEventHandler;
+
+        // Act
+        // Use Direct mode to bypass ANSI encoding which cannot preserve timestamps
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Pipeline };
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+
+        IInputInjector injector = app.GetInputInjector ();
+
+        // First click at T+0
+        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+
+        injector.InjectMouse (
+                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+                              options);
+
+        IInputProcessor processor = app.Driver?.GetInputProcessor ()!;
+        //AnsiInputTestableTests.SimulateInputThread (app.Driver.GetInputProcessor (), queue);
+
+        Thread.Sleep (20); // Allow time for processing
+
+        processor.ProcessQueue ();
+
+        // Assert
+        Assert.Equal (MouseFlags.LeftButtonPressed, receivedFlags [0]);
+        Assert.Equal (MouseFlags.LeftButtonReleased, receivedFlags [1]);
+        Assert.Equal (MouseFlags.LeftButtonClicked, receivedFlags [2]);
+        Assert.Equal (3, receivedFlags.Count);
+
+        app.Mouse.MouseEvent -= MouseEventHandler;
+
+        return;
+
+        void MouseEventHandler (object? s, Mouse e)
+        {
+            receivedFlags.Add (e.Flags);
+            if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+            {
+                Runnable runnable2 = new ();
+                app.Begin (runnable2);
+            }
+
+        }
 
     }
 

@@ -147,7 +147,6 @@ internal class DriverImpl : IDriver
     {
         _sizeMonitor.SizeChanged -= OnSizeMonitorOnSizeChanged;
         Driver.Force16ColorsChanged -= OnDriverOnForce16ColorsChanged;
-        _output.Dispose ();
     }
 
     #endregion Driver Lifecycle

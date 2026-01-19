@@ -249,7 +249,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
             {
                 _heldContent.ClearHeld ();
 
-                //Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
+                Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
             }
         }
     }

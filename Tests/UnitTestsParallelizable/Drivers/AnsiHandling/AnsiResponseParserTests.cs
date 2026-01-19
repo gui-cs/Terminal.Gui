@@ -88,16 +88,14 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [InlineData ("\u001b[<1;1;1MJJ\u001b[9c", "c", "\u001b[9c", "\u001b[<1;1;1MJJ")] // Mixed text
     [InlineData ("Be\u001b[0cAf", "c", "\u001b[0c", "BeAf")] // Escape in the middle of the string
     [InlineData ("\u001b[<0;0;0M\u001b[2cNot e", "c", "\u001b[2c", "\u001b[<0;0;0MNot e")] // Unexpected sequence followed by text
-    [InlineData (
-                    "Just te\u001b[<0;0;0M\u001b[3c\u001b[2c\u001b[4c",
-                    "c",
-                    "\u001b[3c",
-                    "Just te\u001b[<0;0;0M\u001b[2c\u001b[4c")] // Multiple unexpected responses
-    [InlineData (
-                    "\u001b[1;2;3M\u001b[0c\u001b[2;2M\u001b[0;0;0MTe",
-                    "c",
-                    "\u001b[0c",
-                    "\u001b[1;2;3M\u001b[2;2M\u001b[0;0;0MTe")] // Multiple commands with responses
+    [InlineData ("Just te\u001b[<0;0;0M\u001b[3c\u001b[2c\u001b[4c",
+                 "c",
+                 "\u001b[3c",
+                 "Just te\u001b[<0;0;0M\u001b[2c\u001b[4c")] // Multiple unexpected responses
+    [InlineData ("\u001b[1;2;3M\u001b[0c\u001b[2;2M\u001b[0;0;0MTe",
+                 "c",
+                 "\u001b[0c",
+                 "\u001b[1;2;3M\u001b[2;2M\u001b[0;0;0MTe")] // Multiple commands with responses
     [InlineData ("\u001b[<3;3;3Mabc\u001b[4cde", "c", "\u001b[4c", "\u001b[<3;3;3Mabcde")] // Escape sequences mixed with regular text
 
     // Edge cases
@@ -158,15 +156,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
     public static IEnumerable<object? []> TestInputSequencesExact_Cases ()
     {
-        yield return
-        [
-            "Esc Only",
-            null,
-            new []
-            {
-                new StepExpectation ('\u001b', AnsiResponseParserState.ExpectingEscapeSequence, string.Empty)
-            }
-        ];
+        yield return ["Esc Only", null, new [] { new StepExpectation ('\u001b', AnsiResponseParserState.ExpectingEscapeSequence, string.Empty) }];
 
         yield return
         [
@@ -175,15 +165,13 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             new []
             {
                 new StepExpectation ('\u001b', AnsiResponseParserState.ExpectingEscapeSequence, string.Empty),
-                new StepExpectation (
-                                     'H',
+                new StepExpectation ('H',
                                      AnsiResponseParserState.InResponse,
                                      string.Empty), // H is known terminator and not expected one so here we release both chars
                 new StepExpectation ('\u001b', AnsiResponseParserState.ExpectingEscapeSequence, "\u001bH"),
                 new StepExpectation ('[', AnsiResponseParserState.InResponse, string.Empty),
                 new StepExpectation ('0', AnsiResponseParserState.InResponse, string.Empty),
-                new StepExpectation (
-                                     'c',
+                new StepExpectation ('c',
                                      AnsiResponseParserState.Normal,
                                      string.Empty,
                                      "\u001b[0c"), // c is expected terminator so here we swallow input and populate expected response
@@ -216,12 +204,10 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         /// </summary>
         public string ExpectedAnsiResponse { get; } = string.Empty;
 
-        public StepExpectation (
-            char input,
-            AnsiResponseParserState expectedStateAfterOperation,
-            string expectedRelease = "",
-            string expectedAnsiResponse = ""
-        ) : this ()
+        public StepExpectation (char input,
+                                AnsiResponseParserState expectedStateAfterOperation,
+                                string expectedRelease = "",
+                                string expectedAnsiResponse = "") : this ()
         {
             Input = input;
             ExpectedStateAfterOperation = expectedStateAfterOperation;
@@ -374,10 +360,9 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // ReSharper disable once NotAccessedVariable
         var m = 0;
 
-        List<Tuple<char, int>> result = new ();
+        List<Tuple<char, int>> result = [];
 
-        p.ExpectResponseT (
-                           "m",
+        p.ExpectResponseT ("m",
                            r =>
                            {
                                result = r.ToList ();
@@ -389,9 +374,9 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // Act - Feed input strings containing ANSI sequences
         p.ProcessInput (StringToBatch ("\u001b[<0;10;10m")); // Should match and increment `m`
 
-        // Prepare expected result: 
-        List<Tuple<char, int>> expected = new ()
-        {
+        // Prepare expected result:
+        List<Tuple<char, int>> expected =
+        [
             Tuple.Create ('\u001b', 0), // Escape character
             Tuple.Create ('[', 1),
             Tuple.Create ('<', 2),
@@ -403,7 +388,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             Tuple.Create ('1', 8),
             Tuple.Create ('0', 9),
             Tuple.Create ('m', 10)
-        };
+        ];
 
         Assert.Equal (expected.Count, result.Count); // Ensure the count is as expected
         Assert.True (expected.SequenceEqual (result), "The result does not match the expected output."); // Check the actual content
@@ -416,8 +401,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         _parser1.UnexpectedResponseHandler = _ => true;
         _parser2.UnknownResponseHandler = _ => true;
 
-        AssertReleased (
-                        "Just te\u001b[<0;0;0M\u001b[3c\u001b[2c\u001b[4cst",
+        AssertReleased ("Just te\u001b[<0;0;0M\u001b[3c\u001b[2c\u001b[4cst",
                         "Just test",
                         0,
                         1,
@@ -434,7 +418,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     public void UnknownResponses_ParameterShouldMatch ()
     {
         // Track unknown responses passed to the UnexpectedResponseHandler
-        List<string> unknownResponses = new ();
+        List<string> unknownResponses = [];
 
         // Set up the UnexpectedResponseHandler to log each unknown response
         _parser1.UnexpectedResponseHandler = r1 =>
@@ -453,18 +437,10 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
                                           };
 
         // Input with known and unknown responses
-        AssertReleased (
-                        "Just te\u001b[<0;0;0M\u001b[3c\u001b[2c\u001b[4cst",
-                        "Just test");
+        AssertReleased ("Just te\u001b[<0;0;0M\u001b[3c\u001b[2c\u001b[4cst", "Just test");
 
         // Expected unknown responses (ANSI sequences that are unknown)
-        List<string> expectedUnknownResponses = new ()
-        {
-            "\u001b[<0;0;0M",
-            "\u001b[3c",
-            "\u001b[2c",
-            "\u001b[4c"
-        };
+        List<string> expectedUnknownResponses = ["\u001b[<0;0;0M", "\u001b[3c", "\u001b[2c", "\u001b[4c"];
 
         // Assert that the UnexpectedResponseHandler was called with the correct unknown responses
         Assert.Equal (expectedUnknownResponses.Count, unknownResponses.Count);
@@ -483,13 +459,10 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // ANSI escape sequence for mouse up (using a generic format example)
         const string MOUSE_UP = "\u001B[<0;25;50m";
 
-        AnsiResponseParser parser = new (new SystemTimeProvider ())
-        {
-            HandleMouse = true
-        };
+        AnsiResponseParser parser = new (new SystemTimeProvider ()) { HandleMouse = true };
 
         string? foundDar = null;
-        List<Mouse> mouseEventArgs = new ();
+        List<Mouse> mouseEventArgs = [];
 
         parser.Mouse += (s, e) => mouseEventArgs.Add (e);
         parser.ExpectResponse ("c", dar => foundDar = dar, null, false);
@@ -529,7 +502,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         parser.HandleKeyboard = true;
         string? foundDar = null;
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         parser.Keyboard += (s, e) => keys.Add (e);
         parser.ExpectResponse ("c", dar => foundDar = dar, null, false);
@@ -549,102 +522,38 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     public static IEnumerable<object []> ParserDetects_FunctionKeys_Cases ()
     {
         // These are VT100 escape codes for F1-4
-        yield return
-        [
-            "\u001bOP",
-            Key.F1
-        ];
+        yield return ["\u001bOP", Key.F1];
 
-        yield return
-        [
-            "\u001bOQ",
-            Key.F2
-        ];
+        yield return ["\u001bOQ", Key.F2];
 
-        yield return
-        [
-            "\u001bOR",
-            Key.F3
-        ];
+        yield return ["\u001bOR", Key.F3];
 
-        yield return
-        [
-            "\u001bOS",
-            Key.F4
-        ];
+        yield return ["\u001bOS", Key.F4];
 
         // These are also F keys
-        yield return
-        [
-            "\u001b[11~",
-            Key.F1
-        ];
+        yield return ["\u001b[11~", Key.F1];
 
-        yield return
-        [
-            "\u001b[12~",
-            Key.F2
-        ];
+        yield return ["\u001b[12~", Key.F2];
 
-        yield return
-        [
-            "\u001b[13~",
-            Key.F3
-        ];
+        yield return ["\u001b[13~", Key.F3];
 
-        yield return
-        [
-            "\u001b[14~",
-            Key.F4
-        ];
+        yield return ["\u001b[14~", Key.F4];
 
-        yield return
-        [
-            "\u001b[15~",
-            Key.F5
-        ];
+        yield return ["\u001b[15~", Key.F5];
 
-        yield return
-        [
-            "\u001b[17~",
-            Key.F6
-        ];
+        yield return ["\u001b[17~", Key.F6];
 
-        yield return
-        [
-            "\u001b[18~",
-            Key.F7
-        ];
+        yield return ["\u001b[18~", Key.F7];
 
-        yield return
-        [
-            "\u001b[19~",
-            Key.F8
-        ];
+        yield return ["\u001b[19~", Key.F8];
 
-        yield return
-        [
-            "\u001b[20~",
-            Key.F9
-        ];
+        yield return ["\u001b[20~", Key.F9];
 
-        yield return
-        [
-            "\u001b[21~",
-            Key.F10
-        ];
+        yield return ["\u001b[21~", Key.F10];
 
-        yield return
-        [
-            "\u001b[23~",
-            Key.F11
-        ];
+        yield return ["\u001b[23~", Key.F11];
 
-        yield return
-        [
-            "\u001b[24~",
-            Key.F12
-        ];
+        yield return ["\u001b[24~", Key.F12];
     }
 
     [MemberData (nameof (ParserDetects_FunctionKeys_Cases))]
@@ -654,13 +563,13 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         var parser = new AnsiResponseParser (new SystemTimeProvider ());
 
         parser.HandleKeyboard = true;
-        List<Key> keys = new ();
+        List<Key> keys = [];
 
         parser.Keyboard += (s, e) => keys.Add (e);
 
         foreach (char ch in input)
         {
-            parser.ProcessInput (new (ch, 1));
+            parser.ProcessInput (new string (ch, 1));
         }
 
         Key k = Assert.Single (keys);
@@ -668,13 +577,12 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         Assert.Equal (k, expectedKey);
     }
 
-    private Tuple<char, int> [] StringToBatch (string batch) { return batch.Select (k => Tuple.Create (k, _tIndex++)).ToArray (); }
+    private Tuple<char, int> [] StringToBatch (string batch) => batch.Select (k => Tuple.Create (k, _tIndex++)).ToArray ();
 
-    public static IEnumerable<string []> GetBatchPermutations (string input, int maxDepth = 3)
-    {
+    public static IEnumerable<string []> GetBatchPermutations (string input, int maxDepth = 3) =>
+
         // Call the recursive method to generate batches with an initial depth of 0
-        return GenerateBatches (input, 0, maxDepth, 0);
-    }
+        GenerateBatches (input, 0, maxDepth, 0);
 
     private static IEnumerable<string []> GenerateBatches (string input, int start, int maxDepth, int currentDepth)
     {
@@ -687,7 +595,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // If we have reached the end of the string, return an empty list
         if (start >= input.Length)
         {
-            yield return new string [0];
+            yield return [];
 
             yield break;
         }
@@ -744,7 +652,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     private void AssertReleased (string ansiStream, string expectedRelease, params int [] expectedTValues)
     {
         var sb = new StringBuilder ();
-        List<int> tValues = new ();
+        List<int> tValues = [];
 
         var i = 0;
 
@@ -799,9 +707,9 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         Assert.Equal (expectedRelease, _parser2.ProcessInput (c2.ToString ()));
     }
 
-    private string BatchToString (IEnumerable<Tuple<char, int>> processInput) { return new (processInput.Select (a => a.Item1).ToArray ()); }
+    private string BatchToString (IEnumerable<Tuple<char, int>> processInput) => new (processInput.Select (a => a.Item1).ToArray ());
 
-    private Tuple<char, int> [] NextChar (string ansiStream, ref int i) { return StringToBatch (ansiStream [i++].ToString ()); }
+    private Tuple<char, int> [] NextChar (string ansiStream, ref int i) => StringToBatch (ansiStream [i++].ToString ());
 
     private void AssertManualReleaseIs (string expectedRelease, params int [] expectedTValues)
     {

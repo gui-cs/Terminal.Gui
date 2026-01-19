@@ -70,11 +70,11 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// </summary>
     public bool IsEnabled
     {
-        get => field;
+        get;
         private set
         {
             field = value;
-            Logging.Trace ($"{value}");
+            //Logging.Trace ($"{value}");
         }
     }
 
