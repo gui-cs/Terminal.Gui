@@ -18,7 +18,7 @@ namespace Terminal.Gui.Drivers;
 ///         <list type="bullet">
 ///             <item>Keyboard input becomes ANSI sequences (e.g., Arrow Up = ESC[A)</item>
 ///             <item>Mouse input becomes SGR format sequences (e.g., ESC[&lt;0;10;5M)</item>
-///             <item>All input can be parsed uniformly with <see cref="AnsiResponseParser{TInputRecord}"/></item>
+///             <item>All input can be parsed uniformly with <see cref="AnsiResponseParser"/></item>
 ///         </list>
 ///     </para>
 /// </remarks>
@@ -68,15 +68,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// <summary>
     ///     Gets whether VTS input mode was successfully enabled.
     /// </summary>
-    public bool IsEnabled
-    {
-        get;
-        private set
-        {
-            field = value;
-            //Logging.Trace ($"{value}");
-        }
-    }
+    public bool IsEnabled { get; private set; }
 
     /// <summary>
     ///     Gets the Windows console input handle.

@@ -280,12 +280,14 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <param name="mouse"></param>
     public void RaiseSyntheticMouseEvent (Mouse mouse)
     {
+        Logging.Trace ($"{mouse}");
+
         // Process through MouseInterpreter to generate clicks
         // The interpreter yields the original event first, then any synthetic click events
         foreach (Mouse e in _mouseInterpreter.Process (mouse))
         {
             // Raise all events: original + synthetic clicks
-            Logging.Trace ($"{mouse}");
+            Logging.Trace ($"Invoking SyntheticMouseEvent: {e}");
             SyntheticMouseEvent?.Invoke (this, e);
         }
     }

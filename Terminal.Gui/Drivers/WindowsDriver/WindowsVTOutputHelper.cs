@@ -9,16 +9,9 @@ namespace Terminal.Gui.Drivers;
 /// <remarks>
 ///     <para>
 ///         When Virtual Terminal Sequences (VTS) Output mode is enabled via <c>ENABLE_VIRTUAL_TERMINAL_PROCESSING</c>,
-///         the Windows Console converts user input (keyboard, mouse) into ANSI escape sequences that
-///         can be read via standard input APIs like <c>ReadFile</c> or <c>Console.OpenStandardInput()</c>.
-///     </para>
-///     <para>
-///         This provides a unified, cross-platform ANSI input mechanism where:
-///         <list type="bullet">
-///             <item>Keyboard input becomes ANSI sequences (e.g., Arrow Up = ESC[A)</item>
-///             <item>Mouse input becomes SGR format sequences (e.g., ESC[&lt;0;10;5M)</item>
-///             <item>All input can be parsed uniformly with <see cref="AnsiResponseParser{TInputRecord}"/></item>
-///         </list>
+///         with WriteFile or WriteConsole, characters are parsed for VT100 and similar control character sequences that
+///         control cursor movement, color/font mode, and other operations that can also be performed via the existing
+///         Console APIs. Ensure <c>ENABLE_PROCESSED_OUTPUT</c> is set when using this flag
 ///     </para>
 /// </remarks>
 internal sealed class WindowsVTOutputHelper : IDisposable
@@ -26,6 +19,7 @@ internal sealed class WindowsVTOutputHelper : IDisposable
     #region P/Invoke Declarations
 
     private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
+    private const uint ENABLE_PROCESSED_OUTPUT = 1;
     private const int STD_OUTPUT_HANDLE = -11;
 
     [DllImport ("kernel32.dll", SetLastError = true)]
@@ -104,6 +98,16 @@ internal sealed class WindowsVTOutputHelper : IDisposable
             if ((newMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
             {
                 newMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+                if (!SetConsoleMode (OutputHandle, newMode))
+                {
+                    throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
+                }
+            }
+
+            if ((newMode & ENABLE_PROCESSED_OUTPUT) == 0)
+            {
+                newMode |= ENABLE_PROCESSED_OUTPUT;
 
                 if (!SetConsoleMode (OutputHandle, newMode))
                 {

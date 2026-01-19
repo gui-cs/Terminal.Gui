@@ -32,8 +32,7 @@ internal class AnsiResponseParser (ITimeProvider timeProvider) : AnsiResponsePar
     {
         var output = new StringBuilder ();
 
-        ProcessInputBase (
-                          i => input [i],
+        ProcessInputBase (i => input [i],
                           i => input [i], // For string there is no T so object is same as char
                           c => AppendOutput (output, (char)c),
                           input.Length);
@@ -41,11 +40,10 @@ internal class AnsiResponseParser (ITimeProvider timeProvider) : AnsiResponsePar
         return output.ToString ();
     }
 
-    private void AppendOutput (StringBuilder output, char c)
-    {
+    private void AppendOutput (StringBuilder output, char c) =>
+
         //Logging.Trace ($"AnsiResponseParser releasing '{c}'");
         output.Append (c);
-    }
 
     /// <summary>
     ///     Releases all currently held content (typically called when a timeout occurs or parser needs to flush).
@@ -57,7 +55,7 @@ internal class AnsiResponseParser (ITimeProvider timeProvider) : AnsiResponsePar
         {
             TryLastMinuteSequences ();
 
-            string? output = _heldContent.HeldToString ();
+            string output = _heldContent.HeldToString ();
             ResetState ();
 
             return output;

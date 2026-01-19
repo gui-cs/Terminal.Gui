@@ -55,31 +55,32 @@ public static class AnsiKeyboardEncoder
             int modifier = GetAnsiModifierParameter (key);
 
             // If modifiers are present (Shift, Ctrl, or combinations)
-            if (modifier > 1)
+            if (modifier <= 1)
             {
-                // Check if the sequence uses CSI format (starts with ESC[)
-                if (ansiSeq.StartsWith (EscSeqUtils.CSI))
-                {
-                    // Insert modifier parameter into CSI sequence
-                    // Format: ESC [ <num> ; <modifier> ~ or ESC [ 1 ; <modifier> <letter>
-                    ansiSeq = InsertModifierIntoSequence (ansiSeq, modifier);
-                }
-                else
-                {
-                    // For SS3 format (ESC O) or other non-CSI sequences with modifiers,
-                    // convert to CSI format with modifier
-                    // F1-F4: ESC O P/Q/R/S ? ESC [ 1 ; <mod> P/Q/R/S
-                    ansiSeq = ConvertSS3ToCSIWithModifier (ansiSeq, modifier);
-                }
-
                 return ansiSeq;
             }
 
+            // Check if the sequence uses CSI format (starts with ESC[)
+            if (ansiSeq.StartsWith (EscSeqUtils.CSI, StringComparison.Ordinal))
+            {
+                // Insert modifier parameter into CSI sequence
+                // Format: ESC [ <num> ; <modifier> ~ or ESC [ 1 ; <modifier> <letter>
+                ansiSeq = InsertModifierIntoSequence (ansiSeq, modifier);
+            }
+            else
+            {
+                // For SS3 format (ESC O) or other non-CSI sequences with modifiers,
+                // convert to CSI format with modifier
+                // F1-F4: ESC O P/Q/R/S ? ESC [ 1 ; <mod> P/Q/R/S
+                ansiSeq = ConvertSS3ToCSIWithModifier (ansiSeq, modifier);
+            }
+
             return ansiSeq;
+
         }
 
         // Handle Ctrl combinations for letters (Ctrl takes precedence over Alt)
-        if (key.IsCtrl && baseKeyCode >= KeyCode.A && baseKeyCode <= KeyCode.Z)
+        if (key.IsCtrl && baseKeyCode is >= KeyCode.A and <= KeyCode.Z)
         {
             // Ctrl+A = 0x01, Ctrl+B = 0x02, etc.
             var ctrlChar = (char)(baseKeyCode - KeyCode.A + 1);
@@ -100,7 +101,7 @@ public static class AnsiKeyboardEncoder
 
             // KeyCode.A through KeyCode.Z are uppercase by definition
             // If shift is NOT pressed, convert to lowercase
-            if (ch >= 'A' && ch <= 'Z' && !key.IsShift)
+            if (ch is >= 'A' and <= 'Z' && !key.IsShift)
             {
                 ch = char.ToLower (ch);
             }
@@ -125,49 +126,47 @@ public static class AnsiKeyboardEncoder
     /// </summary>
     /// <param name="keyCode">The base key code (without modifiers).</param>
     /// <returns>The ANSI sequence string, or null if the key is not a special key.</returns>
-    private static string? GetSpecialKeySequence (KeyCode keyCode)
-    {
-        return keyCode switch
-               {
-                   // Cursor movement keys - CSI sequences
-                   KeyCode.CursorUp => $"{EscSeqUtils.CSI}A",
-                   KeyCode.CursorDown => $"{EscSeqUtils.CSI}B",
-                   KeyCode.CursorRight => $"{EscSeqUtils.CSI}C",
-                   KeyCode.CursorLeft => $"{EscSeqUtils.CSI}D",
-                   KeyCode.Home => $"{EscSeqUtils.CSI}H",
-                   KeyCode.End => $"{EscSeqUtils.CSI}F",
+    private static string? GetSpecialKeySequence (KeyCode keyCode) =>
+        keyCode switch
+        {
+            // Cursor movement keys - CSI sequences
+            KeyCode.CursorUp => $"{EscSeqUtils.CSI}A",
+            KeyCode.CursorDown => $"{EscSeqUtils.CSI}B",
+            KeyCode.CursorRight => $"{EscSeqUtils.CSI}C",
+            KeyCode.CursorLeft => $"{EscSeqUtils.CSI}D",
+            KeyCode.Home => $"{EscSeqUtils.CSI}H",
+            KeyCode.End => $"{EscSeqUtils.CSI}F",
 
-                   // Function keys F1-F4 use SS3 format (ESC O)
-                   KeyCode.F1 => $"{EscSeqUtils.KeyEsc}OP",
-                   KeyCode.F2 => $"{EscSeqUtils.KeyEsc}OQ",
-                   KeyCode.F3 => $"{EscSeqUtils.KeyEsc}OR",
-                   KeyCode.F4 => $"{EscSeqUtils.KeyEsc}OS",
+            // Function keys F1-F4 use SS3 format (ESC O)
+            KeyCode.F1 => $"{EscSeqUtils.KeyEsc}OP",
+            KeyCode.F2 => $"{EscSeqUtils.KeyEsc}OQ",
+            KeyCode.F3 => $"{EscSeqUtils.KeyEsc}OR",
+            KeyCode.F4 => $"{EscSeqUtils.KeyEsc}OS",
 
-                   // Function keys F5-F12 use CSI format with tilde terminator
-                   KeyCode.F5 => $"{EscSeqUtils.CSI}15~",
-                   KeyCode.F6 => $"{EscSeqUtils.CSI}17~",
-                   KeyCode.F7 => $"{EscSeqUtils.CSI}18~",
-                   KeyCode.F8 => $"{EscSeqUtils.CSI}19~",
-                   KeyCode.F9 => $"{EscSeqUtils.CSI}20~",
-                   KeyCode.F10 => $"{EscSeqUtils.CSI}21~",
-                   KeyCode.F11 => $"{EscSeqUtils.CSI}23~",
-                   KeyCode.F12 => $"{EscSeqUtils.CSI}24~",
+            // Function keys F5-F12 use CSI format with tilde terminator
+            KeyCode.F5 => $"{EscSeqUtils.CSI}15~",
+            KeyCode.F6 => $"{EscSeqUtils.CSI}17~",
+            KeyCode.F7 => $"{EscSeqUtils.CSI}18~",
+            KeyCode.F8 => $"{EscSeqUtils.CSI}19~",
+            KeyCode.F9 => $"{EscSeqUtils.CSI}20~",
+            KeyCode.F10 => $"{EscSeqUtils.CSI}21~",
+            KeyCode.F11 => $"{EscSeqUtils.CSI}23~",
+            KeyCode.F12 => $"{EscSeqUtils.CSI}24~",
 
-                   // Editing keys - CSI format with tilde terminator
-                   KeyCode.Insert => $"{EscSeqUtils.CSI}2~",
-                   KeyCode.Delete => $"{EscSeqUtils.CSI}3~",
-                   KeyCode.PageUp => $"{EscSeqUtils.CSI}5~",
-                   KeyCode.PageDown => $"{EscSeqUtils.CSI}6~",
+            // Editing keys - CSI format with tilde terminator
+            KeyCode.Insert => $"{EscSeqUtils.CSI}2~",
+            KeyCode.Delete => $"{EscSeqUtils.CSI}3~",
+            KeyCode.PageUp => $"{EscSeqUtils.CSI}5~",
+            KeyCode.PageDown => $"{EscSeqUtils.CSI}6~",
 
-                   // Special characters
-                   KeyCode.Tab => "\t",
-                   KeyCode.Enter => "\r",
-                   KeyCode.Backspace => "\x7F", // DEL (127)
-                   KeyCode.Esc => $"{EscSeqUtils.KeyEsc}",
+            // Special characters
+            KeyCode.Tab => "\t",
+            KeyCode.Enter => "\r",
+            KeyCode.Backspace => "\x7F", // DEL (127)
+            KeyCode.Esc => $"{EscSeqUtils.KeyEsc}",
 
-                   _ => null
-               };
-    }
+            _ => null
+        };
 
     /// <summary>
     ///     Calculates the ANSI modifier parameter for a key.
@@ -243,14 +242,14 @@ public static class AnsiKeyboardEncoder
         // Convert to: ESC [ 1 ; <modifier> <letter>
         // Example: ESC O P (F1) ? ESC [ 1 ; 2 P (Shift+F1)
 
-        if (sequence.Length >= 3 && sequence [0] == EscSeqUtils.KeyEsc && sequence [1] == 'O')
+        if (sequence is not [EscSeqUtils.KeyEsc, 'O', _, ..])
         {
-            char letter = sequence [2];
-
-            return $"{EscSeqUtils.CSI}1;{modifier}{letter}";
+            return sequence;
         }
+        char letter = sequence [2];
+
+        return $"{EscSeqUtils.CSI}1;{modifier}{letter}";
 
         // Fallback: return as-is
-        return sequence;
     }
 }

@@ -938,6 +938,65 @@ public static class EscSeqUtils
     /// </summary>
     public const string CSI_ReportWindowSizeInChars_ResponseValue = "8";
 
+    /// <summary>
+    ///     Valid ANSI response terminators per CSI specification. See
+    ///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
+    ///     Note: N and O are intentionally excluded as they have special handling
+    /// </summary>
+    public static readonly char [] KnownTerminators =
+    [
+        '@', // ICH - Insert Character
+        'A', // CUU - Cursor Up
+        'B', // CUD - Cursor Down
+        'C', // CUF - Cursor Forward (Right)
+        'D', // CUB - Cursor Backward (Left)
+        'E', // CNL - Cursor Next Line
+        'F', // CPL - Cursor Previous Line
+        'G', // CHA - Cursor Horizontal Absolute
+        'H', // CUP - Cursor Position
+        'I', // CHT - Cursor Horizontal Tabulation
+        'J', // ED - Erase in Display
+        'K', // EL - Erase in Line
+        'L', // IL - Insert Line
+        'M', // DL - Delete Line
+        //'N', // Single Shift Select of G2 Character Set (SS2  is 0x8e), VT220. This affects next character only.
+        //'O', // Single Shift Select of G3 Character Set (SS3 is 0x8f), VT220. This affects next character only.
+        'P', // DCH - Delete Character
+        'Q', // (Various sequences)
+        'R', // CPR - Cursor Position Report
+        'S', // SU - Scroll Up
+        'T', // SD - Scroll Down / Mouse tracking
+        'W', // CTC - Cursor Tabulation Control
+        'X', // ECH - Erase Character
+        'Z', // CBT - Cursor Backward Tabulation
+        '^', // (Rarely used)
+        '`', // HPA - Horizontal Position Absolute
+        '~', // Function keys and other extended sequences
+        'a', // HPR - Horizontal Position Relative
+        'b', // REP - Repeat
+        'c', // DA - Device Attributes
+        'd', // VPA - Vertical Position Absolute
+        'e', // VPR - Vertical Position Relative
+        'f', // HVP - Horizontal and Vertical Position
+        'g', // TBC - Tab Clear
+        'h', // SM - Set Mode
+        'i', // MC - Media Copy
+        'l', // RM - Reset Mode
+        'm', // SGR - Select Graphic Rendition
+        'n', // DSR - Device Status Report
+        'p', // (Various, including soft terminal reset)
+        'q', // DECSCUSR - Set Cursor Style
+        'r', // DECSTBM - Set Top and Bottom Margins
+        's', // SCOSC - Save Cursor / DECSLRM
+        't', // Window manipulation / DECSLPP
+        'u', // SCORC - Restore Cursor Position
+        'v', // (Rarely used)
+        'w', // (Rarely used)
+        'x', // DECREQTPARM - Request Terminal Parameters
+        'y', // DECTST - Invoke Confidence Test
+        'z' // (Rarely used)
+    ];
+
     #endregion Requests
 
     #region OSC
