@@ -95,6 +95,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // Initialize platform-specific input helpers
             if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {
+                Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
                 _windowsVTInput = new ();
                 bool vtEnabled = _windowsVTInput.TryEnable ();
                 Logging.Information ($"Windows VT Input mode: {(vtEnabled ? "enabled" : "FAILED")}");
@@ -214,7 +215,11 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             }
 
             // Convert UTF-8 bytes to characters
-            string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
+            uint cp = WindowsVTInputHelper.GetConsoleCP ();
+            Encoding enc = Encoding.GetEncoding ((int)cp);
+
+            string text = enc.GetString (buffer, 0, bytesRead);
+
 
             foreach (char ch in text)
             {
