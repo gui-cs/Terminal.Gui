@@ -72,7 +72,7 @@ public class AnsiRequestScheduler
     /// <param name="driver"></param>
     /// <param name="request"></param>
     /// <returns><see langword="true"/> if request was sent immediately. <see langword="false"/> if it was queued.</returns>
-    public bool SendOrSchedule (IDriver? driver, AnsiEscapeSequenceRequest request) { return SendOrSchedule (driver, request, true); }
+    public bool SendOrSchedule (IDriver? driver, AnsiEscapeSequenceRequest request) => SendOrSchedule (driver, request, true);
 
     private bool SendOrSchedule (IDriver? driver, AnsiEscapeSequenceRequest request, bool addToQueue)
     {
@@ -114,7 +114,7 @@ public class AnsiRequestScheduler
         }
     }
 
-    private bool IsStale (DateTime dt) { return Now () - dt > _staleTimeout; }
+    private bool IsStale (DateTime dt) => Now () - dt > _staleTimeout;
 
     /// <summary>
     ///     Looks to see if the last time we sent <paramref name="withTerminator"/>
@@ -125,17 +125,18 @@ public class AnsiRequestScheduler
     /// <returns></returns>
     private bool EvictStaleRequests (string? withTerminator)
     {
-        if (_lastSend.TryGetValue (withTerminator!, out DateTime dt))
+        if (!_lastSend.TryGetValue (withTerminator!, out DateTime dt))
         {
-            if (IsStale (dt))
-            {
-                _parser.StopExpecting (withTerminator, false);
-
-                return true;
-            }
+            return false;
         }
 
-        return false;
+        if (!IsStale (dt))
+        {
+            return false;
+        }
+        _parser.StopExpecting (withTerminator, false);
+
+        return true;
     }
 
     /// <summary>

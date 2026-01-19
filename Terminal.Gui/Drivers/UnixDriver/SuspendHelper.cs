@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui.Drivers;
 
-internal static class Platform
+internal static class SuspendHelper
 {
     private static int _suspendSignal;
 

@@ -12,7 +12,8 @@ namespace Terminal.Gui.Drivers;
 ///         where 'M' indicates button press and 'm' indicates button release.
 ///     </para>
 ///     <para>
-///         <b>Prerequisites:</b> The terminal must have mouse tracking enabled via <see cref="EscSeqUtils.CSI_EnableMouseEvents"/>,
+///         <b>Prerequisites:</b> The terminal must have mouse tracking enabled via
+///         <see cref="EscSeqUtils.CSI_EnableMouseEvents"/>,
 ///         which enables modes 1003 (any-event tracking), 1015 (URXVT), and 1006 (SGR format).
 ///     </para>
 ///     <para>
@@ -27,7 +28,8 @@ namespace Terminal.Gui.Drivers;
 ///         </item>
 ///         <item>
 ///             <description>
-///                 <b>Drag:</b> Terminal sends one press event (M), multiple motion events with <see cref="MouseFlags.PositionReport"/>
+///                 <b>Drag:</b> Terminal sends one press event (M), multiple motion events with
+///                 <see cref="MouseFlags.PositionReport"/>
 ///                 and the button flag set (e.g., button code 32-34 for drag), then one release event (m).
 ///             </description>
 ///         </item>
@@ -45,7 +47,8 @@ namespace Terminal.Gui.Drivers;
 ///         </item>
 ///         <item>
 ///             <description>
-///                 <b>Horizontal Wheel:</b> Terminal sends button codes 68 (left) or 69 (right), typically with Shift modifier.
+///                 <b>Horizontal Wheel:</b> Terminal sends button codes 68 (left) or 69 (right), typically with Shift
+///                 modifier.
 ///             </description>
 ///         </item>
 ///     </list>
@@ -64,12 +67,11 @@ public class AnsiMouseParser
     /// </summary>
     /// <param name="cur"></param>
     /// <returns></returns>
-    public bool IsMouse (string? cur)
-    {
+    public bool IsMouse (string? cur) =>
+
         // Typically in this format
         // ESC [ < {button_code};{x_pos};{y_pos}{final_byte}
-        return cur!.EndsWith ('M') || cur.EndsWith ('m');
-    }
+        cur!.EndsWith ('M') || cur.EndsWith ('m');
 
     /// <summary>
     ///     Parses a mouse ansi escape sequence into a mouse event. Returns null if input
@@ -96,14 +98,9 @@ public class AnsiMouseParser
         int y = int.Parse (match.Groups [3].Value) - 1;
         char terminator = match.Groups [4].Value.Single ();
 
-        Mouse m = new ()
-        {
-            Timestamp = DateTime.Now,
-            ScreenPosition = new (x, y),
-            Flags = GetFlags (buttonCode, terminator)
-        };
+        Mouse m = new () { Timestamp = DateTime.Now, ScreenPosition = new Point (x, y), Flags = GetFlags (buttonCode, terminator) };
 
-        //Logging.Trace ($"{nameof (AnsiMouseParser)} handled as {input} mouse {m.Flags} at {m.Position}");
+        //Logging.Trace ($"{input} -> {m}");
 
         return m;
     }
@@ -141,11 +138,13 @@ public class AnsiMouseParser
                 buttonState |= MouseFlags.Alt;
 
                 break;
+
             case 14:
             case 47:
                 buttonState |= MouseFlags.Alt | MouseFlags.Shift;
 
                 break;
+
             case 16:
             case 17:
             case 18:
@@ -153,11 +152,13 @@ public class AnsiMouseParser
                 buttonState |= MouseFlags.Ctrl;
 
                 break;
+
             case 22:
             case 55:
                 buttonState |= MouseFlags.Ctrl | MouseFlags.Shift;
 
                 break;
+
             case 24:
             case 25:
             case 26:
@@ -165,56 +166,66 @@ public class AnsiMouseParser
                 buttonState |= MouseFlags.Ctrl | MouseFlags.Alt;
 
                 break;
+
             case 30:
             case 63:
                 buttonState |= MouseFlags.Ctrl | MouseFlags.Shift | MouseFlags.Alt;
 
                 break;
+
             case 32:
             case 33:
             case 34:
                 buttonState |= MouseFlags.PositionReport;
 
                 break;
+
             case 36:
             case 37:
                 buttonState |= MouseFlags.PositionReport | MouseFlags.Shift;
 
                 break;
+
             case 39:
             case 68:
             case 69:
                 buttonState |= MouseFlags.Shift;
 
                 break;
+
             case 40:
             case 41:
             case 42:
                 buttonState |= MouseFlags.PositionReport | MouseFlags.Alt;
 
                 break;
+
             case 45:
             case 46:
                 buttonState |= MouseFlags.PositionReport | MouseFlags.Alt | MouseFlags.Shift;
 
                 break;
+
             case 48:
             case 49:
             case 50:
                 buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl;
 
                 break;
+
             case 53:
             case 54:
                 buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Shift;
 
                 break;
+
             case 56:
             case 57:
             case 58:
                 buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Alt;
 
                 break;
+
             case 61:
             case 62:
                 buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Shift | MouseFlags.Alt;
