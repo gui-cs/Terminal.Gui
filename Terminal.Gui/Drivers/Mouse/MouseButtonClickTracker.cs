@@ -36,8 +36,6 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
     private int _consecutiveClicks;
     private Point _lastPosition;
 
-    private Point _pendingClickPosition;
-    private DateTime _pendingClickTime;
 
     /// <summary>
     ///     Gets or sets the timestamp when the button last changed state (pressed or released).
@@ -103,8 +101,8 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
     ///         </item>
     ///     </list>
     ///     <para>
-    ///         <strong>Design:</strong> Single clicks are emitted immediately for instant user feedback. Multi-clicks 
-    ///         (double, triple) are also emitted immediately when detected. Applications that need to distinguish 
+    ///         <strong>Design:</strong> Single clicks are emitted immediately for instant user feedback. Multi-clicks
+    ///         (double, triple) are also emitted immediately when detected. Applications that need to distinguish
     ///         between single and double-click can track timing themselves (see ListView example in mouse.md).
     ///     </para>
     /// </remarks>
@@ -142,10 +140,6 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
             // EMIT CLICKS IMMEDIATELY - no deferral
             // Applications handle timing if they need to distinguish single vs double-click
             numClicks = _consecutiveClicks;
-
-            // Track for potential next click in sequence
-            _pendingClickPosition = mouse.ScreenPosition;
-            _pendingClickTime = currentTime;
         }
 
         // Record new state
@@ -181,6 +175,7 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
         // Clicks are now emitted immediately - no deferred clicks to check
         numClicks = null;
         position = Point.Empty;
+
         return false;
     }
 
@@ -202,7 +197,10 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
     /// <summary>
     ///     Determines if a specific button is pressed based on the mouse flags.
     /// </summary>
-    /// <param name="btn">The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right, 3=Button4).</param>
+    /// <param name="btn">
+    ///     The zero-based button index (0=LeftButton/Left, 1=MiddleButton/Middle, 2=RightButton/Right,
+    ///     3=Button4).
+    /// </param>
     /// <param name="eFlags">The mouse flags to check for the pressed state.</param>
     /// <returns><see langword="true"/> if the specified button is pressed; otherwise <see langword="false"/>.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="btn"/> is not 0-3.</exception>
@@ -231,9 +229,8 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
     ///         </item>
     ///     </list>
     /// </remarks>
-    private bool IsPressed (int btn, MouseFlags eFlags)
-    {
-        return btn switch
+    private bool IsPressed (int btn, MouseFlags eFlags) =>
+        btn switch
         {
             0 => eFlags.HasFlag (MouseFlags.LeftButtonPressed),
             1 => eFlags.HasFlag (MouseFlags.MiddleButtonPressed),
@@ -241,5 +238,4 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
             3 => eFlags.HasFlag (MouseFlags.Button4Pressed),
             _ => throw new ArgumentOutOfRangeException (nameof (btn))
         };
-    }
 }
