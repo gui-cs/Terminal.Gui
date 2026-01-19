@@ -27,8 +27,11 @@
 		<Optimize>true</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Compile Remove="Application\Keyboard\**" />
 	  <Compile Remove="Drivers\**" />
+	  <EmbeddedResource Remove="Application\Keyboard\**" />
 	  <EmbeddedResource Remove="Drivers\**" />
+	  <None Remove="Application\Keyboard\**" />
 	  <None Remove="Drivers\**" />
 	</ItemGroup>
 	<ItemGroup>
@@ -62,8 +65,5 @@
 		<Using Include="System.Drawing" />
 		<Using Include="Terminal.Gui" />
 		<Using Include="Xunit" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Application\Keyboard\" />
 	</ItemGroup>
 </Project>

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -35,15 +34,9 @@ public class ApplicationMouseTests
     [InlineData (-1, -1, -1, -1, true)]
     [InlineData (0, -1, 0, -1, true)]
     [InlineData (-1, 0, -1, 0, true)]
-    public void MouseEventCoordinatesAreScreenRelative (
-        int clickX,
-        int clickY,
-        int expectedX,
-        int expectedY,
-        bool expectedClicked
-    )
+    public void MouseEventCoordinatesAreScreenRelative (int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
     {
-        var mouse = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.LeftButtonPressed };
+        var mouse = new Mouse { ScreenPosition = new Point (clickX, clickY), Flags = MouseFlags.LeftButtonPressed };
         var clicked = false;
 
         void OnApplicationOnMouseEvent (object? s, Mouse e)
@@ -95,29 +88,16 @@ public class ApplicationMouseTests
     [InlineData (1, 0, 1, 0, 0, false)]
     [InlineData (1, 9, 0, 0, 0, false)]
     [InlineData (1, 0, 9, 0, 0, false)]
-    public void MouseCoordinatesTest_NoAdornments (
-        int offset,
-        int clickX,
-        int clickY,
-        int expectedX,
-        int expectedY,
-        bool expectedClicked
-    )
+    public void MouseCoordinatesTest_NoAdornments (int offset, int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
     {
         Size size = new (10, 10);
         Point pos = new (offset, offset);
 
         var clicked = false;
 
-        var view = new View
-        {
-            X = pos.X,
-            Y = pos.Y,
-            Width = size.Width,
-            Height = size.Height
-        };
+        var view = new View { X = pos.X, Y = pos.Y, Width = size.Width, Height = size.Height };
 
-        var mouseEventToRaise = new Mouse { ScreenPosition = new (clickX, clickY), Flags = MouseFlags.LeftButtonClicked };
+        var mouseEventToRaise = new Mouse { ScreenPosition = new Point (clickX, clickY), Flags = MouseFlags.LeftButtonClicked };
 
         view.MouseEvent += (s, mouse) =>
                            {
@@ -134,7 +114,6 @@ public class ApplicationMouseTests
         Assert.Equal (expectedClicked, clicked);
         top.Dispose ();
     }
-
 
     #endregion mouse coordinate tests
 
@@ -304,7 +283,7 @@ public class ApplicationMouseTests
         Assert.True (view.WasDisposed);
 #endif
 
-        Application.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        Application.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
         Assert.Null (Application.Mouse.MouseGrabView);
         Assert.Equal (0, count);
         top.Dispose ();
@@ -349,7 +328,7 @@ public class ApplicationMouseTests
 
         Application.RaiseMouseEvent (new Mouse
         {
-            ScreenPosition = new (2, 2), // Inside both views
+            ScreenPosition = new Point (2, 2), // Inside both views
             Flags = MouseFlags.LeftButtonClicked
         });
 

@@ -140,7 +140,7 @@ public class InputInjector : IInputInjector
     /// <inheritdoc/>
     public void InjectKey (Key key, InputInjectionOptions? options = null)
     {
-        options ??= new () { TimeProvider = _timeProvider };
+        options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
         InputInjectionMode mode = ResolveMode (options.Mode);
 
         if (mode == InputInjectionMode.Direct)
@@ -156,7 +156,7 @@ public class InputInjector : IInputInjector
             if (_testSource != null)
             {
                 // If we have a test source, enqueue the record for full pipeline processing
-                KeyboardEventRecord record = new (key) { Timestamp = (_timeProvider ?? options.TimeProvider ?? new SystemTimeProvider ()).Now };
+                KeyboardEventRecord record = new (key) { Timestamp = _timeProvider.Now };
                 _testSource.Enqueue (record);
             }
         }
@@ -170,11 +170,11 @@ public class InputInjector : IInputInjector
     /// <inheritdoc/>
     public void InjectMouse (Mouse mouseEvent, InputInjectionOptions? options = null)
     {
-        options ??= new () { TimeProvider = _timeProvider };
+        options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
         InputInjectionMode mode = ResolveMode (options.Mode);
 
         // Set timestamp if not provided
-        mouseEvent.Timestamp ??= (_timeProvider ?? options.TimeProvider ?? new SystemTimeProvider ()).Now;
+        mouseEvent.Timestamp ??= _timeProvider.Now;
 
         if (mode == InputInjectionMode.Direct)
         {
@@ -191,7 +191,7 @@ public class InputInjector : IInputInjector
             if (_testSource != null)
             {
                 // If we have a test source, enqueue the record for full pipeline processing
-                MouseEventRecord record = new (mouseEvent) { Timestamp = (_timeProvider ?? options.TimeProvider ?? new SystemTimeProvider ()).Now };
+                MouseEventRecord record = new (mouseEvent) { Timestamp = _timeProvider.Now };
                 _testSource.Enqueue (record);
             }
         }
@@ -205,7 +205,7 @@ public class InputInjector : IInputInjector
     /// <inheritdoc/>
     public void InjectSequence (IEnumerable<InputInjectionEvent> events, InputInjectionOptions? options = null)
     {
-        options ??= new () { TimeProvider = _timeProvider };
+        options ??= new InputInjectionOptions { TimeProvider = _timeProvider };
 
         foreach (InputInjectionEvent evt in events)
         {
@@ -215,12 +215,7 @@ public class InputInjector : IInputInjector
                 vtp.Advance (evt.Delay.Value);
             }
 
-            InputInjectionOptions eventOptions = new ()
-            {
-                Mode = options.Mode,
-                AutoProcess = false,
-                TimeProvider = options.TimeProvider
-            };
+            InputInjectionOptions eventOptions = new () { Mode = options.Mode, AutoProcess = false, TimeProvider = options.TimeProvider };
 
             switch (evt)
             {
@@ -248,16 +243,18 @@ public class InputInjector : IInputInjector
         _processor.ProcessQueue ();
 
         // If using virtual time and parser has stale escape sequences, advance time and process again
-        if (_timeProvider is VirtualTimeProvider vtp)
+        if (_timeProvider is not VirtualTimeProvider vtp)
         {
-            IAnsiResponseParser? parser = _processor.GetParser ();
-
-            if (parser?.State is AnsiResponseParserState.ExpectingEscapeSequence)
-            {
-                vtp.Advance (TimeSpan.FromMilliseconds (60)); // Past 50ms escape timeout
-                _processor.ProcessQueue ();
-            }
+            return;
         }
+        IAnsiResponseParser parser = _processor.GetParser ();
+
+        if (parser.State is not AnsiResponseParserState.ExpectingEscapeSequence)
+        {
+            return;
+        }
+        vtp.Advance (TimeSpan.FromMilliseconds (60)); // Past 50ms escape timeout
+        _processor.ProcessQueue ();
     }
 
     /// <summary>

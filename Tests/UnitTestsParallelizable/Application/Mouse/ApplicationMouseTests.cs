@@ -16,7 +16,7 @@ namespace ApplicationTests.MouseTests;
 ///     - Multiple quick clicks → DoubleClicked, TripleClicked events
 ///     - This means injecting one event may generate multiple output events
 /// </remarks>
-[Collection("Application Tests")]
+[Collection ("Application Tests")]
 [Trait ("Category", "Mouse")]
 public class ApplicationMouseTests : TestDriverBase
 {
@@ -39,11 +39,7 @@ public class ApplicationMouseTests : TestDriverBase
                                     receivedMouse = e;
                                 };
 
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (5, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (5, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act - Inject through new injection system
         app.InjectMouse (testMouse);
@@ -51,7 +47,7 @@ public class ApplicationMouseTests : TestDriverBase
         // Assert
         Assert.True (mouseEventRaised, "Mouse.MouseEvent should have been raised");
         Assert.NotNull (receivedMouse);
-        Assert.Equal (new (5, 10), receivedMouse!.ScreenPosition);
+        Assert.Equal (new Point (5, 10), receivedMouse!.ScreenPosition);
         Assert.True (receivedMouse.Flags.HasFlag (MouseFlags.LeftButtonPressed));
     }
 
@@ -62,6 +58,7 @@ public class ApplicationMouseTests : TestDriverBase
         // Arrange
         using IApplication app = Application.Create ();
         app.Init (driverName);
+
         // The MouseInterpreter generates additional events (e.g., Clicked from Press+Release)
         // So we test each flag individually and verify we receive at least the injected flag
         MouseFlags [] flagsToTest =
@@ -81,7 +78,7 @@ public class ApplicationMouseTests : TestDriverBase
 
             app.Mouse.MouseEvent += MouseEventHandler;
 
-            app.InjectMouse (new () { ScreenPosition = new (0, 0), Flags = flags });
+            app.InjectMouse (new Mouse { ScreenPosition = new Point (0, 0), Flags = flags });
 
             // Verify we received at least one event with the expected flag
             Assert.True (receivedFlags.Count > 0, $"Should receive at least one event for {flags}");
@@ -91,7 +88,7 @@ public class ApplicationMouseTests : TestDriverBase
 
             continue;
 
-            void MouseEventHandler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
+            void MouseEventHandler (object? s, Mouse e) => receivedFlags.Add (e.Flags);
         }
     }
 
@@ -111,7 +108,7 @@ public class ApplicationMouseTests : TestDriverBase
         // Act
         foreach (Point position in positions)
         {
-            app.InjectMouse (new () { ScreenPosition = position, Flags = MouseFlags.PositionReport });
+            app.InjectMouse (new Mouse { ScreenPosition = position, Flags = MouseFlags.PositionReport });
         }
 
         // Assert - PositionReport events should generate one event per injection
@@ -135,11 +132,7 @@ public class ApplicationMouseTests : TestDriverBase
         app.Mouse.MouseEvent += (s, e) => receivedEvents.Add (e);
 
         // Test with modifiers - ANSI encoding may fail with unsupported modifier combinations
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (0, 0),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl | MouseFlags.Shift
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.Ctrl | MouseFlags.Shift };
 
         // Act
         app.InjectMouse (testMouse);
@@ -151,9 +144,7 @@ public class ApplicationMouseTests : TestDriverBase
 
         // The ANSI encoding process may transform the flags (e.g., generating additional Click events)
         // We just verify we received some mouse event at the correct position
-        Assert.True (
-                     receivedEvents.Any (e => e.ScreenPosition == new Point (0, 0)),
-                     "Should receive event at the injected position");
+        Assert.True (receivedEvents.Any (e => e.ScreenPosition == new Point (0, 0)), "Should receive event at the injected position");
     }
 
     [Theory]
@@ -184,12 +175,12 @@ public class ApplicationMouseTests : TestDriverBase
                                 };
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = new (x, y), Flags = flags });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (x, y), Flags = flags });
 
         // Assert
         Assert.True (mouseEventRaised, $"Mouse event should be raised for {flags} at ({x}, {y})");
         Assert.NotNull (receivedMouse);
-        Assert.Equal (new (x, y), receivedMouse!.ScreenPosition);
+        Assert.Equal (new Point (x, y), receivedMouse!.ScreenPosition);
 
         // Note: The first event received should contain the injected flag,
         // but MouseInterpreter may generate additional Click events for button presses/releases
@@ -231,7 +222,7 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert
         Assert.True (mouseReceived, "View should receive the mouse event");
@@ -282,7 +273,7 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert
         Assert.True (applicationMouseEventFired, "Application.Mouse.MouseEvent should fire");
@@ -325,7 +316,7 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert
         Assert.False (viewMouseEventFired, "View should not receive mouse event when handled at Application level");
@@ -359,7 +350,7 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act - click outside the view
-        app.InjectMouse (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert
         Assert.False (viewMouseEventFired, "View should not receive mouse event when clicked outside");
@@ -388,18 +379,14 @@ public class ApplicationMouseTests : TestDriverBase
                                     receivedMouse = e;
                                 };
 
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (15, 20),
-            Flags = MouseFlags.RightButtonPressed
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (15, 20), Flags = MouseFlags.RightButtonPressed };
 
         // Act
         app.Mouse.RaiseMouseEvent (testMouse);
 
         // Assert
         Assert.True (eventRaised);
-        Assert.Equal (new (15, 20), receivedMouse!.ScreenPosition);
+        Assert.Equal (new Point (15, 20), receivedMouse!.ScreenPosition);
         Assert.True (receivedMouse.Flags.HasFlag (MouseFlags.RightButtonPressed));
     }
 
@@ -422,7 +409,7 @@ public class ApplicationMouseTests : TestDriverBase
         app.Mouse.MouseEvent += (s, e) => secondHandlerCalled = true;
 
         // Act
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert - All event subscribers are called regardless of Handled status (C# event semantics)
         Assert.True (firstHandlerCalled);
@@ -443,7 +430,7 @@ public class ApplicationMouseTests : TestDriverBase
         Point expectedPosition = new (25, 30);
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = expectedPosition, Flags = MouseFlags.PositionReport });
+        app.InjectMouse (new Mouse { ScreenPosition = expectedPosition, Flags = MouseFlags.PositionReport });
 
         // Assert
         Assert.Equal (expectedPosition, app.Mouse.LastMousePosition);
@@ -461,7 +448,7 @@ public class ApplicationMouseTests : TestDriverBase
         // Act
         foreach (Point position in positions)
         {
-            app.InjectMouse (new () { ScreenPosition = position, Flags = MouseFlags.PositionReport });
+            app.InjectMouse (new Mouse { ScreenPosition = position, Flags = MouseFlags.PositionReport });
         }
 
         // Assert
@@ -497,7 +484,7 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act - move mouse into view
-        app.InjectMouse (new () { ScreenPosition = new (7, 7), Flags = MouseFlags.PositionReport });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (7, 7), Flags = MouseFlags.PositionReport });
 
         // Assert
         Assert.True (mouseEnterRaised, "MouseEnter should be raised when mouse enters view");
@@ -531,8 +518,8 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act - move mouse into view, then out
-        app.InjectMouse (new () { ScreenPosition = new (7, 7), Flags = MouseFlags.PositionReport });
-        app.InjectMouse (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.PositionReport });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (7, 7), Flags = MouseFlags.PositionReport });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.PositionReport });
 
         // Assert
         Assert.True (mouseLeaveRaised, "MouseLeave should be raised when mouse leaves view");
@@ -575,7 +562,7 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert
         Assert.True (mouseEventRaised, "MouseEvent should be raised for left button press");
@@ -606,12 +593,13 @@ public class ApplicationMouseTests : TestDriverBase
         IInputInjector injector = app.GetInputInjector ();
 
         // First click at T+0
-        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+        injector.InjectMouse (new Mouse
+                              {
+                                  ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100)
+                              },
                               options);
-
 
         // Assert
         Assert.Equal (MouseFlags.LeftButtonPressed, receivedFlags [0]);
@@ -623,8 +611,66 @@ public class ApplicationMouseTests : TestDriverBase
 
         return;
 
-        void MouseEventHandler (object? s, Mouse e) { receivedFlags.Add (e.Flags); }
+        void MouseEventHandler (object? s, Mouse e) => receivedFlags.Add (e.Flags);
+    }
 
+    [Fact (Skip = "Skip until Pipeline Mode is Fixed")]
+    public void InjectMouseEvent_Pipeline ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init ("ansi");
+
+        using Runnable runnable = new ();
+        app.Begin (runnable);
+
+        List<MouseFlags> receivedFlags = [];
+        app.Mouse.MouseEvent += MouseEventHandler;
+
+        // Act
+        // Use Direct mode to bypass ANSI encoding which cannot preserve timestamps
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Pipeline };
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+
+        IInputInjector injector = app.GetInputInjector ();
+
+        // First click at T+0
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (new Mouse
+                              {
+                                  ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100)
+                              },
+                              options);
+
+        IInputProcessor processor = app.Driver?.GetInputProcessor ()!;
+
+        //AnsiInputTestableTests.SimulateInputThread (app.Driver.GetInputProcessor (), queue);
+
+        Thread.Sleep (20); // Allow time for processing
+
+        processor.ProcessQueue ();
+
+        // Assert
+        Assert.Equal (MouseFlags.LeftButtonPressed, receivedFlags [0]);
+        Assert.Equal (MouseFlags.LeftButtonReleased, receivedFlags [1]);
+        Assert.Equal (MouseFlags.LeftButtonClicked, receivedFlags [2]);
+        Assert.Equal (3, receivedFlags.Count);
+
+        app.Mouse.MouseEvent -= MouseEventHandler;
+
+        return;
+
+        void MouseEventHandler (object? s, Mouse e)
+        {
+            receivedFlags.Add (e.Flags);
+
+            if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+            {
+                Runnable runnable2 = new ();
+                app.Begin (runnable2);
+            }
+        }
     }
 
     [Fact]
@@ -660,7 +706,7 @@ public class ApplicationMouseTests : TestDriverBase
         SessionToken? token = app.Begin (top);
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.RightButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.RightButtonPressed });
 
         // Assert
         Assert.True (mouseEventRaised, "MouseEvent should be raised for right button press");
@@ -705,12 +751,12 @@ public class ApplicationMouseTests : TestDriverBase
         DateTime baseTime = DateTime.Now;
 
         // First click
-        app.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime });
-        app.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) });
+        app.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime });
+        app.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) });
 
         // Second click (within double-click threshold of 500ms)
-        app.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (200) });
-        app.InjectMouse (new () { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (250) });
+        app.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (200) });
+        app.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (250) });
 
         // Assert
         Assert.True (doubleClickRaised, "DoubleClick flag should be detected when clicking twice rapidly at same position");
@@ -763,8 +809,8 @@ public class ApplicationMouseTests : TestDriverBase
         app2.Mouse.MouseEvent += (s, e) => app2MouseEventCount++;
 
         // Act
-        app1.InjectMouse (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        app2.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.RightButtonPressed });
+        app1.InjectMouse (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app2.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.RightButtonPressed });
 
         // Assert
         Assert.Equal (1, app1MouseEventCount);
@@ -789,7 +835,7 @@ public class ApplicationMouseTests : TestDriverBase
         app.Mouse.IsMouseDisabled = true;
 
         // Act
-        app.InjectMouse (new () { ScreenPosition = new (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        app.InjectMouse (new Mouse { ScreenPosition = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
 
         // Assert
         Assert.False (mouseEventRaised, "Mouse event should not be raised when mouse is disabled");
@@ -820,19 +866,22 @@ public class ApplicationMouseTests : TestDriverBase
         IInputInjector injector = app.GetInputInjector ();
 
         // First click at T+0
-        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100) },
+        injector.InjectMouse (new Mouse
+                              {
+                                  ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (100)
+                              },
                               options);
 
         // Second click at T+600 (more than 500ms threshold)
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) },
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) },
                               options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (700) },
+        injector.InjectMouse (new Mouse
+                              {
+                                  ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (700)
+                              },
                               options);
 
         // Assert - Should receive two LeftButtonClicked events (not a double-click)
@@ -861,13 +910,7 @@ public class ApplicationMouseTests : TestDriverBase
         using Runnable runnable = new ();
         app.Begin (runnable);
 
-        View view = new ()
-        {
-            X = 0,
-            Y = 0,
-            Width = 10,
-            Height = 10
-        };
+        View view = new () { X = 0, Y = 0, Width = 10, Height = 10 };
         runnable.Add (view);
         runnable.Layout ();
 
@@ -882,19 +925,19 @@ public class ApplicationMouseTests : TestDriverBase
         IInputInjector injector = app.GetInputInjector ();
 
         // First click at T+0
-        injector.InjectMouse (new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
                               options);
 
         // Second click at T+300 (within 500ms threshold)
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) },
+        injector.InjectMouse (new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (300) },
                               options);
 
-        injector.InjectMouse (
-                              new () { ScreenPosition = new (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350) },
+        injector.InjectMouse (new Mouse
+                              {
+                                  ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (350)
+                              },
                               options);
 
         // Assert - Should receive single-click followed by double-click

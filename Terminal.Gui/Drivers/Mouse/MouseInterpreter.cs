@@ -58,20 +58,17 @@ internal class MouseInterpreter
     ///     Creates four <see cref="MouseButtonClickTracker"/> instances, one for each supported mouse button
     ///     (LeftButton/Left, MiddleButton/Middle, RightButton/Right, Button4), all using the same time provider and threshold.
     /// </remarks>
-    public MouseInterpreter (
-        ITimeProvider? timeProvider = null,
-        TimeSpan? doubleClickThreshold = null
-    )
+    public MouseInterpreter (ITimeProvider? timeProvider = null, TimeSpan? doubleClickThreshold = null)
     {
         TimeProvider = timeProvider ?? new SystemTimeProvider ();
         RepeatedClickThreshold = doubleClickThreshold ?? TimeSpan.FromMilliseconds (500);
 
         _mouseButtonClickTracker =
         [
-            new (TimeProvider, RepeatedClickThreshold, 0),
-            new (TimeProvider, RepeatedClickThreshold, 1),
-            new (TimeProvider, RepeatedClickThreshold, 2),
-            new (TimeProvider, RepeatedClickThreshold, 3)
+            new MouseButtonClickTracker (TimeProvider, RepeatedClickThreshold, 0),
+            new MouseButtonClickTracker (TimeProvider, RepeatedClickThreshold, 1),
+            new MouseButtonClickTracker (TimeProvider, RepeatedClickThreshold, 2),
+            new MouseButtonClickTracker (TimeProvider, RepeatedClickThreshold, 3)
         ];
     }
 
