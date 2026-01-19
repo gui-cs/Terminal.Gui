@@ -89,7 +89,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // Check if we have a real console first
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
             {
-                Logging.Warning ("Console Input is redirected. Running in degraded mode.");
+                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
                 return;
             }
@@ -218,7 +218,10 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 }
 
                 // Convert UTF-8 bytes to characters
-                string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
+                uint cp = WindowsVTInputHelper.GetConsoleCP ();
+                Encoding enc = Encoding.GetEncoding ((int)cp);
+
+                string text = enc.GetString (buffer, 0, bytesRead);
 
                 foreach (char ch in text)
                 {

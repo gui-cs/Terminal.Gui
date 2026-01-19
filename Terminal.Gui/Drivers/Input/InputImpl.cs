@@ -22,7 +22,7 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
     public CancellationTokenSource? ExternalCancellationTokenSource { get; set; }
 
     /// <inheritdoc/>
-    public void Initialize (ConcurrentQueue<TInputRecord> inputQueue) { _inputQueue = inputQueue; }
+    public void Initialize (ConcurrentQueue<TInputRecord> inputQueue) => _inputQueue = inputQueue;
 
     /// <inheritdoc/>
     public void Run (CancellationToken runCancellationToken)
@@ -41,15 +41,16 @@ public abstract class InputImpl<TInputRecord> : IInput<TInputRecord>
         {
             if (_inputQueue == null)
             {
-                throw new ("Cannot run input before Initialization");
+                throw new Exception ("Cannot run input before Initialization");
             }
 
             do
             {
                 while (Peek ())
                 {
-                    Logging.Trace($"Read...");
-                    var records = Read ();
+                    //Logging.Trace($"Read...");
+                    IEnumerable<TInputRecord> records = Read ();
+
                     foreach (TInputRecord r in records)
                     {
                         _inputQueue.Enqueue (r);

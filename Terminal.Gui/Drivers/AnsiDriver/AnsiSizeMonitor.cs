@@ -87,7 +87,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
         };
 
         //Logging.Trace($"{request.Request}");
-        //_queueAnsiRequest! (request);
+        _queueAnsiRequest! (request);
     }
 
     /// <inheritdoc/>
@@ -130,7 +130,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
     private void HandleSizeResponse (string? response)
     {
-        Logging.Trace($"{response}");
+        //Logging.Trace($"{response}");
         _expectingResponse = false;
 
         if (string.IsNullOrEmpty (response))

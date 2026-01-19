@@ -5,11 +5,12 @@ using static Terminal.Gui.Drivers.WindowsConsole;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Helper class for enabling Windows Virtual Terminal Input mode.
+///     Helper class for getting input from the Windows Console in Virtual Terminal Sequence (VTS) mode using only
+///     low-level Windows APIs.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         When Virtual Terminal (VT) Input mode is enabled via <c>ENABLE_VIRTUAL_TERMINAL_INPUT</c>,
+///         When Virtual Terminal Sequences (VTS) Input mode is enabled via <c>ENABLE_VIRTUAL_TERMINAL_INPUT</c>,
 ///         the Windows Console converts user input (keyboard, mouse) into ANSI escape sequences that
 ///         can be read via standard input APIs like <c>ReadFile</c> or <c>Console.OpenStandardInput()</c>.
 ///     </para>
@@ -61,6 +62,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
 
+    [DllImport ("kernel32.dll")]
+    internal static extern uint GetConsoleCP ();
+
     // Console mode flags
     private const int STD_INPUT_HANDLE = -10;
     private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
@@ -77,9 +81,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
     private bool _disposed;
 
     /// <summary>
-    ///     Gets whether VT input mode was successfully enabled.
+    ///     Gets whether VTS input mode was successfully enabled.
     /// </summary>
-    public bool IsVTModeEnabled
+    public bool IsEnabled
     {
         get => field;
         private set
@@ -97,10 +101,10 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// <summary>
     ///     Attempts to enable Windows Virtual Terminal Input mode.
     /// </summary>
-    /// <returns>True if VT mode was enabled successfully; false otherwise.</returns>
+    /// <returns>True if VTS mode was enabled successfully; false otherwise.</returns>
     public bool TryEnable ()
     {
-        if (IsVTModeEnabled)
+        if (IsEnabled)
         {
             return true;
         }
@@ -129,8 +133,8 @@ internal sealed class WindowsVTInputHelper : IDisposable
                 return false;
             }
 
-            // Configure VT input mode:
-            // - Enable: VT input, mouse input, extended flags
+            // Configure VTS input mode:
+            // - Enable: VTS input, mouse input, extended flags
             // - Disable: processed input, line input, echo, quick edit
             // This allows raw ANSI sequence reading
             uint newMode = _originalConsoleMode;
@@ -139,19 +143,21 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
             if (!SetConsoleMode (InputHandle, newMode))
             {
-                Logging.Warning ("Failed to set Windows VT console mode.");
+                Logging.Warning ("Failed to set Windows VTS console mode.");
 
                 return false;
             }
 
-            IsVTModeEnabled = true;
-            Logging.Information ($"Windows VT input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
+            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+            IsEnabled = true;
+            Logging.Information ($"Windows VTS input mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to enable Windows VT mode: {ex.Message}");
+            Logging.Warning ($"Failed to enable Windows VTS mode: {ex.Message}");
 
             return false;
         }
@@ -166,7 +172,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         eventCount = 0;
 
-        if (!IsVTModeEnabled || InputHandle == nint.Zero)
+        if (!IsEnabled || InputHandle == nint.Zero)
         {
             return false;
         }
@@ -201,16 +207,18 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         bytesRead = 0;
 
-        if (!IsVTModeEnabled || InputHandle == nint.Zero || !Console.KeyAvailable)
+        if (!IsEnabled || InputHandle == nint.Zero || !Console.KeyAvailable)
         {
             return false;
         }
 
         try
         {
-            Logging.Trace ("ReadFile...");
+            //Logging.Trace ("ReadFile...");
             bool success = ReadFile (InputHandle, buffer, (uint)buffer.Length, out uint numBytesRead, nint.Zero);
-            Logging.Trace ($"...{JsonSerializer.Serialize (Encoding.UTF8.GetString (buffer, 0, (int)numBytesRead))}");
+#pragma warning disable IL3050
+            //Logging.Trace ($"...{JsonSerializer.Serialize (Encoding.UTF8.GetString (buffer, 0, (int)numBytesRead))}");
+#pragma warning restore IL3050
 
             if (!success)
             {
@@ -237,7 +245,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// </summary>
     public void Restore ()
     {
-        if (!IsVTModeEnabled || _disposed || InputHandle == nint.Zero)
+        if (!IsEnabled || _disposed || InputHandle == nint.Zero)
         {
             return;
         }
@@ -253,7 +261,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
             }
 
             SetConsoleMode (InputHandle, _originalConsoleMode);
-            IsVTModeEnabled = false;
+            IsEnabled = false;
             Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)

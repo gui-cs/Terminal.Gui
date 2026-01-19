@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drivers;
@@ -36,27 +35,14 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class AnsiOutput : OutputBase, IOutput
 {
+    // Tracks which underlying platform APIs are in use
+    private readonly AnsiPlatform _platform;
+
     private Size _consoleSize = new (80, 25);
     private IOutputBuffer? _lastBuffer;
-    private readonly bool _terminalInitialized;
 
-    private readonly uint _originalOutputConsoleMode;
-    private readonly nint _outputHandle;
-    private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
-    private const int STD_OUTPUT_HANDLE = -11;
+    private readonly WindowsVTOutputHelper? _windowsVTOutput;
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
-    [DllImport ("kernel32.dll")]
-    private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
-
-
-    [DllImport ("kernel32.dll")]
-    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
-
-
-    [DllImport ("kernel32.dll")]
-    private static extern uint GetLastError ();
     /// <summary>
     ///     Initializes a new instance of <see cref="AnsiOutput"/>.
     ///     Checks if a real console is available for ANSI output and activates the alternate screen buffer.
@@ -64,6 +50,8 @@ public class AnsiOutput : OutputBase, IOutput
     public AnsiOutput ()
     {
         // Logging.Information ($"Creating {nameof (AnsiOutput)}");
+
+        _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
         _lastBuffer.SetSize (80, 25);
@@ -75,80 +63,66 @@ public class AnsiOutput : OutputBase, IOutput
             if (Console.IsOutputRedirected || Console.IsInputRedirected)
             {
                 Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
-                _terminalInitialized = false;
+
+                return;
             }
-            else
+
+            // Initialize platform-specific output helpers
+            if (PlatformDetection.IsWindows ())
             {
-                PlatformID p = Environment.OSVersion.Platform;
+                _windowsVTOutput = new WindowsVTOutputHelper ();
 
-                if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+                if (!_windowsVTOutput.TryEnable ())
                 {
-                    try
-                    {
-                        _outputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+                    _windowsVTOutput.Dispose ();
+                    _windowsVTOutput = null;
 
-                        if (!GetConsoleMode (_outputHandle, out uint mode))
-                        {
-                            throw new ApplicationException ($"Failed to get output console mode, error code: {GetLastError ()}.");
-                        }
+                    Logging.Warning ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
-                        _originalOutputConsoleMode = mode;
-
-                        if ((mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
-                        {
-                            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-
-                            if (!SetConsoleMode (_outputHandle, mode))
-                            {
-                                throw new ApplicationException ($"Failed to set output console mode, error code: {GetLastError ()}.");
-                            }
-                        }
-
-                    }
-                    catch (ApplicationException ex)
-                    {
-                        // Likely running as a unit test, or in a non-interactive session.
-                        Logging.Critical ($"NetWinVTConsole could not configure terminal modes. May indicate running in non-interactive session: {ex}");
-                        _terminalInitialized = false;
-                    }
+                    return;
                 }
-                else
-                {
-                    Stream stream = Console.OpenStandardOutput ();
-
-                    if (!stream.CanWrite)
-                    {
-                        Logging.Warning ("Console output stream is not writable. Running in degraded mode.");
-                        _terminalInitialized = false;
-                    }
-                }
-
-                _terminalInitialized = true;
-
-                // Initialize terminal for ANSI output
-                // Activate alternate screen buffer, hide cursor, enable mouse tracking
-                Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-                Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
-                Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
-                Write (EscSeqUtils.CSI_HideCursor);
-                Write (EscSeqUtils.CSI_EnableMouseEvents);
-
-                // Flush to ensure all sequences are sent
-                Console.Out.Flush ();
-                Logging.Information ("ANSIOutput initialized successfully");
-
-                // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
-                // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
-                // not the alternate screen buffer we just activated.
-                // Start with default size; actual size will be set when ANSI response arrives.
-                _consoleSize = new Size (80, 25);
+                _platform = AnsiPlatform.WindowsVT;
             }
+            else if (PlatformDetection.IsUnixLike ())
+            {
+                // duplicate stdout so we don't mess with Console.Out's FD
+                int fdCopy = UnixIOHelper.dup (UnixIOHelper.STDOUT_FILENO);
+
+                if (fdCopy == -1)
+                {
+                    Logging.Warning ("Console output stream is not writable. Running in degraded mode.");
+
+                    return;
+                }
+
+                _platform = AnsiPlatform.UnixRaw;
+            }
+
+            // Initialize terminal for ANSI output
+            // Activate alternate screen buffer, hide cursor, enable mouse tracking
+            Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
+            Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
+            Write (EscSeqUtils.CSI_HideCursor);
+            Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+            // Flush to ensure all sequences are sent
+            // NOTE: Default implementation of Flush does nothing.
+            Console.Out.Flush ();
+
+            Logging.Information ("ANSIOutput initialized successfully");
+
+            // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
+            // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
+            // not the alternate screen buffer we just activated.
+            // Start with default size; actual size will be set when ANSI response arrives.
+            _consoleSize = new Size (80, 25);
         }
         catch (Exception ex)
         {
             Logging.Warning ($"Failed to initialize ANSIOutput: {ex.GetType ().Name}: {ex.Message}");
             Logging.Warning ($"Stack trace: {ex.StackTrace}");
-            _terminalInitialized = false;
+            _platform = AnsiPlatform.Degraded;
         }
     }
 
@@ -169,18 +143,29 @@ public class AnsiOutput : OutputBase, IOutput
     {
         base.Write (output);
 
-        if (!_terminalInitialized)
-        {
-            return;
-        }
-
         try
         {
-            Console.Out.Write (output);
+            switch (_platform)
+            {
+                case AnsiPlatform.WindowsVT:
+                    _windowsVTOutput!.Write (output);
+
+                    break;
+
+                case AnsiPlatform.UnixRaw:
+                    byte [] utf8 = Encoding.UTF8.GetBytes (output.ToString ());
+                    UnixIOHelper.TryWriteStdout (utf8);
+
+                    return;
+
+                case AnsiPlatform.Degraded:
+                default:
+                    break;
+            }
         }
         catch (Exception e)
         {
-            Logging.Warning (e.Message);
+            //Logging.Warning (e.Message);
 
             // ignore for unit tests
         }
@@ -189,18 +174,31 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
-        if (!_terminalInitialized)
-        {
-            return;
-        }
-
         try
         {
-            Console.Out.Write (text);
+            switch (_platform)
+            {
+                case AnsiPlatform.WindowsVT:
+                    StringBuilder sb = new ();
+                    sb.Append (text);
+                    _windowsVTOutput!.Write (sb);
+
+                    break;
+
+                case AnsiPlatform.UnixRaw:
+                    byte [] utf8 = Encoding.UTF8.GetBytes (text.ToArray ());
+                    UnixIOHelper.TryWriteStdout (utf8);
+
+                    return;
+
+                case AnsiPlatform.Degraded:
+                default:
+                    break;
+            }
         }
         catch (Exception e)
         {
-            Logging.Warning (e.Message);
+            //Logging.Warning (e.Message);
 
             // ignore for unit tests
         }
@@ -257,14 +255,14 @@ public class AnsiOutput : OutputBase, IOutput
             return false;
         }
 
-        if (!_terminalInitialized)
+        if (_platform == AnsiPlatform.Degraded)
         {
             return true;
         }
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
-        EscSeqUtils.CSI_WriteCursorPosition (Console.Out, row + 1, col + 1);
+        Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
 
         return true;
     }
@@ -304,7 +302,7 @@ public class AnsiOutput : OutputBase, IOutput
             // Example: "[8;25;80t"
             Match match = Regex.Match (response, @"\[(\d+);(\d+);(\d+)t$");
 
-            if (match.Success && match.Groups.Count == 4)
+            if (match is { Success: true, Groups.Count: 4 })
             {
                 // Group 1 should be "8" (the response value)
                 // Group 2 is height, Group 3 is width
@@ -323,7 +321,7 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
-        if (!_terminalInitialized)
+        if (_platform == AnsiPlatform.Degraded)
         {
             return;
         }
@@ -341,14 +339,9 @@ public class AnsiOutput : OutputBase, IOutput
         }
         finally
         {
-            Logging.Trace ("Flushing and closing Console.Out");
-            if (!SetConsoleMode (_outputHandle, _originalOutputConsoleMode))
-            {
-                throw new ApplicationException ($"Failed to restore output console mode, error code: {GetLastError ()}.");
-            }
+            Logging.Trace ("Flushing and closing.");
 
-            //Console.Out.Flush ();
-            //Console.Out.Close ();
+            _windowsVTOutput?.Dispose ();
         }
     }
 }

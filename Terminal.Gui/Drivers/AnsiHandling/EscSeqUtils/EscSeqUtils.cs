@@ -381,8 +381,8 @@ public static class EscSeqUtils
                 //uint ck = ConsoleKeyMapping.MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
 
                 //if (isConsoleKey)
-            {
-                key = consoleKeyInfo.Key;// (ConsoleKey)ck;
+                {
+                    key = consoleKeyInfo.Key;// (ConsoleKey)ck;
                 }
 
                 newConsoleKeyInfo = new (
