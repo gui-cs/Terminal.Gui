@@ -121,6 +121,152 @@ public class InputInjectorTests (ITestOutputHelper output)
 
     #endregion
 
+    #region InjectKey Tests - Pipeline Mode
+
+    [Fact]
+    public async Task InjectKey_PipelineMode_MultipleKeys_RaisesAllEvents ()
+    {
+        // Arrange
+        VirtualTimeProvider timeProvider = new ();
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
+
+        using IApplication app = Application.Create (timeProvider);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        List<Key> receivedKeys = [];
+        app.Keyboard.KeyDown += (_, key) => receivedKeys.Add (key);
+
+        // Explicit Pipeline mode
+        TestInputSource testSource = new (timeProvider);
+        InputInjector injector = new (app.Driver?.GetInputProcessor ()!, timeProvider, testSource);
+
+        InputInjectionOptions options = new ()
+        {
+            Mode = InputInjectionMode.Pipeline,
+            AutoProcess = true,
+            TimeProvider = timeProvider
+        };
+
+        // Act
+        injector.InjectKey (Key.A, options);
+        injector.InjectKey (Key.B, options);
+        injector.InjectKey (Key.C, options);
+
+        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
+        await Task.Delay (50); // Allow some time for processing
+        injector.ProcessQueue ();
+
+        // Assert - Should raise exactly 3 KeyDown events
+        Assert.Equal (3, receivedKeys.Count);
+        Assert.Equal (Key.A, receivedKeys [0]);
+        Assert.Equal (Key.B, receivedKeys [1]);
+        Assert.Equal (Key.C, receivedKeys [2]);
+    }
+
+    [Fact]
+    public async Task InjectKey_Pipeline_AccentedKeys_RaisesAllEvents ()
+    {
+        // Arrange
+        VirtualTimeProvider timeProvider = new ();
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
+
+        using IApplication app = Application.Create (timeProvider);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        List<Key> receivedKeys = [];
+        app.Keyboard.KeyDown += (_, key) => receivedKeys.Add (key);
+
+        // Explicit Pipeline mode
+        TestInputSource testSource = new (timeProvider);
+        InputInjector injector = new (app.Driver?.GetInputProcessor ()!, timeProvider, testSource);
+
+        InputInjectionOptions options = new ()
+        {
+            Mode = InputInjectionMode.Pipeline,
+            AutoProcess = false,
+            TimeProvider = timeProvider
+        };
+
+        // Act
+        injector.InjectKey (new Key ('á'), options);
+        injector.InjectKey (new Key ('é'), options);
+        injector.InjectKey (new Key ('í'), options);
+        injector.InjectKey (new Key ('ó'), options);
+        injector.InjectKey (new Key ('ú'), options);
+        injector.InjectKey (new Key ('à'), options);
+        injector.InjectKey (new Key ('è'), options);
+        injector.InjectKey (new Key ('ì'), options);
+        injector.InjectKey (new Key ('ò'), options);
+        injector.InjectKey (new Key ('ù'), options);
+        injector.InjectKey (new Key ('â'), options);
+        injector.InjectKey (new Key ('ê'), options);
+        injector.InjectKey (new Key ('î'), options);
+        injector.InjectKey (new Key ('ô'), options);
+        injector.InjectKey (new Key ('û'), options);
+        injector.InjectKey (new Key ('ã'), options);
+        injector.InjectKey (new Key ('õ'), options);
+        injector.InjectKey (new Key ('Á'), options);
+        injector.InjectKey (new Key ('É'), options);
+        injector.InjectKey (new Key ('Í'), options);
+        injector.InjectKey (new Key ('Ó'), options);
+        injector.InjectKey (new Key ('Ú'), options);
+        injector.InjectKey (new Key ('À'), options);
+        injector.InjectKey (new Key ('È'), options);
+        injector.InjectKey (new Key ('Ì'), options);
+        injector.InjectKey (new Key ('Ò'), options);
+        injector.InjectKey (new Key ('Ù'), options);
+        injector.InjectKey (new Key ('Â'), options);
+        injector.InjectKey (new Key ('Ê'), options);
+        injector.InjectKey (new Key ('Î'), options);
+        injector.InjectKey (new Key ('Ô'), options);
+        injector.InjectKey (new Key ('Û'), options);
+        injector.InjectKey (new Key ('Ã'), options);
+        injector.InjectKey (new Key ('Õ'), options);
+
+        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
+        await Task.Delay (50); // Allow some time for processing
+        injector.ProcessQueue ();
+
+        // Assert - Should raise exactly 3 KeyDown events
+        Assert.Equal (34, receivedKeys.Count);
+        Assert.Equal (new Key ('á'), receivedKeys [0]);
+        Assert.Equal (new Key ('é'), receivedKeys [1]);
+        Assert.Equal (new Key ('í'), receivedKeys [2]);
+        Assert.Equal (new Key ('ó'), receivedKeys [3]);
+        Assert.Equal (new Key ('ú'), receivedKeys [4]);
+        Assert.Equal (new Key ('à'), receivedKeys [5]);
+        Assert.Equal (new Key ('è'), receivedKeys [6]);
+        Assert.Equal (new Key ('ì'), receivedKeys [7]);
+        Assert.Equal (new Key ('ò'), receivedKeys [8]);
+        Assert.Equal (new Key ('ù'), receivedKeys [9]);
+        Assert.Equal (new Key ('â'), receivedKeys [10]);
+        Assert.Equal (new Key ('ê'), receivedKeys [11]);
+        Assert.Equal (new Key ('î'), receivedKeys [12]);
+        Assert.Equal (new Key ('ô'), receivedKeys [13]);
+        Assert.Equal (new Key ('û'), receivedKeys [14]);
+        Assert.Equal (new Key ('ã'), receivedKeys [15]);
+        Assert.Equal (new Key ('õ'), receivedKeys [16]);
+        Assert.Equal (new Key ('Á'), receivedKeys [17]);
+        Assert.Equal (new Key ('É'), receivedKeys [18]);
+        Assert.Equal (new Key ('Í'), receivedKeys [19]);
+        Assert.Equal (new Key ('Ó'), receivedKeys [20]);
+        Assert.Equal (new Key ('Ú'), receivedKeys [21]);
+        Assert.Equal (new Key ('À'), receivedKeys [22]);
+        Assert.Equal (new Key ('È'), receivedKeys [23]);
+        Assert.Equal (new Key ('Ì'), receivedKeys [24]);
+        Assert.Equal (new Key ('Ò'), receivedKeys [25]);
+        Assert.Equal (new Key ('Ù'), receivedKeys [26]);
+        Assert.Equal (new Key ('Â'), receivedKeys [27]);
+        Assert.Equal (new Key ('Ê'), receivedKeys [28]);
+        Assert.Equal (new Key ('Î'), receivedKeys [29]);
+        Assert.Equal (new Key ('Ô'), receivedKeys [30]);
+        Assert.Equal (new Key ('Û'), receivedKeys [31]);
+        Assert.Equal (new Key ('Ã'), receivedKeys [32]);
+        Assert.Equal (new Key ('Õ'), receivedKeys [33]);
+    }
+
+    #endregion
+
     #region InjectMouse Tests - Direct Mode
 
     [Fact]
