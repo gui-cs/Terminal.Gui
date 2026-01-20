@@ -1,6 +1,4 @@
-using Terminal.Gui.App;
-
-namespace Terminal.Gui;
+namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     Interface for views that provide a strongly-typed value.
