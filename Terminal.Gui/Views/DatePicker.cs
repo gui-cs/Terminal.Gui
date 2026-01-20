@@ -13,7 +13,6 @@ namespace Terminal.Gui.Views;
 public class DatePicker : View
 {
     private TableView? _calendar;
-    private DateTime _date;
     private DateField? _dateField;
     private Label? _dateLabel;
     private Button? _nextMonthButton;
@@ -41,13 +40,18 @@ public class DatePicker : View
     }
 
     /// <summary>Get or set the date.</summary>
-    public DateTime Date
+    public DateTime Date { get; set; }
+
+    /// <inheritdoc />
+    public override string Text
     {
-        get => _date;
+        get => Date.ToString (Format);
         set
         {
-            _date = value;
-            Text = _date.ToString (Format);
+            if (DateTime.TryParse (value, out DateTime result))
+            {
+                Date = result;
+            }
         }
     }
 
@@ -67,12 +71,12 @@ public class DatePicker : View
 
     private void ChangeDayDate (int day)
     {
-        _date = new (_date.Year, _date.Month, day);
-        _dateField!.Date = _date;
+        Date = new (Date.Year, Date.Month, day);
+        _dateField!.Date = Date;
         CreateCalendar ();
     }
 
-    private void CreateCalendar () { _calendar!.Table = new DataTableSource (_table = CreateDataTable (_date.Month, _date.Year)); }
+    private void CreateCalendar () { _calendar!.Table = new DataTableSource (_table = CreateDataTable (Date.Month, Date.Year)); }
 
     private DataTable CreateDataTable (int month, int year)
     {
@@ -110,12 +114,12 @@ public class DatePicker : View
     {
         Date = e.Value;
 
-        if (e.Value.Date.Day != _date.Day)
+        if (e.Value.Date.Day != Date.Day)
         {
             SelectDayOnCalendar (e.Value.Day);
         }
 
-        if (_date.Month == DateTime.MinValue.Month && _date.Year == DateTime.MinValue.Year)
+        if (Date.Month == DateTime.MinValue.Month && Date.Year == DateTime.MinValue.Year)
         {
             _previousMonthButton!.Enabled = false;
         }
@@ -124,7 +128,7 @@ public class DatePicker : View
             _previousMonthButton!.Enabled = true;
         }
 
-        if (_date.Month == DateTime.MaxValue.Month && _date.Year == DateTime.MaxValue.Year)
+        if (Date.Month == DateTime.MaxValue.Month && Date.Year == DateTime.MaxValue.Year)
         {
             _nextMonthButton!.Enabled = false;
         }
@@ -134,7 +138,7 @@ public class DatePicker : View
         }
 
         CreateCalendar ();
-        SelectDayOnCalendar (_date.Day);
+        SelectDayOnCalendar (Date.Day);
     }
 
     private void GenerateCalendarLabels ()
@@ -183,7 +187,7 @@ public class DatePicker : View
 
     private void SetInitialProperties (DateTime date)
     {
-        _date = date;
+        Date = date;
         BorderStyle = LineStyle.Single;
         Date = date;
         _dateLabel = new () { X = 0, Y = 0, Text = "Date: " };
@@ -245,7 +249,7 @@ public class DatePicker : View
         _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);
 
         CreateCalendar ();
-        SelectDayOnCalendar (_date.Day);
+        SelectDayOnCalendar (Date.Day);
 
         _calendar.CellActivated += (_, e) =>
                                    {
@@ -260,7 +264,7 @@ public class DatePicker : View
 
                                        ChangeDayDate (day);
                                        SelectDayOnCalendar (day);
-                                       Text = _date.ToString (Format);
+                                       Text = Date.ToString (Format);
                                    };
 
         Width = Dim.Auto (DimAutoStyle.Content);
@@ -273,7 +277,7 @@ public class DatePicker : View
 
     private void AdjustMonth (int offset)
     {
-        Date = _date.AddMonths (offset);
+        Date = Date.AddMonths (offset);
         CreateCalendar ();
         _dateField!.Date = Date;
     }

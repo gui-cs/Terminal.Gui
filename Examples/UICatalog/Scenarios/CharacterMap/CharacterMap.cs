@@ -189,11 +189,11 @@ public class CharacterMap : Scenario
             Menus =
             [
                 new (
-                     "_File",
+                     Strings.menuFile,
                      new MenuItem []
                      {
                          new (
-                              "_Quit",
+                              Strings.cmdQuit,
                               $"{Application.QuitKey}",
                               () => _charMap?.App?.RequestStop ()
                              )

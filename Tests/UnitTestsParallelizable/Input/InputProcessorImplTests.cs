@@ -29,7 +29,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
         // Simulate partial escape sequence that will time out
-        queue.Enqueue (new ('\x1b', ConsoleKey.Escape, false, false, false)); // ESC
+        queue.Enqueue (new ConsoleKeyInfo ('\x1b', ConsoleKey.Escape, false, false, false)); // ESC
 
         // Act - First process (parser holds ESC)
         processor.ProcessQueue ();
@@ -58,7 +58,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
         // Enqueue ESC
-        queue.Enqueue (new ('\x1b', ConsoleKey.Escape, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('\x1b', ConsoleKey.Escape, false, false, false));
 
         // Act - Process immediately
         processor.ProcessQueue ();
@@ -233,8 +233,8 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
         // Enqueue surrogate pair as ConsoleKeyInfo
-        queue.Enqueue (new ('\uD800', 0, false, false, false)); // High
-        queue.Enqueue (new ('\uDC00', 0, false, false, false)); // Low
+        queue.Enqueue (new ConsoleKeyInfo ('\uD800', 0, false, false, false)); // High
+        queue.Enqueue (new ConsoleKeyInfo ('\uDC00', 0, false, false, false)); // Low
 
         // Act
         processor.ProcessQueue ();
@@ -256,10 +256,10 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
         // Enqueue: regular char, surrogate pair, regular char
-        queue.Enqueue (new ('a', ConsoleKey.A, false, false, false));
-        queue.Enqueue (new ('\uD800', 0, false, false, false)); // High
-        queue.Enqueue (new ('\uDC00', 0, false, false, false)); // Low
-        queue.Enqueue (new ('b', ConsoleKey.B, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('\uD800', 0, false, false, false)); // High
+        queue.Enqueue (new ConsoleKeyInfo ('\uDC00', 0, false, false, false)); // Low
+        queue.Enqueue (new ConsoleKeyInfo ('b', ConsoleKey.B, false, false, false));
 
         // Act
         processor.ProcessQueue ();
@@ -287,7 +287,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
         // Enqueue regular key (parser stays in Normal state)
-        queue.Enqueue (new ('a', ConsoleKey.A, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
 
         // Act
         processor.ProcessQueue ();
@@ -315,11 +315,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         List<Mouse> receivedMouseEvents = [];
         processor.MouseEventParsed += (_, mouse) => receivedMouseEvents.Add (mouse);
 
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
         processor.RaiseMouseEventParsed (testMouse);
@@ -340,11 +336,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         List<Mouse> syntheticEvents = [];
         processor.SyntheticMouseEvent += (_, mouse) => syntheticEvents.Add (mouse);
 
-        Mouse testMouse = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse testMouse = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
         processor.RaiseMouseEventParsed (testMouse);
@@ -366,11 +358,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         List<Mouse> syntheticEvents = [];
         processor.SyntheticMouseEvent += (_, mouse) => syntheticEvents.Add (mouse);
 
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         // Act
         processor.RaiseSyntheticMouseEvent (pressEvent);
@@ -391,17 +379,9 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         List<Mouse> syntheticEvents = [];
         processor.SyntheticMouseEvent += (_, mouse) => syntheticEvents.Add (mouse);
 
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
-        Mouse releaseEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        Mouse releaseEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         processor.RaiseSyntheticMouseEvent (pressEvent);
@@ -426,17 +406,9 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.MouseEventParsed += (_, mouse) => parsedEvents.Add (mouse);
         processor.SyntheticMouseEvent += (_, mouse) => syntheticEvents.Add (mouse);
 
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
-        Mouse releaseEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        Mouse releaseEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonReleased };
 
         // Act
         processor.RaiseMouseEventParsed (pressEvent);
@@ -459,11 +431,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         ConcurrentQueue<ConsoleKeyInfo> queue = new ();
         TestInputProcessor processor = new (queue);
 
-        Mouse mouseWithoutTimestamp = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse mouseWithoutTimestamp = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         Assert.Null (mouseWithoutTimestamp.Timestamp);
 
@@ -483,12 +451,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
 
         DateTime specificTime = new (2025, 1, 1, 12, 0, 0);
 
-        Mouse mouseWithTimestamp = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed,
-            Timestamp = specificTime
-        };
+        Mouse mouseWithTimestamp = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed, Timestamp = specificTime };
 
         // Act
         processor.InjectMouseEvent (null, mouseWithTimestamp);
@@ -596,9 +559,9 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
         // Enqueue multiple items
-        queue.Enqueue (new ('a', ConsoleKey.A, false, false, false));
-        queue.Enqueue (new ('b', ConsoleKey.B, false, false, false));
-        queue.Enqueue (new ('c', ConsoleKey.C, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('b', ConsoleKey.B, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('c', ConsoleKey.C, false, false, false));
 
         // Act
         processor.ProcessQueue ();
@@ -621,11 +584,11 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.KeyDown += (_, key) => receivedKeys.Add (key);
 
         // Enqueue first batch
-        queue.Enqueue (new ('a', ConsoleKey.A, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('a', ConsoleKey.A, false, false, false));
         processor.ProcessQueue ();
 
         // Enqueue second batch
-        queue.Enqueue (new ('b', ConsoleKey.B, false, false, false));
+        queue.Enqueue (new ConsoleKeyInfo ('b', ConsoleKey.B, false, false, false));
         processor.ProcessQueue ();
 
         // Assert - Should have processed both batches
@@ -644,11 +607,8 @@ internal class TestInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
 {
     private readonly bool _useParser;
 
-    public TestInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, bool useParser = false)
-        : base (inputBuffer, new TestKeyConverter ())
-    {
+    public TestInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, bool useParser = false) : base (inputBuffer, new TestKeyConverter ()) =>
         _useParser = useParser;
-    }
 
     protected override void Process (ConsoleKeyInfo input)
     {
@@ -719,16 +679,7 @@ internal class TestKeyConverter : IKeyConverter<ConsoleKeyInfo>
         return result;
     }
 
-    public ConsoleKeyInfo ToKeyInfo (Key key)
-    {
-        return new (
-                    (char)key.KeyCode,
-                    0,
-                    key.IsShift,
-                    key.IsAlt,
-                    key.IsCtrl
-                   );
-    }
+    public ConsoleKeyInfo ToKeyInfo (Key key) => new ((char)key.KeyCode, 0, key.IsShift, key.IsAlt, key.IsCtrl);
 }
 
 /// <summary>
@@ -738,7 +689,7 @@ internal class TestableConsoleInput : ITestableInput<ConsoleKeyInfo>
 {
     public List<ConsoleKeyInfo> InjectedInput { get; } = [];
 
-    public void InjectInput (ConsoleKeyInfo input) { InjectedInput.Add (input); }
+    public void InjectInput (ConsoleKeyInfo input) => InjectedInput.Add (input);
 
     public bool IsAvailable => false;
 

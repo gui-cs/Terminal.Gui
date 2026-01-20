@@ -158,8 +158,8 @@ public class ConfigurationEditor : Scenario
             int? result = MessageBox.Query (editor.App!,
                                            "Save Changes",
                                            $"Save changes to {editor.FileInfo!.Name}",
-                                           "_No",
-                                           "_Yes");
+                                           Strings.btnNo,
+                                           Strings.btnYes);
 
             switch (result)
             {

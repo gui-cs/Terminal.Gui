@@ -677,7 +677,12 @@ public class FileDialog : Dialog, IDesignable
     /// <inheritdoc />
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        return Accept (true);
+        if (Accept (true))
+        {
+            return base.OnAccepting (args);
+        }
+
+        return false;
     }
 
     private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)

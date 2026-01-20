@@ -96,7 +96,7 @@ public class CsvEditor : Scenario
         _miCenteredCheckBox.CheckedStateChanged += (_, _) => Align (Alignment.Center);
 
         MenuBarItem fileMenu = new (
-                                    "_File",
+                                    Strings.menuFile,
                                     [
                                         new MenuItem
                                         {
@@ -105,12 +105,12 @@ public class CsvEditor : Scenario
                                         },
                                         new MenuItem
                                         {
-                                            Title = "_Save",
+                                            Title = Strings.cmdSave,
                                             Action = Save
                                         },
                                         new MenuItem
                                         {
-                                            Title = "_Quit",
+                                            Title = Strings.cmdQuit,
                                             HelpText = "Quits The App",
                                             Action = Quit
                                         }

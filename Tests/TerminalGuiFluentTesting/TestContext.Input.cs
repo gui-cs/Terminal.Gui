@@ -18,21 +18,16 @@ public partial class TestContext
     /// <returns></returns>
     public TestContext RightClick (int screenX, int screenY)
     {
-        InjectMouseEvent (
-                          new ()
-                          {
-                              Flags = MouseFlags.RightButtonPressed,
-                              ScreenPosition = new (screenX, screenY),
-                              Position = new (screenX, screenY)
-                          },
-                          false); // Don't advance time between Press and Release
+        InjectMouseEvent (new Mouse
+        {
+            Flags = MouseFlags.RightButtonPressed, ScreenPosition = new Point (screenX, screenY), Position = new Point (screenX, screenY)
+        }); // Don't advance time between Press and Release
 
-        return InjectMouseEvent (
-                                 new ()
+        return InjectMouseEvent (new Mouse
                                  {
                                      Flags = MouseFlags.RightButtonReleased,
-                                     ScreenPosition = new (screenX, screenY),
-                                     Position = new (screenX, screenY)
+                                     ScreenPosition = new Point (screenX, screenY),
+                                     Position = new Point (screenX, screenY)
                                  },
                                  true); // Advance time after the complete click
     }
@@ -47,21 +42,16 @@ public partial class TestContext
     /// <returns></returns>
     public TestContext LeftClick (int screenX, int screenY)
     {
-        InjectMouseEvent (
-                          new ()
-                          {
-                              Flags = MouseFlags.LeftButtonPressed,
-                              ScreenPosition = new (screenX, screenY),
-                              Position = new (screenX, screenY)
-                          },
-                          false); // Don't advance time between Press and Release
+        InjectMouseEvent (new Mouse
+        {
+            Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (screenX, screenY), Position = new Point (screenX, screenY)
+        }); // Don't advance time between Press and Release
 
-        return InjectMouseEvent (
-                                 new ()
+        return InjectMouseEvent (new Mouse
                                  {
                                      Flags = MouseFlags.LeftButtonReleased,
-                                     ScreenPosition = new (screenX, screenY),
-                                     Position = new (screenX, screenY)
+                                     ScreenPosition = new Point (screenX, screenY),
+                                     Position = new Point (screenX, screenY)
                                  },
                                  true); // Advance time after the complete click
     }
@@ -73,15 +63,8 @@ public partial class TestContext
     /// <typeparam name="TView"></typeparam>
     /// <param name="evaluator"></param>
     /// <returns></returns>
-    public TestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View
-    {
-        return InjectMouseEvent (
-                                 new ()
-                                 {
-                                     Flags = MouseFlags.LeftButtonClicked
-                                 },
-                                 evaluator);
-    }
+    public TestContext LeftClick<TView> (Func<TView, bool> evaluator) where TView : View =>
+        InjectMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked }, evaluator);
 
     /// <summary>
     ///     Injects a mouse event to the current driver's input processor.

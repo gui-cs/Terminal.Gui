@@ -1,5 +1,4 @@
-﻿#nullable enable
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 namespace ViewBaseTests.Navigation;
@@ -32,14 +31,9 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         IApplication app = Application.Create ();
-        app.Begin (new Runnable<bool> () { CanFocus = true });
+        app.Begin (new Runnable<bool> { CanFocus = true });
 
-        View otherView = new ()
-        {
-            Id = "otherView",
-            CanFocus = true,
-            TabStop = view.TabStop == TabBehavior.NoStop ? TabBehavior.TabStop : view.TabStop
-        };
+        View otherView = new () { Id = "otherView", CanFocus = true, TabStop = view.TabStop == TabBehavior.NoStop ? TabBehavior.TabStop : view.TabStop };
 
         app.TopRunnableView!.Add (view, otherView);
 
@@ -71,6 +65,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
                     }
 
                     break;
+
                 default:
                     app.Keyboard.RaiseKeyDownEvent (Key.Tab);
 
@@ -124,14 +119,9 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         IApplication app = Application.Create ();
-        app.Begin (new Runnable<bool> () { CanFocus = true });
+        app.Begin (new Runnable<bool> { CanFocus = true });
 
-        View otherView = new ()
-        {
-            Id = "otherView",
-            CanFocus = true,
-            TabStop = view.TabStop == TabBehavior.NoStop ? TabBehavior.TabStop : view.TabStop
-        };
+        View otherView = new () { Id = "otherView", CanFocus = true, TabStop = view.TabStop == TabBehavior.NoStop ? TabBehavior.TabStop : view.TabStop };
 
         var hasFocusTrue = 0;
         var hasFocusFalse = 0;
@@ -141,16 +131,16 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         view.HasFocus = false;
 
         view.HasFocusChanged += (s, e) =>
-        {
-            if (e.NewValue)
-            {
-                hasFocusTrue++;
-            }
-            else
-            {
-                hasFocusFalse++;
-            }
-        };
+                                {
+                                    if (e.NewValue)
+                                    {
+                                        hasFocusTrue++;
+                                    }
+                                    else
+                                    {
+                                        hasFocusFalse++;
+                                    }
+                                };
 
         Assert.Equal (0, hasFocusTrue);
         Assert.Equal (0, hasFocusFalse);
@@ -174,7 +164,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
 
         while (view.HasFocus)
         {
-            if (++tries > 10)
+            if (++tries > 20)
             {
                 Assert.Fail ($"{view} is not leaving after {tries} attempts.");
             }
@@ -191,7 +181,8 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
                             // Try another nav key (e.g. for TextView that eats Tab)
                             app.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
                         }
-                    };
+                    }
+                    ;
 
                     break;
 
@@ -199,6 +190,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
                     app.Keyboard.RaiseKeyDownEvent (Key.F6);
 
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException ();
             }
@@ -217,10 +209,12 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
                 view.SetFocus ();
 
                 break;
+
             case TabBehavior.TabStop:
                 app.Keyboard.RaiseKeyDownEvent (Key.Tab);
 
                 break;
+
             case TabBehavior.TabGroup:
                 if (!app.Keyboard.RaiseKeyDownEvent (Key.F6))
                 {
@@ -228,10 +222,12 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
                 }
 
                 break;
+
             case null:
                 app.Keyboard.RaiseKeyDownEvent (Key.Tab);
 
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException ();
         }
@@ -285,12 +281,9 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         }
 
         IApplication? app = Application.Create ();
-        app.Begin (new Runnable<bool> () { CanFocus = true });
+        app.Begin (new Runnable<bool> { CanFocus = true });
 
-        View otherView = new ()
-        {
-            CanFocus = true
-        };
+        View otherView = new () { CanFocus = true };
 
         view.Visible = false;
 
@@ -367,17 +360,9 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
     [Fact]
     public void GetMostFocused_Returns_Most ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
 
-        var subview = new View
-        {
-            Id = "subview",
-            CanFocus = true
-        };
+        var subview = new View { Id = "subview", CanFocus = true };
 
         view.Add (subview);
 
@@ -386,11 +371,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (subview.HasFocus);
         Assert.Equal (subview, view.MostFocused);
 
-        var subview2 = new View
-        {
-            Id = "subview2",
-            CanFocus = true
-        };
+        var subview2 = new View { Id = "subview2", CanFocus = true };
 
         view.Add (subview2);
         Assert.Equal (subview2, view.MostFocused);

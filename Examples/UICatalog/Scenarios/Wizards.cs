@@ -152,7 +152,7 @@ public class Wizards : Scenario
         wizard.Accepting += (s, args) =>
                             {
                                 _actionLabel!.Text = "Finished";
-                                MessageBox.Query ((s as View)?.App!, "Wizard", "The Wizard has been completed and accepted!", "_Ok");
+                                MessageBox.Query ((s as View)?.App!, "Wizard", "The Wizard has been completed and accepted!", Strings.btnOk);
 
                                 if (wizard.IsRunning)
                                 {
@@ -170,7 +170,7 @@ public class Wizards : Scenario
         //                    {
         //                        _actionLabel!.Text = "Cancelled";
 
-        //                        int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", "_No", "_Yes");
+        //                        int? btn = MessageBox.Query ((s as View)?.App!, "Wizard", "Are you sure you want to cancel?", Strings.btnNo, Strings.btnYes);
         //                        args.Cancel = btn is not 1;
         //                    };
 

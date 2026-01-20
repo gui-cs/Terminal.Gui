@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
+///     The base class for ANSI response parsers handling escape sequences, expected responses, mouse, and keyboard events.
 /// </summary>
 internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider timeProvider) : IAnsiResponseParser
 {
@@ -34,28 +35,18 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     // Valid ANSI response terminators per CSI specification
     // See https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
     // Note: N and O are intentionally excluded as they have special handling
-    protected readonly HashSet<char> _knownTerminators =
-    [
-        '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-        'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Z',
-        '^', '`', '~',
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-        'l', 'm', 'n',
-        'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-    ];
-
-    private AnsiResponseParserState _state = AnsiResponseParserState.Normal;
+    protected readonly HashSet<char> _knownTerminators = [..EscSeqUtils.KnownTerminators];
 
     /// <inheritdoc/>
     public AnsiResponseParserState State
     {
-        get => _state;
+        get;
         protected set
         {
             StateChangedAt = _timeProvider.Now;
-            _state = value;
+            field = value;
         }
-    }
+    } = AnsiResponseParserState.Normal;
 
     /// <summary>
     ///     Timestamp when <see cref="State"/> was last changed. Used to detect stale escape sequences.
@@ -91,12 +82,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     ///     (i.e., it's not part of a recognized escape sequence).
     /// </param>
     /// <param name="inputLength">The total number of elements in the input collection.</param>
-    protected void ProcessInputBase (
-        Func<int, char> getCharAtIndex,
-        Func<int, object> getObjectAtIndex,
-        Action<object> appendOutput,
-        int inputLength
-    )
+    protected void ProcessInputBase (Func<int, char> getCharAtIndex, Func<int, object> getObjectAtIndex, Action<object> appendOutput, int inputLength)
     {
         lock (_lockState)
         {
@@ -104,12 +90,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         }
     }
 
-    private void ProcessInputBaseImpl (
-        Func<int, char> getCharAtIndex,
-        Func<int, object> getObjectAtIndex,
-        Action<object> appendOutput,
-        int inputLength
-    )
+    private void ProcessInputBaseImpl (Func<int, char> getCharAtIndex, Func<int, object> getObjectAtIndex, Action<object> appendOutput, int inputLength)
     {
         var index = 0; // Tracks position in the input string
 
@@ -177,8 +158,8 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                         // Non esc, so continue to build sequence
                         _heldContent.AddToHeld (currentObj);
 
-                        // Check if the held content should be released
-                        if (ShouldReleaseHeldContent ())
+                        // Raise mouse or keyboard events if applicable
+                        if (HandleHeldContent ())
                         {
                             ReleaseHeld (appendOutput);
                         }
@@ -214,13 +195,13 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     /// </summary>
     /// <remarks>
     ///     This is called as a last resort before releasing held content to handle ambiguous sequences
-    ///     where shorter patterns might match but we need to wait to see if a longer pattern emerges.
+    ///     where shorter patterns might match, but we need to wait to see if a longer pattern emerges.
     /// </remarks>
     protected void TryLastMinuteSequences ()
     {
         lock (_lockState)
         {
-            string? cur = _heldContent.HeldToString ();
+            string cur = _heldContent.HeldToString ();
 
             if (HandleKeyboard)
             {
@@ -228,6 +209,8 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
                 if (pattern != null)
                 {
+                    // BUGBUG: We are on the UI thread. This will 'block' as whatever handles the event does its work.
+                    // BUGBUG: Thus, we should be calling ResetState first, to clear held content before raising event.
                     RaiseKeyboardEvent (pattern, cur);
                     _heldContent.ClearHeld ();
 
@@ -237,40 +220,43 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             // We have something totally unexpected, not a CSI and
             // still Esc+<something>. So give last minute swallow chance
-            if (cur!.Length < 2 || cur [0] != ESCAPE)
+            if (cur.Length < 2 || cur [0] != ESCAPE)
             {
                 return;
             }
 
             // Maybe swallow anyway if user has custom delegate
-            bool swallow = ShouldSwallowUnexpectedResponse ();
-
-            if (swallow)
+            if (!ShouldSwallowUnexpectedResponse ())
             {
-                _heldContent.ClearHeld ();
-
-                //Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
+                return;
             }
+            _heldContent.ClearHeld ();
+
+            Logging.Trace ($"AnsiResponseParser last minute swallowed '{cur}'");
         }
     }
 
     /// <summary>
-    ///     Determines whether currently held content should be released based on accumulated escape sequence.
+    ///     Handles currently held content (raising events as needed). Return value indicates whether the held content should
+    ///     be released based on accumulated escape sequence.
     /// </summary>
     /// <returns>
     ///     <see langword="true"/> to release held content to output stream;
     ///     <see langword="false"/> to continue accumulating or if content was handled internally.
     /// </returns>
-    protected bool ShouldReleaseHeldContent ()
+    private bool HandleHeldContent ()
     {
+        // BUGBUG: No need to lock, as this is only called from within a locked context
         lock (_lockState)
         {
-            string? cur = _heldContent.HeldToString ();
+            string cur = _heldContent.HeldToString ();
 
             if (HandleMouse && IsMouse (cur))
             {
-                RaiseMouseEvent (cur);
+                // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
+                // we call ResetState first
                 ResetState ();
+                RaiseMouseEvent (cur);
 
                 return false;
             }
@@ -281,8 +267,10 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
                 if (pattern != null)
                 {
-                    RaiseKeyboardEvent (pattern, cur);
+                    // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
+                    // we call ResetState first
                     ResetState ();
+                    RaiseKeyboardEvent (pattern, cur);
 
                     return false;
                 }
@@ -291,31 +279,19 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
             lock (_lockExpectedResponses)
             {
                 // Look for an expected response for what is accumulated so far (since Esc)
-                if (MatchResponse (
-                                   cur,
-                                   _expectedResponses,
-                                   true,
-                                   true))
+                if (MatchResponse (cur, _expectedResponses, true, true))
                 {
                     return false;
                 }
 
                 // Also try looking for late requests - in which case we do not invoke but still swallow content to avoid corrupting downstream
-                if (MatchResponse (
-                                   cur,
-                                   _lateResponses,
-                                   false,
-                                   true))
+                if (MatchResponse (cur, _lateResponses, false, true))
                 {
                     return false;
                 }
 
                 // Look for persistent requests
-                if (MatchResponse (
-                                   cur,
-                                   _persistentExpectations,
-                                   true,
-                                   false))
+                if (MatchResponse (cur, _persistentExpectations, true, false))
                 {
                     return false;
                 }
@@ -323,7 +299,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             // Finally if it is a valid ansi response but not one we are expect (e.g. its mouse activity)
             // then we can release it back to input processing stream
-            if (!_knownTerminators.Contains (cur!.Last ()) || !cur!.StartsWith (EscSeqUtils.CSI))
+            if (!_knownTerminators.Contains (cur.Last ()) || !cur.StartsWith (EscSeqUtils.CSI, StringComparison.Ordinal))
             {
                 return false; // Continue accumulating
             }
@@ -331,18 +307,16 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
             // We have found a terminator so bail
             State = AnsiResponseParserState.Normal;
 
-            // Maybe swallow anyway if user has custom delegate
-            bool swallow = ShouldSwallowUnexpectedResponse ();
-
-            switch (swallow)
+            switch (ShouldSwallowUnexpectedResponse ())
             {
                 case true:
-                    _heldContent.ClearHeld ();
+                    ResetState ();
 
-                    //Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
+                    Logging.Trace ($"AnsiResponseParser swallowed '{cur}'");
 
                     // Do not send back to input stream
                     return false;
+
                 default:
                     // Do release back to input stream
                     return true;
@@ -406,7 +380,6 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         }
 
         return true;
-
     }
 
     /// <inheritdoc/>
@@ -416,11 +389,11 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         {
             if (persistent)
             {
-                _persistentExpectations.Add (new (terminator, h => response.Invoke (h.HeldToString ()), abandoned));
+                _persistentExpectations.Add (new AnsiResponseExpectation (terminator, h => response.Invoke (h.HeldToString ()), abandoned));
             }
             else
             {
-                _expectedResponses.Add (new (terminator, h => response.Invoke (h.HeldToString ()), abandoned));
+                _expectedResponses.Add (new AnsiResponseExpectation (terminator, h => response.Invoke (h.HeldToString ()), abandoned));
             }
         }
     }
@@ -491,6 +464,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
     private void RaiseMouseEvent (string? cur)
     {
+        //Logging.Trace ($"{cur}");
         Mouse? ev = _mouseParser.ProcessMouseInput (cur);
 
         if (ev != null)

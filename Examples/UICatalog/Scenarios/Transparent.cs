@@ -50,7 +50,7 @@ public sealed class Transparent : Scenario
         };
         appButton.Accepting += (sender, args) =>
                                {
-                                   MessageBox.Query ((sender as View)?.App!, "AppButton", "Transparency is cool!", "_Ok");
+                                   MessageBox.Query ((sender as View)?.App!, "AppButton", "Transparency is cool!", Strings.btnOk);
                                    args.Handled = true;
                                };
         appWindow.Add (appButton);
@@ -111,7 +111,7 @@ public sealed class Transparent : Scenario
             };
             button.Accepting += (_, args) =>
                                 {
-                                    MessageBox.Query (App!, "Clicked!", "Button in Transparent View", "_Ok");
+                                    MessageBox.Query (App!, "Clicked!", "Button in Transparent View", Strings.btnOk);
                                     args.Handled = true;
                                 };
 
