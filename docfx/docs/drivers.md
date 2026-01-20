@@ -467,7 +467,7 @@ This architecture provides:
 - **Input (Unix/macOS)**: Shares `UnixRawModeHelper` and `UnixIOHelper` with UnixDriver. Uses `tcgetattr()`/`tcsetattr()` for raw mode, `poll(STDIN_FILENO, ...)` for non-blocking reads, and `read(STDIN_FILENO, buffer, len)` for input. The `AnsiResponseParser` decodes ANSI sequences into Terminal.Gui events.
 - **Output (Windows)**: Uses `WindowsVTOutputHelper` to enable Virtual Terminal Processing (`ENABLE_VIRTUAL_TERMINAL_PROCESSING`). Writes ANSI sequences via `WriteFile()`, which the Windows console parses and renders.
 - **Output (Unix/macOS)**: Writes pure ANSI escape sequences to stdout via `write()` syscall, same mechanism as UnixDriver.
-- **Screen Management**: Uses `AnsiSizeMonitor` which sends the ANSI query sequence `CSI_ReportWindowSizeInChars` (`ESC[18t`). Terminal responds with `ESC[8;height;width]t`. Queries are throttled to 500ms intervals to avoid spam. Falls back to `AnsiOutput.GetSize()` polling.
+- **Screen Management**: Uses `AnsiSizeMonitor` which sends the ANSI query sequence `CSI_ReportWindowSizeInChars` (`ESC[18t`). Terminal responds with `ESC[8;height;width t`. Queries are throttled to 500ms intervals to avoid spam. Falls back to `AnsiOutput.GetSize()` polling.
 - **Advantages**: True cross-platform portability via ANSI standard, ideal for testing/CI environments, supports virtual time control for deterministic testing.
 - **Trade-offs**: Query-based resize detection is slower than event-based. Requires VT-capable terminal (most modern terminals).
 
