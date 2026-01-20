@@ -19,13 +19,14 @@ Terminal.Gui provides four console driver implementations optimized for differen
 |  | **ansi** | **dotnet** | **unix** | **windows** |
 |---|---|---|---|---|
 | **Theme** | Showcase driver with pure ANSI implementation. Works on all platforms. Ideal for testing/CI. Deterministic behavior with virtual time support. | Cross-platform managed .NET driver. Simplest implementation using `System.Console` API. Works with .NET BCL only. | Optimized Unix/Linux/macOS driver. Direct syscall access. | High-performance Windows-only driver. Native Win32 Console API. Direct access to Windows-specific features. |
-| **Input Model** | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `ConsoleKeyInfo` from .NET, converts to Terminal.Gui events | Reads raw bytes, parses ANSI sequences to Terminal.Gui events | Reads `INPUT_RECORD` structures directly, converts to Terminal.Gui events |
+| **Input Model** | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `ConsoleKeyInfo` from `System.Console`, converts to Terminal.Gui events | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `INPUT_RECORD` structures directly, converts to Terminal.Gui events |
 | **Unix Read APIs** | `poll(STDIN_FILENO, ...)`, `read(STDIN_FILENO, buffer, len)`, `tcgetattr()`/`tcsetattr()` for raw mode via `UnixRawModeHelper` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) reads `char` | `poll()`, `read()` syscalls on stdin (fd 0), `tcgetattr()`/`tcsetattr()` for termios raw mode | N/A (Windows-only) |
-| **Windows Read APIs** | `ReadFile()` reads `char` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) | N/A (Unix-only) | `ReadConsoleInputW()` reads `INPUT_RECORD`, `GetConsoleMode()`/`SetConsoleMode()` enables mouse input and raw mode |
+| **Windows Read APIs** | P/Invokes `ReadFile()` reads `char` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) | N/A (Unix-only) | P/Invokes `ReadConsoleInputW()` reads `INPUT_RECORD`, `GetConsoleMode()`/`SetConsoleMode()` enables mouse input and raw mode |
 | **Output Model** | Pure ANSI escape sequences | Managed .NET + ANSI sequences (when VT mode enabled) | Pure ANSI escape sequences | Direct character output via Win32 API with double buffering |
 | **Unix Write APIs** | `write()` syscall to stdout (fd 1) | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | `write()` syscall to stdout, ANSI SGR sequences for colors (16-color and 24-bit RGB) | N/A (Windows-only) |
-| **Windows Write APIs** | `WriteFile()` | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | N/A (Unix-only) | `WriteConsoleW()`, `CreateConsoleScreenBuffer()`/`SetConsoleActiveScreenBuffer()` for double buffering, `SetConsoleTextAttribute()` |
-| **Screen Model** | ANSI query-based. Throttled to 500ms. Falls back to polling. | Polling-based: `Console.WindowWidth`/`Console.WindowHeight` queried periodically. Falls back to 80x25 on `IOException`. | Polling-based: `ioctl(TIOCGWINSZ)` syscall with platform-specific constants (Linux `0x5413`, macOS `0x40087468`). Queries `WinSize` struct. | Event-based: `WINDOW_BUFFER_SIZE_EVENT` received in input stream via `ReadConsoleInputW()`. Immediate resize notification. `GetConsoleScreenBufferInfoEx()` queries dimensions. |
+| **Windows Write APIs** | P/Invokes `WriteFile()` | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | N/A (Unix-only) | P/Invokes `WriteConsoleW()`, `CreateConsoleScreenBuffer()`/`SetConsoleActiveScreenBuffer()` for double buffering, `SetConsoleTextAttribute()` |
+| **Screen Model** | ANSI query-based resize. Throttled to 500ms. Falls back to polling. | Polling-based re-size: `Console.WindowWidth`/`Console.WindowHeight` queried periodically. Falls back to 80x25 on `IOException`. | Polling-based resize: `ioctl(TIOCGWINSZ)` syscall with platform-specific constants (Linux `0x5413`, macOS `0x40087468`). Queries `WinSize` struct. | Event-based re-size: `WINDOW_BUFFER_SIZE_EVENT` received in input stream via `ReadConsoleInputW()`. Immediate resize notification. `GetConsoleScreenBufferInfoEx()` queries dimensions. |
+| **Cursor Handling** | ANSI sequences: DECTCEM (`CSI ? 25 h/l`) for show/hide, DECSCUSR (`CSI Ps SP q`) for style. Full `CursorStyle` support. | ANSI sequences (same as ansi driver). Falls back to `Console.SetCursorPosition()` on Windows. | ANSI sequences (same as ansi driver). Full `CursorStyle` support. | • Legacy mode: Win32 `CONSOLE_CURSOR_INFO` (size percentage only, no blinking control). <br>• Modern VT mode: ANSI sequences (same as ansi driver). Full `CursorStyle` support. |
 | **Advantages** | • Cross-platform (all platforms)<br>• Pure, clean implementation<br>• Perfect for testing/CI<br>• Virtual time support<br>• Deterministic behavior<br> | • Cross-platform (all platforms)<br>• Maximum compatibility<br>• Simple implementation<br>• No P/Invoke; Works with .NET BCL<br> | • Immediate resize detection<br> | • Highest performance on Windows<br>• Immediate resize detection<br> |
 | **Disadvantages** | • Requires proper ANSI support<br>• Throttled size detection (500ms) | • Lower performance (managed overhead)<br>• Limited feature set<br>• `System.ReadKey` has bugs on Windows<br>• Polling-based resize | • Unix-only<br>• Polling-based resize detection | • Windows-only<br>• More complex P/Invoke code |
 
@@ -360,14 +361,14 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 
 #### Cursor
 
-Drivers implement cursor control through `IOutput` interface methods:
-- `SetCursorPosition(int col, int row)` - Set cursor position in screen coordinates
-- `SetCursorVisibility(CursorStyle style)` - Set cursor style/visibility using ANSI DECSCUSR-based `CursorStyle` enum
-- `SetCursorNeedsUpdate(bool needsUpdate)` - Signal cursor position needs update without redraw
+Drivers implement cursor control through `IDriver` which delegates to `IOutput`:
+- `SetCursor(Cursor cursor)` - Set cursor position and style atomically
+- `GetCursor()` - Get current cursor state
+- `SetCursorNeedsUpdate(bool)` / `GetCursorNeedsUpdate()` - Optimization flag for cursor updates
 
 > [!NOTE]
 > The cursor system is managed by `ApplicationNavigation`. Drivers implement the low-level cursor control; views use the `View.Cursor` property.
-> See [Cursor Management](cursor.md) for details on how views should manage cursors.
+> See [Cursor Management](cursor.md) for complete details.
 
 #### Input Events
 - `KeyDown`, `MouseEvent` - Input events raised by the driver when input is processed
