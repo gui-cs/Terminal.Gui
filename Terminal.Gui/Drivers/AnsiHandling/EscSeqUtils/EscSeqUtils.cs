@@ -103,13 +103,13 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="option"></param>
     /// <returns></returns>
-    public static string CSI_ClearScreen (ClearScreenOptions option) { return $"{CSI}{(int)option}J"; }
+    public static string CSI_ClearScreen (ClearScreenOptions option) => $"{CSI}{(int)option}J";
 
     /// <summary>
     ///     ESC [ 8 ; height ; width t - Set Terminal Window Size
     ///     https://terminalguide.namepad.de/seq/csi_st-8/
     /// </summary>
-    public static string CSI_SetTerminalWindowSize (int height, int width) { return $"{CSI}8;{height};{width}t"; }
+    public static string CSI_SetTerminalWindowSize (int height, int width) => $"{CSI}8;{height};{width}t";
 
     #endregion Screen Window Buffer
 
@@ -152,9 +152,15 @@ public static class EscSeqUtils
     ///         Mode 1003 enables reporting of all mouse events:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item><description>Button press and release events</description></item>
-    ///         <item><description>Motion events with buttons pressed (drag)</description></item>
-    ///         <item><description>Motion events without buttons pressed</description></item>
+    ///         <item>
+    ///             <description>Button press and release events</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Motion events with buttons pressed (drag)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Motion events without buttons pressed</description>
+    ///         </item>
     ///     </list>
     ///     <para>
     ///         Note: This mode controls WHICH events are reported. The format of event data is controlled
@@ -171,10 +177,18 @@ public static class EscSeqUtils
     ///         SGR mode provides the modern mouse reporting format with several advantages:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item><description>Decimal text format: ESC[&lt;button;x;yM (press) or ESC[&lt;button;x;ym (release)</description></item>
-    ///         <item><description>Unlimited coordinate range (not constrained by byte encoding)</description></item>
-    ///         <item><description>Unambiguous press/release distinction via M/m terminator</description></item>
-    ///         <item><description>Human-readable and easier to parse</description></item>
+    ///         <item>
+    ///             <description>Decimal text format: ESC[&lt;button;x;yM (press) or ESC[&lt;button;x;ym (release)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Unlimited coordinate range (not constrained by byte encoding)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Unambiguous press/release distinction via M/m terminator</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Human-readable and easier to parse</description>
+    ///         </item>
     ///     </list>
     ///     <para>
     ///         Supported by Windows Terminal, iTerm2, xterm, and most modern terminal emulators.
@@ -190,9 +204,15 @@ public static class EscSeqUtils
     ///         URXVT mode extends traditional mouse reporting by using UTF-8 encoding for coordinates:
     ///     </para>
     ///     <list type="bullet">
-    ///         <item><description>Coordinate range: up to 2015×2015 (vs 223×223 in traditional mode)</description></item>
-    ///         <item><description>Uses multi-byte UTF-8 sequences for position encoding</description></item>
-    ///         <item><description>Maintains ESC[M format with UTF-8 encoded coordinate bytes</description></item>
+    ///         <item>
+    ///             <description>Coordinate range: up to 2015×2015 (vs 223×223 in traditional mode)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Uses multi-byte UTF-8 sequences for position encoding</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Maintains ESC[M format with UTF-8 encoded coordinate bytes</description>
+    ///         </item>
     ///     </list>
     ///     <para>
     ///         Originally developed for rxvt-unicode terminal emulator. Largely superseded by SGR mode (1006)
@@ -209,13 +229,18 @@ public static class EscSeqUtils
     ///         Disables all mouse tracking modes in this order:
     ///     </para>
     ///     <list type="number">
-    ///         <item><description>Mode 1003 (any-event tracking) - stops reporting mouse events</description></item>
-    ///         <item><description>Mode 1015 (URXVT format) - disables UTF-8 coordinate encoding</description></item>
-    ///         <item><description>Mode 1006 (SGR format) - disables decimal text format</description></item>
+    ///         <item>
+    ///             <description>Mode 1003 (any-event tracking) - stops reporting mouse events</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Mode 1015 (URXVT format) - disables UTF-8 coordinate encoding</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Mode 1006 (SGR format) - disables decimal text format</description>
+    ///         </item>
     ///     </list>
     /// </remarks>
-    public static readonly string CSI_DisableMouseEvents =
-        CSI_DisableAnyEventMouse + CSI_DisableUrxvtExtModeMouse + CSI_DisableSgrExtModeMouse;
+    public static readonly string CSI_DisableMouseEvents = CSI_DisableAnyEventMouse + CSI_DisableUrxvtExtModeMouse + CSI_DisableSgrExtModeMouse;
 
     /// <summary>
     ///     Control sequence for enabling comprehensive mouse event tracking.
@@ -225,9 +250,15 @@ public static class EscSeqUtils
     ///         Enables three mouse tracking modes simultaneously:
     ///     </para>
     ///     <list type="number">
-    ///         <item><description>Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons</description></item>
-    ///         <item><description>Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)</description></item>
-    ///         <item><description>Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)</description></item>
+    ///         <item>
+    ///             <description>Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)</description>
+    ///         </item>
     ///     </list>
     ///     <para>
     ///         When multiple format modes are enabled, modern terminals typically use the most capable format (SGR),
@@ -238,8 +269,7 @@ public static class EscSeqUtils
     ///         You receive one press event, optional motion events (if mode 1003 is enabled), and one release event.
     ///     </para>
     /// </remarks>
-    public static readonly string CSI_EnableMouseEvents =
-        CSI_EnableAnyEventMouse + CSI_EnableUrxvtExtModeMouse + CSI_EnableSgrExtModeMouse;
+    public static readonly string CSI_EnableMouseEvents = CSI_EnableAnyEventMouse + CSI_EnableUrxvtExtModeMouse + CSI_EnableSgrExtModeMouse;
 
     #endregion Mouse
 
@@ -250,7 +280,7 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="ch">The char value.</param>
     /// <returns></returns>
-    public static ConsoleKeyInfo MapChar (char ch) { return MapConsoleKeyInfo (new (ch, ConsoleKey.None, false, false, false)); }
+    public static ConsoleKeyInfo MapChar (char ch) => MapConsoleKeyInfo (new ConsoleKeyInfo (ch, ConsoleKey.None, false, false, false));
 
     /// <summary>
     ///     Ensures a console key is mapped to one that works correctly with ANSI escape sequences.
@@ -268,129 +298,122 @@ public static class EscSeqUtils
             case 0:
                 if (consoleKeyInfo.Key == (ConsoleKey)64)
                 { // Ctrl+Space in Windows.
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             ConsoleKey.Spacebar,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            ConsoleKey.Spacebar,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
                 }
                 else if (consoleKeyInfo.Key == ConsoleKey.None)
                 {
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             ConsoleKey.Spacebar,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             true);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            ConsoleKey.Spacebar,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            true);
                 }
 
                 break;
+
             case uint n when n is > 0 and <= KeyEsc:
                 if (consoleKeyInfo is { Key: 0, KeyChar: '\u001B' })
                 {
                     key = ConsoleKey.Escape;
 
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             key,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            key,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
                 }
                 else if (consoleKeyInfo is { Key: 0, KeyChar: '\t' })
                 {
                     key = ConsoleKey.Tab;
 
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             key,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            key,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
                 }
                 else if (consoleKeyInfo is { Key: 0, KeyChar: '\r' })
                 {
                     key = ConsoleKey.Enter;
 
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             key,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            key,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
                 }
                 else if (consoleKeyInfo is { Key: 0, KeyChar: '\n' })
                 {
                     key = ConsoleKey.Enter;
 
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             key,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             true);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            key,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            true);
                 }
                 else if (consoleKeyInfo is { Key: 0, KeyChar: '\b' })
                 {
                     key = ConsoleKey.Backspace;
 
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             key,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             true);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            key,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            true);
                 }
                 else if (consoleKeyInfo.Key == 0)
                 {
                     key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + (uint)ConsoleKey.A - 1);
 
-                    newConsoleKeyInfo = new (
-                                             consoleKeyInfo.KeyChar,
-                                             key,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                             true);
+                    newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                            key,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                            true);
                 }
 
                 break;
+
             case uint n when n is >= '\u001c' and <= '\u001f':
                 key = (ConsoleKey)(char)(consoleKeyInfo.KeyChar + 24);
 
-                newConsoleKeyInfo = new (
-                                         (char)key,
-                                         key,
-                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                         true);
+                newConsoleKeyInfo = new ConsoleKeyInfo ((char)key,
+                                                        key,
+                                                        (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                        (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                        true);
 
                 break;
+
             case 127: // DEL
                 key = ConsoleKey.Backspace;
 
-                newConsoleKeyInfo = new (
-                                         consoleKeyInfo.KeyChar,
-                                         key,
-                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
-                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+                newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
+                                                        key,
+                                                        (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
+                                                        (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                        (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
 
                 break;
+
             default:
                 //uint ck = ConsoleKeyMapping.MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
 
                 //if (isConsoleKey)
             {
-                key = consoleKeyInfo.Key;// (ConsoleKey)ck;
-                }
+                key = consoleKeyInfo.Key; // (ConsoleKey)ck;
+            }
 
-                newConsoleKeyInfo = new (
-                                         keyChar,
-                                         key,
-                                         GetShiftMod (consoleKeyInfo.Modifiers),
-                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                         (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+                newConsoleKeyInfo = new ConsoleKeyInfo (keyChar,
+                                                        key,
+                                                        GetShiftMod (consoleKeyInfo.Modifiers),
+                                                        (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
+                                                        (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
 
                 break;
         }
@@ -486,8 +509,7 @@ public static class EscSeqUtils
         }
 
         // Handle control keys (e.g. CursorUp)
-        if (keyInfo.Key != ConsoleKey.None
-            && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
+        if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))
         {
             return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
         }
@@ -495,29 +517,26 @@ public static class EscSeqUtils
         if ((ConsoleKey)keyInfo.KeyChar is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             // Shifted
-            keyInfo = new (
-                           keyInfo.KeyChar,
-                           (ConsoleKey)keyInfo.KeyChar,
-                           true,
-                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
-                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+            keyInfo = new ConsoleKeyInfo (keyInfo.KeyChar,
+                                          (ConsoleKey)keyInfo.KeyChar,
+                                          true,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
         }
 
         if ((ConsoleKey)keyInfo.KeyChar - 32 is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
             // Unshifted
-            keyInfo = new (
-                           keyInfo.KeyChar,
-                           (ConsoleKey)(keyInfo.KeyChar - 32),
-                           false,
-                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
-                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+            keyInfo = new ConsoleKeyInfo (keyInfo.KeyChar,
+                                          (ConsoleKey)(keyInfo.KeyChar - 32),
+                                          false,
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                          keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
         }
 
         if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
         {
-            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
-                || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
             {
                 // DotNetDriver doesn't support Shift-Ctrl/Shift-Alt combos
                 return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
@@ -570,7 +589,7 @@ public static class EscSeqUtils
     /// <param name="row">Origin is (1,1).</param>
     /// <param name="col">Origin is (1,1).</param>
     /// <returns></returns>
-    public static string CSI_SetCursorPosition (int row, int col) { return $"{CSI}{row};{col}H"; }
+    public static string CSI_SetCursorPosition (int row, int col) => $"{CSI}{row};{col}H";
 
     /// <summary>
     ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column
@@ -579,11 +598,10 @@ public static class EscSeqUtils
     /// <param name="builder">StringBuilder where to append the cursor position sequence.</param>
     /// <param name="row">Origin is (1,1).</param>
     /// <param name="col">Origin is (1,1).</param>
-    public static void CSI_AppendCursorPosition (StringBuilder builder, int row, int col)
-    {
+    public static void CSI_AppendCursorPosition (StringBuilder builder, int row, int col) =>
+
         // InterpolatedStringHandler is composed in stack, skipping the string allocation.
         builder.Append ($"{CSI}{row};{col}H");
-    }
 
     /// <summary>
     ///     ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column
@@ -609,8 +627,15 @@ public static class EscSeqUtils
         {
             var tooLongCursorPositionSequence = $"{CSI}{row};{col}H";
 
-            throw new InvalidOperationException (
-                                                 $"{nameof (CSI_WriteCursorPosition)} buffer (len: {buffer.Length}) is too short for cursor position sequence '{tooLongCursorPositionSequence}' (len: {tooLongCursorPositionSequence.Length}).");
+            throw new InvalidOperationException ($"{
+                nameof (CSI_WriteCursorPosition)
+            } buffer (len: {
+                buffer.Length
+            }) is too short for cursor position sequence '{
+                tooLongCursorPositionSequence
+            }' (len: {
+                tooLongCursorPositionSequence.Length
+            }).");
         }
 
         ReadOnlySpan<char> cursorPositionSequence = buffer [..charsWritten];
@@ -643,7 +668,7 @@ public static class EscSeqUtils
     /// </summary>
     /// <param name="style"></param>
     /// <returns></returns>
-    public static string CSI_SetCursorStyle (CursorStyle style) { return $"{CSI}{(int)style} q"; }
+    public static string CSI_SetCursorStyle (CursorStyle style) => $"{CSI}{(int)style} q";
 
     #endregion Cursor
 
@@ -655,59 +680,57 @@ public static class EscSeqUtils
     ///     When no parameters are specified, it is treated the same as a single 0 parameter.
     ///     https://terminalguide.namepad.de/seq/csi_sm/
     /// </summary>
-    public static string CSI_SetGraphicsRendition (params int [] parameters) { return $"{CSI}{string.Join (";", parameters)}m"; }
+    public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
 
     /// <summary>
     ///     ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])"/> to set the foreground color.
     /// </summary>
     /// <param name="code">One of the 16 color codes.</param>
     /// <returns></returns>
-    public static string CSI_SetForegroundColor (AnsiColorCode code) { return CSI_SetGraphicsRendition ((int)code); }
+    public static string CSI_SetForegroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code);
 
     /// <summary>
     ///     ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])"/> to set the background color.
     /// </summary>
     /// <param name="code">One of the 16 color codes.</param>
     /// <returns></returns>
-    public static string CSI_SetBackgroundColor (AnsiColorCode code) { return CSI_SetGraphicsRendition ((int)code + 10); }
+    public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code + 10);
 
     /// <summary>
     ///     ESC[38;5;{id}m - Set foreground color (256 colors)
     /// </summary>
-    public static string CSI_SetForegroundColor256 (int color) { return $"{CSI}38;5;{color}m"; }
+    public static string CSI_SetForegroundColor256 (int color) => $"{CSI}38;5;{color}m";
 
     /// <summary>
     ///     ESC[48;5;{id}m - Set background color (256 colors)
     /// </summary>
-    public static string CSI_SetBackgroundColor256 (int color) { return $"{CSI}48;5;{color}m"; }
+    public static string CSI_SetBackgroundColor256 (int color) => $"{CSI}48;5;{color}m";
 
     /// <summary>
     ///     ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.
     /// </summary>
-    public static string CSI_SetForegroundColorRGB (int r, int g, int b) { return $"{CSI}38;2;{r};{g};{b}m"; }
+    public static string CSI_SetForegroundColorRGB (int r, int g, int b) => $"{CSI}38;2;{r};{g};{b}m";
 
     /// <summary>
     ///     ESC[38;2;{r};{g};{b}m	Append foreground color as RGB to StringBuilder.
     /// </summary>
-    public static void CSI_AppendForegroundColorRGB (StringBuilder builder, int r, int g, int b)
-    {
+    public static void CSI_AppendForegroundColorRGB (StringBuilder builder, int r, int g, int b) =>
+
         // InterpolatedStringHandler is composed in stack, skipping the string allocation.
         builder.Append ($"{CSI}38;2;{r};{g};{b}m");
-    }
 
     /// <summary>
     ///     ESC[48;2;{r};{g};{b}m	Set background color as RGB.
     /// </summary>
-    public static string CSI_SetBackgroundColorRGB (int r, int g, int b) { return $"{CSI}48;2;{r};{g};{b}m"; }
+    public static string CSI_SetBackgroundColorRGB (int r, int g, int b) => $"{CSI}48;2;{r};{g};{b}m";
 
     /// <summary>
     ///     ESC[48;2;{r};{g};{b}m	Append background color as RGB to StringBuilder.
     /// </summary>
-    public static void CSI_AppendBackgroundColorRGB (StringBuilder builder, int r, int g, int b)
-    {
+    public static void CSI_AppendBackgroundColorRGB (StringBuilder builder, int r, int g, int b) =>
+
         // InterpolatedStringHandler is composed in stack, skipping the string allocation.
         builder.Append ($"{CSI}48;2;{r};{g};{b}m");
-    }
 
     #endregion Colors
 
@@ -915,6 +938,65 @@ public static class EscSeqUtils
     /// </summary>
     public const string CSI_ReportWindowSizeInChars_ResponseValue = "8";
 
+    /// <summary>
+    ///     Valid ANSI response terminators per CSI specification. See
+    ///     https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
+    ///     Note: N and O are intentionally excluded as they have special handling
+    /// </summary>
+    public static readonly char [] KnownTerminators =
+    [
+        '@', // ICH - Insert Character
+        'A', // CUU - Cursor Up
+        'B', // CUD - Cursor Down
+        'C', // CUF - Cursor Forward (Right)
+        'D', // CUB - Cursor Backward (Left)
+        'E', // CNL - Cursor Next Line
+        'F', // CPL - Cursor Previous Line
+        'G', // CHA - Cursor Horizontal Absolute
+        'H', // CUP - Cursor Position
+        'I', // CHT - Cursor Horizontal Tabulation
+        'J', // ED - Erase in Display
+        'K', // EL - Erase in Line
+        'L', // IL - Insert Line
+        'M', // DL - Delete Line
+        //'N', // Single Shift Select of G2 Character Set (SS2  is 0x8e), VT220. This affects next character only.
+        //'O', // Single Shift Select of G3 Character Set (SS3 is 0x8f), VT220. This affects next character only.
+        'P', // DCH - Delete Character
+        'Q', // (Various sequences)
+        'R', // CPR - Cursor Position Report
+        'S', // SU - Scroll Up
+        'T', // SD - Scroll Down / Mouse tracking
+        'W', // CTC - Cursor Tabulation Control
+        'X', // ECH - Erase Character
+        'Z', // CBT - Cursor Backward Tabulation
+        '^', // (Rarely used)
+        '`', // HPA - Horizontal Position Absolute
+        '~', // Function keys and other extended sequences
+        'a', // HPR - Horizontal Position Relative
+        'b', // REP - Repeat
+        'c', // DA - Device Attributes
+        'd', // VPA - Vertical Position Absolute
+        'e', // VPR - Vertical Position Relative
+        'f', // HVP - Horizontal and Vertical Position
+        'g', // TBC - Tab Clear
+        'h', // SM - Set Mode
+        'i', // MC - Media Copy
+        'l', // RM - Reset Mode
+        'm', // SGR - Select Graphic Rendition
+        'n', // DSR - Device Status Report
+        'p', // (Various, including soft terminal reset)
+        'q', // DECSCUSR - Set Cursor Style
+        'r', // DECSTBM - Set Top and Bottom Margins
+        's', // SCOSC - Save Cursor / DECSLRM
+        't', // Window manipulation / DECSLPP
+        'u', // SCORC - Restore Cursor Position
+        'v', // (Rarely used)
+        'w', // (Rarely used)
+        'x', // DECREQTPARM - Request Terminal Parameters
+        'y', // DECTST - Invoke Confidence Test
+        'z' // (Rarely used)
+    ];
+
     #endregion Requests
 
     #region OSC
@@ -964,11 +1046,10 @@ public static class EscSeqUtils
     ///     This terminates the hyperlink started by <see cref="OSC_StartHyperlink"/>.
     ///     Format: ESC ] 8 ; ; ST (empty URL ends the hyperlink).
     /// </remarks>
-    public static string OSC_EndHyperlink ()
-    {
+    public static string OSC_EndHyperlink () =>
+
         // Format: ESC ] 8 ; ; ST (empty URL ends hyperlink)
-        return $"{OSC}8;;{ST}";
-    }
+        $"{OSC}8;;{ST}";
 
     #endregion OSC
 

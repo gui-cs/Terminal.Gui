@@ -163,7 +163,8 @@ public sealed class UICatalogRunnable : Runnable
                                                                                               buttons: Strings.btnOk),
                                                                       Key.A.WithCtrl)
                                                     ])
-                               ]) { Title = "menuBar", Id = "menuBar" };
+                               ])
+        { Title = "menuBar", Id = "menuBar" };
 
         return menuBar;
 
@@ -657,12 +658,16 @@ public sealed class UICatalogRunnable : Runnable
 
     public static void OpenUrl (string url)
     {
-        if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+        if (PlatformDetection.IsWindows ())
         {
             url = url.Replace ("&", "^&");
             Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
-        else if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux))
+        else if (PlatformDetection.IsMac ())
+        {
+            Process.Start ("open", url);
+        }
+        else if (PlatformDetection.IsUnixLike ())
         {
             using var process = new Process ();
 
@@ -676,10 +681,6 @@ public sealed class UICatalogRunnable : Runnable
                 UseShellExecute = false
             };
             process.Start ();
-        }
-        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
-        {
-            Process.Start ("open", url);
         }
     }
 
