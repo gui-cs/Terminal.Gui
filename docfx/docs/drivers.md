@@ -18,7 +18,7 @@ Terminal.Gui provides console driver implementations optimized for different pla
 - **DotNetDriver (`dotnet`)** - A cross-platform driver that uses the .NET `System.Console` API. Works on all platforms (Windows, macOS, Linux). Best for maximum compatibility.
 - **WindowsDriver (`windows`)** - A Windows-optimized driver that uses native Windows Console APIs for enhanced performance and platform-specific features.
 - **UnixDriver (`unix`)** - A Unix/Linux/macOS-optimized driver that uses platform-specific APIs for better integration and performance.
-- **AnsiDriver (`ansi`)** - A pure ANSI escape sequence driver for unit testing and headless environments. Simulates console behavior without requiring a real terminal.
+- **AnsiDriver (`ansi`)** - The "showcase" cross-platform driver with the most pure ANSI escape sequence implementation. Works on all platforms (Windows, macOS, Linux) and is ideal for unit testing, CI/CD, and headless environments.
 
 ### Driver Comparison
 
@@ -27,7 +27,7 @@ Terminal.Gui provides console driver implementations optimized for different pla
 | **WindowsDriver** | Native Win32 API: `ReadConsoleInputW()` reads `INPUT_RECORD` structures directly from the console input buffer. Supports keyboard, mouse, window buffer size events. | Native Win32 API: `WriteConsoleW()` for direct character output. Uses `CreateConsoleScreenBuffer()` and `SetConsoleActiveScreenBuffer()` for double buffering. `SetConsoleTextAttribute()` for colors. | Console buffer size events via `ReadConsoleInputW()`. Uses `GetConsoleScreenBufferInfoEx()` to query dimensions. Immediate notification on resize. | • Highest performance on Windows<br>• Direct access to Win32 features<br>• Native mouse support<br>• Immediate resize detection | • Windows-only<br>• More complex P/Invoke code |
 | **UnixDriver** | POSIX termios: `tcgetattr()`/`tcsetattr()` for raw mode. Reads bytes from stdin via `read()` syscall, parses as ANSI sequences. Uses `poll()` for non-blocking I/O. | ANSI escape sequences via `EscSeqUtils`. Writes to stdout via `write()` syscall. Supports 16-color and 24-bit RGB. | `ioctl(TIOCGWINSZ)` syscall gets terminal dimensions (platform-specific constants: Linux `0x5413`, macOS `0x40087468`). Polls for size changes. | • Optimized for Unix/Linux/macOS<br>• Direct syscall access<br>• True-color support<br>• Native terminal integration | • Unix-only<br>• Polling-based resize detection |
 | **DotNetDriver** | Managed .NET API: `Console.ReadKey()` for keyboard input. Cross-platform but uses underlying OS APIs through .NET wrapper. | Managed .NET API: `Console.Write()` and ANSI sequences via `EscSeqUtils` (when VT mode enabled). Uses `NetWinVTConsole` helper on Windows for VT mode. | `Console.WindowWidth`/`Console.WindowHeight` for dimensions. Falls back to 80x25 if IOException. Polls for size changes via `SizeMonitorImpl.Poll()`. | • Maximum cross-platform compatibility<br>• Simplest implementation<br>• No P/Invoke required<br>• Works with .NET BCL only | • Lower performance (managed overhead)<br>• Limited feature set<br>• Less direct control |
-| **AnsiDriver** | Platform-specific VT mode: Windows uses `ReadFile()` with `ENABLE_VIRTUAL_TERMINAL_INPUT`. Unix uses `poll()`/`read()` via `UnixIOHelper`. Parses raw ANSI sequences via `AnsiResponseParser`. | Pure ANSI escape sequences. Windows uses `WriteFile()` with `ENABLE_VIRTUAL_TERMINAL_PROCESSING`. Unix uses `write()` syscall. Fully portable SGR sequences. | Sends ANSI query sequence `CSI_ReportWindowSizeInChars`, terminal responds with dimensions. Throttled to 500ms. Falls back to polling. | • Cross-platform via ANSI standard<br>• Perfect for testing/CI<br>• Virtual time support<br>• Deterministic behavior | • Query-based resize (slower)<br>• Requires VT-capable terminal<br>• Throttled size detection |
+| **AnsiDriver** | Platform-specific VT mode: Windows uses `ReadFile()` with `ENABLE_VIRTUAL_TERMINAL_INPUT`. Unix uses `poll()`/`read()` via `UnixIOHelper`. Parses raw ANSI sequences via `AnsiResponseParser`. | Pure ANSI escape sequences. Windows uses `WriteFile()` with `ENABLE_VIRTUAL_TERMINAL_PROCESSING`. Unix uses `write()` syscall. Fully portable SGR sequences. | Sends ANSI query sequence `CSI_ReportWindowSizeInChars`, terminal responds with dimensions. Throttled to 500ms. Falls back to polling. | • Works on all platforms<br>• Showcase driver with pure implementation<br>• Perfect for testing/CI<br>• Virtual time support<br>• Deterministic behavior | • Query-based resize (slower)<br>• Requires proper ANSI support<br>• Throttled size detection |
 
 ### Automatic Driver Selection
 
@@ -461,15 +461,17 @@ This architecture provides:
 
 ### AnsiDriver (AnsiComponentFactory)
 
-**Pure ANSI escape sequence driver for cross-platform compatibility**
+**The "showcase" driver with the most pure ANSI escape sequence implementation**
+
+Works on all platforms (Windows, macOS, Linux) and is the ideal choice for unit testing, CI/CD environments, and applications requiring deterministic, cross-platform behavior.
 
 - **Input (Windows)**: Uses `WindowsVTInputHelper` to enable Virtual Terminal Input mode (`ENABLE_VIRTUAL_TERMINAL_INPUT`). Reads from console via `ReadFile()` API, which returns ANSI escape sequences instead of native input records.
 - **Input (Unix/macOS)**: Shares `UnixRawModeHelper` and `UnixIOHelper` with UnixDriver. Uses `tcgetattr()`/`tcsetattr()` for raw mode, `poll(STDIN_FILENO, ...)` for non-blocking reads, and `read(STDIN_FILENO, buffer, len)` for input. The `AnsiResponseParser` decodes ANSI sequences into Terminal.Gui events.
 - **Output (Windows)**: Uses `WindowsVTOutputHelper` to enable Virtual Terminal Processing (`ENABLE_VIRTUAL_TERMINAL_PROCESSING`). Writes ANSI sequences via `WriteFile()`, which the Windows console parses and renders.
 - **Output (Unix/macOS)**: Writes pure ANSI escape sequences to stdout via `write()` syscall, same mechanism as UnixDriver.
 - **Screen Management**: Uses `AnsiSizeMonitor` which sends the ANSI query sequence `ESC[18t` (CSI "report window size in chars"). Terminal responds with `ESC[8;height;width t` where height/width are in characters. Queries are throttled to 500ms intervals to avoid spam. Falls back to `AnsiOutput.GetSize()` polling.
-- **Advantages**: True cross-platform portability via ANSI standard, ideal for testing/CI environments, supports virtual time control for deterministic testing.
-- **Trade-offs**: Query-based resize detection is slower than event-based. Requires VT-capable terminal (most modern terminals).
+- **Advantages**: Works on all platforms via pure ANSI standard, showcase driver with the cleanest implementation, ideal for testing/CI environments, supports virtual time control for deterministic testing.
+- **Trade-offs**: Query-based resize detection is slower than event-based. Requires proper ANSI support from the terminal.
 
 ## Testing and Input Injection
 
