@@ -285,7 +285,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
     ```csharp
     protected override bool OnAccepting(CommandEventArgs args)
     {
-        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.TypedBinding.Key == Application.QuitKey)
         {
             return true;
         }
@@ -536,7 +536,7 @@ The current implementation of `Command.Activate` is local, but `MenuBar` require
     ```csharp
     protected override void OnAccepting(CommandEventArgs args)
     {
-        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.TypedBinding.Key == Application.QuitKey)
         {
             return true;
         }
@@ -628,32 +628,38 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
    - This ensures `Activating` only propagates state changes to the parent `FlagSelector` via `RaiseActivating`, and `Accepting` is triggered separately (e.g., via Enter on the `FlagSelector` itself) to confirm the `Value`.
 
 3. **Enhance ICommandContext with View-Specific State**:
-   - Enrich `ICommandContext` with a `State` property to include view-specific data (e.g., the selected `MenuItem` in `Menu`, the new `CheckedState` in `CheckBox`, the updated `Value` in `FlagSelector`). This enables more informed event handlers without requiring view-specific subscriptions.
-   - Proposed interface update:
-     ```csharp
-     public interface ICommandContext
-     {
-         Command Command { get; }
-         View? Source { get; }
-         object? Binding { get; }
-         object? State { get; } // View-specific state (e.g., selected item, CheckState)
-     }
-     ```
-   - Example: In `Menu`, include the `SelectedMenuItem` in `ICommandContext.State` for `Activating` handlers:
-     ```csharp
-     protected bool? RaiseActivating(ICommandContext? ctx)
-     {
-         ctx.State = SelectedMenuItem; // Provide selected MenuItem
-         CommandEventArgs args = new () { Context = ctx };
-         if (OnActivating(args) || args.Cancel)
-         {
-             return true;
-         }
-         Activating?.Invoke(this, args);
-         return Activating is null ? null : args.Cancel;
-     }
-     ```
-   - This enhances the flexibility of event handlers, allowing external code to react to state changes without subscribing to view-specific events like `SelectedMenuItemChanged` or `CheckedStateChanged`.
+   - The `ICommandContext` interface now includes a `Binding` property that provides polymorphic access to the binding that triggered the command. This enables pattern matching on binding types:
+      ```csharp
+      public interface ICommandContext
+      {
+          Command Command { get; }
+          View? Source { get; set; }
+          IInputBinding? Binding { get; }  // Polymorphic access to the binding
+      }
+      ```
+   - Pattern match on `ctx.Binding` to access specific binding types:
+      ```csharp
+      if (ctx.Binding is KeyBinding kb)
+      {
+          // Handle key binding - access kb.Key, kb.Target, etc.
+      }
+      else if (ctx.Binding is MouseBinding mb)
+      {
+          // Handle mouse binding - access mb.MouseEvent, etc.
+      }
+      else if (ctx.Binding is InputBinding ib)
+      {
+          // Handle programmatic/generic binding
+      }
+      ```
+   - When using `CommandContext<T>` directly, use `TypedBinding` for strongly-typed access:
+      ```csharp
+      if (args.Context is CommandContext<KeyBinding> keyCommandContext)
+      {
+          Key? key = keyCommandContext.TypedBinding.Key;
+      }
+      ```
+   - A future `State` property could include view-specific data (e.g., the selected `MenuItem` in `Menu`, the new `CheckedState` in `CheckBox`). This would enhance the flexibility of event handlers.
 
 4. **Monitor Use Cases for Propagation Needs**:
    - Track the usage of `Activating` and `Accepting` in real-world applications, particularly in `Menu`, `MenuBar`, `CheckBox`, and `FlagSelector`, to identify scenarios where propagation of `Activating` events could simplify hierarchical coordination.

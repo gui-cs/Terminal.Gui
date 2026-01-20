@@ -92,9 +92,9 @@ public class ListView : View, IDesignable
                             SetFocus ();
                         }
 
-                        if (ctx is CommandContext<MouseBinding> { Binding.MouseEvent: { } } mouseCommandContext)
+                        if (ctx is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
                         {
-                            Point position = mouseCommandContext.Binding.MouseEvent.Position!.Value;
+                            Point position = mouseCommandContext.TypedBinding.MouseEvent.Position!.Value;
                             SelectedItem = position.Y;
                         }
 
@@ -128,7 +128,7 @@ public class ListView : View, IDesignable
                             return false;
                         }
 
-                        return keyCommandContext.Binding.Data is { } && MarkAll ((bool)keyCommandContext.Binding.Data);
+                        return keyCommandContext.TypedBinding.Data is { } && MarkAll ((bool)keyCommandContext.TypedBinding.Data);
                     });
 
         // Default keybindings for all ListViews

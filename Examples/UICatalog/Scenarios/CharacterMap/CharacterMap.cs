@@ -126,7 +126,7 @@ public class CharacterMap : Scenario
         _categoryList.Activating += (_, e) =>
                                     {
                                         // Only handle mouse clicks
-                                        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEvent: { } mouse })
+                                        if (e.Context is not CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
                                         {
                                             return;
                                         }

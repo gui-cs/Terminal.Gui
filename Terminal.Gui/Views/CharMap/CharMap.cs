@@ -836,10 +836,10 @@ public class CharMap : View, IDesignable
     {
         Point position = GetCursor (SelectedCodePoint);
 
-        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEvent: { } } mouseCommandContext)
+        if (commandContext is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
         {
             // If the mouse is clicked on the headers, map it to the first glyph of the row/col
-            position = mouseCommandContext.Binding.MouseEvent.Position!.Value;
+            position = mouseCommandContext.TypedBinding.MouseEvent.Position!.Value;
 
             if (position.Y == 0)
             {
@@ -884,14 +884,14 @@ public class CharMap : View, IDesignable
             return true;
         }
 
-        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEvent: { } } mouseCommandContext)
+        if (commandContext is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
         {
             if (!HasFocus && CanFocus)
             {
                 SetFocus ();
             }
 
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEvent.Position!.Value, out int cp))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.TypedBinding.MouseEvent.Position!.Value, out int cp))
             {
                 return false;
             }
@@ -908,9 +908,9 @@ public class CharMap : View, IDesignable
     {
         int newCodePoint = SelectedCodePoint;
 
-        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEvent: { } } mouseCommandContext)
+        if (commandContext is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
         {
-            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEvent.Position!.Value, out newCodePoint))
+            if (!TryGetCodePointFromPosition (mouseCommandContext.TypedBinding.MouseEvent.Position!.Value, out newCodePoint))
             {
                 return false;
             }

@@ -273,6 +273,9 @@ public interface ICommandContext
 
     /// <summary>The View that first invoked the command (the source).</summary>
     View? Source { get; set; }
+
+    /// <summary>The binding that triggered the command. Use pattern matching to access specific binding types.</summary>
+    IInputBinding? Binding { get; }
 }
 
 public interface IInputBinding
@@ -288,20 +291,48 @@ public interface IInputBinding
 }
 ```
 
+#### Binding Types
+
+Terminal.Gui provides three binding types:
+
+- **`KeyBinding`**: For keyboard-triggered commands. Has `Key` and `Target` properties.
+- **`MouseBinding`**: For mouse-triggered commands. Has `MouseEvent` property.
+- **`InputBinding`**: For programmatic/generic command invocations.
+
 #### Accessing Binding Details
 
-When handling command events, you can access the binding that triggered the command through pattern matching:
+When handling command events, you can access the binding that triggered the command through pattern matching.
+
+**Using `ICommandContext.Binding` (polymorphic access):**
+
+```csharp
+// Pattern match on ctx.Binding for polymorphic access
+if (ctx.Binding is KeyBinding kb)
+{
+    Key? key = kb.Key;
+}
+else if (ctx.Binding is MouseBinding mb)
+{
+    Mouse? mouse = mb.MouseEvent;
+}
+else if (ctx.Binding is InputBinding ib)
+{
+    // Programmatic invocation
+}
+```
+
+**Using `CommandContext<T>.TypedBinding` (strongly-typed access):**
 
 ```csharp
 // For mouse-triggered commands:
-if (e.Context is CommandContext<MouseBinding> { Binding.MouseEvent: { } mouse })
+if (e.Context is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
 {
     Point position = mouse.Position!.Value;
     MouseFlags flags = mouse.Flags;
 }
 
 // For key-triggered commands:
-if (e.Context is CommandContext<KeyBinding> { Binding.Key: { } key })
+if (e.Context is CommandContext<KeyBinding> { TypedBinding.Key: { } key })
 {
     // Handle key-specific logic
 }

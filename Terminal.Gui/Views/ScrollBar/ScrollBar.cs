@@ -511,7 +511,7 @@ public class ScrollBar : View, IOrientation, IDesignable
     protected override bool OnActivating (CommandEventArgs args)
     {
         // Only handle mouse clicks
-        if (args.Context is not CommandContext<MouseBinding> { Binding.MouseEvent: { } mouse })
+        if (args.Context is not CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
         {
             return base.OnActivating (args);
         }

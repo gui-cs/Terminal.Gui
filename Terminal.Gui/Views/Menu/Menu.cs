@@ -1,9 +1,8 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a <see cref="MenuItem"/>.
+///     A <see cref="Bar"/>-derived object to be used as a vertically-oriented menu. Each subview is a
+///     <see cref="MenuItem"/>.
 /// </summary>
 public class Menu : Bar
 {
@@ -53,7 +52,7 @@ public class Menu : Bar
     /// </summary>
     public MenuItem? SuperMenuItem { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnVisibleChanged ()
     {
         if (Visible)
@@ -62,7 +61,7 @@ public class Menu : Bar
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
@@ -70,27 +69,27 @@ public class Menu : Bar
         switch (view)
         {
             case MenuItem menuItem:
-                {
-                    menuItem.CanFocus = true;
+            {
+                menuItem.CanFocus = true;
 
-                    AddCommand (menuItem.Command, (ctx) =>
-                                                  {
-                                                      RaiseAccepted (ctx);
+                AddCommand (menuItem.Command,
+                            ctx =>
+                            {
+                                RaiseAccepted (ctx);
 
-                                                      return true;
+                                return true;
+                            });
 
-                                                  });
+                menuItem.Accepted += MenuItemOnAccepted;
 
-                    menuItem.Accepted += MenuItemOnAccepted;
+                break;
 
-                    break;
+                void MenuItemOnAccepted (object? sender, CommandEventArgs e) =>
 
-                    void MenuItemOnAccepted (object? sender, CommandEventArgs e)
-                    {
-                        // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
-                        RaiseAccepted (e.Context);
-                    }
-                }
+                    // Logging.Debug ($"MenuItemOnAccepted: Calling RaiseAccepted {e.Context?.Source?.Title}");
+                    RaiseAccepted (e.Context);
+            }
+
             case Line line:
                 // Grow line so we get auto-join line
                 line.X = Pos.Func (_ => -Border!.Thickness.Left);
@@ -100,8 +99,7 @@ public class Menu : Bar
         }
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
         // When the user accepts a menuItem, Menu.RaiseAccepting is called, and we intercept that here.
@@ -118,7 +116,7 @@ public class Menu : Bar
 
         // Logging.Debug ($"{Title} - {args.Context}");
 
-        if (args.Context is CommandContext<KeyBinding> { Binding.Key: { } } keyCommandContext && keyCommandContext.Binding.Key == Application.QuitKey)
+        if (args.Context is CommandContext<KeyBinding> { TypedBinding.Key: { } } keyCommandContext && keyCommandContext.TypedBinding.Key == Application.QuitKey)
         {
             // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
             // And causes just the menu to quit.
@@ -133,12 +131,11 @@ public class Menu : Bar
             // Logging.Debug ($"{Title} - Invoking Accept on SuperMenuItem: {SuperMenuItem?.Title}...");
             return SuperMenuItem?.InvokeCommand (Command.Accept, args.Context) is true;
         }
+
         return false;
     }
 
-
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
@@ -157,9 +154,7 @@ public class Menu : Bar
         set
         {
             if (value == Focused)
-            {
-                return;
-            }
+            { }
 
             // Note we DO NOT set focus here; This property tracks Focused
         }
@@ -177,16 +172,14 @@ public class Menu : Bar
     ///     Called when the selected menu item has changed.
     /// </summary>
     /// <param name="selected"></param>
-    protected virtual void OnSelectedMenuItemChanged (MenuItem? selected)
-    {
-    }
+    protected virtual void OnSelectedMenuItemChanged (MenuItem? selected) { }
 
     /// <summary>
     ///     Raised when the selected menu item has changed.
     /// </summary>
     public event EventHandler<MenuItem?>? SelectedMenuItemChanged;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         base.Dispose (disposing);

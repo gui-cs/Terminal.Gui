@@ -192,7 +192,7 @@ public class KeyBindingsDemo : View
                                              {
                                                  return false;
                                              }
-                                             MessageBox.Query (App, $"{keyCommandContext.Binding}", $"Key: {keyCommandContext.Binding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
+                                             MessageBox.Query (App, $"{keyCommandContext.TypedBinding}", $"Key: {keyCommandContext.TypedBinding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
                                              App?.RequestStop ();
                                              return true;
                                          });

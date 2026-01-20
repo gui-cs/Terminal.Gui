@@ -359,10 +359,13 @@ StatusBar receives via propagation
 - [x] Update all call sites using `MouseEventArgs` pattern
 - [x] Update documentation (mouse.md, events.md)
 
-### Phase 2: New Types
+### Phase 2: New Types ✅ COMPLETED
 
-- [ ] Create `InputBinding` record struct
-- [ ] Add `Binding` property to `ICommandContext`
+- [x] Create `InputBinding` record struct
+- [x] Add `Binding` property to `ICommandContext`
+- [x] Rename `CommandContext<T>.Binding` → `TypedBinding` (strongly-typed access)
+- [x] Add computed `Binding` property to `CommandContext<T>` for interface compliance
+- [x] Update all call sites from `.Binding` to `.TypedBinding`
 
 ### Phase 3: CommandContext Simplification
 
@@ -411,10 +414,19 @@ StatusBar receives via propagation
   - `MouseBindingTests.cs` - 14 tests covering constructor, properties, Source, MouseEvent, pattern matching
   - `KeyBindingTests.cs` - 17 tests covering constructor, properties, Source, Target, Key, pattern matching  
   - `CommandContextTests.cs` - 13 tests covering ICommandContext, pattern matching, Source propagation
+- [x] **Phase 2: New Types** (2026-01-21)
+  - Created `InputBinding` record struct in `Terminal.Gui\Input\InputBinding.cs`
+  - Added `IInputBinding? Binding { get; }` property to `ICommandContext` interface
+  - Renamed `CommandContext<T>.Binding` to `TypedBinding` for strongly-typed access
+  - Added computed `Binding` property: `IInputBinding? Binding => TypedBinding`
+  - Updated 20+ files to use `.TypedBinding` instead of `.Binding`
+  - Created `InputBindingTests.cs` - 19 tests covering constructor, properties, IInputBinding, pattern matching
+  - Updated `CommandContextTests.cs` - added 6 tests for new `Binding` property
+  - All 34 binding-related tests pass
 
 ### In Progress
 
-- [ ] Phase 2: New Types
+- [ ] Phase 3: CommandContext Simplification
 
 ### Blocked
 
@@ -433,15 +445,16 @@ StatusBar receives via propagation
 
 4. ~~**Should `CommandEventArgs` include a `Sender` property?**~~
    - **Resolved: No** - In virtual method overrides, `this` is the View currently processing (equivalent to `sender` in event handlers). No additional property needed.
-   - `this` / `sender` = View currently handling the command (changes during propagation)
-   - `args.Context?.Source` = View that originally invoked the command (constant during propagation)
+      - `this` / `sender` = View currently handling the command (changes during propagation)
+      - `args.Context?.Source` = View that originally invoked the command (constant during propagation)
 
----
+   ---
 
-## Revision History
+   ## Revision History
 
-| Date | Author | Changes |
-|------|--------|---------|
-| 2026-01-09 | GitHub Copilot | Initial document created from design discussion |
-| 2026-01-09 | GitHub Copilot | Phase 1 completed: Added Source to IInputBinding, renamed MouseEventArgs to MouseEvent |
-| 2026-01-20 | Claude Opus 4.5 | Added "Relationship to Command Propagation" section; added Open Question #4 about CommandEventArgs.Sender; updated to note propagation depends on this refactor completing (alpha status) |
+   | Date | Author | Changes |
+   |------|--------|---------|
+   | 2026-01-09 | GitHub Copilot | Initial document created from design discussion |
+   | 2026-01-09 | GitHub Copilot | Phase 1 completed: Added Source to IInputBinding, renamed MouseEventArgs to MouseEvent |
+   | 2026-01-20 | Claude Opus 4.5 | Added "Relationship to Command Propagation" section; added Open Question #4 about CommandEventArgs.Sender; updated to note propagation depends on this refactor completing (alpha status) |
+   | 2026-01-21 | GitHub Copilot | Phase 2 completed: Created InputBinding, added Binding to ICommandContext, renamed Binding to TypedBinding in CommandContext<T> |

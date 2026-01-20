@@ -18,7 +18,7 @@ public record struct CommandContext<TBindingType> : ICommandContext where TBindi
     public CommandContext (Command command, View? source, TBindingType? binding)
     {
         Command = command;
-        Binding = binding;
+        TypedBinding = binding;
         Source = source;
     }
 
@@ -29,7 +29,16 @@ public record struct CommandContext<TBindingType> : ICommandContext where TBindi
     public View? Source { get; set; }
 
     /// <summary>
-    /// The keyboard or mouse minding that was used to invoke the <see cref="Command"/>, if any.
+    ///     The keyboard or mouse binding that was used to invoke the <see cref="Command"/>, if any.
     /// </summary>
-    public TBindingType? Binding { get; set; }
+    /// <remarks>
+    ///     <para>
+    ///         Use this property when you need access to the strongly-typed binding.
+    ///         Use <see cref="Binding"/> when you need polymorphic access via the interface.
+    ///     </para>
+    /// </remarks>
+    public TBindingType? TypedBinding { get; set; }
+
+    /// <inheritdoc />
+    public IInputBinding? Binding => TypedBinding;
 }

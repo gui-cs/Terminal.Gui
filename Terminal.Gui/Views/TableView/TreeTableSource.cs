@@ -165,7 +165,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     private void Table_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEvent: { } mouse })
+        if (e.Context is not CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
         {
             return;
         }

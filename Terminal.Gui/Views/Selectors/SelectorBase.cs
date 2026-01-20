@@ -58,7 +58,7 @@ public abstract class SelectorBase : View, IOrientation
     {
         if (!DoubleClickAccepts
             && ctx is CommandContext<MouseBinding> mouseCommandContext
-            && mouseCommandContext.Binding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
+            && mouseCommandContext.TypedBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
             return false;
         }
@@ -75,7 +75,7 @@ public abstract class SelectorBase : View, IOrientation
             return base.OnHandlingHotKey (args);
         }
 
-        if ((HasFocus || !CanFocus) && HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
+        if ((HasFocus || !CanFocus) && HotKey == keyCommandContext.TypedBinding.Key?.NoAlt.NoCtrl.NoShift!)
         {
             // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
             return Focused?.InvokeCommand (Command.Activate, args.Context) is true;

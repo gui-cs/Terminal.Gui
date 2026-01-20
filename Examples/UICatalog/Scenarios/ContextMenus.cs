@@ -109,14 +109,14 @@ public class ContextMenus : Scenario
     {
         switch (e.Context)
         {
-            case CommandContext<MouseBinding> { Binding.MouseEvent: { } mouseArgs }:
+            case CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouseArgs }:
                 // ReSharper disable once AccessToDisposedClosure
                 _winContextMenu?.MakeVisible (mouseArgs.ScreenPosition);
                 e.Handled = true;
 
                 break;
 
-            case CommandContext<KeyBinding> { Binding.Key: { } key } when key == _winContextMenuKey:
+            case CommandContext<KeyBinding> { TypedBinding.Key: { } key } when key == _winContextMenuKey:
                 // ReSharper disable once AccessToDisposedClosure
                 _winContextMenu?.MakeVisible ();
                 e.Handled = true;

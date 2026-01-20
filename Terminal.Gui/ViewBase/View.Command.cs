@@ -473,7 +473,7 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (new CommandContext<TBindingType> { Command = command, Source = this, Binding = binding });
+        return implementation! (new CommandContext<TBindingType> { Command = command, Source = this, TypedBinding = binding });
     }
 
     /// <summary>
@@ -516,6 +516,6 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (new CommandContext<IInputBinding> { Command = command, Source = this, Binding = null });
+        return implementation! (new CommandContext<IInputBinding> { Command = command, Source = this, TypedBinding = null });
     }
 }

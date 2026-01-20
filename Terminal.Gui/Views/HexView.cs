@@ -339,7 +339,7 @@ public class HexView : View, IDesignable
 
     private bool? HandleMouseClick (ICommandContext? commandContext)
     {
-        if (commandContext is not CommandContext<MouseBinding> { Binding.MouseEvent: { } } mouseCommandContext)
+        if (commandContext is not CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
         {
             return false;
         }
@@ -354,7 +354,7 @@ public class HexView : View, IDesignable
             SetFocus ();
         }
 
-        if (mouseCommandContext.Binding.MouseEvent.Position!.Value.X < GetLeftSideStartColumn ())
+        if (mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.X < GetLeftSideStartColumn ())
         {
             return true;
         }
@@ -363,14 +363,14 @@ public class HexView : View, IDesignable
         int blocksSize = blocks * HEX_COLUMN_WIDTH;
         int blocksRightOffset = GetLeftSideStartColumn () + blocksSize - 1;
 
-        if (mouseCommandContext.Binding.MouseEvent.Position!.Value.X > blocksRightOffset + BytesPerLine - 1)
+        if (mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.X > blocksRightOffset + BytesPerLine - 1)
         {
             return true;
         }
 
-        bool clickIsOnLeftSide = mouseCommandContext.Binding.MouseEvent.Position!.Value.X >= blocksRightOffset;
-        long lineStart = mouseCommandContext.Binding.MouseEvent.Position!.Value.Y * BytesPerLine + Viewport.Y * BytesPerLine;
-        int x = mouseCommandContext.Binding.MouseEvent.Position!.Value.X - GetLeftSideStartColumn () + 1;
+        bool clickIsOnLeftSide = mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.X >= blocksRightOffset;
+        long lineStart = mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.Y * BytesPerLine + Viewport.Y * BytesPerLine;
+        int x = mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.X - GetLeftSideStartColumn () + 1;
         int block = x / HEX_COLUMN_WIDTH;
         x -= block * 2;
         int empty = x % 3;
@@ -385,14 +385,14 @@ public class HexView : View, IDesignable
 
         if (clickIsOnLeftSide)
         {
-            Address = Math.Min (lineStart + mouseCommandContext.Binding.MouseEvent.Position!.Value.X - blocksRightOffset, GetEditedSize ());
+            Address = Math.Min (lineStart + mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.X - blocksRightOffset, GetEditedSize ());
         }
         else
         {
             Address = Math.Min (lineStart + item, GetEditedSize ());
         }
 
-        if (mouseCommandContext.Binding.MouseEvent.Flags == MouseFlags.LeftButtonDoubleClicked)
+        if (mouseCommandContext.TypedBinding.MouseEvent.Flags == MouseFlags.LeftButtonDoubleClicked)
         {
             _leftSideHasFocus = !clickIsOnLeftSide;
 
