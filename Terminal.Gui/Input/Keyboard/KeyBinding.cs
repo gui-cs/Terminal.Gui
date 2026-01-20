@@ -1,13 +1,10 @@
-
-
-
 // These classes use a key binding system based on the design implemented in Scintilla.Net which is an
 // MIT licensed open source project https://github.com/jacobslusser/ScintillaNET/blob/master/src/ScintillaNET/Command.cs
 
 namespace Terminal.Gui.Input;
 
 /// <summary>
-/// Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>.
+///     Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>.
 /// </summary>
 /// <seealso cref="KeyBindings"/>
 /// <seealso cref="KeyBindings"/>
@@ -37,7 +34,7 @@ public record struct KeyBinding : IInputBinding
     /// <summary>The commands this key binding will invoke.</summary>
     public Command [] Commands { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public object? Data { get; set; }
 
     /// <summary>
@@ -45,6 +42,20 @@ public record struct KeyBinding : IInputBinding
     /// </summary>
     public Key? Key { get; set; }
 
-    /// <summary>The view the key binding is bound to.</summary>
+    /// <inheritdoc/>
+    public View? Source { get; set; }
+
+    /// <summary>
+    ///     The view the key binding is bound to.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is used for application-level hotkeys where the binding is added at the application level
+    ///         but the target view is where the command should be invoked.
+    ///     </para>
+    ///     <para>
+    ///         This is distinct from <see cref="Source"/> which indicates where the binding was created.
+    ///     </para>
+    /// </remarks>
     public View? Target { get; set; }
 }

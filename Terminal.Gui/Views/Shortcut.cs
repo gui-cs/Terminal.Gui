@@ -473,7 +473,7 @@ public class Shortcut : View, IOrientation, IDesignable
                     || e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
-                    InvokeCommand (Command.Activate, e);
+                    InvokeCommand (Command.Activate, e.Context);
                 }
 
                 e.Handled = true;

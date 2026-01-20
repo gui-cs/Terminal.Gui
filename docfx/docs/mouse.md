@@ -561,7 +561,7 @@ This ensures consistent mouse behavior across platforms while maintaining platfo
 * **Use `Activating` event** to handle clicks - provides mouse position via CommandContext
 * **Access mouse details via CommandContext:**
   ```csharp
-  if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+  if (e.Context is CommandContext<MouseBinding> { Binding.MouseEvent: { } mouse })
   {
       Point pos = mouse.Position;  // Viewport-relative
       MouseFlags flags = mouse.Flags;

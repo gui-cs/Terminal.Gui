@@ -65,7 +65,7 @@ public class ViewExperiments : Scenario
 
         testFrame.Activating += (_, e) =>
                                 {
-                                    if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+                                    if (e.Context is CommandContext<MouseBinding> { Binding.MouseEvent: { } mouseArgs })
                                     {
                                         if (mouseArgs.Flags == MouseFlags.RightButtonClicked)
                                         {

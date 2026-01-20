@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View // Command APIs
 {
@@ -19,9 +18,8 @@ public partial class View // Command APIs
         AddCommand (Command.Accept, RaiseAccepting);
 
         // HotKey - SetFocus and raise HandlingHotKey
-        AddCommand (
-                    Command.HotKey,
-                    (ctx) =>
+        AddCommand (Command.HotKey,
+                    ctx =>
                     {
                         if (RaiseHandlingHotKey (ctx) is true)
                         {
@@ -36,8 +34,7 @@ public partial class View // Command APIs
                     });
 
         // Space or single-click - Raise Activating
-        AddCommand (
-                    Command.Activate,
+        AddCommand (Command.Activate,
                     ctx =>
                     {
                         if (RaiseActivating (ctx) is true)
@@ -89,7 +86,7 @@ public partial class View // Command APIs
     /// </summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnCommandNotBound (CommandEventArgs args) { return false; }
+    protected virtual bool OnCommandNotBound (CommandEventArgs args) => false;
 
     /// <summary>
     ///     Cancelable event raised when a command that has not been bound is invoked.
@@ -193,7 +190,7 @@ public partial class View // Command APIs
     /// </remarks>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnAccepting (CommandEventArgs args) { return false; }
+    protected virtual bool OnAccepting (CommandEventArgs args) => false;
 
     /// <summary>
     ///     Cancelable event raised when the user is accepting the state of the View and the <see cref="Command.Accept"/> has
@@ -227,18 +224,21 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not cancelled.
+    ///     Called when the View has been accepted. This is called after <see cref="Accepting"/> has been raised and not
+    ///     cancelled.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Unlike <see cref="OnAccepting"/>, this method is called after the View has been accepted and cannot cancel the operation.
+    ///         Unlike <see cref="OnAccepting"/>, this method is called after the View has been accepted and cannot cancel the
+    ///         operation.
     ///     </para>
     /// </remarks>
     /// <param name="args">The event arguments.</param>
     protected virtual void OnAccepted (CommandEventArgs args) { }
 
     /// <summary>
-    ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not cancelled.
+    ///     Event raised when the View has been accepted. This is raised after <see cref="Accepting"/> has been raised and not
+    ///     cancelled.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -251,7 +251,8 @@ public partial class View // Command APIs
     public event EventHandler<CommandEventArgs>? Accepted;
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state or preparing it for interaction.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state
+    ///     or preparing it for interaction.
     ///     Calls <see cref="OnActivating"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
     ///     event. The default <see cref="Command.Activate"/> handler calls this method.
     /// </summary>
@@ -284,16 +285,18 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state or preparing it for interaction.
+    ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state
+    ///     or preparing it for interaction.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> and return <see langword="true"/> to indicate the event was
     ///     handled and processing should stop.
     /// </summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnActivating (CommandEventArgs args) { return false; }
+    protected virtual bool OnActivating (CommandEventArgs args) => false;
 
     /// <summary>
-    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View
+    ///     Cancelable event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the
+    ///     View
     ///     to change state or preparing it for interaction.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.
@@ -315,6 +318,7 @@ public partial class View // Command APIs
     protected bool? RaiseHandlingHotKey (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
+
         //Logging.Debug ($"{Title} ({args.Context?.Source?.Title})");
 
         // Best practice is to invoke the virtual method first.
@@ -337,7 +341,7 @@ public partial class View // Command APIs
     /// </summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> to stop processing.</returns>
-    protected virtual bool OnHandlingHotKey (CommandEventArgs args) { return false; }
+    protected virtual bool OnHandlingHotKey (CommandEventArgs args) => false;
 
     /// <summary>
     ///     Cancelable event raised when the View is handling the user pressing the View's <see cref="HotKey"/>. Set
@@ -374,12 +378,13 @@ public partial class View // Command APIs
     ///         This version of AddCommand is for commands that require <see cref="ICommandContext"/>.
     ///     </para>
     ///     <para>
-    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
+    ///         See the Commands Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, CommandImplementation impl) { _commandImplementations [command] = impl; }
+    protected void AddCommand (Command command, CommandImplementation impl) => _commandImplementations [command] = impl;
 
     /// <summary>
     ///     <para>
@@ -398,16 +403,17 @@ public partial class View // Command APIs
     ///         <see cref="AddCommand(Command,CommandImplementation)"/>
     ///     </para>
     ///     <para>
-    ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
+    ///         See the Commands Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, Func<bool?> impl) { _commandImplementations [command] = _ => impl (); }
+    protected void AddCommand (Command command, Func<bool?> impl) => _commandImplementations [command] = _ => impl ();
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>
     /// <returns></returns>
-    public IEnumerable<Command> GetSupportedCommands () { return _commandImplementations.Keys; }
+    public IEnumerable<Command> GetSupportedCommands () => _commandImplementations.Keys;
 
     /// <summary>
     ///     Invokes the specified commands.
@@ -421,7 +427,7 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommands<TBindingType> (Command [] commands, TBindingType binding)
+    public bool? InvokeCommands<TBindingType> (Command [] commands, TBindingType binding) where TBindingType : IInputBinding
     {
         bool? toReturn = null;
 
@@ -460,20 +466,14 @@ public partial class View // Command APIs
     ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
     ///     stop.
     /// </returns>
-    public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding)
+    public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding) where TBindingType : IInputBinding
     {
         if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
         {
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (
-                                new CommandContext<TBindingType>
-                                {
-                                    Command = command,
-                                    Source = this,
-                                    Binding = binding
-                                });
+        return implementation! (new CommandContext<TBindingType> { Command = command, Source = this, Binding = binding });
     }
 
     /// <summary>
@@ -516,12 +516,6 @@ public partial class View // Command APIs
             _commandImplementations.TryGetValue (Command.NotBound, out implementation);
         }
 
-        return implementation! (
-                                new CommandContext<object>
-                                {
-                                    Command = command,
-                                    Source = this,
-                                    Binding = null
-                                });
+        return implementation! (new CommandContext<IInputBinding> { Command = command, Source = this, Binding = null });
     }
 }

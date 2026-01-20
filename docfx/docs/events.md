@@ -263,16 +263,55 @@ public class CommandEventArgs : EventArgs
 
 ### Command Context
 
-Command execution includes context through `ICommandContext`:
+Command execution includes context through `ICommandContext` and input bindings:
 
 ```csharp
 public interface ICommandContext
 {
-    View Source { get; }
-    object? Parameter { get; }
-    IDictionary<string, object> State { get; }
+    /// <summary>The command being invoked.</summary>
+    Command Command { get; set; }
+
+    /// <summary>The View that first invoked the command (the source).</summary>
+    View? Source { get; set; }
+}
+
+public interface IInputBinding
+{
+    /// <summary>The commands this binding will invoke.</summary>
+    Command[] Commands { get; set; }
+
+    /// <summary>Arbitrary context data.</summary>
+    object? Data { get; set; }
+
+    /// <summary>The View that is the origin of this binding.</summary>
+    View? Source { get; set; }
 }
 ```
+
+#### Accessing Binding Details
+
+When handling command events, you can access the binding that triggered the command through pattern matching:
+
+```csharp
+// For mouse-triggered commands:
+if (e.Context is CommandContext<MouseBinding> { Binding.MouseEvent: { } mouse })
+{
+    Point position = mouse.Position!.Value;
+    MouseFlags flags = mouse.Flags;
+}
+
+// For key-triggered commands:
+if (e.Context is CommandContext<KeyBinding> { Binding.Key: { } key })
+{
+    // Handle key-specific logic
+}
+```
+
+#### Source Tracking
+
+- **`ICommandContext.Source`**: The View that first invoked the command. This remains constant during command propagation.
+- **`IInputBinding.Source`**: The View where the binding was defined/added.
+- **`sender` (event parameter)**: The View currently raising the event (changes during propagation).
 
 ## Best Practices
 

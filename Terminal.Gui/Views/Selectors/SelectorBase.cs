@@ -24,7 +24,7 @@ public abstract class SelectorBase : View, IOrientation
         Height = Dim.Auto (DimAutoStyle.Content);
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new (this);
+        _orientationHelper = new OrientationHelper (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
         AddCommand (Command.Accept, HandleAcceptCommand);
@@ -58,7 +58,7 @@ public abstract class SelectorBase : View, IOrientation
     {
         if (!DoubleClickAccepts
             && ctx is CommandContext<MouseBinding> mouseCommandContext
-            && mouseCommandContext.Binding.MouseEventArgs!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
+            && mouseCommandContext.Binding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
             return false;
         }
@@ -127,7 +127,7 @@ public abstract class SelectorBase : View, IOrientation
 
         if (Value.HasValue)
         {
-            ValueChanged?.Invoke (this, new (Value.Value));
+            ValueChanged?.Invoke (this, new EventArgs<int?> (Value.Value));
         }
     }
 
@@ -157,9 +157,7 @@ public abstract class SelectorBase : View, IOrientation
             }
 
             // Use Labels and assume 0..Labels.Count - 1
-            return Labels is { }
-                       ? Enumerable.Range (0, Labels.Count).ToList ()
-                       : null;
+            return Labels is { } ? Enumerable.Range (0, Labels.Count).ToList () : null;
         }
         set
         {
@@ -243,7 +241,7 @@ public abstract class SelectorBase : View, IOrientation
 
         if (Styles.HasFlag (SelectorStyles.ShowValue))
         {
-            _valueField = new ()
+            _valueField = new TextField
             {
                 Id = "valueField",
                 Text = Value.ToString ()!,
@@ -339,14 +337,14 @@ public abstract class SelectorBase : View, IOrientation
             {
                 SubViews.ElementAt (i).X = 0;
                 SubViews.ElementAt (i).Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
-                SubViews.ElementAt (i).Margin!.Thickness = new (0);
+                SubViews.ElementAt (i).Margin!.Thickness = new Thickness (0);
                 SubViews.ElementAt (i).Width = Dim.Func (_ => Math.Max (Viewport.Width, maxNaturalCheckBoxWidth));
             }
             else
             {
                 SubViews.ElementAt (i).X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 SubViews.ElementAt (i).Y = 0;
-                SubViews.ElementAt (i).Margin!.Thickness = new (0, 0, i < SubViews.Count - 1 ? _horizontalSpace : 0, 0);
+                SubViews.ElementAt (i).Margin!.Thickness = new Thickness (0, 0, i < SubViews.Count - 1 ? _horizontalSpace : 0, 0);
                 SubViews.ElementAt (i).Width = Dim.Auto ();
             }
         }
@@ -377,11 +375,7 @@ public abstract class SelectorBase : View, IOrientation
     ///     Gets or sets the <see cref="Orientation"/> for this <see cref="SelectorBase"/>. The default is
     ///     <see cref="Orientation.Vertical"/>.
     /// </summary>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
     private readonly OrientationHelper _orientationHelper;
 

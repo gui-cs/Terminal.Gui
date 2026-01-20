@@ -14,6 +14,7 @@
 - [Background](#background)
 - [Current State Analysis](#current-state-analysis)
 - [Problems Identified](#problems-identified)
+- [Shortcut + CommandView Scenario Analysis](#shortcut--commandview-scenario-analysis)
 - [Design Requirements](#design-requirements)
 - [Proposed Solution](#proposed-solution)
 - [Implementation Impact](#implementation-impact)
@@ -287,6 +288,73 @@ protected override void OnSelectedMenuItemChanged(MenuItem? selected)
 
 ---
 
+## Shortcut + CommandView Scenario Analysis
+
+### Overview
+
+A critical use case for command propagation is when a `Shortcut` contains a custom `CommandView` such as a `CheckBox`. This section validates that the proposed `PropagatedCommands` design correctly supports this scenario.
+
+### View Hierarchy
+
+```
+SuperView (e.g., StatusBar, Bar, or custom container)
+  └── Shortcut
+        └── CheckBox (as CommandView)
+```
+
+### How Shortcut Handles CommandView Events
+
+`Shortcut` acts as a **command aggregator** for its `CommandView`. When setting the `CommandView` property, Shortcut attaches event handlers:
+
+```csharp
+_commandView.Activating += CommandViewOnActivating;
+_commandView.Accepting += CommandViewOnAccepted;
+
+void CommandViewOnAccepted (object? sender, CommandEventArgs e)
+{
+    e.Handled = true;  // Eat CommandView's Accept
+}
+
+void CommandViewOnActivating (object? sender, CommandEventArgs e)
+{
+    if (/* context indicates direct activation */)
+    {
+        InvokeCommand (Command.Activate, e);  // Forward to Shortcut
+    }
+    e.Handled = true;  // Eat CommandView's Activating
+}
+```
+
+**Key Behavior**: Shortcut intercepts and "eats" all CommandView events, then raises its own events through `DispatchCommand`.
+
+### Command Flow in DispatchCommand
+
+When a command is dispatched on a Shortcut:
+
+1. **Activate CommandView**: `CommandView.InvokeCommand(Command.Activate)` - toggles CheckBox
+2. **Raise Activating**: `RaiseActivating(ctx)` - if handled, **stops here**
+3. **Set Focus**: If focusable, sets focus
+4. **Raise Accepting**: `RaiseAccepting(ctx)` - if handled, **stops here**
+5. **Invoke Action**: If `Action` is set, invokes it
+
+### Validation: PropagatedCommands Works for This Scenario
+
+The proposed design works correctly:
+
+1. **CheckBox state changes**: Step 1 invokes Activate on CommandView, toggling the checkbox
+2. **Activating can propagate**: Step 2 calls `RaiseActivating` on Shortcut, which (with the proposed changes) will propagate to SuperView if in `PropagatedCommands`
+3. **Accepting can propagate**: Step 4 calls `RaiseAccepting`, which already propagates by default
+
+### Important Behavior: Handled Commands Stop the Chain
+
+If `RaiseActivating` returns `true` (handled locally or via propagation), `DispatchCommand` returns early and:
+- **`Accepting` is NOT raised**
+- **`Action` is NOT invoked**
+
+This is intentional CWP behavior but should be documented clearly.
+
+---
+
 ## Design Requirements
 
 ### Functional Requirements
@@ -541,6 +609,10 @@ Once `Command.Activate` propagation is proven stable:
    - (Optional) Remove `MenuOnSelectedMenuItemChanged` handler
    - (Optional) Remove event subscription
 
+5. **Terminal.Gui/Views/Shortcut.cs** (Documentation only):
+   - Update XML documentation to clarify command aggregation behavior
+   - Document that handled `Activating` prevents `Accepting` from being raised
+
 ### New Tests Required
 
 1. **PropagatedCommands Default Behavior**:
@@ -559,6 +631,16 @@ Once `Command.Activate` propagation is proven stable:
 4. **Backward Compatibility**:
    - Verify existing `Button.IsDefault` behavior unchanged
    - Verify existing `Dialog` accept behavior unchanged
+
+5. **Shortcut + CheckBox Propagation**:
+   - Verify CheckBox toggles when Shortcut receives Activate
+   - Verify Shortcut.Activating propagates when SuperView opts-in
+   - Verify Shortcut.Accepting propagates when not handled
+   - Verify that if SuperView handles Activating, Accepting is NOT raised
+
+6. **Shortcut Command Chain Behavior**:
+   - Verify handled Activating prevents Accepting from being raised
+   - Verify handled Accepting prevents Action from being invoked
 
 ### Documentation Updates
 
@@ -629,6 +711,11 @@ Once `Command.Activate` propagation is proven stable:
 4. **Should `PropagatedCommands` be settable or collection-mutable?**
    - **Decision**: Settable (replace entire list)
    - **Rationale**: Simpler API; most use cases set once during initialization
+
+5. **Should Activating handled by SuperView prevent Accepting on Shortcut?**
+   - **Current Design**: Yes - if `RaiseActivating` returns `true`, `DispatchCommand` exits early
+   - **Rationale**: Consistent with CWP "cancelable" semantics
+   - **Alternative**: Could add `Activated` event (non-cancelable) like `Accepted`, allowing observation without cancellation
 
 ---
 

@@ -7,7 +7,7 @@ namespace Terminal.Gui.Input;
 /// </summary>
 /// <seealso cref="View.InvokeCommand"/>.
 #pragma warning restore CS1574, CS0419 // XML comment has cref attribute that could not be resolved
-public record struct CommandContext<TBinding> : ICommandContext
+public record struct CommandContext<TBindingType> : ICommandContext where TBindingType : IInputBinding
 {
     /// <summary>
     ///     Initializes a new instance with the specified <see cref="Command"/>,
@@ -15,7 +15,7 @@ public record struct CommandContext<TBinding> : ICommandContext
     /// <param name="command"></param>
     /// <param name="source"></param>
     /// <param name="binding"></param>
-    public CommandContext (Command command, View? source, TBinding? binding)
+    public CommandContext (Command command, View? source, TBindingType? binding)
     {
         Command = command;
         Binding = binding;
@@ -31,5 +31,5 @@ public record struct CommandContext<TBinding> : ICommandContext
     /// <summary>
     /// The keyboard or mouse minding that was used to invoke the <see cref="Command"/>, if any.
     /// </summary>
-    public TBinding? Binding { get; set; }
+    public TBindingType? Binding { get; set; }
 }
