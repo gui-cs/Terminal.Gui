@@ -375,6 +375,10 @@ StatusBar receives via propagation
   - Updated 15+ files with call site changes
   - Updated documentation (mouse.md, events.md)
   - All tests pass
+- [x] **Added Unit Tests for Bindings** (2026-01-09)
+  - `MouseBindingTests.cs` - 14 tests covering constructor, properties, Source, MouseEvent, pattern matching
+  - `KeyBindingTests.cs` - 17 tests covering constructor, properties, Source, Target, Key, pattern matching  
+  - `CommandContextTests.cs` - 13 tests covering ICommandContext, pattern matching, Source propagation
 
 ### In Progress
 
