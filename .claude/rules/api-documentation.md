@@ -4,7 +4,7 @@
 
 ## XML Documentation Rules
 
-**All public APIs MUST have XML documentation:**
+- **All public APIs MUST have XML documentation:**
 
 ### Required Elements
 
@@ -12,20 +12,22 @@
    - Use proper English and grammar
    - Clear, concise, complete
    - Use imperative mood ("Gets the value" not "Get the value")
+   - Use infinitive-of-purpose + imperative pattern for instructional sentences
 
 2. **`<see cref=""/>` for cross-references**
    - Link to related types, methods, properties
    - Example: `<see cref="View.Draw"/>` or `<see cref="Application"/>`
 
 3. **`<remarks>` for context**
+   - Add only if obviously essential to do so
    - Add important notes, warnings, or additional context
    - Explain non-obvious behavior
 
-4. **`<example>` for non-obvious usage**
-   - Include code examples when usage isn't immediately clear
-   - Use working, compilable code snippets
+5. **`<example>` for non-obvious usage**
+   - Include code examples ONLY when usage isn't immediately clear
+   - Use working, compilable code snippets that strictly adhear to the coding/syntax style
 
-5. **Complex topics → `docfx/docs/*.md` files**
+6. **Complex topics → `docfx/docs/*.md` files**
    - For architecture concepts, patterns, or deep dives
    - Link from XML docs to conceptual docs
 
