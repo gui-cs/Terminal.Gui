@@ -13,6 +13,7 @@ This document covers Terminal.Gui's navigation system, which determines:
 
 * [Keyboard Deep Dive](keyboard.md)
 * [Mouse Deep Dive](mouse.md)
+* [Cursor Management](cursor.md)
 * [Lexicon & Taxonomy](lexicon.md)
 
 ## Lexicon & Taxonomy
@@ -39,13 +40,17 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 **Current Focus Indicator:**
 - Views with focus are rendered using their `ColorScheme.Focus` attribute
-- The focused view may display a cursor (for text input views)
+- The most focused view (deepest in focus chain) may display a terminal cursor via `View.Cursor`
 - Views in the focus chain (SuperViews of the focused view) also use focused styling
+- Only one terminal cursor is displayed at a time, managed by `ApplicationNavigation`
 
 **Navigation Cues:**
 - HotKeys are indicated by underlined characters in Labels, Buttons, and MenuItems
 - Tab order is generally left-to-right, top-to-bottom within containers
 - Focus indicators (such as highlight rectangles) show which view will receive input
+
+> [!TIP]
+> See [Cursor Management](cursor.md) for details on how views control cursor position and style.
 
 ### Changing Focus
 
@@ -184,6 +189,22 @@ This method is called from the `Command` handlers bound to the application-scope
 **Note:** When accessing from within a View, use `App?.Current` instead of `Application.TopRunnable` (which is obsolete).
 
 This method replaces about a dozen functions in v1 (scattered across `Application` and `Runnable`).
+
+### Cursor Management
+
+`ApplicationNavigation` also manages the terminal cursor. Each main loop iteration, `UpdateCursor()` is called to:
+
+1. Check if cursor update is needed (optimization via `GetCursorNeedsUpdate()`)
+2. Get the most focused view's `Cursor` property
+3. Validate the cursor position is within all ancestor viewport bounds
+4. Delegate to the driver via `SetCursor()`
+
+The cursor is only displayed for the **most focused view** (deepest in the focus chain). When focus changes, the cursor automatically updates to reflect the new focused view's cursor state.
+
+Views control their cursor through the `View.Cursor` property, not through `ApplicationNavigation` directly.
+
+> [!NOTE]
+> See [Cursor Management](cursor.md) for complete details on how views should set cursor position and style.
 
 ### Application Navigation Examples
 
