@@ -32,8 +32,6 @@ cd myproj
 dotnet run
 ```
 
-Press `Esc` to exit (the default [QuitKey](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.App.Application.html#Terminal_Gui_App_Application_QuitKey)).
-
 Run the comprehensive [UI Catalog](Examples/UICatalog) demo to explore all controls:
 
 ```powershell

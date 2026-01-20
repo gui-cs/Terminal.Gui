@@ -1,8 +1,5 @@
 # Cursor Management in Terminal.Gui
 
-> [!NOTE]
-> This document describes the cursor management system in Terminal.Gui v2.
-
 ## Overview
 
 Terminal.Gui provides a unified cursor management system that separates the **Terminal Cursor** (the visible cursor indicator users see) from the **Draw Cursor** (internal rendering state).
@@ -193,160 +190,121 @@ private void MoveCursorRight ()
 
 ### ApplicationNavigation
 
-The `ApplicationNavigation` class manages cursor positioning at the application level:
+The `ApplicationNavigation` class manages cursor positioning at the application level. Called once per main loop iteration, it:
 
-```csharp
-public class ApplicationNavigation
-{
-    internal void UpdateCursor (IOutput output)
-    {
-        View? focused = GetFocused ();
-        
-        // Only show cursor for most focused, enabled view
-        if (focused is null || !focused.Enabled || !focused.Visible)
-        {
-            output.SetCursorVisibility (CursorStyle.Hidden);
-            return;
-        }
-        
-        Cursor cursor = focused.Cursor;
-        
-        if (!cursor.IsVisible)
-        {
-            output.SetCursorVisibility (CursorStyle.Hidden);
-            return;
-        }
-        
-        // Check cursor is within all ancestor viewports
-        Point? screenPos = cursor.Position;
-        if (screenPos.HasValue && IsWithinAllAncestors (focused, screenPos.Value))
-        {
-            output.SetCursorPosition (screenPos.Value.X, screenPos.Value.Y);
-            output.SetCursorVisibility (cursor.Style);
-        }
-        else
-        {
-            output.SetCursorVisibility (CursorStyle.Hidden);
-        }
-    }
-}
+1. **Checks update flag** - Exits early if `GetCursorNeedsUpdate()` returns false (optimization)
+2. **Gets most focused view** - Retrieves `TopRunnableView.MostFocused` 
+3. **Validates visibility** - Hides cursor if no focused view or cursor not visible
+4. **Validates position** - Walks ancestor chain to ensure cursor position is within all viewport bounds
+5. **Delegates to driver** - Calls `Driver.SetCursor()` with the final cursor state
+
+This ensures only the deepest focused view's cursor is displayed, and only when visible within the view hierarchy.
+
+### Driver Architecture
+
+Drivers implement cursor control through `IDriver.SetCursor(Cursor)` which delegates to `IOutput.SetCursor(Cursor)`. The driver also tracks an update flag via `GetCursorNeedsUpdate()` / `SetCursorNeedsUpdate()` to avoid redundant cursor updates.
+
+### Platform Implementations
+
+Each driver implements cursor control based on platform capabilities:
+
+#### WindowsOutput
+
+Windows supports two modes based on terminal capabilities:
+
+**Legacy Console Mode** (pre-Windows 10 or conhost compatibility mode):
+- Uses Win32 `CONSOLE_CURSOR_INFO` structure with P/Invoke
+- Maps `CursorStyle` to cursor size percentage (Block → 100%, Underline/Bar → 15%)
+- Cannot distinguish between blinking and steady styles
+
+**Modern VT Mode** (Windows Terminal, modern ConHost):
+- Uses ANSI escape sequences identical to Unix drivers
+- Full `CursorStyle` support via DECSCUSR
+
+#### UnixOutput / AnsiOutput / NetOutput
+
+All use pure ANSI escape sequences:
+- **DECTCEM** (`CSI ? 25 h/l`) for show/hide
+- **DECSCUSR** (`CSI Ps SP q`) for cursor style
+- **CUP** (`CSI row;col H`) for positioning
+
+Only emits style change sequences when the style actually changes (optimization).
+
+### ANSI Escape Sequences Reference
+
+| Sequence | Description |
+|----------|-------------|
+| `CSI ? 25 h` | DECTCEM - Show cursor |
+| `CSI ? 25 l` | DECTCEM - Hide cursor |
+| `CSI Ps SP q` | DECSCUSR - Set cursor style (Ps = 0-6) |
+| `CSI row ; col H` | CUP - Set cursor position |
+
+**CursorStyle to DECSCUSR Mapping:**
+
+| CursorStyle | DECSCUSR Ps | Appearance |
+|-------------|-------------|------------|
+| `Default` | 0 | Implementation-defined (usually blinking block) |
+| `BlinkingBlock` | 1 | █ blinking |
+| `SteadyBlock` | 2 | █ steady |
+| `BlinkingUnderline` | 3 | _ blinking |
+| `SteadyUnderline` | 4 | _ steady |
+| `BlinkingBar` | 5 | \| blinking |
+| `SteadyBar` | 6 | \| steady |
+| `Hidden` | N/A | Uses DECTCEM hide instead |
+
+### Cursor Update Flow
+
+The cursor is updated once per main loop iteration:
+
 ```
-
-### Driver Interface
-
-Drivers implement cursor control through `IOutput`:
-
-```csharp
-public interface IOutput
-{
-    void SetCursorPosition (int col, int row);
-    void SetCursorVisibility (CursorStyle style);
-    void SetCursorNeedsUpdate (bool needsUpdate);
-}
+┌──────────────────────────────────────────────────────────┐
+│                  Main Loop Iteration                      │
+├──────────────────────────────────────────────────────────┤
+│ 1. Process input events                                  │
+│ 2. Execute callbacks                                     │
+│ 3. Layout pass (if needed)                               │
+│ 4. Draw pass (if needed)                                 │
+│    └─ Cursor hidden during draw to prevent flicker       │
+│ 5. ApplicationNavigation.UpdateCursor()                  │
+│    └─ Checks GetCursorNeedsUpdate()                      │
+│    └─ Gets MostFocused view's Cursor                     │
+│    └─ Validates position within ancestor viewports       │
+│    └─ Calls Driver.SetCursor(cursor)                     │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ## Common Patterns
 
 ### Text Editor Pattern
 
-```csharp
-public class MyTextEditor : View
-{
-    private int _cursorRow, _cursorCol;
-    private int _scrollTop, _scrollLeft;
-    
-    protected override void OnDrawContent (Rectangle viewport)
-    {
-        // Draw text content...
-        
-        // Update cursor
-        if (HasFocus)
-        {
-            int viewportRow = _cursorRow - _scrollTop;
-            int viewportCol = _cursorCol - _scrollLeft;
-            
-            if (viewportRow >= 0 && viewportRow < viewport.Height &&
-                viewportCol >= 0 && viewportCol < viewport.Width)
-            {
-                Point screenPos = ViewportToScreen (new Point (viewportCol, viewportRow));
-                Cursor = new Cursor 
-                { 
-                    Position = screenPos, 
-                    Style = CursorStyle.BlinkingBar 
-                };
-            }
-            else
-            {
-                Cursor = new Cursor { Position = null };
-            }
-        }
-    }
-}
-```
+Views that display text with a visible insertion point should:
+1. Track cursor position in content coordinates
+2. Check if cursor is within visible viewport bounds
+3. Convert to screen coordinates using `ViewportToScreen()`
+4. Set `Cursor` property with appropriate style (typically `BlinkingBar`)
+5. Hide cursor when out of viewport bounds or unfocused
 
 ### List Selection Pattern
 
+Views using highlight-based selection (like `ListView`) should hide the cursor:
+
 ```csharp
-public class MyListView : View
-{
-    private int _selectedIndex;
-    
-    protected override void OnDrawContent (Rectangle viewport)
-    {
-        // Draw list items with highlighting...
-        
-        // Hide cursor - use selection highlighting instead
-        Cursor = new Cursor { Position = null };
-    }
-}
+Cursor = new Cursor { Position = null };
 ```
+
+The selection is indicated visually through attribute changes, not the terminal cursor.
 
 ## Migration from Old API
 
-### Before (v1 / early v2)
+**Before** (v1 / early v2): `PositionCursor()` override returned viewport-relative coordinates.
 
-```csharp
-// Old PositionCursor override
-public override Point? PositionCursor ()
-{
-    if (!HasFocus) return null;
-    
-    int col = _cursorPos - _scrollOffset;
-    if (col < 0 || col >= Viewport.Width) return null;
-    
-    Move (col, 0);  // ❌ WRONG - affects Draw Cursor
-    return new Point (col, 0);  // Viewport-relative
-}
-```
+**After** (current v2): Set `Cursor` property with screen-absolute coordinates during `OnDrawContent()`.
 
-### After (current v2)
-
-```csharp
-// New Cursor property approach
-protected override void OnDrawContent (Rectangle viewport)
-{
-    // ... drawing code ...
-    
-    if (HasFocus)
-    {
-        int col = _cursorPos - _scrollOffset;
-        
-        if (col >= 0 && col < viewport.Width)
-        {
-            Point screenPos = ViewportToScreen (new Point (col, 0));
-            Cursor = new Cursor 
-            { 
-                Position = screenPos,  // Screen-absolute
-                Style = CursorStyle.BlinkingBar 
-            };
-        }
-        else
-        {
-            Cursor = new Cursor { Position = null };
-        }
-    }
-}
-```
+Key changes:
+- No more `PositionCursor()` override
+- Cursor set during drawing, not in separate method
+- Must convert to screen coordinates explicitly
+- Use `ViewportToScreen()` for conversion
 
 ## Key Differences from Draw Cursor
 
