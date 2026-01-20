@@ -20,6 +20,15 @@ Terminal.Gui provides console driver implementations optimized for different pla
 - **UnixDriver (`unix`)** - A Unix/Linux/macOS-optimized driver that uses platform-specific APIs for better integration and performance.
 - **AnsiDriver (`ansi`)** - A pure ANSI escape sequence driver for unit testing and headless environments. Simulates console behavior without requiring a real terminal.
 
+### Driver Comparison
+
+| Driver | Input | Output | Screen Management | Key Advantages | Key Disadvantages |
+|--------|-------|--------|-------------------|----------------|-------------------|
+| **WindowsDriver** | Native Win32 API: `ReadConsoleInputW()` reads `INPUT_RECORD` structures directly from the console input buffer. Supports keyboard, mouse, window buffer size events. | Native Win32 API: `WriteConsoleW()` for direct character output. Uses `CreateConsoleScreenBuffer()` and `SetConsoleActiveScreenBuffer()` for double buffering. `SetConsoleTextAttribute()` for colors. | Console buffer size events via `ReadConsoleInputW()`. Uses `GetConsoleScreenBufferInfoEx()` to query dimensions. Immediate notification on resize. | • Highest performance on Windows<br>• Direct access to Win32 features<br>• Native mouse support<br>• Immediate resize detection | • Windows-only<br>• More complex P/Invoke code |
+| **UnixDriver** | POSIX termios: `tcgetattr()`/`tcsetattr()` for raw mode. Reads bytes from stdin via `read()` syscall, parses as ANSI sequences. Uses `poll()` for non-blocking I/O. | ANSI escape sequences via `EscSeqUtils`. Writes to stdout via `write()` syscall. Supports 16-color and 24-bit RGB. | `ioctl(TIOCGWINSZ)` syscall gets terminal dimensions (platform-specific constants: Linux `0x5413`, macOS `0x40087468`). Polls for size changes. | • Optimized for Unix/Linux/macOS<br>• Direct syscall access<br>• True-color support<br>• Native terminal integration | • Unix-only<br>• Polling-based resize detection |
+| **DotNetDriver** | Managed .NET API: `Console.ReadKey()` for keyboard input. Cross-platform but uses underlying OS APIs through .NET wrapper. | Managed .NET API: `Console.Write()` and ANSI sequences via `EscSeqUtils` (when VT mode enabled). Uses `NetWinVTConsole` helper on Windows for VT mode. | `Console.WindowWidth`/`Console.WindowHeight` for dimensions. Falls back to 80x25 if IOException. Polls for size changes via `SizeMonitorImpl.Poll()`. | • Maximum cross-platform compatibility<br>• Simplest implementation<br>• No P/Invoke required<br>• Works with .NET BCL only | • Lower performance (managed overhead)<br>• Limited feature set<br>• Less direct control |
+| **AnsiDriver** | Platform-specific VT mode: Windows uses `ReadFile()` with `ENABLE_VIRTUAL_TERMINAL_INPUT`. Unix uses `poll()`/`read()` via `UnixIOHelper`. Parses raw ANSI sequences via `AnsiResponseParser`. | Pure ANSI escape sequences. Windows uses `WriteFile()` with `ENABLE_VIRTUAL_TERMINAL_PROCESSING`. Unix uses `write()` syscall. Fully portable SGR sequences. | Sends ANSI query sequence `CSI_ReportWindowSizeInChars`, terminal responds with dimensions. Throttled to 500ms. Falls back to polling. | • Cross-platform via ANSI standard<br>• Perfect for testing/CI<br>• Virtual time support<br>• Deterministic behavior | • Query-based resize (slower)<br>• Requires VT-capable terminal<br>• Throttled size detection |
+
 ### Automatic Driver Selection
 
 The appropriate driver is automatically selected based on the platform when `Application.Init()` is called:
@@ -215,19 +224,25 @@ The factory pattern ensures proper component creation and initialization while m
 Each driver is composed of specialized components, each with a single responsibility:
 
 #### IInput&lt;T&gt;
-Reads raw console input events from the terminal. The generic type `T` represents the platform-specific input type:
-- `ConsoleKeyInfo` for DotNetDriver
-- `WindowsConsole.InputRecord` for WindowsDriver
-- `char` for UnixDriver and AnsiDriver
+Reads raw console input events from the terminal on a dedicated input thread. The generic type `T` represents the platform-specific input record type:
+- `ConsoleKeyInfo` for DotNetDriver (from `Console.ReadKey()`)
+- `WindowsConsole.InputRecord` for WindowsDriver (from `ReadConsoleInputW()`)
+- `char` for UnixDriver and AnsiDriver (raw bytes from `read()` syscall or `ReadFile()`)
 
-Runs on a dedicated input thread to avoid blocking the UI.
+Input runs on a separate thread managed by `MainLoopCoordinator`, continuously reading from the console and queueing events into a thread-safe `ConcurrentQueue<T>` to avoid blocking the UI thread.
 
 #### IOutput
-Renders the output buffer to the terminal. Handles:
-- Writing text and ANSI escape sequences
-- Setting cursor position
-- Managing cursor visibility
-- Detecting terminal window size
+Renders the output buffer to the terminal. Platform-specific implementations:
+- **WindowsOutput**: Uses `WriteConsoleW()` for direct character output
+- **UnixOutput**: Writes ANSI sequences to stdout via `write()` syscall
+- **NetOutput**: Uses `Console.Write()` with ANSI sequences (VT mode on Windows)
+- **AnsiOutput**: Pure ANSI escape sequences via `WriteFile()` (Windows) or `write()` (Unix)
+
+Responsibilities include:
+- Writing characters, strings, and ANSI escape sequences
+- Cursor positioning and visibility control
+- Querying terminal window size
+- Managing the active screen buffer
 
 #### IInputProcessor
 Translates raw console input into Terminal.Gui events:
@@ -411,53 +426,50 @@ This architecture provides:
 - **Extensibility** - custom drivers can register themselves
 - **AOT compatibility** - no reflection required
 
-## Platform-Specific Details
+## Platform-Specific Implementation Details
 
 ### DotNetDriver (NetComponentFactory)
 
-- Uses `System.Console` for all I/O operations
-- Input: Reads `ConsoleKeyInfo` via `Console.ReadKey()`
-- Output: Uses `Console.Write()` and ANSI escape sequences
-- Works on all platforms but may have limited features
-- Best for maximum compatibility and simple applications
+**Cross-platform driver using managed .NET APIs**
+
+- **Input**: Uses `System.Console.ReadKey()` which internally delegates to platform-specific implementations. Sets `Console.TreatControlCAsInput = true` to capture Ctrl+C as input rather than terminating.
+- **Output**: Writes via `Console.Write()` and `Console.WriteLine()`. Uses ANSI escape sequences via `EscSeqUtils` when VT mode is enabled. On Windows, the `NetWinVTConsole` helper enables Virtual Terminal processing mode.
+- **Screen Management**: Queries `Console.WindowWidth` and `Console.WindowHeight` for terminal dimensions. Falls back to 80x25 on `IOException` (non-interactive sessions). Uses `SizeMonitorImpl.Poll()` for periodic size change detection.
+- **Advantages**: Maximum portability, no P/Invoke required, works with any .NET runtime.
+- **Trade-offs**: Managed wrapper overhead reduces performance compared to native drivers.
 
 ### WindowsDriver (WindowsComponentFactory)
 
-- Uses Windows Console API via P/Invoke
-- Input: Reads `InputRecord` structs via `ReadConsoleInput`
-- Output: Uses Windows Console API for optimal performance
-- Supports Windows-specific features and better performance
-- Automatically selected on Windows platforms
+**Native Win32 Console API implementation for Windows**
 
-#### Visual Studio Debug Console Support
-
-When running in Visual Studio's debug console (`VSDebugConsole.exe`), WindowsDriver detects the `VSAPPIDNAME` environment variable and automatically adjusts its behavior:
-
-- Disables the alternative screen buffer (which is not supported in VS debug console)
-- Preserves the original console colors on startup
-- Restores the original colors and clears the screen on shutdown
-
-This ensures Terminal.Gui applications can be debugged directly in Visual Studio without rendering issues.
+- **Input**: Direct calls to `ReadConsoleInputW()` read `INPUT_RECORD` structures from the console input buffer. Uses `GetConsoleMode()`/`SetConsoleMode()` to enable mouse input (`ENABLE_MOUSE_INPUT`), extended flags, and disable quick edit mode for raw input.
+- **Output**: Uses `WriteConsoleW()` for character output and `CreateConsoleScreenBuffer()`/`SetConsoleActiveScreenBuffer()` for double buffering. Color management via `SetConsoleTextAttribute()` and `SetConsoleScreenBufferInfoEx()`. Cursor control via `SetConsoleCursorPosition()` and `SetConsoleCursorInfo()`.
+- **Screen Management**: Receives `WINDOW_BUFFER_SIZE_EVENT` in the input stream for immediate resize notification. Queries dimensions via `GetConsoleScreenBufferInfoEx()`.
+- **Visual Studio Debug Console**: Detects the `VSAPPIDNAME` environment variable and automatically disables the alternative screen buffer, preserves original console colors on startup, and restores them on shutdown for proper Visual Studio integration.
+- **Advantages**: Highest performance on Windows, native feature support, immediate resize detection.
+- **Platform**: Windows only (Win32NT, Win32S, Win32Windows).
 
 ### UnixDriver (UnixComponentFactory)
 
-- Uses Unix/Linux terminal APIs via P/Invoke to libc
-- Input: Reads raw `char` data from stdin using `poll()` and `read()` syscalls
-- Output: Writes ANSI escape sequences to stdout using `write()` syscall
-- Terminal control: Uses termios for raw mode (via `UnixRawModeHelper`)
-- Size detection: Uses `ioctl(TIOCGWINSZ)` to get terminal dimensions
-- Automatically selected on Unix/Linux/macOS platforms
+**POSIX-compliant implementation for Unix/Linux/macOS**
+
+- **Input**: Uses `tcgetattr()`/`tcsetattr()` to configure terminal raw mode via termios, disabling canonical mode (`ICANON`), echo (`ECHO`), signal generation (`ISIG`), and other cooked-mode features. Reads raw bytes from stdin (fd 0) via `read()` syscall, using `poll()` for non-blocking I/O. Parses bytes as ANSI escape sequences for keyboard and mouse events.
+- **Output**: Writes ANSI escape sequences to stdout (fd 1) via `write()` syscall. Uses `EscSeqUtils` for SGR (Select Graphic Rendition) sequences. Supports both 16-color ANSI and 24-bit RGB true-color output.
+- **Screen Management**: Uses `ioctl(STDOUT_FILENO, TIOCGWINSZ, &winsize)` to query terminal dimensions. Platform-specific ioctl constants: Linux `0x5413`, macOS/FreeBSD/ARM64 `0x40087468`. The `WinSize` struct contains `ws_row`, `ws_col`, `ws_xpixel`, `ws_ypixel`. Polls for size changes via `SizeMonitorImpl.Poll()`.
+- **Advantages**: Optimized Unix/Linux/macOS performance, direct syscall access, true-color support, native terminal integration.
+- **Platform**: Unix, Linux, macOS (PlatformID.Unix, PlatformID.MacOSX).
 
 ### AnsiDriver (AnsiComponentFactory)
 
-- Pure ANSI escape sequence cross-platform driver
-- **Windows**: Uses Virtual Terminal Input mode (`ReadFile` API)
-- **Unix/Linux/macOS**: Uses the same low-level syscalls as UnixDriver (`poll()`, `read()`) via shared `UnixIOHelper`
-- Shares code with UnixDriver:
-  - `UnixRawModeHelper` - Terminal raw mode configuration (termios)
-  - `UnixIOHelper` - Shared Unix syscall wrappers (poll, read, write, ioctl)
-- Best for unit testing, headless environments, and maximum portability
-- Specify with `IApplication.ForceDriver = "ansi"` or `DriverRegistry.Names.ANSI`
+**Pure ANSI escape sequence driver for cross-platform compatibility**
+
+- **Input (Windows)**: Uses `WindowsVTInputHelper` to enable Virtual Terminal Input mode (`ENABLE_VIRTUAL_TERMINAL_INPUT`). Reads from console via `ReadFile()` API, which returns ANSI escape sequences instead of native input records.
+- **Input (Unix/macOS)**: Shares `UnixRawModeHelper` and `UnixIOHelper` with UnixDriver. Uses `tcgetattr()`/`tcsetattr()` for raw mode, `poll(STDIN_FILENO, ...)` for non-blocking reads, and `read(STDIN_FILENO, buffer, len)` for input. The `AnsiResponseParser` decodes ANSI sequences into Terminal.Gui events.
+- **Output (Windows)**: Uses `WindowsVTOutputHelper` to enable Virtual Terminal Processing (`ENABLE_VIRTUAL_TERMINAL_PROCESSING`). Writes ANSI sequences via `WriteFile()`, which the Windows console parses and renders.
+- **Output (Unix/macOS)**: Writes pure ANSI escape sequences to stdout via `write()` syscall, same mechanism as UnixDriver.
+- **Screen Management**: Uses `AnsiSizeMonitor` which sends the ANSI query sequence `CSI_ReportWindowSizeInChars` (`ESC[18t`). Terminal responds with `ESC[8;height;widtht`. Queries are throttled to 500ms intervals to avoid spam. Falls back to `AnsiOutput.GetSize()` polling.
+- **Advantages**: True cross-platform portability via ANSI standard, ideal for testing/CI environments, supports virtual time control for deterministic testing.
+- **Trade-offs**: Query-based resize detection is slower than event-based. Requires VT-capable terminal (most modern terminals).
 
 ## Testing and Input Injection
 
