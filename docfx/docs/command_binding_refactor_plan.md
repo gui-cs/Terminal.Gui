@@ -32,6 +32,38 @@ This document tracks the refactoring of Terminal.Gui's command and binding syste
 
 ---
 
+## Relationship to Command Propagation
+
+This refactor prepares the infrastructure for the command propagation design documented in [command-propagation-analysis.md](./command-propagation-analysis.md). Key dependencies:
+
+| Refactor Item | Propagation Impact |
+|---------------|-------------------|
+| **`ctx.Source` clarity** | Propagation relies on `Source` remaining constant as commands bubble up the view hierarchy |
+| **Non-generic `CommandContext`** | Simplifies propagation code that pattern-matches on binding types |
+| **`IInputBinding.Source`** | Provides consistent origin tracking across binding types during propagation |
+| **`InputBinding`** | Provides binding type for programmatically-propagated commands (though propagation typically forwards the original binding) |
+
+### Dependency Note
+
+**Propagation implementation should wait for this refactor to complete.** Terminal.Gui v2 is in alpha, and this binding refactor plus command propagation are the last major items before beta. Since breaking changes are acceptable during alpha, we should complete the type system cleanup first to avoid implementing propagation against deprecated types.
+
+**Recommended order:**
+1. Complete Phases 2-6 of this refactor (non-generic `CommandContext`, `InputBinding`, etc.)
+2. Implement `PropagatedCommands` using the clean type system
+3. Remove deprecated types before beta
+
+### How Propagation Uses These Types
+
+During command propagation:
+
+1. The original `ICommandContext` (including its `Source` and `Binding`) is passed unchanged to `SuperView.InvokeCommand()`
+2. `sender` changes at each propagation step, but `ctx.Source` remains the original invoker
+3. Pattern matching on `ctx.Binding` works at any level: `if (ctx.Binding is KeyBinding kb)`
+
+See the "Identifying the Originating View in Handlers" section in [command-propagation-analysis.md](./command-propagation-analysis.md) for detailed guidance.
+
+---
+
 ## Current State
 
 ### Type Hierarchy (Before)
@@ -394,10 +426,15 @@ StatusBar receives via propagation
    - Leaning: No, keep optional for flexibility
 
 2. **Should we deprecate or remove `CommandContext<T>`?**
-   - Leaning: Deprecate first, remove in next major version
+   - **Resolved: Remove** - We can and will break things in alpha
 
 3. **How to handle existing code using `CommandContext<KeyBinding>` pattern?**
-   - Answer: Pattern match on `ctx.Binding is KeyBinding kb` instead
+   - Answer: Pattern match on `ctx.Binding is KeyBinding kb` instead.
+
+4. ~~**Should `CommandEventArgs` include a `Sender` property?**~~
+   - **Resolved: No** - In virtual method overrides, `this` is the View currently processing (equivalent to `sender` in event handlers). No additional property needed.
+   - `this` / `sender` = View currently handling the command (changes during propagation)
+   - `args.Context?.Source` = View that originally invoked the command (constant during propagation)
 
 ---
 
@@ -407,3 +444,4 @@ StatusBar receives via propagation
 |------|--------|---------|
 | 2026-01-09 | GitHub Copilot | Initial document created from design discussion |
 | 2026-01-09 | GitHub Copilot | Phase 1 completed: Added Source to IInputBinding, renamed MouseEventArgs to MouseEvent |
+| 2026-01-20 | Claude Opus 4.5 | Added "Relationship to Command Propagation" section; added Open Question #4 about CommandEventArgs.Sender; updated to note propagation depends on this refactor completing (alpha status) |

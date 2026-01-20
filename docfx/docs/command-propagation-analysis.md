@@ -374,9 +374,10 @@ This is intentional CWP behavior but should be documented clearly.
 
 ### Constraints
 
-1. **No Breaking Changes**: Cannot alter existing public APIs
+1. **Alpha Status**: Terminal.Gui v2 is in alpha; breaking changes are acceptable before beta
 2. **.NET 8 Compatible**: Use available C# 12 features
 3. **Follows Conventions**: Adhere to Terminal.Gui coding standards
+4. **Depends on Binding Refactor**: Implementation should wait for [command_binding_refactor_plan.md](./command_binding_refactor_plan.md) to complete
 
 ---
 
@@ -541,14 +542,14 @@ protected override bool OnActivating(CommandEventArgs args)
         {
             Active = true;
         }
-        
+
         ShowItem(menuBarItem);
-        
+
         if (!menuBarItem.HasFocus)
         {
             menuBarItem.SetFocus();
         }
-        
+
         return true; // Handled
     }
 
@@ -556,33 +557,55 @@ protected override bool OnActivating(CommandEventArgs args)
 }
 ```
 
-### Migration Path
+### Identifying the Originating View in Handlers
 
-#### Phase 1: Deprecate Custom Events (Optional)
+During command propagation, handlers need to identify which subview initiated the command. Several properties are available:
 
-Mark `SelectedMenuItemChanged` as `[Obsolete]` with guidance:
+| Property | Meaning | Changes During Propagation? |
+|----------|---------|----------------------------|
+| `sender` parameter | The View currently raising the event | **Yes** - changes at each propagation step |
+| `this` in virtual override | The View currently processing | **Yes** - changes at each propagation step |
+| `args.Context?.Source` | The View that originally invoked the command | **No** - remains constant |
+| `args.Context?.Binding?.Source` | The View where the binding was defined | **No** - remains constant |
+| `args.Context?.Binding` | The original binding (`KeyBinding`, `MouseBinding`, etc.) | **No** - passed unchanged |
+
+**For propagation handlers**, use `args.Context?.Source` to identify the originating view:
 
 ```csharp
-/// <summary>
-///     Event raised when the selected menu item changes.
-/// </summary>
-/// <remarks>
-///     <para>
-///         <b>Obsolete</b>: Use <see cref="Command.Activate"/> propagation instead.
-///         Set <see cref="View.PropagatedCommands"/> to include <see cref="Command.Activate"/>
-///         and override <see cref="View.OnActivating"/> in the superview.
-///     </para>
-/// </remarks>
-[Obsolete("Use Command.Activate propagation via PropagatedCommands property instead.")]
-public event EventHandler<MenuItem?>? SelectedMenuItemChanged;
+protected override bool OnActivating(CommandEventArgs args)
+{
+    // args.Context?.Source = the View that first invoked Command.Activate
+    // This remains the original MenuBarItem even if propagated through intermediate views
+    if (args.Context?.Source is MenuBarItem menuBarItem)
+    {
+        ShowItem(menuBarItem);
+        return true;
+    }
+    return base.OnActivating(args);
+}
 ```
 
-#### Phase 2: Remove Custom Event Usage (Later Release)
+**Important**: The binding type (`KeyBinding`, `MouseBinding`, or future `InputBinding`) is preserved during propagation. When `PropagateCommand` calls `SuperView.InvokeCommand(command, ctx)`, the original `ICommandContext` (including its binding) is passed unchanged. This means:
 
-Once `Command.Activate` propagation is proven stable:
-1. Remove `SelectedMenuItemChanged` event
-2. Remove event subscriptions in `PopoverMenu` and `MenuBar`
-3. Update documentation
+- Pattern matching on `args.Context?.Binding` works correctly at any propagation level
+- The binding's `Source`, `Data`, and type-specific properties remain accessible
+- Propagation does **not** create a new binding - it forwards the existing one
+
+### Migration Path
+
+Since Terminal.Gui v2 is in alpha and breaking changes are acceptable before beta, we can directly remove legacy patterns rather than deprecating them.
+
+#### Remove Custom Events
+
+Remove `SelectedMenuItemChanged` and related workarounds:
+
+1. **Remove `SelectedMenuItemChanged` event** from `Menu.cs`
+2. **Remove `RaiseSelectedMenuItemChanged` method** from `Menu.cs`
+3. **Remove event subscriptions** in `PopoverMenu` and `MenuBar`
+4. **Remove `OnSelectedMenuItemChanged` overrides** - replace with `OnActivating` using propagation
+5. **Update documentation** to reflect the new pattern
+
+These custom events were workarounds for missing `Command.Activate` propagation. With `PropagatedCommands`, the standard command system handles this cleanly.
 
 ---
 
@@ -628,9 +651,9 @@ Once `Command.Activate` propagation is proven stable:
    - Verify `MenuBar` shows popover on `Command.Activate`
    - Verify backward compatibility with `Command.Accept`
 
-4. **Backward Compatibility**:
-   - Verify existing `Button.IsDefault` behavior unchanged
-   - Verify existing `Dialog` accept behavior unchanged
+4. **Core Functionality**:
+   - Verify `Button.IsDefault` behavior works with generalized propagation
+   - Verify `Dialog` accept behavior works with generalized propagation
 
 5. **Shortcut + CheckBox Propagation**:
    - Verify CheckBox toggles when Shortcut receives Activate
@@ -723,22 +746,21 @@ Once `Command.Activate` propagation is proven stable:
 
 ### Must Have
 
-1. ✅ `Command.Accept` propagation behavior unchanged (backward compatibility)
+1. ✅ `Command.Accept` propagation via `PropagatedCommands` (generalizes existing behavior)
 2. ✅ `Command.Activate` can propagate when `PropagatedCommands` includes it
 3. ✅ `MenuBar` can respond to `MenuItem` activations via `Command.Activate` propagation
-4. ✅ All existing tests pass
+4. ✅ All existing tests pass (update tests that rely on removed APIs)
 5. ✅ New tests cover propagation scenarios
+6. ✅ `SelectedMenuItemChanged` and related workarounds removed
 
 ### Should Have
 
-1. ⚠️ `SelectedMenuItemChanged` marked obsolete with migration guidance
-2. ⚠️ Documentation updated across all relevant files
-3. ⚠️ UICatalog scenario demonstrates propagation
+1. ⚠️ Documentation updated across all relevant files
+2. ⚠️ UICatalog scenario demonstrates propagation
 
 ### Could Have
 
-1. ⏸️ Remove `SelectedMenuItemChanged` entirely (deferred to later release)
-2. ⏸️ Apply propagation to other commands (e.g., `Command.HotKey`)
+1. ⏸️ Apply propagation to other commands (e.g., `Command.HotKey`)
 
 ---
 
@@ -775,4 +797,5 @@ Once `Command.Activate` propagation is proven stable:
 | Date       | Author          | Changes                          |
 |------------|-----------------|----------------------------------|
 | 2026-01-09 | GitHub Copilot  | Initial analysis document created |
+| 2026-01-20 | Claude Opus 4.5 | Added "Identifying the Originating View in Handlers" section; clarified binding preservation during propagation; updated for alpha status (breaking changes OK); added binding refactor dependency |
 
