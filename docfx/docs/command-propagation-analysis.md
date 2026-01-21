@@ -354,6 +354,181 @@ This is intentional CWP behavior but should be documented clearly.
 
 ---
 
+## FlagSelector in MenuItem in MenuBar Scenario
+
+### Overview
+
+This is the most complex propagation scenario and represents a critical use case that is **BROKEN TODAY**. It involves:
+
+- `FlagSelector` (contains `CheckBox` SubViews) as the `CommandView` of a `MenuItem`
+- That `MenuItem` is in a `Menu` which is the `Root` of a `PopoverMenu`
+- That `PopoverMenu` belongs to a `MenuBarItem`
+- That `MenuBarItem` is in a `MenuBar`
+
+### Class Hierarchy Understanding
+
+```
+View
+  └─ Bar (horizontal/vertical container for Shortcuts)
+      └─ Menu (vertical bar of MenuItems)
+          └─ MenuBar (horizontal bar of MenuBarItems)
+
+View
+  └─ Shortcut
+      └─ MenuItem (Shortcut with optional SubMenu)
+          └─ MenuBarItem (MenuItem with PopoverMenu)
+
+View
+  └─ PopoverBaseImpl
+      └─ PopoverMenu (displays cascading Menus)
+```
+
+**Key relationships:**
+- `MenuBar` IS-A `Menu` (inheritance, not containment)
+- `MenuBarItem` IS-A `MenuItem` IS-A `Shortcut`
+- `PopoverMenu` is NOT a normal View container - it dynamically adds/removes `Menu` SubViews
+
+### Complete View Hierarchy
+
+```
+MenuBar (contains MenuBarItems as SubViews)
+  └─ MenuBarItem (owns PopoverMenu, NOT as SubView)
+      └─ PopoverMenu (dynamically manages Menu SubViews)
+          └─ Menu (Root - contains MenuItems as SubViews)
+              └─ MenuItem (Shortcut subclass)
+                  └─ FlagSelector (as CommandView, NOT as SubView)
+                      └─ CheckBox (SubView of FlagSelector)
+```
+
+### Current Event Flow (BROKEN)
+
+When a user activates a CheckBox in this hierarchy:
+
+```
+1. User presses Space on focused CheckBox
+   ↓
+2. CheckBox.Command.Activate handler runs
+   ├─ Advances CheckState
+   ├─ RaiseActivating(ctx) called
+   ↓
+3. FlagSelector.OnCheckboxOnActivating intercepts
+   ├─ InvokeCommand(Command.Activate, ctx) on FlagSelector
+   ├─ args.Handled = true (consumes CheckBox's event)
+   ↓
+4. FlagSelector.RaiseActivating(ctx)
+   ├─ OnActivating virtual method
+   ├─ Activating event
+   ↓
+5. MenuItem.CommandViewOnActivating intercepts (FlagSelector is CommandView)
+   ├─ InvokeCommand(Command.Activate, ctx) on MenuItem
+   ├─ args.Handled = true (consumes FlagSelector's event)
+   ↓
+6. MenuItem.DispatchCommand(ctx)
+   ├─ RaiseActivating(ctx) on MenuItem
+   ↓
+7. **STOPS HERE** - Command.Activate does NOT propagate!
+   ├─ Menu never sees the Activate
+   ├─ MenuBar never sees the Activate
+   └─ SelectedMenuItemChanged workaround doesn't help for CommandView activation
+```
+
+**The Problem**: The activation event from the CheckBox never reaches MenuBar. The `SelectedMenuItemChanged` workaround only fires when `SelectedMenuItem` changes (focus-based), not when a CommandView inside a MenuItem is activated.
+
+### Required Event Flow (With PropagatedCommands)
+
+```
+1-6. Same as above through MenuItem.RaiseActivating(ctx)
+   ↓
+7. MenuItem.RaiseActivating checks propagation
+   ├─ Menu.PropagatedCommands contains Command.Activate? YES
+   ├─ Menu.InvokeCommand(Command.Activate, ctx)
+   ↓
+8. Menu.RaiseActivating(ctx)
+   ├─ OnActivating virtual method
+   ├─ Activating event
+   ├─ PopoverMenu.PropagatedCommands contains Command.Activate? YES
+   ├─ (Note: Menu's SuperView during display is PopoverMenu)
+   ↓
+9. PopoverMenu forwards to MenuBarItem (owner)
+   ├─ MenuBarItem.PropagatedCommands contains Command.Activate? YES
+   ↓
+10. MenuBar.RaiseActivating(ctx)
+    ├─ OnActivating receives ctx.Source = CheckBox (original source!)
+    ├─ Can identify the originating view and respond appropriately
+    └─ HANDLED - MenuBar can now react to deep activations
+```
+
+### Source Tracking Through the Chain
+
+The `ctx.Source` property is critical for this scenario:
+
+| Step | View Processing | `ctx.Source` | `this` / `sender` |
+|------|-----------------|--------------|-------------------|
+| 2 | CheckBox | CheckBox | CheckBox |
+| 4 | FlagSelector | CheckBox | FlagSelector |
+| 6 | MenuItem | CheckBox | MenuItem |
+| 8 | Menu | CheckBox | Menu |
+| 10 | MenuBar | CheckBox | MenuBar |
+
+**`ctx.Source` remains constant** (the CheckBox that was activated), while `this`/`sender` changes at each propagation step. This allows MenuBar's handler to know exactly which leaf view initiated the command.
+
+### Accept Flow (Similar Pattern)
+
+For `Command.Accept` (e.g., user double-clicks the CheckBox):
+
+```
+CheckBox.Accept → FlagSelector.Accept → MenuItem.Accept
+  → Menu.Accept → MenuBar.Accept
+```
+
+`Command.Accept` already propagates by default, but the event interception patterns in FlagSelector and Shortcut may interfere. The design must ensure:
+
+1. FlagSelector forwards Accept to itself (already does via `OnCheckboxOnAccepting`)
+2. MenuItem (as Shortcut) forwards Accept from CommandView (already does via `CommandViewOnAccepted`)
+3. Propagation continues from MenuItem → Menu → MenuBar
+
+### Views That Must Opt-In to Propagation
+
+For this scenario to work, the following views must include `Command.Activate` in their `PropagatedCommands`:
+
+| View | Default PropagatedCommands | Required for This Scenario |
+|------|---------------------------|---------------------------|
+| Menu | `[Command.Accept]` | `[Command.Accept, Command.Activate]` |
+| PopoverMenu | `[Command.Accept]` | `[Command.Accept, Command.Activate]` |
+| MenuBar | `[Command.Accept]` | `[Command.Accept, Command.Activate]` |
+
+### Implementation Considerations
+
+1. **PopoverMenu is not a normal SuperView**: When a Menu is displayed inside a PopoverMenu, the Menu's SuperView is temporarily set to PopoverMenu. Propagation must work through this dynamic relationship.
+
+2. **MenuBarItem owns PopoverMenu but is not its SuperView**: The PopoverMenu must explicitly forward propagated commands to its owning MenuBarItem, or MenuBarItem must subscribe to PopoverMenu's events.
+
+3. **Event interception must not block propagation**: FlagSelector and Shortcut both intercept and consume events from their subviews. The design relies on them correctly forwarding commands via `InvokeCommand()`, which then triggers propagation.
+
+### Test Cases for This Scenario
+
+1. **Activate propagation through full hierarchy**:
+   - Create MenuBar with MenuBarItem containing PopoverMenu with Menu with MenuItem
+   - Set MenuItem.CommandView = FlagSelector with CheckBox
+   - Activate CheckBox
+   - Verify MenuBar.OnActivating receives event with `ctx.Source` = CheckBox
+
+2. **Accept propagation through full hierarchy**:
+   - Same setup as above
+   - Accept (double-click) CheckBox
+   - Verify MenuBar.OnAccepting receives event with `ctx.Source` = CheckBox
+
+3. **Source preservation**:
+   - Verify `ctx.Source` remains the original CheckBox at every level
+   - Verify `ctx.Binding` is preserved (KeyBinding or MouseBinding from original input)
+
+4. **Handled at intermediate level**:
+   - Menu.OnActivating sets `args.Handled = true`
+   - Verify MenuBar.OnActivating is NOT called
+   - Verify CWP semantics are respected
+
+---
+
 ## Design Requirements
 
 ### Functional Requirements
@@ -620,20 +795,29 @@ These custom events were workarounds for missing `Command.Activate` propagation.
    - Update XML documentation
 
 2. **Terminal.Gui/Views/Menu/MenuBar.cs**:
-   - Set `PropagatedCommands` in constructor
-   - Add/update `OnActivating()` override
-   - (Optional) Mark `OnSelectedMenuItemChanged` as obsolete
+   - Set `PropagatedCommands = [Command.Accept, Command.Activate]` in constructor
+   - Add/update `OnActivating()` override to handle propagated activations
+   - Remove `OnSelectedMenuItemChanged` override (replaced by propagation)
 
 3. **Terminal.Gui/Views/Menu/Menu.cs**:
-   - (Optional) Mark `SelectedMenuItemChanged` as obsolete
+   - Set `PropagatedCommands = [Command.Accept, Command.Activate]` in constructor
+   - Remove `SelectedMenuItemChanged` event
+   - Remove `RaiseSelectedMenuItemChanged` method
 
 4. **Terminal.Gui/Views/Menu/PopoverMenu.cs**:
-   - (Optional) Remove `MenuOnSelectedMenuItemChanged` handler
-   - (Optional) Remove event subscription
+   - Set `PropagatedCommands = [Command.Accept, Command.Activate]` in constructor
+   - Remove `MenuOnSelectedMenuItemChanged` handler
+   - Remove event subscription in `Root` setter
+   - Add logic to forward propagated commands to owning MenuBarItem (PopoverMenu → MenuBarItem is ownership, not SuperView)
 
-5. **Terminal.Gui/Views/Shortcut.cs** (Documentation only):
+5. **Terminal.Gui/Views/Shortcut.cs**:
+   - Verify `CommandViewOnActivating` correctly forwards context (including `Source`)
    - Update XML documentation to clarify command aggregation behavior
    - Document that handled `Activating` prevents `Accepting` from being raised
+
+6. **Terminal.Gui/Views/Selectors/SelectorBase.cs** (FlagSelector/OptionSelector):
+   - Verify `OnCheckboxOnActivating` correctly forwards context (including `Source`)
+   - Ensure `InvokeCommand` is called with the original context, not a new one
 
 ### New Tests Required
 
@@ -663,6 +847,20 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 6. **Shortcut Command Chain Behavior**:
    - Verify handled Activating prevents Accepting from being raised
    - Verify handled Accepting prevents Action from being invoked
+
+7. **FlagSelector in MenuItem in MenuBar (Critical Scenario)**:
+   - Create hierarchy: MenuBar → MenuBarItem → PopoverMenu → Menu → MenuItem → FlagSelector → CheckBox
+   - **Activate propagation**: Activate CheckBox, verify MenuBar.OnActivating receives event
+   - **Accept propagation**: Accept CheckBox, verify MenuBar.OnAccepting receives event
+   - **Source preservation**: Verify `ctx.Source` = CheckBox at every level (FlagSelector, MenuItem, Menu, MenuBar)
+   - **Binding preservation**: Verify `ctx.Binding` is the original KeyBinding/MouseBinding at every level
+   - **Intermediate handling**: Menu.OnActivating handles → verify MenuBar.OnActivating NOT called
+   - **Event interception**: Verify FlagSelector and Shortcut correctly forward (not block) commands
+
+8. **PopoverMenu Propagation** (Special case - not normal SuperView relationship):
+   - Verify Menu inside PopoverMenu can propagate to PopoverMenu
+   - Verify PopoverMenu can forward propagated commands to its owning MenuBarItem
+   - Verify dynamic SuperView assignment (Menu added/removed from PopoverMenu) doesn't break propagation
 
 ### Documentation Updates
 
@@ -771,8 +969,13 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 - `Terminal.Gui/Views/Shortcut.cs` (lines 1-300)
 - `Terminal.Gui/Views/Menu/Menu.cs`
 - `Terminal.Gui/Views/Menu/MenuBar.cs`
+- `Terminal.Gui/Views/Menu/MenuBarItem.cs`
 - `Terminal.Gui/Views/Menu/MenuItem.cs`
 - `Terminal.Gui/Views/Menu/PopoverMenu.cs`
+- `Terminal.Gui/Views/Selectors/SelectorBase.cs`
+- `Terminal.Gui/Views/Selectors/FlagSelector.cs`
+- `Terminal.Gui/Views/Selectors/OptionSelector.cs`
+- `Terminal.Gui/Views/CheckBox.cs`
 - `Terminal.Gui/Input/Command.cs`
 
 ### Documentation Reviewed
@@ -798,4 +1001,5 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 | 2026-01-09 | GitHub Copilot  | Initial analysis document created |
 | 2026-01-20 | Claude Opus 4.5 | Added "Identifying the Originating View in Handlers" section; clarified binding preservation during propagation; updated for alpha status (breaking changes OK); added binding refactor dependency |
 | 2026-01-22 | Claude Opus 4.5 | Updated constraints: binding refactor is now complete; ready for implementation |
+| 2026-01-22 | Claude Opus 4.5 | Added "FlagSelector in MenuItem in MenuBar Scenario" section; expanded test cases and files to modify; documented class hierarchy (MenuBar IS-A Menu, MenuBarItem IS-A MenuItem IS-A Shortcut) |
 
