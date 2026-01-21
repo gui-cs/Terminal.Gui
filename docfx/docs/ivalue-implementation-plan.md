@@ -387,12 +387,180 @@ selector.ValueChanged += (s, e) => DoSomething(e.NewValue);
 
 ---
 
+## API Simplification Plan
+
+> **Status**: Planned
+>
+> **Goal**: Remove legacy property/event duplication by making `Value`/`ValueChanging`/`ValueChanged` the primary API.
+
+Since backwards compatibility is not a concern, we can simplify the API by removing the "legacy" properties and events that duplicate the `IValue<T>` pattern.
+
+### Views Requiring Simplification
+
+| View | Legacy Property | Legacy Events | Virtual Methods | Action |
+|------|-----------------|---------------|-----------------|--------|
+| **CheckBox** | `CheckedState` | `CheckedStateChanging`, `CheckedStateChanged` | `OnCheckedStateChanging`, `OnCheckedStateChanged` | Remove all legacy; rename `Value` internals |
+| **ScrollBar** | `Position` | `PositionChanging`, `PositionChanged`, `Scrolled` | `OnPositionChanging`, `OnPositionChanged`, `OnScrolled` | Remove position events; keep `Position` as alias or remove |
+| **DateField** | `Date` | `DateChanged` | `OnDateChanged` | Remove all legacy |
+| **TimeField** | `Time` | `TimeChanged` | `OnTimeChanged` | Remove all legacy |
+| **DatePicker** | `Date` | *(none)* | *(none)* | Remove `Date` property |
+| **ListView** | `SelectedItem` | `SelectedItemChanged` | `OnSelectedChanged` | Remove all legacy |
+| **CharMap** | `SelectedCodePoint` | `SelectedCodePointChanged` | *(none)* | Remove all legacy |
+| **ColorPicker** | *(Value is primary)* | `ColorChanged` | *(none)* | Remove `ColorChanged` event |
+| **ColorPicker16** | `SelectedColor` | `ColorChanged` | *(none)* | Implement `IValue<Color>` or remove `ColorChanged` |
+
+### Views Already Clean (No Changes Needed)
+
+| View | Notes |
+|------|-------|
+| **SelectorBase** | `Value` is already the primary property |
+| **OptionSelector** / **OptionSelector<TEnum>** | Inherits from SelectorBase |
+| **FlagSelector** / **FlagSelector<TFlagsEnum>** | Inherits from SelectorBase |
+| **NumericUpDown<T>** | `Value` is already the primary property |
+| **AttributePicker** | `Value` is already the primary property |
+
+### Special Cases
+
+#### TextField
+- `Text` is an override of `View.Text` and is the natural primary property
+- `Value` should remain an alias for `Text`
+- `TextChanging` event uses `ResultEventArgs<string>` which allows modifying the result
+- **Decision needed**: Keep `TextChanging` as-is (different semantics from `ValueChanging`) or unify?
+- **Recommendation**: Keep both - `TextChanging` allows result modification, `ValueChanging` is for cancellation only
+
+#### ScrollBar
+- `Position` is semantic (refers to scroll position)
+- `Scrolled` event is useful for indicating distance scrolled
+- **Recommendation**: Keep `Position` as the primary property name (more semantic than `Value`), but remove the `PositionChanging`/`PositionChanged` events in favor of `ValueChanging`/`ValueChanged`
+
+### Implementation Steps
+
+For each view requiring simplification:
+
+1. **Remove legacy events** - Delete `XXXChanging`, `XXXChanged` event declarations
+2. **Remove legacy virtual methods** - Delete `OnXXXChanging`, `OnXXXChanged` methods
+3. **Update property setter** - Modify to only use `RaiseValueChanging`/`RaiseValueChanged`
+4. **Rename property** - Either:
+   - Remove legacy property, make `Value` the only property, OR
+   - Keep legacy property as primary and have `Value` delegate to it (for semantic names like `Position`, `SelectedItem`)
+5. **Update all usages** - Find and replace all references to old events/properties
+6. **Update tests** - Modify tests to use new API
+7. **Update documentation** - Update XML docs and any conceptual docs
+8. **Code Cleanup** - For each .cs file touched run the ./claude/code-cleanup.md agent.
+
+### Detailed Changes by View
+
+#### CheckBox
+```csharp
+// BEFORE
+public CheckState CheckedState { get => _checkedState; set => ChangeCheckedState(value); }
+public event EventHandler<ResultEventArgs<CheckState>>? CheckedStateChanging;
+public event EventHandler<EventArgs<CheckState>>? CheckedStateChanged;
+protected virtual bool OnCheckedStateChanging(...) { }
+protected virtual void OnCheckedStateChanged(...) { }
+
+// AFTER - Value becomes the primary property
+public CheckState Value { get => _value; set => ChangeValue(value); }
+// ValueChanging and ValueChanged from IValue<CheckState>
+protected virtual bool OnValueChanging(...) { }
+protected virtual void OnValueChanged(...) { }
+```
+
+#### ScrollBar
+```csharp
+// BEFORE
+public int Position { get; set; }
+public event EventHandler<CancelEventArgs<int>>? PositionChanging;
+public event EventHandler<EventArgs<int>>? PositionChanged;
+public event EventHandler<EventArgs<int>>? Scrolled;  // Keep this one - different semantics
+public int Value { get => Position; set => Position = value; }
+
+// AFTER - Position remains primary, events unified
+public int Position { get; set; }  // Internally uses Value pattern
+public event EventHandler<EventArgs<int>>? Scrolled;  // Keep - indicates scroll distance
+// ValueChanging/ValueChanged from IValue<int> - Position setter uses these
+public int Value { get => Position; set => Position = value; }  // Alias
+```
+
+#### DateField / TimeField / DatePicker
+```csharp
+// BEFORE (DateField example)
+public DateTime? Date { get; set; }
+public event EventHandler<EventArgs<DateTime>>? DateChanged;
+
+// AFTER - Value becomes primary
+public DateTime? Value { get; set; }
+// ValueChanging/ValueChanged from IValue<DateTime?>
+```
+
+#### ListView
+```csharp
+// BEFORE
+public int? SelectedItem { get; set; }
+public event EventHandler<ListViewItemEventArgs>? SelectedItemChanged;
+
+// AFTER - Keep SelectedItem as primary (semantic), but use Value events
+public int? SelectedItem { get; set; }  // Uses ValueChanging/ValueChanged internally
+public int? Value { get => SelectedItem; set => SelectedItem = value; }  // Alias
+// Remove SelectedItemChanged, use ValueChanged instead
+```
+
+#### CharMap
+```csharp
+// BEFORE
+public int SelectedCodePoint { get; set; }
+public event EventHandler<EventArgs<int>>? SelectedCodePointChanged;
+public Rune Value { get => new(SelectedCodePoint); set => SelectedCodePoint = value.Value; }
+
+// AFTER - Keep SelectedCodePoint for int access, Value for Rune
+public int SelectedCodePoint { get; set; }  // Uses ValueChanging/ValueChanged internally
+public Rune Value { get => new(SelectedCodePoint); set => SelectedCodePoint = value.Value; }
+// Remove SelectedCodePointChanged, use ValueChanged instead
+```
+
+#### ColorPicker
+```csharp
+// BEFORE
+public Color? Value { get; set; }
+public event EventHandler<ResultEventArgs<Color>>? ColorChanged;  // Redundant
+public event EventHandler<ValueChangingEventArgs<Color?>>? ValueChanging;
+public event EventHandler<ValueChangedEventArgs<Color?>>? ValueChanged;
+
+// AFTER - Remove ColorChanged
+public Color? Value { get; set; }
+public event EventHandler<ValueChangingEventArgs<Color?>>? ValueChanging;
+public event EventHandler<ValueChangedEventArgs<Color?>>? ValueChanged;
+```
+
+### Migration Guide for External Code
+
+| Old API | New API |
+|---------|---------|
+| `checkbox.CheckedState` | `checkbox.Value` |
+| `checkbox.CheckedStateChanging` | `checkbox.ValueChanging` |
+| `checkbox.CheckedStateChanged` | `checkbox.ValueChanged` |
+| `scrollbar.PositionChanging` | `scrollbar.ValueChanging` |
+| `scrollbar.PositionChanged` | `scrollbar.ValueChanged` |
+| `dateField.Date` | `dateField.Value` |
+| `dateField.DateChanged` | `dateField.ValueChanged` |
+| `timeField.Time` | `timeField.Value` |
+| `timeField.TimeChanged` | `timeField.ValueChanged` |
+| `datePicker.Date` | `datePicker.Value` |
+| `listView.SelectedItem` | `listView.Value` (or keep using `SelectedItem`) |
+| `listView.SelectedItemChanged` | `listView.ValueChanged` |
+| `charMap.SelectedCodePoint` | `charMap.Value.Value` (int) or keep using `SelectedCodePoint` |
+| `charMap.SelectedCodePointChanged` | `charMap.ValueChanged` |
+| `colorPicker.ColorChanged` | `colorPicker.ValueChanged` |
+
+---
+
 ## Future Work
 
 1. **CommandContext.Value Integration**: Update `View.Command.cs` `InvokeCommand()` to set `ctx.Value` from `IValue` implementers
 2. **LinearRange<T>**: Design and implement appropriate value pattern
 3. **TextView**: Consider `IValue<string>` for text content
 4. **TreeView<T>**: Consider `IValue<T?>` for selected item
+5. **API Simplification**: Execute the plan above to remove legacy property/event duplication
 
 ---
 
@@ -402,3 +570,4 @@ selector.ValueChanged += (s, e) => DoSomething(e.NewValue);
 |------|--------|---------|
 | 2026-01-21 | Claude Opus 4.5 | Initial plan created |
 | 2026-01-21 | Claude Opus 4.5 | Implementation completed for all identified Views except LinearRange<T> |
+| 2026-01-21 | Claude Opus 4.5 | Added API Simplification Plan to remove legacy property/event duplication |
