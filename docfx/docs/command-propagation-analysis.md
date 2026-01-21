@@ -38,7 +38,6 @@ However, this approach has **three critical problems**:
 This document analyzes the current state, identifies problems, establishes design requirements, and proposes a solution that:
 
 - Generalizes propagation to support multiple commands
-- Maintains backward compatibility
 - Enables opt-in propagation for superviews
 - Preserves the decoupling principle of the Cancellable Work Pattern (CWP)
 
@@ -185,7 +184,7 @@ protected virtual bool? RaiseActivating(ICommandContext? ctx)
 **Key Points**:
 1. Follows CWP pattern correctly
 2. **Does NOT propagate** - stops at the view that handles it
-3. **This is the problem** for hierarchical views like `MenuBar`
+3. **This is the problem** for hierarchical views like `MenuBar` - Many features are BROKEN TODAY BECAUSE OF THIS.
 
 ### How MenuBar Currently Works Around This
 
@@ -377,7 +376,7 @@ This is intentional CWP behavior but should be documented clearly.
 1. **Alpha Status**: Terminal.Gui v2 is in alpha; breaking changes are acceptable before beta
 2. **.NET 8 Compatible**: Use available C# 12 features
 3. **Follows Conventions**: Adhere to Terminal.Gui coding standards
-4. **Depends on Binding Refactor**: Implementation should wait for [command_binding_refactor_plan.md](./command_binding_refactor_plan.md) to complete
+4. **Binding Refactor Complete**: ✅ The [command_binding_refactor_plan.md](./command_binding_refactor_plan.md) is complete - non-generic `CommandContext`, `InputBinding`, and `IInputBinding.Source` are all available
 
 ---
 
@@ -798,4 +797,5 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 |------------|-----------------|----------------------------------|
 | 2026-01-09 | GitHub Copilot  | Initial analysis document created |
 | 2026-01-20 | Claude Opus 4.5 | Added "Identifying the Originating View in Handlers" section; clarified binding preservation during propagation; updated for alpha status (breaking changes OK); added binding refactor dependency |
+| 2026-01-22 | Claude Opus 4.5 | Updated constraints: binding refactor is now complete; ready for implementation |
 

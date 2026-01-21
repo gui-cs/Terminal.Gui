@@ -1,12 +1,12 @@
 # Command and Binding Refactor Plan
 
-> **Status**: Design In Progress
+> **Status**: ✅ Complete
 >
 > **Branch**: `copilot/fix-command-propagation-issue`
 >
 > **Related**: [command-propagation-analysis.md](./command-propagation-analysis.md)
 >
-> **Last Updated**: 2026-01-09
+> **Last Updated**: 2026-01-22
 
 ## Table of Contents
 
@@ -43,14 +43,11 @@ This refactor prepares the infrastructure for the command propagation design doc
 | **`IInputBinding.Source`** | Provides consistent origin tracking across binding types during propagation |
 | **`InputBinding`** | Provides binding type for programmatically-propagated commands (though propagation typically forwards the original binding) |
 
-### Dependency Note
+### Status Note
 
-**Propagation implementation should wait for this refactor to complete.** Terminal.Gui v2 is in alpha, and this binding refactor plus command propagation are the last major items before beta. Since breaking changes are acceptable during alpha, we should complete the type system cleanup first to avoid implementing propagation against deprecated types.
+✅ **This refactor is complete.** The type system is now ready for command propagation implementation.
 
-**Recommended order:**
-1. Complete Phases 2-6 of this refactor (non-generic `CommandContext`, `InputBinding`, etc.)
-2. Implement `PropagatedCommands` using the clean type system
-3. Remove deprecated types before beta
+**Next step:** Implement `PropagatedCommands` as documented in [command-propagation-analysis.md](./command-propagation-analysis.md).
 
 ### How Propagation Uses These Types
 
@@ -445,17 +442,18 @@ StatusBar receives via propagation
 
 4. ~~**Should `CommandEventArgs` include a `Sender` property?**~~
    - **Resolved: No** - In virtual method overrides, `this` is the View currently processing (equivalent to `sender` in event handlers). No additional property needed.
-      - `this` / `sender` = View currently handling the command (changes during propagation)
-      - `args.Context?.Source` = View that originally invoked the command (constant during propagation)
+   - `this` / `sender` = View currently handling the command (changes during propagation)
+   - `args.Context?.Source` = View that originally invoked the command (constant during propagation)
 
-   ---
+---
 
-   ## Revision History
+## Revision History
 
-   | Date | Author | Changes |
-   |------|--------|---------|
-   | 2026-01-09 | GitHub Copilot | Initial document created from design discussion |
-   | 2026-01-09 | GitHub Copilot | Phase 1 completed: Added Source to IInputBinding, renamed MouseEventArgs to MouseEvent |
-   | 2026-01-20 | Claude Opus 4.5 | Added "Relationship to Command Propagation" section; added Open Question #4 about CommandEventArgs.Sender; updated to note propagation depends on this refactor completing (alpha status) |
-   | 2026-01-21 | GitHub Copilot | Phase 2 completed: Created InputBinding, added Binding to ICommandContext, renamed Binding to TypedBinding in CommandContext<T> |
-   | 2026-01-22 | GitHub Copilot | Phase 3 completed: Replaced CommandContext<T> with non-generic CommandContext, updated all call sites to pattern match on ctx.Binding |
+| Date | Author | Changes |
+|------|--------|---------|
+| 2026-01-09 | GitHub Copilot | Initial document created from design discussion |
+| 2026-01-09 | GitHub Copilot | Phase 1 completed: Added Source to IInputBinding, renamed MouseEventArgs to MouseEvent |
+| 2026-01-20 | Claude Opus 4.5 | Added "Relationship to Command Propagation" section; added Open Question #4 about CommandEventArgs.Sender; updated to note propagation depends on this refactor completing (alpha status) |
+| 2026-01-21 | GitHub Copilot | Phase 2 completed: Created InputBinding, added Binding to ICommandContext, renamed Binding to TypedBinding in CommandContext<T> |
+| 2026-01-22 | GitHub Copilot | Phase 3 completed: Replaced CommandContext<T> with non-generic CommandContext, updated all call sites to pattern match on ctx.Binding |
+| 2026-01-22 | Claude Opus 4.5 | Updated status to Complete; refactor finished, ready for PropagatedCommands implementation |
