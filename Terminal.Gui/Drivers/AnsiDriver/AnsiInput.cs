@@ -219,9 +219,11 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                 // Convert UTF-8 bytes to characters
                 uint cp = WindowsVTInputHelper.GetConsoleCP ();
-                Encoding enc = Encoding.GetEncoding ((int)cp);
+                var enc = Encoding.GetEncoding ((int)cp);
 
                 string text = enc.GetString (buffer, 0, bytesRead);
+
+                //Logging.Trace ($"AnsiInput.Read: read {bytesRead} text: {text}");
 
                 foreach (char ch in text)
                 {
