@@ -263,16 +263,86 @@ public class CommandEventArgs : EventArgs
 
 ### Command Context
 
-Command execution includes context through `ICommandContext`:
+Command execution includes context through `ICommandContext` and input bindings:
 
 ```csharp
 public interface ICommandContext
 {
-    View Source { get; }
-    object? Parameter { get; }
-    IDictionary<string, object> State { get; }
+    /// <summary>The command being invoked.</summary>
+    Command Command { get; set; }
+
+    /// <summary>The View that first invoked the command (the source).</summary>
+    View? Source { get; set; }
+
+    /// <summary>The binding that triggered the command. Use pattern matching to access specific binding types.</summary>
+    IInputBinding? Binding { get; }
+}
+
+public interface IInputBinding
+{
+    /// <summary>The commands this binding will invoke.</summary>
+    Command[] Commands { get; set; }
+
+    /// <summary>Arbitrary context data.</summary>
+    object? Data { get; set; }
+
+    /// <summary>The View that is the origin of this binding.</summary>
+    View? Source { get; set; }
 }
 ```
+
+#### Binding Types
+
+Terminal.Gui provides three binding types:
+
+- **`KeyBinding`**: For keyboard-triggered commands. Has `Key` and `Target` properties.
+- **`MouseBinding`**: For mouse-triggered commands. Has `MouseEvent` property.
+- **`InputBinding`**: For programmatic/generic command invocations.
+
+#### Accessing Binding Details
+
+When handling command events, you can access the binding that triggered the command through pattern matching.
+
+**Using `ICommandContext.Binding` (polymorphic access):**
+
+```csharp
+// Pattern match on ctx.Binding for polymorphic access
+if (ctx.Binding is KeyBinding kb)
+{
+    Key? key = kb.Key;
+}
+else if (ctx.Binding is MouseBinding mb)
+{
+    Mouse? mouse = mb.MouseEvent;
+}
+else if (ctx.Binding is InputBinding ib)
+{
+        // Programmatic invocation
+    }
+    ```
+
+    **Examples of pattern matching on `Binding`:**
+
+    ```csharp
+    // For mouse-triggered commands:
+    if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
+    {
+        Point position = mouse.Position!.Value;
+        MouseFlags flags = mouse.Flags;
+    }
+
+    // For key-triggered commands:
+    if (e.Context?.Binding is KeyBinding { Key: { } key })
+    {
+        // Handle key-specific logic
+    }
+    ```
+
+    #### Source Tracking
+
+- **`ICommandContext.Source`**: The View that first invoked the command. This remains constant during command propagation.
+- **`IInputBinding.Source`**: The View where the binding was defined/added.
+- **`sender` (event parameter)**: The View currently raising the event (changes during propagation).
 
 ## Best Practices
 
