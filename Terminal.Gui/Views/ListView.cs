@@ -92,9 +92,9 @@ public class ListView : View, IDesignable, IValue<int?>
                             SetFocus ();
                         }
 
-                        if (ctx is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
+                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
                         {
-                            Point position = mouseCommandContext.Binding.MouseEventArgs.Position!.Value;
+                            Point position = mouse.Position!.Value;
                             SelectedItem = position.Y;
                         }
 
@@ -123,12 +123,12 @@ public class ListView : View, IDesignable, IValue<int?>
         AddCommand (Command.SelectAll,
                     ctx =>
                     {
-                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                        if (ctx?.Binding is not KeyBinding keyBinding)
                         {
                             return false;
                         }
 
-                        return keyCommandContext.Binding.Data is { } && MarkAll ((bool)keyCommandContext.Binding.Data);
+                        return keyBinding.Data is { } && MarkAll ((bool)keyBinding.Data);
                     });
 
         // Default keybindings for all ListViews

@@ -1,4 +1,3 @@
-
 #nullable disable
 namespace Terminal.Gui.Views;
 
@@ -32,12 +31,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     /// }
     ///  </code>
     /// </param>
-    public TreeTableSource (
-        TableView table,
-        string firstColumnName,
-        TreeView<T> tree,
-        Dictionary<string, Func<T, object>> subsequentColumns
-    )
+    public TreeTableSource (TableView table, string firstColumnName, TreeView<T> tree, Dictionary<string, Func<T, object>> subsequentColumns)
     {
         _tableView = table;
         _tree = tree;
@@ -61,8 +55,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     }
 
     /// <inheritdoc/>
-    public object this [int row, int col] =>
-        col == 0 ? GetColumnZeroRepresentationFromTree (row) : _lambdas [ColumnNames [col]] (RowToObject (row));
+    public object this [int row, int col] => col == 0 ? GetColumnZeroRepresentationFromTree (row) : _lambdas [ColumnNames [col]] (RowToObject (row));
 
     /// <inheritdoc/>
     public int Rows => _tree.BuildLineMap ().Count;
@@ -74,15 +67,15 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     public string [] ColumnNames { get; }
 
     /// <inheritdoc/>
-    public T GetObjectOnRow (int row) { return RowToObject (row); }
+    public T GetObjectOnRow (int row) => RowToObject (row);
 
     /// <inheritdoc/>
-    public IEnumerable<T> GetAllObjects () { return _tree.BuildLineMap ().Select (b => b.Model); }
+    public IEnumerable<T> GetAllObjects () => _tree.BuildLineMap ().Select (b => b.Model);
 
     /// <summary>Returns the tree model object rendering on the given <paramref name="row"/> of the table.</summary>
     /// <param name="row">Row in table.</param>
     /// <returns></returns>
-    public T RowToObject (int row) { return _tree.BuildLineMap ().ElementAt (row).Model; }
+    public T RowToObject (int row) => _tree.BuildLineMap ().ElementAt (row).Model;
 
     private string GetColumnZeroRepresentationFromTree (int row)
     {
@@ -127,7 +120,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         return colNames [column] == ColumnNames [0];
     }
 
-    private Branch<T> RowToBranch (int row) { return _tree.BuildLineMap ().ElementAt (row); }
+    private Branch<T> RowToBranch (int row) => _tree.BuildLineMap ().ElementAt (row);
 
     private void Table_KeyPress (object sender, Key e)
     {
@@ -172,7 +165,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     private void Table_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+        if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
         {
             return;
         }
@@ -209,5 +202,4 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             _tableView.SetNeedsDraw ();
         }
     }
-#nullable restore
 }

@@ -77,7 +77,7 @@ public class OptionSelector : SelectorBase, IDesignable
             return false;
         }
 
-        if (args.Context is CommandContext<KeyBinding> { } && (int)checkBox.Data! == Value)
+        if (args.Context?.Binding is KeyBinding && (int)checkBox.Data! == Value)
         {
             // Caused by keypress. If the checkbox is already checked, we cycle to the next one.
             Cycle ();
