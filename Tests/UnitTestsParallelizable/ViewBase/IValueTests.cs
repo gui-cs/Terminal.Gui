@@ -209,4 +209,72 @@ public class IValueTests
 
         Assert.Null (view.Value);
     }
+
+    // Tests for non-generic IValue interface
+
+    [Fact]
+    public void GetValue_ReturnsBoxedValue_ForInt ()
+    {
+        TestIntValueView view = new ();
+        view.Value = 42;
+
+        IValue nonGeneric = view;
+        object? result = nonGeneric.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<int> (result);
+        Assert.Equal (42, result);
+    }
+
+    [Fact]
+    public void GetValue_ReturnsNull_WhenValueIsNull ()
+    {
+        TestIntValueView view = new ();
+        view.Value = null;
+
+        IValue nonGeneric = view;
+        object? result = nonGeneric.GetValue ();
+
+        Assert.Null (result);
+    }
+
+    [Fact]
+    public void GetValue_ReturnsBoxedValue_ForString ()
+    {
+        TestStringValueView view = new ();
+        view.Value = "Hello World";
+
+        IValue nonGeneric = view;
+        object? result = nonGeneric.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<string> (result);
+        Assert.Equal ("Hello World", result);
+    }
+
+    [Fact]
+    public void GetValue_ReturnsUpdatedValue_AfterValueChange ()
+    {
+        TestIntValueView view = new ();
+        view.Value = 10;
+
+        IValue nonGeneric = view;
+        Assert.Equal (10, nonGeneric.GetValue ());
+
+        view.Value = 99;
+        Assert.Equal (99, nonGeneric.GetValue ());
+    }
+
+    [Fact]
+    public void IValue_CanBeUsedPolymorphically ()
+    {
+        // Demonstrates that different IValue<T> implementations can be used through IValue
+        TestIntValueView intView = new () { Value = 42 };
+        TestStringValueView stringView = new () { Value = "test" };
+
+        List<IValue> values = [intView, stringView];
+
+        Assert.Equal (42, values [0].GetValue ());
+        Assert.Equal ("test", values [1].GetValue ());
+    }
 }
