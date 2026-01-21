@@ -101,9 +101,9 @@ public class MenuItem : Shortcut
 
         var quit = false;
 
-        if (commandContext is CommandContext<KeyBinding> keyCommandContext)
+        if (commandContext?.Binding is KeyBinding { Key: { } key })
         {
-            if (keyCommandContext.TypedBinding.Key is { } && keyCommandContext.TypedBinding.Key == Application.QuitKey && SuperView is { Visible: true })
+            if (key == Application.QuitKey && SuperView is { Visible: true })
             {
                 // This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
                 // Logging.Debug ($"{Title} - Ignoring Key = Application.QuitKey/Command = Command.Quit");

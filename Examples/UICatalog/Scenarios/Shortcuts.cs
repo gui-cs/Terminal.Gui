@@ -64,9 +64,9 @@ public class Shortcuts : Scenario
                                         {
                                             if (sender is Shortcut shortcut)
                                             {
-                                                if (args.Context is CommandContext<IInputBinding> { } commandContext)
+                                                if (args.Context?.Binding is { } binding)
                                                 {
-                                                    eventSource.Add ($"{shortcut.Id}.Activating - Source: {args.Context?.Source?.ToDebugString ()}, Binding Source: {commandContext.Binding.ToString ()}");
+                                                    eventSource.Add ($"{shortcut.Id}.Activating - Source: {args.Context?.Source?.ToDebugString ()}, Binding Source: {binding}");
                                                     eventLog.MoveDown ();
                                                 }
                                             }

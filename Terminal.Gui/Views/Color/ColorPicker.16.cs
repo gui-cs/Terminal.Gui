@@ -204,15 +204,15 @@ public class ColorPicker16 : View
         AddCommand (Command.Activate,
                     ctx =>
                     {
-                        if (ctx is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
+                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
                         {
                             if (RaiseActivating (ctx) == true)
                             {
                                 return true;
                             }
 
-                            Caret = new Point (mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.X / _boxWidth,
-                                               mouseCommandContext.TypedBinding.MouseEvent.Position!.Value.Y / _boxHeight);
+                            Caret = new Point (mouse.Position!.Value.X / _boxWidth,
+                                               mouse.Position!.Value.Y / _boxHeight);
 
                             return SetFocus ();
                         }

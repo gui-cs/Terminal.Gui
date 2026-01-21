@@ -836,10 +836,10 @@ public class CharMap : View, IDesignable
     {
         Point position = GetCursor (SelectedCodePoint);
 
-        if (commandContext is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
+        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             // If the mouse is clicked on the headers, map it to the first glyph of the row/col
-            position = mouseCommandContext.TypedBinding.MouseEvent.Position!.Value;
+            position = mouse.Position!.Value;
 
             if (position.Y == 0)
             {
@@ -884,14 +884,14 @@ public class CharMap : View, IDesignable
             return true;
         }
 
-        if (commandContext is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
+        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             if (!HasFocus && CanFocus)
             {
                 SetFocus ();
             }
 
-            if (!TryGetCodePointFromPosition (mouseCommandContext.TypedBinding.MouseEvent.Position!.Value, out int cp))
+            if (!TryGetCodePointFromPosition (mouse.Position!.Value, out int cp))
             {
                 return false;
             }
@@ -908,9 +908,9 @@ public class CharMap : View, IDesignable
     {
         int newCodePoint = SelectedCodePoint;
 
-        if (commandContext is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } } mouseCommandContext)
+        if (commandContext?.Binding is MouseBinding { MouseEvent: { } mouse })
         {
-            if (!TryGetCodePointFromPosition (mouseCommandContext.TypedBinding.MouseEvent.Position!.Value, out newCodePoint))
+            if (!TryGetCodePointFromPosition (mouse.Position!.Value, out newCodePoint))
             {
                 return false;
             }

@@ -285,7 +285,7 @@ These concepts are opinionated, reflecting Terminal.Gui’s view that most UI in
     ```csharp
     protected override bool OnAccepting(CommandEventArgs args)
     {
-        if (args.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.TypedBinding.Key == Application.QuitKey)
+        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
         {
             return true;
         }

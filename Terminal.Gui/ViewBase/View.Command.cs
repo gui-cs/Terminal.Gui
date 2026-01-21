@@ -415,107 +415,107 @@ public partial class View // Command APIs
     /// <returns></returns>
     public IEnumerable<Command> GetSupportedCommands () => _commandImplementations.Keys;
 
-    /// <summary>
-    ///     Invokes the specified commands.
-    /// </summary>
-    /// <param name="commands">The set of commands to invoke.</param>
-    /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommands<TBindingType> (Command [] commands, TBindingType binding) where TBindingType : IInputBinding
-    {
-        bool? toReturn = null;
-
-        foreach (Command command in commands)
+        /// <summary>
+        ///     Invokes the specified commands.
+        /// </summary>
+        /// <param name="commands">The set of commands to invoke.</param>
+        /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommands (Command [] commands, IInputBinding? binding)
         {
-            if (!_commandImplementations.ContainsKey (command))
+            bool? toReturn = null;
+
+            foreach (Command command in commands)
             {
-                Logging.Warning (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
+                if (!_commandImplementations.ContainsKey (command))
+                {
+                    Logging.Warning (@$"{command} is not supported by this View ({GetType ().Name}). Binding: {binding}.");
+                }
+
+                // each command has its own return value
+                bool? thisReturn = InvokeCommand (command, binding);
+
+                // if we haven't got anything yet, the current command result should be used
+                toReturn ??= thisReturn;
+
+                // if ever see a true then that's what we will return
+                if (thisReturn ?? false)
+                {
+                    toReturn = true;
+                }
             }
 
-            // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, binding);
+            return toReturn;
+        }
 
-            // if we haven't got anything yet, the current command result should be used
-            toReturn ??= thisReturn;
-
-            // if ever see a true then that's what we will return
-            if (thisReturn ?? false)
+        /// <summary>
+        ///     Invokes the specified command.
+        /// </summary>
+        /// <param name="command">The command to invoke.</param>
+        /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommand (Command command, IInputBinding? binding)
+        {
+            if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
             {
-                toReturn = true;
+                _commandImplementations.TryGetValue (Command.NotBound, out implementation);
             }
+
+            return implementation! (new CommandContext { Command = command, Source = this, Binding = binding });
         }
 
-        return toReturn;
-    }
-
-    /// <summary>
-    ///     Invokes the specified command.
-    /// </summary>
-    /// <param name="command">The command to invoke.</param>
-    /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding) where TBindingType : IInputBinding
-    {
-        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        /// <summary>
+        ///     Invokes the specified command.
+        /// </summary>
+        /// <param name="command">The command to invoke.</param>
+        /// <param name="ctx">The context to pass with the command.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommand (Command command, ICommandContext? ctx)
         {
-            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+            {
+                _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            }
+
+            return implementation! (ctx);
         }
 
-        return implementation! (new CommandContext<TBindingType> { Command = command, Source = this, TypedBinding = binding });
-    }
-
-    /// <summary>
-    ///     Invokes the specified command.
-    /// </summary>
-    /// <param name="command">The command to invoke.</param>
-    /// <param name="ctx">The context to pass with the command.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommand (Command command, ICommandContext? ctx)
-    {
-        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        /// <summary>
+        ///     Invokes the specified command without context.
+        /// </summary>
+        /// <param name="command">The command to invoke.</param>
+        /// <returns>
+        ///     <see langword="null"/> if no command was found; input processing should continue.
+        ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
+        ///     continue.
+        ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
+        ///     stop.
+        /// </returns>
+        public bool? InvokeCommand (Command command)
         {
-            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+            {
+                _commandImplementations.TryGetValue (Command.NotBound, out implementation);
+            }
+
+            return implementation! (new CommandContext { Command = command, Source = this, Binding = null });
         }
-
-        return implementation! (ctx);
     }
-
-    /// <summary>
-    ///     Invokes the specified command without context.
-    /// </summary>
-    /// <param name="command">The command to invoke.</param>
-    /// <returns>
-    ///     <see langword="null"/> if no command was found; input processing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should
-    ///     continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should
-    ///     stop.
-    /// </returns>
-    public bool? InvokeCommand (Command command)
-    {
-        if (!_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
-        {
-            _commandImplementations.TryGetValue (Command.NotBound, out implementation);
-        }
-
-        return implementation! (new CommandContext<IInputBinding> { Command = command, Source = this, TypedBinding = null });
-    }
-}

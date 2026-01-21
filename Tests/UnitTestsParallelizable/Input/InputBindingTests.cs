@@ -166,12 +166,20 @@ public class InputBindingTests
         View source = new () { Id = "contextSource" };
         InputBinding binding = new ([Command.Activate], source, "contextData");
 
-        CommandContext<InputBinding> ctx = new () { Command = Command.Activate, Source = source, TypedBinding = binding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = source, Binding = binding };
 
         Assert.Equal (Command.Activate, ctx.Command);
         Assert.Equal (source, ctx.Source);
-        Assert.Equal (binding, ctx.TypedBinding);
-        Assert.Equal ("contextData", ctx.TypedBinding.Data);
+        Assert.NotNull (ctx.Binding);
+
+        if (ctx.Binding is InputBinding ib)
+        {
+            Assert.Equal ("contextData", ib.Data);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be InputBinding");
+        }
     }
 
     [Fact]
@@ -179,7 +187,7 @@ public class InputBindingTests
     {
         InputBinding binding = new ([Command.Accept]);
 
-        CommandContext<InputBinding> ctx = new () { Command = Command.Accept, TypedBinding = binding };
+        CommandContext ctx = new () { Command = Command.Accept, Binding = binding };
 
         // Binding property (from ICommandContext) returns IInputBinding
         Assert.NotNull (ctx.Binding);
@@ -190,7 +198,7 @@ public class InputBindingTests
     public void PatternMatching_ThroughICommandContext_Works ()
     {
         InputBinding binding = new ([Command.Accept], new View { Id = "test" });
-        ICommandContext ctx = new CommandContext<InputBinding> { Command = Command.Accept, TypedBinding = binding };
+        ICommandContext ctx = new CommandContext { Command = Command.Accept, Binding = binding };
 
         // Can pattern match the binding from the interface
         if (ctx.Binding is InputBinding ib)

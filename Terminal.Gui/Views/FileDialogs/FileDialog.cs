@@ -263,7 +263,7 @@ public class FileDialog : Dialog, IDesignable
             return;
         }
 
-        if (e.Context is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
+        if (e.Context.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
 
@@ -279,7 +279,7 @@ public class FileDialog : Dialog, IDesignable
             }
         }
 
-        if (e.Context is CommandContext<KeyBinding>)
+        if (e.Context.Binding is KeyBinding)
         {
             PopoverMenu? contextMenu = new ([
                                                 new MenuItem (Strings.fdCtxNew, string.Empty, New),
@@ -1008,7 +1008,7 @@ public class FileDialog : Dialog, IDesignable
     private void OnTableViewActivating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
-        if (e.Context is not CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
+        if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
         {
             return;
         }

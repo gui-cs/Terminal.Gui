@@ -372,6 +372,9 @@ StatusBar receives via propagation
 - [ ] Create non-generic `CommandContext`
 - [ ] Update `InvokeCommand` overloads
 - [ ] Deprecate `CommandContext<T>`
+- [ ] Unit tests for new binding types
+- [ ] Update command.md
+- [ ] Update events.md
 
 ### Phase 4: Update Call Sites
 

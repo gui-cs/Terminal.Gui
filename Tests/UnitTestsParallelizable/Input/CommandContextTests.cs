@@ -1,7 +1,7 @@
 namespace InputTests;
 
 /// <summary>
-///     Tests for <see cref="CommandContext{TBindingType}"/> record struct.
+///     Tests for <see cref="CommandContext"/> record struct.
 /// </summary>
 /// <remarks>
 ///     Copilot generated.
@@ -16,12 +16,20 @@ public class CommandContextTests
         View sourceView = new () { Id = "sourceView" };
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Enter };
 
-        CommandContext<KeyBinding> ctx = new () { Command = Command.Activate, Source = sourceView, TypedBinding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = sourceView, Binding = keyBinding };
 
         Assert.Equal (Command.Activate, ctx.Command);
         Assert.Equal (sourceView, ctx.Source);
-        Assert.Equal (keyBinding, ctx.TypedBinding);
-        Assert.Equal (Key.Enter, ctx.TypedBinding.Key);
+        Assert.NotNull (ctx.Binding);
+
+        if (ctx.Binding is KeyBinding kb)
+        {
+            Assert.Equal (Key.Enter, kb.Key);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be KeyBinding");
+        }
     }
 
     [Fact]
@@ -30,13 +38,21 @@ public class CommandContextTests
         View sourceView = new () { Id = "sourceView" };
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked);
 
-        CommandContext<MouseBinding> ctx = new () { Command = Command.Activate, Source = sourceView, TypedBinding = mouseBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = sourceView, Binding = mouseBinding };
 
         Assert.Equal (Command.Activate, ctx.Command);
         Assert.Equal (sourceView, ctx.Source);
-        Assert.Equal (mouseBinding, ctx.TypedBinding);
-        Assert.NotNull (ctx.TypedBinding.MouseEvent);
-        Assert.Equal (MouseFlags.LeftButtonClicked, ctx.TypedBinding.MouseEvent!.Flags);
+        Assert.NotNull (ctx.Binding);
+
+        if (ctx.Binding is MouseBinding mb)
+        {
+            Assert.NotNull (mb.MouseEvent);
+            Assert.Equal (MouseFlags.LeftButtonClicked, mb.MouseEvent!.Flags);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be MouseBinding");
+        }
     }
 
     #endregion
@@ -46,7 +62,7 @@ public class CommandContextTests
     [Fact]
     public void CommandContext_ImplementsICommandContext ()
     {
-        CommandContext<KeyBinding> ctx = new () { Command = Command.Accept, Source = new View () };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new View () };
 
         ICommandContext iCtx = ctx;
 
@@ -60,7 +76,7 @@ public class CommandContextTests
         View originalSource = new () { Id = "original" };
         View newSource = new () { Id = "new" };
 
-        CommandContext<KeyBinding> ctx = new () { Command = Command.Accept, Source = originalSource };
+        CommandContext ctx = new () { Command = Command.Accept, Source = originalSource };
 
         ICommandContext iCtx = ctx;
         iCtx.Source = newSource;
@@ -75,15 +91,17 @@ public class CommandContextTests
     [Fact]
     public void PatternMatching_KeyBinding_Works ()
     {
-        ICommandContext? ctx = new CommandContext<KeyBinding>
+        ICommandContext ctx = new CommandContext
         {
-            Command = Command.Activate, Source = new View (), TypedBinding = new KeyBinding ([Command.Activate]) { Key = Key.Enter }
+            Command = Command.Activate,
+            Source = new View (),
+            Binding = new KeyBinding ([Command.Activate]) { Key = Key.Enter }
         };
 
-        if (ctx is CommandContext<KeyBinding> { TypedBinding.Key: { } key } keyCtx)
+        if (ctx.Binding is KeyBinding { Key: { } key })
         {
             Assert.Equal (Key.Enter, key);
-            Assert.Equal (Command.Activate, keyCtx.Command);
+            Assert.Equal (Command.Activate, ctx.Command);
         }
         else
         {
@@ -97,10 +115,10 @@ public class CommandContextTests
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = new View { Id = "mouseSource" } };
         mouseBinding.MouseEvent = new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (10, 20) };
 
-        ICommandContext? ctx = new CommandContext<MouseBinding> { Command = Command.Activate, Source = new View (), TypedBinding = mouseBinding };
+        ICommandContext ctx = new CommandContext { Command = Command.Activate, Source = new View (), Binding = mouseBinding };
 
-        // This is the actual pattern used in production code after rename
-        if (ctx is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse } mouseCtx)
+        // This is the actual pattern used in production code
+        if (ctx.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             Assert.Equal (MouseFlags.LeftButtonClicked, mouse.Flags);
             Assert.Equal (new Point (10, 20), mouse.Position);
@@ -119,10 +137,10 @@ public class CommandContextTests
             MouseEvent = null // Explicitly set to null
         };
 
-        ICommandContext? ctx = new CommandContext<MouseBinding> { Command = Command.Activate, Source = new View (), TypedBinding = mouseBinding };
+        ICommandContext ctx = new CommandContext { Command = Command.Activate, Source = new View (), Binding = mouseBinding };
 
         // Pattern should NOT match when MouseEvent is null
-        bool matched = ctx is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } };
+        bool matched = ctx.Binding is MouseBinding { MouseEvent: { } };
 
         Assert.False (matched);
     }
@@ -130,13 +148,15 @@ public class CommandContextTests
     [Fact]
     public void PatternMatching_DifferentBindingTypes_DoNotMatch ()
     {
-        ICommandContext? ctx = new CommandContext<KeyBinding>
+        ICommandContext ctx = new CommandContext
         {
-            Command = Command.Activate, Source = new View (), TypedBinding = new KeyBinding ([Command.Activate])
+            Command = Command.Activate,
+            Source = new View (),
+            Binding = new KeyBinding ([Command.Activate])
         };
 
-        // KeyBinding context should not match MouseBinding pattern
-        bool matchedMouse = ctx is CommandContext<MouseBinding>;
+        // KeyBinding should not match MouseBinding pattern
+        bool matchedMouse = ctx.Binding is MouseBinding;
 
         Assert.False (matchedMouse);
     }
@@ -153,11 +173,19 @@ public class CommandContextTests
 
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.A, Source = bindingSource };
 
-        CommandContext<KeyBinding> ctx = new () { Command = Command.Activate, Source = contextSource, TypedBinding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = contextSource, Binding = keyBinding };
 
         // Both sources are accessible
         Assert.Equal ("contextSource", ctx.Source?.Id);
-        Assert.Equal ("bindingSource", ctx.TypedBinding.Source?.Id);
+
+        if (ctx.Binding is KeyBinding kb)
+        {
+            Assert.Equal ("bindingSource", kb.Source?.Id);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be KeyBinding");
+        }
     }
 
     [Fact]
@@ -168,11 +196,19 @@ public class CommandContextTests
 
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.LeftButtonClicked) { Source = bindingSource };
 
-        CommandContext<MouseBinding> ctx = new () { Command = Command.Activate, Source = contextSource, TypedBinding = mouseBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = contextSource, Binding = mouseBinding };
 
         // Both sources are accessible
         Assert.Equal ("contextSource", ctx.Source?.Id);
-        Assert.Equal ("bindingSource", ctx.TypedBinding.Source?.Id);
+
+        if (ctx.Binding is MouseBinding mb)
+        {
+            Assert.Equal ("bindingSource", mb.Source?.Id);
+        }
+        else
+        {
+            Assert.Fail ("Binding should be MouseBinding");
+        }
     }
 
     #endregion
@@ -184,20 +220,20 @@ public class CommandContextTests
     {
         KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.Enter, Source = new View { Id = "keySource" } };
 
-        CommandContext<KeyBinding> ctx = new () { Command = Command.Accept, Source = new View { Id = "invoker" }, TypedBinding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Accept, Source = new View { Id = "invoker" }, Binding = keyBinding };
 
         CommandEventArgs args = new () { Context = ctx };
 
         Assert.NotNull (args.Context);
         Assert.Equal (Command.Accept, args.Context.Command);
 
-        if (args.Context is CommandContext<KeyBinding> { TypedBinding.Key: { } key })
+        if (args.Context.Binding is KeyBinding { Key: { } key })
         {
             Assert.Equal (Key.Enter, key);
         }
         else
         {
-            Assert.Fail ("Should be able to pattern match from CommandEventArgs.Context");
+            Assert.Fail ("Should be able to pattern match KeyBinding from CommandEventArgs.Context.Binding");
         }
     }
 
@@ -206,19 +242,19 @@ public class CommandContextTests
     {
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked) { Source = new View { Id = "mouseSource" } };
 
-        CommandContext<MouseBinding> ctx = new () { Command = Command.Activate, Source = new View { Id = "invoker" }, TypedBinding = mouseBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Source = new View { Id = "invoker" }, Binding = mouseBinding };
 
         CommandEventArgs args = new () { Context = ctx };
 
         Assert.NotNull (args.Context);
 
-        if (args.Context is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
+        if (args.Context.Binding is MouseBinding { MouseEvent: { } mouse })
         {
             Assert.Equal (MouseFlags.RightButtonClicked, mouse.Flags);
         }
         else
         {
-            Assert.Fail ("Should be able to pattern match MouseBinding from CommandEventArgs.Context");
+            Assert.Fail ("Should be able to pattern match MouseBinding from CommandEventArgs.Context.Binding");
         }
     }
 
@@ -227,11 +263,11 @@ public class CommandContextTests
     #region ICommandContext.Binding Property Tests
 
     [Fact]
-    public void Binding_Property_ReturnsTypedBindingAsIInputBinding ()
+    public void Binding_Property_ReturnsBindingAsIInputBinding ()
     {
         KeyBinding keyBinding = new ([Command.Activate]) { Key = Key.Enter };
 
-        CommandContext<KeyBinding> ctx = new () { Command = Command.Activate, TypedBinding = keyBinding };
+        CommandContext ctx = new () { Command = Command.Activate, Binding = keyBinding };
 
         // Access via ICommandContext interface
         ICommandContext iCtx = ctx;
@@ -245,7 +281,7 @@ public class CommandContextTests
     public void Binding_Property_AllowsPolymorphicPatternMatching ()
     {
         KeyBinding keyBinding = new ([Command.Accept]) { Key = Key.F5 };
-        ICommandContext ctx = new CommandContext<KeyBinding> { Command = Command.Accept, TypedBinding = keyBinding };
+        ICommandContext ctx = new CommandContext { Command = Command.Accept, Binding = keyBinding };
 
         // Pattern match on Binding from the interface
         if (ctx.Binding is KeyBinding kb)
@@ -262,7 +298,7 @@ public class CommandContextTests
     public void Binding_Property_WithMouseBinding_Works ()
     {
         MouseBinding mouseBinding = new ([Command.Activate], MouseFlags.RightButtonClicked);
-        ICommandContext ctx = new CommandContext<MouseBinding> { Command = Command.Activate, TypedBinding = mouseBinding };
+        ICommandContext ctx = new CommandContext { Command = Command.Activate, Binding = mouseBinding };
 
         // Pattern match on Binding from the interface
         if (ctx.Binding is MouseBinding mb)
@@ -279,7 +315,7 @@ public class CommandContextTests
     public void Binding_Property_WithInputBinding_Works ()
     {
         InputBinding inputBinding = new ([Command.Accept], new View { Id = "programmatic" }, "data");
-        ICommandContext ctx = new CommandContext<InputBinding> { Command = Command.Accept, TypedBinding = inputBinding };
+        ICommandContext ctx = new CommandContext { Command = Command.Accept, Binding = inputBinding };
 
         // Pattern match on Binding from the interface
         if (ctx.Binding is InputBinding ib)
@@ -294,17 +330,14 @@ public class CommandContextTests
     }
 
     [Fact]
-    public void Binding_Property_DefaultTypedBinding_ReturnsDefaultStruct ()
+    public void Binding_Property_NullBinding_ReturnsNull ()
     {
-        // When using record struct with nullable TBindingType, default initialization
-        // results in a default struct value rather than null due to C# boxing behavior
-        CommandContext<KeyBinding> ctx = new () { Command = Command.Activate };
+        CommandContext ctx = new () { Command = Command.Activate };
 
         ICommandContext iCtx = ctx;
 
-        // For struct binding types, Binding returns the default struct (not null)
-        Assert.NotNull (iCtx.Binding);
-        Assert.IsType<KeyBinding> (iCtx.Binding);
+        // When Binding is not set, it should be null
+        Assert.Null (iCtx.Binding);
     }
 
     #endregion

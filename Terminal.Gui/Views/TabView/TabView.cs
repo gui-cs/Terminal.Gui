@@ -621,7 +621,7 @@ public class TabView : View
 
     internal void Tab_Selecting (object? sender, CommandEventArgs e)
     {
-        if (e.Context is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouseArgs })
+        if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouseArgs })
         {
             e.Handled = _tabsBar.NewMouseEvent (mouseArgs) == true;
         }

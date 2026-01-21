@@ -116,7 +116,7 @@ public class Menu : Bar
 
         // Logging.Debug ($"{Title} - {args.Context}");
 
-        if (args.Context is CommandContext<KeyBinding> { TypedBinding.Key: { } } keyCommandContext && keyCommandContext.TypedBinding.Key == Application.QuitKey)
+        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey)
         {
             // Special case QuitKey if we are Visible - This supports a MenuItem with Key = Application.QuitKey/Command = Command.Quit
             // And causes just the menu to quit.

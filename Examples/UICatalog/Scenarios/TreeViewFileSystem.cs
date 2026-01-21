@@ -446,7 +446,7 @@ public class TreeViewFileSystem : Scenario
         }
 
         // Only handle mouse clicks
-        if (e.Context is not CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
+        if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
         {
             return;
         }

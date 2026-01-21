@@ -256,20 +256,20 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </returns>
     internal virtual bool? DispatchCommand (ICommandContext? commandContext)
     {
-        CommandContext<KeyBinding>? keyCommandContext = commandContext as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
+        KeyBinding? keyBinding = commandContext?.Binding as KeyBinding?;
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) Command: {commandContext?.Command}");
 
-        if (keyCommandContext?.TypedBinding.Data != this)
+        if (keyBinding is { } kb && kb.Data != this)
         {
             // TODO: Optimize this to only do this if CommandView is custom (non View)
             // Invoke Activate on the CommandView to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
-            keyCommandContext = keyCommandContext!.Value with { TypedBinding = keyCommandContext.Value.TypedBinding with { Data = this } };
+            KeyBinding updatedBinding = kb with { Data = this };
 
             Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - Invoking Activate on CommandView ({CommandView.GetType ().Name}).");
 
-            CommandView.InvokeCommand (Command.Activate, keyCommandContext);
+            CommandView.InvokeCommand (Command.Activate, updatedBinding);
         }
 
         Logging.Debug ($"{Title} ({commandContext?.Source?.Title}) - RaiseActivating ...");
@@ -452,8 +452,8 @@ public class Shortcut : View, IOrientation, IDesignable
 
             void CommandViewOnActivating (object? sender, CommandEventArgs e)
             {
-                if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.TypedBinding.Data != this)
-                    || e.Context is CommandContext<MouseBinding>)
+                if ((e.Context?.Binding is KeyBinding { Data: var data } && data != this)
+                    || e.Context?.Binding is MouseBinding)
                 {
                     // Forward command to ourselves
                     InvokeCommand (Command.Activate, e.Context);

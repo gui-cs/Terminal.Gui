@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -22,31 +19,14 @@ public sealed class KeyBindings : Scenario
         _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            SuperViewRendersLineCanvas = true,
-        };
+        using Window appWindow = new () { Title = GetQuitKeyAndName (), SuperViewRendersLineCanvas = true };
 
-        Label label = new ()
-        {
-            Title = "_Label:",
-        };
-        TextField textField = new ()
-        {
-            X = Pos.Right (label),
-            Y = Pos.Top (label),
-            Width = 20,
-        };
+        Label label = new () { Title = "_Label:" };
+        TextField textField = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 20 };
 
         appWindow.Add (label, textField);
 
-        Button button = new ()
-        {
-            X = Pos.Right (textField) + 1,
-            Y = Pos.Top (label),
-            Text = "_Button",
-        };
+        Button button = new () { X = Pos.Right (textField) + 1, Y = Pos.Top (label), Text = "_Button" };
         appWindow.Add (button);
 
         KeyBindingsDemo keyBindingsDemo = new ()
@@ -61,13 +41,16 @@ public sealed class KeyBindings : Scenario
                     - Hotkey: k, K, Alt-K, Alt-Shift-K
                     - Focused: F3
                     - Application: F4
-                    Pressing Esc or {Application.QuitKey} will cause it to quit the app.
+                    Pressing Esc or {
+                        Application.QuitKey
+                    } will cause it to quit the app.
                     """,
             BorderStyle = LineStyle.Dashed
         };
         appWindow.Add (keyBindingsDemo);
 
         ObservableCollection<string> appBindings = new ();
+
         ListView appBindingsListView = new ()
         {
             Title = "_Application Bindings",
@@ -82,13 +65,14 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (appBindingsListView);
 
-        foreach (Key key in app.Keyboard.KeyBindings.GetBindings().ToDictionary().Keys)
+        foreach (Key key in app.Keyboard.KeyBindings.GetBindings ().ToDictionary ().Keys)
         {
             KeyBinding binding = app.Keyboard.KeyBindings.Get (key);
             appBindings.Add ($"{key} -> {binding.Target?.GetType ().Name} - {binding.Commands [0]}");
         }
 
         ObservableCollection<string> hotkeyBindings = new ();
+
         ListView hotkeyBindingsListView = new ()
         {
             Title = "_Hotkey Bindings",
@@ -100,7 +84,6 @@ public sealed class KeyBindings : Scenario
             CanFocus = true,
             Source = new ListWrapper<string> (hotkeyBindings),
             SuperViewRendersLineCanvas = true
-
         };
         appWindow.Add (hotkeyBindingsListView);
 
@@ -112,7 +95,7 @@ public sealed class KeyBindings : Scenario
             }
         }
 
-        _focusedBindingsListView = new ()
+        _focusedBindingsListView = new ListView
         {
             Title = "_Focused Bindings",
             BorderStyle = LineStyle.Single,
@@ -123,7 +106,6 @@ public sealed class KeyBindings : Scenario
             CanFocus = true,
             Source = new ListWrapper<string> (_focusedBindings),
             SuperViewRendersLineCanvas = true
-
         };
         appWindow.Add (_focusedBindingsListView);
 
@@ -133,7 +115,6 @@ public sealed class KeyBindings : Scenario
         app.Run (appWindow);
         app.Navigation!.FocusedChanged -= Application_HasFocusChanged;
     }
-
 
     private void Application_HasFocusChanged (object sender, EventArgs e)
     {
@@ -147,6 +128,7 @@ public sealed class KeyBindings : Scenario
         _focusedBindingsListView.Title = $"_Focused ({focused.GetType ().Name}) Bindings";
 
         _focusedBindings.Clear ();
+
         foreach (KeyValuePair<Key, KeyBinding> binding in focused.KeyBindings.GetBindings ())
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
@@ -160,41 +142,51 @@ public class KeyBindingsDemo : View
     {
         CanFocus = true;
 
+        AddCommand (Command.Save,
+                    ctx =>
+                    {
+                        MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", "Ok");
 
-        AddCommand (Command.Save, ctx =>
-                                 {
-                                     MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", buttons: "Ok");
-                                     return true;
-                                 });
-        AddCommand (Command.New, ctx =>
-                                {
-                                    MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", buttons: "Ok");
-                                    return true;
-                                });
-        AddCommand (Command.HotKey, ctx =>
-        {
-            MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}\nCommand: {ctx?.Command}", buttons: "Ok");
-            SetFocus ();
-            return true;
-        });
+                        return true;
+                    });
+
+        AddCommand (Command.New,
+                    ctx =>
+                    {
+                        MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", "Ok");
+
+                        return true;
+                    });
+
+        AddCommand (Command.HotKey,
+                    ctx =>
+                    {
+                        MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}\nCommand: {ctx?.Command}", "Ok");
+                        SetFocus ();
+
+                        return true;
+                    });
 
         KeyBindings.Add (Key.F2, Command.Save);
         KeyBindings.Add (Key.F3, Command.New); // same as specifying KeyBindingScope.Focused
+
         Initialized += (_, _) =>
                        {
                            App?.Keyboard.KeyBindings.Add (Key.F4, this, Command.New);
                            App?.Keyboard.KeyBindings.Add (Key.Q.WithAlt, this, Command.Quit);
                        };
 
-        AddCommand (Command.Quit, ctx =>
-                                         {
-                                             if (ctx is not CommandContext<KeyBinding> keyCommandContext)
-                                             {
-                                                 return false;
-                                             }
-                                             MessageBox.Query (App, $"{keyCommandContext.TypedBinding}", $"Key: {keyCommandContext.TypedBinding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
-                                             App?.RequestStop ();
-                                             return true;
-                                         });
+        AddCommand (Command.Quit,
+                    ctx =>
+                    {
+                        if (ctx?.Binding is not KeyBinding keyBinding)
+                        {
+                            return false;
+                        }
+                        MessageBox.Query (App, $"{keyBinding}", $"Key: {keyBinding.Key}\nCommand: {ctx.Command}", "Ok");
+                        App?.RequestStop ();
+
+                        return true;
+                    });
     }
 }
