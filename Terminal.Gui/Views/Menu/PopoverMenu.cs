@@ -581,15 +581,15 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
             Visible = false;
         }
 
-        if (e.Context is CommandContext<KeyBinding> keyCommandContext)
-        {
-            if (keyCommandContext.Binding.Key is { } && keyCommandContext.Binding.Key == Application.QuitKey && SuperView is { Visible: true })
+            if (e.Context?.Binding is KeyBinding { Key: { } key })
             {
-                // Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
-                e.Handled = true;
+                if (key == Application.QuitKey && SuperView is { Visible: true })
+                {
+                    // Logging.Debug ($"{Title} - Setting e.Handled = true - Application.QuitKey/Command = Command.Quit");
+                    e.Handled = true;
+                }
             }
         }
-    }
 
     private void MenuAccepted (object? sender, CommandEventArgs e)
     {
@@ -621,11 +621,11 @@ public class PopoverMenu : PopoverBaseImpl, IDesignable
         // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command}");
 
         // If we're not visible, ignore any keys that are not hotkeys
-        CommandContext<KeyBinding>? keyCommandContext = args.Context as CommandContext<KeyBinding>? ?? default (CommandContext<KeyBinding>);
+        KeyBinding? keyBinding = args.Context?.Binding as KeyBinding?;
 
-        if (!Visible && keyCommandContext is { Binding.Key: { } })
+        if (!Visible && keyBinding is { Key: { } key })
         {
-            if (GetMenuItemsOfAllSubMenus ().All (i => i.Key != keyCommandContext.Value.Binding.Key))
+            if (GetMenuItemsOfAllSubMenus ().All (i => i.Key != key))
             {
                 // Logging.Debug ($"{Title} ({args.Context?.Source?.Title}) Command: {args.Context?.Command} - ignore any keys that are not hotkeys");
 
