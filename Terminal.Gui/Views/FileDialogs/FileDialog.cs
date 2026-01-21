@@ -1524,7 +1524,7 @@ public class FileDialog : Dialog, IDesignable
                     UpdateChildrenToFound ();
                 }
 
-                Application.Invoke (_ => { Parent._spinnerView.Visible = false; });
+                Parent.App?.Invoke ((_) => { Parent._spinnerView.Visible = false; });
             }
         }
 
@@ -1535,7 +1535,8 @@ public class FileDialog : Dialog, IDesignable
                 Children = _found.ToArray ();
             }
 
-            Application.Invoke (_ =>
+            Parent.App?.Invoke (
+                                (_) =>
                                 {
                                     Parent._tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (Parent._tbPath.Text,
                                                                                          Parent._tbPath.InsertionPoint,
