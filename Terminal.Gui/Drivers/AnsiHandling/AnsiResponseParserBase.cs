@@ -383,39 +383,56 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     }
 
     /// <inheritdoc/>
-    public void ExpectResponse (string? terminator, Action<string?> response, Action? abandoned, bool persistent)
+    public void ExpectResponse (string? terminator, string? value, Action<string?> response, Action? abandoned, bool persistent)
     {
         lock (_lockExpectedResponses)
         {
             if (persistent)
             {
-                _persistentExpectations.Add (new AnsiResponseExpectation (terminator, h => response.Invoke (h.HeldToString ()), abandoned));
+                _persistentExpectations.Add (new AnsiResponseExpectation (terminator, value, h => response.Invoke (h.HeldToString ()), abandoned));
             }
             else
             {
-                _expectedResponses.Add (new AnsiResponseExpectation (terminator, h => response.Invoke (h.HeldToString ()), abandoned));
+                _expectedResponses.Add (new AnsiResponseExpectation (terminator, value, h => response.Invoke (h.HeldToString ()), abandoned));
             }
         }
     }
 
     /// <inheritdoc/>
-    public bool IsExpecting (string? terminator)
+    public bool IsExpecting (string? terminator, string? value)
     {
         lock (_lockExpectedResponses)
         {
-            // If any of the new terminator matches any existing terminators characters it's a collision so true.
-            return _expectedResponses.Any (r => r.Terminator!.Intersect (terminator!).Any ());
+            if (string.IsNullOrEmpty (terminator))
+            {
+                return false;
+            }
+
+            // Conservative collision logic: any existing expectation with same terminator
+            // collides unless both have a specific value and those values differ.
+            return _expectedResponses.Any (r => r.Terminator != null
+                                                && r.Terminator!.Any (terminator.Contains)
+                                                && (string.IsNullOrEmpty (r.Value) || string.IsNullOrEmpty (value) || r.Value == value));
         }
     }
 
     /// <inheritdoc/>
-    public void StopExpecting (string? terminator, bool persistent)
+    public void StopExpecting (string? terminator, string? value, bool persistent)
     {
         lock (_lockExpectedResponses)
         {
             if (persistent)
             {
-                AnsiResponseExpectation [] removed = _persistentExpectations.Where (r => r.Matches (terminator)).ToArray ();
+                AnsiResponseExpectation [] removed;
+
+                if (string.IsNullOrEmpty (value))
+                {
+                    removed = _persistentExpectations.Where (r => r.Terminator == terminator).ToArray ();
+                }
+                else
+                {
+                    removed = _persistentExpectations.Where (r => r.Terminator == terminator && r.Value == value).ToArray ();
+                }
 
                 foreach (AnsiResponseExpectation toRemove in removed)
                 {
@@ -425,7 +442,16 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
             }
             else
             {
-                AnsiResponseExpectation [] removed = _expectedResponses.Where (r => r.Terminator == terminator).ToArray ();
+                AnsiResponseExpectation [] removed;
+
+                if (string.IsNullOrEmpty (value))
+                {
+                    removed = _expectedResponses.Where (r => r.Terminator == terminator).ToArray ();
+                }
+                else
+                {
+                    removed = _expectedResponses.Where (r => r.Terminator == terminator && r.Value == value).ToArray ();
+                }
 
                 foreach (AnsiResponseExpectation r in removed)
                 {
