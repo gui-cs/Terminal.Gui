@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text;
 using Xunit.Abstractions;
 
@@ -31,8 +31,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         var i = 0;
 
         // Imagine that we are expecting a DAR
-        _parser1.ExpectResponse ("c", s => response1 = s, null, false);
-        _parser2.ExpectResponse ("c", s => response2 = s, null, false);
+        _parser1.ExpectResponse ("c", null, s => response1 = s, null, false);
+        _parser2.ExpectResponse ("c", null, s => response2 = s, null, false);
 
         // First char is Escape which we must consume incase what follows is the DAR
         AssertConsumed (ansiStream, ref i); // Esc
@@ -127,8 +127,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             var response2 = string.Empty;
 
             // Register the expected response with the given terminator
-            _parser1.ExpectResponse (expectedTerminator, s => response1 = s, null, false);
-            _parser2.ExpectResponse (expectedTerminator, s => response2 = s, null, false);
+            _parser1.ExpectResponse (expectedTerminator, null, s => response1 = s, null, false);
+            _parser2.ExpectResponse (expectedTerminator, null, s => response2 = s, null, false);
 
             // Process the input
             var actualOutput1 = new StringBuilder ();
@@ -227,7 +227,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         if (terminator.HasValue)
         {
-            parser.ExpectResponse (terminator.Value.ToString (), s => response = s, null, false);
+            parser.ExpectResponse (terminator.Value.ToString (), null, s => response = s, null, false);
         }
 
         var step = 0;
@@ -305,13 +305,13 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         string? responseA = null;
         string? responseB = null;
 
-        p.ExpectResponse ("z", r => responseA = r, null, false);
+        p.ExpectResponse ("z", null, r => responseA = r, null, false);
 
         // Some time goes by without us seeing a response
-        p.StopExpecting ("z", false);
+        p.StopExpecting ("z", null, false);
 
         // Send our new request
-        p.ExpectResponse ("z", r => responseB = r, null, false);
+        p.ExpectResponse ("z", null, r => responseB = r, null, false);
 
         // Because we gave up on getting A, we should expect the response to be to our new request
         Assert.Empty (p.ProcessInput ("\u001b[<1;2z"));
@@ -337,8 +337,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         var m = 0;
         var M = 1;
 
-        p.ExpectResponse ("m", _ => m++, null, true);
-        p.ExpectResponse ("M", _ => M++, null, true);
+        p.ExpectResponse ("m", null, _ => m++, null, true);
+        p.ExpectResponse ("M", null, _ => M++, null, true);
 
         // Act - Feed input strings containing ANSI sequences
         p.ProcessInput ("\u001b[<0;10;10m"); // Should match and increment `m`
@@ -363,6 +363,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         List<Tuple<char, int>> result = [];
 
         p.ExpectResponseT ("m",
+                           null,
                            r =>
                            {
                                result = r.ToList ();
@@ -465,7 +466,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         List<Mouse> mouseEventArgs = [];
 
         parser.Mouse += (s, e) => mouseEventArgs.Add (e);
-        parser.ExpectResponse ("c", dar => foundDar = dar, null, false);
+        parser.ExpectResponse ("c", null, dar => foundDar = dar, null, false);
         string released = parser.ProcessInput ("a" + MOUSE_DOWN + "asdf" + DEVICE_ATTRIBUTE_RESPONSE + "bbcc" + MOUSE_UP + "sss");
 
         Assert.Equal ("aasdfbbccsss", released);
@@ -505,7 +506,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         List<Key> keys = [];
 
         parser.Keyboard += (s, e) => keys.Add (e);
-        parser.ExpectResponse ("c", dar => foundDar = dar, null, false);
+        parser.ExpectResponse ("c", null, dar => foundDar = dar, null, false);
         string released = parser.ProcessInput ("a" + LEFT + "asdf" + DEVICE_ATTRIBUTE_RESPONSE + "bbcc" + SHIFT_UP + "sss");
 
         Assert.Equal ("aasdfbbccsss", released);
