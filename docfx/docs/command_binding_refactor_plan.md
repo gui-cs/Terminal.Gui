@@ -72,39 +72,42 @@ See the "Identifying the Originating View in Handlers" section in [command-propa
 IInputBinding (interface)
 ├── Commands: Command[]
 ├── Data: object?
-└── (no Source property)
+└── Source: View?  ← Added in Phase 1
 
 KeyBinding : IInputBinding (record struct)
-├── Commands, Data
+├── Commands, Data, Source
 ├── Key: Key?
 └── Target: View?  ← Used for app-level hotkeys
 
 MouseBinding : IInputBinding (record struct)
-├── Commands, Data
-└── MouseEventArgs: Mouse?  ← Mouse.View tracks source
+├── Commands, Data, Source
+└── MouseEvent: Mouse?  ← Renamed from MouseEventArgs in Phase 1
+
+InputBinding : IInputBinding (record struct)  ← Added in Phase 2
+├── Commands, Data, Source
 
 ICommandContext (interface)
 ├── Command: Command
-└── Source: View?
+├── Source: View?
+└── Binding: IInputBinding?  ← Added in Phase 2
 
-CommandContext<TBindingType> : ICommandContext (record struct)
+CommandContext : ICommandContext (record struct)  ← Non-generic in Phase 3
 ├── Command, Source
-└── Binding: TBindingType?  ← Generic, causes variance issues
+└── Binding: IInputBinding?
 ```
 
-### Current Issues
+### Issues Resolved
 
-| Issue | Description |
-|-------|-------------|
-| Generic variance | `CommandContext<MouseBinding>` is NOT a subtype of `CommandContext<IInputBinding>` |
-| No polymorphic binding access | `ICommandContext` doesn't expose `Binding` |
-| Inconsistent source tracking | `KeyBinding.Target` vs `Mouse.View` in `MouseBinding.MouseEventArgs` |
-| Redundant `Source` | Both `ICommandContext.Source` and binding track origin |
-| Naming inconsistency | `MouseEventArgs` should be `MouseEvent` |
+| Issue | Resolution |
+|-------|------------|
+| ~~Generic variance~~ | ✅ Removed generic `CommandContext<T>`, now non-generic |
+| ~~No polymorphic binding access~~ | ✅ `ICommandContext.Binding` added |
+| ~~Inconsistent source tracking~~ | ✅ `Source` added to `IInputBinding` |
+| ~~Naming inconsistency~~ | ✅ `MouseEventArgs` renamed to `MouseEvent` |
 
 ---
 
-## Problems to Solve
+## Problems Solved
 
 ### Problem 1: Generic Variance Blocks Pattern Matching
 
@@ -367,32 +370,34 @@ StatusBar receives via propagation
 - [x] Add computed `Binding` property to `CommandContext<T>` for interface compliance
 - [x] Update all call sites from `.Binding` to `.TypedBinding`
 
-### Phase 3: CommandContext Simplification
+### Phase 3: CommandContext Simplification ✅ COMPLETED
 
-- [ ] Create non-generic `CommandContext`
-- [ ] Update `InvokeCommand` overloads
-- [ ] Deprecate `CommandContext<T>`
-- [ ] Unit tests for new binding types
-- [ ] Update command.md
-- [ ] Update events.md
+- [x] Create non-generic `CommandContext`
+- [x] Update `InvokeCommand` overloads
+- [x] Remove `CommandContext<T>` (replaced with non-generic `CommandContext`)
+- [x] Update all production call sites to pattern match on `ctx.Binding`
+- [x] Update all test files
+- [x] Update all example scenarios
+- [x] Update command.md
+- [x] Update events.md
+- [x] Update mouse.md
 
-### Phase 4: Update Call Sites
+### Phase 4: Update Call Sites ✅ COMPLETED (merged into Phase 3)
 
-- [ ] Update `View.Command.cs` to use new types
-- [ ] Update `KeyBindings` to populate `Source`
-- [ ] Update `MouseBindings` to populate `Source`
-- [ ] Update scenarios and examples
+- [x] Update `View.Command.cs` to use new types
+- [x] Update `KeyboardImpl.cs` to use new types
+- [x] Update scenarios and examples
 
 ### Phase 5: Testing
 
-- [ ] Unit tests for new binding types
 - [ ] Integration tests for propagation scenarios
 - [ ] Verify backward compatibility
 
 ### Phase 6: Documentation
 
-- [ ] Update command.md
-- [ ] Update events.md
+- [x] Update command.md
+- [x] Update events.md
+- [x] Update mouse.md
 - [ ] Add migration guide
 
 ---
@@ -426,10 +431,18 @@ StatusBar receives via propagation
   - Created `InputBindingTests.cs` - 19 tests covering constructor, properties, IInputBinding, pattern matching
   - Updated `CommandContextTests.cs` - added 6 tests for new `Binding` property
   - All 34 binding-related tests pass
+- [x] **Phase 3: CommandContext Simplification** (2026-01-22)
+  - Replaced generic `CommandContext<T>` with non-generic `CommandContext`
+  - Updated `InvokeCommand` and `InvokeCommands` to use non-generic signatures
+  - Updated all production call sites (20+ files) to pattern match on `ctx.Binding`
+  - Updated all test files to use new `CommandContext`
+  - Updated all example scenarios (8 files)
+  - Updated documentation (command.md, events.md, mouse.md)
+  - All tests pass
 
 ### In Progress
 
-- [ ] Phase 3: CommandContext Simplification
+- [ ] Phase 5: Integration tests for propagation scenarios
 
 ### Blocked
 
@@ -438,13 +451,13 @@ StatusBar receives via propagation
 ### Open Questions
 
 1. **Should `InputBinding` require a non-null `Source`?**
-   - Leaning: No, keep optional for flexibility
+   - **Resolved: No** - Keep optional for flexibility
 
 2. **Should we deprecate or remove `CommandContext<T>`?**
-   - **Resolved: Remove** - We can and will break things in alpha
+   - **Resolved: Removed** - Breaking change acceptable in alpha
 
 3. **How to handle existing code using `CommandContext<KeyBinding>` pattern?**
-   - Answer: Pattern match on `ctx.Binding is KeyBinding kb` instead.
+   - **Resolved**: Pattern match on `ctx.Binding is KeyBinding kb` instead.
 
 4. ~~**Should `CommandEventArgs` include a `Sender` property?**~~
    - **Resolved: No** - In virtual method overrides, `this` is the View currently processing (equivalent to `sender` in event handlers). No additional property needed.
@@ -461,3 +474,4 @@ StatusBar receives via propagation
    | 2026-01-09 | GitHub Copilot | Phase 1 completed: Added Source to IInputBinding, renamed MouseEventArgs to MouseEvent |
    | 2026-01-20 | Claude Opus 4.5 | Added "Relationship to Command Propagation" section; added Open Question #4 about CommandEventArgs.Sender; updated to note propagation depends on this refactor completing (alpha status) |
    | 2026-01-21 | GitHub Copilot | Phase 2 completed: Created InputBinding, added Binding to ICommandContext, renamed Binding to TypedBinding in CommandContext<T> |
+   | 2026-01-22 | GitHub Copilot | Phase 3 completed: Replaced CommandContext<T> with non-generic CommandContext, updated all call sites to pattern match on ctx.Binding |

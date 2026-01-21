@@ -51,7 +51,7 @@ ANSI Input ? AnsiMouseParser ? MouseInterpreter ? MouseImpl ? View ? Commands
 ```csharp
 view.Activating += (s, e) =>
 {
-    if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
+    if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
     {
         Point position = mouse.Position;  // Viewport-relative
         HandleClick(position);
@@ -212,27 +212,27 @@ public class ClickableView : View
 {
     public ClickableView()
     {
-        Activating += OnActivating;
-    }
-    
-    private void OnActivating(object sender, CommandEventArgs e)
-    {
-        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouse })
-        {
-            Point clickPosition = mouse.Position; // Viewport-relative
-            
-            if (mouse.Flags.HasFlag(MouseFlags.LeftButtonPressed))
-            {
-                HandleLeftClick(clickPosition);
-            }
-            else if (mouse.Flags.HasFlag(MouseFlags.RightButtonPressed))
-            {
-                ShowContextMenu(clickPosition);
-            }
-            
-            e.Handled = true;
+            Activating += OnActivating;
         }
-    }
+
+        private void OnActivating(object sender, CommandEventArgs e)
+        {
+            if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
+            {
+                Point clickPosition = mouse.Position; // Viewport-relative
+
+                if (mouse.Flags.HasFlag(MouseFlags.LeftButtonPressed))
+                {
+                    HandleLeftClick(clickPosition);
+                }
+                else if (mouse.Flags.HasFlag(MouseFlags.RightButtonPressed))
+                {
+                    ShowContextMenu(clickPosition);
+                }
+
+                e.Handled = true;
+            }
+        }
 }
 ```
 
@@ -561,7 +561,7 @@ This ensures consistent mouse behavior across platforms while maintaining platfo
 * **Use `Activating` event** to handle clicks - provides mouse position via CommandContext
 * **Access mouse details via CommandContext:**
   ```csharp
-  if (e.Context is CommandContext<MouseBinding> { Binding.MouseEvent: { } mouse })
+  if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
   {
       Point pos = mouse.Position;  // Viewport-relative
       MouseFlags flags = mouse.Flags;

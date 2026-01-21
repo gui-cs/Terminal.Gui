@@ -642,24 +642,17 @@ Based on the analysis of the current `Command` and `View.Command` system, as imp
       if (ctx.Binding is KeyBinding kb)
       {
           // Handle key binding - access kb.Key, kb.Target, etc.
-      }
-      else if (ctx.Binding is MouseBinding mb)
-      {
-          // Handle mouse binding - access mb.MouseEvent, etc.
-      }
-      else if (ctx.Binding is InputBinding ib)
-      {
-          // Handle programmatic/generic binding
-      }
-      ```
-   - When using `CommandContext<T>` directly, use `TypedBinding` for strongly-typed access:
-      ```csharp
-      if (args.Context is CommandContext<KeyBinding> keyCommandContext)
-      {
-          Key? key = keyCommandContext.TypedBinding.Key;
-      }
-      ```
-   - A future `State` property could include view-specific data (e.g., the selected `MenuItem` in `Menu`, the new `CheckedState` in `CheckBox`). This would enhance the flexibility of event handlers.
+         }
+         else if (ctx.Binding is MouseBinding mb)
+         {
+             // Handle mouse binding - access mb.MouseEvent, etc.
+         }
+         else if (ctx.Binding is InputBinding ib)
+         {
+             // Handle programmatic/generic binding
+         }
+         ```
+      - A future `State` property could include view-specific data (e.g., the selected `MenuItem` in `Menu`, the new `CheckedState` in `CheckBox`). This would enhance the flexibility of event handlers.
 
 4. **Monitor Use Cases for Propagation Needs**:
    - Track the usage of `Activating` and `Accepting` in real-world applications, particularly in `Menu`, `MenuBar`, `CheckBox`, and `FlagSelector`, to identify scenarios where propagation of `Activating` events could simplify hierarchical coordination.

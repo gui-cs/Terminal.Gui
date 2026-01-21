@@ -317,28 +317,28 @@ else if (ctx.Binding is MouseBinding mb)
 }
 else if (ctx.Binding is InputBinding ib)
 {
-    // Programmatic invocation
-}
-```
+        // Programmatic invocation
+    }
+    ```
 
-**Using `CommandContext<T>.TypedBinding` (strongly-typed access):**
+    **Examples of pattern matching on `Binding`:**
 
-```csharp
-// For mouse-triggered commands:
-if (e.Context is CommandContext<MouseBinding> { TypedBinding.MouseEvent: { } mouse })
-{
-    Point position = mouse.Position!.Value;
-    MouseFlags flags = mouse.Flags;
-}
+    ```csharp
+    // For mouse-triggered commands:
+    if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
+    {
+        Point position = mouse.Position!.Value;
+        MouseFlags flags = mouse.Flags;
+    }
 
-// For key-triggered commands:
-if (e.Context is CommandContext<KeyBinding> { TypedBinding.Key: { } key })
-{
-    // Handle key-specific logic
-}
-```
+    // For key-triggered commands:
+    if (e.Context?.Binding is KeyBinding { Key: { } key })
+    {
+        // Handle key-specific logic
+    }
+    ```
 
-#### Source Tracking
+    #### Source Tracking
 
 - **`ICommandContext.Source`**: The View that first invoked the command. This remains constant during command propagation.
 - **`IInputBinding.Source`**: The View where the binding was defined/added.
