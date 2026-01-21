@@ -91,7 +91,7 @@ public class ScrollBarDemo : Scenario
                                                           : scrollBar.SuperView?.GetContentSize ().Height))
                                                {
                                                    // TODO: This must be handled in the ScrollSlider if Width and Height being virtual
-                                                   e.Cancel = true;
+                                                   e.Handled = true;
 
                                                    return;
                                                }
@@ -167,7 +167,7 @@ public class ScrollBarDemo : Scenario
                                            {
                                                if (e.NewValue < 0)
                                                {
-                                                   e.Cancel = true;
+                                                   e.Handled = true;
 
                                                    return;
                                                }
@@ -204,7 +204,7 @@ public class ScrollBarDemo : Scenario
                                             {
                                                 if (e.NewValue < 0)
                                                 {
-                                                    e.Cancel = true;
+                                                    e.Handled = true;
 
                                                     return;
                                                 }
@@ -236,7 +236,7 @@ public class ScrollBarDemo : Scenario
                                         {
                                             if (e.NewValue < 0)
                                             {
-                                                e.Cancel = true;
+                                                e.Handled = true;
 
                                                 return;
                                             }
@@ -248,7 +248,7 @@ public class ScrollBarDemo : Scenario
 
                                             if (scrollBar.Position != e.NewValue)
                                             {
-                                                e.Cancel = true;
+                                                e.Handled = true;
                                             }
                                         };
 

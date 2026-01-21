@@ -108,9 +108,9 @@ public class HexEditor : Scenario
 
         addressWidthUpDown.ValueChanging += (_, args) =>
                                             {
-                                                args.Cancel = args.NewValue is < 0 or > 8;
+                                                args.Handled = args.NewValue < 0 || args.NewValue > 8;
 
-                                                if (!args.Cancel)
+                                                if (!args.Handled)
                                                 {
                                                     _hexView.AddressWidth = args.NewValue;
 
@@ -121,9 +121,9 @@ public class HexEditor : Scenario
 
         addressUpDown.ValueChanging += (_, args) =>
                                        {
-                                           args.Cancel = args.NewValue is < 0;
+                                           args.Handled = args.NewValue < 0;
 
-                                           if (!args.Cancel)
+                                           if (!args.Handled)
                                            {
                                                _hexView.Address = args.NewValue;
                                            }

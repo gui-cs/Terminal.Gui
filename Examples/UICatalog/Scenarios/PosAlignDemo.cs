@@ -262,16 +262,19 @@ public sealed class PosAlignDemo : Scenario
                                           {
                                               if (e.NewValue < 0)
                                               {
-                                                  e.Cancel = true;
+                                                  e.Handled = true;
 
                                                   return;
                                               }
 
+                                              int newValue = e.NewValue;
+                                              int currentValue = e.CurrentValue;
+
                                               // Add or remove buttons
-                                              if (e.NewValue < e.CurrentValue)
+                                              if (newValue < currentValue)
                                               {
                                                   // Remove buttons
-                                                  for (int i = e.CurrentValue - 1; i >= e.NewValue; i--)
+                                                  for (int i = currentValue - 1; i >= newValue; i--)
                                                   {
                                                       Button button = addedViews [i];
                                                       appWindow.Remove (button);
@@ -280,12 +283,12 @@ public sealed class PosAlignDemo : Scenario
                                                   }
                                               }
 
-                                              if (e.NewValue > e.CurrentValue)
+                                              if (newValue > currentValue)
                                               {
                                                   // Add buttons
-                                                  for (int i = e.CurrentValue; i < e.NewValue; i++)
+                                                  for (int i = currentValue; i < newValue; i++)
                                                   {
-                                                      var button = new Button
+                                                      Button button = new ()
                                                       {
                                                           X = dimension == Dimension.Width
                                                                   ? Pos.Align (_horizAligner.Alignment)

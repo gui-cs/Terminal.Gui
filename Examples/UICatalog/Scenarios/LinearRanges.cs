@@ -155,7 +155,7 @@ public class LinearRanges : Scenario
                                             {
                                                 if (e.NewValue < 0)
                                                 {
-                                                    e.Cancel = true;
+                                                    e.Handled = true;
 
                                                     return;
                                                 }

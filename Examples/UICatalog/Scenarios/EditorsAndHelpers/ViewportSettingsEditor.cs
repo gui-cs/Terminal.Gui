@@ -191,11 +191,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _contentSizeWidth.ValueChanging += ContentSizeWidthValueChanged;
 
-        void ContentSizeWidthValueChanged (object? sender, CancelEventArgs<int> cea)
+        void ContentSizeWidthValueChanged (object? sender, ValueChangingEventArgs<int> cea)
         {
             if (cea.NewValue < 0)
             {
-                cea.Cancel = true;
+                cea.Handled = true;
 
                 return;
             }
@@ -218,11 +218,11 @@ public sealed class ViewportSettingsEditor : EditorBase
         };
         _contentSizeHeight.ValueChanging += ContentSizeHeightValueChanged;
 
-        void ContentSizeHeightValueChanged (object? sender, CancelEventArgs<int> cea)
+        void ContentSizeHeightValueChanged (object? sender, ValueChangingEventArgs<int> cea)
         {
             if (cea.NewValue < 0)
             {
-                cea.Cancel = true;
+                cea.Handled = true;
 
                 return;
             }

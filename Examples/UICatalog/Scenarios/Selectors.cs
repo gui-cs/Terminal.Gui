@@ -212,11 +212,11 @@ public sealed class Selectors : Scenario
             }
         }
 
-        void HorizontalSpaceOnValueChanging (object? sender, CancelEventArgs<int> e)
+        void HorizontalSpaceOnValueChanging (object? sender, ValueChangingEventArgs<int> e)
         {
             if (sender is not NumericUpDown<int> || e.NewValue < 0)
             {
-                e.Cancel = true;
+                e.Handled = true;
 
                 return;
             }

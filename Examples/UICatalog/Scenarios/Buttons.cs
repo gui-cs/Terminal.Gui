@@ -332,7 +332,7 @@ public class Buttons : Scenario
         };
         numericUpDown.ValueChanged += NumericUpDownValueChanged;
 
-        void NumericUpDownValueChanged (object sender, EventArgs<int> e) { }
+        void NumericUpDownValueChanged (object? sender, ValueChangedEventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
