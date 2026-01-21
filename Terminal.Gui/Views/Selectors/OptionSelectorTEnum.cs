@@ -1,3 +1,5 @@
+using Terminal.Gui.ViewBase;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -5,7 +7,7 @@ namespace Terminal.Gui.Views;
 ///     Each option is represented by a checkbox, but only one can be selected at a time.
 ///     <see cref="OptionSelector"/> provides a non-type-safe version.
 /// </summary>
-public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct, Enum
+public sealed class OptionSelector<TEnum> : OptionSelector, IValue where TEnum : struct, Enum
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="OptionSelector{TEnum}"/> class.
@@ -51,5 +53,5 @@ public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct,
     }
 
     /// <inheritdoc/>
-    public override object? GetValue () => Value;
+    object? IValue.GetValue () => Value;
 }

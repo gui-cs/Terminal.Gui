@@ -36,7 +36,7 @@ namespace Terminal.Gui.Views;
 ///         </list>
 ///     </para>
 /// </remarks>
-public class TimeField : TextField
+public class TimeField : TextField, IValue<TimeSpan>
 {
     /// <summary>
     ///     The field length for long format (HH:mm:ss) = 8 characters.
@@ -198,14 +198,23 @@ public class TimeField : TextField
             }
 
             TimeSpan oldTime = _time;
+
+            if (oldTime == value)
+            {
+                return;
+            }
+
+            if (RaiseTimeValueChanging (oldTime, value))
+            {
+                return;
+            }
+
             _time = value;
             Text = " " + value.ToString (Format.Trim ());
             EventArgs<TimeSpan> args = new (value);
 
-            if (oldTime != value)
-            {
-                OnTimeChanged (args);
-            }
+            OnTimeChanged (args);
+            RaiseTimeValueChanged (oldTime, value);
         }
     }
 
@@ -298,6 +307,40 @@ public class TimeField : TextField
     /// <summary>TimeChanged event, raised when the Date has changed.</summary>
     /// <remarks>This event is raised when the <see cref="Time"/> changes.</remarks>
     public event EventHandler<EventArgs<TimeSpan>>? TimeChanged;
+
+    #region IValue<TimeSpan> Implementation
+
+    /// <inheritdoc/>
+    public new TimeSpan Value
+    {
+        get => Time;
+        set => Time = value;
+    }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => Time;
+
+    /// <inheritdoc/>
+    public new event EventHandler<ValueChangingEventArgs<TimeSpan>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public new event EventHandler<ValueChangedEventArgs<TimeSpan>>? ValueChanged;
+
+    private bool RaiseTimeValueChanging (TimeSpan currentValue, TimeSpan newValue)
+    {
+        ValueChangingEventArgs<TimeSpan> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    private void RaiseTimeValueChanged (TimeSpan oldValue, TimeSpan newValue)
+    {
+        ValueChangedEventArgs<TimeSpan> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     /// <summary>
     ///     Adjusts the cursor position to ensure it lands on a valid digit position, skipping separator characters.

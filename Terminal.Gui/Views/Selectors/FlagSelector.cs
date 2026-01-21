@@ -126,6 +126,13 @@ public class FlagSelector : SelectorBase, IDesignable
             }
 
             int? previousValue = _value;
+
+            // Raise ValueChanging (cancellable) - use base class implementation
+            if (RaiseValueChanging (previousValue, value))
+            {
+                return;
+            }
+
             _value = value;
 
             if (_value is null)
@@ -138,7 +145,7 @@ public class FlagSelector : SelectorBase, IDesignable
                 UpdateChecked ();
             }
 
-            RaiseValueChanged (previousValue);
+            RaiseValueChanged (previousValue, _value);
         }
     }
 

@@ -8,7 +8,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="RadioStyle"/> is used to display radio button style glyphs (●) instead of checkbox style glyphs (☑).
 ///     </para>
 /// </remarks>
-public class CheckBox : View, IValue
+public class CheckBox : View, IValue<CheckState>
 {
     private static MouseState _defaultHighlightStates = MouseState.PressedOutside | MouseState.Pressed | MouseState.In; // Resources/config.json overrides
 
@@ -166,6 +166,8 @@ public class CheckBox : View, IValue
             return null;
         }
 
+        CheckState oldValue = _checkedState;
+
         ResultEventArgs<CheckState> e = new (value);
 
         if (OnCheckedStateChanging (e))
@@ -180,6 +182,12 @@ public class CheckBox : View, IValue
             return e.Handled;
         }
 
+        // Raise IValue<CheckState>.ValueChanging
+        if (RaiseValueChanging (oldValue, value))
+        {
+            return true;
+        }
+
         _checkedState = value;
         UpdateTextFormatterText ();
         SetNeedsLayout ();
@@ -188,6 +196,9 @@ public class CheckBox : View, IValue
         OnCheckedStateChanged (args);
 
         CheckedStateChanged?.Invoke (this, args);
+
+        // Raise IValue<CheckState>.ValueChanged
+        RaiseValueChanged (oldValue, _checkedState);
 
         return false;
     }
@@ -213,6 +224,49 @@ public class CheckBox : View, IValue
 
     /// <summary>Raised when the <see cref="CheckBox"/> state has changed.</summary>
     public event EventHandler<EventArgs<CheckState>>? CheckedStateChanged;
+
+    #region IValue<CheckState> Implementation
+
+    /// <summary>
+    ///     Gets or sets the value of the <see cref="CheckBox"/>. This is an alias for <see cref="CheckedState"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property enables <see cref="CheckBox"/> to be used with the <see cref="IValue{TValue}"/> pattern
+    ///     for generic value access and command propagation.
+    /// </remarks>
+    public CheckState Value
+    {
+        get => CheckedState;
+        set => CheckedState = value;
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<CheckState>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<CheckState>>? ValueChanged;
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanging"/> event. Called from <see cref="ChangeCheckedState"/>.
+    /// </summary>
+    private bool RaiseValueChanging (CheckState currentValue, CheckState newValue)
+    {
+        ValueChangingEventArgs<CheckState> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event. Called from <see cref="ChangeCheckedState"/>.
+    /// </summary>
+    private void RaiseValueChanged (CheckState oldValue, CheckState newValue)
+    {
+        ValueChangedEventArgs<CheckState> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     /// <summary>
     ///     Advances <see cref="CheckedState"/> to the next value. Invokes the cancelable <see cref="CheckedStateChanging"/>
@@ -309,9 +363,6 @@ public class CheckBox : View, IValue
     ///     checkbox style glyphs (☑).
     /// </summary>
     public bool RadioStyle { get; set; }
-
-    /// <inheritdoc/>
-    public object? GetValue () => CheckedState;
 
     private Rune GetRadioGlyph ()
     {

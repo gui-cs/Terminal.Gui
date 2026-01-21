@@ -1,4 +1,5 @@
 using System;
+using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
@@ -7,7 +8,7 @@ namespace Terminal.Gui.Views;
 ///     <see cref="FlagSelector"/> provides a non-type-safe version. <c>TFlagsEnum</c> must be a valid enum type with
 ///     the '[Flags]' attribute.
 /// </summary>
-public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : struct, Enum
+public sealed class FlagSelector<TFlagsEnum> : FlagSelector, IValue where TFlagsEnum : struct, Enum
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="FlagSelector{TFlagsEnum}"/> class.
@@ -41,5 +42,5 @@ public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : s
     }
 
     /// <inheritdoc/>
-    public override object? GetValue () => Value;
+    object? IValue.GetValue () => Value;
 }

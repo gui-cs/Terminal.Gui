@@ -124,7 +124,7 @@ public class DimEditor : EditorBase
         Add (_dimOptionSelector);
     }
 
-    private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { DimChanged (); }
+    private void OnOptionSelectorOnValueChanged (object? s, ValueChangedEventArgs<int?> args) { DimChanged (); }
 
     // These need to have same order
     private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent"];

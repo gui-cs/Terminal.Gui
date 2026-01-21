@@ -216,11 +216,11 @@ public sealed class UICatalogRunnable : Runnable
 
                 _themesSelector.ValueChanged += (_, args) =>
                                                 {
-                                                    if (args.Value is null)
+                                                    if (args.NewValue is null)
                                                     {
                                                         return;
                                                     }
-                                                    ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.Value];
+                                                    ThemeManager.Theme = ThemeManager.GetThemeNames () [(int)args.NewValue];
                                                 };
 
                 var menuItem = new MenuItem { CommandView = _themesSelector, HelpText = "Cycle Through Themes", Key = Key.T.WithCtrl };
@@ -232,11 +232,11 @@ public sealed class UICatalogRunnable : Runnable
 
                 _topSchemesSelector.ValueChanged += (_, args) =>
                                                     {
-                                                        if (args.Value is null)
+                                                        if (args.NewValue is null)
                                                         {
                                                             return;
                                                         }
-                                                        CachedRunnableScheme = SchemeManager.GetSchemesForCurrentTheme ().Keys.ToArray () [(int)args.Value];
+                                                        CachedRunnableScheme = SchemeManager.GetSchemesForCurrentTheme ().Keys.ToArray () [(int)args.NewValue];
                                                         SchemeName = CachedRunnableScheme;
                                                         SetNeedsDraw ();
                                                     };
@@ -326,7 +326,7 @@ public sealed class UICatalogRunnable : Runnable
 
             _logLevelSelector.ValueChanged += (_, args) =>
                                               {
-                                                  UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.Value!.Value])! };
+                                                  UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.NewValue!.Value])! };
 
                                                   UICatalog.LogLevelSwitch.MinimumLevel =
                                                       UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));

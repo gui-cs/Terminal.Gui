@@ -4,7 +4,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
 /// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
-public partial class TextField : View, IDesignable, IValue
+public partial class TextField : View, IDesignable, IValue<string>
 {
     /// <summary>
     ///     Gets or sets the default cursor style.
@@ -149,8 +149,48 @@ public partial class TextField : View, IDesignable, IValue
         return true;
     }
 
+    #region IValue<string> Implementation
+
+    /// <summary>
+    ///     Gets or sets the value of the <see cref="TextField"/>. This is an alias for <see cref="Text"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property enables <see cref="TextField"/> to be used with the <see cref="IValue{TValue}"/> pattern
+    ///     for generic value access and command propagation.
+    /// </remarks>
+    public string? Value
+    {
+        get => Text;
+        set => Text = value ?? string.Empty;
+    }
+
     /// <inheritdoc/>
-    public object? GetValue () => Text;
+    public event EventHandler<ValueChangingEventArgs<string?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanging"/> event.
+    /// </summary>
+    private bool RaiseValueChanging (string? currentValue, string? newValue)
+    {
+        ValueChangingEventArgs<string?> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event.
+    /// </summary>
+    private void RaiseValueChanged (string? oldValue, string? newValue)
+    {
+        ValueChangedEventArgs<string?> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

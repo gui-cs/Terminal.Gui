@@ -332,7 +332,7 @@ public class FlagSelectorTests
 
         flagSelector.ValueChanged += (s, e) =>
         {
-            newValue = e.Value;
+            newValue = e.NewValue;
         };
 
         flagSelector.Value = 1;

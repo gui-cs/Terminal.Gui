@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
@@ -26,7 +27,7 @@ namespace Terminal.Gui.Views;
 ///         By default, this view cannot be focused and does not support keyboard input.
 ///     </para>
 /// </remarks>
-public class ScrollBar : View, IOrientation, IDesignable
+public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 {
     private readonly Button _decreaseButton;
     private readonly ScrollSlider _slider;
@@ -332,6 +333,14 @@ public class ScrollBar : View, IOrientation, IDesignable
             int newContentPosition = Math.Clamp (value, 0, Math.Max (0, ScrollableContentSize - VisibleContentSize));
             NavigationDirection direction = newContentPosition >= _position ? NavigationDirection.Forward : NavigationDirection.Backward;
 
+            int oldPosition = _position;
+
+            // Raise IValue<int>.ValueChanging (cancellable)
+            if (RaiseValueChanging (oldPosition, newContentPosition))
+            {
+                return;
+            }
+
             if (OnPositionChanging (_position, newContentPosition))
             {
                 return;
@@ -364,6 +373,9 @@ public class ScrollBar : View, IOrientation, IDesignable
             OnPositionChanged (_position);
             PositionChanged?.Invoke (this, new (in _position));
 
+            // Raise IValue<int>.ValueChanged
+            RaiseValueChanged (oldPosition, _position);
+
             OnScrolled (distance);
             Scrolled?.Invoke (this, new (in distance));
             SetNeedsLayout ();
@@ -392,6 +404,50 @@ public class ScrollBar : View, IOrientation, IDesignable
 
     /// <summary>Raised when the <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
     public event EventHandler<EventArgs<int>>? Scrolled;
+
+    #region IValue<int> Implementation
+
+    /// <summary>
+    ///     Gets or sets the value of the <see cref="ScrollBar"/>. This is an alias for <see cref="Position"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property enables <see cref="ScrollBar"/> to be used with the <see cref="IValue{TValue}"/> pattern
+    ///     for generic value access and command propagation.
+    /// </remarks>
+    public int Value
+    {
+        get => Position;
+        set => Position = value;
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<int>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanging"/> event.
+    /// </summary>
+    /// <returns><see langword="true"/> if the change was cancelled.</returns>
+    private bool RaiseValueChanging (int currentValue, int newValue)
+    {
+        ValueChangingEventArgs<int> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event.
+    /// </summary>
+    private void RaiseValueChanged (int oldValue, int newValue)
+    {
+        ValueChangedEventArgs<int> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     /// <summary>
     ///     INTERNAL API (for unit tests) - Calculates the position within the <see cref="ScrollableContentSize"/> based on the

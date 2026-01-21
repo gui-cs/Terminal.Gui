@@ -1,4 +1,5 @@
 using System.Globalization;
+using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
@@ -67,7 +68,7 @@ namespace Terminal.Gui.Views;
 ///         </list>
 ///     </para>
 /// </remarks>
-public class DateField : TextField
+public class DateField : TextField, IValue<DateTime?>
 {
     /// <summary>
     ///     Unicode Right-to-Left Mark character, used to handle RTL date formats in some cultures.
@@ -167,6 +168,18 @@ public class DateField : TextField
             }
 
             DateTime? oldData = _date;
+
+            if (oldData == value)
+            {
+                return;
+            }
+
+            // Raise IValue<DateTime?>.ValueChanging (cancellable)
+            if (RaiseDateValueChanging (oldData, value))
+            {
+                return;
+            }
+
             _date = value;
 
             if (_format is null)
@@ -177,11 +190,11 @@ public class DateField : TextField
             Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ())).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
             EventArgs<DateTime> args = new (value!.Value);
 
-            if (oldData != value)
-            {
-                OnDateChanged (args);
-                DateChanged?.Invoke (this, args);
-            }
+            OnDateChanged (args);
+            DateChanged?.Invoke (this, args);
+
+            // Raise IValue<DateTime?>.ValueChanged
+            RaiseDateValueChanged (oldData, _date);
         }
     }
 
@@ -202,6 +215,53 @@ public class DateField : TextField
     /// <remarks>This event is raised when the <see cref="Date"/> property changes.</remarks>
     /// <remarks>The passed event arguments containing the old value, new value, and format string.</remarks>
     public event EventHandler<EventArgs<DateTime>>? DateChanged;
+
+    #region IValue<DateTime?> Implementation
+
+    /// <summary>
+    ///     Gets or sets the value of the <see cref="DateField"/>. This is an alias for <see cref="Date"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property enables <see cref="DateField"/> to be used with the <see cref="IValue{TValue}"/> pattern
+    ///     for generic value access and command propagation.
+    /// </remarks>
+    public new DateTime? Value
+    {
+        get => Date;
+        set => Date = value;
+    }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => Date;
+
+    /// <inheritdoc/>
+    public new event EventHandler<ValueChangingEventArgs<DateTime?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public new event EventHandler<ValueChangedEventArgs<DateTime?>>? ValueChanged;
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanging"/> event.
+    /// </summary>
+    /// <returns><see langword="true"/> if the change was cancelled.</returns>
+    private bool RaiseDateValueChanging (DateTime? currentValue, DateTime? newValue)
+    {
+        ValueChangingEventArgs<DateTime?> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event.
+    /// </summary>
+    private void RaiseDateValueChanged (DateTime? oldValue, DateTime? newValue)
+    {
+        ValueChangedEventArgs<DateTime?> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     /// <inheritdoc/>
     public override bool DeleteCharLeft (bool useOldCursorPos)

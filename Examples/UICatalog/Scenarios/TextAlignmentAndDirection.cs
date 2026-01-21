@@ -546,9 +546,9 @@ public class TextAlignmentAndDirection : Scenario
                                                  ToggleJustify (true);
                                              }
 
-                                             foreach (View v in multiLineLabels.Where (v => ev.Value is not null))
+                                             foreach (View v in multiLineLabels.Where (v => ev.NewValue is not null))
                                              {
-                                                 v.TextDirection = (TextDirection)ev.Value!.Value;
+                                                 v.TextDirection = (TextDirection)ev.NewValue!.Value;
                                              }
 
                                              if (justChecked)

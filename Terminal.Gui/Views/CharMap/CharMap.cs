@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
+using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
@@ -10,7 +11,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     See <see href="../docs/CharacterMap.md"/> for details.
 /// </remarks>
-public class CharMap : View, IDesignable
+public class CharMap : View, IDesignable, IValue<Rune>
 {
     /// <summary>
     ///     Gets or sets the default cursor style.
@@ -194,7 +195,13 @@ public class CharMap : View, IDesignable
                 return;
             }
 
+            int oldSelectedCodePoint = _selectedCodepoint;
             int newSelectedCodePoint = Math.Clamp (value, 0, MAX_CODE_POINT);
+
+            if (RaiseRuneValueChanging (new Rune (oldSelectedCodePoint), new Rune (newSelectedCodePoint)))
+            {
+                return;
+            }
 
             Point offsetToNewCursor = GetCursor (newSelectedCodePoint);
 
@@ -206,6 +213,7 @@ public class CharMap : View, IDesignable
             SetNeedsDraw ();
             UpdateCursor ();
             SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint));
+            RaiseRuneValueChanged (new Rune (oldSelectedCodePoint), new Rune (newSelectedCodePoint));
         }
     }
 
@@ -213,6 +221,40 @@ public class CharMap : View, IDesignable
     ///     Raised when the selected code point changes.
     /// </summary>
     public event EventHandler<EventArgs<int>>? SelectedCodePointChanged;
+
+    #region IValue<Rune> Implementation
+
+    /// <inheritdoc/>
+    public Rune Value
+    {
+        get => new (SelectedCodePoint);
+        set => SelectedCodePoint = value.Value;
+    }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => new Rune (SelectedCodePoint);
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<Rune>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<Rune>>? ValueChanged;
+
+    private bool RaiseRuneValueChanging (Rune currentValue, Rune newValue)
+    {
+        ValueChangingEventArgs<Rune> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    private void RaiseRuneValueChanged (Rune oldValue, Rune newValue)
+    {
+        ValueChangedEventArgs<Rune> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     /// <summary>
     ///     Gets or sets whether the number of columns each glyph is displayed.

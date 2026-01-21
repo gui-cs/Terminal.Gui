@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
@@ -41,7 +42,7 @@ namespace Terminal.Gui.Views;
 ///         first item that starts with what the user types will be selected.
 ///     </para>
 /// </remarks>
-public class ListView : View, IDesignable
+public class ListView : View, IDesignable, IValue<int?>
 {
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView"/>. Set the <see cref="Source"/> property to display
@@ -548,9 +549,22 @@ public class ListView : View, IDesignable
                 throw new ArgumentException (@"SelectedItem must be greater than 0 or less than the number of items.");
             }
 
+            int? oldValue = field;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            if (RaiseValueChanging (oldValue, value))
+            {
+                return;
+            }
+
             field = value;
             OnSelectedChanged ();
             SetNeedsDraw ();
+            RaiseValueChanged (oldValue, value);
         }
     }
 
@@ -574,6 +588,40 @@ public class ListView : View, IDesignable
 
     /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
     public event EventHandler<ListViewItemEventArgs>? SelectedItemChanged;
+
+    #region IValue<int?> Implementation
+
+    /// <inheritdoc/>
+    public int? Value
+    {
+        get => SelectedItem;
+        set => SelectedItem = value;
+    }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => SelectedItem;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+    private bool RaiseValueChanging (int? currentValue, int? newValue)
+    {
+        ValueChangingEventArgs<int?> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    private void RaiseValueChanged (int? oldValue, int? newValue)
+    {
+        ValueChangedEventArgs<int?> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     /// <summary>Sets the source of the <see cref="ListView"/> to an <see cref="IList"/>.</summary>
     /// <value>An object implementing the IList interface.</value>

@@ -181,10 +181,10 @@ public class ColorPickers : Scenario
             _backgroundColorPicker.ApplyStyleChanges ();
         }
 
-        void OnOsColorModelOnValueChanged (object _, EventArgs<int?> e)
+        void OnOsColorModelOnValueChanged (object? _, ValueChangedEventArgs<int?> e)
         {
             // 16 colors
-            if (e.Value == 3)
+            if (e.NewValue == 3)
             {
                 _foregroundColorPicker16.Visible = true;
                 _foregroundColorPicker.Visible = false;
@@ -201,14 +201,14 @@ public class ColorPickers : Scenario
                 _foregroundColorPicker16.Visible = false;
                 _foregroundColorPicker.Visible = true;
 
-                if (e.Value is { })
+                if (e.NewValue is { })
                 {
-                    _foregroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                    _foregroundColorPicker.Style.ColorModel = (ColorModel)e.NewValue;
                     _foregroundColorPicker.ApplyStyleChanges ();
 
                     _backgroundColorPicker16.Visible = false;
                     _backgroundColorPicker.Visible = true;
-                    _backgroundColorPicker.Style.ColorModel = (ColorModel)e.Value;
+                    _backgroundColorPicker.Style.ColorModel = (ColorModel)e.NewValue;
                 }
 
                 _backgroundColorPicker.ApplyStyleChanges ();

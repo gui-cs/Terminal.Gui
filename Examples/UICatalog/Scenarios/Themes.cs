@@ -46,7 +46,7 @@ public sealed class Themes : Scenario
                                                  {
                                                      return;
                                                  }
-                                                 string? newTheme = optionSelector.Labels! [(int)args.Value!] as string;
+                                                 string? newTheme = optionSelector.Labels! [(int)args.NewValue!] as string;
                                                  // strip off the leading underscore
                                                  ThemeManager.Theme = newTheme!.Substring (1);
                                                  ConfigurationManager.Apply ();

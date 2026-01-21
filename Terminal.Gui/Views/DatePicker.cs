@@ -6,13 +6,15 @@
 
 using System.Data;
 using System.Globalization;
+using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>Lets the user pick a date from a visual calendar.</summary>
-public class DatePicker : View
+public class DatePicker : View, IValue<DateTime>
 {
     private TableView? _calendar;
+    private DateTime _date;
     private DateField? _dateField;
     private Label? _dateLabel;
     private Button? _nextMonthButton;
@@ -40,7 +42,27 @@ public class DatePicker : View
     }
 
     /// <summary>Get or set the date.</summary>
-    public DateTime Date { get; set; }
+    public DateTime Date
+    {
+        get => _date;
+        set
+        {
+            DateTime oldDate = _date;
+
+            if (oldDate == value)
+            {
+                return;
+            }
+
+            if (RaiseDateValueChanging (oldDate, value))
+            {
+                return;
+            }
+
+            _date = value;
+            RaiseDateValueChanged (oldDate, value);
+        }
+    }
 
     /// <inheritdoc />
     public override string Text
@@ -54,6 +76,40 @@ public class DatePicker : View
             }
         }
     }
+
+    #region IValue<DateTime> Implementation
+
+    /// <inheritdoc/>
+    public DateTime Value
+    {
+        get => Date;
+        set => Date = value;
+    }
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => Date;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<DateTime>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<DateTime>>? ValueChanged;
+
+    private bool RaiseDateValueChanging (DateTime currentValue, DateTime newValue)
+    {
+        ValueChangingEventArgs<DateTime> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    private void RaiseDateValueChanged (DateTime oldValue, DateTime newValue)
+    {
+        ValueChangedEventArgs<DateTime> args = new (oldValue, newValue);
+        ValueChanged?.Invoke (this, args);
+    }
+
+    #endregion
 
     private string Format => StandardizeDateFormat (Culture?.DateTimeFormat.ShortDatePattern);
 

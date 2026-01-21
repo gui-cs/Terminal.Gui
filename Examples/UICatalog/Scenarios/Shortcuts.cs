@@ -205,7 +205,7 @@ public class Shortcuts : Scenario
                                                                                     if (send is not null)
                                                                                     {
                                                                                         eventSource.Add (
-                                                                                                         $"ValueChanged: {send.GetType ().Name} - {args.Value}");
+                                                                                                         $"ValueChanged: {send.GetType ().Name} - {args.NewValue}");
                                                                                         eventLog.MoveDown ();
                                                                                     }
                                                                                 };
