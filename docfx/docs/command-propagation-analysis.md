@@ -1,6 +1,6 @@
 # Command Propagation Analysis and Design
 
-> **Status**: Analysis Document (Step 1 of Issue Resolution)
+> **Status**: Analysis Document
 >
 > **Issue**: [Menu etc. with Selectors are broken - Formalize/Fix Command propagation](https://github.com/gui-cs/Terminal.Gui/issues/XXXXX)
 >
