@@ -80,6 +80,7 @@ public class AnsiRequestScheduler
         if (CanSend (request, out ReasonCannotSend reason))
         {
             Send (driver, request);
+
             //Logging.Trace ($"AnsiRequestScheduler: Sent request '{request.Request}' (Terminator='{request.Terminator}', Value='{request.Value ?? "<null>"}')");
 
             return true;
@@ -103,6 +104,7 @@ public class AnsiRequestScheduler
         if (addToQueue)
         {
             _queuedRequests.Add (Tuple.Create (request, Now ()));
+
             //Logging.Trace ($"AnsiRequestScheduler: Queued request '{request.Request}' (QueueSize={_queuedRequests.Count})");
         }
 

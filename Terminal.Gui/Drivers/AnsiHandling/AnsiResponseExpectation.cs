@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -26,17 +28,19 @@ internal record AnsiResponseExpectation (string? Terminator, string? Value, Acti
 
         // Remove leading ESC if present to simplify parsing
         string s = cur;
-        if (s.Length > 0 && s[0] == '\x1B')
+
+        if (s.Length > 0 && s [0] == '\x1B')
         {
             s = s.Substring (1);
         }
 
         // Extract the first numeric token after '[' (e.g. "[8;..." -> "8", "[6;..." -> "6")
         // This matches typical CSI reply formats used here.
-        var m = System.Text.RegularExpressions.Regex.Match (s, @"^\[(\d+);");
+        Match m = Regex.Match (s, @"^\[(\d+);");
+
         if (m.Success)
         {
-            return string.Equals (m.Groups[1].Value, Value, StringComparison.Ordinal);
+            return string.Equals (m.Groups [1].Value, Value, StringComparison.Ordinal);
         }
 
         // Fallback: conservative contains check (rare)

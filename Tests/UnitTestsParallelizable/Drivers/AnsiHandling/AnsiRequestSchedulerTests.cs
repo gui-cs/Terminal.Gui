@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 
 namespace DriverTests.AnsiHandling;
 
@@ -12,9 +12,9 @@ public class AnsiRequestSchedulerTests
 
     public AnsiRequestSchedulerTests ()
     {
-        _parserMock = new (MockBehavior.Strict);
+        _parserMock = new Mock<IAnsiResponseParser> (MockBehavior.Strict);
         _staticNow = DateTime.UtcNow; // Initialize static time
-        _scheduler = new (_parserMock.Object, () => _staticNow);
+        _scheduler = new AnsiRequestScheduler (_parserMock.Object, () => _staticNow);
     }
 
     [Fact]
@@ -146,12 +146,7 @@ public class AnsiRequestSchedulerTests
     public void EvictStaleRequests_RemovesStaleRequest_AfterTimeout ()
     {
         // Arrange
-        var request1 = new AnsiEscapeSequenceRequest
-        {
-            Request = "\u001b[0c",
-            Terminator = "c",
-            ResponseReceived = r => { }
-        };
+        var request1 = new AnsiEscapeSequenceRequest { Request = "\u001b[0c", Terminator = "c", ResponseReceived = r => { } };
 
         // Send
         _parserMock.Setup (p => p.IsExpecting ("c", null)).Returns (false).Verifiable (Times.Once);

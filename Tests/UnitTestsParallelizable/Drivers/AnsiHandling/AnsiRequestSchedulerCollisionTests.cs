@@ -35,7 +35,8 @@ public class AnsiRequestSchedulerCollisionTests
         bool sentFirst = scheduler.SendOrSchedule (null, requestWindowSizeChars);
 
         // Ensure parser registered expectation with Value == "8"
-        Assert.True (parser.IsExpecting (requestWindowSizeChars.Terminator, "8"), "Parser should be expecting terminator 't' with value '8' after first request");
+        Assert.True (parser.IsExpecting (requestWindowSizeChars.Terminator, "8"),
+                     "Parser should be expecting terminator 't' with value '8' after first request");
 
         // Send second request. With value-aware scheduling the second request (Value="6") is independent
         // and should be sent (not queued).
