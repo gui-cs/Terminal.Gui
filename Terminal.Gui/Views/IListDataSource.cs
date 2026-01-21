@@ -99,7 +99,7 @@ public interface IListDataSource : IDisposable
     /// <returns>The data source as an <see cref="IList"/>.</returns>
     /// <remarks>
     ///     <see cref="ListView"/> uses this method to access individual items for events like
-    ///     <see cref="ListView.SelectedItemChanged"/> and to enable keyboard search via
+    ///     <see cref="ListView.ValueChanged"/> and to enable keyboard search via
     ///     <see cref="ListView.KeystrokeNavigator"/>.
     /// </remarks>
     IList ToList ();

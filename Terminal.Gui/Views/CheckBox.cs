@@ -103,7 +103,7 @@ public class CheckBox : View, IValue<CheckState>
     private bool _allowNone;
 
     /// <summary>
-    ///     If <see langword="true"/> allows <see cref="CheckedState"/> to be <see cref="CheckState.None"/>. The default is
+    ///     If <see langword="true"/> allows <see cref="Value"/> to be <see cref="CheckState.None"/>. The default is
     ///     <see langword="false"/>.
     /// </summary>
     public bool AllowCheckStateNone
@@ -118,17 +118,19 @@ public class CheckBox : View, IValue<CheckState>
 
             _allowNone = value;
 
-            if (CheckedState == CheckState.None)
+            if (Value == CheckState.None)
             {
-                CheckedState = CheckState.UnChecked;
+                Value = CheckState.UnChecked;
             }
         }
     }
 
-    private CheckState _checkedState = CheckState.UnChecked;
+    #region IValue<CheckState> Implementation
+
+    private CheckState _value = CheckState.UnChecked;
 
     /// <summary>
-    ///     The state of the <see cref="CheckBox"/>.
+    ///     Gets or sets the state of the <see cref="CheckBox"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -145,99 +147,10 @@ public class CheckBox : View, IValue<CheckState>
     ///         will display the <c>Glyphs.CheckStateChecked</c> character (☑).
     ///     </para>
     /// </remarks>
-    public CheckState CheckedState
-    {
-        get => _checkedState;
-        set => ChangeCheckedState (value);
-    }
-
-    /// <summary>
-    ///     INTERNAL Sets CheckedState.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns>
-    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
-    ///     <see langword="null"/> if the state was not changed for some other reason.
-    /// </returns>
-    private bool? ChangeCheckedState (CheckState value)
-    {
-        if (_checkedState == value || (value is CheckState.None && !AllowCheckStateNone))
-        {
-            return null;
-        }
-
-        CheckState oldValue = _checkedState;
-
-        ResultEventArgs<CheckState> e = new (value);
-
-        if (OnCheckedStateChanging (e))
-        {
-            return true;
-        }
-
-        CheckedStateChanging?.Invoke (this, e);
-
-        if (e.Handled)
-        {
-            return e.Handled;
-        }
-
-        // Raise IValue<CheckState>.ValueChanging
-        if (RaiseValueChanging (oldValue, value))
-        {
-            return true;
-        }
-
-        _checkedState = value;
-        UpdateTextFormatterText ();
-        SetNeedsLayout ();
-
-        EventArgs<CheckState> args = new (in _checkedState);
-        OnCheckedStateChanged (args);
-
-        CheckedStateChanged?.Invoke (this, args);
-
-        // Raise IValue<CheckState>.ValueChanged
-        RaiseValueChanged (oldValue, _checkedState);
-
-        return false;
-    }
-
-    /// <summary>Called when the <see cref="CheckBox"/> state is changing.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         The state change can be cancelled by setting the args.Cancel to <see langword="true"/>.
-    ///     </para>
-    /// </remarks>
-    protected virtual bool OnCheckedStateChanging (ResultEventArgs<CheckState> args) { return false; }
-
-    /// <summary>Raised when the <see cref="CheckBox"/> state is changing.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         This event can be cancelled. If cancelled, the <see cref="CheckBox"/> will not change its state.
-    ///     </para>
-    /// </remarks>
-    public event EventHandler<ResultEventArgs<CheckState>>? CheckedStateChanging;
-
-    /// <summary>Called when the <see cref="CheckBox"/> state has changed.</summary>
-    protected virtual void OnCheckedStateChanged (EventArgs<CheckState> args) { }
-
-    /// <summary>Raised when the <see cref="CheckBox"/> state has changed.</summary>
-    public event EventHandler<EventArgs<CheckState>>? CheckedStateChanged;
-
-    #region IValue<CheckState> Implementation
-
-    /// <summary>
-    ///     Gets or sets the value of the <see cref="CheckBox"/>. This is an alias for <see cref="CheckedState"/>.
-    /// </summary>
-    /// <remarks>
-    ///     This property enables <see cref="CheckBox"/> to be used with the <see cref="IValue{TValue}"/> pattern
-    ///     for generic value access and command propagation.
-    /// </remarks>
     public CheckState Value
     {
-        get => CheckedState;
-        set => CheckedState = value;
+        get => _value;
+        set => ChangeValue (value);
     }
 
     /// <inheritdoc/>
@@ -247,29 +160,70 @@ public class CheckBox : View, IValue<CheckState>
     public event EventHandler<ValueChangedEventArgs<CheckState>>? ValueChanged;
 
     /// <summary>
-    ///     Raises the <see cref="ValueChanging"/> event. Called from <see cref="ChangeCheckedState"/>.
+    ///     Called when the <see cref="CheckBox"/> <see cref="Value"/> is changing.
     /// </summary>
-    private bool RaiseValueChanging (CheckState currentValue, CheckState newValue)
-    {
-        ValueChangingEventArgs<CheckState> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
-
-        return args.Handled;
-    }
+    /// <remarks>
+    ///     <para>
+    ///         The value change can be cancelled by returning <see langword="true"/> or setting
+    ///         <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<CheckState> args) { return false; }
 
     /// <summary>
-    ///     Raises the <see cref="ValueChanged"/> event. Called from <see cref="ChangeCheckedState"/>.
+    ///     Called when the <see cref="CheckBox"/> <see cref="Value"/> has changed.
     /// </summary>
-    private void RaiseValueChanged (CheckState oldValue, CheckState newValue)
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<CheckState> args) { }
+
+    /// <summary>
+    ///     INTERNAL Sets Value.
+    /// </summary>
+    /// <param name="newValue">The new value.</param>
+    /// <returns>
+    ///     <see langword="true"/> if state change was canceled, <see langword="false"/> if the state changed, and
+    ///     <see langword="null"/> if the state was not changed for some other reason.
+    /// </returns>
+    private bool? ChangeValue (CheckState newValue)
     {
-        ValueChangedEventArgs<CheckState> args = new (oldValue, newValue);
-        ValueChanged?.Invoke (this, args);
+        if (_value == newValue || (newValue is CheckState.None && !AllowCheckStateNone))
+        {
+            return null;
+        }
+
+        CheckState oldValue = _value;
+
+        ValueChangingEventArgs<CheckState> changingArgs = new (oldValue, newValue);
+
+        if (OnValueChanging (changingArgs) || changingArgs.Handled)
+        {
+            return true;
+        }
+
+        ValueChanging?.Invoke (this, changingArgs);
+
+        if (changingArgs.Handled)
+        {
+            return true;
+        }
+
+        _value = newValue;
+        UpdateTextFormatterText ();
+        SetNeedsLayout ();
+
+        ValueChangedEventArgs<CheckState> changedArgs = new (oldValue, _value);
+        OnValueChanged (changedArgs);
+        ValueChanged?.Invoke (this, changedArgs);
+
+        return false;
     }
 
     #endregion
 
     /// <summary>
-    ///     Advances <see cref="CheckedState"/> to the next value. Invokes the cancelable <see cref="CheckedStateChanging"/>
+    ///     Advances <see cref="Value"/> to the next value. Invokes the cancelable <see cref="ValueChanging"/>
     ///     event.
     /// </summary>
     /// <remarks>
@@ -278,7 +232,7 @@ public class CheckBox : View, IValue<CheckState>
     ///         <see cref="CheckState.UnChecked"/>.
     ///     </para>
     ///     <para>
-    ///         If the <see cref="CheckedStateChanging"/> event is not canceled, the <see cref="CheckedState"/> will be updated
+    ///         If the <see cref="ValueChanging"/> event is not canceled, the <see cref="Value"/> will be updated
     ///         and the <see cref="Command.Accept"/> event will be raised.
     ///     </para>
     /// </remarks>
@@ -288,35 +242,15 @@ public class CheckBox : View, IValue<CheckState>
     /// </returns>
     public bool? AdvanceCheckState ()
     {
-        CheckState oldValue = CheckedState;
-        ResultEventArgs<CheckState> e = new (oldValue);
-
-        switch (CheckedState)
+        CheckState nextValue = Value switch
         {
-            case CheckState.None:
-                e.Result = CheckState.Checked;
+            CheckState.None => CheckState.Checked,
+            CheckState.Checked => CheckState.UnChecked,
+            CheckState.UnChecked => AllowCheckStateNone ? CheckState.None : CheckState.Checked,
+            _ => CheckState.UnChecked
+        };
 
-                break;
-            case CheckState.Checked:
-                e.Result = CheckState.UnChecked;
-
-                break;
-            case CheckState.UnChecked:
-                if (AllowCheckStateNone)
-                {
-                    e.Result = CheckState.None;
-                }
-                else
-                {
-                    e.Result = CheckState.Checked;
-                }
-
-                break;
-        }
-
-        bool? cancelled = ChangeCheckedState (e.Result);
-
-        return cancelled;
+        return ChangeValue (nextValue);
     }
 
     /// <inheritdoc />
@@ -349,7 +283,7 @@ public class CheckBox : View, IValue<CheckState>
 
     private Rune GetCheckGlyph ()
     {
-        return CheckedState switch
+        return Value switch
         {
             CheckState.Checked => Glyphs.CheckStateChecked,
             CheckState.UnChecked => Glyphs.CheckStateUnChecked,
@@ -366,7 +300,7 @@ public class CheckBox : View, IValue<CheckState>
 
     private Rune GetRadioGlyph ()
     {
-        return CheckedState switch
+        return Value switch
         {
             CheckState.Checked => Glyphs.Selected,
             CheckState.UnChecked => Glyphs.UnSelected,

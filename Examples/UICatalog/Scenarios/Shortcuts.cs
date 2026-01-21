@@ -64,18 +64,18 @@ public class Shortcuts : Scenario
                 Text = "_Align Keys",
                 CanFocus = false,
                 MouseHighlightStates = MouseState.None,
-                CheckedState = CheckState.Checked
+                Value = CheckState.Checked
             },
             Key = Key.F5.WithCtrl.WithAlt.WithShift
         };
 
-        ((CheckBox)alignKeysShortcut.CommandView).CheckedStateChanging += (_, a) =>
+        ((CheckBox)alignKeysShortcut.CommandView).ValueChanging += (_, a) =>
                                                                           {
                                                                               if (alignKeysShortcut.CommandView is CheckBox cb)
                                                                               {
-                                                                                  bool align = a.Result == CheckState.Checked;
+                                                                                  bool align = a.NewValue == CheckState.Checked;
                                                                                   eventSource.Add (
-                                                                                                   $"{alignKeysShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
+                                                                                                   $"{alignKeysShortcut.Id}.CommandView.ValueChanging: {cb.Text}");
                                                                                   eventLog.MoveDown ();
 
                                                                                   AlignKeys (align);
@@ -101,20 +101,20 @@ public class Shortcuts : Scenario
             Key = Key.F.WithCtrl
         };
 
-        ((CheckBox)commandFirstShortcut.CommandView).CheckedState =
+        ((CheckBox)commandFirstShortcut.CommandView).Value =
             commandFirstShortcut.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.UnChecked : CheckState.Checked;
 
-        ((CheckBox)commandFirstShortcut.CommandView).CheckedStateChanging += (_, eventArgs) =>
+        ((CheckBox)commandFirstShortcut.CommandView).ValueChanging += (_, eventArgs) =>
                                                                              {
                                                                                  if (commandFirstShortcut.CommandView is CheckBox cb)
                                                                                  {
                                                                                      eventSource.Add (
-                                                                                                      $"{commandFirstShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
+                                                                                                      $"{commandFirstShortcut.Id}.CommandView.ValueChanging: {cb.Text}");
                                                                                      eventLog.MoveDown ();
 
                                                                                      foreach (Shortcut peer in _app!.TopRunnableView!.SubViews.OfType<Shortcut> ())
                                                                                      {
-                                                                                         if (eventArgs.Result == CheckState.Checked)
+                                                                                         if (eventArgs.NewValue == CheckState.Checked)
                                                                                          {
                                                                                              peer.AlignmentModes &= ~AlignmentModes.EndToStart;
                                                                                          }
@@ -139,14 +139,14 @@ public class Shortcuts : Scenario
             CommandView = new CheckBox { Text = "_CommandView.CanFocus" },
         };
 
-        ((CheckBox)canFocusShortcut.CommandView).CheckedStateChanging += (_, a) =>
+        ((CheckBox)canFocusShortcut.CommandView).ValueChanging += (_, a) =>
                                                                          {
                                                                              if (canFocusShortcut.CommandView is CheckBox cb)
                                                                              {
                                                                                  eventSource.Add ($"Toggle: {cb.Text}");
                                                                                  eventLog.MoveDown ();
 
-                                                                                 SetCanFocus (a.Result == CheckState.Checked);
+                                                                                 SetCanFocus (a.NewValue == CheckState.Checked);
                                                                              }
                                                                          };
         _app?.TopRunnableView.Add (canFocusShortcut);
@@ -431,11 +431,11 @@ public class Shortcuts : Scenario
                                          args.Handled = true;
                                      };
 
-        bgColor.ColorChanged += (sendingView, args) =>
+        bgColor.ValueChanged += (sendingView, args) =>
                                 {
                                     if (sendingView is not null)
                                     {
-                                        eventSource.Add ($"ColorChanged: {sendingView.GetType ().Name} - {args.Result}");
+                                        eventSource.Add ($"ValueChanged: {sendingView.GetType ().Name} - {args.NewValue}");
                                         eventLog.MoveDown ();
 
                                         _app!.TopRunnableView!.SetScheme (
@@ -443,7 +443,7 @@ public class Shortcuts : Scenario
                                                                    {
                                                                        Normal = new (
                                                                                      _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                                     args.Result,
+                                                                                     args.NewValue,
                                                                                      _app.TopRunnableView.GetAttributeForRole (VisualRole.Normal).Style)
                                                                    });
                                     }

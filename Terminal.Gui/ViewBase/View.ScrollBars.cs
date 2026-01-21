@@ -79,7 +79,7 @@ public partial class View
 
         ViewportChanged += (_, _) =>
                            {
-                               scrollBar.Position = Viewport.Y;
+                               scrollBar.Value = Viewport.Y;
                            };
 
         ContentSizeChanged += (_, _) =>
@@ -101,7 +101,7 @@ public partial class View
 
         ViewportChanged += (_, _) =>
                            {
-                               scrollBar.Position = Viewport.X;
+                               scrollBar.Value = Viewport.X;
                            };
 
         ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
@@ -125,13 +125,13 @@ public partial class View
     {
         Padding!.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
 
-        scrollBar.PositionChanged += (_, args) =>
-                                     {
-                                         Viewport = Viewport with
-                                         {
-                                             Y = Math.Min (args.Value, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
-                                         };
-                                     };
+        scrollBar.ValueChanged += (_, args) =>
+                                  {
+                                      Viewport = Viewport with
+                                      {
+                                          Y = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
+                                      };
+                                  };
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {
@@ -152,13 +152,13 @@ public partial class View
     {
         Padding!.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
 
-        scrollBar.PositionChanged += (_, args) =>
-                                     {
-                                         Viewport = Viewport with
-                                         {
-                                             X = Math.Min (args.Value, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
-                                         };
-                                     };
+        scrollBar.ValueChanged += (_, args) =>
+                                  {
+                                      Viewport = Viewport with
+                                      {
+                                          X = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize)
+                                      };
+                                  };
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {

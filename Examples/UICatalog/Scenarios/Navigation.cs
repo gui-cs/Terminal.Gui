@@ -171,7 +171,7 @@ public class Navigation : Scenario
         colorPicker.ApplyStyleChanges ();
 
         colorPicker.Value = testFrame.GetAttributeForRole (VisualRole.Normal).Background;
-        colorPicker.ColorChanged += ColorPickerColorChanged;
+        colorPicker.ValueChanged += ColorPickerColorChanged;
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
 
@@ -223,9 +223,9 @@ public class Navigation : Scenario
             app.Invoke (_ => { });
         }
 
-        void ColorPickerColorChanged (object sender, ResultEventArgs<Color> e)
+        void ColorPickerColorChanged (object? sender, ValueChangedEventArgs<Color?> e)
         {
-            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.Result) });
+            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.NewValue ?? Color.Black) });
         }
     }
 

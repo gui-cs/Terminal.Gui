@@ -50,9 +50,9 @@ public class TextEffectsScenario : Scenario
             Y = Pos.AnchorEnd (1)
         };
 
-        cbLooping.CheckedStateChanging += (_, e) =>
+        cbLooping.ValueChanging += (_, e) =>
                                           {
-                                              _loopingGradient = e.Result == CheckState.Checked;
+                                              _loopingGradient = e.NewValue == CheckState.Checked;
                                               SetupGradientLineCanvas (w, w.Frame.Size);
                                           };
 

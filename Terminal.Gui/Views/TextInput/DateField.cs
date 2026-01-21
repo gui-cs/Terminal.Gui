@@ -120,7 +120,7 @@ public class DateField : TextField, IValue<DateTime?>
             _culture = value ?? CultureInfo.CurrentCulture;
             _separator = GetDataSeparator (_culture.DateTimeFormat.DateSeparator);
             _format = " " + StandardizeDateFormat (_culture.DateTimeFormat.ShortDatePattern);
-            Text = Date?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
+            Text = Value?.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
         }
     }
 
@@ -155,49 +155,6 @@ public class DateField : TextField, IValue<DateTime?>
         set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1);
     }
 
-    /// <summary>Gets or sets the date of the <see cref="DateField"/>.</summary>
-    /// <remarks></remarks>
-    public DateTime? Date
-    {
-        get => _date;
-        set
-        {
-            if (ReadOnly)
-            {
-                return;
-            }
-
-            DateTime? oldData = _date;
-
-            if (oldData == value)
-            {
-                return;
-            }
-
-            // Raise IValue<DateTime?>.ValueChanging (cancellable)
-            if (RaiseDateValueChanging (oldData, value))
-            {
-                return;
-            }
-
-            _date = value;
-
-            if (_format is null)
-            {
-                return;
-            }
-
-            Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ())).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
-            EventArgs<DateTime> args = new (value!.Value);
-
-            OnDateChanged (args);
-            DateChanged?.Invoke (this, args);
-
-            // Raise IValue<DateTime?>.ValueChanged
-            RaiseDateValueChanged (oldData, _date);
-        }
-    }
-
     /// <summary>
     ///     Gets the length of the date format string (excluding the leading space), which represents
     ///     the maximum valid cursor position.
@@ -211,55 +168,76 @@ public class DateField : TextField, IValue<DateTime?>
     /// </remarks>
     private int FormatLength => StandardizeDateFormat (_format).Trim ().Length;
 
-    /// <summary>DateChanged event, raised when the <see cref="Date"/> property has changed.</summary>
-    /// <remarks>This event is raised when the <see cref="Date"/> property changes.</remarks>
-    /// <remarks>The passed event arguments containing the old value, new value, and format string.</remarks>
-    public event EventHandler<EventArgs<DateTime>>? DateChanged;
-
     #region IValue<DateTime?> Implementation
 
-    /// <summary>
-    ///     Gets or sets the value of the <see cref="DateField"/>. This is an alias for <see cref="Date"/>.
-    /// </summary>
-    /// <remarks>
-    ///     This property enables <see cref="DateField"/> to be used with the <see cref="IValue{TValue}"/> pattern
-    ///     for generic value access and command propagation.
-    /// </remarks>
+    /// <summary>Gets or sets the date value of the <see cref="DateField"/>.</summary>
     public new DateTime? Value
     {
-        get => Date;
-        set => Date = value;
+        get => _date;
+        set
+        {
+            if (ReadOnly)
+            {
+                return;
+            }
+
+            DateTime? oldValue = _date;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            ValueChangingEventArgs<DateTime?> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            _date = value;
+
+            if (_format is null)
+            {
+                return;
+            }
+
+            Text = value?.ToString (" " + StandardizeDateFormat (_format.Trim ())).Replace (RIGHT_TO_LEFT_MARK, "") ?? string.Empty;
+
+            ValueChangedEventArgs<DateTime?> changedArgs = new (oldValue, _date);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
+        }
     }
 
     /// <inheritdoc/>
-    object? IValue.GetValue () => Date;
+    object? IValue.GetValue () => _date;
+
+    /// <summary>
+    ///     Called when the <see cref="DateField"/> <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<DateTime?> args) { return false; }
 
     /// <inheritdoc/>
     public new event EventHandler<ValueChangingEventArgs<DateTime?>>? ValueChanging;
 
+    /// <summary>
+    ///     Called when the <see cref="DateField"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<DateTime?> args) { }
+
     /// <inheritdoc/>
     public new event EventHandler<ValueChangedEventArgs<DateTime?>>? ValueChanged;
-
-    /// <summary>
-    ///     Raises the <see cref="ValueChanging"/> event.
-    /// </summary>
-    /// <returns><see langword="true"/> if the change was cancelled.</returns>
-    private bool RaiseDateValueChanging (DateTime? currentValue, DateTime? newValue)
-    {
-        ValueChangingEventArgs<DateTime?> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
-
-        return args.Handled;
-    }
-
-    /// <summary>
-    ///     Raises the <see cref="ValueChanged"/> event.
-    /// </summary>
-    private void RaiseDateValueChanged (DateTime? oldValue, DateTime? newValue)
-    {
-        ValueChangedEventArgs<DateTime?> args = new (oldValue, newValue);
-        ValueChanged?.Invoke (this, args);
-    }
 
     #endregion
 
@@ -307,9 +285,6 @@ public class DateField : TextField, IValue<DateTime?>
         return mouse.Handled;
     }
 
-    /// <summary>Event firing method for the <see cref="DateChanged"/> event.</summary>
-    /// <param name="args">Event arguments</param>
-    protected virtual void OnDateChanged (EventArgs<DateTime> args) { }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key a)
@@ -619,7 +594,7 @@ public class DateField : TextField, IValue<DateTime?>
     {
         _format = $" {StandardizeDateFormat (Culture!.DateTimeFormat.ShortDatePattern)}";
         _separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
-        Date = date;
+        Value = date;
         InsertionPoint = 1;
         TextChanging += OnTextChanging;
 
@@ -784,7 +759,7 @@ public class DateField : TextField, IValue<DateTime?>
             return false;
         }
 
-        Date = date;
+        Value = date;
 
         return true;
     }

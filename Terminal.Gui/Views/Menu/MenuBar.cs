@@ -523,7 +523,7 @@ public class MenuBar : Menu, IDesignable
         var bordersCb = new CheckBox
         {
             Title = "_Borders",
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
 
         var autoSaveCb = new CheckBox
@@ -547,18 +547,18 @@ public class MenuBar : Menu, IDesignable
             Width = 30
         };
 
-        menuBgColorCp.ColorChanged += (sender, args) =>
-                                      {
-                                          // BUGBUG: This is weird.
-                                          SetScheme (
-                                                     GetScheme () with
-                                                     {
-                                                         Normal = new (
-                                                                       GetAttributeForRole (VisualRole.Normal).Foreground,
-                                                                       args.Result,
-                                                                       GetAttributeForRole (VisualRole.Normal).Style)
-                                                     });
-                                      };
+        menuBgColorCp.ValueChanged += (_, args) =>
+                                     {
+                                         // BUGBUG: This is weird.
+                                         SetScheme (
+                                                    GetScheme () with
+                                                    {
+                                                        Normal = new (
+                                                                      GetAttributeForRole (VisualRole.Normal).Foreground,
+                                                                      args.NewValue ?? Color.Black,
+                                                                      GetAttributeForRole (VisualRole.Normal).Style)
+                                                    });
+                                     };
 
         Add (
              new MenuBarItem (
@@ -692,7 +692,7 @@ public class MenuBar : Menu, IDesignable
 
                 foreach (Menu? subMenu in mbi.PopoverMenu.GetAllSubMenus ())
                 {
-                    if (bordersCb.CheckedState == CheckState.Checked)
+                    if (bordersCb.Value == CheckState.Checked)
                     {
                         subMenu.Border!.Thickness = new (1);
                     }

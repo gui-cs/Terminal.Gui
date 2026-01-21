@@ -556,38 +556,34 @@ public class ListView : View, IDesignable, IValue<int?>
                 return;
             }
 
-            if (RaiseValueChanging (oldValue, value))
+            ValueChangingEventArgs<int?> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
             {
                 return;
             }
 
             field = value;
-            OnSelectedChanged ();
             SetNeedsDraw ();
-            RaiseValueChanged (oldValue, value);
+
+            if (SelectedItem != _lastSelectedItem)
+            {
+                _lastSelectedItem = SelectedItem;
+                EnsureSelectedItemVisible ();
+            }
+
+            ValueChangedEventArgs<int?> changedArgs = new (oldValue, field);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
     }
-
-    // TODO: Use CWP event model
-    /// <summary>Invokes the <see cref="SelectedItemChanged"/> event if it is defined.</summary>
-    /// <returns></returns>
-    public virtual bool OnSelectedChanged ()
-    {
-        if (SelectedItem == _lastSelectedItem)
-        {
-            return false;
-        }
-
-        object? value = SelectedItem.HasValue && Source?.Count > 0 ? Source.ToList () [SelectedItem.Value] : null;
-        SelectedItemChanged?.Invoke (this, new (SelectedItem, value));
-        _lastSelectedItem = SelectedItem;
-        EnsureSelectedItemVisible ();
-
-        return true;
-    }
-
-    /// <summary>This event is raised when the selected item in the <see cref="ListView"/> has changed.</summary>
-    public event EventHandler<ListViewItemEventArgs>? SelectedItemChanged;
 
     #region IValue<int?> Implementation
 
@@ -601,25 +597,24 @@ public class ListView : View, IDesignable, IValue<int?>
     /// <inheritdoc/>
     object? IValue.GetValue () => SelectedItem;
 
+    /// <summary>
+    ///     Called when the <see cref="ListView"/> <see cref="SelectedItem"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) { return false; }
+
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
 
+    /// <summary>
+    ///     Called when the <see cref="ListView"/> <see cref="SelectedItem"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
+
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
-
-    private bool RaiseValueChanging (int? currentValue, int? newValue)
-    {
-        ValueChangingEventArgs<int?> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
-
-        return args.Handled;
-    }
-
-    private void RaiseValueChanged (int? oldValue, int? newValue)
-    {
-        ValueChangedEventArgs<int?> args = new (oldValue, newValue);
-        ValueChanged?.Invoke (this, args);
-    }
 
     #endregion
 

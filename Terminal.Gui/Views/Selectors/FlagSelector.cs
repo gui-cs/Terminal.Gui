@@ -29,26 +29,26 @@ public class FlagSelector : SelectorBase, IDesignable
 
         checkbox.RadioStyle = false;
 
-        checkbox.CheckedStateChanging += OnCheckboxOnCheckedStateChanging;
-        checkbox.CheckedStateChanged += OnCheckboxOnCheckedStateChanged;
+        checkbox.ValueChanging += OnCheckboxOnValueChanging;
+        checkbox.ValueChanged += OnCheckboxOnValueChanged;
         checkbox.Activating += OnCheckboxOnActivating;
         checkbox.Accepting += OnCheckboxOnAccepting;
     }
 
-    private void OnCheckboxOnCheckedStateChanging (object? sender, ResultEventArgs<CheckState> args)
+    private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
     {
         if (sender is not CheckBox checkbox)
         {
             return;
         }
 
-        if (checkbox.CheckedState == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
+        if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
         {
             args.Handled = true;
         }
     }
 
-    private void OnCheckboxOnCheckedStateChanged (object? sender, EventArgs<CheckState> args)
+    private void OnCheckboxOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> args)
     {
         if (sender is not CheckBox checkbox)
         {
@@ -57,7 +57,7 @@ public class FlagSelector : SelectorBase, IDesignable
 
         int newValue = Value ?? 0;
 
-        if (checkbox.CheckedState == CheckState.Checked)
+        if (checkbox.Value == CheckState.Checked)
         {
             if ((int)checkbox.Data! == 0)
             {
@@ -155,7 +155,7 @@ public class FlagSelector : SelectorBase, IDesignable
         _updatingChecked = true;
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! == 0))
         {
-            cb.CheckedState = CheckState.UnChecked;
+            cb.Value = CheckState.UnChecked;
         }
         _updatingChecked = false;
     }
@@ -166,7 +166,7 @@ public class FlagSelector : SelectorBase, IDesignable
         _updatingChecked = true;
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? null!) != 0))
         {
-            cb.CheckedState = CheckState.UnChecked;
+            cb.Value = CheckState.UnChecked;
         }
         _updatingChecked = false;
     }
@@ -188,11 +188,11 @@ public class FlagSelector : SelectorBase, IDesignable
             // If this flag is set in Value, check the checkbox. Otherwise, uncheck it.
             if (flag == 0)
             {
-                cb.CheckedState = Value != 0 ? CheckState.UnChecked : CheckState.Checked;
+                cb.Value = Value != 0 ? CheckState.UnChecked : CheckState.Checked;
             }
             else
             {
-                cb.CheckedState = (Value & flag) == flag ? CheckState.Checked : CheckState.UnChecked;
+                cb.Value = (Value & flag) == flag ? CheckState.Checked : CheckState.UnChecked;
             }
         }
 

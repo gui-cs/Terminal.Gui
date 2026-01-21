@@ -36,78 +36,82 @@ public class DatePicker : View, IValue<DateTime>
             if (value is { })
             {
                 CultureInfo.CurrentCulture = value;
-                Text = Date.ToString (Format);
+                Text = Value.ToString (Format);
             }
-        }
-    }
-
-    /// <summary>Get or set the date.</summary>
-    public DateTime Date
-    {
-        get => _date;
-        set
-        {
-            DateTime oldDate = _date;
-
-            if (oldDate == value)
-            {
-                return;
-            }
-
-            if (RaiseDateValueChanging (oldDate, value))
-            {
-                return;
-            }
-
-            _date = value;
-            RaiseDateValueChanged (oldDate, value);
         }
     }
 
     /// <inheritdoc />
     public override string Text
     {
-        get => Date.ToString (Format);
+        get => Value.ToString (Format);
         set
         {
             if (DateTime.TryParse (value, out DateTime result))
             {
-                Date = result;
+                Value = result;
             }
         }
     }
 
     #region IValue<DateTime> Implementation
 
-    /// <inheritdoc/>
+    /// <summary>Gets or sets the date value of the <see cref="DatePicker"/>.</summary>
     public DateTime Value
     {
-        get => Date;
-        set => Date = value;
+        get => _date;
+        set
+        {
+            DateTime oldValue = _date;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            ValueChangingEventArgs<DateTime> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            _date = value;
+
+            ValueChangedEventArgs<DateTime> changedArgs = new (oldValue, _date);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
+        }
     }
 
     /// <inheritdoc/>
-    object? IValue.GetValue () => Date;
+    object? IValue.GetValue () => _date;
+
+    /// <summary>
+    ///     Called when the <see cref="DatePicker"/> <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<DateTime> args) { return false; }
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<DateTime>>? ValueChanging;
 
+    /// <summary>
+    ///     Called when the <see cref="DatePicker"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<DateTime> args) { }
+
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<DateTime>>? ValueChanged;
-
-    private bool RaiseDateValueChanging (DateTime currentValue, DateTime newValue)
-    {
-        ValueChangingEventArgs<DateTime> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
-
-        return args.Handled;
-    }
-
-    private void RaiseDateValueChanged (DateTime oldValue, DateTime newValue)
-    {
-        ValueChangedEventArgs<DateTime> args = new (oldValue, newValue);
-        ValueChanged?.Invoke (this, args);
-    }
 
     #endregion
 
@@ -127,12 +131,12 @@ public class DatePicker : View, IValue<DateTime>
 
     private void ChangeDayDate (int day)
     {
-        Date = new (Date.Year, Date.Month, day);
-        _dateField!.Date = Date;
+        Value = new (Value.Year, Value.Month, day);
+        _dateField!.Value = Value;
         CreateCalendar ();
     }
 
-    private void CreateCalendar () { _calendar!.Table = new DataTableSource (_table = CreateDataTable (Date.Month, Date.Year)); }
+    private void CreateCalendar () { _calendar!.Table = new DataTableSource (_table = CreateDataTable (Value.Month, Value.Year)); }
 
     private DataTable CreateDataTable (int month, int year)
     {
@@ -166,16 +170,21 @@ public class DatePicker : View, IValue<DateTime>
         return _table;
     }
 
-    private void DateField_DateChanged (object? sender, EventArgs<DateTime> e)
+    private void DateField_ValueChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
     {
-        Date = e.Value;
-
-        if (e.Value.Date.Day != Date.Day)
+        if (!e.NewValue.HasValue)
         {
-            SelectDayOnCalendar (e.Value.Day);
+            return;
         }
 
-        if (Date.Month == DateTime.MinValue.Month && Date.Year == DateTime.MinValue.Year)
+        Value = e.NewValue.Value;
+
+        if (e.NewValue.Value.Day != Value.Day)
+        {
+            SelectDayOnCalendar (e.NewValue.Value.Day);
+        }
+
+        if (Value.Month == DateTime.MinValue.Month && Value.Year == DateTime.MinValue.Year)
         {
             _previousMonthButton!.Enabled = false;
         }
@@ -184,7 +193,7 @@ public class DatePicker : View, IValue<DateTime>
             _previousMonthButton!.Enabled = true;
         }
 
-        if (Date.Month == DateTime.MaxValue.Month && Date.Year == DateTime.MaxValue.Year)
+        if (Value.Month == DateTime.MaxValue.Month && Value.Year == DateTime.MaxValue.Year)
         {
             _nextMonthButton!.Enabled = false;
         }
@@ -194,7 +203,7 @@ public class DatePicker : View, IValue<DateTime>
         }
 
         CreateCalendar ();
-        SelectDayOnCalendar (Date.Day);
+        SelectDayOnCalendar (Value.Day);
     }
 
     private void GenerateCalendarLabels ()
@@ -243,9 +252,9 @@ public class DatePicker : View, IValue<DateTime>
 
     private void SetInitialProperties (DateTime date)
     {
-        Date = date;
+        Value = date;
         BorderStyle = LineStyle.Single;
-        Date = date;
+        Value = date;
         _dateLabel = new () { X = 0, Y = 0, Text = "Date: " };
         CanFocus = true;
 
@@ -305,7 +314,7 @@ public class DatePicker : View, IValue<DateTime>
         _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);
 
         CreateCalendar ();
-        SelectDayOnCalendar (Date.Day);
+        SelectDayOnCalendar (Value.Day);
 
         _calendar.CellActivated += (_, e) =>
                                    {
@@ -320,22 +329,22 @@ public class DatePicker : View, IValue<DateTime>
 
                                        ChangeDayDate (day);
                                        SelectDayOnCalendar (day);
-                                       Text = Date.ToString (Format);
+                                       Text = Value.ToString (Format);
                                    };
 
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        _dateField.DateChanged += DateField_DateChanged;
+        _dateField.ValueChanged += DateField_ValueChanged;
 
         Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
     }
 
     private void AdjustMonth (int offset)
     {
-        Date = Date.AddMonths (offset);
+        Value = Value.AddMonths (offset);
         CreateCalendar ();
-        _dateField!.Date = Date;
+        _dateField!.Value = Value;
     }
 
     /// <inheritdoc/>

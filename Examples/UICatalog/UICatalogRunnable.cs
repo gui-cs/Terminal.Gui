@@ -64,7 +64,7 @@ public sealed class UICatalogRunnable : Runnable
     {
         if (_disableMouseCb is { })
         {
-            _disableMouseCb.CheckedState = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+            _disableMouseCb.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_shVersion is { })
@@ -175,30 +175,30 @@ public sealed class UICatalogRunnable : Runnable
             _force16ColorsMenuItemCb = new CheckBox
             {
                 Title = "Force _16 Colors",
-                CheckedState = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+                Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
 
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
                 MouseHighlightStates = MouseState.None
             };
 
-            _force16ColorsMenuItemCb.CheckedStateChanging += (_, args) =>
-                                                             {
-                                                                 if (Driver.Force16Colors
-                                                                     && args.Result == CheckState.UnChecked
-                                                                     && !App!.Driver!.SupportsTrueColor)
-                                                                 {
-                                                                     args.Handled = true;
-                                                                 }
-                                                             };
+            _force16ColorsMenuItemCb.ValueChanging += (_, args) =>
+                                                      {
+                                                          if (Driver.Force16Colors
+                                                              && args.NewValue == CheckState.UnChecked
+                                                              && !App!.Driver!.SupportsTrueColor)
+                                                          {
+                                                              args.Handled = true;
+                                                          }
+                                                      };
 
-            _force16ColorsMenuItemCb.CheckedStateChanged += (_, args) =>
-                                                            {
-                                                                Driver.Force16Colors = args.Value == CheckState.Checked;
+            _force16ColorsMenuItemCb.ValueChanged += (_, args) =>
+                                                     {
+                                                         Driver.Force16Colors = args.NewValue == CheckState.Checked;
 
-                                                                _force16ColorsShortcutCb!.CheckedState = args.Value;
-                                                                SetNeedsDraw ();
-                                                            };
+                                                         _force16ColorsShortcutCb!.Value = args.NewValue;
+                                                         SetNeedsDraw ();
+                                                     };
 
             menuItems.Add (new MenuItem { CommandView = _force16ColorsMenuItemCb });
 
@@ -291,7 +291,7 @@ public sealed class UICatalogRunnable : Runnable
             _disableMouseCb = new CheckBox
             {
                 Title = "_Disable MouseEventArgs",
-                CheckedState = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
+                Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked,
 
                 // Best practice for CheckBoxes in menus is to disable focus and highlight states
                 CanFocus = false,
@@ -302,7 +302,7 @@ public sealed class UICatalogRunnable : Runnable
             _disableMouseCb.Activating += (sender, args) =>
                                           {
                                               App!.Mouse.IsMouseDisabled = !App!.Mouse.IsMouseDisabled;
-                                              _disableMouseCb.CheckedState = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.None;
+                                              _disableMouseCb.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.None;
                                           };
             menuItems.Add (new MenuItem { CommandView = _disableMouseCb, HelpText = "Disable MouseEventArgs" });
 
@@ -493,7 +493,7 @@ public sealed class UICatalogRunnable : Runnable
             Source = new ListWrapper<string> (CachedCategories)
         };
         categoryList.OpenSelectedItem += (_, _) => { _scenarioList!.SetFocus (); };
-        categoryList.SelectedItemChanged += CategoryView_SelectedChanged;
+        categoryList.ValueChanged += CategoryView_SelectedChanged;
 
         // This enables the scrollbar by causing lazy instantiation to happen
         categoryList.VerticalScrollBar.AutoShow = true;
@@ -501,16 +501,16 @@ public sealed class UICatalogRunnable : Runnable
         return categoryList;
     }
 
-    private void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)
+    private void CategoryView_SelectedChanged (object? sender, ValueChangedEventArgs<int?> e)
     {
-        if (e is null or { Item: null })
+        if (e.NewValue is null)
         {
             return;
         }
-        string item = CachedCategories! [e.Item.Value];
+        string item = CachedCategories! [e.NewValue.Value];
         ObservableCollection<Scenario> newScenarioList;
 
-        if (e.Item == 0)
+        if (e.NewValue == 0)
         {
             // First category is "All"
             newScenarioList = CachedScenarios!;
@@ -566,7 +566,7 @@ public sealed class UICatalogRunnable : Runnable
 
         _force16ColorsShortcutCb = new CheckBox
         {
-            Title = "16 color mode", CheckedState = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked, CanFocus = true
+            Title = "16 color mode", Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked, CanFocus = true
         };
 
         Shortcut force16ColorsShortcut = new ()
@@ -581,7 +581,7 @@ public sealed class UICatalogRunnable : Runnable
         force16ColorsShortcut.Accepting += (_, args) =>
                                            {
                                                Driver.Force16Colors = !Driver.Force16Colors;
-                                               _force16ColorsMenuItemCb!.CheckedState = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                                               _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                                                SetNeedsDraw ();
                                                args.Handled = true;
                                            };
@@ -618,8 +618,8 @@ public sealed class UICatalogRunnable : Runnable
             _statusBar.Visible = ShowStatusBar;
         }
 
-        _disableMouseCb!.CheckedState = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
-        _force16ColorsShortcutCb!.CheckedState = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+        _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+        _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
         App.TopRunnableView?.SetNeedsDraw ();
     }

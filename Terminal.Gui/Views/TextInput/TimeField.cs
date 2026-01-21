@@ -83,7 +83,7 @@ public class TimeField : TextField, IValue<TimeSpan>
         _longFormat = $" hh\\{_sepChar}mm\\{_sepChar}ss";
         _shortFormat = $" hh\\{_sepChar}mm";
         Width = FieldLength + 2;
-        Time = TimeSpan.MinValue;
+        Value = TimeSpan.MinValue;
         base.InsertionPoint = 1;
         TextChanging += TextField_TextChanging;
 
@@ -185,39 +185,6 @@ public class TimeField : TextField, IValue<TimeSpan>
         }
     }
 
-    /// <summary>Gets or sets the time of the <see cref="TimeField"/>.</summary>
-    /// <remarks></remarks>
-    public TimeSpan Time
-    {
-        get => _time;
-        set
-        {
-            if (ReadOnly)
-            {
-                return;
-            }
-
-            TimeSpan oldTime = _time;
-
-            if (oldTime == value)
-            {
-                return;
-            }
-
-            if (RaiseTimeValueChanging (oldTime, value))
-            {
-                return;
-            }
-
-            _time = value;
-            Text = " " + value.ToString (Format.Trim ());
-            EventArgs<TimeSpan> args = new (value);
-
-            OnTimeChanged (args);
-            RaiseTimeValueChanged (oldTime, value);
-        }
-    }
-
     /// <summary>
     ///     Gets the length of the time format string (excluding the leading space), which represents
     ///     the maximum valid cursor position.
@@ -300,45 +267,70 @@ public class TimeField : TextField, IValue<TimeSpan>
         return false;
     }
 
-    /// <summary>Event firing method that invokes the <see cref="TimeChanged"/> event.</summary>
-    /// <param name="args">The event arguments</param>
-    public virtual void OnTimeChanged (EventArgs<TimeSpan> args) { TimeChanged?.Invoke (this, args); }
-
-    /// <summary>TimeChanged event, raised when the Date has changed.</summary>
-    /// <remarks>This event is raised when the <see cref="Time"/> changes.</remarks>
-    public event EventHandler<EventArgs<TimeSpan>>? TimeChanged;
-
     #region IValue<TimeSpan> Implementation
 
-    /// <inheritdoc/>
+    /// <summary>Gets or sets the time value of the <see cref="TimeField"/>.</summary>
     public new TimeSpan Value
     {
-        get => Time;
-        set => Time = value;
+        get => _time;
+        set
+        {
+            if (ReadOnly)
+            {
+                return;
+            }
+
+            TimeSpan oldValue = _time;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            ValueChangingEventArgs<TimeSpan> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            _time = value;
+            Text = " " + value.ToString (Format.Trim ());
+
+            ValueChangedEventArgs<TimeSpan> changedArgs = new (oldValue, _time);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
+        }
     }
 
     /// <inheritdoc/>
-    object? IValue.GetValue () => Time;
+    object? IValue.GetValue () => _time;
+
+    /// <summary>
+    ///     Called when the <see cref="TimeField"/> <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<TimeSpan> args) { return false; }
 
     /// <inheritdoc/>
     public new event EventHandler<ValueChangingEventArgs<TimeSpan>>? ValueChanging;
 
+    /// <summary>
+    ///     Called when the <see cref="TimeField"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<TimeSpan> args) { }
+
     /// <inheritdoc/>
     public new event EventHandler<ValueChangedEventArgs<TimeSpan>>? ValueChanged;
-
-    private bool RaiseTimeValueChanging (TimeSpan currentValue, TimeSpan newValue)
-    {
-        ValueChangingEventArgs<TimeSpan> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
-
-        return args.Handled;
-    }
-
-    private void RaiseTimeValueChanged (TimeSpan oldValue, TimeSpan newValue)
-    {
-        ValueChangedEventArgs<TimeSpan> args = new (oldValue, newValue);
-        ValueChanged?.Invoke (this, args);
-    }
 
     #endregion
 
@@ -608,7 +600,7 @@ public class TimeField : TextField, IValue<TimeSpan>
 
         if (IsInitialized)
         {
-            Time = result;
+            Value = result;
         }
 
         return true;

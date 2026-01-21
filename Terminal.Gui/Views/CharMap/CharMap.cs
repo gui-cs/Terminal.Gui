@@ -198,7 +198,19 @@ public class CharMap : View, IDesignable, IValue<Rune>
             int oldSelectedCodePoint = _selectedCodepoint;
             int newSelectedCodePoint = Math.Clamp (value, 0, MAX_CODE_POINT);
 
-            if (RaiseRuneValueChanging (new Rune (oldSelectedCodePoint), new Rune (newSelectedCodePoint)))
+            Rune oldValue = new (oldSelectedCodePoint);
+            Rune newValue = new (newSelectedCodePoint);
+
+            ValueChangingEventArgs<Rune> changingArgs = new (oldValue, newValue);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
             {
                 return;
             }
@@ -212,15 +224,12 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
             SetNeedsDraw ();
             UpdateCursor ();
-            SelectedCodePointChanged?.Invoke (this, new (SelectedCodePoint));
-            RaiseRuneValueChanged (new Rune (oldSelectedCodePoint), new Rune (newSelectedCodePoint));
+
+            ValueChangedEventArgs<Rune> changedArgs = new (oldValue, new Rune (_selectedCodepoint));
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
         }
     }
-
-    /// <summary>
-    ///     Raised when the selected code point changes.
-    /// </summary>
-    public event EventHandler<EventArgs<int>>? SelectedCodePointChanged;
 
     #region IValue<Rune> Implementation
 
@@ -234,25 +243,24 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// <inheritdoc/>
     object? IValue.GetValue () => new Rune (SelectedCodePoint);
 
+    /// <summary>
+    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<Rune> args) { return false; }
+
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<Rune>>? ValueChanging;
 
+    /// <summary>
+    ///     Called when the <see cref="CharMap"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<Rune> args) { }
+
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<Rune>>? ValueChanged;
-
-    private bool RaiseRuneValueChanging (Rune currentValue, Rune newValue)
-    {
-        ValueChangingEventArgs<Rune> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
-
-        return args.Handled;
-    }
-
-    private void RaiseRuneValueChanged (Rune oldValue, Rune newValue)
-    {
-        ValueChangedEventArgs<Rune> args = new (oldValue, newValue);
-        ValueChanged?.Invoke (this, args);
-    }
 
     #endregion
 

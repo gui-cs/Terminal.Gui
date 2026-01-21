@@ -90,10 +90,10 @@ public class ShadowStyles : Scenario
             Width = Dim.Percent (80)
         };
 
-        colorPicker.ColorChanged += (_, args) =>
+        colorPicker.ValueChanged += (_, args) =>
                                     {
                                         Attribute normal = window.GetScheme ().Normal;
-                                        window.SetScheme (window.GetScheme () with { Normal = new (normal.Foreground, args.Result) });
+                                        window.SetScheme (window.GetScheme () with { Normal = new (normal.Foreground, args.NewValue ?? Color.Black) });
                                     };
         window.Add (button, colorPicker);
 

@@ -93,15 +93,15 @@ public class CharacterMap : Scenario
         };
         top.Add (jumpEdit);
 
-        _charMap.SelectedCodePointChanged += (_, args) =>
+        _charMap.ValueChanged += (_, args) =>
                                              {
-                                                 if (Rune.IsValid (args.Value))
+                                                 if (Rune.IsValid (args.NewValue.Value))
                                                  {
-                                                     jumpEdit.Text = ((Rune)args.Value).ToString ();
+                                                     jumpEdit.Text = args.NewValue.ToString ();
                                                  }
                                                  else
                                                  {
-                                                     jumpEdit.Text = $"U+{args.Value:x5}";
+                                                     jumpEdit.Text = $"U+{args.NewValue.Value:x5}";
                                                  }
                                              };
 
@@ -348,7 +348,7 @@ public class CharacterMap : Scenario
         CheckBox cb = new ()
         {
             Title = "_Show Glyph Width",
-            CheckedState = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
+            Value = _charMap!.ShowGlyphWidths ? CheckState.Checked : CheckState.None
         };
         var item = new MenuItem { CommandView = cb };
 
@@ -356,7 +356,7 @@ public class CharacterMap : Scenario
                        {
                            if (_charMap is not null)
                            {
-                               _charMap.ShowGlyphWidths = cb.CheckedState == CheckState.Checked;
+                               _charMap.ShowGlyphWidths = cb.Value == CheckState.Checked;
                            }
                        };
 

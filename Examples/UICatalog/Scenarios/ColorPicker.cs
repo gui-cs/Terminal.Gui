@@ -41,7 +41,7 @@ public class ColorPickers : Scenario
 
         // Foreground ColorPicker.
         _foregroundColorPicker = new ColorPicker { Title = "_Foreground Color", BorderStyle = LineStyle.Single, Width = Dim.Percent (50) };
-        _foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
+        _foregroundColorPicker.ValueChanged += ForegroundColor_ColorChanged;
         window.Add (_foregroundColorPicker);
 
         _foregroundColorLabel = new Label { X = Pos.Left (_foregroundColorPicker), Y = Pos.Bottom (_foregroundColorPicker) + 1 };
@@ -53,7 +53,7 @@ public class ColorPickers : Scenario
             Title = "_Background Color", X = Pos.AnchorEnd (), Width = Dim.Percent (50), BorderStyle = LineStyle.Single
         };
 
-        _backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
+        _backgroundColorPicker.ValueChanged += BackgroundColor_ColorChanged;
         window.Add (_backgroundColorPicker);
 
         _backgroundColorLabel = new Label { X = Pos.AnchorEnd (), Y = Pos.Bottom (_backgroundColorPicker) + 1 };
@@ -69,7 +69,7 @@ public class ColorPickers : Scenario
         {
             Title = "_Foreground Color", BorderStyle = LineStyle.Single, Width = Dim.Percent (50), Visible = false // We default to HSV so hide old one
         };
-        _foregroundColorPicker16.ColorChanged += ForegroundColor_ColorChanged;
+        _foregroundColorPicker16.ValueChanged += ForegroundColor_ColorChanged16;
         window.Add (_foregroundColorPicker16);
 
         // Background ColorPicker 16.
@@ -82,7 +82,7 @@ public class ColorPickers : Scenario
             Visible = false // We default to HSV so hide old one
         };
 
-        _backgroundColorPicker16.ColorChanged += BackgroundColor_ColorChanged;
+        _backgroundColorPicker16.ValueChanged += BackgroundColor_ColorChanged16;
         window.Add (_backgroundColorPicker16);
 
         // Demo Label.
@@ -120,10 +120,10 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (osColorModel) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            CheckedState = _foregroundColorPicker.Style.ShowTextFields ? CheckState.Checked : CheckState.UnChecked
+            Value = _foregroundColorPicker.Style.ShowTextFields ? CheckState.Checked : CheckState.UnChecked
         };
 
-        cbShowTextFields.CheckedStateChanging += OnCbShowTextFieldsOnCheckedStateChanging;
+        cbShowTextFields.ValueChanging += OnCbShowTextFieldsOnValueChanging;
         window.Add (cbShowTextFields);
 
         // Checkbox for switching show text fields on and off
@@ -133,10 +133,10 @@ public class ColorPickers : Scenario
             Y = Pos.Bottom (cbShowTextFields) + 1,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            CheckedState = _foregroundColorPicker.Style.ShowColorName ? CheckState.Checked : CheckState.UnChecked
+            Value = _foregroundColorPicker.Style.ShowColorName ? CheckState.Checked : CheckState.UnChecked
         };
 
-        cbShowName.CheckedStateChanging += OnCbShowTextFieldsOnCheckedStateChanging;
+        cbShowName.ValueChanging += OnCbShowTextFieldsOnValueChanging;
 
         window.Add (cbShowName);
 
@@ -147,7 +147,7 @@ public class ColorPickers : Scenario
         {
             X = Pos.Right (lblDriverName) + 1,
             Y = Pos.Top (lblDriverName),
-            CheckedState = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
+            Value = canTrueColor ? CheckState.Checked : CheckState.UnChecked,
             CanFocus = false,
             Enabled = false,
             Text = "SupportsTrueColor"
@@ -158,11 +158,11 @@ public class ColorPickers : Scenario
         {
             X = Pos.Right (cbSupportsTrueColor) + 1,
             Y = Pos.Top (lblDriverName),
-            CheckedState = app.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            Value = app.Driver!.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
             Enabled = canTrueColor,
             Text = "Force16Colors"
         };
-        cbUseTrueColor.CheckedStateChanging += (_, evt) => { app.Driver!.Force16Colors = evt.Result == CheckState.Checked; };
+        cbUseTrueColor.ValueChanging += (_, evt) => { app.Driver!.Force16Colors = evt.NewValue == CheckState.Checked; };
         window.Add (lblDriverName, cbSupportsTrueColor, cbUseTrueColor);
 
         // Set default colors.
@@ -173,11 +173,11 @@ public class ColorPickers : Scenario
 
         return;
 
-        void OnCbShowTextFieldsOnCheckedStateChanging (object _, ResultEventArgs<CheckState> e)
+        void OnCbShowTextFieldsOnValueChanging (object _, ValueChangingEventArgs<CheckState> e)
         {
-            _foregroundColorPicker.Style.ShowTextFields = e.Result == CheckState.Checked;
+            _foregroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
             _foregroundColorPicker.ApplyStyleChanges ();
-            _backgroundColorPicker.Style.ShowTextFields = e.Result == CheckState.Checked;
+            _backgroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
             _backgroundColorPicker.ApplyStyleChanges ();
         }
 
@@ -193,8 +193,8 @@ public class ColorPickers : Scenario
                 _backgroundColorPicker.Visible = false;
 
                 // Switching to 16 colors
-                ForegroundColor_ColorChanged (null, null);
-                BackgroundColor_ColorChanged (null, null);
+                ForegroundColor_ColorChanged16 (null, new (default, _foregroundColorPicker16.SelectedColor));
+                BackgroundColor_ColorChanged16 (null, new (default, _backgroundColorPicker16.SelectedColor));
             }
             else
             {
@@ -221,16 +221,30 @@ public class ColorPickers : Scenario
     }
 
     /// <summary>Fired when background color is changed.</summary>
-    private void BackgroundColor_ColorChanged (object sender, ResultEventArgs<Color> e)
+    private void BackgroundColor_ColorChanged (object sender, ValueChangedEventArgs<Color?> e)
     {
-        UpdateColorLabel (_backgroundColorLabel, _backgroundColorPicker.Visible ? _backgroundColorPicker.Value!.Value : _backgroundColorPicker16.SelectedColor);
+        UpdateColorLabel (_backgroundColorLabel, _backgroundColorPicker.Visible ? _backgroundColorPicker.Value.Value : _backgroundColorPicker16.SelectedColor);
         UpdateDemoLabel ();
     }
 
     /// <summary>Fired when foreground color is changed.</summary>
-    private void ForegroundColor_ColorChanged (object sender, ResultEventArgs<Color> e)
+    private void ForegroundColor_ColorChanged (object sender, ValueChangedEventArgs<Color?> e)
     {
-        UpdateColorLabel (_foregroundColorLabel, _foregroundColorPicker.Visible ? _foregroundColorPicker.Value!.Value : _foregroundColorPicker16.SelectedColor);
+        UpdateColorLabel (_foregroundColorLabel, _foregroundColorPicker.Visible ? _foregroundColorPicker.Value.Value : _foregroundColorPicker16.SelectedColor);
+        UpdateDemoLabel ();
+    }
+
+    /// <summary>Fired when background color is changed (16-color picker).</summary>
+    private void BackgroundColor_ColorChanged16 (object sender, ValueChangedEventArgs<ColorName16> e)
+    {
+        UpdateColorLabel (_backgroundColorLabel, _backgroundColorPicker.Visible ? _backgroundColorPicker.Value.Value : _backgroundColorPicker16.SelectedColor);
+        UpdateDemoLabel ();
+    }
+
+    /// <summary>Fired when foreground color is changed (16-color picker).</summary>
+    private void ForegroundColor_ColorChanged16 (object sender, ValueChangedEventArgs<ColorName16> e)
+    {
+        UpdateColorLabel (_foregroundColorLabel, _foregroundColorPicker.Visible ? _foregroundColorPicker.Value.Value : _foregroundColorPicker16.SelectedColor);
         UpdateDemoLabel ();
     }
 

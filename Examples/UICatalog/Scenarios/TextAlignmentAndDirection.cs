@@ -487,7 +487,7 @@ public class TextAlignmentAndDirection : Scenario
             Enabled = false
         };
 
-        justifyCheckbox.CheckedStateChanging += (_, e) => ToggleJustify (e.Result != CheckState.Checked);
+        justifyCheckbox.ValueChanging += (_, e) => ToggleJustify (e.NewValue != CheckState.Checked);
 
         justifyOptions.ValueChanged += (_, _) => { ToggleJustify (false, true); };
 
@@ -503,11 +503,11 @@ public class TextAlignmentAndDirection : Scenario
             Height = 1,
             Text = "Word Wrap"
         };
-        wrapCheckbox.CheckedState = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
+        wrapCheckbox.Value = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
 
-        wrapCheckbox.CheckedStateChanging += (s, e) =>
+        wrapCheckbox.ValueChanging += (s, e) =>
                                              {
-                                                 if (e.Result == CheckState.Checked)
+                                                 if (e.NewValue == CheckState.Checked)
                                                  {
                                                      foreach (View t in multiLineLabels)
                                                      {
@@ -539,7 +539,7 @@ public class TextAlignmentAndDirection : Scenario
 
         directionOptions.ValueChanged += (s, ev) =>
                                          {
-                                             bool justChecked = justifyCheckbox.CheckedState == CheckState.Checked;
+                                             bool justChecked = justifyCheckbox.Value == CheckState.Checked;
 
                                              if (justChecked)
                                              {

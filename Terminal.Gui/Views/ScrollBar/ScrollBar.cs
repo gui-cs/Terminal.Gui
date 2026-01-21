@@ -88,13 +88,13 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         void OnDecreaseButtonOnAccept (object? s, CommandEventArgs e)
         {
-            Position -= Increment;
+            Value -= Increment;
             e.Handled = true;
         }
 
         void OnIncreaseButtonOnAccept (object? s, CommandEventArgs e)
         {
-            Position += Increment;
+            Value += Increment;
             e.Handled = true;
         }
     }
@@ -111,7 +111,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         _slider.VisibleContentSize = VisibleContentSize;
         _slider.Size = CalculateSliderSize ();
-        _sliderPosition = CalculateSliderPositionFromContentPosition (_position);
+        _sliderPosition = CalculateSliderPositionFromContentPosition (_value);
         _slider.Position = _sliderPosition.Value;
     }
 
@@ -191,7 +191,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
     /// <summary>
     ///     Gets or sets the amount each mouse wheel event, or click on the increment/decrement buttons, will
-    ///     incremenet/decrement the <see cref="Position"/>.
+    ///     incremenet/decrement the <see cref="Value"/>.
     /// </summary>
     /// <remarks>
     ///     The default is 1.
@@ -302,79 +302,72 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// <summary>Raised when <see cref="ScrollableContentSize"/> has changed.</summary>
     public event EventHandler<EventArgs<int>>? ScrollableContentSizeChanged;
 
-    #region Position
+    #region IValue<int> Implementation
 
-    private int _position;
+    private int _value;
 
     /// <summary>
-    ///     Gets or sets the position of the slider relative to <see cref="ScrollableContentSize"/>.
+    ///     Gets or sets the scroll position relative to <see cref="ScrollableContentSize"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         The content position is clamped to 0 and <see cref="ScrollableContentSize"/> minus
+    ///         The scroll position is clamped to 0 and <see cref="ScrollableContentSize"/> minus
     ///         <see cref="VisibleContentSize"/>.
     ///     </para>
     ///     <para>
-    ///         Setting will result in the <see cref="PositionChanging"/> and <see cref="PositionChanged"/>
+    ///         Setting will result in the <see cref="ValueChanging"/> and <see cref="ValueChanged"/>
     ///         events being raised.
     ///     </para>
     /// </remarks>
-    public int Position
+    public int Value
     {
-        get => _position;
+        get => _value;
         set
         {
-            if (value == _position || !Visible)
+            if (value == _value || !Visible)
             {
                 return;
             }
 
             // Clamp the value between 0 and Size - VisibleContentSize
-            int newContentPosition = Math.Clamp (value, 0, Math.Max (0, ScrollableContentSize - VisibleContentSize));
-            NavigationDirection direction = newContentPosition >= _position ? NavigationDirection.Forward : NavigationDirection.Backward;
+            int newValue = Math.Clamp (value, 0, Math.Max (0, ScrollableContentSize - VisibleContentSize));
+            NavigationDirection direction = newValue >= _value ? NavigationDirection.Forward : NavigationDirection.Backward;
 
-            int oldPosition = _position;
+            int oldValue = _value;
 
-            // Raise IValue<int>.ValueChanging (cancellable)
-            if (RaiseValueChanging (oldPosition, newContentPosition))
+            ValueChangingEventArgs<int> changingArgs = new (oldValue, newValue);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
             {
                 return;
             }
 
-            if (OnPositionChanging (_position, newContentPosition))
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
             {
                 return;
             }
 
-            CancelEventArgs<int> args = new (ref _position, ref newContentPosition);
-            PositionChanging?.Invoke (this, args);
+            int distance = newValue - _value;
 
-            if (args.Cancel)
+            if (_value == newValue)
             {
                 return;
             }
 
-            int distance = newContentPosition - _position;
+            _value = newValue;
 
-            if (_position == newContentPosition)
-            {
-                return;
-            }
-
-            _position = newContentPosition;
-
-            _sliderPosition = CalculateSliderPositionFromContentPosition (_position, direction);
+            _sliderPosition = CalculateSliderPositionFromContentPosition (_value, direction);
 
             if (_slider.Position != _sliderPosition)
             {
                 _slider.Position = _sliderPosition.Value;
             }
 
-            OnPositionChanged (_position);
-            PositionChanged?.Invoke (this, new (in _position));
-
-            // Raise IValue<int>.ValueChanged
-            RaiseValueChanged (oldPosition, _position);
+            ValueChangedEventArgs<int> changedArgs = new (oldValue, _value);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
 
             OnScrolled (distance);
             Scrolled?.Invoke (this, new (in distance));
@@ -383,69 +376,27 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     }
 
     /// <summary>
-    ///     Called when <see cref="Position"/> is changing. Return true to cancel the change.
+    ///     Called when <see cref="Value"/> is changing. Return <see langword="true"/> to cancel the change.
     /// </summary>
-    protected virtual bool OnPositionChanging (int currentPos, int newPos) { return false; }
-
-    /// <summary>
-    ///     Raised when the <see cref="Position"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to
-    ///     <see langword="true"/> to prevent the position from being changed.
-    /// </summary>
-    public event EventHandler<CancelEventArgs<int>>? PositionChanging;
-
-    /// <summary>Called when <see cref="Position"/> has changed.</summary>
-    protected virtual void OnPositionChanged (int position) { }
-
-    /// <summary>Raised when the <see cref="Position"/> has changed.</summary>
-    public event EventHandler<EventArgs<int>>? PositionChanged;
-
-    /// <summary>Called when <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
-    protected virtual void OnScrolled (int distance) { }
-
-    /// <summary>Raised when the <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
-    public event EventHandler<EventArgs<int>>? Scrolled;
-
-    #region IValue<int> Implementation
-
-    /// <summary>
-    ///     Gets or sets the value of the <see cref="ScrollBar"/>. This is an alias for <see cref="Position"/>.
-    /// </summary>
-    /// <remarks>
-    ///     This property enables <see cref="ScrollBar"/> to be used with the <see cref="IValue{TValue}"/> pattern
-    ///     for generic value access and command propagation.
-    /// </remarks>
-    public int Value
-    {
-        get => Position;
-        set => Position = value;
-    }
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<int> args) { return false; }
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<int>>? ValueChanging;
 
+    /// <summary>Called when <see cref="Value"/> has changed.</summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<int> args) { }
+
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
 
-    /// <summary>
-    ///     Raises the <see cref="ValueChanging"/> event.
-    /// </summary>
-    /// <returns><see langword="true"/> if the change was cancelled.</returns>
-    private bool RaiseValueChanging (int currentValue, int newValue)
-    {
-        ValueChangingEventArgs<int> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
+    /// <summary>Called when <see cref="Value"/> has changed. Indicates how much to scroll.</summary>
+    protected virtual void OnScrolled (int distance) { }
 
-        return args.Handled;
-    }
-
-    /// <summary>
-    ///     Raises the <see cref="ValueChanged"/> event.
-    /// </summary>
-    private void RaiseValueChanged (int oldValue, int newValue)
-    {
-        ValueChangedEventArgs<int> args = new (oldValue, newValue);
-        ValueChanged?.Invoke (this, args);
-    }
+    /// <summary>Raised when the <see cref="Value"/> has changed. Indicates how much was scrolled.</summary>
+    public event EventHandler<EventArgs<int>>? Scrolled;
 
     #endregion
 
@@ -465,8 +416,6 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         return ScrollSlider.CalculateContentPosition (ScrollableContentSize, VisibleContentSize, sliderPosition, scrollBarSize - _slider.SliderPadding);
     }
-
-    #endregion ContentPosition
 
     #region Slider Management
 
@@ -502,7 +451,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         }
 
         int calculatedSliderPos = CalculateSliderPositionFromContentPosition (
-                                                                              _position,
+                                                                              _value,
                                                                               e.Value >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
 
         if (calculatedSliderPos == _sliderPosition)
@@ -513,13 +462,13 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         int sliderScrolledAmount = e.Value;
         int calculatedPosition = CalculatePositionFromSliderPosition (calculatedSliderPos + sliderScrolledAmount);
 
-        Position = calculatedPosition;
+        Value = calculatedPosition;
     }
 
     /// <summary>
     ///     Gets or sets the position of the start of the Scroll slider, within the Viewport.
     /// </summary>
-    public int GetSliderPosition () { return CalculateSliderPositionFromContentPosition (_position); }
+    public int GetSliderPosition () { return CalculateSliderPositionFromContentPosition (_value); }
 
     private void RaiseSliderPositionChangeEvents (int? currentSliderPosition, int newSliderPosition)
     {
@@ -610,11 +559,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         // Adjust the content position based on the distance
         if (distanceFromCenter < 0)
         {
-            Position = Math.Max (0, Position - jump);
+            Value = Math.Max (0, Value - jump);
         }
         else
         {
-            Position = Math.Min (ScrollableContentSize - _slider.VisibleContentSize, Position + jump);
+            Value = Math.Min (ScrollableContentSize - _slider.VisibleContentSize, Value + jump);
         }
 
         return true;
@@ -637,24 +586,24 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         {
             if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
             {
-                Position += Increment;
+                Value += Increment;
             }
 
             if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
             {
-                Position -= Increment;
+                Value -= Increment;
             }
         }
         else
         {
             if (mouse.Flags.HasFlag (MouseFlags.WheeledRight))
             {
-                Position += Increment;
+                Value += Increment;
             }
 
             if (mouse.Flags.HasFlag (MouseFlags.WheeledLeft))
             {
-                Position -= Increment;
+                Value -= Increment;
             }
         }
 

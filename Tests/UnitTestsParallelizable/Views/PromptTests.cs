@@ -294,11 +294,11 @@ public class PromptTests : TestDriverBase
     [Fact]
     public void Prompt_Works_With_DateTime_Result ()
     {
-        DatePicker datePicker = new () { Date = new DateTime (2024, 6, 15) };
+        DatePicker datePicker = new () { Value = new DateTime (2024, 6, 15) };
 
         using Prompt<DatePicker, DateTime> dialog = new (datePicker)
         {
-            ResultExtractor = dp => dp.Date
+            ResultExtractor = dp => dp.Value
         };
 
         // Manually invoke the extractor to verify it works

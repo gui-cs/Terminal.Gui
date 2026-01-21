@@ -236,11 +236,11 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (checkBox)
-                                        .AssertEqual (CheckState.UnChecked, checkBox.CheckedState)
+                                        .AssertEqual (CheckState.UnChecked, checkBox.Value)
                                         .LeftClick (6, 6) // Click checkbox
-                                        .AssertEqual (CheckState.Checked, checkBox.CheckedState)
+                                        .AssertEqual (CheckState.Checked, checkBox.Value)
                                         .LeftClick (6, 6) // Click again
-                                        .AssertEqual (CheckState.UnChecked, checkBox.CheckedState);
+                                        .AssertEqual (CheckState.UnChecked, checkBox.Value);
     }
 
     [Theory]

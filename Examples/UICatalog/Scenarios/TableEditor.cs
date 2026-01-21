@@ -661,10 +661,10 @@ public class TableEditor : Scenario
             CheckBox checkBox = new ()
             {
                 Title = title,
-                CheckedState = initialState ? CheckState.Checked : CheckState.UnChecked
+                Value = initialState ? CheckState.Checked : CheckState.UnChecked
             };
 
-            checkBox.CheckedStateChanged += (s, e) => onToggle (checkBox.CheckedState == CheckState.Checked);
+            checkBox.ValueChanged += (s, e) => onToggle (checkBox.Value == CheckState.Checked);
 
             MenuItem item = new () { CommandView = checkBox };
 
@@ -812,10 +812,10 @@ public class TableEditor : Scenario
                                          _tableView!.Style.ShowHorizontalHeaderUnderline = true;
                                          _tableView!.Style.ShowVerticalCellLines = true;
 
-                                         checkboxes ["HeaderOverline"].CheckedState = CheckState.Checked;
-                                         checkboxes ["HeaderMidline"].CheckedState = CheckState.Checked;
-                                         checkboxes ["HeaderUnderline"].CheckedState = CheckState.Checked;
-                                         checkboxes ["CellLines"].CheckedState = CheckState.Checked;
+                                         checkboxes ["HeaderOverline"].Value = CheckState.Checked;
+                                         checkboxes ["HeaderMidline"].Value = CheckState.Checked;
+                                         checkboxes ["HeaderUnderline"].Value = CheckState.Checked;
+                                         checkboxes ["CellLines"].Value = CheckState.Checked;
 
                                          _tableView!.Update ();
                                      }
@@ -830,10 +830,10 @@ public class TableEditor : Scenario
                                          _tableView!.Style.ShowHorizontalHeaderUnderline = false;
                                          _tableView!.Style.ShowVerticalCellLines = false;
 
-                                         checkboxes ["HeaderOverline"].CheckedState = CheckState.UnChecked;
-                                         checkboxes ["HeaderMidline"].CheckedState = CheckState.UnChecked;
-                                         checkboxes ["HeaderUnderline"].CheckedState = CheckState.UnChecked;
-                                         checkboxes ["CellLines"].CheckedState = CheckState.UnChecked;
+                                         checkboxes ["HeaderOverline"].Value = CheckState.UnChecked;
+                                         checkboxes ["HeaderMidline"].Value = CheckState.UnChecked;
+                                         checkboxes ["HeaderUnderline"].Value = CheckState.UnChecked;
+                                         checkboxes ["CellLines"].Value = CheckState.UnChecked;
 
                                          _tableView!.Update ();
                                      }
@@ -847,7 +847,7 @@ public class TableEditor : Scenario
                                                     if (state)
                                                     {
                                                         ToggleCheckboxes (false);
-                                                        checkboxes ["Radioboxes"].CheckedState = CheckState.UnChecked;
+                                                        checkboxes ["Radioboxes"].Value = CheckState.UnChecked;
                                                     }
                                                     else if (HasCheckboxes ())
                                                     {
@@ -864,7 +864,7 @@ public class TableEditor : Scenario
                                                     if (state)
                                                     {
                                                         ToggleCheckboxes (true);
-                                                        checkboxes ["Checkboxes"].CheckedState = CheckState.UnChecked;
+                                                        checkboxes ["Checkboxes"].Value = CheckState.UnChecked;
                                                     }
                                                     else if (HasCheckboxes ())
                                                     {

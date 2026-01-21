@@ -283,7 +283,7 @@ public class IValueTests
     [Fact]
     public void CheckBox_GetValue_ReturnsCheckedState ()
     {
-        CheckBox checkBox = new () { CheckedState = CheckState.Checked };
+        CheckBox checkBox = new () { Value = CheckState.Checked };
 
         IValue valueProvider = checkBox;
         object? result = valueProvider.GetValue ();
@@ -296,7 +296,7 @@ public class IValueTests
     [Fact]
     public void CheckBox_GetValue_ReturnsUnCheckedState ()
     {
-        CheckBox checkBox = new () { CheckedState = CheckState.UnChecked };
+        CheckBox checkBox = new () { Value = CheckState.UnChecked };
 
         IValue valueProvider = checkBox;
         object? result = valueProvider.GetValue ();

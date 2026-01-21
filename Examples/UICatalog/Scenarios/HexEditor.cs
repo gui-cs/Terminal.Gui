@@ -90,7 +90,7 @@ public class HexEditor : Scenario
         CheckBox cb = new ()
         {
             Title = _miReadOnly.Title,
-            CheckedState = _hexView.ReadOnly ? CheckState.Checked : CheckState.None,
+            Value = _hexView.ReadOnly ? CheckState.Checked : CheckState.None,
         };
         _miReadOnly.CommandView = cb;
         _win.Add (menu);
@@ -280,6 +280,6 @@ public class HexEditor : Scenario
             return;
         }
 
-        _hexView!.ReadOnly = cb.CheckedState == CheckState.Checked;
+        _hexView!.ReadOnly = cb.Value == CheckState.Checked;
     }
 }

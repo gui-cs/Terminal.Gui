@@ -213,7 +213,7 @@ public class ContextMenus : Scenario
                 culture.Title = "_English";
                 culture.HelpText = "en-US";
 
-                ((CheckBox)culture.CommandView).CheckedState =
+                ((CheckBox)culture.CommandView).Value =
                     Thread.CurrentThread.CurrentUICulture.Name == "en-US" ? CheckState.Checked : CheckState.UnChecked;
                 CreateAction (supportedCultures, culture);
                 supportedCultures.Add (culture);
@@ -227,7 +227,7 @@ public class ContextMenus : Scenario
             culture.Title = $"_{c.Parent.EnglishName}";
             culture.HelpText = c.Name;
 
-            ((CheckBox)culture.CommandView).CheckedState =
+            ((CheckBox)culture.CommandView).Value =
                 Thread.CurrentThread.CurrentUICulture.Name == culture.HelpText ? CheckState.Checked : CheckState.UnChecked;
             CreateAction (supportedCultures, culture);
             supportedCultures.Add (culture);
@@ -243,7 +243,7 @@ public class ContextMenus : Scenario
 
                                   foreach (MenuItem item in cultures)
                                   {
-                                      ((CheckBox)item.CommandView).CheckedState =
+                                      ((CheckBox)item.CommandView).Value =
                                           Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
                                   }
                               };

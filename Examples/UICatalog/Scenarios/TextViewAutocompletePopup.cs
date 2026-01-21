@@ -98,16 +98,16 @@ public class TextViewAutocompletePopup : Scenario
         _miMultilineCheckBox = new ()
         {
             Title = "_Multiline",
-            CheckedState = _textViewTopLeft.Multiline ? CheckState.Checked : CheckState.UnChecked
+            Value = _textViewTopLeft.Multiline ? CheckState.Checked : CheckState.UnChecked
         };
-        _miMultilineCheckBox.CheckedStateChanged += (_, _) => Multiline ();
+        _miMultilineCheckBox.ValueChanged += (_, _) => Multiline ();
 
         _miWrapCheckBox = new ()
         {
             Title = "_Word Wrap",
-            CheckedState = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked
+            Value = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked
         };
-        _miWrapCheckBox.CheckedStateChanged += (_, _) => WordWrap ();
+        _miWrapCheckBox.ValueChanged += (_, _) => WordWrap ();
 
         menu.Add (
                   new MenuBarItem (
@@ -167,11 +167,11 @@ public class TextViewAutocompletePopup : Scenario
         }
 
         SetMultilineStatusText ();
-        _textViewTopLeft.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
-        _textViewTopRight.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
-        _textViewBottomLeft.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
-        _textViewBottomRight.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
-        _textViewCentered.Multiline = _miMultilineCheckBox.CheckedState == CheckState.Checked;
+        _textViewTopLeft.Multiline = _miMultilineCheckBox.Value == CheckState.Checked;
+        _textViewTopRight.Multiline = _miMultilineCheckBox.Value == CheckState.Checked;
+        _textViewBottomLeft.Multiline = _miMultilineCheckBox.Value == CheckState.Checked;
+        _textViewBottomRight.Multiline = _miMultilineCheckBox.Value == CheckState.Checked;
+        _textViewCentered.Multiline = _miMultilineCheckBox.Value == CheckState.Checked;
     }
 
     private void Quit () { _appWindow?.RequestStop (); }
@@ -192,7 +192,7 @@ public class TextViewAutocompletePopup : Scenario
     {
         if (_siMultiline is not null && _miMultilineCheckBox is not null)
         {
-            _siMultiline.Title = $"Multiline: {_miMultilineCheckBox.CheckedState == CheckState.Checked}";
+            _siMultiline.Title = $"Multiline: {_miMultilineCheckBox.Value == CheckState.Checked}";
         }
     }
 
@@ -200,7 +200,7 @@ public class TextViewAutocompletePopup : Scenario
     {
         if (_siWrap is not null && _miWrapCheckBox is not null)
         {
-            _siWrap.Title = $"WordWrap: {_miWrapCheckBox.CheckedState == CheckState.Checked}";
+            _siWrap.Title = $"WordWrap: {_miWrapCheckBox.Value == CheckState.Checked}";
         }
     }
 
@@ -251,12 +251,12 @@ public class TextViewAutocompletePopup : Scenario
             return;
         }
 
-        _miMultilineCheckBox.CheckedState = _textViewTopLeft.Multiline ? CheckState.Checked : CheckState.UnChecked;
-        _miWrapCheckBox.CheckedState = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked;
+        _miMultilineCheckBox.Value = _textViewTopLeft.Multiline ? CheckState.Checked : CheckState.UnChecked;
+        _miWrapCheckBox.Value = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked;
         SetMultilineStatusText ();
         SetWrapStatusText ();
 
-        if (_miMultilineCheckBox.CheckedState == CheckState.Checked)
+        if (_miMultilineCheckBox.Value == CheckState.Checked)
         {
             _height = 10;
         }
@@ -280,12 +280,12 @@ public class TextViewAutocompletePopup : Scenario
             return;
         }
 
-        _textViewTopLeft.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
-        _textViewTopRight.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
-        _textViewBottomLeft.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
-        _textViewBottomRight.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
-        _textViewCentered.WordWrap = _miWrapCheckBox.CheckedState == CheckState.Checked;
-        _miWrapCheckBox.CheckedState = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked;
+        _textViewTopLeft.WordWrap = _miWrapCheckBox.Value == CheckState.Checked;
+        _textViewTopRight.WordWrap = _miWrapCheckBox.Value == CheckState.Checked;
+        _textViewBottomLeft.WordWrap = _miWrapCheckBox.Value == CheckState.Checked;
+        _textViewBottomRight.WordWrap = _miWrapCheckBox.Value == CheckState.Checked;
+        _textViewCentered.WordWrap = _miWrapCheckBox.Value == CheckState.Checked;
+        _miWrapCheckBox.Value = _textViewTopLeft.WordWrap ? CheckState.Checked : CheckState.UnChecked;
         SetWrapStatusText ();
     }
 }
