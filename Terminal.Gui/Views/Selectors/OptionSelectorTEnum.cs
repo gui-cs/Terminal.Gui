@@ -49,4 +49,7 @@ public sealed class OptionSelector<TEnum> : OptionSelector where TEnum : struct,
 
         ValueChanged?.Invoke (this, new (newValue));
     }
+
+    /// <inheritdoc/>
+    public override object? GetValue () => Value;
 }

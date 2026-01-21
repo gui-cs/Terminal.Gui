@@ -1,11 +1,12 @@
 using System.Collections.Immutable;
+using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     The abstract base class for <see cref="OptionSelector{TEnum}"/> and <see cref="FlagSelector{TFlagsEnum}"/>.
 /// </summary>
-public abstract class SelectorBase : View, IOrientation
+public abstract class SelectorBase : View, IOrientation, IValue
 {
     /// <summary>
     ///     Gets or sets the default Highlight Style.
@@ -140,6 +141,9 @@ public abstract class SelectorBase : View, IOrientation
     ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
     public event EventHandler<EventArgs<int?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public virtual object? GetValue () => Value;
 
     private IReadOnlyList<int>? _values;
 

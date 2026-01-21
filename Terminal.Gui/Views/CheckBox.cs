@@ -1,3 +1,5 @@
+using Terminal.Gui.ViewBase;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
@@ -6,7 +8,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="RadioStyle"/> is used to display radio button style glyphs (●) instead of checkbox style glyphs (☑).
 ///     </para>
 /// </remarks>
-public class CheckBox : View
+public class CheckBox : View, IValue
 {
     private static MouseState _defaultHighlightStates = MouseState.PressedOutside | MouseState.Pressed | MouseState.In; // Resources/config.json overrides
 
@@ -307,6 +309,9 @@ public class CheckBox : View
     ///     checkbox style glyphs (☑).
     /// </summary>
     public bool RadioStyle { get; set; }
+
+    /// <inheritdoc/>
+    public object? GetValue () => CheckedState;
 
     private Rune GetRadioGlyph ()
     {

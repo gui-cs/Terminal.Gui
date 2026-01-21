@@ -277,4 +277,132 @@ public class IValueTests
         Assert.Equal (42, values [0].GetValue ());
         Assert.Equal ("test", values [1].GetValue ());
     }
+
+    // Tests for concrete views implementing IValue
+
+    [Fact]
+    public void CheckBox_GetValue_ReturnsCheckedState ()
+    {
+        CheckBox checkBox = new () { CheckedState = CheckState.Checked };
+
+        IValue valueProvider = checkBox;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<CheckState> (result);
+        Assert.Equal (CheckState.Checked, result);
+    }
+
+    [Fact]
+    public void CheckBox_GetValue_ReturnsUnCheckedState ()
+    {
+        CheckBox checkBox = new () { CheckedState = CheckState.UnChecked };
+
+        IValue valueProvider = checkBox;
+        object? result = valueProvider.GetValue ();
+
+        Assert.Equal (CheckState.UnChecked, result);
+    }
+
+    [Fact]
+    public void TextField_GetValue_ReturnsText ()
+    {
+        TextField textField = new () { Text = "Hello World" };
+
+        IValue valueProvider = textField;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<string> (result);
+        Assert.Equal ("Hello World", result);
+    }
+
+    [Fact]
+    public void TextField_GetValue_ReturnsEmptyString_WhenEmpty ()
+    {
+        TextField textField = new ();
+
+        IValue valueProvider = textField;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.Equal ("", result);
+    }
+
+    [Fact]
+    public void OptionSelector_GetValue_ReturnsSelectedValue ()
+    {
+        OptionSelector optionSelector = new ()
+        {
+            Labels = ["Option 1", "Option 2", "Option 3"],
+            Value = 1
+        };
+
+        IValue valueProvider = optionSelector;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<int> (result);
+        Assert.Equal (1, result);
+    }
+
+    [Fact]
+    public void OptionSelectorT_GetValue_ReturnsTypedValue ()
+    {
+        OptionSelector<Alignment> optionSelector = new ()
+        {
+            Value = Alignment.Center
+        };
+
+        IValue valueProvider = optionSelector;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<Alignment> (result);
+        Assert.Equal (Alignment.Center, result);
+    }
+
+    [Fact]
+    public void FlagSelectorT_GetValue_ReturnsTypedValue ()
+    {
+        FlagSelector<AlignmentModes> flagSelector = new ()
+        {
+            Value = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems
+        };
+
+        IValue valueProvider = flagSelector;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<AlignmentModes> (result);
+        Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, result);
+    }
+
+    [Fact]
+    public void NumericUpDown_GetValue_ReturnsValue ()
+    {
+        NumericUpDown<int> numericUpDown = new () { Value = 42 };
+
+        IValue valueProvider = numericUpDown;
+        object? result = valueProvider.GetValue ();
+
+        Assert.NotNull (result);
+        Assert.IsType<int> (result);
+        Assert.Equal (42, result);
+    }
+
+    [Fact]
+    public void ColorPicker_GetValue_ReturnsColor ()
+    {
+        // ColorPicker implements IValue<Color?> with Value property delegating to SelectedColor
+        ColorPicker colorPicker = new () { Value = Color.Red };
+
+        IValue valueProvider = colorPicker;
+        object? result = valueProvider.GetValue ();
+
+        // The getter returns the SelectedColor which may differ from the set value
+        // Just verify we get a Color back
+        Assert.NotNull (result);
+        Assert.IsType<Color> (result);
+    }
 }

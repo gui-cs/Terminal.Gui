@@ -39,4 +39,7 @@ public sealed class FlagSelector<TFlagsEnum> : FlagSelector where TFlagsEnum : s
 
         ValueChanged?.Invoke (this, new EventArgs<TFlagsEnum?> (newValue));
     }
+
+    /// <inheritdoc/>
+    public override object? GetValue () => Value;
 }

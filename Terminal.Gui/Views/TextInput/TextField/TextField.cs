@@ -1,8 +1,10 @@
+using Terminal.Gui.ViewBase;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
 /// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
-public partial class TextField : View, IDesignable
+public partial class TextField : View, IDesignable, IValue
 {
     /// <summary>
     ///     Gets or sets the default cursor style.
@@ -146,6 +148,9 @@ public partial class TextField : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public object? GetValue () => Text;
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
