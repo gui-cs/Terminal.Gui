@@ -26,6 +26,8 @@ internal partial class ApplicationImpl
             throw new InvalidOperationException ("Init called multiple times without Shutdown");
         }
 
+        MainThreadId = Thread.CurrentThread.ManagedThreadId;
+
         // Thread-safe fence check: Ensure we're not mixing application models
         // Use lock to make check-and-set atomic
         lock (_modelUsageLock)
@@ -90,7 +92,6 @@ internal partial class ApplicationImpl
         SubscribeDriverEvents ();
 
         SynchronizationContext.SetSynchronizationContext (new ());
-        MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
         _result = null;
 
