@@ -67,8 +67,7 @@ public class ListView : View, IDesignable
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
 
         // Accept (Enter key) - Raise Accept event - DO NOT advance state
-        AddCommand (
-                    Command.Accept,
+        AddCommand (Command.Accept,
                     ctx =>
                     {
                         if (RaiseAccepting (ctx) == true)
@@ -80,8 +79,7 @@ public class ListView : View, IDesignable
                     });
 
         // Activate (Space key and single-click) - If AllowsMarking, change mark and raise Activate event
-        AddCommand (
-                    Command.Activate,
+        AddCommand (Command.Activate,
                     ctx =>
                     {
                         if (RaiseActivating (ctx) == true)
@@ -94,9 +92,9 @@ public class ListView : View, IDesignable
                             SetFocus ();
                         }
 
-                        if (ctx is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
+                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
                         {
-                            Point position = mouseCommandContext.Binding.MouseEventArgs.Position!.Value;
+                            Point position = mouse.Position!.Value;
                             SelectedItem = position.Y;
                         }
 
@@ -104,8 +102,7 @@ public class ListView : View, IDesignable
                     });
 
         // Hotkey - If none set, activate and raise Activate event. SetFocus. - DO NOT raise Accept
-        AddCommand (
-                    Command.HotKey,
+        AddCommand (Command.HotKey,
                     ctx =>
                     {
                         if (SelectedItem is { })
@@ -123,16 +120,15 @@ public class ListView : View, IDesignable
                         return !SetFocus ();
                     });
 
-        AddCommand (
-                    Command.SelectAll,
+        AddCommand (Command.SelectAll,
                     ctx =>
                     {
-                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                        if (ctx?.Binding is not KeyBinding keyBinding)
                         {
                             return false;
                         }
 
-                        return keyCommandContext.Binding.Data is { } && MarkAll ((bool)keyCommandContext.Binding.Data);
+                        return keyBinding.Data is { } && MarkAll ((bool)keyBinding.Data);
                     });
 
         // Default keybindings for all ListViews
@@ -508,7 +504,7 @@ public class ListView : View, IDesignable
 
         object? value = Source.ToList () [SelectedItem.Value];
 
-        OpenSelectedItem?.Invoke (this, new (SelectedItem.Value, value!));
+        OpenSelectedItem?.Invoke (this, new ListViewItemEventArgs (SelectedItem.Value, value!));
 
         // BUGBUG: this should not blindly return true.
         return true;
@@ -516,7 +512,7 @@ public class ListView : View, IDesignable
 
     /// <summary>Virtual method that will invoke the <see cref="RowRender"/>.</summary>
     /// <param name="rowEventArgs"></param>
-    public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs) { RowRender?.Invoke (this, rowEventArgs); }
+    public virtual void OnRowRender (ListViewRowEventArgs rowEventArgs) => RowRender?.Invoke (this, rowEventArgs);
 
     /// <summary>This event is raised when the user Double-Clicks on an item or presses ENTER to open the selected item.</summary>
     public event EventHandler<ListViewItemEventArgs>? OpenSelectedItem;
@@ -524,7 +520,7 @@ public class ListView : View, IDesignable
     /// <summary>
     ///     Allow resume the <see cref="CollectionChanged"/> event from being invoked,
     /// </summary>
-    public void ResumeSuspendCollectionChangedEvent () { Source?.SuspendCollectionChangedEvent = false; }
+    public void ResumeSuspendCollectionChangedEvent () => Source?.SuspendCollectionChangedEvent = false;
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs>? RowRender;
@@ -565,7 +561,7 @@ public class ListView : View, IDesignable
         }
 
         object? value = SelectedItem.HasValue && Source?.Count > 0 ? Source.ToList () [SelectedItem.Value] : null;
-        SelectedItemChanged?.Invoke (this, new (SelectedItem, value));
+        SelectedItemChanged?.Invoke (this, new ListViewItemEventArgs (SelectedItem, value));
         _lastSelectedItem = SelectedItem;
         EnsureSelectedItemVisible ();
 
@@ -599,27 +595,23 @@ public class ListView : View, IDesignable
     ///     Use the <see cref="Source"/> property to set a new <see cref="IListDataSource"/> source and use custom
     ///     rendering.
     /// </remarks>
-    public Task SetSourceAsync<T> (ObservableCollection<T>? source)
-    {
-        return Task.Factory.StartNew (
-                                      () =>
-                                      {
-                                          if (source is null && Source is not ListWrapper<T>)
-                                          {
-                                              Source = null;
-                                          }
-                                          else
-                                          {
-                                              Source = new ListWrapper<T> (source);
-                                          }
+    public Task SetSourceAsync<T> (ObservableCollection<T>? source) =>
+        Task.Factory.StartNew (() =>
+                               {
+                                   if (source is null && Source is not ListWrapper<T>)
+                                   {
+                                       Source = null;
+                                   }
+                                   else
+                                   {
+                                       Source = new ListWrapper<T> (source);
+                                   }
 
-                                          return source;
-                                      },
-                                      CancellationToken.None,
-                                      TaskCreationOptions.DenyChildAttach,
-                                      TaskScheduler.Default
-                                     );
-    }
+                                   return source;
+                               },
+                               CancellationToken.None,
+                               TaskCreationOptions.DenyChildAttach,
+                               TaskScheduler.Default);
 
     /// <summary>Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ListView"/>, enabling custom rendering.</summary>
     /// <value>The source.</value>
@@ -653,7 +645,7 @@ public class ListView : View, IDesignable
     /// <summary>
     ///     Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
     /// </summary>
-    public void SuspendCollectionChangedEvent () { Source?.SuspendCollectionChangedEvent = true; }
+    public void SuspendCollectionChangedEvent () => Source?.SuspendCollectionChangedEvent = true;
 
     /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
     /// <remarks>
@@ -708,7 +700,7 @@ public class ListView : View, IDesignable
     ///     Call the event to raises the <see cref="CollectionChanged"/>.
     /// </summary>
     /// <param name="e"></param>
-    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) { CollectionChanged?.Invoke (this, e); }
+    protected virtual void OnCollectionChanged (NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke (this, e);
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
@@ -761,10 +753,8 @@ public class ListView : View, IDesignable
 
                 if (AllowsMarking)
                 {
-                    AddRune (
-                             Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
-                             AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
-                            );
+                    AddRune (Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
+                             AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected);
                     AddRune ((Rune)' ');
                 }
 
@@ -776,7 +766,7 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnFrameChanged (in Rectangle frame) { EnsureSelectedItemVisible (); }
+    protected override void OnFrameChanged (in Rectangle frame) => EnsureSelectedItemVisible ();
 
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? currentFocused, View? newFocused)
@@ -818,7 +808,7 @@ public class ListView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnViewportChanged (DrawEventArgs e) { SetContentSize (new Size (MaxLength, Source?.Count ?? Viewport.Height)); }
+    protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (MaxLength, Source?.Count ?? Viewport.Height));
 
     private void Source_CollectionChanged (object? sender, NotifyCollectionChangedEventArgs e)
     {
