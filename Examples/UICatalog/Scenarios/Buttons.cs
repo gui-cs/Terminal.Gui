@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿#nullable enable
+using System.Text;
 
 namespace UICatalog.Scenarios;
 
@@ -69,7 +70,7 @@ public class Buttons : Scenario
 
         View prev = colorButtonsLabel;
 
-        foreach (KeyValuePair<string, Scheme> scheme in SchemeManager.GetSchemesForCurrentTheme ())
+        foreach (KeyValuePair<string, Scheme?> scheme in SchemeManager.GetSchemesForCurrentTheme ())
         {
             Button colorButton = new ()
             {
@@ -332,7 +333,7 @@ public class Buttons : Scenario
         };
         numericUpDown.ValueChanged += NumericUpDownValueChanged;
 
-        void NumericUpDownValueChanged (object sender, EventArgs<int> e) { }
+        void NumericUpDownValueChanged (object? sender, ValueChangedEventArgs<int> e) { }
 
         main.Add (label, numericUpDown);
 
@@ -416,9 +417,9 @@ public class Buttons : Scenario
             X = Pos.Right (repeatButton) + 1,
             Y = Pos.Top (repeatButton),
             Title = "Enabled",
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
-        enableCb.CheckedStateChanging += (_, _) => { repeatButton.Enabled = !repeatButton.Enabled; };
+        enableCb.ValueChanging += (_, _) => { repeatButton.Enabled = !repeatButton.Enabled; };
         main.Add (label, repeatButton, enableCb);
 
         NumericUpDown<int> decNumericUpDown = new ()

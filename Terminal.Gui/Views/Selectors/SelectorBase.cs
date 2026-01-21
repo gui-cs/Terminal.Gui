@@ -5,7 +5,7 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     The abstract base class for <see cref="OptionSelector{TEnum}"/> and <see cref="FlagSelector{TFlagsEnum}"/>.
 /// </summary>
-public abstract class SelectorBase : View, IOrientation
+public abstract class SelectorBase : View, IOrientation, IValue<int?>
 {
     /// <summary>
     ///     Gets or sets the default Highlight Style.
@@ -57,8 +57,8 @@ public abstract class SelectorBase : View, IOrientation
     private bool? HandleAcceptCommand (ICommandContext? ctx)
     {
         if (!DoubleClickAccepts
-            && ctx?.Binding is MouseBinding mouseBinding
-            && mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
+            && ctx is CommandContext<MouseBinding> mouseCommandContext
+            && mouseCommandContext.Binding.MouseEventArgs!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
             return false;
         }
@@ -70,12 +70,12 @@ public abstract class SelectorBase : View, IOrientation
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         // If the command did not come from a keyboard event, ignore it
-        if (args.Context?.Binding is not KeyBinding keyBinding)
+        if (args.Context is not CommandContext<KeyBinding> keyCommandContext)
         {
             return base.OnHandlingHotKey (args);
         }
 
-        if ((HasFocus || !CanFocus) && HotKey == keyBinding.Key?.NoAlt.NoCtrl.NoShift!)
+        if ((HasFocus || !CanFocus) && HotKey == keyCommandContext.Binding.Key?.NoAlt.NoCtrl.NoShift!)
         {
             // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
             return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
@@ -105,30 +105,49 @@ public abstract class SelectorBase : View, IOrientation
             }
 
             int? previousValue = _value;
+
+            // Raise IValue<int?>.ValueChanging (cancellable)
+            if (RaiseValueChanging (previousValue, value))
+            {
+                return;
+            }
+
             _value = value;
 
             UpdateChecked ();
-            RaiseValueChanged (previousValue);
+            RaiseValueChanged (previousValue, _value);
         }
     }
 
+    #region IValue<int?> Implementation
+
     /// <summary>
-    ///     Raised the <see cref="ValueChanged"/> event.
+    ///     Raises the <see cref="ValueChanging"/> event.
     /// </summary>
-    /// <param name="previousValue"></param>
-    protected void RaiseValueChanged (int? previousValue)
+    /// <returns><see langword="true"/> if the change was cancelled.</returns>
+    protected bool RaiseValueChanging (int? currentValue, int? newValue)
+    {
+        ValueChangingEventArgs<int?> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event.
+    /// </summary>
+    /// <param name="previousValue">The value before the change.</param>
+    /// <param name="newValue">The value after the change.</param>
+    protected void RaiseValueChanged (int? previousValue, int? newValue)
     {
         if (_valueField is { })
         {
             _valueField.Text = Value.ToString ()!;
         }
 
-        OnValueChanged (Value, previousValue);
+        OnValueChanged (newValue, previousValue);
 
-        if (Value.HasValue)
-        {
-            ValueChanged?.Invoke (this, new EventArgs<int?> (Value.Value));
-        }
+        ValueChanged?.Invoke (this, new ValueChangedEventArgs<int?> (previousValue, newValue));
     }
 
     /// <summary>
@@ -136,10 +155,13 @@ public abstract class SelectorBase : View, IOrientation
     /// </summary>
     protected virtual void OnValueChanged (int? value, int? previousValue) { }
 
-    /// <summary>
-    ///     Raised when <see cref="Value"/> has changed.
-    /// </summary>
-    public event EventHandler<EventArgs<int?>>? ValueChanged;
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+
+    #endregion
 
     private IReadOnlyList<int>? _values;
 

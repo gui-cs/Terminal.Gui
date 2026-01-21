@@ -14,12 +14,12 @@ public class ColorPickerTests
 
         var cp = new ColorPicker ();
 
-        cp.ColorChanged += (s, e) =>
+        cp.ValueChanged += (s, e) =>
                            {
                                count++;
-                               newColor = e.Result;
+                               newColor = e.NewValue ?? Color.Black;
 
-                               Assert.Equal (cp.SelectedColor, e.Result);
+                               Assert.Equal (cp.SelectedColor, e.NewValue);
                            };
 
         cp.SelectedColor = new Color (1, 2, 3);
@@ -945,11 +945,11 @@ public class ColorPickerTests
     }
 
     [Fact]
-    public void ColorChanged_StillFires_ForBackwardsCompatibility ()
+    public void ValueChanged_Fires_WhenSettingValue ()
     {
         ColorPicker picker = new ();
-        Color received = default;
-        picker.ColorChanged += (_, e) => received = e.Result;
+        Color? received = default;
+        picker.ValueChanged += (_, e) => received = e.NewValue;
 
         picker.Value = Color.Cyan;
 

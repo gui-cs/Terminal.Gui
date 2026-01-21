@@ -163,7 +163,7 @@ public class ProgressBarStyles : Scenario
 
         var ckbBidirectional = new CheckBox
         {
-            X = Pos.Center (), Y = Pos.Bottom (continuousPB), Text = "BidirectionalMarquee", CheckedState = CheckState.Checked
+            X = Pos.Center (), Y = Pos.Bottom (continuousPB), Text = "BidirectionalMarquee", Value = CheckState.Checked
         };
         container.Add (ckbBidirectional);
 
@@ -195,11 +195,16 @@ public class ProgressBarStyles : Scenario
                                                                       .Select (v => v.Title)
                                                                       .ToList ()));
 
-        _pbList.SelectedItemChanged += (sender, e) =>
-                                       {
-                                           editor.ViewToEdit =
-                                               container.SubViews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == (string)e.Value);
-                                       };
+        _pbList.ValueChanged += (sender, e) =>
+                                {
+                                    if (e.NewValue is null)
+                                    {
+                                        return;
+                                    }
+                                    string title = (string)_pbList.Source!.ToList () [e.NewValue.Value]!;
+                                    editor.ViewToEdit =
+                                        container.SubViews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == title);
+                                };
 
         osPbFormat.ValueChanged += (s, e) =>
                                    {
@@ -214,10 +219,10 @@ public class ProgressBarStyles : Scenario
                                        marqueesContinuousPB.ProgressBarFormat = e.Value.Value;
                                    };
 
-        ckbBidirectional.CheckedStateChanging += (s, e) =>
+        ckbBidirectional.ValueChanging += (s, e) =>
                                                  {
                                                      marqueesBlocksPB.BidirectionalMarquee =
-                                                         marqueesContinuousPB.BidirectionalMarquee = e.Result == CheckState.Checked;
+                                                         marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
                                                  };
 
         win.Initialized += Win_Initialized;

@@ -122,71 +122,71 @@ public class ListColumns : Scenario
         _topLineCheckBox = new ()
         {
             Title = "_TopLine",
-            CheckedState = _listColView.Style.ShowHorizontalHeaderOverline ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.ShowHorizontalHeaderOverline ? CheckState.Checked : CheckState.UnChecked
         };
-        _topLineCheckBox.CheckedStateChanged += (s, e) => ToggleTopline ();
+        _topLineCheckBox.ValueChanged += (s, e) => ToggleTopline ();
 
         _bottomLineCheckBox = new ()
         {
             Title = "_BottomLine",
-            CheckedState = _listColView.Style.ShowHorizontalBottomline ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.ShowHorizontalBottomline ? CheckState.Checked : CheckState.UnChecked
         };
-        _bottomLineCheckBox.CheckedStateChanged += (s, e) => ToggleBottomline ();
+        _bottomLineCheckBox.ValueChanged += (s, e) => ToggleBottomline ();
 
         _cellLinesCheckBox = new ()
         {
             Title = "_CellLines",
-            CheckedState = _listColView.Style.ShowVerticalCellLines ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.ShowVerticalCellLines ? CheckState.Checked : CheckState.UnChecked
         };
-        _cellLinesCheckBox.CheckedStateChanged += (s, e) => ToggleCellLines ();
+        _cellLinesCheckBox.ValueChanged += (s, e) => ToggleCellLines ();
 
         _expandLastColumnCheckBox = new ()
         {
             Title = "_ExpandLastColumn",
-            CheckedState = _listColView.Style.ExpandLastColumn ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.ExpandLastColumn ? CheckState.Checked : CheckState.UnChecked
         };
-        _expandLastColumnCheckBox.CheckedStateChanged += (s, e) => ToggleExpandLastColumn ();
+        _expandLastColumnCheckBox.ValueChanged += (s, e) => ToggleExpandLastColumn ();
 
         _alwaysUseNormalColorForVerticalCellLinesCheckBox = new ()
         {
             Title = "_AlwaysUseNormalColorForVerticalCellLines",
-            CheckedState = _listColView.Style.AlwaysUseNormalColorForVerticalCellLines ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.AlwaysUseNormalColorForVerticalCellLines ? CheckState.Checked : CheckState.UnChecked
         };
-        _alwaysUseNormalColorForVerticalCellLinesCheckBox.CheckedStateChanged += (s, e) => ToggleAlwaysUseNormalColorForVerticalCellLines ();
+        _alwaysUseNormalColorForVerticalCellLinesCheckBox.ValueChanged += (s, e) => ToggleAlwaysUseNormalColorForVerticalCellLines ();
 
         _smoothScrollingCheckBox = new ()
         {
             Title = "_SmoothHorizontalScrolling",
-            CheckedState = _listColView.Style.SmoothHorizontalScrolling ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.SmoothHorizontalScrolling ? CheckState.Checked : CheckState.UnChecked
         };
-        _smoothScrollingCheckBox.CheckedStateChanged += (s, e) => ToggleSmoothScrolling ();
+        _smoothScrollingCheckBox.ValueChanged += (s, e) => ToggleSmoothScrolling ();
 
         _alternatingColorsCheckBox = new ()
         {
             Title = "Alternating Colors"
         };
-        _alternatingColorsCheckBox.CheckedStateChanged += (s, e) => ToggleAlternatingColors ();
+        _alternatingColorsCheckBox.ValueChanged += (s, e) => ToggleAlternatingColors ();
 
         _cursorCheckBox = new ()
         {
             Title = "Invert Selected Cell First Character",
-            CheckedState = _listColView.Style.InvertSelectedCellFirstCharacter ? CheckState.Checked : CheckState.UnChecked
+            Value = _listColView.Style.InvertSelectedCellFirstCharacter ? CheckState.Checked : CheckState.UnChecked
         };
-        _cursorCheckBox.CheckedStateChanged += (s, e) => ToggleInvertSelectedCellFirstCharacter ();
+        _cursorCheckBox.ValueChanged += (s, e) => ToggleInvertSelectedCellFirstCharacter ();
 
         _orientVerticalCheckBox = new ()
         {
             Title = "_OrientVertical",
-            CheckedState = listColStyle.Orientation == Orientation.Vertical ? CheckState.Checked : CheckState.UnChecked
+            Value = listColStyle.Orientation == Orientation.Vertical ? CheckState.Checked : CheckState.UnChecked
         };
-        _orientVerticalCheckBox.CheckedStateChanged += (s, e) => ToggleVerticalOrientation ();
+        _orientVerticalCheckBox.ValueChanged += (s, e) => ToggleVerticalOrientation ();
 
         _scrollParallelCheckBox = new ()
         {
             Title = "_ScrollParallel",
-            CheckedState = listColStyle.ScrollParallel ? CheckState.Checked : CheckState.UnChecked
+            Value = listColStyle.ScrollParallel ? CheckState.Checked : CheckState.UnChecked
         };
-        _scrollParallelCheckBox.CheckedStateChanged += (s, e) => ToggleScrollParallel ();
+        _scrollParallelCheckBox.ValueChanged += (s, e) => ToggleScrollParallel ();
 
         menuBar.Add (
                   new MenuBarItem (
@@ -390,7 +390,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        if (_alternatingColorsCheckBox.CheckedState == CheckState.Checked)
+        if (_alternatingColorsCheckBox.Value == CheckState.Checked)
         {
             _listColView.Style.RowColorGetter = a => a.RowIndex % 2 == 0 ? _alternatingScheme : null;
         }
@@ -410,7 +410,7 @@ public class ListColumns : Scenario
         }
 
         _listColView.Style.AlwaysUseNormalColorForVerticalCellLines =
-            _alwaysUseNormalColorForVerticalCellLinesCheckBox.CheckedState == CheckState.Checked;
+            _alwaysUseNormalColorForVerticalCellLinesCheckBox.Value == CheckState.Checked;
 
         _listColView.Update ();
     }
@@ -422,7 +422,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.ShowHorizontalBottomline = _bottomLineCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.ShowHorizontalBottomline = _bottomLineCheckBox.Value == CheckState.Checked;
         _listColView.Update ();
     }
 
@@ -433,7 +433,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.ShowVerticalCellLines = _cellLinesCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.ShowVerticalCellLines = _cellLinesCheckBox.Value == CheckState.Checked;
         _listColView.Update ();
     }
 
@@ -444,7 +444,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.ExpandLastColumn = _expandLastColumnCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.ExpandLastColumn = _expandLastColumnCheckBox.Value == CheckState.Checked;
 
         _listColView.Update ();
     }
@@ -456,7 +456,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.InvertSelectedCellFirstCharacter = _cursorCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.InvertSelectedCellFirstCharacter = _cursorCheckBox.Value == CheckState.Checked;
         _listColView.SetNeedsDraw ();
     }
 
@@ -467,7 +467,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        listTableSource.Style.ScrollParallel = _scrollParallelCheckBox.CheckedState == CheckState.Checked;
+        listTableSource.Style.ScrollParallel = _scrollParallelCheckBox.Value == CheckState.Checked;
         _listColView.SetNeedsDraw ();
     }
 
@@ -478,7 +478,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.SmoothHorizontalScrolling = _smoothScrollingCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.SmoothHorizontalScrolling = _smoothScrollingCheckBox.Value == CheckState.Checked;
 
         _listColView.Update ();
     }
@@ -490,7 +490,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.ShowHorizontalHeaderOverline = _topLineCheckBox.CheckedState == CheckState.Checked;
+        _listColView.Style.ShowHorizontalHeaderOverline = _topLineCheckBox.Value == CheckState.Checked;
         _listColView.Update ();
     }
 
@@ -501,7 +501,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        listTableSource.Style.Orientation = _orientVerticalCheckBox.CheckedState == CheckState.Checked
+        listTableSource.Style.Orientation = _orientVerticalCheckBox.Value == CheckState.Checked
                                                 ? Orientation.Vertical
                                                 : Orientation.Horizontal;
         _listColView.SetNeedsDraw ();

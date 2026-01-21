@@ -55,7 +55,7 @@ public class TextFormatterDemo : Scenario
             X = 0,
             Y = Pos.Bottom (blockText) + 1,
             Text = "Unicode",
-            CheckedState = window.HotKeySpecifier == (Rune)' ' ? CheckState.Checked : CheckState.UnChecked
+            Value = window.HotKeySpecifier == (Rune)' ' ? CheckState.Checked : CheckState.UnChecked
         };
 
         window.Add (unicodeCheckBox);
@@ -118,12 +118,12 @@ public class TextFormatterDemo : Scenario
             label = multipleLines [i];
         }
 
-        unicodeCheckBox.CheckedStateChanging += (_, e) =>
+        unicodeCheckBox.ValueChanging += (_, e) =>
                                                 {
                                                     for (var i = 0; i < alignments.Count; i++)
                                                     {
-                                                        singleLines [i].Text = e.Result == CheckState.Checked ? TEXT : UNICODE;
-                                                        multipleLines [i].Text = e.Result == CheckState.Checked ? TEXT : UNICODE;
+                                                        singleLines [i].Text = e.NewValue == CheckState.Checked ? TEXT : UNICODE;
+                                                        multipleLines [i].Text = e.NewValue == CheckState.Checked ? TEXT : UNICODE;
                                                     }
                                                 };
 
