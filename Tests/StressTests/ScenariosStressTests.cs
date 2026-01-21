@@ -111,12 +111,12 @@ public class ScenariosStressTests
 
         void OnApplicationInstanceDisposed (object? s, EventArgs<IApplication> a)
         {
-            if (a.Value != app)
+            if (a.Value is null || app is null || a.Value != app)
             {
                 return;
             }
 
-            app!.Driver!.ClearedContents -= OnClearedContents;
+            app.Driver!.ClearedContents -= OnClearedContents;
             app.SessionBegun -= OnApplicationSessionBegun;
             app.Iteration -= OnApplicationOnIteration;
             stopwatch!.Stop ();
@@ -168,7 +168,7 @@ public class ScenariosStressTests
             _output.WriteLine (
                                $"'{scenario!.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
-            app.RequestStop ();
+            app?.RequestStop ();
 
             return false;
         }
