@@ -164,7 +164,7 @@ public class ScenariosStressTests
             }
 
             _output.WriteLine (
-                               $"'{scenario!.GetName ()}' failed to Quit with {app!.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
+                               $"'{scenario!.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             app.RequestStop ();
 
