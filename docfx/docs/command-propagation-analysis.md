@@ -7,6 +7,12 @@
 > **Created**: 2026-01-09
 >
 > **Author**: GitHub Copilot
+>
+> **Implementation Status**:
+> - ✅ Command Binding Refactor (dependency) - Complete
+> - ✅ IValue Interface Implementation (dependency) - Complete
+> - ⏸️ PropagatedCommands Implementation - NOT STARTED
+> - ⏸️ CommandContext.Source/Value Design - PROPOSED (not yet implemented)
 
 ## Table of Contents
 
@@ -454,31 +460,32 @@ When a user activates a CheckBox in this hierarchy:
    ├─ MenuBarItem.PropagatedCommands contains Command.Activate? YES
    ↓
 10. MenuBar.RaiseActivating(ctx)
-    ├─ OnActivating receives ctx.SourceId = "AutoSave", ctx.Value = CheckState.Checked
-    ├─ Can identify the originating view and respond appropriately
+    ├─ OnActivating receives ctx.Source = WeakRef(CheckBox), ctx.Value = CheckState.Checked
+    ├─ Can identify the originating view via Source.TryGetTarget and respond appropriately
     └─ HANDLED - MenuBar can now react to deep activations
 ```
 
-### Source Tracking Through the Chain
+### Source and Value Tracking Through the Chain
 
-The `ctx.SourceId` and `ctx.Value` properties are critical for this scenario:
+The `ctx.Source` and `ctx.Value` properties are critical for this scenario:
 
-| Step | View Processing | `ctx.SourceId` | `ctx.Value` | `this` / `sender` |
-|------|-----------------|----------------|-------------|-------------------|
-| 2 | CheckBox | "AutoSave" | CheckState.Checked | CheckBox |
-| 4 | FlagSelector | "AutoSave" | CheckState.Checked | FlagSelector |
-| 6 | MenuItem | "AutoSave" | CheckState.Checked | MenuItem |
-| 8 | Menu | "AutoSave" | CheckState.Checked | Menu |
-| 10 | MenuBar | "AutoSave" | CheckState.Checked | MenuBar |
+| Step | View Processing | `ctx.Source` | `ctx.Value` | `this` / `sender` |
+|------|-----------------|--------------|-------------|-------------------|
+| 2 | CheckBox | WeakRef(CheckBox) | CheckState.Checked | CheckBox |
+| 4 | FlagSelector | WeakRef(CheckBox) | CheckState.Checked | FlagSelector |
+| 6 | MenuItem | WeakRef(CheckBox) | CheckState.Checked | MenuItem |
+| 8 | Menu | WeakRef(CheckBox) | CheckState.Checked | Menu |
+| 10 | MenuBar | WeakRef(CheckBox) | CheckState.Checked | MenuBar |
 
-**`ctx.SourceId` and `ctx.Value` remain constant** throughout propagation, while `this`/`sender` changes at each step. This allows MenuBar's handler to:
-- Identify which view triggered the command via `SourceId` (the user-defined `View.Id`)
+**`ctx.Source` and `ctx.Value` remain constant** throughout propagation, while `this`/`sender` changes at each step. This allows MenuBar's handler to:
+- Identify which view triggered the command via `Source` (WeakReference to the originating View)
 - Access the relevant data via `Value` (from views implementing `IValue<T>`)
 
-**Why SourceId instead of Source (View reference)?** The original design used `ctx.Source` (a View reference), but this creates a **lifecycle issue**: when a superview receives a propagated event, the Source reference may be invalid if an intermediate view has removed or disposed the original subview. Using `SourceId` (string) and `Value` (object?) eliminates this issue:
-- **SourceId** is a stable identifier (the `View.Id` string)
+**Why WeakReference instead of strong View reference?** Using `WeakReference<View>` for `ctx.Source` solves the **lifecycle issue**:
+- **WeakReference prevents keeping disposed views alive** while allowing safe access via `TryGetTarget`
+- **Type safety** - pattern match on View types after getting the reference
 - **Value** is the data captured at invocation time (from `IValue<T>.GetValue()`)
-- No dangling references - handlers don't need the View itself
+- **Safe access pattern**: `ctx.Source?.TryGetTarget(out View? view)` - handlers can check if the view is still alive
 
 ### Accept Flow (Similar Pattern)
 
@@ -676,29 +683,35 @@ MenuBar menuBar = new ()
 // Handle Accepting (cancellable) - the "New" menuitem is handled automatically via Command.New binding
 menuBar.Accepting += (sender, args) =>
 {
-    switch (args.Context?.SourceId)
+    // Pattern 1: Use Value directly (most common - no view access needed)
+    if (args.Context?.Value is CheckState checkState)
     {
-        case "AutoSave":
-            _autoSave = args.Context?.Value is CheckState checkState && checkState == CheckState.Checked;
-            break;
-
-        case "MutuallyExclusiveOptionsSelector":
-            _selectedOption = args.Context?.Value is int optionValue ? optionValue : 0;
-            break;
-
-        case "MenuBgColorCp":
-            if (args.Context?.Value is Color color)
-            {
-                menuBar.SetScheme (
-                    menuBar.GetScheme () with
-                    {
-                        Normal = new (
-                            menuBar.GetAttributeForRole (VisualRole.Normal).Foreground,
-                            color,
-                            menuBar.GetAttributeForRole (VisualRole.Normal).Style)
-                    });
-            }
-            break;
+        // Identify via View.Id if needed
+        if (args.Context?.Source?.TryGetTarget (out View? view) && view.Id == "AutoSave")
+        {
+            _autoSave = checkState == CheckState.Checked;
+        }
+    }
+    else if (args.Context?.Value is int optionValue)
+    {
+        if (args.Context?.Source?.TryGetTarget (out View? view) && view.Id == "MutuallyExclusiveOptionsSelector")
+        {
+            _selectedOption = optionValue;
+        }
+    }
+    else if (args.Context?.Value is Color color)
+    {
+        if (args.Context?.Source?.TryGetTarget (out View? view) && view.Id == "MenuBgColorCp")
+        {
+            menuBar.SetScheme (
+                menuBar.GetScheme () with
+                {
+                    Normal = new (
+                        menuBar.GetAttributeForRole (VisualRole.Normal).Foreground,
+                        color,
+                        menuBar.GetAttributeForRole (VisualRole.Normal).Style)
+                });
+        }
     }
 };
 ```
@@ -769,11 +782,15 @@ MenuItem settingsMenuItem = new ()
 // Handle Accepting at the MenuItem level (cancellable)
 settingsMenuItem.Accepting += (sender, args) =>
 {
-    // args.Context?.SourceId = "DarkMode" (the CheckBox that was activated)
+    // args.Context?.Source = WeakReference to the CheckBox that was activated
     // args.Context?.Value = CheckState from the CheckBox
     if (args.Context?.Value is CheckState state)
     {
-        ApplyTheme (state == CheckState.Checked ? Theme.Dark : Theme.Light);
+        // Can optionally verify the source view if needed
+        if (args.Context?.Source?.TryGetTarget (out View? view) && view.Id == "DarkMode")
+        {
+            ApplyTheme (state == CheckState.Checked ? Theme.Dark : Theme.Light);
+        }
     }
     // Don't set args.Handled = true if you want it to continue propagating to Menu/MenuBar
 };
@@ -795,17 +812,21 @@ Menu fileMenu = new (
 // Handle Accepting at the Menu level (cancellable)
 fileMenu.Accepting += (sender, args) =>
 {
-    switch (args.Context?.SourceId)
+    // Use View.Id for identification
+    if (args.Context?.Source?.TryGetTarget (out View? view))
     {
-        case "New":
-            CreateNewDocument ();
-            break;
-        case "Open":
-            OpenDocument ();
-            break;
-        case "Save":
-            SaveDocument ();
-            break;
+        switch (view.Id)
+        {
+            case "New":
+                CreateNewDocument ();
+                break;
+            case "Open":
+                OpenDocument ();
+                break;
+            case "Save":
+                SaveDocument ();
+                break;
+        }
     }
     // args.Handled = true; // Set if you want to stop propagation to MenuBar
 };
@@ -828,30 +849,34 @@ MenuBarItem editMenuBarItem = new (
 // Handle Accepting at the MenuBarItem level (cancellable)
 editMenuBarItem.Accepting += (sender, args) =>
 {
-    switch (args.Context?.SourceId)
+    // Use View.Id for identification
+    if (args.Context?.Source?.TryGetTarget (out View? view))
     {
-        case "Cut":
-            CutToClipboard ();
-            break;
-        case "Copy":
-            CopyToClipboard ();
-            break;
-        case "Paste":
-            PasteFromClipboard ();
-            break;
+        switch (view.Id)
+        {
+            case "Cut":
+                CutToClipboard ();
+                break;
+            case "Copy":
+                CopyToClipboard ();
+                break;
+            case "Paste":
+                PasteFromClipboard ();
+                break;
+        }
     }
 };
 ```
 
 #### Summary: Event Handling Levels
 
-| Level | Use Case | SourceId Contains |
-|-------|----------|-------------------|
+| Level | Use Case | Source Contains |
+|-------|----------|-----------------|
 | **CommandView** | Self-contained logic for a specific control | N/A (you have the view directly) |
-| **MenuItem** | Handle a specific menu item and its CommandView | CommandView's Id (if present) or MenuItem's Id |
-| **Menu** | Handle all items in a submenu | The originating MenuItem or CommandView Id |
-| **MenuBarItem** | Handle all items under a top-level menu | The originating MenuItem or CommandView Id |
-| **MenuBar** | Centralized handling for entire menu system | The originating MenuItem or CommandView Id |
+| **MenuItem** | Handle a specific menu item and its CommandView | WeakReference to CommandView or MenuItem |
+| **Menu** | Handle all items in a submenu | WeakReference to originating MenuItem or CommandView |
+| **MenuBarItem** | Handle all items under a top-level menu | WeakReference to originating MenuItem or CommandView |
+| **MenuBar** | Centralized handling for entire menu system | WeakReference to originating MenuItem or CommandView |
 
 **Propagation order**: CommandView → MenuItem → Menu → MenuBarItem → MenuBar
 
@@ -881,15 +906,15 @@ For this scenario to work, the following views must include `Command.Activate` i
    - Create MenuBar with MenuBarItem containing PopoverMenu with Menu with MenuItem
    - Set MenuItem.CommandView = FlagSelector with CheckBox (Id = "AutoSave")
    - Activate CheckBox
-   - Verify MenuBar.OnActivating receives event with `ctx.SourceId` = "AutoSave" and `ctx.Value` = CheckState
+   - Verify MenuBar.OnActivating receives event with `ctx.Source` = WeakRef(CheckBox) and `ctx.Value` = CheckState
 
 2. **Accept propagation through full hierarchy**:
    - Same setup as above
    - Accept (double-click) CheckBox
-   - Verify MenuBar.OnAccepting receives event with `ctx.SourceId` = "AutoSave" and `ctx.Value` = CheckState
+   - Verify MenuBar.OnAccepting receives event with `ctx.Source` = WeakRef(CheckBox) and `ctx.Value` = CheckState
 
-3. **SourceId and Value preservation**:
-   - Verify `ctx.SourceId` and `ctx.Value` remain constant at every level (FlagSelector, MenuItem, Menu, MenuBar)
+3. **Source and Value preservation**:
+   - Verify `ctx.Source` and `ctx.Value` remain constant at every level (FlagSelector, MenuItem, Menu, MenuBar)
    - Verify `ctx.Binding` is preserved (KeyBinding or MouseBinding from original input)
 
 4. **Handled at intermediate level**:
@@ -909,6 +934,31 @@ For this scenario to work, the following views must include `Command.Activate` i
 4. **CWP Compliance**: Maintain the Cancellable Work Pattern structure
 5. **Decoupling**: Subviews remain ignorant of superview propagation needs
 
+### WeakReference for Source Tracking
+
+**Problem**: During command propagation, intermediate views may dispose or remove the original source view, leading to dangling references.
+
+**Solution**: Use `WeakReference<View>` for `CommandContext.Source`.
+
+**Benefits**:
+1. **Lifecycle Safety**: Disposed views can be garbage collected; reference won't keep them alive
+2. **Type Safety**: Maintains strong typing - pattern match on View types after `TryGetTarget`
+3. **Safe Access**: Handlers check `ctx.Source?.TryGetTarget(out View? view)` before use
+4. **Performance**: Minimal overhead compared to strong references
+5. **Backward Compatible**: Views can still identify sources via View.Id if needed
+
+**Handler Patterns**:
+```csharp
+// Pattern 1: Value-only (most common)
+if (args.Context?.Value is CheckState state) { }
+
+// Pattern 2: Type-based with view access
+if (args.Context?.Source?.TryGetTarget(out var view) && view is CheckBox cb) { }
+
+// Pattern 3: Id-based identification
+if (args.Context?.Source?.TryGetTarget(out var view) && view.Id == "AutoSave") { }
+```
+
 ### Non-Functional Requirements
 
 1. **Performance**: Minimal overhead (avoid reflection, keep checks simple)
@@ -921,7 +971,18 @@ For this scenario to work, the following views must include `Command.Activate` i
 1. **Alpha Status**: Terminal.Gui v2 is in alpha; breaking changes are acceptable before beta
 2. **.NET 8 Compatible**: Use available C# 12 features
 3. **Follows Conventions**: Adhere to Terminal.Gui coding standards
-4. **Binding Refactor Complete**: ✅ The [command_binding_refactor_plan.md](./command_binding_refactor_plan.md) is complete - non-generic `CommandContext`, `InputBinding`, and `IInputBinding.Source` are all available
+
+### Completed Dependencies
+
+1. **Binding Refactor** ✅ ([command_binding_refactor_plan.md](./command_binding_refactor_plan.md) - Complete 2026-01-22)
+   - Non-generic `CommandContext` with `View? Source` and `IInputBinding? Binding`
+   - `IInputBinding.Source` property added
+   - `InputBinding` type for programmatic invocations
+
+2. **IValue Implementation** ✅ ([ivalue-implementation-plan.md](./ivalue-implementation-plan.md) - Complete 2026-01-21)
+   - Non-generic `IValue` interface with `GetValue()`
+   - Generic `IValue<T>` interface with default implementation
+   - Many views implement `IValue<T>` (CheckBox, TextField, DateField, ScrollBar, ListView, etc.)
 
 ---
 
@@ -963,28 +1024,34 @@ Introduce a **propagation registry** that allows superviews to declare which com
 public IReadOnlyList<Command> PropagatedCommands { get; set; } = new List<Command> { Command.Accept };
 ```
 
-#### 2. Update `CommandContext` to Use SourceId and Value
+#### 2. Update `CommandContext` to Add Value Property (PROPOSED)
 
-Replace `View? Source` with `string? SourceId` and add `object? Value`:
+> **⚠️ NOT YET IMPLEMENTED** - This is a proposed design change.
+> Current `CommandContext` has `View? Source` - this proposal would enhance it with `WeakReference<View>` and `Value`.
+
+Change `View? Source` to `WeakReference<View>? Source` and add `object? Value`:
 
 ```csharp
 public record struct CommandContext : ICommandContext
 {
     public Command Command { get; set; }
-    public string? SourceId { get; set; }       // Replaces View? Source - uses View.Id
-    public object? Value { get; set; }          // Value from IValue<T>.GetValue() if available
+    public WeakReference<View>? Source { get; set; }  // Weak reference - safe from lifecycle issues
+    public object? Value { get; set; }                 // Value from IValue<T>.GetValue() if available
     public IInputBinding? Binding { get; set; }
 }
 ```
 
 **Why this change?**
-- **Lifecycle safety**: View references can become invalid if intermediate views dispose subviews during propagation
-- **Developer experience**: `SourceId` enables meaningful switch/case patterns (`case "AutoSave":`)
+- **Lifecycle safety**: WeakReference prevents keeping disposed views alive
+- **Type safety**: Maintains strong typing while preventing dangling references
 - **Data access**: `Value` provides the relevant data (CheckState, selected option, color, etc.) without needing the View
+- **Safe access pattern**: `ctx.Source?.TryGetTarget(out View? view)`
 
-#### 3. Add Non-Generic `IValue` Interface
+#### 3. Non-Generic `IValue` Interface (ALREADY IMPLEMENTED) ✅
 
-To support boxing values from generic `IValue<T>` implementations:
+> **✅ ALREADY IMPLEMENTED** - This was completed as part of ivalue-implementation-plan.md
+
+The non-generic `IValue` interface for boxing values from generic `IValue<T>` implementations:
 
 ```csharp
 public interface IValue
@@ -998,6 +1065,8 @@ public interface IValue<TValue> : IValue
     object? IValue.GetValue() => Value;  // Default implementation
 }
 ```
+
+Many views already implement `IValue<T>`: CheckBox, TextField, DateField, ScrollBar, ListView, etc.
 
 #### 4. Create a Propagation Helper Method
 
@@ -1115,9 +1184,18 @@ Add a new override or update the existing `Command.Activate` handler in `MenuBar
 ```csharp
 protected override bool OnActivating(CommandEventArgs args)
 {
-    // Look up the MenuBarItem by SourceId (direct SubViews only - lifecycle safe)
-    MenuBarItem? menuBarItem = SubViews.OfType<MenuBarItem>()
-        .FirstOrDefault(m => m.Id == args.Context?.SourceId);
+    // Look up the MenuBarItem - use Source or check all MenuBarItems
+    MenuBarItem? menuBarItem = null;
+    if (args.Context?.Source?.TryGetTarget (out View? sourceView) && sourceView is MenuBarItem mbi)
+    {
+        menuBarItem = mbi;
+    }
+    else
+    {
+        // If source is a subview of a MenuBarItem, find the containing MenuBarItem
+        menuBarItem = SubViews.OfType<MenuBarItem> ()
+            .FirstOrDefault (m => args.Context?.Source?.TryGetTarget (out View? view) &&
+                                  (view == m || m.SubViews.Contains (view)));
 
     // If a MenuBarItem is being activated, show its popover if applicable
     if (menuBarItem is { PopoverMenuOpen: false })
@@ -1149,33 +1227,63 @@ During command propagation, handlers need to identify which subview initiated th
 |----------|---------|----------------------------|
 | `sender` parameter | The View currently raising the event | **Yes** - changes at each propagation step |
 | `this` in virtual override | The View currently processing | **Yes** - changes at each propagation step |
-| `args.Context?.SourceId` | The `Id` of the View that originally invoked | **No** - remains constant |
+| `args.Context?.Source` | WeakReference to View that originally invoked | **No** - remains constant |
 | `args.Context?.Value` | The value from the source (if `IValue<T>`) | **No** - remains constant |
 | `args.Context?.Binding` | The original binding (`KeyBinding`, `MouseBinding`, etc.) | **No** - passed unchanged |
 
-**For propagation handlers**, use `args.Context?.SourceId` and `args.Context?.Value` to identify and process the originating view's data:
+**For propagation handlers**, three patterns are available:
 
 ```csharp
-// Option 1: Switch on SourceId for multiple handlers (cancellable)
+// Pattern 1: Value-based (most common - no view access needed)
 menuBar.Accepting += (sender, args) =>
 {
-    switch (args.Context?.SourceId)
+    if (args.Context?.Value is CheckState checkState)
     {
-        case "AutoSave":
-            _autoSave = args.Context?.Value is CheckState.Checked;
-            break;
-        case "MenuBgColorCp":
-            if (args.Context?.Value is Color color)
-                SetBackgroundColor (color);
-            break;
+        _autoSave = checkState == CheckState.Checked;
+    }
+    else if (args.Context?.Value is Color color)
+    {
+        SetBackgroundColor (color);
     }
 };
 
-// Option 2: Override in subclass
+// Pattern 2: Type-based with view access
+menuBar.Accepting += (sender, args) =>
+{
+    if (args.Context?.Source?.TryGetTarget (out var view) && view is CheckBox cb)
+    {
+        _autoSave = cb.CheckedState == CheckState.Checked;
+    }
+};
+
+// Pattern 3: Id-based identification
+menuBar.Accepting += (sender, args) =>
+{
+    if (args.Context?.Source?.TryGetTarget (out var view))
+    {
+        switch (view.Id)
+        {
+            case "AutoSave":
+                if (args.Context?.Value is CheckState cs)
+                {
+                    _autoSave = cs == CheckState.Checked;
+                }
+                break;
+            case "MenuBgColorCp":
+                if (args.Context?.Value is Color color)
+                {
+                    SetBackgroundColor (color);
+                }
+                break;
+        }
+    }
+};
+
+// Pattern 4: Override in subclass
 protected override bool OnActivating (CommandEventArgs args)
 {
-    // Use SourceId to identify, Value to get the data
-    if (args.Context?.SourceId == "settings" && args.Context?.Value is bool enabled)
+    // Use Value directly or access Source if needed
+    if (args.Context?.Value is bool enabled)
     {
         ApplySettings (enabled);
         return true;
@@ -1190,7 +1298,7 @@ protected override bool OnActivating (CommandEventArgs args)
 - The binding's `Data` and type-specific properties remain accessible
 - Propagation does **not** create a new binding - it forwards the existing one
 
-**Note on SourceId uniqueness**: `SourceId` uses the `View.Id` property, which is developer-defined (like HTML element ids). Uniqueness within your application is your responsibility. If two views have the same `Id`, only one will match in switch statements.
+**Note on View.Id uniqueness**: `View.Id` is developer-defined (like HTML element ids). Uniqueness within your application is your responsibility. If two views have the same `Id`, only one will match in switch statements.
 
 ### Migration Path
 
@@ -1212,7 +1320,19 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 
 ## Implementation Impact
 
-### Files to Modify
+### Already Completed ✅
+
+1. **Command Binding Refactor** (command_binding_refactor_plan.md):
+   - Non-generic `CommandContext` with `View? Source` and `IInputBinding? Binding`
+   - `IInputBinding.Source` property added
+   - `InputBinding` type for programmatic invocations
+
+2. **IValue Implementation** (ivalue-implementation-plan.md):
+   - Non-generic `IValue` interface with `GetValue()`
+   - Generic `IValue<T>` interface with default implementation
+   - Many views implement `IValue<T>` (CheckBox, TextField, DateField, ScrollBar, ListView, etc.)
+
+### Core Implementation (PropagatedCommands Mechanism)
 
 1. **Terminal.Gui/ViewBase/View.Command.cs**:
    - Add `PropagatedCommands` property
@@ -1245,6 +1365,27 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 6. **Terminal.Gui/Views/Selectors/SelectorBase.cs** (FlagSelector/OptionSelector):
    - Verify `OnCheckboxOnActivating` correctly forwards context (including `Source`)
    - Ensure `InvokeCommand` is called with the original context, not a new one
+
+### CommandContext Enhancement (WeakReference + Value) - PROPOSED
+
+**⚠️ NOT YET IMPLEMENTED** - Optional enhancement to add lifecycle safety and value propagation:
+
+1. **Terminal.Gui/Input/CommandContext.cs**:
+   - Change `View? Source` to `WeakReference<View>? Source`
+   - Add `object? Value` property
+   - Update XML documentation
+
+2. **Terminal.Gui/ViewBase/View.Command.cs** (`InvokeCommand` methods):
+   - Populate `CommandContext.Value` from `IValue.GetValue()` on source views
+   ```csharp
+   object? value = this is IValue valueView ? valueView.GetValue() : null;
+   return implementation! (new CommandContext {
+       Command = command,
+       Source = new WeakReference<View>(this),
+       Value = value,
+       Binding = binding
+   });
+   ```
 
 ### New Tests Required
 
@@ -1279,7 +1420,7 @@ These custom events were workarounds for missing `Command.Activate` propagation.
    - Create hierarchy: MenuBar → MenuBarItem → PopoverMenu → Menu → MenuItem → FlagSelector → CheckBox
    - **Activate propagation**: Activate CheckBox, verify MenuBar.OnActivating receives event
    - **Accept propagation**: Accept CheckBox, verify MenuBar.OnAccepting receives event
-   - **SourceId/Value preservation**: Verify `ctx.SourceId` and `ctx.Value` remain constant at every level (FlagSelector, MenuItem, Menu, MenuBar)
+   - **Source/Value preservation**: Verify `ctx.Source` and `ctx.Value` remain constant at every level (FlagSelector, MenuItem, Menu, MenuBar)
    - **Binding preservation**: Verify `ctx.Binding` is the original KeyBinding/MouseBinding at every level
    - **Intermediate handling**: Menu.OnActivating handles → verify MenuBar.OnActivating NOT called
    - **Event interception**: Verify FlagSelector and Shortcut correctly forward (not block) commands
@@ -1429,6 +1570,7 @@ These custom events were workarounds for missing `Command.Activate` propagation.
 | 2026-01-20 | Claude Opus 4.5 | Added "Identifying the Originating View in Handlers" section; clarified binding preservation during propagation; updated for alpha status (breaking changes OK); added binding refactor dependency |
 | 2026-01-22 | Claude Opus 4.5 | Updated constraints: binding refactor is now complete; ready for implementation |
 | 2026-01-22 | Claude Opus 4.5 | Added "FlagSelector in MenuItem in MenuBar Scenario" section; expanded test cases and files to modify; documented class hierarchy (MenuBar IS-A Menu, MenuBarItem IS-A MenuItem IS-A Shortcut) |
-| 2026-01-21 | Claude Opus 4.5 | **Major design change**: Replaced `ctx.Source` (View?) with `ctx.SourceId` (string) and `ctx.Value` (object?) to fix lifecycle issues; added non-generic `IValue` interface; updated all handler examples to use switch/case on SourceId |
+| 2026-01-21 | Claude Opus 4.5 | **Proposed design change** (superseded): Replaced `ctx.Source` (View?) with `ctx.SourceId` (string) and `ctx.Value` (object?) to fix lifecycle issues; added non-generic `IValue` interface proposal; updated all handler examples to use switch/case on SourceId. **NOTE: SourceId design was reconsidered - see 2026-01-21 revision below** |
 | 2026-01-21 | Claude Opus 4.5 | Fixed code style in all examples: explicit types (no `var`), `new ()` syntax, space before `()`, changed `Accepted` to `Accepting` (cancellable) |
+| 2026-01-21 | Claude Opus 4.5 | **Design revision based on user feedback**: Replaced `SourceId` (string) approach with `WeakReference<View>? Source` to maintain type safety while solving lifecycle issues; kept `object? Value` for data propagation; updated all handler examples to show WeakReference.TryGetTarget patterns; added WeakReference design rationale section; documented IValue implementation as complete; reorganized Implementation Impact section to show completed dependencies vs proposed changes |
 
