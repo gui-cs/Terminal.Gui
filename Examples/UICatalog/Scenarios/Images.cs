@@ -230,7 +230,7 @@ public class Images : Scenario
                 SixelData = _fireEncoder.EncodeSixel (bmp),
                 ScreenPosition = new (0, 0)
             };
-            Application.GetSixels ().Enqueue (_fireSixel);
+            _app.Driver?.GetOutput ().GetSixels ().Enqueue (_fireSixel);
         }
         else
         {
@@ -469,7 +469,8 @@ public class Images : Scenario
         _sixelSupported.Add (_popularityThreshold);
         _sixelSupported.Add (lblPopThreshold);
 
-        _sixelView.DrawingContent += SixelViewOnDrawingContent;
+        // This is already handled by the OutputBase
+        //_sixelView.DrawingContent += SixelViewOnDrawingContent;
     }
 
     private IPaletteBuilder GetPaletteBuilder ()
@@ -517,7 +518,7 @@ public class Images : Scenario
                 ScreenPosition = _screenLocationForSixel
             };
 
-            Application.GetSixels ().Enqueue (_sixelImage);
+            _app.Driver?.GetOutput().GetSixels ().Enqueue (_sixelImage);
         }
         else
         {
@@ -528,19 +529,19 @@ public class Images : Scenario
         _sixelView.SetNeedsDraw ();
     }
 
-    private void SixelViewOnDrawingContent (object sender, DrawEventArgs e)
-    {
-        if (!string.IsNullOrWhiteSpace (_encodedSixelData))
-        {
-            // Does not work (see https://github.com/gui-cs/Terminal.Gui/issues/3763)
-            // Application.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
-            // Application.Driver?.AddStr (_encodedSixelData);
+    //private void SixelViewOnDrawingContent (object sender, DrawEventArgs e)
+    //{
+    //    if (!string.IsNullOrWhiteSpace (_encodedSixelData))
+    //    {
+    //        // Does not work (see https://github.com/gui-cs/Terminal.Gui/issues/3763)
+    //        _app.Driver?.Move (_screenLocationForSixel.X, _screenLocationForSixel.Y);
+    //        _app.Driver?.AddStr (_encodedSixelData);
 
-            // Works in DotNetDriver but results in screen flicker when moving mouse but vanish instantly
-            // Console.SetCursorPosition (_screenLocationForSixel.X, _screenLocationForSixel.Y);
-            // Console.Write (_encodedSixelData);
-        }
-    }
+    //        // Works in DotNetDriver but results in screen flicker when moving mouse but vanish instantly
+    //        Console.SetCursorPosition (_screenLocationForSixel.X, _screenLocationForSixel.Y);
+    //        Console.Write (_encodedSixelData);
+    //    }
+    //}
 
     public string GenerateSixelData (
         Image<Rgba32> fullResImage,
@@ -575,7 +576,7 @@ public class Images : Scenario
         Dialog dlg = new ()
         {
             Title = "Palette",
-            Buttons = [new () { Title = Strings.btnCancel }]
+            Buttons = [new () { Title = Strings.btnOk }]
         };
 
         dlg.Add (pv);

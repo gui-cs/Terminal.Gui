@@ -33,6 +33,9 @@ public class SixelEncoder
 
    */
 
+    // SIXEL requires rows which are multiples of 6 px high
+    private const int PIXEL_HIGH = 6;
+
     /// <summary>
     ///     Gets or sets the quantizer responsible for building a representative
     ///     limited color palette for images and for mapping novel colors in
@@ -67,7 +70,7 @@ public class SixelEncoder
     private string WriteSixel (Color [,] pixels)
     {
         var sb = new StringBuilder ();
-        int height = pixels.GetLength (1);
+        int height = pixels.GetLength (1) - PIXEL_HIGH;
         int width = pixels.GetLength (0);
 
         // Iterate over each 'row' of the image. Because each sixel write operation
@@ -224,7 +227,7 @@ public class SixelEncoder
     private string GetFillArea (Color [,] pixels)
     {
         int widthInChars = pixels.GetLength (0);
-        int heightInChars = pixels.GetLength (1);
+        int heightInChars = pixels.GetLength (1) - PIXEL_HIGH;
 
         return $"{widthInChars};{heightInChars}";
     }
@@ -232,7 +235,7 @@ public class SixelEncoder
     private bool AnyHasAlphaOfZero (Color [,] pixels)
     {
         int width = pixels.GetLength (0);
-        int height = pixels.GetLength (1);
+        int height = pixels.GetLength (1) - PIXEL_HIGH;
 
         // Loop through each pixel in the 2D array
         for (var x = 0; x < width; x++)
