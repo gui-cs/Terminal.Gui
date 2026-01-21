@@ -81,6 +81,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
         var request = new AnsiEscapeSequenceRequest
         {
             Request = EscSeqUtils.CSI_ReportWindowSizeInChars.Request,
+            Value = EscSeqUtils.CSI_ReportWindowSizeInChars.Value,
             Terminator = EscSeqUtils.CSI_ReportWindowSizeInChars.Terminator,
             ResponseReceived = HandleSizeResponse,
             Abandoned = () => { _expectingResponse = false; }
