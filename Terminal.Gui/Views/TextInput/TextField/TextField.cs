@@ -1,5 +1,3 @@
-using Terminal.Gui.ViewBase;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
@@ -17,7 +15,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     /// </summary>
     public TextField ()
     {
-        _historyText = new ();
+        _historyText = new HistoryText ();
         _isButtonReleased = true;
         _selectionAnchor = -1;
         _text = [];
@@ -38,7 +36,7 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        Cursor = new () { Style = DefaultCursorStyle };
+        Cursor = new Cursor { Style = DefaultCursorStyle };
     }
 
     private void TextField_Initialized (object? sender, EventArgs e)
@@ -93,7 +91,7 @@ public partial class TextField : View, IDesignable, IValue<string>
         UpdateCursor ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         base.OnSubViewsLaidOut (args);
@@ -103,23 +101,22 @@ public partial class TextField : View, IDesignable, IValue<string>
     /// <summary>Get the Context Menu for this view.</summary>
     public PopoverMenu? ContextMenu { get; private set; }
 
-    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object? sender, KeyChangedEventArgs e) => KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
 
     private void CreateContextMenu ()
     {
         DisposeContextMenu ();
 
-        PopoverMenu menu = new (
-                                new List<MenuItem>
-                                {
-                                    new (this, Command.SelectAll, Strings.ctxSelectAll),
-                                    new (this, Command.DeleteAll, Strings.ctxDeleteAll),
-                                    new (this, Command.Copy, Strings.ctxCopy),
-                                    new (this, Command.Cut, Strings.ctxCut),
-                                    new (this, Command.Paste, Strings.ctxPaste),
-                                    new (this, Command.Undo, Strings.ctxUndo),
-                                    new (this, Command.Redo, Strings.ctxRedo)
-                                });
+        PopoverMenu menu = new (new List<MenuItem>
+        {
+            new (this, Command.SelectAll, Strings.ctxSelectAll),
+            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
+            new (this, Command.Copy, Strings.ctxCopy),
+            new (this, Command.Cut, Strings.ctxCut),
+            new (this, Command.Paste, Strings.ctxPaste),
+            new (this, Command.Undo, Strings.ctxUndo),
+            new (this, Command.Redo, Strings.ctxRedo)
+        });
 
         HotKeyBindings.Remove (menu.Key);
         HotKeyBindings.Add (menu.Key, Command.Context);
@@ -158,11 +155,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     ///     This property enables <see cref="TextField"/> to be used with the <see cref="IValue{TValue}"/> pattern
     ///     for generic value access and command propagation.
     /// </remarks>
-    public string? Value
-    {
-        get => Text;
-        set => Text = value ?? string.Empty;
-    }
+    public string? Value { get => Text; set => Text = value ?? string.Empty; }
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<string?>>? ValueChanging;
@@ -202,5 +195,4 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         base.Dispose (disposing);
     }
-
 }

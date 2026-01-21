@@ -111,7 +111,7 @@ public class ListViewWithSelection : Scenario
         _listView.VerticalScrollBar.AutoShow = true;
         _listView.HorizontalScrollBar.AutoShow = true;
 
-        bool? LogEvent (View? sender, string message)
+        bool? LogEvent (View sender, string message)
         {
             _eventList.Add (message);
             _eventListView.MoveDown ();
@@ -195,7 +195,7 @@ public class ListViewWithSelection : Scenario
         private int _count;
         private BitArray _marks;
         private ObservableCollection<Scenario> _scenarios;
-        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) { Scenarios = itemList; }
+        public ScenarioListDataSource (ObservableCollection<Scenario> itemList) => Scenarios = itemList;
 
         public ObservableCollection<Scenario> Scenarios
         {

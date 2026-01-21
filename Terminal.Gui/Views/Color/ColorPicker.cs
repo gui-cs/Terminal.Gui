@@ -210,7 +210,7 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
             bar.Dispose ();
         }
 
-        _bars = new List<IColorBar> ();
+        _bars = [];
         _textFields.Clear ();
 
         if (_lbHex != null)

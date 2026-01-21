@@ -9,30 +9,64 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         TimeField extends <see cref="TextField"/> with time-specific cursor behavior:
 ///         <list type="bullet">
-///             <item><description>Cursor positions are constrained to valid digit positions (skipping separators)</description></item>
-///             <item><description>Position 0 is reserved for a leading space; valid cursor range is [1, FieldLength]</description></item>
-///             <item><description>Numeric input replaces characters in-place rather than inserting</description></item>
-///             <item><description>Delete operations replace digits with '0' rather than removing characters</description></item>
-///             <item><description>Supports both short (HH:mm) and long (HH:mm:ss) formats</description></item>
+///             <item>
+///                 <description>Cursor positions are constrained to valid digit positions (skipping separators)</description>
+///             </item>
+///             <item>
+///                 <description>Position 0 is reserved for a leading space; valid cursor range is [1, FieldLength]</description>
+///             </item>
+///             <item>
+///                 <description>Numeric input replaces characters in-place rather than inserting</description>
+///             </item>
+///             <item>
+///                 <description>Delete operations replace digits with '0' rather than removing characters</description>
+///             </item>
+///             <item>
+///                 <description>Supports both short (HH:mm) and long (HH:mm:ss) formats</description>
+///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
 ///         <b>Cursor Position Model:</b>
 ///         <list type="bullet">
-///             <item><description><see cref="TextField.InsertionPoint"/>: Inherited, but constrained by the override to [1, FieldLength]</description></item>
-///             <item><description><see cref="AdjustInsertionPoint"/>: Adjusts cursor to skip over time separator characters</description></item>
-///             <item><description><see cref="IncrementInsertionPoint"/>/<see cref="DecrementInsertionPoint"/>: Move cursor while respecting separator positions</description></item>
+///             <item>
+///                 <description>
+///                     <see cref="TextField.InsertionPoint"/>: Inherited, but constrained by the override to [1,
+///                     FieldLength]
+///                 </description>
+///             </item>
+///             <item>
+///                 <description><see cref="AdjustInsertionPoint"/>: Adjusts cursor to skip over time separator characters</description>
+///             </item>
+///             <item>
+///                 <description>
+///                     <see cref="IncrementInsertionPoint"/>/<see cref="DecrementInsertionPoint"/>: Move cursor while
+///                     respecting separator positions
+///                 </description>
+///             </item>
 ///         </list>
 ///     </para>
 ///     <para>
 ///         <b>Example:</b> For long format "HH:mm:ss" with text " 14:30:45":
 ///         <list type="bullet">
-///             <item><description>Position 0: Leading space (not user-accessible)</description></item>
-///             <item><description>Positions 1-2: Hour digits (14)</description></item>
-///             <item><description>Position 3: Separator ':' (cursor skips over)</description></item>
-///             <item><description>Positions 4-5: Minute digits (30)</description></item>
-///             <item><description>Position 6: Separator ':' (cursor skips over)</description></item>
-///             <item><description>Positions 7-8: Second digits (45)</description></item>
+///             <item>
+///                 <description>Position 0: Leading space (not user-accessible)</description>
+///             </item>
+///             <item>
+///                 <description>Positions 1-2: Hour digits (14)</description>
+///             </item>
+///             <item>
+///                 <description>Position 3: Separator ':' (cursor skips over)</description>
+///             </item>
+///             <item>
+///                 <description>Positions 4-5: Minute digits (30)</description>
+///             </item>
+///             <item>
+///                 <description>Position 6: Separator ':' (cursor skips over)</description>
+///             </item>
+///             <item>
+///                 <description>Positions 7-8: Second digits (45)</description>
+///             </item>
 ///         </list>
 ///     </para>
 /// </remarks>
@@ -88,25 +122,21 @@ public class TimeField : TextField, IValue<TimeSpan>
         TextChanging += TextField_TextChanging;
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.DeleteCharRight,
+        AddCommand (Command.DeleteCharRight,
                     () =>
                     {
                         DeleteCharRight ();
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.DeleteCharLeft,
+        AddCommand (Command.DeleteCharLeft,
                     () =>
                     {
                         DeleteCharLeft (false);
 
                         return true;
-                    }
-                   );
+                    });
         AddCommand (Command.LeftStart, () => MoveHome ());
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
@@ -146,8 +176,12 @@ public class TimeField : TextField, IValue<TimeSpan>
     ///     <para>
     ///         This override constrains the cursor to valid editing positions within the time format:
     ///         <list type="bullet">
-    ///             <item><description>Minimum position is 1 (first digit of hours)</description></item>
-    ///             <item><description>Maximum position is FieldLength (5 for short format, 8 for long format)</description></item>
+    ///             <item>
+    ///                 <description>Minimum position is 1 (first digit of hours)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>Maximum position is FieldLength (5 for short format, 8 for long format)</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
@@ -157,11 +191,7 @@ public class TimeField : TextField, IValue<TimeSpan>
     /// </remarks>
     /// <seealso cref="AdjustInsertionPoint"/>
     /// <seealso cref="FieldLength"/>
-    public override int InsertionPoint
-    {
-        get => base.InsertionPoint;
-        set => base.InsertionPoint = Math.Max (Math.Min (value, FieldLength), 1);
-    }
+    public override int InsertionPoint { get => base.InsertionPoint; set => base.InsertionPoint = Math.Max (Math.Min (value, FieldLength), 1); }
 
     /// <summary>Get or sets whether <see cref="TimeField"/> uses the short or long time format.</summary>
     public bool IsShortFormat
@@ -214,6 +244,7 @@ public class TimeField : TextField, IValue<TimeSpan>
         ClearAllSelection ();
         SetText ((Rune)'0');
         DecrementInsertionPoint ();
+
         return true;
     }
 
@@ -227,6 +258,7 @@ public class TimeField : TextField, IValue<TimeSpan>
 
         ClearAllSelection ();
         SetText ((Rune)'0');
+
         return true;
     }
 
@@ -318,7 +350,7 @@ public class TimeField : TextField, IValue<TimeSpan>
     /// </summary>
     /// <param name="args">The event arguments containing old and new values.</param>
     /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<TimeSpan> args) { return false; }
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<TimeSpan> args) => false;
 
     /// <inheritdoc/>
     public new event EventHandler<ValueChangingEventArgs<TimeSpan>>? ValueChanging;
@@ -346,15 +378,26 @@ public class TimeField : TextField, IValue<TimeSpan>
     ///     <para>
     ///         This method performs two adjustments:
     ///         <list type="number">
-    ///             <item><description>Clamps <paramref name="point"/> to valid bounds [1, FieldLength]</description></item>
-    ///             <item><description>If the cursor is on a separator character, moves it in the specified direction until it reaches a digit</description></item>
+    ///             <item>
+    ///                 <description>Clamps <paramref name="point"/> to valid bounds [1, FieldLength]</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>
+    ///                     If the cursor is on a separator character, moves it in the specified direction until it
+    ///                     reaches a digit
+    ///                 </description>
+    ///             </item>
     ///         </list>
     ///     </para>
     ///     <para>
     ///         <b>Example:</b> For time " 14:30:45" with separator ':':
     ///         <list type="bullet">
-    ///             <item><description>AdjustInsertionPoint(3, true) → cursor moves to position 4 (first digit of minutes)</description></item>
-    ///             <item><description>AdjustInsertionPoint(3, false) → cursor moves to position 2 (last digit of hours)</description></item>
+    ///             <item>
+    ///                 <description>AdjustInsertionPoint(3, true) → cursor moves to position 4 (first digit of minutes)</description>
+    ///             </item>
+    ///             <item>
+    ///                 <description>AdjustInsertionPoint(3, false) → cursor moves to position 2 (last digit of hours)</description>
+    ///             </item>
     ///         </list>
     ///     </para>
     /// </remarks>
@@ -517,11 +560,7 @@ public class TimeField : TextField, IValue<TimeSpan>
 
         if (InsertionPoint < FieldLength)
         {
-            newText =
-            [
-                .. newText,
-                .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))
-            ];
+            newText = [.. newText, .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))];
         }
 
         return SetText (StringExtensions.ToString (newText));
@@ -540,8 +579,7 @@ public class TimeField : TextField, IValue<TimeSpan>
         int hour = int.Parse (vals [0]);
         int minute = int.Parse (vals [1]);
 
-        int second = _isShort ? 0 :
-                     vals.Length > 2 ? int.Parse (vals [2]) : 0;
+        int second = _isShort ? 0 : vals.Length > 2 ? int.Parse (vals [2]) : 0;
 
         if (hour < 0)
         {
@@ -582,18 +620,9 @@ public class TimeField : TextField, IValue<TimeSpan>
             vals [2] = "59";
         }
 
-        string t = _isShort
-                       ? $" {hour,2:00}{_sepChar}{minute,2:00}"
-                       : $" {hour,2:00}{_sepChar}{minute,2:00}{_sepChar}{second,2:00}";
+        string t = _isShort ? $" {hour,2:00}{_sepChar}{minute,2:00}" : $" {hour,2:00}{_sepChar}{minute,2:00}{_sepChar}{second,2:00}";
 
-        if (!TimeSpan.TryParseExact (
-                                     t.Trim (),
-                                     Format.Trim (),
-                                     CultureInfo.CurrentCulture,
-                                     TimeSpanStyles.None,
-                                     out TimeSpan result
-                                    )
-            || !isValidTime)
+        if (!TimeSpan.TryParseExact (t.Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result) || !isValidTime)
         {
             return false;
         }
@@ -632,20 +661,14 @@ public class TimeField : TextField, IValue<TimeSpan>
             spaces += FieldLength;
             string trimmedText = e.Result [..spaces];
             spaces -= FieldLength;
-            trimmedText = trimmedText.Replace (new (' ', spaces), " ");
+            trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
 
             if (trimmedText != e.Result)
             {
                 e.Result = trimmedText;
             }
 
-            if (!TimeSpan.TryParseExact (
-                                         e.Result.Trim (),
-                                         Format.Trim (),
-                                         CultureInfo.CurrentCulture,
-                                         TimeSpanStyles.None,
-                                         out TimeSpan _
-                                        ))
+            if (!TimeSpan.TryParseExact (e.Result.Trim (), Format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan _))
             {
                 e.Handled = true;
             }

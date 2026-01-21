@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿#nullable enable
+using System.Text;
 
 namespace UICatalog.Scenarios;
 
@@ -69,7 +70,7 @@ public class Buttons : Scenario
 
         View prev = colorButtonsLabel;
 
-        foreach (KeyValuePair<string, Scheme> scheme in SchemeManager.GetSchemesForCurrentTheme ())
+        foreach (KeyValuePair<string, Scheme?> scheme in SchemeManager.GetSchemesForCurrentTheme ())
         {
             Button colorButton = new ()
             {

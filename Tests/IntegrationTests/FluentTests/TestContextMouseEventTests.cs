@@ -18,8 +18,8 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickedCount = 0;
 
-        var button = new Button { X = 5, Y = 5, Text = "Click Me" };
-        button.Accepting += (s, e) => clickedCount++;
+        Button button = new () { X = 5, Y = 5, Text = "Click Me" };
+        button.Accepting += (_, _) => clickedCount++;
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (button)
@@ -33,8 +33,8 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickedCount = 0;
 
-        var button = new Button { X = 5, Y = 5, Text = "Click Me" };
-        button.Accepting += (s, e) => clickedCount++;
+        Button button = new () { X = 5, Y = 5, Text = "Click Me" };
+        button.Accepting += (_, _) => clickedCount++;
 
         using TestContext context = With.A<Window> (40, 10, d, _out).Add (button).LeftClick<Button> (b => b.Text == "Click Me").AssertEqual (1, clickedCount);
     }
@@ -46,7 +46,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
         var mouseReceived = false;
         var receivedPosition = Point.Empty;
 
-        var view = new View { X = 10, Y = 5, Width = 20, Height = 5 };
+        View view = new () { X = 10, Y = 5, Width = 20, Height = 5 };
 
         view.MouseEvent += (_, mouse) =>
                            {
@@ -63,8 +63,8 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickCount = 0;
 
-        var button = new Button { X = 5, Y = 5, Text = "Click Me" };
-        button.Accepting += (s, e) => clickCount++;
+        Button button = new () { X = 5, Y = 5, Text = "Click Me" };
+        button.Accepting += (_, _) => clickCount++;
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (button)
@@ -80,9 +80,9 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var rightClickCount = 0;
 
-        var view = new View { X = 10, Y = 5, Width = 20, Height = 5 };
+        View view = new () { X = 10, Y = 5, Width = 20, Height = 5 };
 
-        view.MouseEvent += (s, e) =>
+        view.MouseEvent += (_, e) =>
                            {
                                if (e.Flags.HasFlag (MouseFlags.RightButtonClicked))
                                {
@@ -97,7 +97,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     [MemberData (nameof (GetAllDriverNames))]
     public void Click_SetsFocusOnView (string d)
     {
-        var view1 = new View
+        View view1 = new ()
         {
             Id = "view1",
             X = 5,
@@ -107,7 +107,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
             CanFocus = true
         };
 
-        var view2 = new View
+        View view2 = new ()
         {
             Id = "view2",
             X = 20,
@@ -133,8 +133,8 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickCount = 0;
 
-        var button = new Button { X = 5, Y = 5, Text = "Click Me" };
-        button.Accepting += (s, e) => clickCount++;
+        Button button = new () { X = 5, Y = 5, Text = "Click Me" };
+        button.Accepting += (_, _) => clickCount++;
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (button)
@@ -149,7 +149,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     [MemberData (nameof (GetAllDriverNames))]
     public void Click_OnTextField_SetsCaretPosition (string d)
     {
-        var textField = new TextField { X = 5, Y = 5, Width = 20, Text = "Hello World" };
+        TextField textField = new () { X = 5, Y = 5, Width = 20, Text = "Hello World" };
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (textField)
@@ -163,10 +163,10 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickCount = 0;
 
-        var view = new View { X = 10, Y = 5, Width = 20, Height = 5 };
+        View view = new () { X = 10, Y = 5, Width = 20, Height = 5 };
 
         // Only count Clicked events, not all mouse events (Pressed, Released, Clicked)
-        view.MouseEvent += (s, e) =>
+        view.MouseEvent += (_, e) =>
                            {
                                if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked))
                                {
@@ -191,9 +191,9 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickCount = 0;
 
-        var view = new View { X = 10, Y = 5, Width = 10, Height = 5 };
+        View view = new () { X = 10, Y = 5, Width = 10, Height = 5 };
 
-        view.MouseEvent += (s, e) => clickCount++;
+        view.MouseEvent += (_, _) => clickCount++;
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (view)
@@ -207,8 +207,8 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickCount = 0;
 
-        var button = new Button { X = 5, Y = 5, Text = "Click Me", Enabled = false };
-        button.Accepting += (s, e) => clickCount++;
+        Button button = new () { X = 5, Y = 5, Text = "Click Me", Enabled = false };
+        button.Accepting += (_, _) => clickCount++;
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (button)
@@ -222,8 +222,8 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     {
         var clickCount = 0;
 
-        var button = new Button { X = 5, Y = 5, Text = "Click Me" };
-        button.Accepting += (s, e) => clickCount++;
+        Button button = new () { X = 5, Y = 5, Text = "Click Me" };
+        button.Accepting += (_, _) => clickCount++;
 
         using TestContext context = With.A<Window> (40, 10, d, _out).Add (button).ResizeConsole (50, 20).LeftClick (6, 6).AssertEqual (1, clickCount);
     }
@@ -232,7 +232,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     [MemberData (nameof (GetAllDriverNames))]
     public void WithCheckBox_TogglesState (string d)
     {
-        var checkBox = new CheckBox { X = 5, Y = 5, Text = "Check Me" };
+        CheckBox checkBox = new () { X = 5, Y = 5, Text = "Check Me" };
 
         using TestContext context = With.A<Window> (40, 10, d, _out)
                                         .Add (checkBox)
@@ -247,7 +247,7 @@ public class TestContextMouseEventTests (ITestOutputHelper outputHelper) : Tests
     [MemberData (nameof (GetAllDriverNames))]
     public void WithListView_SelectsItem (string d)
     {
-        var listView = new ListView { X = 5, Y = 5, Width = 20, Height = 10 };
+        ListView listView = new () { X = 5, Y = 5, Width = 20, Height = 10 };
         listView.SetSource (["Item1", "Item2", "Item3", "Item4", "Item5"]);
         listView.SelectedItem = 0;
 

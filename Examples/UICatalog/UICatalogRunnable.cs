@@ -1,12 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿#nullable enable
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
-
-#nullable enable
 
 namespace UICatalog;
 
@@ -62,15 +60,9 @@ public sealed class UICatalogRunnable : Runnable
     /// <inheritdoc/>
     protected override void OnIsModalChanged (bool newIsModal)
     {
-        if (_disableMouseCb is { })
-        {
-            _disableMouseCb.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _disableMouseCb?.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_shVersion is { })
-        {
-            _shVersion.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App!.Driver!.GetVersionInfo ()}";
-        }
+        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App!.Driver!.GetVersionInfo ()}";
 
         if (string.IsNullOrEmpty ((string?)Result))
         {
@@ -97,15 +89,17 @@ public sealed class UICatalogRunnable : Runnable
         if (newIsRunning)
         {
             // Show error dialog if any errors occurred during the scenario
-            if (UICatalog.LogCapture.HasErrors)
+            if (!UICatalog.LogCapture.HasErrors)
             {
-                if (_scenarioList is { })
-                {
-                    ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
-                }
-
-                UICatalog.LogCapture.HasErrors = false;
+                return;
             }
+
+            if (_scenarioList is { })
+            {
+                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
+            }
+
+            UICatalog.LogCapture.HasErrors = false;
 
             return;
         }
@@ -163,8 +157,7 @@ public sealed class UICatalogRunnable : Runnable
                                                                                               buttons: Strings.btnOk),
                                                                       Key.A.WithCtrl)
                                                     ])
-                               ])
-        { Title = "menuBar", Id = "menuBar" };
+                               ]) { Title = "menuBar", Id = "menuBar" };
 
         return menuBar;
 
@@ -172,7 +165,7 @@ public sealed class UICatalogRunnable : Runnable
         {
             List<View> menuItems = [];
 
-            _force16ColorsMenuItemCb = new CheckBox
+            _force16ColorsMenuItemCb = new ()
             {
                 Title = "Force _16 Colors",
                 Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
@@ -184,9 +177,7 @@ public sealed class UICatalogRunnable : Runnable
 
             _force16ColorsMenuItemCb.ValueChanging += (_, args) =>
                                                       {
-                                                          if (Driver.Force16Colors
-                                                              && args.NewValue == CheckState.UnChecked
-                                                              && !App!.Driver!.SupportsTrueColor)
+                                                          if (Driver.Force16Colors && args.NewValue == CheckState.UnChecked && !App!.Driver!.SupportsTrueColor)
                                                           {
                                                               args.Handled = true;
                                                           }
@@ -277,7 +268,7 @@ public sealed class UICatalogRunnable : Runnable
 
             var diagFlagMenuItem = new MenuItem { CommandView = _diagnosticFlagsSelector, HelpText = "View Diagnostics" };
 
-            diagFlagMenuItem.Accepting += (sender, args) =>
+            diagFlagMenuItem.Accepting += (_, _) =>
                                           {
                                               //_diagnosticFlags = (ViewDiagnosticFlags)_diagnosticFlagsSelector.Value;
                                               //Diagnostics = _diagnosticFlags;
@@ -299,7 +290,7 @@ public sealed class UICatalogRunnable : Runnable
             };
 
             //_disableMouseCb.CheckedStateChanged += (_, args) => { Application.IsMouseDisabled = args.Value == CheckState.Checked; };
-            _disableMouseCb.Activating += (sender, args) =>
+            _disableMouseCb.Activating += (_, _) =>
                                           {
                                               App!.Mouse.IsMouseDisabled = !App!.Mouse.IsMouseDisabled;
                                               _disableMouseCb.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.None;
@@ -326,7 +317,10 @@ public sealed class UICatalogRunnable : Runnable
 
             _logLevelSelector.ValueChanged += (_, args) =>
                                               {
-                                                  UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (logLevels [args.NewValue!.Value])! };
+                                                  UICatalog.Options = UICatalog.Options with
+                                                  {
+                                                      DebugLogLevel = Enum.GetName (logLevels [args.NewValue!.Value])!
+                                                  };
 
                                                   UICatalog.LogLevelSwitch.MinimumLevel =
                                                       UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
@@ -608,16 +602,9 @@ public sealed class UICatalogRunnable : Runnable
 
         SchemeName = CachedRunnableScheme;
 
-        if (_shQuit is { })
-        {
-            _shQuit.Key = Application.QuitKey;
-        }
+        _shQuit?.Key = Application.QuitKey;
 
-        if (_statusBar is { })
-        {
-            _statusBar.Visible = ShowStatusBar;
-        }
-
+        _statusBar!.Visible = ShowStatusBar;
         _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
@@ -669,7 +656,7 @@ public sealed class UICatalogRunnable : Runnable
         }
         else if (PlatformDetection.IsUnixLike ())
         {
-            using var process = new Process ();
+            using Process process = new ();
 
             process.StartInfo = new ProcessStartInfo
             {

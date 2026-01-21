@@ -1,5 +1,4 @@
 using System.Globalization;
-using Terminal.Gui.ViewBase;
 
 namespace Terminal.Gui.Views;
 
@@ -149,11 +148,7 @@ public class DateField : TextField, IValue<DateTime?>
     ///     </para>
     /// </remarks>
     /// <seealso cref="AdjustInsertionPoint"/>
-    public override int InsertionPoint
-    {
-        get => base.InsertionPoint;
-        set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1);
-    }
+    public override int InsertionPoint { get => base.InsertionPoint; set => base.InsertionPoint = Math.Max (Math.Min (value, FormatLength), 1); }
 
     /// <summary>
     ///     Gets the length of the date format string (excluding the leading space), which represents
@@ -225,7 +220,7 @@ public class DateField : TextField, IValue<DateTime?>
     /// </summary>
     /// <param name="args">The event arguments containing old and new values.</param>
     /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<DateTime?> args) { return false; }
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<DateTime?> args) => false;
 
     /// <inheritdoc/>
     public new event EventHandler<ValueChangingEventArgs<DateTime?>>? ValueChanging;
@@ -252,6 +247,7 @@ public class DateField : TextField, IValue<DateTime?>
         ClearAllSelection ();
         SetText ((Rune)'0');
         DecrementInsertionPoint ();
+
         return true;
     }
 
@@ -284,7 +280,6 @@ public class DateField : TextField, IValue<DateTime?>
 
         return mouse.Handled;
     }
-
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key a)
@@ -401,7 +396,7 @@ public class DateField : TextField, IValue<DateTime?>
             spaces += FormatLength;
             string trimmedText = e.Result [..spaces];
             spaces -= FormatLength;
-            trimmedText = trimmedText.Replace (new (' ', spaces), " ");
+            trimmedText = trimmedText.Replace (new string (' ', spaces), " ");
             var date = Convert.ToDateTime (trimmedText).ToString (_format!.Trim ());
 
             if ($" {date}" != e.Result)
@@ -587,7 +582,7 @@ public class DateField : TextField, IValue<DateTime?>
             }
         }
 
-        return new (fmtText);
+        return new string (fmtText);
     }
 
     private void SetInitialProperties (DateTime date)
@@ -599,25 +594,21 @@ public class DateField : TextField, IValue<DateTime?>
         TextChanging += OnTextChanging;
 
         // Things this view knows how to do
-        AddCommand (
-                    Command.DeleteCharRight,
+        AddCommand (Command.DeleteCharRight,
                     () =>
                     {
                         DeleteCharRight ();
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.DeleteCharLeft,
+        AddCommand (Command.DeleteCharLeft,
                     () =>
                     {
                         DeleteCharLeft (false);
 
                         return true;
-                    }
-                   );
+                    });
         AddCommand (Command.LeftStart, () => MoveHome ());
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.RightEnd, () => MoveEnd ());
@@ -668,11 +659,7 @@ public class DateField : TextField, IValue<DateTime?>
 
         if (InsertionPoint < FormatLength)
         {
-            newText =
-            [
-                .. newText,
-                .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))
-            ];
+            newText = [.. newText, .. text.GetRange (InsertionPoint + 1, text.Count - (InsertionPoint + 1))];
         }
 
         return SetText (StringExtensions.ToString (newText));
@@ -767,38 +754,36 @@ public class DateField : TextField, IValue<DateTime?>
     // Converts various date formats to a uniform 10-character format.
     // This aids in simplifying the handling of single-digit months and days,
     // and reduces the number of distinct date formats to maintain.
-    private static string StandardizeDateFormat (string? format)
-    {
-        return format switch
-               {
-                   "MM/dd/yyyy" => "MM/dd/yyyy",
-                   "yyyy-MM-dd" => "yyyy-MM-dd",
-                   "yyyy/MM/dd" => "yyyy/MM/dd",
-                   "dd/MM/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy" => "dd/MM/yyyy",
-                   "dd.MM.yyyy" => "dd.MM.yyyy",
-                   "dd-MM-yyyy" => "dd-MM-yyyy",
-                   "dd/MM yyyy" => "dd/MM/yyyy",
-                   "d. M. yyyy" => "dd.MM.yyyy",
-                   "yyyy.MM.dd" => "yyyy.MM.dd",
-                   "g yyyy/M/d" => "yyyy/MM/dd",
-                   "d/M/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy g" => "dd/MM/yyyy",
-                   "d-M-yyyy" => "dd-MM-yyyy",
-                   "d.MM.yyyy" => "dd.MM.yyyy",
-                   "d.MM.yyyy '?'." => "dd.MM.yyyy",
-                   "M/d/yyyy" => "MM/dd/yyyy",
-                   "d. M. yyyy." => "dd.MM.yyyy",
-                   "d.M.yyyy." => "dd.MM.yyyy",
-                   "g yyyy-MM-dd" => "yyyy-MM-dd",
-                   "d.M.yyyy" => "dd.MM.yyyy",
-                   "d/MM/yyyy" => "dd/MM/yyyy",
-                   "yyyy/M/d" => "yyyy/MM/dd",
-                   "dd. MM. yyyy." => "dd.MM.yyyy",
-                   "yyyy. MM. dd." => "yyyy.MM.dd",
-                   "yyyy. M. d." => "yyyy.MM.dd",
-                   "d. MM. yyyy" => "dd.MM.yyyy",
-                   _ => "dd/MM/yyyy"
-               };
-    }
+    private static string StandardizeDateFormat (string? format) =>
+        format switch
+        {
+            "MM/dd/yyyy" => "MM/dd/yyyy",
+            "yyyy-MM-dd" => "yyyy-MM-dd",
+            "yyyy/MM/dd" => "yyyy/MM/dd",
+            "dd/MM/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy" => "dd/MM/yyyy",
+            "dd.MM.yyyy" => "dd.MM.yyyy",
+            "dd-MM-yyyy" => "dd-MM-yyyy",
+            "dd/MM yyyy" => "dd/MM/yyyy",
+            "d. M. yyyy" => "dd.MM.yyyy",
+            "yyyy.MM.dd" => "yyyy.MM.dd",
+            "g yyyy/M/d" => "yyyy/MM/dd",
+            "d/M/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy g" => "dd/MM/yyyy",
+            "d-M-yyyy" => "dd-MM-yyyy",
+            "d.MM.yyyy" => "dd.MM.yyyy",
+            "d.MM.yyyy '?'." => "dd.MM.yyyy",
+            "M/d/yyyy" => "MM/dd/yyyy",
+            "d. M. yyyy." => "dd.MM.yyyy",
+            "d.M.yyyy." => "dd.MM.yyyy",
+            "g yyyy-MM-dd" => "yyyy-MM-dd",
+            "d.M.yyyy" => "dd.MM.yyyy",
+            "d/MM/yyyy" => "dd/MM/yyyy",
+            "yyyy/M/d" => "yyyy/MM/dd",
+            "dd. MM. yyyy." => "dd.MM.yyyy",
+            "yyyy. MM. dd." => "yyyy.MM.dd",
+            "yyyy. M. d." => "yyyy.MM.dd",
+            "d. MM. yyyy" => "dd.MM.yyyy",
+            _ => "dd/MM/yyyy"
+        };
 }

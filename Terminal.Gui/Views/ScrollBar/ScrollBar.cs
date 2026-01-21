@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using Terminal.Gui.ViewBase;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -37,15 +34,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     public ScrollBar ()
     {
         // Set the default width and height based on the orientation - fill Viewport
-        Width = Dim.Auto (
-                          DimAutoStyle.Content,
-                          Dim.Func (_ => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
+        Width = Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => Orientation == Orientation.Vertical ? 1 : SuperView?.Viewport.Width ?? 0));
 
-        Height = Dim.Auto (
-                           DimAutoStyle.Content,
-                           Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
+        Height = Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
 
-        _decreaseButton = new ()
+        _decreaseButton = new Button
         {
             CanFocus = false,
             NoDecorations = true,
@@ -55,14 +48,14 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
-        _slider = new ()
+        _slider = new ScrollSlider
         {
             SliderPadding = 2 // For the buttons
         };
         _slider.Scrolled += SliderOnScroll;
         _slider.PositionChanged += SliderOnPositionChanged;
 
-        _increaseButton = new ()
+        _increaseButton = new Button
         {
             CanFocus = false,
             NoDecorations = true,
@@ -76,7 +69,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         CanFocus = false;
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new (this); // Do not use object initializer!
+        _orientationHelper = new OrientationHelper (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
 
         // This sets the width/height etc...
@@ -100,7 +93,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     }
 
     /// <inheritdoc/>
-    protected override void OnFrameChanged (in Rectangle frame) { ShowHide (); }
+    protected override void OnFrameChanged (in Rectangle frame) => ShowHide ();
 
     private void ShowHide ()
     {
@@ -160,11 +153,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     private readonly OrientationHelper _orientationHelper;
 
     /// <inheritdoc/>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
 #pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
@@ -184,7 +173,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         _slider.Orientation = newOrientation;
         PositionSubViews ();
 
-        OrientationChanged?.Invoke (this, new (newOrientation));
+        OrientationChanged?.Invoke (this, new EventArgs<Orientation> (newOrientation));
     }
 
     #endregion
@@ -291,7 +280,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             }
 
             OnSizeChanged (value);
-            ScrollableContentSizeChanged?.Invoke (this, new (in value));
+            ScrollableContentSizeChanged?.Invoke (this, new EventArgs<int> (in value));
             SetNeedsLayout ();
         }
     }
@@ -370,7 +359,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             ValueChanged?.Invoke (this, changedArgs);
 
             OnScrolled (distance);
-            Scrolled?.Invoke (this, new (in distance));
+            Scrolled?.Invoke (this, new EventArgs<int> (in distance));
             SetNeedsLayout ();
         }
     }
@@ -380,7 +369,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// </summary>
     /// <param name="args">The event arguments containing old and new values.</param>
     /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<int> args) { return false; }
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<int> args) => false;
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<int>>? ValueChanging;
@@ -450,9 +439,8 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             return;
         }
 
-        int calculatedSliderPos = CalculateSliderPositionFromContentPosition (
-                                                                              _value,
-                                                                              e.Value >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
+        int calculatedSliderPos =
+            CalculateSliderPositionFromContentPosition (_value, e.Value >= 0 ? NavigationDirection.Forward : NavigationDirection.Backward);
 
         if (calculatedSliderPos == _sliderPosition)
         {
@@ -468,7 +456,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// <summary>
     ///     Gets or sets the position of the start of the Scroll slider, within the Viewport.
     /// </summary>
-    public int GetSliderPosition () { return CalculateSliderPositionFromContentPosition (_value); }
+    public int GetSliderPosition () => CalculateSliderPositionFromContentPosition (_value);
 
     private void RaiseSliderPositionChangeEvents (int? currentSliderPosition, int newSliderPosition)
     {
@@ -480,7 +468,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         _sliderPosition = newSliderPosition;
 
         OnSliderPositionChanged (newSliderPosition);
-        SliderPositionChanged?.Invoke (this, new (in newSliderPosition));
+        SliderPositionChanged?.Invoke (this, new EventArgs<int> (in newSliderPosition));
     }
 
     /// <summary>Called when the slider position has changed.</summary>

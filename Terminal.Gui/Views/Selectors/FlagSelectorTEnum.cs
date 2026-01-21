@@ -1,6 +1,3 @@
-using System;
-using Terminal.Gui.ViewBase;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -20,8 +17,8 @@ public sealed class FlagSelector<TFlagsEnum> : FlagSelector, IValue where TFlags
     /// </summary>
     public new TFlagsEnum? Value
     {
-        get => base.Value.HasValue ? (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), base.Value.Value) : (TFlagsEnum?)null;
-        set => base.Value = value.HasValue ? Convert.ToInt32 (value.Value) : (int?)null;
+        get => base.Value.HasValue ? (TFlagsEnum)Enum.ToObject (typeof (TFlagsEnum), base.Value.Value) : null;
+        set => base.Value = value.HasValue ? Convert.ToInt32 (value.Value) : null;
     }
 
     /// <summary>

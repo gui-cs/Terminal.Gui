@@ -1,5 +1,3 @@
-using Terminal.Gui.ViewBase;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
@@ -10,17 +8,11 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class CheckBox : View, IValue<CheckState>
 {
-    private static MouseState _defaultHighlightStates = MouseState.PressedOutside | MouseState.Pressed | MouseState.In; // Resources/config.json overrides
-
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultMouseHighlightStates
-    {
-        get => _defaultHighlightStates;
-        set => _defaultHighlightStates = value;
-    }
+    public static MouseState DefaultMouseHighlightStates { get; set; } = MouseState.PressedOutside | MouseState.Pressed | MouseState.In;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="CheckBox"/>.
@@ -48,19 +40,21 @@ public class CheckBox : View, IValue<CheckState>
         MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
     {
         // Invoke Activate on ourselves
-        if (InvokeCommand (Command.Activate, args.Context) is true)
+        if (InvokeCommand (Command.Activate, args.Context) is not true)
         {
-            // Default behavior for View is to set Focus on hotkey. We need to return
-            // true here to indicate Activate was handled. That will prevent the default
-            // behavior from setting focus, so we do it here.
-            SetFocus ();
-            return true;
+            return base.OnHandlingHotKey (args);
         }
-        return base.OnHandlingHotKey (args);
+
+        // Default behavior for View is to set Focus on hotkey. We need to return
+        // true here to indicate Activate was handled. That will prevent the default
+        // behavior from setting focus, so we do it here.
+        SetFocus ();
+
+        return true;
     }
 
     private bool? ActivateAndAdvance (ICommandContext? commandContext)
@@ -87,18 +81,10 @@ public class CheckBox : View, IValue<CheckState>
     }
 
     /// <inheritdoc/>
-    public override string Text
-    {
-        get => Title;
-        set => base.Text = Title = value;
-    }
+    public override string Text { get => Title; set => base.Text = Title = value; }
 
     /// <inheritdoc/>
-    public override Rune HotKeySpecifier
-    {
-        get => base.HotKeySpecifier;
-        set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
-    }
+    public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
     private bool _allowNone;
 
@@ -147,11 +133,7 @@ public class CheckBox : View, IValue<CheckState>
     ///         will display the <c>Glyphs.CheckStateChecked</c> character (☑).
     ///     </para>
     /// </remarks>
-    public CheckState Value
-    {
-        get => _value;
-        set => ChangeValue (value);
-    }
+    public CheckState Value { get => _value; set => ChangeValue (value); }
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<CheckState>>? ValueChanging;
@@ -170,7 +152,7 @@ public class CheckBox : View, IValue<CheckState>
     /// </remarks>
     /// <param name="args">The event arguments containing old and new values.</param>
     /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<CheckState> args) { return false; }
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<CheckState> args) => false;
 
     /// <summary>
     ///     Called when the <see cref="CheckBox"/> <see cref="Value"/> has changed.
@@ -243,20 +225,21 @@ public class CheckBox : View, IValue<CheckState>
     public bool? AdvanceCheckState ()
     {
         CheckState nextValue = Value switch
-        {
-            CheckState.None => CheckState.Checked,
-            CheckState.Checked => CheckState.UnChecked,
-            CheckState.UnChecked => AllowCheckStateNone ? CheckState.None : CheckState.Checked,
-            _ => CheckState.UnChecked
-        };
+                               {
+                                   CheckState.None => CheckState.Checked,
+                                   CheckState.Checked => CheckState.UnChecked,
+                                   CheckState.UnChecked => AllowCheckStateNone ? CheckState.None : CheckState.Checked,
+                                   _ => CheckState.UnChecked
+                               };
 
         return ChangeValue (nextValue);
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnClearingViewport ()
     {
         SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+
         return base.OnClearingViewport ();
     }
 
@@ -266,6 +249,7 @@ public class CheckBox : View, IValue<CheckState>
         base.UpdateTextFormatterText ();
 
         Rune glyph = RadioStyle ? GetRadioGlyph () : GetCheckGlyph ();
+
         switch (TextAlignment)
         {
             case Alignment.Start:
@@ -274,6 +258,7 @@ public class CheckBox : View, IValue<CheckState>
                 TextFormatter.Text = $"{glyph} {Text}";
 
                 break;
+
             case Alignment.End:
                 TextFormatter.Text = $"{Text} {glyph}";
 
@@ -281,16 +266,14 @@ public class CheckBox : View, IValue<CheckState>
         }
     }
 
-    private Rune GetCheckGlyph ()
-    {
-        return Value switch
+    private Rune GetCheckGlyph () =>
+        Value switch
         {
             CheckState.Checked => Glyphs.CheckStateChecked,
             CheckState.UnChecked => Glyphs.CheckStateUnChecked,
             CheckState.None => Glyphs.CheckStateNone,
             _ => throw new ArgumentOutOfRangeException ()
         };
-    }
 
     /// <summary>
     ///     If <see langword="true"/>, the <see cref="CheckBox"/> will display radio button style glyphs (●) instead of
@@ -298,14 +281,12 @@ public class CheckBox : View, IValue<CheckState>
     /// </summary>
     public bool RadioStyle { get; set; }
 
-    private Rune GetRadioGlyph ()
-    {
-        return Value switch
+    private Rune GetRadioGlyph () =>
+        Value switch
         {
             CheckState.Checked => Glyphs.Selected,
             CheckState.UnChecked => Glyphs.UnSelected,
             CheckState.None => Glyphs.Dot,
             _ => throw new ArgumentOutOfRangeException ()
         };
-    }
 }

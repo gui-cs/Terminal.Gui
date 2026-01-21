@@ -25,12 +25,11 @@ namespace Terminal.Gui.Views;
 public class OptionSelector : SelectorBase, IDesignable
 {
     /// <inheritdoc/>
-    public OptionSelector ()
-    {
+    public OptionSelector () =>
+
         // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer
         // really wants that.
         base.Value = 0;
-    }
 
     /// <inheritdoc/>
     protected override bool OnHandlingHotKey (CommandEventArgs args)
@@ -177,9 +176,7 @@ public class OptionSelector : SelectorBase, IDesignable
     {
         int valueIndex = Values.IndexOf (v => v == Value);
 
-        Value = valueIndex == Values?.Count () - 1
-                    ? Values! [0]
-                    : Values! [valueIndex + 1];
+        Value = valueIndex == Values?.Count () - 1 ? Values! [0] : Values! [valueIndex + 1];
 
         if (HasFocus)
         {

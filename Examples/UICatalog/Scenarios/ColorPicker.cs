@@ -1,4 +1,5 @@
-﻿namespace UICatalog.Scenarios;
+﻿#nullable enable
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ColorPicker", "Color Picker and TrueColor demonstration.")]
 [ScenarioCategory ("Colors")]
@@ -6,25 +7,25 @@
 public class ColorPickers : Scenario
 {
     /// <summary>Background color Label.</summary>
-    private Label _backgroundColorLabel;
+    private Label? _backgroundColorLabel;
 
     /// <summary>Demo label.</summary>
-    private View _demoView;
+    private View? _demoView;
 
     /// <summary>Foreground color label.</summary>
-    private Label _foregroundColorLabel;
+    private Label? _foregroundColorLabel;
 
     /// <summary>Background ColorPicker.</summary>
-    private ColorPicker _backgroundColorPicker;
+    private ColorPicker? _backgroundColorPicker;
 
     /// <summary>Foreground ColorPicker.</summary>
-    private ColorPicker _foregroundColorPicker;
+    private ColorPicker? _foregroundColorPicker;
 
     /// <summary>Background ColorPicker.</summary>
-    private ColorPicker16 _backgroundColorPicker16;
+    private ColorPicker16? _backgroundColorPicker16;
 
     /// <summary>Foreground ColorPicker.</summary>
-    private ColorPicker16 _foregroundColorPicker16;
+    private ColorPicker16? _foregroundColorPicker16;
 
     /// <summary>Set up the scenario.</summary>
     public override void Main ()
@@ -33,7 +34,8 @@ public class ColorPickers : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window window = new () { Title = GetQuitKeyAndName () };
+        using Window window = new ();
+        window.Title = GetQuitKeyAndName ();
 
         ///////////////////////////////////////
         // True Color Pickers
@@ -173,7 +175,7 @@ public class ColorPickers : Scenario
 
         return;
 
-        void OnCbShowTextFieldsOnValueChanging (object _, ValueChangingEventArgs<CheckState> e)
+        void OnCbShowTextFieldsOnValueChanging (object? _, ValueChangingEventArgs<CheckState> e)
         {
             _foregroundColorPicker.Style.ShowTextFields = e.NewValue == CheckState.Checked;
             _foregroundColorPicker.ApplyStyleChanges ();
@@ -221,30 +223,30 @@ public class ColorPickers : Scenario
     }
 
     /// <summary>Fired when background color is changed.</summary>
-    private void BackgroundColor_ColorChanged (object sender, ValueChangedEventArgs<Color?> e)
+    private void BackgroundColor_ColorChanged (object? sender, ValueChangedEventArgs<Color?> e)
     {
-        UpdateColorLabel (_backgroundColorLabel, _backgroundColorPicker.Visible ? _backgroundColorPicker.Value.Value : _backgroundColorPicker16.SelectedColor);
+        UpdateColorLabel (_backgroundColorLabel!, _backgroundColorPicker!.Visible ? _backgroundColorPicker.Value!.Value : _backgroundColorPicker16!.SelectedColor);
         UpdateDemoLabel ();
     }
 
     /// <summary>Fired when foreground color is changed.</summary>
-    private void ForegroundColor_ColorChanged (object sender, ValueChangedEventArgs<Color?> e)
+    private void ForegroundColor_ColorChanged (object? sender, ValueChangedEventArgs<Color?> e)
     {
-        UpdateColorLabel (_foregroundColorLabel, _foregroundColorPicker.Visible ? _foregroundColorPicker.Value.Value : _foregroundColorPicker16.SelectedColor);
+        UpdateColorLabel (_foregroundColorLabel!, _foregroundColorPicker!.Visible ? _foregroundColorPicker.Value!.Value : _foregroundColorPicker16!.SelectedColor);
         UpdateDemoLabel ();
     }
 
     /// <summary>Fired when background color is changed (16-color picker).</summary>
-    private void BackgroundColor_ColorChanged16 (object sender, ValueChangedEventArgs<ColorName16> e)
+    private void BackgroundColor_ColorChanged16 (object? sender, ValueChangedEventArgs<ColorName16> e)
     {
-        UpdateColorLabel (_backgroundColorLabel, _backgroundColorPicker.Visible ? _backgroundColorPicker.Value.Value : _backgroundColorPicker16.SelectedColor);
+        UpdateColorLabel (_backgroundColorLabel!, _backgroundColorPicker!.Visible ? _backgroundColorPicker.Value!.Value : _backgroundColorPicker16!.SelectedColor);
         UpdateDemoLabel ();
     }
 
     /// <summary>Fired when foreground color is changed (16-color picker).</summary>
-    private void ForegroundColor_ColorChanged16 (object sender, ValueChangedEventArgs<ColorName16> e)
+    private void ForegroundColor_ColorChanged16 (object? sender, ValueChangedEventArgs<ColorName16> e)
     {
-        UpdateColorLabel (_foregroundColorLabel, _foregroundColorPicker.Visible ? _foregroundColorPicker.Value.Value : _foregroundColorPicker16.SelectedColor);
+        UpdateColorLabel (_foregroundColorLabel!, _foregroundColorPicker!.Visible ? _foregroundColorPicker.Value!.Value : _foregroundColorPicker16!.SelectedColor);
         UpdateDemoLabel ();
     }
 
@@ -258,17 +260,17 @@ public class ColorPickers : Scenario
 
     /// <summary>Update Demo Label.</summary>
     private void UpdateDemoLabel () =>
-        _demoView.SetScheme (new Scheme
+        _demoView?.SetScheme (new Scheme
         {
-            Normal = new Attribute (_foregroundColorPicker.Visible
+            Normal = new Attribute (_foregroundColorPicker!.Visible
                                         ? _foregroundColorPicker.Value!.Value
-                                        : _foregroundColorPicker16.SelectedColor,
-                                    _backgroundColorPicker.Visible
+                                        : _foregroundColorPicker16!.SelectedColor,
+                                    _backgroundColorPicker!.Visible
                                         ? _backgroundColorPicker.Value!.Value
-                                        : _backgroundColorPicker16.SelectedColor)
+                                        : _backgroundColorPicker16!.SelectedColor)
         });
 
-    public override List<Key> GetDemoKeyStrokes (IApplication app)
+    public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
         List<Key> keys = [Key.B.WithAlt];
 
