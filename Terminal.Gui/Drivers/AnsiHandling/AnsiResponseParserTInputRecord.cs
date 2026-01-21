@@ -70,23 +70,24 @@ internal class AnsiResponseParser<TInputRecord> (ITimeProvider timeProvider) : A
     ///     This method has a unique name (ExpectResponseT) to avoid ambiguous overload resolution when using lambdas.
     /// </remarks>
     /// <param name="terminator">The terminating character(s) that indicate the response is complete.</param>
+    /// <param name="value">The value character(s) that prevents collision with requests with the same terminator.</param>
     /// <param name="response">Callback invoked with the character-metadata tuples when the response arrives.</param>
     /// <param name="abandoned">Optional callback invoked if the expectation is cancelled or times out.</param>
     /// <param name="persistent">
     ///     If <see langword="true"/>, the expectation remains active for multiple responses.
     ///     If <see langword="false"/>, it's removed after the first match.
     /// </param>
-    public void ExpectResponseT (string? terminator, Action<IEnumerable<Tuple<char, TInputRecord>>> response, Action? abandoned, bool persistent)
+    public void ExpectResponseT (string? terminator, string? value, Action<IEnumerable<Tuple<char, TInputRecord>>> response, Action? abandoned, bool persistent)
     {
         lock (_lockExpectedResponses)
         {
             if (persistent)
             {
-                _persistentExpectations.Add (new AnsiResponseExpectation (terminator, _ => response.Invoke (HeldToEnumerable ()), abandoned));
+                _persistentExpectations.Add (new AnsiResponseExpectation (terminator, value, _ => response.Invoke (HeldToEnumerable ()), abandoned));
             }
             else
             {
-                _expectedResponses.Add (new AnsiResponseExpectation (terminator, _ => response.Invoke (HeldToEnumerable ()), abandoned));
+                _expectedResponses.Add (new AnsiResponseExpectation (terminator, value, _ => response.Invoke (HeldToEnumerable ()), abandoned));
             }
         }
     }
