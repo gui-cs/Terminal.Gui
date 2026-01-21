@@ -100,7 +100,12 @@ public class ScenariosStressTests
             }
 
             app.Iteration += OnApplicationOnIteration;
-            app.Driver!.ClearedContents += OnClearedContents;
+            
+            if (app.Driver is { })
+            {
+                app.Driver.ClearedContents += OnClearedContents;
+            }
+            
             app.SessionBegun += OnApplicationSessionBegun;
 
             stopwatch = Stopwatch.StartNew ();
@@ -116,7 +121,11 @@ public class ScenariosStressTests
                 return;
             }
 
-            app.Driver!.ClearedContents -= OnClearedContents;
+            if (app.Driver is { })
+            {
+                app.Driver.ClearedContents -= OnClearedContents;
+            }
+            
             app.SessionBegun -= OnApplicationSessionBegun;
             app.Iteration -= OnApplicationOnIteration;
             stopwatch!.Stop ();
