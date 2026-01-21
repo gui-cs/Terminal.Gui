@@ -31,7 +31,7 @@ internal record AnsiResponseExpectation (string? Terminator, string? Value, Acti
 
         if (s.Length > 0 && s [0] == '\x1B')
         {
-            s = s.Substring (1);
+            s = s [1..];
         }
 
         // Extract the first numeric token after '[' (e.g. "[8;..." -> "8", "[6;..." -> "6")
