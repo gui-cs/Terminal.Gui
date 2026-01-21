@@ -636,9 +636,291 @@ Test the complete MenuBar scenario with:
 - Issue #4473: Menu etc. with Selectors are broken - Formalize/Fix Command propagation
 - Issue #4050: PropagatedCommands design
 
+---
+
+## Phased Implementation Plan
+
+> **Goal**: Incremental, compilable changes at each stage with skipped tests re-enabled as functionality completes.
+
+### Phase 1: Foundation - Add PropagatedCommands Property
+
+**Objective**: Add core infrastructure without breaking changes.
+
+**Changes**:
+1. Add `PropagatedCommands` property to `View.Command.cs`:
+   ```csharp
+   public IReadOnlyList<Command> PropagatedCommands { get; set; } = [Command.Accept];
+   ```
+
+2. Add `PropagateCommand` helper method to `View.Command.cs`:
+   - Implement full logic from [Proposed Solution #4](#4-add-propagatecommand-helper-method)
+   - Include IsDefault button handling for backward compatibility
+
+3. Update `RaiseAccepting` to use `PropagateCommand` helper:
+   - Replace direct propagation logic with helper call
+   - Should maintain 100% backward compatibility
+
+**Status**: ✅ Compiles | ✅ All existing tests pass
+
+**Test Impact**: None - backward compatible
+
+**Verification**:
+```bash
+dotnet build --no-restore
+dotnet test Tests/UnitTestsParallelizable --no-build
+dotnet test Tests/UnitTests --no-build
+```
+
+---
+
+### Phase 2: WeakReference Infrastructure (BREAKING)
+
+**Objective**: Change CommandContext to use WeakReference<View>.
+
+**Changes**:
+1. Update `CommandContext` struct in `Input/CommandContext.cs`:
+   ```csharp
+   public record struct CommandContext : ICommandContext
+   {
+       public Command Command { get; set; }
+       public WeakReference<View>? Source { get; set; }  // Changed from View?
+       public IInputBinding? Binding { get; set; }
+   }
+   ```
+
+2. Update `ICommandContext` interface:
+   ```csharp
+   public interface ICommandContext
+   {
+       Command Command { get; }
+       WeakReference<View>? Source { get; set; }  // Changed from View?
+       IInputBinding Binding { get; }
+   }
+   ```
+
+3. Update `InvokeCommand` methods in `View.Command.cs`:
+   ```csharp
+   return implementation! (new CommandContext {
+       Command = command,
+       Source = new WeakReference<View> (this),  // Wrap in WeakReference
+       Binding = binding
+   });
+   ```
+
+**Status**: ✅ Compiles | ⚠️ Many tests will fail
+
+**Test Impact**: **BREAKING** - All tests that access `Context.Source` directly will fail.
+
+**Test Strategy**: Skip broken tests temporarily:
+```csharp
+[Fact (Skip = "Phase 2: Needs WeakReference update - re-enable in Phase 4")]
+public void SomeTest_ThatAccessesContextSource ()
+{
+    // Test accesses args.Context.Source directly
+    // Will be updated in Phase 4 to use TryGetTarget pattern
+}
+```
+
+**Expected Skipped Tests**:
+- Tests in `Tests/UnitTests/Input/` that verify CommandContext.Source
+- Tests in `Tests/UnitTests/ViewBase/` that check command propagation source
+- Tests in `Tests/UnitTests/Views/Menu/` that inspect menu activation sources
+- Any scenario tests that assert on Context.Source
+
+**Verification**:
+```bash
+dotnet build --no-restore  # Must compile
+dotnet test Tests/UnitTestsParallelizable --no-build  # Some tests skipped
+dotnet test Tests/UnitTests --no-build  # Some tests skipped
+```
+
+---
+
+### Phase 3: Enable Command.Activate Propagation
+
+**Objective**: Wire up Activate propagation for MenuBar/Menu hierarchy.
+
+**Changes**:
+1. Update `RaiseActivating` in `View.Command.cs`:
+   ```csharp
+   protected virtual bool? RaiseActivating (ICommandContext? ctx)
+   {
+       CommandEventArgs args = new () { Context = ctx };
+
+       if (OnActivating (args) || args.Handled)
+       {
+           return true;
+       }
+
+       Activating?.Invoke (this, args);
+
+       // NEW: Enable propagation via helper
+       return PropagateCommand (Command.Activate, ctx, args.Handled ?? false);
+   }
+   ```
+
+2. Update `MenuBar` constructor to opt-in:
+   ```csharp
+   public MenuBar (IEnumerable<MenuBarItem> menuBarItems) : base (menuBarItems)
+   {
+       // ... existing initialization ...
+
+       PropagatedCommands = [Command.Accept, Command.Activate];
+   }
+   ```
+
+3. Add `OnActivating` override to `MenuBar.cs`:
+   - Implement logic from [Proposed Solution #8](#8-handle-propagated-activations-in-menubar)
+   - Uses `TryGetTarget` to safely access source view
+
+4. Update `Menu` constructor:
+   ```csharp
+   PropagatedCommands = [Command.Accept, Command.Activate];
+   ```
+
+5. Update `PopoverMenu` constructor:
+   ```csharp
+   PropagatedCommands = [Command.Accept, Command.Activate];
+   ```
+
+**Status**: ✅ Compiles | ⚠️ Tests still skipped from Phase 2
+
+**Test Impact**: Same tests skipped as Phase 2
+
+**Verification**:
+```bash
+dotnet build --no-restore  # Must compile
+# Tests remain skipped until Phase 4
+```
+
+---
+
+### Phase 4: Update Tests and Remove Legacy Code
+
+**Objective**: Re-enable all tests and remove workarounds.
+
+**Changes**:
+1. **Update skipped tests** to use WeakReference pattern:
+   ```csharp
+   // OLD (Phase 2 skip)
+   [Fact (Skip = "Phase 2: Needs WeakReference update")]
+   public void CommandPropagation_PreservesSource ()
+   {
+       View? source = args.Context?.Source;  // Fails - wrong type
+       Assert.Equal (subView, source);
+   }
+
+   // NEW (Phase 4 - re-enabled)
+   [Fact]  // Remove Skip attribute
+   public void CommandPropagation_PreservesSource ()
+   {
+       View? source = null;
+       if (args.Context?.Source?.TryGetTarget (out View? view))
+       {
+           source = view;
+       }
+       Assert.Equal (subView, source);
+   }
+   ```
+
+2. **Add new PropagatedCommands tests** from [Testing Requirements](#testing-requirements):
+   - `PropagatedCommands_DefaultIsAcceptOnly`
+   - `CommandAccept_PropagatesByDefault`
+   - `CommandActivate_DoesNotPropagateByDefault`
+   - `CommandActivate_PropagatesWhenOptedIn`
+   - `PropagatedCommands_CanDisableAllPropagation`
+   - `Propagation_UsesWeakReferenceForSource`
+   - `MenuBar_ReceivesActivateFromMenuItem`
+   - `MenuBar_ReceivesActivateFromCheckBoxInFlagSelector` **(Critical)**
+   - `Propagation_StopsWhenIntermediateHandlerSetsHandled`
+   - `Propagation_PreservesSourceAndBinding`
+
+3. **Remove legacy workarounds**:
+   - Delete `SelectedMenuItemChanged` event from `Menu.cs`
+   - Delete `RaiseSelectedMenuItemChanged` method from `Menu.cs`
+   - Delete `MenuOnSelectedMenuItemChanged` handler from `PopoverMenu.cs`
+   - Remove event subscription in `PopoverMenu.Root` setter
+   - Remove `OnSelectedMenuItemChanged` override from `MenuBar.cs`
+
+4. **Verify CommandView forwarding**:
+   - Check `Shortcut.CommandViewOnActivating` preserves context
+   - Check `SelectorBase.OnCheckboxOnActivating` preserves context
+   - Update XML docs if needed
+
+**Status**: ✅ Compiles | ✅ All tests pass
+
+**Test Impact**: All tests re-enabled and passing
+
+**Verification**:
+```bash
+dotnet build --no-restore
+dotnet test Tests/UnitTestsParallelizable --no-build  # All pass
+dotnet test Tests/UnitTests --no-build  # All pass
+# Verify no tests are skipped
+dotnet test --list-tests | grep -i skip  # Should be empty
+```
+
+---
+
+### Phase 5: Documentation and Polish
+
+**Objective**: Update docs and add UICatalog demos.
+
+**Changes**:
+1. **Update documentation**:
+   - `docfx/docs/command.md` - Document PropagatedCommands
+   - `docfx/docs/events.md` - Update propagation examples
+   - `docfx/docs/View.md` - Update SuperView/SubView command flow
+
+2. **Add UICatalog scenario**:
+   - Create `Examples/UICatalog/Scenarios/CommandPropagation.cs`
+   - Demonstrate:
+     - Default Accept propagation
+     - Custom PropagatedCommands configuration
+     - MenuBar activation propagation
+     - WeakReference source inspection
+
+3. **Verify XML documentation**:
+   - `PropagatedCommands` property has full XML docs
+   - `PropagateCommand` method documented
+   - Cross-references to related concepts
+
+**Status**: ✅ Compiles | ✅ All tests pass | ✅ Documentation complete
+
+**Verification**:
+```bash
+# Build with documentation warnings
+dotnet build -p:TreatWarningsAsErrors=true
+# Run UICatalog scenario manually
+cd Examples/UICatalog
+dotnet run
+# Select "Command Propagation" scenario and test interactively
+```
+
+---
+
+### Phase Summary
+
+| Phase | Description | Compiles | Tests Pass | Breaking |
+|-------|-------------|----------|------------|----------|
+| **1** | Add PropagatedCommands property | ✅ | ✅ | No |
+| **2** | WeakReference infrastructure | ✅ | ⚠️ Skipped | **YES** |
+| **3** | Enable Activate propagation | ✅ | ⚠️ Skipped | No |
+| **4** | Update tests, remove legacy | ✅ | ✅ | No |
+| **5** | Documentation and demos | ✅ | ✅ | No |
+
+**Key Strategy**:
+- Phase 2 is the ONLY breaking phase
+- Tests are temporarily skipped during Phases 2-3
+- All tests re-enabled and passing by end of Phase 4
+- Each phase commits independently with working code
+
+---
+
 ### Revision History
 
 | Date | Author | Changes |
 |------|--------|---------|
 | 2026-01-09 | GitHub Copilot | Initial analysis |
 | 2026-01-21 | Claude Opus 4.5 | WeakReference design revision; condensed from 1576 to 567 lines; renamed to command-propagation-plan.md; made WeakReference core (not optional); parent/child → superView/subView |
+| 2026-01-21 | Claude Sonnet 4.5 | Added phased implementation plan with test skipping strategy |
