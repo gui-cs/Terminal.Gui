@@ -423,7 +423,16 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         {
             if (persistent)
             {
-                AnsiResponseExpectation [] removed = _persistentExpectations.Where (r => r.Matches (terminator)).ToArray ();
+                AnsiResponseExpectation [] removed;
+
+                if (string.IsNullOrEmpty (value))
+                {
+                    removed = _persistentExpectations.Where (r => r.Terminator == terminator).ToArray ();
+                }
+                else
+                {
+                    removed = _persistentExpectations.Where (r => r.Terminator == terminator && r.Value == value).ToArray ();
+                }
 
                 foreach (AnsiResponseExpectation toRemove in removed)
                 {

@@ -38,7 +38,7 @@ public class AnsiRequestSchedulerRaceTests
         bool sentSecond = scheduler.SendOrSchedule (null, requestSixelResolution);
 
         Assert.True (sentFirst, "First request must be sent immediately");
-            Assert.True (sentSecond, "Second request with different value should be sent immediately");
+        Assert.True (sentSecond, "Second request with different value should be sent immediately");
 
         // Terminal replies for the SIXEL resolution.
         parser.ProcessInput ("\u001B[6;20;10t");
