@@ -19,8 +19,18 @@ public class AnsiRequestScheduler
     internal Func<DateTime> Now { get; set; }
 
     private readonly HashSet<Tuple<AnsiEscapeSequenceRequest, DateTime>> _queuedRequests = new ();
+    private readonly object _lockQueuedRequests = new ();
 
-    internal IReadOnlyCollection<AnsiEscapeSequenceRequest> QueuedRequests => _queuedRequests.Select (r => r.Item1).ToList ();
+    internal IReadOnlyCollection<AnsiEscapeSequenceRequest> QueuedRequests
+    {
+        get
+        {
+            lock (_lockQueuedRequests)
+            {
+                return _queuedRequests.Select (r => r.Item1).ToList ();
+            }
+        }
+    }
 
     /// <summary>
     ///     <para>
@@ -103,9 +113,12 @@ public class AnsiRequestScheduler
 
         if (addToQueue)
         {
-            _queuedRequests.Add (Tuple.Create (request, Now ()));
+            lock (_lockQueuedRequests)
+            {
+                _queuedRequests.Add (Tuple.Create (request, Now ()));
 
-            //Logging.Trace ($"AnsiRequestScheduler: Queued request '{request.Request}' (QueueSize={_queuedRequests.Count})");
+                //Logging.Trace ($"AnsiRequestScheduler: Queued request '{request.Request}' (QueueSize={_queuedRequests.Count})");
+            }
         }
 
         return false;
@@ -167,14 +180,22 @@ public class AnsiRequestScheduler
         }
 
         // Get oldest request
-        Tuple<AnsiEscapeSequenceRequest, DateTime>? opportunity = _queuedRequests.MinBy (r => r.Item2);
+        Tuple<AnsiEscapeSequenceRequest, DateTime>? opportunity;
+
+        lock (_lockQueuedRequests)
+        {
+            opportunity = _queuedRequests.MinBy (r => r.Item2);
+        }
 
         if (opportunity != null)
         {
             // Give it another go
             if (SendOrSchedule (driver, opportunity.Item1, false))
             {
-                _queuedRequests.Remove (opportunity);
+                lock (_lockQueuedRequests)
+                {
+                    _queuedRequests.Remove (opportunity);
+                }
 
                 return true;
             }
