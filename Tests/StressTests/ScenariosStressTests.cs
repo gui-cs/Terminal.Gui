@@ -100,12 +100,14 @@ public class ScenariosStressTests
             }
 
             app.Iteration += OnApplicationOnIteration;
-            app.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
+            app.Driver!.ClearedContents += OnClearedContents;
             app.SessionBegun += OnApplicationSessionBegun;
 
             stopwatch = Stopwatch.StartNew ();
             _output.WriteLine ($"Application instance initialized");
         }
+
+        void OnClearedContents (object? sender, EventArgs args) { clearedContentCount++; }
 
         void OnApplicationInstanceDisposed (object? s, EventArgs<IApplication> a)
         {
@@ -114,7 +116,7 @@ public class ScenariosStressTests
                 return;
             }
 
-            app!.Driver!.ClearedContents -= (sender, args) => clearedContentCount++;
+            app!.Driver!.ClearedContents -= OnClearedContents;
             app.SessionBegun -= OnApplicationSessionBegun;
             app.Iteration -= OnApplicationOnIteration;
             stopwatch!.Stop ();
