@@ -9,6 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Mouse and Keyboard")]
 [ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("DateTime")]
 public class TextInputControls : Scenario
 {
     private Label? _labelMirroringTimeField;
@@ -309,11 +310,11 @@ public class TextInputControls : Scenario
         {
             X = Pos.Left (dateField),
             Y = Pos.Bottom (dateField) + 1,
-            Text = "_NetMaskedTextProvider [ 999 000 LLL >LLL |AAA aaa ]:"
+            Text = "_NetMaskedTextProvider [ +99 (000) 000-0000 ]:"
         };
         win.Add (netProviderLabel);
 
-        NetMaskedTextProvider netProvider = new ("999 000 LLL >LLL |AAA aaa");
+        NetMaskedTextProvider netProvider = new ("+99 (000) 000-0000");
 
         TextValidateField netProviderField = new ()
         {
