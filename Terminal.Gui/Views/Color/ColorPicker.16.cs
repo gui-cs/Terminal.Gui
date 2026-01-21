@@ -4,7 +4,7 @@ namespace Terminal.Gui.Views;
 public class ColorPicker16 : View
 {
     /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
-    public ColorPicker16 () { SetInitialProperties (); }
+    public ColorPicker16 () => SetInitialProperties ();
 
     /// <summary>Columns of color boxes</summary>
     private const int COLS = 8;
@@ -27,7 +27,7 @@ public class ColorPicker16 : View
                 _boxHeight = value;
                 Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-                SetContentSize (new (_boxWidth * COLS, _boxHeight * ROWS));
+                SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
                 SetNeedsLayout ();
             }
         }
@@ -44,7 +44,7 @@ public class ColorPicker16 : View
                 _boxWidth = value;
                 Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
                 Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-                SetContentSize (new (_boxWidth * COLS, _boxHeight * ROWS));
+                SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
                 SetNeedsLayout ();
             }
         }
@@ -76,8 +76,10 @@ public class ColorPicker16 : View
         if (Caret.Y < ROWS - 1)
         {
             SelectedColor += COLS;
+
             return true;
         }
+
         return false;
     }
 
@@ -93,8 +95,10 @@ public class ColorPicker16 : View
         if (Caret.X > 0)
         {
             SelectedColor--;
+
             return true;
         }
+
         return false;
     }
 
@@ -110,8 +114,10 @@ public class ColorPicker16 : View
         if (Caret.X < COLS - 1)
         {
             SelectedColor++;
+
             return true;
         }
+
         return false;
     }
 
@@ -127,8 +133,10 @@ public class ColorPicker16 : View
         if (Caret.Y > 0)
         {
             SelectedColor -= COLS;
+
             return true;
         }
+
         return false;
     }
 
@@ -151,11 +159,11 @@ public class ColorPicker16 : View
 
                 if (Enabled)
                 {
-                    SetAttribute (new ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
+                    SetAttribute (new Attribute ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
                 }
                 else
                 {
-                    SetAttribute (new ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimColor (), TextStyle.Faint));
+                    SetAttribute (new Attribute ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimColor (), TextStyle.Faint));
                 }
 
                 bool selected = x == Caret.X && y == Caret.Y;
@@ -180,10 +188,7 @@ public class ColorPicker16 : View
 
             _selectColorIndex = (int)value;
 
-            ColorChanged?.Invoke (
-                                  this,
-                                  new (value)
-                                 );
+            ColorChanged?.Invoke (this, new ResultEventArgs<Color> (value));
             SetNeedsDraw ();
         }
     }
@@ -191,26 +196,29 @@ public class ColorPicker16 : View
     /// <summary>Add the commands.</summary>
     private void AddCommands ()
     {
-        AddCommand (Command.Left, (ctx) => MoveLeft (ctx));
-        AddCommand (Command.Right, (ctx) => MoveRight (ctx));
-        AddCommand (Command.Up, (ctx) => MoveUp (ctx));
-        AddCommand (Command.Down, (ctx) => MoveDown (ctx));
+        AddCommand (Command.Left, ctx => MoveLeft (ctx));
+        AddCommand (Command.Right, ctx => MoveRight (ctx));
+        AddCommand (Command.Up, ctx => MoveUp (ctx));
+        AddCommand (Command.Down, ctx => MoveDown (ctx));
 
-        AddCommand (Command.Activate, (ctx) =>
-                                    {
-                                        if (ctx is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
-                                        {
-                                            if (RaiseActivating (ctx) == true)
-                                            {
-                                                return true;
-                                            }
+        AddCommand (Command.Activate,
+                    ctx =>
+                    {
+                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse })
+                        {
+                            if (RaiseActivating (ctx) == true)
+                            {
+                                return true;
+                            }
 
-                                            Caret = new (mouseCommandContext.Binding.MouseEventArgs.Position!.Value.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position!.Value.Y / _boxHeight);
-                                            return SetFocus ();
-                                        }
+                            Caret = new Point (mouse.Position!.Value.X / _boxWidth,
+                                               mouse.Position!.Value.Y / _boxHeight);
 
-                                        return false;
-                                    });
+                            return SetFocus ();
+                        }
+
+                        return false;
+                    });
     }
 
     /// <summary>Add the KeyBindings.</summary>
@@ -243,7 +251,7 @@ public class ColorPicker16 : View
 
         if (selected)
         {
-            DrawFocusRect (new (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
+            DrawFocusRect (new Rectangle (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
         }
     }
 
@@ -263,21 +271,11 @@ public class ColorPicker16 : View
         {
             lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 
-            lc.AddLine (
-                        rect.Location with { Y = rect.Location.Y + rect.Height - 1 },
-                        rect.Width,
-                        Orientation.Horizontal,
-                        LineStyle.Dotted
-                       );
+            lc.AddLine (rect.Location with { Y = rect.Location.Y + rect.Height - 1 }, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 
             lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
 
-            lc.AddLine (
-                        rect.Location with { X = rect.Location.X + rect.Width - 1 },
-                        rect.Height,
-                        Orientation.Vertical,
-                        LineStyle.Dotted
-                       );
+            lc.AddLine (rect.Location with { X = rect.Location.X + rect.Width - 1 }, rect.Height, Orientation.Vertical, LineStyle.Dotted);
         }
 
         foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
@@ -294,6 +292,6 @@ public class ColorPicker16 : View
 
         Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
         Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-        SetContentSize (new (_boxWidth * COLS, _boxHeight * ROWS));
+        SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
     }
 }
