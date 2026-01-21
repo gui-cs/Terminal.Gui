@@ -144,7 +144,7 @@ public partial class TextField
                 return;
             }
 
-            string oldText = StringExtensions.ToString (_text);
+            var oldText = StringExtensions.ToString (_text);
 
             if (oldText == value)
             {
